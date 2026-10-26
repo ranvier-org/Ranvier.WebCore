@@ -24,3 +24,7 @@ set(ENABLE_WEBGPU OFF CACHE BOOL "")
 set(ENABLE_AV1 OFF CACHE BOOL "")
 set(ENABLE_WEB_RTC OFF CACHE BOOL "")
 set(ENABLE_MEDIA_STREAM OFF CACHE BOOL "")
+
+# The patch series (patches/). 0010: the media features PlatformEnableCocoa.h turns on by itself, off with
+# ENABLE_VIDEO; without it PlatformEnable.h rejects COCOA_WEBM_PLAYER, which requires MEDIA_SOURCE.
+set(USE_COCOA_WITHOUT_MEDIA ON CACHE BOOL "")
