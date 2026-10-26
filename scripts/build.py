@@ -194,7 +194,7 @@ def icu_data(env):
     if sha256(data) != icu['data_sha256']:
         sys.exit(f'{data}: sha256 differs from pins.json')
     run([sys.executable, '-I', root / 'scripts/icu_data.py', '--data', data, '--icu-tools', triplet / 'tools/icu',
-         '--icu-bin', triplet / 'bin', '--linker', llvm / 'lld-link.exe', '--out', build / 'bin'], env=env)
+         '--icu-bin', triplet / 'bin', '--linker', llvm / 'lld-link.exe', '--out', build / 'bin', '--machine', arch.upper()], env=env)
 
 
 def build_step(env):
