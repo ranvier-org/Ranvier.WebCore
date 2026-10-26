@@ -1,0 +1,532 @@
+diff --git a/Source/WebCore/PlatformWin.cmake b/Source/WebCore/PlatformWin.cmake
+index a0faa42..39c0180 100644
+--- a/Source/WebCore/PlatformWin.cmake
++++ b/Source/WebCore/PlatformWin.cmake
+@@ -266,3 +266,7 @@ endif ()
+ if (USE_BROWSER_API_STUB)
+     include(Modules/stub/BrowserAPIStub.cmake)
+ endif ()
++
++if (USE_INSPECTOR_STUB)
++    include(inspector/stub/InspectorStub.cmake)
++endif ()
+diff --git a/Source/WebCore/inspector/stub/InspectorStub.cmake b/Source/WebCore/inspector/stub/InspectorStub.cmake
+new file mode 100644
+index 0000000..376a6ae
+--- /dev/null
++++ b/Source/WebCore/inspector/stub/InspectorStub.cmake
+@@ -0,0 +1,39 @@
++# WebCore without the inspector (USE_INSPECTOR_STUB). The inspector's sources and IDL files are left out,
++# apart from the instrumenting agents, the identifier registry and the public instrumentation entry points,
++# which the remaining WebCore code calls. InspectorStub.cpp defines the page, frame and worker inspector
++# controllers, and InspectorGeneratedStub.cpp, generated from the inspector headers, defines the
++# instrumentation hooks and the canvas call tracer's argument processors.
++
++set(WebCore_INSPECTOR_STUB_IDL_EXCLUDED "^inspector/(CommandLineAPIHost|InspectorAudit[A-Za-z]*|InspectorFrontendHost)\.idl$")
++
++list(APPEND WebCore_UNIFIED_SOURCE_EXCLUDES
++    "^inspector/"
++)
++
++set(WebCore_INSPECTOR_STUB_EXCLUDED_IDL_FILES ${WebCore_IDL_FILES})
++list(FILTER WebCore_INSPECTOR_STUB_EXCLUDED_IDL_FILES INCLUDE REGEX "${WebCore_INSPECTOR_STUB_IDL_EXCLUDED}")
++foreach (_idl IN LISTS WebCore_INSPECTOR_STUB_EXCLUDED_IDL_FILES)
++    get_filename_component(_name "${_idl}" NAME_WE)
++    list(APPEND WebCore_UNIFIED_SOURCE_EXCLUDES "^JS${_name}\.cpp")
++endforeach ()
++list(FILTER WebCore_IDL_FILES EXCLUDE REGEX "${WebCore_INSPECTOR_STUB_IDL_EXCLUDED}")
++
++add_custom_command(
++    OUTPUT ${WebCore_DERIVED_SOURCES_DIR}/InspectorGeneratedStub.cpp
++    DEPENDS
++        ${WEBCORE_DIR}/inspector/InspectorCanvasArguments.h
++        ${WEBCORE_DIR}/inspector/InspectorInstrumentation.h
++        ${WEBCORE_DIR}/inspector/stub/generate-inspector-stub.py
++    COMMAND ${PYTHON_EXECUTABLE} ${WEBCORE_DIR}/inspector/stub/generate-inspector-stub.py
++        ${WEBCORE_DIR}/inspector/InspectorInstrumentation.h ${WEBCORE_DIR}/inspector/InspectorCanvasArguments.h
++        ${WebCore_DERIVED_SOURCES_DIR}/InspectorGeneratedStub.cpp
++    VERBATIM)
++
++list(APPEND WebCore_SOURCES
++    inspector/InspectorIdentifierRegistry.cpp
++    inspector/InspectorInstrumentationPublic.cpp
++    inspector/InspectorInstrumentationWebKit.cpp
++    inspector/InstrumentingAgents.cpp
++    inspector/stub/InspectorStub.cpp
++    ${WebCore_DERIVED_SOURCES_DIR}/InspectorGeneratedStub.cpp
++)
+diff --git a/Source/WebCore/inspector/stub/InspectorStub.cpp b/Source/WebCore/inspector/stub/InspectorStub.cpp
+new file mode 100644
+index 0000000..99ab73c
+--- /dev/null
++++ b/Source/WebCore/inspector/stub/InspectorStub.cpp
+@@ -0,0 +1,373 @@
++// The page, frame and worker inspector controllers and the other inspector members the remaining WebCore
++// code references, for a build without the inspector (USE_INSPECTOR_STUB).
++//
++// No frontend ever connects: nothing in the build creates an inspector frontend or a remote inspection
++// target. Each controller keeps the instrumenting agents the instrumentation hooks read and no agents, so
++// the hooks find no agent to call. Queries answer as they do with no frontend connected, the page and
++// frame lifecycle members release what the controllers hold, and every member that serves a frontend or
++// a canvas recording is a release assertion.
++
++#include "config.h"
++
++#include "CommonVM.h"
++#include "DocumentPage.h"
++#include "FrameInspectorController.h"
++#include "InspectorBackendClient.h"
++#include "InspectorCanvasCallTracer.h"
++#include "InspectorDOMAgent.h"
++#include "InspectorIdentifierRegistry.h"
++#include "InspectorInstrumentation.h"
++#include "InspectorOverlay.h"
++#include "InspectorPageAgent.h"
++#include "InstrumentingAgents.h"
++#include "LocalFrame.h"
++#include "LocalFrameView.h"
++#include "NodeList.h"
++#include "Page.h"
++#include "PageDebugger.h"
++#include "PageInspectorController.h"
++#include "WebInjectedScriptHost.h"
++#include "WebInjectedScriptManager.h"
++#include "WorkerDebugger.h"
++#include "WorkerInspectorController.h"
++#include "WorkerOrWorkletGlobalScope.h"
++#include <JavaScriptCore/InspectorAgent.h>
++#include <JavaScriptCore/InspectorBackendDispatcher.h>
++#include <JavaScriptCore/InspectorFrontendChannel.h>
++#include <JavaScriptCore/InspectorFrontendRouter.h>
++#include <wtf/Stopwatch.h>
++#include <wtf/TZoneMallocInlines.h>
++
++namespace WebCore {
++
++using namespace Inspector;
++
++WTF_MAKE_TZONE_ALLOCATED_IMPL(PageInspectorController);
++WTF_MAKE_TZONE_ALLOCATED_IMPL(FrameInspectorController);
++WTF_MAKE_TZONE_ALLOCATED_IMPL(WorkerInspectorController);
++WTF_MAKE_TZONE_ALLOCATED_IMPL(InspectorOverlay);
++WTF_MAKE_TZONE_ALLOCATED_IMPL(WebInjectedScriptManager);
++
++// PageInspectorController
++
++PageInspectorController::PageInspectorController(Page& page, std::unique_ptr<InspectorBackendClient>&& inspectorBackendClient)
++    : m_page(page)
++    , m_instrumentingAgents(InstrumentingAgents::create(*this))
++    , m_injectedScriptManager(WebInjectedScriptManager::create(*this, WebInjectedScriptHost::create()))
++    , m_frontendRouter(FrontendRouter::create())
++    , m_backendDispatcher(BackendDispatcher::create(m_frontendRouter.copyRef()))
++    , m_overlay(makeUniqueRefWithoutRefCountedCheck<InspectorOverlay>(*this, inspectorBackendClient.get()))
++    , m_executionStopwatch(Stopwatch::create())
++    , m_inspectorBackendClient(WTF::move(inspectorBackendClient))
++    , m_identifierRegistry(LegacyIdentifierRegistry::create())
++{
++}
++
++PageInspectorController::~PageInspectorController()
++{
++    m_instrumentingAgents->reset();
++}
++
++void PageInspectorController::ref() const
++{
++    m_page->ref();
++}
++
++void PageInspectorController::deref() const
++{
++    m_page->deref();
++}
++
++void PageInspectorController::inspectedPageDestroyed()
++{
++    if (m_inspectorBackendClient)
++        m_inspectorBackendClient->inspectedPageDestroyed();
++    m_inspectorBackendClient = nullptr;
++}
++
++bool PageInspectorController::enabled() const
++{
++    return false;
++}
++
++unsigned PageInspectorController::inspectionLevel() const
++{
++    return 0;
++}
++
++bool PageInspectorController::hasRemoteFrontend() const
++{
++    return false;
++}
++
++void PageInspectorController::didClearWindowObjectInWorld(LocalFrame&, DOMWrapperWorld&)
++{
++}
++
++void PageInspectorController::willComposite(LocalFrame&)
++{
++}
++
++void PageInspectorController::didComposite(LocalFrame&)
++{
++}
++
++void PageInspectorController::inspect(Node*) { RELEASE_ASSERT_NOT_REACHED(); }
++
++bool PageInspectorController::developerExtrasEnabled() const
++{
++    return false;
++}
++
++bool PageInspectorController::canAccessInspectedScriptState(JSC::JSGlobalObject*) const { RELEASE_ASSERT_NOT_REACHED(); }
++InspectorFunctionCallHandler PageInspectorController::functionCallHandler() const { RELEASE_ASSERT_NOT_REACHED(); }
++InspectorEvaluateHandler PageInspectorController::evaluateHandler() const { RELEASE_ASSERT_NOT_REACHED(); }
++void PageInspectorController::frontendInitialized() { RELEASE_ASSERT_NOT_REACHED(); }
++
++Stopwatch& PageInspectorController::executionStopwatch() const
++{
++    return m_executionStopwatch;
++}
++
++JSC::Debugger* PageInspectorController::debugger()
++{
++    return nullptr;
++}
++
++JSC::VM& PageInspectorController::vm()
++{
++    return commonVM();
++}
++
++// FrameInspectorController
++
++FrameInspectorController::FrameInspectorController(LocalFrame& frame, PageInspectorController& parentPageController)
++    : m_frame(frame)
++    , m_instrumentingAgents(InstrumentingAgents::create(*this, parentPageController.instrumentingAgents()))
++    , m_injectedScriptManager(WebInjectedScriptManager::create(*this, WebInjectedScriptHost::create()))
++    , m_frontendRouter(FrontendRouter::create())
++    , m_backendDispatcher(BackendDispatcher::create(m_frontendRouter.copyRef(), &parentPageController.backendDispatcher()))
++    , m_executionStopwatch(Stopwatch::create())
++{
++}
++
++FrameInspectorController::~FrameInspectorController()
++{
++    m_instrumentingAgents->reset();
++}
++
++void FrameInspectorController::ref() const
++{
++    m_frame->ref();
++}
++
++void FrameInspectorController::deref() const
++{
++    m_frame->deref();
++}
++
++void FrameInspectorController::inspectedFrameDestroyed()
++{
++}
++
++bool FrameInspectorController::developerExtrasEnabled() const
++{
++    return false;
++}
++
++bool FrameInspectorController::canAccessInspectedScriptState(JSC::JSGlobalObject*) const { RELEASE_ASSERT_NOT_REACHED(); }
++InspectorFunctionCallHandler FrameInspectorController::functionCallHandler() const { RELEASE_ASSERT_NOT_REACHED(); }
++InspectorEvaluateHandler FrameInspectorController::evaluateHandler() const { RELEASE_ASSERT_NOT_REACHED(); }
++void FrameInspectorController::frontendInitialized() { RELEASE_ASSERT_NOT_REACHED(); }
++
++Stopwatch& FrameInspectorController::executionStopwatch() const
++{
++    return m_executionStopwatch;
++}
++
++JSC::Debugger* FrameInspectorController::debugger()
++{
++    return nullptr;
++}
++
++JSC::VM& FrameInspectorController::vm()
++{
++    return commonVM();
++}
++
++// WorkerInspectorController
++
++WorkerInspectorController::WorkerInspectorController(WorkerOrWorkletGlobalScope& globalScope)
++    : m_instrumentingAgents(InstrumentingAgents::create(*this))
++    , m_injectedScriptManager(WebInjectedScriptManager::create(*this, WebInjectedScriptHost::create()))
++    , m_frontendRouter(FrontendRouter::create())
++    , m_backendDispatcher(BackendDispatcher::create(m_frontendRouter.copyRef()))
++    , m_executionStopwatch(Stopwatch::create())
++    , m_globalScope(globalScope)
++{
++}
++
++WorkerInspectorController::~WorkerInspectorController()
++{
++    m_instrumentingAgents->reset();
++}
++
++void WorkerInspectorController::workerTerminating()
++{
++}
++
++void WorkerInspectorController::connectFrontend(bool, bool) { RELEASE_ASSERT_NOT_REACHED(); }
++void WorkerInspectorController::disconnectFrontend(DisconnectReason) { RELEASE_ASSERT_NOT_REACHED(); }
++void WorkerInspectorController::dispatchMessageFromFrontend(const String&) { RELEASE_ASSERT_NOT_REACHED(); }
++InspectorFunctionCallHandler WorkerInspectorController::functionCallHandler() const { RELEASE_ASSERT_NOT_REACHED(); }
++InspectorEvaluateHandler WorkerInspectorController::evaluateHandler() const { RELEASE_ASSERT_NOT_REACHED(); }
++void WorkerInspectorController::frontendInitialized() { RELEASE_ASSERT_NOT_REACHED(); }
++
++Stopwatch& WorkerInspectorController::executionStopwatch() const
++{
++    return m_executionStopwatch;
++}
++
++JSC::Debugger* WorkerInspectorController::debugger()
++{
++    return nullptr;
++}
++
++JSC::VM& WorkerInspectorController::vm()
++{
++    return m_globalScope->vm();
++}
++
++// InspectorOverlay: the page controller holds one, which never shows.
++
++InspectorOverlay::InspectorOverlay(PageInspectorController& controller, InspectorBackendClient* client)
++    : m_controller(controller)
++    , m_client(client)
++    , m_paintRectUpdateTimer(*this, &InspectorOverlay::updatePaintRectsTimerFired)
++{
++}
++
++InspectorOverlay::~InspectorOverlay() = default;
++
++void InspectorOverlay::ref() const
++{
++    m_controller->ref();
++}
++
++void InspectorOverlay::deref() const
++{
++    m_controller->deref();
++}
++
++void InspectorOverlay::updatePaintRectsTimerFired() { RELEASE_ASSERT_NOT_REACHED(); }
++
++// InspectorCanvasCallTracer: the generated canvas bindings record calls only while a recording is active.
++
++void InspectorCanvasCallTracer::recordAction(CanvasRenderingContext&, String&&, ProcessedArguments&&) { RELEASE_ASSERT_NOT_REACHED(); }
++void InspectorCanvasCallTracer::recordAction(const CanvasBase&, String&&, ProcessedArguments&&) { RELEASE_ASSERT_NOT_REACHED(); }
++RefPtr<InspectorCanvas> InspectorCanvasCallTracer::enabledInspectorCanvas(CanvasRenderingContext&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<JSON::Value> InspectorCanvas::valueIndexForData(DuplicateDataVariant) { RELEASE_ASSERT_NOT_REACHED(); }
++
++// console.screenshot() of a canvas logs no image.
++Protocol::ErrorStringOr<String> InspectorCanvas::getContentAsDataURL(CanvasRenderingContext&)
++{
++    return makeUnexpected("The inspector is unavailable"_s);
++}
++
++// WebInjectedScriptManager: each controller holds one, which never injects a script.
++
++Ref<WebInjectedScriptManager> WebInjectedScriptManager::create(InspectorEnvironment& environment, Ref<InjectedScriptHost>&& host)
++{
++    return adoptRef(*new WebInjectedScriptManager(environment, WTF::move(host)));
++}
++
++WebInjectedScriptManager::WebInjectedScriptManager(InspectorEnvironment& environment, Ref<InjectedScriptHost>&& host)
++    : InjectedScriptManager(environment, WTF::move(host))
++{
++}
++
++WebInjectedScriptManager::~WebInjectedScriptManager() = default;
++
++void WebInjectedScriptManager::connect() { RELEASE_ASSERT_NOT_REACHED(); }
++void WebInjectedScriptManager::disconnect() { RELEASE_ASSERT_NOT_REACHED(); }
++void WebInjectedScriptManager::discardInjectedScripts() { RELEASE_ASSERT_NOT_REACHED(); }
++void WebInjectedScriptManager::didCreateInjectedScript(const InjectedScript&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++JSC::JSValue WebInjectedScriptHost::subtype(JSC::JSGlobalObject*, JSC::JSValue) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue WebInjectedScriptHost::getInternalProperties(JSC::VM&, JSC::JSGlobalObject*, JSC::JSValue) { RELEASE_ASSERT_NOT_REACHED(); }
++bool WebInjectedScriptHost::isHTMLAllCollection(JSC::VM&, JSC::JSValue) { RELEASE_ASSERT_NOT_REACHED(); }
++
++// InspectorInstrumentation members other than the *Impl hooks, which the generated
++// InspectorGeneratedStub.cpp defines.
++
++void InspectorInstrumentation::firstFrontendCreated() { RELEASE_ASSERT_NOT_REACHED(); }
++void InspectorInstrumentation::lastFrontendDeleted() { RELEASE_ASSERT_NOT_REACHED(); }
++
++#if ENABLE(WEBGL)
++void InspectorInstrumentation::willDestroyWebGLProgram(WebGLProgram&)
++{
++}
++#endif
++
++bool InspectorInstrumentation::consoleAgentEnabled(ScriptExecutionContext*)
++{
++    return false;
++}
++
++bool InspectorInstrumentation::timelineAgentTracking(ScriptExecutionContext*)
++{
++    return false;
++}
++
++void InspectorInstrumentation::registerInstrumentingAgents(InstrumentingAgents&) { RELEASE_ASSERT_NOT_REACHED(); }
++void InspectorInstrumentation::unregisterInstrumentingAgents(InstrumentingAgents&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++InstrumentingAgents& InspectorInstrumentation::instrumentingAgents(const RenderObject& renderer)
++{
++    return instrumentingAgents(renderer.frame());
++}
++
++InstrumentingAgents& InspectorInstrumentation::instrumentingAgents(WorkerOrWorkletGlobalScope& globalScope)
++{
++    return globalScope.inspectorController().m_instrumentingAgents;
++}
++
++InstrumentingAgents& InspectorInstrumentation::instrumentingAgents(ServiceWorkerGlobalScope&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++InstrumentingAgents& InspectorInstrumentation::instrumentingAgents(const LocalFrameView& frameView)
++{
++    return instrumentingAgents(frameView.frame());
++}
++
++InstrumentingAgents& InspectorInstrumentation::instrumentingAgents(const LocalFrame& frame)
++{
++    return frame.inspectorController().m_instrumentingAgents.get();
++}
++
++InstrumentingAgents* InspectorInstrumentation::instrumentingAgents(Document& document)
++{
++    Page* page = document.page();
++    if (!page && document.templateDocumentHost())
++        page = document.templateDocumentHost()->page();
++    return instrumentingAgents(page);
++}
++
++InstrumentingAgents& InspectorInstrumentation::instrumentingAgents(Page& page)
++{
++    return page.inspectorController().m_instrumentingAgents.get();
++}
++
++InstrumentingAgents* InspectorInstrumentation::instrumentingAgents(ScriptExecutionContext& context)
++{
++    if (WeakPtr document = dynamicDowncast<Document>(context)) {
++        if (auto* frame = document->frame())
++            return &instrumentingAgents(*frame);
++        return instrumentingAgents(document->page());
++    }
++    if (auto* workerOrWorkletGlobal = dynamicDowncast<WorkerOrWorkletGlobalScope>(context))
++        return &instrumentingAgents(*workerOrWorkletGlobal);
++    return nullptr;
++}
++
++} // namespace WebCore
+diff --git a/Source/WebCore/inspector/stub/generate-inspector-stub.py b/Source/WebCore/inspector/stub/generate-inspector-stub.py
+new file mode 100644
+index 0000000..533d26a
+--- /dev/null
++++ b/Source/WebCore/inspector/stub/generate-inspector-stub.py
+@@ -0,0 +1,77 @@
++#!/usr/bin/env python3
++#
++# Writes, for a build without the inspector (USE_INSPECTOR_STUB), definitions of the inspector members
++# that the remaining WebCore code calls through templates and inline functions, read from their
++# declarations:
++#
++# - InspectorInstrumentation's private *Impl hooks, from InspectorInstrumentation.h. Each does nothing
++#   and returns a value-initialized result, which is what the hooks do while no frontend is connected.
++# - The canvas call tracer's argument processors, from InspectorCanvasArguments.h. Each is a release
++#   assertion: the generated bindings process arguments only while a canvas recording is active.
++#
++# Usage: generate-inspector-stub.py InspectorInstrumentation.h InspectorCanvasArguments.h output.cpp
++
++import re
++import sys
++
++instrumentation_path, canvas_arguments_path, output_path = sys.argv[1:]
++
++preprocessor = re.compile(r'^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b')
++
++
++def read_lines(path):
++    with open(path, encoding='utf-8') as file:
++        return file.read().splitlines()
++
++
++def instrumentation_hooks(lines):
++    class_start = lines.index('class InspectorInstrumentation {')
++    private_start = lines.index('private:', class_start)
++    class_end = lines.index('};', private_start)
++    hook = re.compile(r'^\s*static (\w+) (\w+Impl)\((.*)\);$')
++    default_argument = re.compile(r'\s*=\s*(\{\s*\}|[^,]+)')
++    definitions, count = [], 0
++    for line in lines[private_start + 1:class_end]:
++        if preprocessor.match(line):
++            definitions.append(line.strip())
++            continue
++        match = hook.match(line)
++        if not match:
++            continue
++        result, name, parameters = match.groups()
++        body = '' if result == 'void' else ' return { }; '
++        definitions.append('%s InspectorInstrumentation::%s(%s) {%s}' % (result, name, default_argument.sub('', parameters), body))
++        count += 1
++    return definitions, count
++
++
++def canvas_argument_processors(lines):
++    specialization = re.compile(r'^template<> struct InspectorCanvasArgumentProcessor<(.*)> \{$')
++    operator = re.compile(r'^\s*std::optional<InspectorCanvasProcessedArgument> (?:NODELETE )?operator\(\)\((.*)\);$')
++    definitions, count, processor = [], 0, None
++    for line in lines:
++        if preprocessor.match(line):
++            definitions.append(line.strip())
++            continue
++        match = specialization.match(line)
++        if match:
++            processor = match.group(1)
++            continue
++        match = operator.match(line)
++        if match and processor:
++            definitions.append('std::optional<InspectorCanvasProcessedArgument> InspectorCanvasArgumentProcessor<%s>::operator()(%s) { RELEASE_ASSERT_NOT_REACHED(); }' % (processor, match.group(1)))
++            count += 1
++        processor = None
++    return definitions, count
++
++
++hooks, hook_count = instrumentation_hooks(read_lines(instrumentation_path))
++processors, processor_count = canvas_argument_processors(read_lines(canvas_arguments_path))
++if not hook_count or not processor_count:
++    sys.exit('Found %d *Impl hooks and %d canvas argument processors' % (hook_count, processor_count))
++
++with open(output_path, 'w', encoding='utf-8', newline='\n') as output:
++    output.write('// Generated by generate-inspector-stub.py from InspectorInstrumentation.h and InspectorCanvasArguments.h.\n\n')
++    output.write('#include "config.h"\n#include "InspectorCanvasArguments.h"\n#include "InspectorInstrumentation.h"\n\nnamespace WebCore {\n\n')
++    output.write('\n'.join(hooks + [''] + processors))
++    output.write('\n\n} // namespace WebCore\n')
+diff --git a/Source/cmake/OptionsWin.cmake b/Source/cmake/OptionsWin.cmake
+index 624acbc..71cd93a 100644
+--- a/Source/cmake/OptionsWin.cmake
++++ b/Source/cmake/OptionsWin.cmake
+@@ -74,6 +74,8 @@ option(USE_BROWSER_API_STUB "Build WebCore without WebTransport, the File System
+ if (USE_BROWSER_API_STUB AND NOT USE_WEB_API_STUB)
+     message(FATAL_ERROR "USE_BROWSER_API_STUB requires USE_WEB_API_STUB")
+ endif ()
++# Builds WebCore without the inspector: no Web Inspector frontend can connect to a page or worker.
++option(USE_INSPECTOR_STUB "Build WebCore without the inspector" OFF)
+ find_package(SQLite3 3.23.1 REQUIRED)
+ find_package(ZLIB 1.2.11 REQUIRED)
+ if (NOT USE_NETWORK_STUB)

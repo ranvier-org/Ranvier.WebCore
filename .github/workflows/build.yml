@@ -1,0 +1,129 @@
+# Builds the native package for each runtime in the matrix. Only win-x64 is built today; docs/CI.md lists
+# what each other runtime needs.
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      flavor:
+        description: Build flavor
+        type: choice
+        options: [slim, lean]
+        default: slim
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            # A WebKit build needs about 10 GB of disk and runs for hours on 4 cores; a larger runner
+            # (repository variable RANVIER_WINDOWS_RUNNER) shortens it.
+            runner: windows-2025
+    runs-on: ${{ vars.RANVIER_WINDOWS_RUNNER || matrix.runner }}
+    timeout-minutes: 360
+    env:
+      FLAVOR: ${{ inputs.flavor || 'slim' }}
+      # A short root: WebKit's generated paths exceed MAX_PATH under the default workspace.
+      RANVIER_WORK: C:\rw
+      VCPKG_DOWNLOADS: C:\rw\vcpkg-downloads
+      VCPKG_BINARY_SOURCES: clear;files,C:\rw\vcpkg-archives,readwrite
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install gperf
+        run: choco install gperf --no-progress -y
+
+      - name: Tool versions
+        shell: pwsh
+        run: |
+          python --version; perl -v | Select-Object -Skip 1 -First 1; ruby -v; gperf --version | Select-Object -First 1
+          cmake --version | Select-Object -First 1; dotnet --version
+          New-Item -ItemType Directory -Force $env:VCPKG_DOWNLOADS, "$env:RANVIER_WORK\vcpkg-archives" | Out-Null
+
+      - name: Restore vcpkg archives and downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\rw\vcpkg-archives
+            C:\rw\vcpkg-downloads
+          key: vcpkg-${{ matrix.rid }}-${{ env.FLAVOR }}-${{ hashFiles('pins.json', 'config/**') }}
+          restore-keys: vcpkg-${{ matrix.rid }}-${{ env.FLAVOR }}-
+
+      - name: Restore LLVM
+        uses: actions/cache@v4
+        with:
+          path: C:\rw\tools\llvm
+          key: llvm-${{ matrix.rid }}-${{ hashFiles('pins.json') }}
+
+      - name: Package version from the tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: Add-Content $env:GITHUB_ENV "RANVIER_PACKAGE_VERSION=$($env:GITHUB_REF_NAME.Substring(1))"
+
+      - name: Fetch WebKit, vcpkg and LLVM
+        run: python scripts/build.py fetch --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: Apply patches and install the host
+        run: python scripts/build.py prepare --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: Configure (installs vcpkg packages)
+        run: python scripts/build.py configure --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: Build
+        run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: Package
+        run: python scripts/build.py package --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: |
+            C:\rw\packages\*.nupkg
+            C:\rw\out\${{ env.FLAVOR }}\manifest.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: symbols-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: C:\rw\out\${{ env.FLAVOR }}\symbols
+
+      - name: Upload the CMake logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: |
+            C:\rw\build-${{ env.FLAVOR }}\CMakeCache.txt
+            C:\rw\build-${{ env.FLAVOR }}\CMakeFiles\CMakeConfigureLog.yaml
+            C:\rw\build-${{ env.FLAVOR }}\vcpkg-manifest-install.log
+            C:\rw\vcpkg\buildtrees\**\*.log
+
+  publish:
+    # On a version tag, pushes the packages to the feed in the repository variable NUGET_SOURCE with the
+    # secret NUGET_API_KEY. Without both, the packages stay as workflow artifacts.
+    if: startsWith(github.ref, 'refs/tags/v') && vars.NUGET_SOURCE != ''
+    needs: native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: package-*
+          merge-multiple: true
+      - name: Push
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "**/*.nupkg" --source "${{ vars.NUGET_SOURCE }}" --api-key "$NUGET_API_KEY" --skip-duplicate

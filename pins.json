@@ -1,0 +1,29 @@
+{
+  "package": {
+    "id": "Ranvier.WebCore.Native",
+    "version": "0.1.0-preview.1"
+  },
+  "webkit": {
+    "repository": "https://github.com/WebKit/WebKit.git",
+    "commit": "b95c91b1c0ee43cc86d25ff7af73038f67a88e04"
+  },
+  "vcpkg": {
+    "repository": "https://github.com/microsoft/vcpkg.git",
+    "commit": "0c2a9ace1964b818b15f7ae50ba1c42404918a7b"
+  },
+  "llvm": {
+    "version": "23.1.4",
+    "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.4/clang+llvm-23.1.4-x86_64-pc-windows-msvc.tar.xz",
+    "sha256": ""
+  },
+  "icu": {
+    "version": "77_1",
+    "url": "https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz",
+    "sha256": "588e431f77327c39031ffbb8843c0e3bc122c211374485fa87dc5f3faff24061",
+    "data": "icu/source/data/in/icudt77l.dat",
+    "data_sha256": "310d9b2cb42947fad7f388b09d2ae574e2adeb60ca76abf280438908f20b2d7b"
+  },
+  "msvc": {
+    "tested": "14.50.35717"
+  }
+}

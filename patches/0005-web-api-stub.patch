@@ -1,0 +1,507 @@
+diff --git a/Source/WebCore/CMakeLists.txt b/Source/WebCore/CMakeLists.txt
+index 02a0c65..09db9d2 100644
+--- a/Source/WebCore/CMakeLists.txt
++++ b/Source/WebCore/CMakeLists.txt
+@@ -3129,12 +3129,18 @@ GENERATE_DOM_NAMES(HTML ${WEBCORE_DIR}/html/HTMLAttributeNames.in ${WEBCORE_DIR}
+ list(APPEND WebCore_SOURCES ${WebCore_DERIVED_SOURCES_DIR}/HTMLNames.cpp ${WebCore_DERIVED_SOURCES_DIR}/HTMLElementFactory.cpp ${WebCore_DERIVED_SOURCES_DIR}/JSHTMLElementWrapperFactory.cpp)
+ 
+ 
+-GENERATE_EVENT_FACTORY(${WEBCORE_DIR}/dom/EventInterfaces.in Event)
++if (NOT WebCore_EVENT_INTERFACES_FILE)
++    set(WebCore_EVENT_INTERFACES_FILE ${WEBCORE_DIR}/dom/EventInterfaces.in)
++endif ()
++GENERATE_EVENT_FACTORY(${WebCore_EVENT_INTERFACES_FILE} Event)
+ list(APPEND WebCore_SOURCES ${WebCore_DERIVED_SOURCES_DIR}/EventInterfaces.h)
+ list(APPEND WebCore_SOURCES ${WebCore_DERIVED_SOURCES_DIR}/EventFactory.cpp)
+ 
+ 
+-GENERATE_EVENT_FACTORY(${WEBCORE_DIR}/dom/EventTargetFactory.in EventTarget)
++if (NOT WebCore_EVENT_TARGET_FACTORY_FILE)
++    set(WebCore_EVENT_TARGET_FACTORY_FILE ${WEBCORE_DIR}/dom/EventTargetFactory.in)
++endif ()
++GENERATE_EVENT_FACTORY(${WebCore_EVENT_TARGET_FACTORY_FILE} EventTarget)
+ list(APPEND WebCore_SOURCES ${WebCore_DERIVED_SOURCES_DIR}/EventTargetInterfaces.h)
+ list(APPEND WebCore_SOURCES ${WebCore_DERIVED_SOURCES_DIR}/EventTargetFactory.cpp)
+ 
+diff --git a/Source/WebCore/Modules/stub/JSEventTargetStub.h.in b/Source/WebCore/Modules/stub/JSEventTargetStub.h.in
+new file mode 100644
+index 0000000..1aaf1fc
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/JSEventTargetStub.h.in
+@@ -0,0 +1,15 @@
++// The toJS overload of @WEB_API_STUB_EVENT_TARGET@, an event target type excluded by USE_WEB_API_STUB.
++// WebAPIStub.cpp defines it.
++
++#pragma once
++
++#include <JavaScriptCore/JSCJSValue.h>
++
++namespace WebCore {
++
++class JSDOMGlobalObject;
++class @WEB_API_STUB_EVENT_TARGET@;
++
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, @WEB_API_STUB_EVENT_TARGET@&);
++
++} // namespace WebCore
+diff --git a/Source/WebCore/Modules/stub/WebAPIStub.cmake b/Source/WebCore/Modules/stub/WebAPIStub.cmake
+new file mode 100644
+index 0000000..80ef0f8
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/WebAPIStub.cmake
+@@ -0,0 +1,65 @@
++# WebCore without IndexedDB, service and shared workers, WebSockets, the Cache API, the Cookie Store
++# API, the Push API and Background Fetch (USE_WEB_API_STUB). Their sources and IDL files are left out.
++# The IDL files in Modules/stub/idl replace the interfaces and mixins referenced by the remaining
++# WebCore code; they declare no members and no interface objects. WebAPIStub.cpp defines the members
++# of the excluded types that the remaining WebCore code references.
++
++set(WebCore_WEB_API_STUB_EXCLUDED "^Modules/(cache|cookie-store|indexeddb|push-api|websockets)/|^workers/(service|shared)/")
++set(WebCore_WEB_API_STUB_IDL_FILES
++    Modules/stub/idl/ExtendableEvent.idl
++    Modules/stub/idl/ExtendableMessageEvent.idl
++    Modules/stub/idl/IDBFactory.idl
++    Modules/stub/idl/PushEvent.idl
++    Modules/stub/idl/PushSubscription.idl
++    Modules/stub/idl/ServiceWorker.idl
++    Modules/stub/idl/ServiceWorkerGlobalScope.idl
++    Modules/stub/idl/SharedWorkerGlobalScope.idl
++    Modules/stub/idl/WebSocket.idl
++)
++
++list(APPEND WebCore_UNIFIED_SOURCE_EXCLUDES
++    "${WebCore_WEB_API_STUB_EXCLUDED}"
++    "^bindings/js/(IDBBindingUtilities|JSExtendableMessageEventCustom|JSFetchEventCustom|JSIDBCursorCustom|JSIDBCursorWithValueCustom|JSIDBObjectStoreCustom|JSIDBRecordCustom|JSIDBRequestCustom|JSIDBTransactionCustom|JSServiceWorkerGlobalScopeCustom)\.cpp"
++)
++
++set(WebCore_WEB_API_STUB_EXCLUDED_IDL_FILES ${WebCore_IDL_FILES})
++list(FILTER WebCore_WEB_API_STUB_EXCLUDED_IDL_FILES INCLUDE REGEX "${WebCore_WEB_API_STUB_EXCLUDED}|^Modules/notifications/NotificationEvent\.idl$")
++foreach (_idl IN LISTS WebCore_WEB_API_STUB_EXCLUDED_IDL_FILES)
++    get_filename_component(_name "${_idl}" NAME_WE)
++    if (NOT "${WebCore_WEB_API_STUB_IDL_FILES}" MATCHES "/${_name}\.idl")
++        list(APPEND WebCore_UNIFIED_SOURCE_EXCLUDES "^JS${_name}\.cpp")
++    endif ()
++endforeach ()
++
++list(FILTER WebCore_IDL_FILES EXCLUDE REGEX "${WebCore_WEB_API_STUB_EXCLUDED}|^Modules/notifications/NotificationEvent\.idl$")
++list(FILTER WebCore_SUPPLEMENTAL_IDL_FILES EXCLUDE REGEX "${WebCore_WEB_API_STUB_EXCLUDED}|^page/NavigatorServiceWorker\.idl$")
++list(APPEND WebCore_IDL_FILES ${WebCore_WEB_API_STUB_IDL_FILES})
++list(APPEND WebCore_SUPPLEMENTAL_IDL_FILES
++    Modules/stub/idl/NavigatorServiceWorker.idl
++    Modules/stub/idl/WindowPush.idl
++)
++
++# The event factory input without the excluded events. ExtendableEvent, ExtendableMessageEvent and
++# PushEvent stay: headers included by the remaining code reference their event interface types.
++function(WEB_API_STUB_FACTORY _name _variable _excluded)
++    file(READ "${WEBCORE_DIR}/dom/${_name}.in" _contents)
++    string(REPLACE "\n" ";" _lines "${_contents}")
++    list(FILTER _lines EXCLUDE REGEX "^(${_excluded})( .*)?$")
++    string(REPLACE ";" "\n" _contents "${_lines}")
++    file(WRITE "${WebCore_DERIVED_SOURCES_DIR}/${_name}.in" "${_contents}")
++    set(${_variable} "${WebCore_DERIVED_SOURCES_DIR}/${_name}.in" PARENT_SCOPE)
++endfunction()
++WEB_API_STUB_FACTORY(EventInterfaces WebCore_EVENT_INTERFACES_FILE
++    "BackgroundFetchEvent|BackgroundFetchUpdateUIEvent|CloseEvent|CookieChangeEvent|ExtendableCookieChangeEvent|FetchEvent|IDBVersionChangeEvent|InstallEvent|NotificationEvent|PushSubscriptionChangeEvent")
++
++# The event target factory includes JS<Name>.h for every event target type. These headers declare the
++# toJS overloads of the excluded event target types, which WebAPIStub.cpp defines.
++foreach (WEB_API_STUB_EVENT_TARGET IN ITEMS BackgroundFetchRegistration CookieStore IDBDatabase IDBOpenDBRequest IDBRequest
++                                          IDBTransaction ServiceWorkerContainer ServiceWorkerRegistration SharedWorker)
++    configure_file(${WEBCORE_DIR}/Modules/stub/JSEventTargetStub.h.in
++        ${WebCore_DERIVED_SOURCES_DIR}/JS${WEB_API_STUB_EVENT_TARGET}.h @ONLY)
++endforeach ()
++
++list(APPEND WebCore_SOURCES
++    Modules/stub/WebAPIStub.cpp
++)
+diff --git a/Source/WebCore/Modules/stub/WebAPIStub.cpp b/Source/WebCore/Modules/stub/WebAPIStub.cpp
+new file mode 100644
+index 0000000..26b1330
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/WebAPIStub.cpp
+@@ -0,0 +1,219 @@
++// Members of IndexedDB, service and shared worker, WebSocket, Cookie Store and Push API types for a
++// build without those modules (USE_WEB_API_STUB).
++//
++// No script can create an object of these types. Members on the page and worker lifecycle paths do
++// nothing, and IndexedDB connections report themselves invalid. Every other member is a release
++// assertion.
++
++#include "config.h"
++
++#include "BackgroundFetchInformation.h"
++#include "CookieStore.h"
++#include "DOMPromiseProxy.h"
++#include "ExceptionOr.h"
++#include "ExtendableMessageEvent.h"
++#include "FileSystemHandleRecord.h"
++#include "FileSystemHandleStorageKeepAlive.h"
++#include "IDBBindingUtilities.h"
++#include "IDBConnectionProxy.h"
++#include "IDBConnectionToServer.h"
++#include "IDBCursor.h"
++#include "IDBDatabase.h"
++#include "IDBDatabaseInfo.h"
++#include "IDBFactory.h"
++#include "IDBIndex.h"
++#include "IDBKey.h"
++#include "IDBKeyData.h"
++#include "IDBKeyRange.h"
++#include "IDBObjectStore.h"
++#include "IDBOpenDBRequest.h"
++#include "IDBRequest.h"
++#include "IDBTransaction.h"
++#include "IDBValue.h"
++#include "PushSubscription.h"
++#include "PushSubscriptionOptions.h"
++#include "ServiceWorker.h"
++#include "ServiceWorkerClientData.h"
++#include "ServiceWorkerContainer.h"
++#include "ServiceWorkerData.h"
++#include "ServiceWorkerGlobalScope.h"
++#include "ServiceWorkerProvider.h"
++#include "ServiceWorkerRegistration.h"
++#include "SharedWorker.h"
++#include "SharedWorkerGlobalScope.h"
++#include "WebSocket.h"
++#include "WindowOrWorkerGlobalScopeIndexedDatabase.h"
++#include "WorkerSWClientConnection.h"
++#include "WorkerThread.h"
++
++namespace WebCore {
++
++class BackgroundFetchRegistration;
++
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, BackgroundFetchRegistration&);
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, CookieStore&);
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, IDBDatabase&);
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, IDBOpenDBRequest&);
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, IDBRequest&);
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, IDBTransaction&);
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, ServiceWorkerContainer&);
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, ServiceWorkerRegistration&);
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, SharedWorker&);
++
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, BackgroundFetchRegistration&) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, CookieStore&) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, IDBDatabase&) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, IDBOpenDBRequest&) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, IDBRequest&) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, IDBTransaction&) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, ServiceWorkerContainer&) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, ServiceWorkerRegistration&) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue toJS(JSC::JSGlobalObject*, JSDOMGlobalObject*, SharedWorker&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++// IndexedDB.
++
++JSC::JSValue deserializeIDBValueToJSValue(JSC::JSGlobalObject&, const IDBValue&) { RELEASE_ASSERT_NOT_REACHED(); }
++JSC::JSValue toJS(JSC::JSGlobalObject&, JSC::JSGlobalObject&, IDBKey*) { RELEASE_ASSERT_NOT_REACHED(); }
++
++IDBKey::IDBKey(IndexedDB::KeyType, double)
++    : m_type(IndexedDB::KeyType::Invalid)
++    , m_sizeEstimate(0)
++{ RELEASE_ASSERT_NOT_REACHED(); }
++IDBKey::IDBKey(const String&)
++    : m_type(IndexedDB::KeyType::Invalid)
++    , m_sizeEstimate(0)
++{ RELEASE_ASSERT_NOT_REACHED(); }
++IDBKey::IDBKey(Vector<Ref<IDBKey>>&&, uint64_t)
++    : m_type(IndexedDB::KeyType::Invalid)
++    , m_sizeEstimate(0)
++{ RELEASE_ASSERT_NOT_REACHED(); }
++IDBKey::~IDBKey() = default;
++
++IDBKeyData::IDBKeyData(const IDBKey*) { RELEASE_ASSERT_NOT_REACHED(); }
++
++IDBValue::IDBValue() = default;
++IDBValue::IDBValue(const SerializedScriptValue&, const Vector<String>&, const Vector<String>&) { RELEASE_ASSERT_NOT_REACHED(); }
++IDBValue::IDBValue(const IDBValue&) = default;
++IDBValue::IDBValue(IDBValue&&) = default;
++IDBValue::~IDBValue() = default;
++void IDBValue::setAsIsolatedCopy(const IDBValue&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<IDBKeyRange> IDBKeyRange::create(RefPtr<IDBKey>&&, RefPtr<IDBKey>&&, bool, bool) { RELEASE_ASSERT_NOT_REACHED(); }
++IDBKeyRange::~IDBKeyRange() = default;
++
++IDBFactory::~IDBFactory() = default;
++ExceptionOr<Ref<IDBOpenDBRequest>> IDBFactory::open(ScriptExecutionContext&, const String&, std::optional<uint64_t>) { RELEASE_ASSERT_NOT_REACHED(); }
++void IDBFactory::getAllDatabaseNames(ScriptExecutionContext&, Function<void(const Vector<String>&)>&&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++IDBFactory* WindowOrWorkerGlobalScopeIndexedDatabase::indexedDB(DOMWindow&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++IDBDatabase::~IDBDatabase() = default;
++void IDBDatabase::close() { RELEASE_ASSERT_NOT_REACHED(); }
++ExceptionOr<Ref<IDBTransaction>> IDBDatabase::transaction(Variant<String, Vector<String>>&&, IDBTransactionMode, TransactionOptions) { RELEASE_ASSERT_NOT_REACHED(); }
++
++Vector<String> IDBDatabaseInfo::objectStoreNames() const { RELEASE_ASSERT_NOT_REACHED(); }
++IDBObjectStoreInfo* IDBDatabaseInfo::infoForExistingObjectStore(const String&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++IDBTransaction::~IDBTransaction() = default;
++ExceptionOr<Ref<IDBObjectStore>> IDBTransaction::objectStore(const String&) { RELEASE_ASSERT_NOT_REACHED(); }
++void IDBTransaction::activate() { RELEASE_ASSERT_NOT_REACHED(); }
++void IDBTransaction::deactivate() { RELEASE_ASSERT_NOT_REACHED(); }
++
++void IDBObjectStore::deref() const { RELEASE_ASSERT_NOT_REACHED(); }
++ExceptionOr<Ref<IDBIndex>> IDBObjectStore::index(const String&) { RELEASE_ASSERT_NOT_REACHED(); }
++ExceptionOr<Ref<IDBRequest>> IDBObjectStore::clear() { RELEASE_ASSERT_NOT_REACHED(); }
++ExceptionOr<Ref<IDBRequest>> IDBObjectStore::openCursor(RefPtr<IDBKeyRange>&&, IndexedDB::CursorDirection) { RELEASE_ASSERT_NOT_REACHED(); }
++
++void IDBIndex::deref() const { RELEASE_ASSERT_NOT_REACHED(); }
++ExceptionOr<Ref<IDBRequest>> IDBIndex::openCursor(RefPtr<IDBKeyRange>&&, IndexedDB::CursorDirection) { RELEASE_ASSERT_NOT_REACHED(); }
++
++ExceptionOr<IDBRequest::Result> IDBRequest::result() const { RELEASE_ASSERT_NOT_REACHED(); }
++
++ExceptionOr<void> IDBCursor::advance(unsigned) { RELEASE_ASSERT_NOT_REACHED(); }
++ExceptionOr<void> IDBCursor::continueFunction(const IDBKeyData&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++namespace IDBClient {
++
++Ref<IDBConnectionToServer> IDBConnectionToServer::create(IDBConnectionToServerDelegate&, PAL::SessionID) { RELEASE_ASSERT_NOT_REACHED(); }
++IDBConnectionToServer::~IDBConnectionToServer() = default;
++
++void IDBConnectionProxy::ref() { RELEASE_ASSERT_NOT_REACHED(); }
++void IDBConnectionProxy::deref() { RELEASE_ASSERT_NOT_REACHED(); }
++bool IDBConnectionProxy::isValid() const { return false; }
++void IDBConnectionProxy::abortActivitiesForCurrentThread() { }
++void IDBConnectionProxy::setContextSuspended(ScriptExecutionContext&, bool) { }
++
++} // namespace IDBClient
++
++// Service and shared workers.
++
++ServiceWorkerProvider& ServiceWorkerProvider::singleton() { RELEASE_ASSERT_NOT_REACHED(); }
++
++ServiceWorkerClientData ServiceWorkerClientData::from(ScriptExecutionContext&) { RELEASE_ASSERT_NOT_REACHED(); }
++ServiceWorkerData ServiceWorkerData::isolatedCopy() const & { RELEASE_ASSERT_NOT_REACHED(); }
++ServiceWorkerData ServiceWorkerData::isolatedCopy() && { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<ServiceWorker> ServiceWorker::getOrCreate(ScriptExecutionContext&, ServiceWorkerData&&) { RELEASE_ASSERT_NOT_REACHED(); }
++ServiceWorker::~ServiceWorker() = default;
++
++UniqueRef<ServiceWorkerContainer> ServiceWorkerContainer::create(ScriptExecutionContext*, NavigatorBase&) { RELEASE_ASSERT_NOT_REACHED(); }
++void ServiceWorkerContainer::ref() const { RELEASE_ASSERT_NOT_REACHED(); }
++void ServiceWorkerContainer::deref() const { RELEASE_ASSERT_NOT_REACHED(); }
++void ServiceWorkerContainer::startMessages() { }
++void ServiceWorkerContainer::whenRegisterJobsAreFinished(CompletionHandler<void()>&& completionHandler) { completionHandler(); }
++
++WallTime ServiceWorkerRegistration::lastUpdateTime() const { RELEASE_ASSERT_NOT_REACHED(); }
++ServiceWorkerUpdateViaCache ServiceWorkerRegistration::updateViaCache() const { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<ServiceWorkerThread> ServiceWorkerGlobalScope::thread() { RELEASE_ASSERT_NOT_REACHED(); }
++Page* ServiceWorkerGlobalScope::serviceWorkerPage() { RELEASE_ASSERT_NOT_REACHED(); }
++const ServiceWorkerImportedScript* ServiceWorkerGlobalScope::scriptResource(const URL&) const { RELEASE_ASSERT_NOT_REACHED(); }
++void ServiceWorkerGlobalScope::setScriptResource(const URL&, ServiceWorkerImportedScript&&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<SharedWorkerThread> SharedWorkerGlobalScope::thread() { RELEASE_ASSERT_NOT_REACHED(); }
++
++void WorkerSWClientConnection::registerServiceWorkerClient(const ClientOrigin&, ServiceWorkerClientData&&, const std::optional<ServiceWorkerRegistrationIdentifier>&, String&&) { RELEASE_ASSERT_NOT_REACHED(); }
++void WorkerSWClientConnection::unregisterServiceWorkerClient(ScriptExecutionContextIdentifier) { RELEASE_ASSERT_NOT_REACHED(); }
++
++// The WorkerSWClientConnection constructor and the ServiceWorkerContainer destructor resolve to
++// webAPIStubNotReached, which keeps the vtables of both classes out of the build.
++extern "C" void webAPIStubNotReached()
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++#pragma comment(linker, "/alternatename:??0WorkerSWClientConnection@WebCore@@AEAA@AEAVWorkerGlobalScope@1@@Z=webAPIStubNotReached")
++#pragma comment(linker, "/alternatename:??1ServiceWorkerContainer@WebCore@@UEAA@XZ=webAPIStubNotReached")
++
++const RefPtr<SecurityOrigin> ExtendableMessageEvent::securityOrigin() const { RELEASE_ASSERT_NOT_REACHED(); }
++
++// WebSockets.
++
++Lock& WebSocket::allActiveWebSocketsLock()
++{
++    static Lock lock;
++    return lock;
++}
++
++HashSet<CheckedPtr<WebSocket>>& WebSocket::allActiveWebSockets()
++{
++    static NeverDestroyed<HashSet<CheckedPtr<WebSocket>>> webSockets;
++    return webSockets;
++}
++
++const URL& WebSocket::url() const { RELEASE_ASSERT_NOT_REACHED(); }
++WebSocket::State WebSocket::readyState() const { RELEASE_ASSERT_NOT_REACHED(); }
++RefPtr<ThreadableWebSocketChannel> WebSocket::channel() const { RELEASE_ASSERT_NOT_REACHED(); }
++ScriptExecutionContext* WebSocket::scriptExecutionContext() const { RELEASE_ASSERT_NOT_REACHED(); }
++
++// Cookie Store and Push APIs.
++
++class CookieStore::MainThreadBridge : public ThreadSafeRefCounted<MainThreadBridge, WTF::DestructionThread::Main> {
++};
++
++Ref<CookieStore> CookieStore::create(ScriptExecutionContext*) { RELEASE_ASSERT_NOT_REACHED(); }
++CookieStore::~CookieStore() = default;
++
++PushSubscription::~PushSubscription() = default;
++PushSubscriptionOptions::~PushSubscriptionOptions() = default;
++
++} // namespace WebCore
+diff --git a/Source/WebCore/Modules/stub/idl/ExtendableEvent.idl b/Source/WebCore/Modules/stub/idl/ExtendableEvent.idl
+new file mode 100644
+index 0000000..b28f66b
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/ExtendableEvent.idl
+@@ -0,0 +1,8 @@
++// ExtendableEvent without service workers (USE_WEB_API_STUB): no interface object and no members.
++[
++    LegacyNoInterfaceObject,
++    Exposed=ServiceWorker,
++    ExportMacro=WEBCORE_EXPORT,
++    JSGenerateToNativeObject,
++] interface ExtendableEvent : Event {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/ExtendableMessageEvent.idl b/Source/WebCore/Modules/stub/idl/ExtendableMessageEvent.idl
+new file mode 100644
+index 0000000..b0cbff8
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/ExtendableMessageEvent.idl
+@@ -0,0 +1,6 @@
++// ExtendableMessageEvent without service workers (USE_WEB_API_STUB): no interface object and no members.
++[
++    LegacyNoInterfaceObject,
++    Exposed=ServiceWorker
++] interface ExtendableMessageEvent : ExtendableEvent {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/IDBFactory.idl b/Source/WebCore/Modules/stub/idl/IDBFactory.idl
+new file mode 100644
+index 0000000..b052762
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/IDBFactory.idl
+@@ -0,0 +1,7 @@
++// IDBFactory without IndexedDB (USE_WEB_API_STUB): no interface object and no members.
++[
++    LegacyNoInterfaceObject,
++    SkipVTableValidation,
++    Exposed=(Window,Worker)
++] interface IDBFactory {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/NavigatorServiceWorker.idl b/Source/WebCore/Modules/stub/idl/NavigatorServiceWorker.idl
+new file mode 100644
+index 0000000..f0978b7
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/NavigatorServiceWorker.idl
+@@ -0,0 +1,4 @@
++// The NavigatorServiceWorker mixin without service workers (USE_WEB_API_STUB): Navigator and
++// WorkerNavigator have no serviceWorker attribute.
++interface mixin NavigatorServiceWorker {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/PushEvent.idl b/Source/WebCore/Modules/stub/idl/PushEvent.idl
+new file mode 100644
+index 0000000..dadaba9
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/PushEvent.idl
+@@ -0,0 +1,6 @@
++// PushEvent without the Push API (USE_WEB_API_STUB): no interface object and no members.
++[
++    LegacyNoInterfaceObject,
++    Exposed=ServiceWorker
++] interface PushEvent : ExtendableEvent {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/PushSubscription.idl b/Source/WebCore/Modules/stub/idl/PushSubscription.idl
+new file mode 100644
+index 0000000..90a8f56
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/PushSubscription.idl
+@@ -0,0 +1,7 @@
++// PushSubscription without the Push API (USE_WEB_API_STUB): no interface object and no members.
++[
++    LegacyNoInterfaceObject,
++    ExportMacro=WEBCORE_EXPORT,
++    Exposed=(Window,Worker),
++] interface PushSubscription {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/ServiceWorker.idl b/Source/WebCore/Modules/stub/idl/ServiceWorker.idl
+new file mode 100644
+index 0000000..1f1e2f9
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/ServiceWorker.idl
+@@ -0,0 +1,9 @@
++// ServiceWorker without service workers (USE_WEB_API_STUB): MessageEvent's source type names it. No
++// interface object and no members.
++[
++    ActiveDOMObject,
++    LegacyNoInterfaceObject,
++    Exposed=(Window,Worker),
++    ExportMacro=WEBCORE_EXPORT
++] interface ServiceWorker : EventTarget {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/ServiceWorkerGlobalScope.idl b/Source/WebCore/Modules/stub/idl/ServiceWorkerGlobalScope.idl
+new file mode 100644
+index 0000000..dd7683b
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/ServiceWorkerGlobalScope.idl
+@@ -0,0 +1,9 @@
++// The service worker global scope without service workers (USE_WEB_API_STUB): no members.
++[
++    Global=(Worker,ServiceWorker),
++    Exposed=ServiceWorker,
++    EnabledBySetting=ServiceWorkersEnabled,
++    IsImmutablePrototypeExoticObject,
++    IsImmutablePrototypeExoticObjectOnPrototype,
++] interface ServiceWorkerGlobalScope : WorkerGlobalScope {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/SharedWorkerGlobalScope.idl b/Source/WebCore/Modules/stub/idl/SharedWorkerGlobalScope.idl
+new file mode 100644
+index 0000000..8d6a743
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/SharedWorkerGlobalScope.idl
+@@ -0,0 +1,8 @@
++// The shared worker global scope without shared workers (USE_WEB_API_STUB): no members.
++[
++    EnabledBySetting=SharedWorkerEnabled,
++    Global=(Worker,SharedWorker),
++    Exposed=SharedWorker,
++    JSGenerateToNativeObject,
++] interface SharedWorkerGlobalScope : WorkerGlobalScope {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/WebSocket.idl b/Source/WebCore/Modules/stub/idl/WebSocket.idl
+new file mode 100644
+index 0000000..aedd4e6
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/WebSocket.idl
+@@ -0,0 +1,7 @@
++// WebSocket without WebSockets (USE_WEB_API_STUB): no interface object, constructor or members.
++[
++    ActiveDOMObject,
++    LegacyNoInterfaceObject,
++    Exposed=(Window,Worker)
++] interface WebSocket : EventTarget {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/WindowPush.idl b/Source/WebCore/Modules/stub/idl/WindowPush.idl
+new file mode 100644
+index 0000000..64b2f40
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/WindowPush.idl
+@@ -0,0 +1,3 @@
++// The WindowPush mixin without the Push API (USE_WEB_API_STUB): DOMWindow has no pushManager attribute.
++interface mixin WindowPush {
++};
+diff --git a/Source/WebCore/PlatformWin.cmake b/Source/WebCore/PlatformWin.cmake
+index 58eb009..2ed3271 100644
+--- a/Source/WebCore/PlatformWin.cmake
++++ b/Source/WebCore/PlatformWin.cmake
+@@ -254,3 +254,7 @@ endif ()
+ if (USE_GPU_STUB)
+     include(platform/graphics/stub/GPUStub.cmake)
+ endif ()
++
++if (USE_WEB_API_STUB)
++    include(Modules/stub/WebAPIStub.cmake)
++endif ()
+diff --git a/Source/cmake/OptionsWin.cmake b/Source/cmake/OptionsWin.cmake
+index 1284c72..61f36eb 100644
+--- a/Source/cmake/OptionsWin.cmake
++++ b/Source/cmake/OptionsWin.cmake
+@@ -61,6 +61,8 @@ endif ()
+ option(USE_GPU_STUB "Build WebCore and Skia without GPU rendering" OFF)
+ 
+ find_package(PNG 1.6.34 REQUIRED)
++# Builds WebCore without IndexedDB, service and shared workers, WebSockets, the Cache, Cookie Store and Push APIs and Background Fetch.
++option(USE_WEB_API_STUB "Build WebCore without IndexedDB, service and shared workers, WebSockets and the Cache, Cookie Store and Push APIs" OFF)
+ find_package(SQLite3 3.23.1 REQUIRED)
+ find_package(ZLIB 1.2.11 REQUIRED)
+ if (NOT USE_NETWORK_STUB)

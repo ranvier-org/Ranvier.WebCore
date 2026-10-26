@@ -1,0 +1,505 @@
+diff --git a/Source/WebCore/PAL/pal/PlatformWin.cmake b/Source/WebCore/PAL/pal/PlatformWin.cmake
+index 0b5f410..a53207b 100644
+--- a/Source/WebCore/PAL/pal/PlatformWin.cmake
++++ b/Source/WebCore/PAL/pal/PlatformWin.cmake
+@@ -1,6 +1,4 @@
+ list(APPEND PAL_SOURCES
+-    crypto/openssl/CryptoDigestOpenSSL.cpp
+-
+     system/ClockGeneric.cpp
+
+     system/win/SoundWin.cpp
+@@ -8,6 +6,9 @@ list(APPEND PAL_SOURCES
+     text/KillRing.cpp
+ )
+
+-list(APPEND PAL_PRIVATE_LIBRARIES
+-    OpenSSL::Crypto
+-)
++if (USE_CRYPTO_STUB)
++    list(APPEND PAL_SOURCES crypto/win/CryptoDigestWin.cpp)
++else ()
++    list(APPEND PAL_SOURCES crypto/openssl/CryptoDigestOpenSSL.cpp)
++    list(APPEND PAL_PRIVATE_LIBRARIES OpenSSL::Crypto)
++endif ()
+diff --git a/Source/WebCore/PAL/pal/crypto/win/CryptoDigestWin.cpp b/Source/WebCore/PAL/pal/crypto/win/CryptoDigestWin.cpp
+index f2627b3..0084b4e 100644
+--- a/Source/WebCore/PAL/pal/crypto/win/CryptoDigestWin.cpp
++++ b/Source/WebCore/PAL/pal/crypto/win/CryptoDigestWin.cpp
+@@ -29,7 +29,7 @@
+ #include <windows.h>
+ #include <wincrypt.h>
+
+-namespace PAL {
++namespace PAL::Crypto {
+
+ struct CryptoDigestContext {
+     CryptoDigest::Algorithm algorithm;
+@@ -62,6 +62,9 @@ std::unique_ptr<CryptoDigest> CryptoDigest::create(Algorithm algorithm)
+         succeeded = CryptCreateHash(digest->m_context->hContext, CALG_SHA1, 0, 0, &digest->m_context->hHash);
+         break;
+     }
++    case CryptoDigest::Algorithm::DEPRECATED_SHA_224:
++        RELEASE_ASSERT_NOT_REACHED_WITH_MESSAGE("SHA224 is not supported.");
++        break;
+     case CryptoDigest::Algorithm::SHA_256: {
+         succeeded = CryptCreateHash(digest->m_context->hContext, CALG_SHA_256, 0, 0, &digest->m_context->hHash);
+         break;
+@@ -96,9 +99,9 @@ Vector<uint8_t> CryptoDigest::computeHash()
+     RELEASE_ASSERT(CryptGetHashParam(m_context->hHash, HP_HASHSIZE, reinterpret_cast<BYTE*>(&digestLengthBuffer), &digestLengthBufferSize, 0));
+     result.resize(digestLengthBuffer);
+
+-    RELEASE_ASSERT(CryptGetHashParam(m_context->hHash, HP_HASHVAL, result.data(), &digestLengthBuffer, 0));
++    RELEASE_ASSERT(CryptGetHashParam(m_context->hHash, HP_HASHVAL, result.mutableSpan().data(), &digestLengthBuffer, 0));
+     RELEASE_ASSERT(result.size() == digestLengthBuffer);
+     return result;
+ }
+
+-} // namespace PAL
++} // namespace PAL::Crypto
+diff --git a/Source/WebCore/PlatformWin.cmake b/Source/WebCore/PlatformWin.cmake
+index 4913566..f20f3bb 100644
+--- a/Source/WebCore/PlatformWin.cmake
++++ b/Source/WebCore/PlatformWin.cmake
+@@ -11,7 +11,11 @@ else ()
+     include(platform/Curl.cmake)
+ endif ()
+ include(platform/ImageDecoders.cmake)
+-include(platform/OpenSSL.cmake)
++if (USE_CRYPTO_STUB)
++    include(crypto/stub/CryptoStub.cmake)
++else ()
++    include(platform/OpenSSL.cmake)
++endif ()
+ include(platform/TextureMapper.cmake)
+
+ if (USE_CAIRO)
+diff --git a/Source/WebCore/crypto/keys/CryptoKeyEC.h b/Source/WebCore/crypto/keys/CryptoKeyEC.h
+index 5c7e5df..3682a3f 100644
+--- a/Source/WebCore/crypto/keys/CryptoKeyEC.h
++++ b/Source/WebCore/crypto/keys/CryptoKeyEC.h
+@@ -54,6 +54,13 @@ using PlatformECKeyContainer = WebCore::EvpPKeyPtr;
+ }
+ #endif
+
++#if USE(CRYPTO_STUB)
++#include "crypto/stub/CryptoKeyStub.h"
++namespace WebCore {
++using PlatformECKeyContainer = std::unique_ptr<PlatformKeyStub>;
++}
++#endif
++
+ namespace WebCore {
+
+ struct JsonWebKey;
+diff --git a/Source/WebCore/crypto/keys/CryptoKeyRSA.h b/Source/WebCore/crypto/keys/CryptoKeyRSA.h
+index e219a0e..d5dc279 100644
+--- a/Source/WebCore/crypto/keys/CryptoKeyRSA.h
++++ b/Source/WebCore/crypto/keys/CryptoKeyRSA.h
+@@ -53,6 +53,12 @@ typedef EVP_PKEY* PlatformRSAKey;
+ typedef WebCore::EvpPKeyPtr PlatformRSAKeyContainer;
+ #endif
+
++#if USE(CRYPTO_STUB)
++#include "crypto/stub/CryptoKeyStub.h"
++typedef WebCore::PlatformKeyStub* PlatformRSAKey;
++typedef std::unique_ptr<WebCore::PlatformKeyStub> PlatformRSAKeyContainer;
++#endif
++
+ namespace WebCore {
+
+ class CryptoKeyRSAComponents;
+diff --git a/Source/WebCore/crypto/stub/CryptoKeyStub.h b/Source/WebCore/crypto/stub/CryptoKeyStub.h
+new file mode 100644
+index 0000000..6e83434
+--- /dev/null
++++ b/Source/WebCore/crypto/stub/CryptoKeyStub.h
+@@ -0,0 +1,16 @@
++// The platform key of CryptoKeyEC and CryptoKeyRSA in a build without a Web Crypto backend (USE_CRYPTO_STUB).
++// The build registers no algorithm, so no key is ever created.
++
++#pragma once
++
++#if USE(CRYPTO_STUB)
++
++#include <memory>
++
++namespace WebCore {
++
++struct PlatformKeyStub { };
++
++} // namespace WebCore
++
++#endif
+diff --git a/Source/WebCore/crypto/stub/CryptoStub.cmake b/Source/WebCore/crypto/stub/CryptoStub.cmake
+new file mode 100644
+index 0000000..51005b3
+--- /dev/null
++++ b/Source/WebCore/crypto/stub/CryptoStub.cmake
+@@ -0,0 +1,5 @@
++# Web Crypto without a backend (USE_CRYPTO_STUB): crypto.subtle registers no algorithm, so every operation
++# rejects with NotSupportedError. CryptoStub.cpp defines the platform members that WebCore references.
++list(APPEND WebCore_SOURCES
++    crypto/stub/CryptoStub.cpp
++)
+diff --git a/Source/WebCore/crypto/stub/CryptoStub.cpp b/Source/WebCore/crypto/stub/CryptoStub.cpp
+new file mode 100644
+index 0000000..4174fe8
+--- /dev/null
++++ b/Source/WebCore/crypto/stub/CryptoStub.cpp
+@@ -0,0 +1,305 @@
++// Platform members of Web Crypto for a build without a backend (USE_CRYPTO_STUB).
++//
++// The registry holds the SHA digests alone, which PAL's CryptoDigest computes, so every other crypto.subtle
++// operation rejects with NotSupportedError and no EC or RSA key is created. Importing a serialized EC or
++// RSA key fails.
++
++#include "config.h"
++
++#if USE(CRYPTO_STUB)
++
++#include "CryptoAlgorithmAESCBC.h"
++#include "CryptoAlgorithmAESCFB.h"
++#include "CryptoAlgorithmAESCTR.h"
++#include "CryptoAlgorithmAESGCM.h"
++#include "CryptoAlgorithmAESKW.h"
++#include "CryptoAlgorithmECDH.h"
++#include "CryptoAlgorithmECDSA.h"
++#include "CryptoAlgorithmHKDF.h"
++#include "CryptoAlgorithmHMAC.h"
++#include "CryptoAlgorithmPBKDF2.h"
++#include "CryptoAlgorithmRSASSA_PKCS1_v1_5.h"
++#include "CryptoAlgorithmRSA_OAEP.h"
++#include "CryptoAlgorithmRegistry.h"
++#include "CryptoAlgorithmSHA1.h"
++#include "CryptoAlgorithmSHA256.h"
++#include "CryptoAlgorithmSHA384.h"
++#include "CryptoAlgorithmSHA512.h"
++#include "CryptoKeyEC.h"
++#include "CryptoKeyPair.h"
++#include "CryptoKeyRSA.h"
++#include "CryptoKeyRSAComponents.h"
++#include "ExceptionOr.h"
++#include "JsonWebKey.h"
++#include "SerializedCryptoKeyWrap.h"
++#include "WrappedCryptoKey.h"
++
++namespace WebCore {
++
++static Exception notSupported()
++{
++    return Exception { ExceptionCode::NotSupportedError };
++}
++
++void CryptoAlgorithmRegistry::platformRegisterAlgorithms()
++{
++    registerAlgorithm<CryptoAlgorithmSHA1>();
++    registerAlgorithm<CryptoAlgorithmSHA256>();
++    registerAlgorithm<CryptoAlgorithmSHA384>();
++    registerAlgorithm<CryptoAlgorithmSHA512>();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESCBC::platformEncrypt(const CryptoAlgorithmAesCbcCfbParams&, const CryptoKeyAES&, const Vector<uint8_t>&, Padding)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESCBC::platformDecrypt(const CryptoAlgorithmAesCbcCfbParams&, const CryptoKeyAES&, const Vector<uint8_t>&, Padding)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESCFB::platformEncrypt(const CryptoAlgorithmAesCbcCfbParams&, const CryptoKeyAES&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESCFB::platformDecrypt(const CryptoAlgorithmAesCbcCfbParams&, const CryptoKeyAES&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESCTR::platformEncrypt(const CryptoAlgorithmAesCtrParams&, const CryptoKeyAES&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESCTR::platformDecrypt(const CryptoAlgorithmAesCtrParams&, const CryptoKeyAES&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESGCM::platformEncrypt(const CryptoAlgorithmAesGcmParams&, const CryptoKeyAES&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESGCM::platformDecrypt(const CryptoAlgorithmAesGcmParams&, const CryptoKeyAES&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESKW::platformWrapKey(const CryptoKeyAES&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmAESKW::platformUnwrapKey(const CryptoKeyAES&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++std::optional<Vector<uint8_t>> CryptoAlgorithmECDH::platformDeriveBits(const CryptoKeyEC&, const CryptoKeyEC&)
++{
++    return std::nullopt;
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmECDSA::platformSign(const CryptoAlgorithmEcdsaParams&, const CryptoKeyEC&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<bool> CryptoAlgorithmECDSA::platformVerify(const CryptoAlgorithmEcdsaParams&, const CryptoKeyEC&, const Vector<uint8_t>&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmHKDF::platformDeriveBits(const CryptoAlgorithmHkdfParams&, const CryptoKeyRaw&, size_t)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmHMAC::platformSign(const CryptoKeyHMAC&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<bool> CryptoAlgorithmHMAC::platformVerify(const CryptoKeyHMAC&, const Vector<uint8_t>&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmPBKDF2::platformDeriveBits(const CryptoAlgorithmPbkdf2Params&, const CryptoKeyRaw&, size_t)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmRSASSA_PKCS1_v1_5::platformSign(const CryptoKeyRSA&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<bool> CryptoAlgorithmRSASSA_PKCS1_v1_5::platformVerify(const CryptoKeyRSA&, const Vector<uint8_t>&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmRSA_OAEP::platformEncrypt(const CryptoAlgorithmRsaOaepParams&, const CryptoKeyRSA&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoAlgorithmRSA_OAEP::platformDecrypt(const CryptoAlgorithmRsaOaepParams&, const CryptoKeyRSA&, const Vector<uint8_t>&)
++{
++    return notSupported();
++}
++
++size_t CryptoKeyEC::keySizeInBits() const
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++bool CryptoKeyEC::platformSupportedCurve(NamedCurve)
++{
++    return false;
++}
++
++std::optional<CryptoKeyPair> CryptoKeyEC::platformGeneratePair(CryptoAlgorithmIdentifier, NamedCurve, bool, CryptoKeyUsageBitmap)
++{
++    return std::nullopt;
++}
++
++RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportRaw(CryptoAlgorithmIdentifier, NamedCurve, Vector<uint8_t>&&, bool, CryptoKeyUsageBitmap)
++{
++    return nullptr;
++}
++
++RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportJWKPublic(CryptoAlgorithmIdentifier, NamedCurve, Vector<uint8_t>&&, Vector<uint8_t>&&, bool, CryptoKeyUsageBitmap)
++{
++    return nullptr;
++}
++
++RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportJWKPrivate(CryptoAlgorithmIdentifier, NamedCurve, Vector<uint8_t>&&, Vector<uint8_t>&&, Vector<uint8_t>&&, bool, CryptoKeyUsageBitmap)
++{
++    return nullptr;
++}
++
++RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportSpki(CryptoAlgorithmIdentifier, NamedCurve, Vector<uint8_t>&&, bool, CryptoKeyUsageBitmap)
++{
++    return nullptr;
++}
++
++RefPtr<CryptoKeyEC> CryptoKeyEC::platformImportPkcs8(CryptoAlgorithmIdentifier, NamedCurve, Vector<uint8_t>&&, bool, CryptoKeyUsageBitmap)
++{
++    return nullptr;
++}
++
++Vector<uint8_t> CryptoKeyEC::platformExportRaw() const
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++bool CryptoKeyEC::platformAddFieldElements(JsonWebKey&) const
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++Vector<uint8_t> CryptoKeyEC::platformExportSpki() const
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++Vector<uint8_t> CryptoKeyEC::platformExportPkcs8() const
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++RefPtr<CryptoKeyRSA> CryptoKeyRSA::create(CryptoAlgorithmIdentifier, CryptoAlgorithmIdentifier, bool, const CryptoKeyRSAComponents&, bool, CryptoKeyUsageBitmap)
++{
++    return nullptr;
++}
++
++CryptoKeyRSA::CryptoKeyRSA(CryptoAlgorithmIdentifier identifier, CryptoAlgorithmIdentifier hash, bool hasHash, CryptoKeyType type, PlatformRSAKeyContainer&& platformKey, bool extractable, CryptoKeyUsageBitmap usages)
++    : CryptoKey(identifier, type, extractable, usages)
++    , m_platformKey(WTF::move(platformKey))
++    , m_restrictedToSpecificHash(hasHash)
++    , m_hash(hash)
++{
++}
++
++bool CryptoKeyRSA::isRestrictedToHash(CryptoAlgorithmIdentifier& identifier) const
++{
++    if (!m_restrictedToSpecificHash)
++        return false;
++
++    identifier = m_hash;
++    return true;
++}
++
++size_t CryptoKeyRSA::keySizeInBits() const
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++void CryptoKeyRSA::generatePair(CryptoAlgorithmIdentifier, CryptoAlgorithmIdentifier, bool, unsigned, const Vector<uint8_t>&, bool, CryptoKeyUsageBitmap, KeyPairCallback&&, VoidCallback&& failureCallback, ScriptExecutionContext*)
++{
++    failureCallback();
++}
++
++RefPtr<CryptoKeyRSA> CryptoKeyRSA::importSpki(CryptoAlgorithmIdentifier, std::optional<CryptoAlgorithmIdentifier>, Vector<uint8_t>&&, bool, CryptoKeyUsageBitmap)
++{
++    return nullptr;
++}
++
++RefPtr<CryptoKeyRSA> CryptoKeyRSA::importPkcs8(CryptoAlgorithmIdentifier, std::optional<CryptoAlgorithmIdentifier>, Vector<uint8_t>&&, bool, CryptoKeyUsageBitmap)
++{
++    return nullptr;
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoKeyRSA::exportSpki() const
++{
++    return notSupported();
++}
++
++ExceptionOr<Vector<uint8_t>> CryptoKeyRSA::exportPkcs8() const
++{
++    return notSupported();
++}
++
++auto CryptoKeyRSA::algorithm() const -> KeyAlgorithm
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++std::unique_ptr<CryptoKeyRSAComponents> CryptoKeyRSA::exportData() const
++{
++    return nullptr;
++}
++
++std::optional<Vector<uint8_t>> defaultWebCryptoMasterKey()
++{
++    return std::nullopt;
++}
++
++bool wrapSerializedCryptoKey(const Vector<uint8_t>&, const Vector<uint8_t>& key, Vector<uint8_t>& result)
++{
++    result = Vector<uint8_t>(key);
++    return true;
++}
++
++std::optional<struct WrappedCryptoKey> readSerializedCryptoKey(const Vector<uint8_t>& wrappedKey)
++{
++    std::array<uint8_t, 24> a { 0 };
++    std::array<uint8_t, 16> b { 0 };
++    struct WrappedCryptoKey k { a, wrappedKey, b };
++    return k;
++}
++
++std::optional<Vector<uint8_t>> unwrapCryptoKey(const Vector<uint8_t>&, const struct WrappedCryptoKey& wrappedKey)
++{
++    return wrappedKey.encryptedKey;
++}
++
++} // namespace WebCore
++
++#endif
+diff --git a/Source/cmake/OptionsWin.cmake b/Source/cmake/OptionsWin.cmake
+index d562687..3b0056d 100644
+--- a/Source/cmake/OptionsWin.cmake
++++ b/Source/cmake/OptionsWin.cmake
+@@ -51,7 +51,12 @@ find_package(HarfBuzz 1.4.2 REQUIRED COMPONENTS ICU)
+ find_package(ICU 70.1 REQUIRED COMPONENTS data i18n uc)
+ find_package(JPEG 1.5.2 REQUIRED)
+ find_package(LibXml2 2.9.7 REQUIRED)
+-find_package(OpenSSL REQUIRED)
++# Builds WebCore without OpenSSL: Web Crypto supports no algorithm, and PAL digests use the Windows CryptoAPI.
++option(USE_CRYPTO_STUB "Build WebCore's Web Crypto and PAL's digests without OpenSSL" OFF)
++
++if (NOT USE_CRYPTO_STUB OR NOT USE_NETWORK_STUB)
++    find_package(OpenSSL REQUIRED)
++endif ()
+ find_package(PNG 1.6.34 REQUIRED)
+ find_package(SQLite3 3.23.1 REQUIRED)
+ find_package(ZLIB 1.2.11 REQUIRED)
+@@ -130,7 +135,11 @@ SET_AND_EXPOSE_TO_BUILD(USE_CURL ON)
+ SET_AND_EXPOSE_TO_BUILD(USE_GRAPHICS_LAYER_TEXTURE_MAPPER ON)
+ SET_AND_EXPOSE_TO_BUILD(USE_GRAPHICS_LAYER_WC ON)
+ SET_AND_EXPOSE_TO_BUILD(USE_HARFBUZZ ON)
+-SET_AND_EXPOSE_TO_BUILD(USE_OPENSSL ON)
++if (USE_CRYPTO_STUB)
++    SET_AND_EXPOSE_TO_BUILD(USE_CRYPTO_STUB ON)
++else ()
++    SET_AND_EXPOSE_TO_BUILD(USE_OPENSSL ON)
++endif ()
+ SET_AND_EXPOSE_TO_BUILD(USE_TEXTURE_MAPPER ON)
+ SET_AND_EXPOSE_TO_BUILD(USE_THEME_ADWAITA ON)
+ SET_AND_EXPOSE_TO_BUILD(USE_MEDIA_FOUNDATION ${ENABLE_VIDEO})
+@@ -139,11 +148,13 @@ SET_AND_EXPOSE_TO_BUILD(HAVE_GL_FENCE ON)
+ SET_AND_EXPOSE_TO_BUILD(ENABLE_DEVELOPER_MODE ${DEVELOPER_MODE})
+
+ # See if OpenSSL implementation is BoringSSL
+-cmake_push_check_state()
+-set(CMAKE_REQUIRED_INCLUDES "${OPENSSL_INCLUDE_DIR}")
+-set(CMAKE_REQUIRED_LIBRARIES "${OPENSSL_LIBRARIES}")
+-WEBKIT_CHECK_HAVE_SYMBOL(USE_BORINGSSL OPENSSL_IS_BORINGSSL openssl/ssl.h)
+-cmake_pop_check_state()
++if (OPENSSL_FOUND)
++    cmake_push_check_state()
++    set(CMAKE_REQUIRED_INCLUDES "${OPENSSL_INCLUDE_DIR}")
++    set(CMAKE_REQUIRED_LIBRARIES "${OPENSSL_LIBRARIES}")
++    WEBKIT_CHECK_HAVE_SYMBOL(USE_BORINGSSL OPENSSL_IS_BORINGSSL openssl/ssl.h)
++    cmake_pop_check_state()
++endif ()
+
+ if (ENABLE_XSLT)
+     find_package(LibXslt 1.1.32 REQUIRED)

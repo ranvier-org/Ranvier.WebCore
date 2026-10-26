@@ -1,0 +1,245 @@
+diff --git a/Source/WebCore/Modules/stub/BrowserAPIStub.cmake b/Source/WebCore/Modules/stub/BrowserAPIStub.cmake
+new file mode 100644
+index 0000000..3d73fbb
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/BrowserAPIStub.cmake
+@@ -0,0 +1,60 @@
++# WebCore without WebTransport, the File System and entries APIs, WebXR and the WebGPU bindings
++# (USE_BROWSER_API_STUB). Their sources and IDL files are left out. The IDL files in Modules/stub/idl
++# replace the interfaces and mixins referenced by the remaining WebCore code; they declare no members
++# and no interface objects. BrowserAPIStub.cpp defines the members of the excluded types that the
++# remaining WebCore code references.
++
++set(WebCore_BROWSER_API_STUB_EXCLUDED "^Modules/(WebGPU|entriesapi|filesystem|webtransport|webxr)/|^html/canvas/GPU(BasedCanvasRenderingContext|CanvasContext)\.")
++set(WebCore_BROWSER_API_STUB_IDL_FILES
++    Modules/stub/idl/FileSystemDirectoryHandle.idl
++    Modules/stub/idl/FileSystemEntry.idl
++    Modules/stub/idl/FileSystemFileHandle.idl
++    Modules/stub/idl/FileSystemHandle.idl
++    Modules/stub/idl/GPUCanvasContext.idl
++)
++
++list(APPEND WebCore_UNIFIED_SOURCE_EXCLUDES
++    "${WebCore_BROWSER_API_STUB_EXCLUDED}"
++    "^bindings/js/JSWebXR(RigidTransform|Session|View)Custom\.cpp"
++)
++
++set(WebCore_BROWSER_API_STUB_EXCLUDED_IDL_FILES ${WebCore_IDL_FILES} ${WebCore_SUPPLEMENTAL_IDL_FILES})
++list(FILTER WebCore_BROWSER_API_STUB_EXCLUDED_IDL_FILES INCLUDE REGEX "${WebCore_BROWSER_API_STUB_EXCLUDED}")
++foreach (_idl IN LISTS WebCore_BROWSER_API_STUB_EXCLUDED_IDL_FILES)
++    get_filename_component(_name "${_idl}" NAME_WE)
++    if (NOT "${WebCore_BROWSER_API_STUB_IDL_FILES}" MATCHES "/${_name}\.idl")
++        list(APPEND WebCore_UNIFIED_SOURCE_EXCLUDES "^JS${_name}\.cpp")
++    endif ()
++endforeach ()
++
++list(FILTER WebCore_IDL_FILES EXCLUDE REGEX "${WebCore_BROWSER_API_STUB_EXCLUDED}")
++list(FILTER WebCore_SUPPLEMENTAL_IDL_FILES EXCLUDE REGEX "${WebCore_BROWSER_API_STUB_EXCLUDED}")
++list(APPEND WebCore_IDL_FILES ${WebCore_BROWSER_API_STUB_IDL_FILES})
++list(APPEND WebCore_SUPPLEMENTAL_IDL_FILES
++    Modules/stub/idl/NavigatorGPU.idl
++)
++
++# The event factory inputs without the excluded events and event targets, read from the inputs
++# already in use.
++function(BROWSER_API_STUB_FACTORY _input _name _variable _excluded)
++    file(READ "${_input}" _contents)
++    string(REPLACE "\n" ";" _lines "${_contents}")
++    list(FILTER _lines EXCLUDE REGEX "^(${_excluded})( .*)?$")
++    string(REPLACE ";" "\n" _contents "${_lines}")
++    file(WRITE "${WebCore_DERIVED_SOURCES_DIR}/BrowserAPIStub${_name}.in" "${_contents}")
++    set(${_variable} "${WebCore_DERIVED_SOURCES_DIR}/BrowserAPIStub${_name}.in" PARENT_SCOPE)
++endfunction()
++if (NOT WebCore_EVENT_INTERFACES_FILE)
++    set(WebCore_EVENT_INTERFACES_FILE "${WEBCORE_DIR}/dom/EventInterfaces.in")
++endif ()
++if (NOT WebCore_EVENT_TARGET_FACTORY_FILE)
++    set(WebCore_EVENT_TARGET_FACTORY_FILE "${WEBCORE_DIR}/dom/EventTargetFactory.in")
++endif ()
++BROWSER_API_STUB_FACTORY("${WebCore_EVENT_INTERFACES_FILE}" EventInterfaces WebCore_EVENT_INTERFACES_FILE
++    "GPUUncapturedErrorEvent|XR[A-Za-z]*Event")
++BROWSER_API_STUB_FACTORY("${WebCore_EVENT_TARGET_FACTORY_FILE}" EventTargetFactory WebCore_EVENT_TARGET_FACTORY_FILE
++    "GPUDevice|WebXR[A-Za-z]*")
++
++list(APPEND WebCore_SOURCES
++    Modules/stub/BrowserAPIStub.cpp
++)
+diff --git a/Source/WebCore/Modules/stub/BrowserAPIStub.cpp b/Source/WebCore/Modules/stub/BrowserAPIStub.cpp
+new file mode 100644
+index 0000000..bbc2e0f
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/BrowserAPIStub.cpp
+@@ -0,0 +1,69 @@
++// Members of WebCore's File System, entries API and WebGPU types for a build without them
++// (USE_BROWSER_API_STUB).
++//
++// No File System handle, storage connection, entry or GPU object is ever created: page scripts have no
++// interface that returns one, and the context lookups below report no storage connection, so
++// deserializing a handle fails. Every other member is a release assertion.
++
++#include "config.h"
++
++#include "DOMFileSystem.h"
++#include "File.h"
++#include "FileSystemDirectoryHandle.h"
++#include "FileSystemFileHandle.h"
++#include "FileSystemHandleStorageKeepAlive.h"
++#include "FileSystemStorageConnection.h"
++#include "GPU.h"
++#include "GPUCanvasContext.h"
++#include "WGSLLanguageFeatures.h"
++#include "WorkerFileSystemStorageConnection.h"
++#include <wtf/RefPtr.h>
++
++namespace WebCore {
++
++RefPtr<FileSystemStorageConnection> fileSystemStorageConnectionForContext(ScriptExecutionContext&)
++{
++    return nullptr;
++}
++
++ClientOrigin clientOriginForContext(ScriptExecutionContext&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++FileSystemHandleKeepAlive::FileSystemHandleKeepAlive(ClientOrigin&&, FileSystemHandleGlobalIdentifier, Ref<FileSystemStorageConnection>&&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++// A keep-alive is only ever default-constructed or moved from, so it holds no connection.
++FileSystemHandleKeepAlive::~FileSystemHandleKeepAlive() { RELEASE_ASSERT(!m_connection); }
++
++FileSystemHandleKeepAlive FileSystemHandleKeepAlive::copy() const { RELEASE_ASSERT_NOT_REACHED(); }
++
++FileSystemHandleStorageKeepAlive::~FileSystemHandleStorageKeepAlive() { RELEASE_ASSERT_NOT_REACHED(); }
++
++void FileSystemHandle::markAsUnresolved(ClientOrigin&&, Ref<FileSystemStorageConnection>&&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<FileSystemFileHandle> FileSystemFileHandle::create(ScriptExecutionContext&, String&&, FileSystemHandleGlobalIdentifier) { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<FileSystemDirectoryHandle> FileSystemDirectoryHandle::create(ScriptExecutionContext&, String&&, FileSystemHandleGlobalIdentifier) { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<FileSystemDirectoryHandle> FileSystemDirectoryHandle::create(ScriptExecutionContext&, String&&, FileSystemHandleGlobalIdentifier, FileSystemHandleIdentifier, Ref<FileSystemStorageConnection>&&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<WorkerFileSystemStorageConnection> WorkerFileSystemStorageConnection::create(WorkerGlobalScope&, Ref<FileSystemStorageConnection>&&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++void WorkerFileSystemStorageConnection::scopeClosed() { RELEASE_ASSERT_NOT_REACHED(); }
++
++void WorkerFileSystemStorageConnection::connectionClosed() { RELEASE_ASSERT_NOT_REACHED(); }
++
++DOMFileSystem::~DOMFileSystem() { RELEASE_ASSERT_NOT_REACHED(); }
++
++Ref<FileSystemEntry> DOMFileSystem::fileAsEntry(ScriptExecutionContext&) { RELEASE_ASSERT_NOT_REACHED(); }
++
++GPU::~GPU() { RELEASE_ASSERT_NOT_REACHED(); }
++
++std::unique_ptr<GPUCanvasContext> GPUCanvasContext::create(CanvasBase&, GPU&, Document*) { RELEASE_ASSERT_NOT_REACHED(); }
++
++} // namespace WebCore
++
++// The DOMFileSystem constructor resolves to browserAPIStubNotReached.
++extern "C" void browserAPIStubNotReached()
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++#pragma comment(linker, "/alternatename:??0DOMFileSystem@WebCore@@AEAA@$$QEAV?$Ref@VFile@WebCore@@U?$RawPtrTraits@VFile@WebCore@@@WTF@@U?$DefaultRefDerefTraits@VFile@WebCore@@@4@@WTF@@@Z=browserAPIStubNotReached")
+diff --git a/Source/WebCore/Modules/stub/idl/FileSystemDirectoryHandle.idl b/Source/WebCore/Modules/stub/idl/FileSystemDirectoryHandle.idl
+new file mode 100644
+index 0000000..14eaccd
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/FileSystemDirectoryHandle.idl
+@@ -0,0 +1,7 @@
++// FileSystemDirectoryHandle without the File System API (USE_BROWSER_API_STUB): no interface object
++// or members.
++[
++    LegacyNoInterfaceObject,
++    Exposed=(Window,Worker)
++] interface FileSystemDirectoryHandle : FileSystemHandle {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/FileSystemEntry.idl b/Source/WebCore/Modules/stub/idl/FileSystemEntry.idl
+new file mode 100644
+index 0000000..de994ab
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/FileSystemEntry.idl
+@@ -0,0 +1,7 @@
++// FileSystemEntry without the entries API (USE_BROWSER_API_STUB): no interface object or members.
++[
++    ActiveDOMObject,
++    LegacyNoInterfaceObject,
++    Exposed=Window
++] interface FileSystemEntry {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/FileSystemFileHandle.idl b/Source/WebCore/Modules/stub/idl/FileSystemFileHandle.idl
+new file mode 100644
+index 0000000..8384be2
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/FileSystemFileHandle.idl
+@@ -0,0 +1,7 @@
++// FileSystemFileHandle without the File System API (USE_BROWSER_API_STUB): no interface object or
++// members.
++[
++    LegacyNoInterfaceObject,
++    Exposed=(Window,Worker)
++] interface FileSystemFileHandle : FileSystemHandle {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/FileSystemHandle.idl b/Source/WebCore/Modules/stub/idl/FileSystemHandle.idl
+new file mode 100644
+index 0000000..e325fed
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/FileSystemHandle.idl
+@@ -0,0 +1,7 @@
++// FileSystemHandle without the File System API (USE_BROWSER_API_STUB): no interface object or members.
++[
++    ActiveDOMObject,
++    LegacyNoInterfaceObject,
++    Exposed=(Window,Worker)
++] interface FileSystemHandle {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/GPUCanvasContext.idl b/Source/WebCore/Modules/stub/idl/GPUCanvasContext.idl
+new file mode 100644
+index 0000000..d0117a0
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/GPUCanvasContext.idl
+@@ -0,0 +1,8 @@
++// GPUCanvasContext without the WebGPU bindings (USE_BROWSER_API_STUB): no interface object or
++// members. getContext("webgpu") returns null.
++[
++    ActiveDOMObject,
++    LegacyNoInterfaceObject,
++    Exposed=(Window,Worker)
++] interface GPUCanvasContext {
++};
+diff --git a/Source/WebCore/Modules/stub/idl/NavigatorGPU.idl b/Source/WebCore/Modules/stub/idl/NavigatorGPU.idl
+new file mode 100644
+index 0000000..e821ff6
+--- /dev/null
++++ b/Source/WebCore/Modules/stub/idl/NavigatorGPU.idl
+@@ -0,0 +1,4 @@
++// The NavigatorGPU mixin without the WebGPU bindings (USE_BROWSER_API_STUB): Navigator and
++// WorkerNavigator have no gpu attribute.
++interface mixin NavigatorGPU {
++};
+diff --git a/Source/WebCore/PlatformWin.cmake b/Source/WebCore/PlatformWin.cmake
+index b2e1a07..a0faa42 100644
+--- a/Source/WebCore/PlatformWin.cmake
++++ b/Source/WebCore/PlatformWin.cmake
+@@ -262,3 +262,7 @@ endif ()
+ if (USE_SQLITE_STUB)
+     include(platform/sql/stub/SQLiteStub.cmake)
+ endif ()
++
++if (USE_BROWSER_API_STUB)
++    include(Modules/stub/BrowserAPIStub.cmake)
++endif ()
+diff --git a/Source/cmake/OptionsWin.cmake b/Source/cmake/OptionsWin.cmake
+index 8015f28..624acbc 100644
+--- a/Source/cmake/OptionsWin.cmake
++++ b/Source/cmake/OptionsWin.cmake
+@@ -69,6 +69,11 @@ option(USE_SQLITE_STUB "Build WebCore without SQLite" OFF)
+ if (USE_SQLITE_STUB AND NOT USE_WEB_API_STUB)
+     message(FATAL_ERROR "USE_SQLITE_STUB requires USE_WEB_API_STUB")
+ endif ()
++# Builds WebCore without WebTransport, the File System and entries APIs, WebXR and the WebGPU bindings. Requires USE_WEB_API_STUB.
++option(USE_BROWSER_API_STUB "Build WebCore without WebTransport, the File System and entries APIs, WebXR and the WebGPU bindings" OFF)
++if (USE_BROWSER_API_STUB AND NOT USE_WEB_API_STUB)
++    message(FATAL_ERROR "USE_BROWSER_API_STUB requires USE_WEB_API_STUB")
++endif ()
+ find_package(SQLite3 3.23.1 REQUIRED)
+ find_package(ZLIB 1.2.11 REQUIRED)
+ if (NOT USE_NETWORK_STUB)

@@ -1,0 +1,18 @@
+<Project>
+  <!-- WebCore reads WebKit.resources from the directory of WebCore.dll. A build without a runtime identifier
+       copies runtimes/<rid>/native/** with its folders, so the resources sit beside WebCore.dll there. A build
+       or publish with a runtime identifier flattens native assets into the output root, so this puts the
+       resources back into WebKit.resources beside them. build.py writes the package's runtime identifier
+       for @RID@, and the project packs the result as buildTransitive/<PackageId>.targets. -->
+  <PropertyGroup>
+    <!-- A full path without "..": MSBuild computes %(RecursiveDir) wrongly from an include that has one. -->
+    <_RanvierWebKitResources>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../runtimes/@RID@/native/WebKit.resources/'))</_RanvierWebKitResources>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <None Include="$(_RanvierWebKitResources)**/*"
+          Link="WebKit.resources/%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest"
+          Visible="false" />
+  </ItemGroup>
+</Project>

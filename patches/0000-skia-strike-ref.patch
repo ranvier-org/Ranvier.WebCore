@@ -1,0 +1,12 @@
+diff --git a/Source/ThirdParty/skia/CMakeLists.txt b/Source/ThirdParty/skia/CMakeLists.txt
+index 49b9262..f050775 100644
+--- a/Source/ThirdParty/skia/CMakeLists.txt
++++ b/Source/ThirdParty/skia/CMakeLists.txt
+@@ -238,6 +238,7 @@ add_library(Skia STATIC
+     src/core/SkStream.cpp
+     src/core/SkStrike.cpp
+     src/core/SkStrikeCache.cpp
++    src/core/SkStrikeRef.cpp
+     src/core/SkStrikeSpec.cpp
+     src/core/SkString.cpp
+     src/core/SkStringUtils.cpp

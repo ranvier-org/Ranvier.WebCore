@@ -1,0 +1,212 @@
+diff --git a/Source/WebCore/PlatformWin.cmake b/Source/WebCore/PlatformWin.cmake
+index f86ea76..4913566 100644
+--- a/Source/WebCore/PlatformWin.cmake
++++ b/Source/WebCore/PlatformWin.cmake
+@@ -1,7 +1,15 @@
+ add_definitions(/bigobj -D__STDC_CONSTANT_MACROS)
+
++if (NOT USE_NETWORK_STUB)
++    list(APPEND WebCore_SOURCES platform/network/win/CurlSSLHandleWin.cpp)
++endif ()
++
+ include(platform/Adwaita.cmake)
+-include(platform/Curl.cmake)
++if (USE_NETWORK_STUB)
++    include(platform/network/stub/NetworkStub.cmake)
++else ()
++    include(platform/Curl.cmake)
++endif ()
+ include(platform/ImageDecoders.cmake)
+ include(platform/OpenSSL.cmake)
+ include(platform/TextureMapper.cmake)
+@@ -83,7 +91,6 @@ list(APPEND WebCore_SOURCES
+     platform/graphics/win/SystemFontDatabaseWin.cpp
+     platform/graphics/win/TransformationMatrixWin.cpp
+
+-    platform/network/win/CurlSSLHandleWin.cpp
+     platform/network/win/NetworkStateNotifierWin.cpp
+
+     platform/text/Hyphenation.cpp
+diff --git a/Source/WebCore/platform/OpenSSL.cmake b/Source/WebCore/platform/OpenSSL.cmake
+index d65ff90..bf88678 100644
+--- a/Source/WebCore/platform/OpenSSL.cmake
++++ b/Source/WebCore/platform/OpenSSL.cmake
+@@ -18,3 +18,7 @@ list(APPEND WebCore_SOURCES
+     crypto/openssl/OpenSSLUtilities.cpp
+     crypto/openssl/SerializedCryptoKeyWrapOpenSSL.cpp
+ )
++
++list(APPEND WebCore_LIBRARIES
++    OpenSSL::Crypto
++)
+diff --git a/Source/WebCore/platform/network/stub/NetworkStub.cmake b/Source/WebCore/platform/network/stub/NetworkStub.cmake
+new file mode 100644
+index 0000000..3ddd85e
+--- /dev/null
++++ b/Source/WebCore/platform/network/stub/NetworkStub.cmake
+@@ -0,0 +1,30 @@
++# WebCore's curl network layer without libcurl, libpsl and OpenSSL (USE_NETWORK_STUB). It keeps the curl
++# port's request, response, error, cookie and protection space types, which depend exclusively on WebCore.
++# NetworkStub.cpp defines the members of the excluded files that WebCore references.
++list(APPEND WebCore_PRIVATE_INCLUDE_DIRECTORIES
++    "${WEBCORE_DIR}/platform/network/curl"
++)
++
++list(APPEND WebCore_SOURCES
++    platform/network/curl/CookieJarDB.cpp
++    platform/network/curl/CookieStorageCurl.cpp
++    platform/network/curl/CookieUtil.cpp
++    platform/network/curl/DNSResolveQueueCurl.cpp
++    platform/network/curl/ProtectionSpaceCurl.cpp
++    platform/network/curl/ResourceRequestCurl.cpp
++
++    platform/network/stub/NetworkStub.cpp
++)
++
++list(APPEND WebCore_PRIVATE_FRAMEWORK_HEADERS
++    platform/network/curl/AuthenticationChallenge.h
++    platform/network/curl/CertificateInfo.h
++    platform/network/curl/CookieJarDB.h
++    platform/network/curl/CookieUtil.h
++    platform/network/curl/CurlProxySettings.h
++    platform/network/curl/DNSResolveQueueCurl.h
++    platform/network/curl/ProtectionSpaceCurl.h
++    platform/network/curl/ResourceError.h
++    platform/network/curl/ResourceRequest.h
++    platform/network/curl/ResourceResponse.h
++)
+diff --git a/Source/WebCore/platform/network/stub/NetworkStub.cpp b/Source/WebCore/platform/network/stub/NetworkStub.cpp
+new file mode 100644
+index 0000000..b6288bf
+--- /dev/null
++++ b/Source/WebCore/platform/network/stub/NetworkStub.cpp
+@@ -0,0 +1,100 @@
++// Members of WebCore's curl network layer for a build without libcurl, libpsl and OpenSSL (USE_NETWORK_STUB).
++//
++// The NetworkStorageSession holds no cookies: cookie reads return none and cookie writes are dropped. The
++// public suffix list is empty, so a host's registrable domain is unknown. Certificates carry their chain
++// and verification error, with no summary.
++
++#include "config.h"
++
++#include "CertificateInfo.h"
++#include "Cookie.h"
++#include "HTTPParsers.h"
++#include "NetworkStorageSession.h"
++#include "PublicSuffixStore.h"
++#include "ResourceError.h"
++#include "ResourceResponse.h"
++#include "SameSiteInfo.h"
++#include <wtf/CompletionHandler.h>
++#include <wtf/CrossThreadCopier.h>
++
++namespace WebCore {
++
++bool PublicSuffixStore::platformIsPublicSuffix(StringView) const
++{
++    return false;
++}
++
++String PublicSuffixStore::platformTopPrivatelyControlledDomain(StringView) const
++{
++    return String();
++}
++
++String ResourceResponse::platformSuggestedFilename() const
++{
++    auto value = httpHeaderField(HTTPHeaderName::ContentDisposition);
++    StringView contentDisposition = filenameFromHTTPContentDisposition(value);
++    if (contentDisposition.is8Bit())
++        return String::fromUTF8WithLatin1Fallback(contentDisposition.span8());
++    return contentDisposition.toString();
++}
++
++void ResourceError::doPlatformIsolatedCopy(const ResourceError&)
++{
++}
++
++bool ResourceError::platformCompare(const ResourceError&, const ResourceError&)
++{
++    return true;
++}
++
++CertificateInfo::CertificateInfo(int verificationError, CertificateChain&& certificateChain)
++    : m_verificationError(verificationError)
++    , m_certificateChain(WTF::move(certificateChain))
++{
++}
++
++CertificateInfo CertificateInfo::isolatedCopy() const
++{
++    return { m_verificationError, crossThreadCopy(m_certificateChain) };
++}
++
++std::optional<CertificateSummary> CertificateInfo::summary() const
++{
++    return std::nullopt;
++}
++
++void NetworkStorageSession::setCookie(const Cookie&)
++{
++}
++
++void NetworkStorageSession::setCookiesFromDOM(const URL&, const SameSiteInfo&, const URL&, std::optional<FrameIdentifier>, std::optional<PageIdentifier>, ApplyTrackingPrevention, RequiresScriptTrackingPrivacy, const String&, ShouldRelaxThirdPartyCookieBlocking, IsKnownCrossSiteTracker) const
++{
++}
++
++void NetworkStorageSession::deleteCookie(const URL&, const URL&, const String&, CompletionHandler<void()>&& completionHandler) const
++{
++    completionHandler();
++}
++
++void NetworkStorageSession::deleteCookiesForHostnames(std::span<const String>, IncludeHttpOnlyCookies, ScriptWrittenCookiesOnly, CompletionHandler<void()>&& completionHandler)
++{
++    completionHandler();
++}
++
++bool NetworkStorageSession::getRawCookies(const URL&, const SameSiteInfo&, const URL&, std::optional<FrameIdentifier>, std::optional<PageIdentifier>, ApplyTrackingPrevention, ShouldRelaxThirdPartyCookieBlocking, Vector<Cookie>& rawCookies) const
++{
++    rawCookies.clear();
++    return true;
++}
++
++std::pair<String, bool> NetworkStorageSession::cookiesForDOM(const URL&, const SameSiteInfo&, const URL&, std::optional<FrameIdentifier>, std::optional<PageIdentifier>, IncludeSecureCookies, ApplyTrackingPrevention, ShouldRelaxThirdPartyCookieBlocking, IsKnownCrossSiteTracker) const
++{
++    return { String(), false };
++}
++
++std::pair<String, bool> NetworkStorageSession::cookieRequestHeaderFieldValue(const URL&, const SameSiteInfo&, const URL&, std::optional<FrameIdentifier>, std::optional<PageIdentifier>, IncludeSecureCookies, ApplyTrackingPrevention, ShouldRelaxThirdPartyCookieBlocking, IsKnownCrossSiteTracker) const
++{
++    return { String(), false };
++}
++
++} // namespace WebCore
+diff --git a/Source/cmake/OptionsWin.cmake b/Source/cmake/OptionsWin.cmake
+index 24ee121..d562687 100644
+--- a/Source/cmake/OptionsWin.cmake
++++ b/Source/cmake/OptionsWin.cmake
+@@ -41,7 +41,12 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+-find_package(CURL 7.87.0 REQUIRED)
++# Builds WebCore's network layer without libcurl and libpsl: the embedder's LoaderStrategy serves every load.
++option(USE_NETWORK_STUB "Build WebCore without libcurl and libpsl" OFF)
++
++if (NOT USE_NETWORK_STUB)
++    find_package(CURL 7.87.0 REQUIRED)
++endif ()
+ find_package(HarfBuzz 1.4.2 REQUIRED COMPONENTS ICU)
+ find_package(ICU 70.1 REQUIRED COMPONENTS data i18n uc)
+ find_package(JPEG 1.5.2 REQUIRED)
+@@ -50,7 +55,9 @@ find_package(OpenSSL REQUIRED)
+ find_package(PNG 1.6.34 REQUIRED)
+ find_package(SQLite3 3.23.1 REQUIRED)
+ find_package(ZLIB 1.2.11 REQUIRED)
+-find_package(LibPSL 0.20.2 REQUIRED)
++if (NOT USE_NETWORK_STUB)
++    find_package(LibPSL 0.20.2 REQUIRED)
++endif ()
+ find_package(WebP REQUIRED COMPONENTS demux)
+
+ if (NOT TARGET SQLite3::SQLite3) # CMake < 4.3

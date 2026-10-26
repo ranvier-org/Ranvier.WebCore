@@ -1,0 +1,11 @@
+# Applied in order by patches.py over the pinned WebKit commit.
+0000-skia-strike-ref.patch
+0001-angle-stub.patch
+0002-network-stub.patch
+0003-crypto-stub.patch
+0004-gpu-stub.patch
+0005-web-api-stub.patch
+0006-sqlite-stub.patch
+0007-browser-api-stub.patch
+0008-inspector-stub.patch
+0009-jsc-inspector-stub.patch

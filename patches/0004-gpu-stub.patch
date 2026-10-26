@@ -1,0 +1,332 @@
+diff --git a/Source/ThirdParty/skia/CMakeLists.txt b/Source/ThirdParty/skia/CMakeLists.txt
+index f050775..8231f00 100644
+--- a/Source/ThirdParty/skia/CMakeLists.txt
++++ b/Source/ThirdParty/skia/CMakeLists.txt
+@@ -1066,10 +1066,14 @@ endif ()
+ # Enable the Ganesh GPU renderer.
+ #
+ # FIXME: Support other combinations.
+-target_compile_definitions(Skia PRIVATE
+-    SK_GL
+-    SK_GANESH
+-)
++if (USE_GPU_STUB)
++    include(GPUStub.cmake)
++else ()
++    target_compile_definitions(Skia PRIVATE
++        SK_GL
++        SK_GANESH
++    )
++endif ()
+
+ #
+ # FIXME: We may want to support both GLES and "traditional" GL, so we maybe
+diff --git a/Source/ThirdParty/skia/GPUStub.cmake b/Source/ThirdParty/skia/GPUStub.cmake
+new file mode 100644
+index 0000000..44a338b
+--- /dev/null
++++ b/Source/ThirdParty/skia/GPUStub.cmake
+@@ -0,0 +1,10 @@
++# Skia without its GPU backends (USE_GPU_STUB): Ganesh, the GPU text and tessellation code, the SkSL
++# code generators for GPU shading languages, and the EGL interface. Raster drawing and the SkSL raster
++# pipeline remain. stub/GaneshStub.cpp defines the Ganesh entry points WebKit references.
++
++get_target_property(_skia_sources Skia SOURCES)
++list(FILTER _skia_sources EXCLUDE REGEX "^src/gpu/|^src/text/gpu/|^src/sksl/codegen/SkSL(GLSL|Metal|PipelineStage|SPIRV|WGSL)CodeGenerator\\.cpp$")
++set_property(TARGET Skia PROPERTY SOURCES ${_skia_sources})
++unset(_skia_sources)
++
++target_sources(Skia PRIVATE stub/GaneshStub.cpp)
+diff --git a/Source/ThirdParty/skia/stub/GaneshStub.cpp b/Source/ThirdParty/skia/stub/GaneshStub.cpp
+new file mode 100644
+index 0000000..ba0fe6c
+--- /dev/null
++++ b/Source/ThirdParty/skia/stub/GaneshStub.cpp
+@@ -0,0 +1,162 @@
++/*
++ * The Ganesh entry points WebKit references, for a Skia built without Ganesh (USE_GPU_STUB).
++ *
++ * Every factory returns nullptr or an invalid object, so no GrDirectContext, GPU surface or texture-backed
++ * image exists. Members of a context abort.
++ */
++
++#include "include/core/SkColorSpace.h"
++#include "include/core/SkImage.h"
++#include "include/core/SkSurface.h"
++#include "include/gpu/ganesh/GrBackendSurface.h"
++#include "include/gpu/ganesh/GrContextThreadSafeProxy.h"
++#include "include/gpu/ganesh/GrDirectContext.h"
++#include "include/gpu/ganesh/GrRecordingContext.h"
++#include "include/gpu/ganesh/SkImageGanesh.h"
++#include "include/gpu/ganesh/SkSurfaceGanesh.h"
++#include "include/gpu/ganesh/gl/GrGLBackendSurface.h"
++#include "include/gpu/ganesh/gl/GrGLDirectContext.h"
++#include "include/gpu/ganesh/gl/GrGLInterface.h"
++#include "include/gpu/ganesh/gl/egl/GrGLMakeEGLInterface.h"
++#include "include/private/chromium/GrPromiseImageTexture.h"
++#include "include/private/chromium/SkImageChromium.h"
++#include "src/gpu/ganesh/GrBackendSurfacePriv.h"
++
++#define GANESH_STUB_ABORT() SK_ABORT("Skia is built without Ganesh")
++
++GrBackendFormat::~GrBackendFormat() = default;
++
++GrBackendTexture::GrBackendTexture() : fIsValid(false) {}
++
++GrBackendTexture::GrBackendTexture(const GrBackendTexture&) : fIsValid(false) {}
++
++GrBackendTexture::~GrBackendTexture() = default;
++
++GrPromiseImageTexture::GrPromiseImageTexture(const GrBackendTexture& backendTexture) : fBackendTexture(backendTexture) {}
++
++GrPromiseImageTexture::~GrPromiseImageTexture() = default;
++
++namespace GrBackendTextures {
++
++GrBackendTexture MakeGL(int, int, skgpu::Mipmapped, const GrGLTextureInfo&, std::string_view)
++{
++    return {};
++}
++
++bool GetGLTextureInfo(const GrBackendTexture&, GrGLTextureInfo*)
++{
++    return false;
++}
++
++} // namespace GrBackendTextures
++
++namespace GrDirectContexts {
++
++sk_sp<GrDirectContext> MakeGL(sk_sp<const GrGLInterface>, const GrContextOptions&)
++{
++    return nullptr;
++}
++
++} // namespace GrDirectContexts
++
++namespace GrGLInterfaces {
++
++sk_sp<const GrGLInterface> MakeEGL()
++{
++    return nullptr;
++}
++
++} // namespace GrGLInterfaces
++
++namespace SkImages {
++
++sk_sp<SkImage> BorrowTextureFrom(GrRecordingContext*, const GrBackendTexture&, GrSurfaceOrigin, SkColorType, SkAlphaType, sk_sp<SkColorSpace>, TextureReleaseProc, ReleaseContext)
++{
++    return nullptr;
++}
++
++bool GetBackendTextureFromImage(const SkImage*, GrBackendTexture*, bool, GrSurfaceOrigin*)
++{
++    return false;
++}
++
++sk_sp<SkImage> PromiseTextureFrom(sk_sp<GrContextThreadSafeProxy>, const GrBackendFormat&, SkISize, skgpu::Mipmapped, GrSurfaceOrigin, SkColorType, SkAlphaType, sk_sp<SkColorSpace>, PromiseImageTextureFulfillProc, PromiseImageTextureReleaseProc, PromiseImageTextureContext)
++{
++    return nullptr;
++}
++
++} // namespace SkImages
++
++namespace SkSurfaces {
++
++sk_sp<SkSurface> RenderTarget(GrRecordingContext*, skgpu::Budgeted, const SkImageInfo&, int, GrSurfaceOrigin, const SkSurfaceProps*, bool, bool)
++{
++    return nullptr;
++}
++
++sk_sp<SkSurface> WrapBackendTexture(GrRecordingContext*, const GrBackendTexture&, GrSurfaceOrigin, int, SkColorType, sk_sp<SkColorSpace>, const SkSurfaceProps*, TextureReleaseProc, ReleaseContext)
++{
++    return nullptr;
++}
++
++} // namespace SkSurfaces
++
++GrBackendFormat GrContextThreadSafeProxy::defaultBackendFormat(SkColorType, GrRenderable) const
++{
++    GANESH_STUB_ABORT();
++}
++
++SkRecorder* GrRecordingContext::asRecorder()
++{
++    GANESH_STUB_ABORT();
++}
++
++void GrDirectContext::releaseResourcesAndAbandonContext()
++{
++    GANESH_STUB_ABORT();
++}
++
++size_t GrDirectContext::getResourceCacheLimit() const
++{
++    GANESH_STUB_ABORT();
++}
++
++void GrDirectContext::setResourceCacheLimit(size_t)
++{
++    GANESH_STUB_ABORT();
++}
++
++void GrDirectContext::freeGpuResources()
++{
++    GANESH_STUB_ABORT();
++}
++
++void GrDirectContext::purgeUnlockedResources(GrPurgeResourceOptions)
++{
++    GANESH_STUB_ABORT();
++}
++
++GrSemaphoresSubmitted GrDirectContext::flush(const GrFlushInfo&)
++{
++    GANESH_STUB_ABORT();
++}
++
++void GrDirectContext::flush(const sk_sp<const SkImage>&)
++{
++    GANESH_STUB_ABORT();
++}
++
++void GrDirectContext::flushAndSubmit(SkSurface*, GrSyncCpu)
++{
++    GANESH_STUB_ABORT();
++}
++
++void GrDirectContext::flush(SkSurface*)
++{
++    GANESH_STUB_ABORT();
++}
++
++bool GrDirectContext::submit(const GrSubmitInfo&)
++{
++    GANESH_STUB_ABORT();
++}
+diff --git a/Source/WebCore/PlatformWin.cmake b/Source/WebCore/PlatformWin.cmake
+index f20f3bb..58eb009 100644
+--- a/Source/WebCore/PlatformWin.cmake
++++ b/Source/WebCore/PlatformWin.cmake
+@@ -250,3 +250,7 @@ endif ()
+ if (USE_SKIA)
+     list(APPEND WebCore_PRIVATE_LIBRARIES ${SHARPYUV_LIBS})
+ endif ()
++
++if (USE_GPU_STUB)
++    include(platform/graphics/stub/GPUStub.cmake)
++endif ()
+diff --git a/Source/WebCore/platform/graphics/stub/GPUStub.cmake b/Source/WebCore/platform/graphics/stub/GPUStub.cmake
+new file mode 100644
+index 0000000..7dc8149
+--- /dev/null
++++ b/Source/WebCore/platform/graphics/stub/GPUStub.cmake
+@@ -0,0 +1,9 @@
++# WebCore without GPU rendering (USE_GPU_STUB): the TextureMapper compositor, EGL and GL contexts and
++# PlatformDisplay. GPUStub.cpp defines the members of these types that the remaining WebCore code
++# references; painting is raster only.
++
++list(FILTER WebCore_SOURCES EXCLUDE REGEX "^platform/graphics/(texmap|egl|angle)/|^platform/graphics/(win/)?PlatformDisplay(Win)?\.cpp$")
++
++list(APPEND WebCore_SOURCES
++    platform/graphics/stub/GPUStub.cpp
++)
+diff --git a/Source/WebCore/platform/graphics/stub/GPUStub.cpp b/Source/WebCore/platform/graphics/stub/GPUStub.cpp
+new file mode 100644
+index 0000000..cfd6962
+--- /dev/null
++++ b/Source/WebCore/platform/graphics/stub/GPUStub.cpp
+@@ -0,0 +1,78 @@
++// Members of WebCore's GPU rendering types for a build without TextureMapper, EGL and PlatformDisplay
++// (USE_GPU_STUB).
++//
++// Painting is raster only: no GL context, fence, texture or composited layer exists, and a call that
++// requires one is a release assertion. GLFence reports itself unsupported.
++
++#include "config.h"
++
++#include "BitmapTexture.h"
++#include "GLContext.h"
++#include "GLContextWrapper.h"
++#include "GLDisplay.h"
++#include "GLFence.h"
++#include "GraphicsLayer.h"
++#include "PlatformDisplay.h"
++
++namespace WebCore {
++
++Ref<GraphicsLayer> GraphicsLayer::create(GraphicsLayerFactory*, GraphicsLayerClient&, Type)
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++PlatformDisplay& PlatformDisplay::sharedDisplay()
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++GLContextWrapper::~GLContextWrapper() = default;
++
++GLContext::~GLContext() = default;
++
++RefPtr<GLDisplay> GLContext::display() const
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++bool GLContext::makeContextCurrent()
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++GLContext::ScopedGLContextCurrent::ScopedGLContextCurrent(GLContext& context)
++    : m_context(context)
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++GLContext::ScopedGLContextCurrent::~ScopedGLContextCurrent() = default;
++
++bool GLDisplay::runIfNotTerminated(NOESCAPE const Function<void(EGLDisplay)>&)
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++bool GLFence::isSupported(const GLDisplay&)
++{
++    return false;
++}
++
++std::unique_ptr<GLFence> GLFence::create(const GLDisplay&)
++{
++    return nullptr;
++}
++
++BitmapTexture::~BitmapTexture() = default;
++
++void BitmapTexture::updateContents(const void*, const IntRect&, const IntPoint&, int, PixelFormat)
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++GrBackendTexture BitmapTexture::createSkiaBackendTexture() const
++{
++    RELEASE_ASSERT_NOT_REACHED();
++}
++
++} // namespace WebCore
+diff --git a/Source/cmake/OptionsWin.cmake b/Source/cmake/OptionsWin.cmake
+index 3b0056d..1284c72 100644
+--- a/Source/cmake/OptionsWin.cmake
++++ b/Source/cmake/OptionsWin.cmake
+@@ -57,6 +57,9 @@ option(USE_CRYPTO_STUB "Build WebCore's Web Crypto and PAL's digests without Ope
+ if (NOT USE_CRYPTO_STUB OR NOT USE_NETWORK_STUB)
+     find_package(OpenSSL REQUIRED)
+ endif ()
++# Builds WebCore and Skia without GPU rendering: TextureMapper, EGL and GL contexts, PlatformDisplay and Skia's Ganesh backend.
++option(USE_GPU_STUB "Build WebCore and Skia without GPU rendering" OFF)
++
+ find_package(PNG 1.6.34 REQUIRED)
+ find_package(SQLite3 3.23.1 REQUIRED)
+ find_package(ZLIB 1.2.11 REQUIRED)

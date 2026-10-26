@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Packs one runtime's native files, staged by `scripts/build.py package`, into a RID-specific package.
+       Set by build.py: PackageId, PackageVersion, StageDir (with a trailing slash), RuntimeId, WebKitCommit. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <Authors>Ranvier</Authors>
+    <Description>WebCore, JavaScriptCore and the Ranvier C ABI host (RanvierWebCoreHost) for $(RuntimeId), built from WebKit $(WebKitCommit) with the patches and settings of the ranvier-webcore repository.</Description>
+    <PackageTags>webkit;webcore;native;ranvier</PackageTags>
+    <PackageLicenseFile>NOTICE.md</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(StageDir)runtimes/**/*" Pack="true" PackagePath="runtimes/" />
+    <None Include="$(StageDir)include/*" Pack="true" PackagePath="include/" />
+    <None Include="$(StageDir)manifest.json" Pack="true" PackagePath="" />
+    <None Include="$(StageDir)buildTransitive.targets" Pack="true" PackagePath="buildTransitive/$(PackageId).targets" />
+    <None Include="../NOTICE.md" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+</Project>

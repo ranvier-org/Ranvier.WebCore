@@ -1,0 +1,112 @@
+diff --git a/Source/WebCore/PlatformWin.cmake b/Source/WebCore/PlatformWin.cmake
+index 2ed3271..b2e1a07 100644
+--- a/Source/WebCore/PlatformWin.cmake
++++ b/Source/WebCore/PlatformWin.cmake
+@@ -258,3 +258,7 @@ endif ()
+ if (USE_WEB_API_STUB)
+     include(Modules/stub/WebAPIStub.cmake)
+ endif ()
++
++if (USE_SQLITE_STUB)
++    include(platform/sql/stub/SQLiteStub.cmake)
++endif ()
+diff --git a/Source/WebCore/platform/sql/stub/Database.idl b/Source/WebCore/platform/sql/stub/Database.idl
+new file mode 100644
+index 0000000..a2a8be2
+--- /dev/null
++++ b/Source/WebCore/platform/sql/stub/Database.idl
+@@ -0,0 +1,6 @@
++// Database without Web SQL (USE_SQLITE_STUB): no interface object and no members.
++[
++    LegacyNoInterfaceObject,
++    Exposed=Window
++] interface Database {
++};
+diff --git a/Source/WebCore/platform/sql/stub/SQLiteStub.cmake b/Source/WebCore/platform/sql/stub/SQLiteStub.cmake
+new file mode 100644
+index 0000000..3066fae
+--- /dev/null
++++ b/Source/WebCore/platform/sql/stub/SQLiteStub.cmake
+@@ -0,0 +1,22 @@
++# WebCore without SQLite (USE_SQLITE_STUB): the SQLite wrappers, Web SQL databases, the curl cookie
++# database, the search field's recent-searches database and the resource monitor's persistence.
++# Database.idl replaces the Web SQL database interface referenced by the remaining bindings code; it
++# declares no members and no interface object. SQLiteStub.cpp defines the members of these types that
++# the remaining WebCore code references. Requires USE_WEB_API_STUB, which leaves out the SQLite stores
++# of IndexedDB and service workers.
++
++list(APPEND WebCore_UNIFIED_SOURCE_EXCLUDES
++    "^platform/sql/"
++    "^Modules/webdatabase/"
++    "^loader/ResourceMonitorPersistence\.cpp"
++    "^JSSQL[A-Za-z]+\.cpp"
++)
++
++list(FILTER WebCore_SOURCES EXCLUDE REGEX "^platform/network/curl/CookieJarDB\.cpp$|^platform/win/SearchPopupMenuDB\.cpp$")
++list(FILTER WebCore_IDL_FILES EXCLUDE REGEX "^Modules/webdatabase/Database\.idl$|^Modules/webdatabase/SQL")
++list(APPEND WebCore_IDL_FILES platform/sql/stub/Database.idl)
++list(REMOVE_ITEM WebCore_LIBRARIES SQLite3::SQLite3)
++
++list(APPEND WebCore_SOURCES
++    platform/sql/stub/SQLiteStub.cpp
++)
+diff --git a/Source/WebCore/platform/sql/stub/SQLiteStub.cpp b/Source/WebCore/platform/sql/stub/SQLiteStub.cpp
+new file mode 100644
+index 0000000..ede8b34
+--- /dev/null
++++ b/Source/WebCore/platform/sql/stub/SQLiteStub.cpp
+@@ -0,0 +1,37 @@
++// Members of WebCore's Web SQL types for a build without SQLite (USE_SQLITE_STUB).
++//
++// Web SQL opens no database: openDatabase reports an error, and stopping a document's databases does
++// nothing. Members of a database or its context are release assertions.
++
++#include "config.h"
++
++#include "Database.h"
++#include "DatabaseAuthorizer.h"
++#include "DatabaseContext.h"
++#include "DatabaseManager.h"
++#include "DatabaseThread.h"
++#include "LocalDOMWindowWebDatabase.h"
++#include "SQLTransaction.h"
++#include "SecurityOrigin.h"
++#include <wtf/NeverDestroyed.h>
++
++namespace WebCore {
++
++DatabaseManager& DatabaseManager::singleton()
++{
++    static NeverDestroyed<DatabaseManager> instance;
++    return instance;
++}
++
++void DatabaseManager::stopDatabases(Document&, DatabaseTaskSynchronizer*) { }
++
++ExceptionOr<RefPtr<Database>> LocalDOMWindowWebDatabase::openDatabase(LocalDOMWindow&, const String&, const String&, const String&, unsigned, RefPtr<DatabaseCallback>&&)
++{
++    return Exception { ExceptionCode::NotSupportedError, "Web SQL is not supported"_s };
++}
++
++Database::~Database() { RELEASE_ASSERT_NOT_REACHED(); }
++
++DatabaseContext::~DatabaseContext() { RELEASE_ASSERT_NOT_REACHED(); }
++
++} // namespace WebCore
+diff --git a/Source/cmake/OptionsWin.cmake b/Source/cmake/OptionsWin.cmake
+index 61f36eb..8015f28 100644
+--- a/Source/cmake/OptionsWin.cmake
++++ b/Source/cmake/OptionsWin.cmake
+@@ -63,6 +63,12 @@ option(USE_GPU_STUB "Build WebCore and Skia without GPU rendering" OFF)
+ find_package(PNG 1.6.34 REQUIRED)
+ # Builds WebCore without IndexedDB, service and shared workers, WebSockets, the Cache, Cookie Store and Push APIs and Background Fetch.
+ option(USE_WEB_API_STUB "Build WebCore without IndexedDB, service and shared workers, WebSockets and the Cache, Cookie Store and Push APIs" OFF)
++# Builds WebCore without SQLite: Web SQL, the curl cookie database and saved recent searches are unavailable. Requires USE_WEB_API_STUB.
++option(USE_SQLITE_STUB "Build WebCore without SQLite" OFF)
++
++if (USE_SQLITE_STUB AND NOT USE_WEB_API_STUB)
++    message(FATAL_ERROR "USE_SQLITE_STUB requires USE_WEB_API_STUB")
++endif ()
+ find_package(SQLite3 3.23.1 REQUIRED)
+ find_package(ZLIB 1.2.11 REQUIRED)
+ if (NOT USE_NETWORK_STUB)
