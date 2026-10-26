@@ -20,8 +20,10 @@ if (ENABLE_WEBCORE)
     _WEBKIT_TARGET(RanvierWebCoreHost)
     set_target_properties(RanvierWebCoreHost PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/ranvier)
     if (APPLE)
-        # WebCore.framework lets only the clients it names (-allowable_client) link it; the host links as
-        # TestWebCore, one of them.
-        target_link_options(RanvierWebCoreHost PRIVATE "LINKER:-client_name,TestWebCore")
+        # WebCore.framework lets only the clients it names (-allowable_client) link it, and the linker takes
+        # a library's client name from its install name. The host links as libTestWebCore.dylib, TestWebCore
+        # being one of those clients; build.py package sets the install name back to its file name. The
+        # option goes with the libraries because they follow CMake's own -install_name, and the last wins.
+        target_link_libraries(RanvierWebCoreHost PRIVATE "-Wl,-install_name,@rpath/libTestWebCore.dylib")
     endif ()
 endif ()
