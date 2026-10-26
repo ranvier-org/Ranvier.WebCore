@@ -113,17 +113,27 @@ jobs:
             C:\rw\vcpkg\buildtrees\**\*.log
 
   publish:
-    # On a version tag, pushes the packages to the feed in the repository variable NUGET_SOURCE with the
-    # secret NUGET_API_KEY. Without both, the packages stay as workflow artifacts.
-    if: startsWith(github.ref, 'refs/tags/v') && vars.NUGET_SOURCE != ''
+    # On a version tag, pushes the packages to nuget.org through trusted publishing: the job exchanges
+    # GitHub's OIDC token for a one-hour API key under the nuget.org account in the repository variable
+    # NUGET_USER, whose trusted publishing policy names this file. Without NUGET_USER, the packages stay
+    # as workflow artifacts.
+    if: startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != ''
     needs: native
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/download-artifact@v4
         with:
           pattern: package-*
           merge-multiple: true
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
       - name: Push
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: dotnet nuget push "**/*.nupkg" --source "${{ vars.NUGET_SOURCE }}" --api-key "$NUGET_API_KEY" --skip-duplicate
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate

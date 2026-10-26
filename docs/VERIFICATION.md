@@ -40,7 +40,7 @@ Run 40342183732 on `windows-2025`, 2026-10-26, commit `25c939f`, with empty cach
 
 ## Not verified
 
-- The publish job, which runs only on a `v*` tag with a NuGet source and key configured.
+- The publish job, which runs only on a `v*` tag with `NUGET_USER` set.
 - The LLVM archive's SHA-256 in `pins.json` is the one the first CI run printed for its download from
   LLVM's GitHub release; it was not compared with a second download.
 - The lean flavor through `build.py`.
