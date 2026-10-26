@@ -3,14 +3,19 @@ new file mode 100644
 index 0000000..3d73fbb
 --- /dev/null
 +++ b/Source/WebCore/Modules/stub/BrowserAPIStub.cmake
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,65 @@
 +# WebCore without WebTransport, the File System and entries APIs, WebXR and the WebGPU bindings
 +# (USE_BROWSER_API_STUB). Their sources and IDL files are left out. The IDL files in Modules/stub/idl
 +# replace the interfaces and mixins referenced by the remaining WebCore code; they declare no members
 +# and no interface objects. BrowserAPIStub.cpp defines the members of the excluded types that the
 +# remaining WebCore code references.
 +
-+set(WebCore_BROWSER_API_STUB_EXCLUDED "^Modules/(WebGPU|entriesapi|filesystem|webtransport|webxr)/|^html/canvas/GPU(BasedCanvasRenderingContext|CanvasContext)\.")
++# GPUBasedCanvasRenderingContext is also the base of the WebGL contexts, so it stays when WebGL is on.
++if (ENABLE_WEBGL)
++    set(WebCore_BROWSER_API_STUB_EXCLUDED "^Modules/(WebGPU|entriesapi|filesystem|webtransport|webxr)/|^html/canvas/GPUCanvasContext\.")
++else ()
++    set(WebCore_BROWSER_API_STUB_EXCLUDED "^Modules/(WebGPU|entriesapi|filesystem|webtransport|webxr)/|^html/canvas/GPU(BasedCanvasRenderingContext|CanvasContext)\.")
++endif ()
 +set(WebCore_BROWSER_API_STUB_IDL_FILES
 +    Modules/stub/idl/FileSystemDirectoryHandle.idl
 +    Modules/stub/idl/FileSystemEntry.idl
