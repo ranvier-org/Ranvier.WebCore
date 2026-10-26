@@ -147,12 +147,13 @@ enum {
     RV_COMPOSITING_WHEN_NEEDED = 2,
 };
 
-/* Sets the accelerated compositing mode; it is RV_COMPOSITING_OFF when a host is created. A composited frame
- * is composited with OpenGL ES (ANGLE on Windows) into an offscreen framebuffer and read back, so 3D
- * transforms and backdrop filters render; it can differ from the CPU frame and between GPUs. Returns
- * RV_ERR_UNSUPPORTED, and leaves the mode unchanged, for an unknown mode, when the library was built without
- * the GPU code, or when RV_COMPOSITING_ALWAYS could not create a GL context. RV_COMPOSITING_WHEN_NEEDED creates
- * it on the first composited frame, and rv_host_paint_rgba returns RV_ERR_PAINT_FAILED if that fails. */
+/* Sets the accelerated compositing mode. A host is created in RV_COMPOSITING_WHEN_NEEDED when the library has
+ * the GPU code, and in RV_COMPOSITING_OFF otherwise. A composited frame is composited with OpenGL ES (ANGLE on
+ * Windows) into an offscreen framebuffer and read back, so 3D transforms and backdrop filters render; it can
+ * differ from the CPU frame and between GPUs. Returns RV_ERR_UNSUPPORTED, and leaves the mode unchanged, for
+ * an unknown mode, when the library was built without the GPU code, or when RV_COMPOSITING_ALWAYS could not
+ * create a GL context. RV_COMPOSITING_WHEN_NEEDED creates the context on the first composited frame; if that
+ * fails, the host switches to RV_COMPOSITING_OFF and paints that frame on the CPU. */
 RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t mode);
 
 /* Registers a WebCore EventListener on target that calls callback(context, event). Returns NULL on a

@@ -220,6 +220,7 @@ struct RvHost {
     RvResourceHandler resourceHandler { nullptr };
     void* resourceContext { nullptr };
 #if RANVIER_COMPOSITING
+    // rv_host_create sets RV_COMPOSITING_WHEN_NEEDED.
     int32_t compositingMode { RV_COMPOSITING_OFF };
     // Created on the first frame that composites, so a page that never needs a layer never creates a GL context.
     std::unique_ptr<RvCompositor> compositor;
@@ -584,6 +585,17 @@ int32_t rv_abi_version(void) { return 11; }
 
 int64_t rv_process_id(void) { return static_cast<int64_t>(getCurrentProcessID()); }
 
+#if RANVIER_COMPOSITING
+static void applyCompositingMode(RvHost& host, int32_t mode)
+{
+    // Without ForceCompositingMode, WebCore enters compositing mode only while some element needs a layer of its
+    // own (RenderLayerCompositor), and the frame then has a clip layer.
+    host.compositingMode = mode;
+    host.page->settings().setAcceleratedCompositingEnabled(mode != RV_COMPOSITING_OFF);
+    host.page->settings().setForceCompositingMode(mode == RV_COMPOSITING_ALWAYS);
+}
+#endif
+
 RvHost* rv_host_create(int32_t width, int32_t height)
 {
     static bool initialized;
@@ -601,6 +613,9 @@ RvHost* rv_host_create(int32_t width, int32_t height)
         return nullptr;
     auto* host = new RvHost { createPage({ width, height }), { width, height }, std::nullopt };
     host->noScript.emplace(host->document().vm());
+#if RANVIER_COMPOSITING
+    applyCompositingMode(*host, RV_COMPOSITING_WHEN_NEEDED);
+#endif
     liveHosts.append(host);
     return host;
 }
@@ -608,11 +623,7 @@ RvHost* rv_host_create(int32_t width, int32_t height)
 #if RANVIER_COMPOSITING
 static void setCompositing(RvHost& host, int32_t mode)
 {
-    // Without ForceCompositingMode, WebCore enters compositing mode only while some element needs a layer of its
-    // own (RenderLayerCompositor), and the frame then has a clip layer.
-    host.compositingMode = mode;
-    host.page->settings().setAcceleratedCompositingEnabled(mode != RV_COMPOSITING_OFF);
-    host.page->settings().setForceCompositingMode(mode == RV_COMPOSITING_ALWAYS);
+    applyCompositingMode(host, mode);
     host.document().updateLayoutIgnorePendingStylesheets();
     if (RefPtr view = host.frame().view())
         view->updateLayoutAndStyleIfNeededRecursive();
@@ -852,7 +863,8 @@ int32_t rv_host_paint_rgba(RvHost* host, uint8_t* rgba, int32_t length)
             host->compositor = RvCompositor::create(host->size);
         if (host->compositor)
             return composite(*host->compositor, *view, rgba);
-        return RV_ERR_PAINT_FAILED;
+        // No GL: the host stays on the CPU path, as with RV_COMPOSITING_OFF.
+        setCompositing(*host, RV_COMPOSITING_OFF);
     }
 #endif
     auto buffer = ImageBuffer::create(FloatSize { size }, RenderingMode::Unaccelerated,
