@@ -136,12 +136,24 @@ RV_EXPORT void rv_node_release(RvNode*);
 
 /* Lays out and paints the viewport into rgba (width*height*4 bytes, unpremultiplied RGBA8, sRGB). */
 RV_EXPORT int32_t rv_host_paint_rgba(RvHost*, uint8_t* rgba, int32_t length);
-/* Turns accelerated compositing on (enabled != 0) or off; it is off when a host is created. While it is on,
- * rv_host_paint_rgba composites the page's layers with OpenGL ES (ANGLE on Windows) into an offscreen
- * framebuffer and reads the frame back, so 3D transforms and backdrop filters render. Returns
- * RV_ERR_UNSUPPORTED, and leaves compositing off, when the library was built without the GPU code or no GL
- * context could be created. */
-RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t enabled);
+/* Modes of rv_host_set_accelerated_compositing. */
+enum {
+    /* Every frame is painted on the CPU; 3D transforms are drawn flat and backdrop filters are ignored. */
+    RV_COMPOSITING_OFF = 0,
+    /* Every frame is composited. */
+    RV_COMPOSITING_ALWAYS = 1,
+    /* A frame is composited only while some element needs a layer of its own (a 3D transform, a backdrop
+     * filter, will-change, an animated transform or opacity, ...); other frames take the CPU path. */
+    RV_COMPOSITING_WHEN_NEEDED = 2,
+};
+
+/* Sets the accelerated compositing mode; it is RV_COMPOSITING_OFF when a host is created. A composited frame
+ * is composited with OpenGL ES (ANGLE on Windows) into an offscreen framebuffer and read back, so 3D
+ * transforms and backdrop filters render; it can differ from the CPU frame and between GPUs. Returns
+ * RV_ERR_UNSUPPORTED, and leaves the mode unchanged, for an unknown mode, when the library was built without
+ * the GPU code, or when RV_COMPOSITING_ALWAYS could not create a GL context. RV_COMPOSITING_WHEN_NEEDED creates
+ * it on the first composited frame, and rv_host_paint_rgba returns RV_ERR_PAINT_FAILED if that fails. */
+RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t mode);
 
 /* Registers a WebCore EventListener on target that calls callback(context, event). Returns NULL on a
  * NULL argument or the wrong thread. */

@@ -128,6 +128,15 @@ static void loadHTML(LocalFrame& frame, const String& html)
 }
 
 #if RANVIER_COMPOSITING
+// The GL context every host composites in, created on first use and kept for the process's lifetime. WebKit
+// has one per compositing thread, and BitmapTexturePool, which is process-wide, hands a texture made in one
+// context to whichever context paints next.
+static GLContext* compositingContext()
+{
+    static GLContext* context = GLContext::create(PlatformDisplay::sharedDisplay().glDisplay(), GLContext::Target::Default).release();
+    return context;
+}
+
 // Composites the page's GraphicsLayerTextureMapper tree in this process, the way WebKit's
 // LayerTreeHostTextureMapper does, but into an offscreen framebuffer that paint reads back.
 //
@@ -135,7 +144,7 @@ static void loadHTML(LocalFrame& frame, const String& html)
 // the compositor's tree: on the Windows port the frame's root layer paints into the window, not into a
 // layer (RenderLayerBacking::paintsIntoWindow).
 struct RvCompositor final : GraphicsLayerClient {
-    std::unique_ptr<GLContext> context;
+    GLContext* context { nullptr };
     std::unique_ptr<TextureMapper> textureMapper;
     RefPtr<GraphicsLayer> root;
     // The compositor's root layer, a child of root; and the view root paints, during composite.
@@ -150,7 +159,7 @@ struct RvCompositor final : GraphicsLayerClient {
     {
         auto compositor = std::make_unique<RvCompositor>();
         compositor->size = size;
-        compositor->context = GLContext::create(PlatformDisplay::sharedDisplay().glDisplay(), GLContext::Target::Default);
+        compositor->context = compositingContext();
         if (!compositor->context || !compositor->context->makeContextCurrent())
             return nullptr;
         // The TextureMapper takes its shaders and limits from the current context.
@@ -211,6 +220,8 @@ struct RvHost {
     RvResourceHandler resourceHandler { nullptr };
     void* resourceContext { nullptr };
 #if RANVIER_COMPOSITING
+    int32_t compositingMode { RV_COMPOSITING_OFF };
+    // Created on the first frame that composites, so a page that never needs a layer never creates a GL context.
     std::unique_ptr<RvCompositor> compositor;
 #endif
 
@@ -595,43 +606,48 @@ RvHost* rv_host_create(int32_t width, int32_t height)
 }
 
 #if RANVIER_COMPOSITING
-static void setCompositing(RvHost& host, bool enabled)
+static void setCompositing(RvHost& host, int32_t mode)
 {
-    // ForceCompositingMode composites the root layer whatever the page holds, so every frame takes one path.
-    host.page->settings().setAcceleratedCompositingEnabled(enabled);
-    host.page->settings().setForceCompositingMode(enabled);
+    // Without ForceCompositingMode, WebCore enters compositing mode only while some element needs a layer of its
+    // own (RenderLayerCompositor), and the frame then has a clip layer.
+    host.compositingMode = mode;
+    host.page->settings().setAcceleratedCompositingEnabled(mode != RV_COMPOSITING_OFF);
+    host.page->settings().setForceCompositingMode(mode == RV_COMPOSITING_ALWAYS);
     host.document().updateLayoutIgnorePendingStylesheets();
     if (RefPtr view = host.frame().view())
         view->updateLayoutAndStyleIfNeededRecursive();
 }
 #endif
 
-int32_t rv_host_set_accelerated_compositing(RvHost* host, int32_t enabled)
+int32_t rv_host_set_accelerated_compositing(RvHost* host, int32_t mode)
 {
     if (!host)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
+    if (mode != RV_COMPOSITING_OFF && mode != RV_COMPOSITING_ALWAYS && mode != RV_COMPOSITING_WHEN_NEEDED)
+        return RV_ERR_UNSUPPORTED;
 #if RANVIER_COMPOSITING
-    if (!enabled) {
+    if (mode == RV_COMPOSITING_OFF) {
         if (host->compositor) {
             // The layers free their textures in the compositor's context.
             host->compositor->context->makeContextCurrent();
-            setCompositing(*host, false);
+            setCompositing(*host, mode);
             host->compositor = nullptr;
-        }
+        } else if (host->compositingMode != RV_COMPOSITING_OFF)
+            setCompositing(*host, mode);
         return RV_OK;
     }
-    if (!host->compositor) {
+    if (mode == RV_COMPOSITING_ALWAYS && !host->compositor) {
         auto compositor = RvCompositor::create(host->size);
         if (!compositor)
             return RV_ERR_UNSUPPORTED;
         host->compositor = WTF::move(compositor);
-        setCompositing(*host, true);
     }
+    setCompositing(*host, mode);
     return RV_OK;
 #else
-    return enabled ? RV_ERR_UNSUPPORTED : RV_OK;
+    return mode == RV_COMPOSITING_OFF ? RV_OK : RV_ERR_UNSUPPORTED;
 #endif
 }
 
@@ -639,7 +655,7 @@ void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread())
         return;
-    rv_host_set_accelerated_compositing(host, 0);
+    rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
     liveHosts.removeFirst(host);
     delete host;
@@ -830,8 +846,14 @@ int32_t rv_host_paint_rgba(RvHost* host, uint8_t* rgba, int32_t length)
         return RV_ERR_PAINT_FAILED;
     view->updateLayoutAndStyleIfNeededRecursive();
 #if RANVIER_COMPOSITING
-    if (host->compositor)
-        return composite(*host->compositor, *view, rgba);
+    // In RV_COMPOSITING_WHEN_NEEDED a frame without a clip layer is not in compositing mode and takes the CPU path.
+    if (host->compositingMode != RV_COMPOSITING_OFF && view->clipLayer()) {
+        if (!host->compositor)
+            host->compositor = RvCompositor::create(host->size);
+        if (host->compositor)
+            return composite(*host->compositor, *view, rgba);
+        return RV_ERR_PAINT_FAILED;
+    }
 #endif
     auto buffer = ImageBuffer::create(FloatSize { size }, RenderingMode::Unaccelerated,
         RenderingPurpose::Unspecified, 1.0f, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
