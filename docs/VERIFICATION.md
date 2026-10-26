@@ -30,7 +30,8 @@ broken-image icon was missing.
 
 - The GitHub Actions workflow has not run. Unchecked: the hosted image's Visual Studio version, disk
   space and time, `choco install gperf`, the LLVM download and extraction in `fetch`, and the publish job.
-- `pins.json` has no SHA-256 for the LLVM archive yet; `fetch` prints it, for pinning after a first run.
+- The LLVM archive's SHA-256 in `pins.json` is the one the first CI run printed for its download from
+  LLVM's GitHub release; it was not compared with a second download.
 - The lean flavor through `build.py`.
 - Ranvier's full conformance run and the timing benchmark against the packaged DLLs.
 - The licensing in `NOTICE.md`.

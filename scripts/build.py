@@ -103,7 +103,9 @@ def toolchain_env():
         sys.exit('vswhere found no Visual Studio with the x64 C++ build tools')
     dump = subprocess.run(f'"{found[-1]}" >nul && set', shell=True, capture_output=True, text=True, check=True).stdout
     env = dict(line.split('=', 1) for line in dump.splitlines() if '=' in line)
-    env['PATH'] = os.pathsep.join([str(llvm), *args.tool_path, env['PATH']])
+    # Windows names are case-insensitive: hosted runners spell it Path, and a dict needs one spelling.
+    path = next(env.pop(key) for key in list(env) if key.upper() == 'PATH')
+    env['PATH'] = os.pathsep.join([str(llvm), *args.tool_path, path])
     env['VCPKG_ROOT'] = str(vcpkg)
     env['VCPKG_DISABLE_METRICS'] = '1'
     env['DOTNET_CLI_TELEMETRY_OPTOUT'] = '1'
