@@ -15,8 +15,12 @@ endif ()
 set(ENABLE_WEBGL OFF CACHE BOOL "")
 set(ENABLE_VIDEO OFF CACHE BOOL "")
 set(ENABLE_XSLT OFF CACHE BOOL "")
-set(ENABLE_REMOTE_INSPECTOR OFF CACHE BOOL "")
 set(ENABLE_WEBDRIVER OFF CACHE BOOL "")
+
+# The remote inspector stays on: with it off, JavaScriptCore's API/JSRemoteInspector.cpp does not compile on
+# Cocoa (it calls RemoteInspector::singleton() under PLATFORM(COCOA) alone). This file runs before
+# slim.cmake's settings, and a cache entry set first is kept, so slim's OFF does not apply here.
+set(ENABLE_REMOTE_INSPECTOR ON CACHE BOOL "")
 
 # Cocoa features that build further libraries into or beside WebCore: WebGPU.framework, the dav1d AV1
 # decoder and WebRTC. With ENABLE_VIDEO off WebKit also turns off the media features that depend on it.
