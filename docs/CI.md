@@ -42,6 +42,30 @@ An incremental rebuild after vcpkg reinstalls packages can fail with clang rejec
 the reinstalled headers keep older modification times. Delete `cmake_pch.cxx.obj` under
 `<build>/Source` and build again. A fresh build, as in CI, does not hit this.
 
+## macOS (osx-arm64)
+
+`osx-arm64` builds WebKit's Cocoa port (`PORT=Mac`, `config/mac.cmake`) with Xcode's AppleClang and Swift,
+and packs `Ranvier.WebCore.Native.osx-arm64`. It draws with CoreGraphics and CoreText, so its pixels do not
+match the Skia ports'.
+
+| Need | Value | Note |
+|---|---|---|
+| Image | `macos-26` (arm64, standard runner) | `macos-15`'s newest Xcode, 26.3 with the macOS 26.2 SDK, cannot build the pin: PAL's Swift module fails on a module cycle (`_DarwinFoundation3` and `CxxStdlib`), and its Swift and clang reject warning flags WebKit passes. Measured 2026-10-26, run 40372523818. |
+| Xcode | the newest released Xcode 26 on the image, chosen with `xcode-select` | 26.6 with the macOS 26.5 SDK and Apple clang 21.0.0 on 2026-10-26. The deployment target is the runner's macOS version, WebKit's default. |
+| Disk | 4.2 GB used: source 1.7 GB, build 2.1 GB | `macos-26` had 96 GB free before the build and 92 GB at its lowest; `macos-15` had 43 GB free. No disk was freed. |
+| Time | 38 min for the job | Run 40387342307 on 2026-10-26: fetch 1 min 10 s, prepare 10 s, configure 29 s, build 35 min 16 s (9,436 steps, including libwebrtc, which the Cocoa port always links into WebCore), package 32 s. |
+| Tools | Python 3.12+, CMake, Ninja, gperf, Perl, Ruby, .NET SDK | The image has them; the workflow installs CMake, Ninja or gperf with Homebrew only when one is missing. |
+
+`build.py package` stages each framework's library as a plain dylib (`WebCore.framework/Versions/A/WebCore`
+as `libWebCore.dylib`), because a build with a runtime identifier flattens native assets into one folder.
+It changes the install names to `@rpath/<file>`, replaces the build tree's rpaths with `@loader_path`,
+writes a dSYM per library to `symbols/` (the symbol tables: the Release build has no DWARF), strips local
+symbols with `strip -x` and signs each library again ad hoc, since arm64 macOS loads only signed code.
+
+The workflow's last macOS step loads `libRanvierWebCoreHost.dylib` from the staged package with Python's
+`ctypes`, checks that no staged library names the build tree, compares `rv_abi_version()` with the manifest,
+and paints a 32 by 32 page with a blue square on red, checking one pixel of each.
+
 ## Other runtimes
 
 The patches change `OptionsWin.cmake` and the Windows platform CMake files, and `build.py` drives

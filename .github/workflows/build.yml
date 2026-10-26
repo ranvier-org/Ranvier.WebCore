@@ -42,7 +42,8 @@ jobs:
               dict(rid='win-x64', runner='windows-2025', work='C:\\rw'),
               dict(rid='linux-x64', runner='ubuntu-24.04', work='/mnt/rw'),
               dict(rid='linux-arm64', runner='ubuntu-24.04-arm', work='/mnt/rw'),
-              # macOS runners have one volume; the home directory is on its data volume.
+              # macOS runners have one volume; the home directory is on its data volume. macos-26, because the
+              # newest Xcode on macos-15 (26.3) cannot build WebKit's Swift sources (docs/CI.md).
               dict(rid='osx-arm64', runner='macos-26', work='/Users/runner/rw'),
           ]
           wanted = [r.strip() for r in os.environ.get('RIDS', '').split(',') if r.strip()]
@@ -83,15 +84,12 @@ jobs:
       - name: Install the macOS tools
         if: runner.os == 'macOS'
         run: |
-          # WebKit's CMake build for the Mac port wants the newest Xcode's SDK and Swift.
-          ls -d /Applications/Xcode*.app
+          # WebKit's Mac port builds Swift sources that need a recent Xcode: the newest released Xcode 26.
           xcode=$(ls -d /Applications/Xcode_26*.app | grep -v -i beta | sort -V | tail -1)
           sudo xcode-select -s "$xcode/Contents/Developer"
           xcodebuild -version
           for tool in gperf ninja cmake; do command -v $tool >/dev/null || brew install $tool; done
           mkdir -p "$RANVIER_WORK"
-          # TEMPORARY: free disk every minute, for the peak (removed before merging).
-          nohup sh -c 'while true; do df -k "$RANVIER_WORK" | tail -1 >> "$RANVIER_WORK/disk.log"; sleep 60; done' >/dev/null 2>&1 &
 
       - name: Tool versions and disk
         shell: pwsh
@@ -142,12 +140,6 @@ jobs:
       - name: Build
         run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
-      - name: Disk after the build (TEMPORARY)
-        if: always() && runner.os == 'macOS'
-        run: |
-          df -h "$RANVIER_WORK"; du -sh "$RANVIER_WORK"/* 2>/dev/null || true
-          sort -n -k4 "$RANVIER_WORK/disk.log" | head -1 || true
-
       - name: Package
         run: python scripts/build.py package --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
@@ -164,15 +156,21 @@ jobs:
           path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/symbols
 
       - name: Load the host and paint a page
-        # The library loads from the staged package, with its siblings found through @loader_path; Python's
-        # main thread is the process's main thread, which WebCore on Cocoa requires.
+        # The library loads from the staged package, with its siblings found through @loader_path: no staged
+        # library names the build tree. Python's main thread is the process's main thread, which WebCore on
+        # Cocoa requires.
         if: runner.os == 'macOS'
         shell: python
         run: |
-          import ctypes, json, os, pathlib
+          import ctypes, json, os, pathlib, subprocess
           out = pathlib.Path(os.environ['RANVIER_WORK']) / 'out' / os.environ['FLAVOR']
+          native = out / 'runtimes/${{ matrix.rid }}/native'
           manifest = json.loads((out / 'manifest.json').read_text())
-          lib = ctypes.CDLL(str(out / 'runtimes/${{ matrix.rid }}/native/libRanvierWebCoreHost.dylib'))
+          build = str(out.parents[1] / f"build-{os.environ['FLAVOR']}")
+          for path in sorted(native.glob('*.dylib')):
+              commands = subprocess.run(['otool', '-l', str(path)], capture_output=True, text=True, check=True).stdout
+              assert build not in commands, f'{path.name} names the build tree'
+          lib = ctypes.CDLL(str(native / 'libRanvierWebCoreHost.dylib'))
           lib.rv_host_create.restype = ctypes.c_void_p
           lib.rv_host_create.argtypes = [ctypes.c_int32, ctypes.c_int32]
           lib.rv_host_load_html.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
