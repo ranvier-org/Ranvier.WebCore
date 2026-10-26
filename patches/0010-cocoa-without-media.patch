@@ -1,0 +1,24 @@
+diff --git a/Source/cmake/OptionsMac.cmake b/Source/cmake/OptionsMac.cmake
+index a490228..0c52727 100644
+--- a/Source/cmake/OptionsMac.cmake
++++ b/Source/cmake/OptionsMac.cmake
+@@ -143,6 +143,19 @@ WEBKIT_OPTION_DEFAULT_PORT_VALUE(ENABLE_IPC_TESTING_SWIFT PRIVATE ON)
+ 
+ WEBKIT_OPTION_END()
+ 
++# Cocoa enables these media features in PlatformEnableCocoa.h, outside the options above, so turning
++# ENABLE_VIDEO off leaves them on, and PlatformEnable.h rejects COCOA_WEBM_PLAYER without MEDIA_SOURCE.
++# cmakeconfig.h is included before the platform headers, so defining them there turns them off.
++option(USE_COCOA_WITHOUT_MEDIA "Turn off the Cocoa media features that PlatformEnableCocoa.h enables" OFF)
++if (USE_COCOA_WITHOUT_MEDIA)
++    foreach (_feature
++        ACCESSIBILITY_VIDEO_AUTOPLAY_CONTROL AIRPLAY_PICKER AUDIO_DECODER_REGISTRATION COCOA_WEBM_PLAYER
++        DOM_AUDIO_SESSION MEDIA_RECORDER_WEBM MEDIA_USAGE OPUS VORBIS VP9 WIRELESS_PLAYBACK_TARGET_AVAILABILITY_API)
++        SET_AND_EXPOSE_TO_BUILD(ENABLE_${_feature} OFF)
++    endforeach ()
++    unset(_feature)
++endif ()
++
+ # -----------------------------------------------------------------------------
+ # Toolchain / SDK resolution
+ # -----------------------------------------------------------------------------
