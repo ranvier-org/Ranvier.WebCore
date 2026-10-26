@@ -10,9 +10,9 @@ package version from the tag and, when the repository variable `NUGET_SOURCE` an
 | Need | Value | Note |
 |---|---|---|
 | Image | `windows-2025` by default; repository variable `RANVIER_WINDOWS_RUNNER` overrides | |
-| Visual Studio | x64 C++ build tools, found with `vswhere` | Measured with MSVC 14.50.35717 (VS 18). An older toolset on the image is untested. |
+| Visual Studio | x64 C++ build tools, found with `vswhere` | Measured with MSVC 14.50.35717 (VS 18) locally. `windows-2025` had 14.51.36231 on 2026-10-26, and its package passed the F# driver (`docs/VERIFICATION.md`). An older toolset is untested. |
 | Disk | about 12 GB (E): source 3.3 GB, build 5.0 GB, vcpkg packages and LLVM | |
-| Time | 6-hour job limit | Locally, 20 jobs on 24 threads: vcpkg about 6 minutes, a full compile about 9 minutes. On a 4-core hosted runner, several hours (E). A larger runner is the reliable option. |
+| Time | 6-hour job limit | Locally, 20 jobs on 24 threads: vcpkg about 6 minutes, a full compile about 9 minutes. On `windows-2025` on 2026-10-26, with empty caches: the job took 1 h 41 min, of which fetch 11 min, configure (vcpkg) 20 min and the compile 65 min. |
 | Tools | Python 3.12+, Perl, Ruby, gperf, CMake, Ninja, .NET SDK | The hosted Windows image has Perl, Ruby, CMake and .NET; Ninja comes with Visual Studio's CMake; the workflow installs Python and gperf. |
 
 ## Caches
