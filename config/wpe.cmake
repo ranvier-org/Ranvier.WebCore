@@ -22,6 +22,11 @@ set(ENABLE_BUBBLEWRAP_SANDBOX OFF CACHE BOOL "")
 set(ENABLE_LAYOUT_TESTS OFF CACHE BOOL "")
 set(ENABLE_COG OFF CACHE BOOL "")
 
+# 0004 takes Ganesh out of Skia, and WPE's WebCore, unlike the Windows port's, links it whatever the
+# compositing setting (texmap/coordinated, PlatformDisplaySkia). This file comes before the flavor's
+# settings, so this value wins.
+set(USE_GPU_STUB OFF CACHE BOOL "")
+
 # Libraries the port links for browser features: accessibility over AT-SPI, speech, hyphenation
 # dictionaries, GPU buffers, crash backtraces and profiler capture. libdrm stays: the API test tree's WPE
 # platform mock links it, and the host does not.
