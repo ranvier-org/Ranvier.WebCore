@@ -42,6 +42,8 @@ jobs:
               dict(rid='win-x64', runner='windows-2025', work='C:\\rw'),
               dict(rid='linux-x64', runner='ubuntu-24.04', work='/mnt/rw'),
               dict(rid='linux-arm64', runner='ubuntu-24.04-arm', work='/mnt/rw'),
+              # macOS runners have one volume; the home directory is on its data volume.
+              dict(rid='osx-arm64', runner='macos-15', work='/Users/runner/rw'),
           ]
           wanted = [r.strip() for r in os.environ.get('RIDS', '').split(',') if r.strip()]
           include = [r for r in runtimes if not wanted or r['rid'] in wanted]
@@ -77,6 +79,19 @@ jobs:
           sudo apt-get update -q
           grep -v '^#' scripts/linux-packages.txt | xargs sudo apt-get install -y -q --no-install-recommends
           sudo mkdir -p "$RANVIER_WORK" && sudo chown "$USER" "$RANVIER_WORK"
+
+      - name: Install the macOS tools
+        if: runner.os == 'macOS'
+        run: |
+          # WebKit's CMake build for the Mac port wants the newest Xcode's SDK and Swift.
+          ls -d /Applications/Xcode*.app
+          xcode=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
+          for tool in gperf ninja cmake; do command -v $tool >/dev/null || brew install $tool; done
+          mkdir -p "$RANVIER_WORK"
+          # TEMPORARY: free disk every minute, for the peak (removed before merging).
+          nohup sh -c 'while true; do df -k "$RANVIER_WORK" | tail -1 >> "$RANVIER_WORK/disk.log"; sleep 60; done' >/dev/null 2>&1 &
 
       - name: Tool versions and disk
         shell: pwsh
@@ -125,7 +140,19 @@ jobs:
         run: python scripts/build.py configure --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
       - name: Build
+        if: runner.os != 'macOS'
         run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      # TEMPORARY: keep going past compile errors, to collect them all in one run.
+      - name: Build (macOS, keep going)
+        if: runner.os == 'macOS'
+        run: cmake --build "$RANVIER_WORK/build-$FLAVOR" --target RanvierWebCoreHost -j 3 -- -k 0
+
+      - name: Disk after the build (TEMPORARY)
+        if: always() && runner.os == 'macOS'
+        run: |
+          df -h "$RANVIER_WORK"; du -sh "$RANVIER_WORK"/* 2>/dev/null || true
+          sort -n -k4 "$RANVIER_WORK/disk.log" | head -1 || true
 
       - name: Package
         run: python scripts/build.py package --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
@@ -141,6 +168,35 @@ jobs:
         with:
           name: symbols-${{ matrix.rid }}-${{ env.FLAVOR }}
           path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/symbols
+
+      - name: Load the host and paint a page
+        # The library loads from the staged package, with its siblings found through @loader_path; Python's
+        # main thread is the process's main thread, which WebCore on Cocoa requires.
+        if: runner.os == 'macOS'
+        shell: python
+        run: |
+          import ctypes, json, os, pathlib
+          out = pathlib.Path(os.environ['RANVIER_WORK']) / 'out' / os.environ['FLAVOR']
+          manifest = json.loads((out / 'manifest.json').read_text())
+          lib = ctypes.CDLL(str(out / 'runtimes/${{ matrix.rid }}/native/libRanvierWebCoreHost.dylib'))
+          lib.rv_host_create.restype = ctypes.c_void_p
+          lib.rv_host_create.argtypes = [ctypes.c_int32, ctypes.c_int32]
+          lib.rv_host_load_html.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+          lib.rv_host_paint_rgba.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int32]
+          lib.rv_host_destroy.argtypes = [ctypes.c_void_p]
+          abi = lib.rv_abi_version()
+          print('rv_abi_version', abi, '- manifest', manifest['abi'])
+          assert abi == manifest['abi']
+          host = lib.rv_host_create(32, 32)
+          assert host
+          assert lib.rv_host_load_html(host, b'<body style="margin:0;background:#f00"><div style="width:8px;height:8px;background:#00f"></div>') == 0
+          rgba = ctypes.create_string_buffer(32 * 32 * 4)
+          assert lib.rv_host_paint_rgba(host, rgba, len(rgba)) == 0
+          pixel = lambda x, y: tuple(rgba.raw[(y * 32 + x) * 4:(y * 32 + x) * 4 + 4])
+          print('pixel (2, 2)', pixel(2, 2), 'pixel (20, 20)', pixel(20, 20))
+          near = lambda actual, expected: all(abs(a - e) <= 2 for a, e in zip(actual, expected))
+          assert near(pixel(2, 2), (0, 0, 255, 255)) and near(pixel(20, 20), (255, 0, 0, 255))
+          lib.rv_host_destroy(host)
 
       - name: Upload the CMake logs on failure
         if: failure()
