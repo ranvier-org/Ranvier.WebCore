@@ -85,8 +85,9 @@ def download(url, target, expected):
         sys.exit(f'{target}: sha256 {actual}, pins.json expects {expected}')
 
 
-def clone(repository, commit, target):
-    """A shallow checkout of one commit: fetching by commit keeps the clone at about 2 GB for WebKit. A
+def clone(repository, commit, target, exclude=()):
+    """A shallow checkout of one commit: fetching by commit keeps the clone at about 2 GB for WebKit. The
+    top-level directories in exclude are left out of the checkout, and their files are not downloaded. A
     checkout already at the commit is left as it is."""
     if (target / '.git').exists():
         head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=target, capture_output=True, text=True).stdout.strip()
@@ -97,7 +98,9 @@ def clone(repository, commit, target):
         target.mkdir(parents=True, exist_ok=True)
         git('init', '-q', cwd=target)
         git('remote', 'add', 'origin', repository, cwd=target)
-    git('fetch', '--depth', '1', 'origin', commit, cwd=target)
+        if exclude:
+            git('sparse-checkout', 'set', '--no-cone', '/*', *(f'!/{name}/' for name in exclude), cwd=target)
+    git('fetch', '--depth', '1', *(['--filter=blob:none'] if exclude else []), 'origin', commit, cwd=target)
     git('checkout', '-q', '--detach', commit, cwd=target)
 
 
@@ -130,7 +133,8 @@ def toolchain_env():
 
 
 def fetch():
-    clone(args.webkit_repo, commit, source)
+    # WebKit's test and website trees are most of its checkout, and the build reads none of them.
+    clone(args.webkit_repo, commit, source, exclude=['LayoutTests', 'JSTests', 'PerformanceTests', 'Websites', 'ManualTests'])
     if not windows:
         return
     clone(pins['vcpkg']['repository'], pins['vcpkg']['commit'], vcpkg)

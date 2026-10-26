@@ -1,5 +1,4 @@
-# Builds the native package for each runtime in the matrix. Only win-x64 is built today; docs/CI.md lists
-# what each other runtime needs.
+# Builds the native package for each runtime in the matrix (docs/CI.md). A manual run can build a subset.
 name: build
 
 on:
@@ -14,29 +13,53 @@ on:
         type: choice
         options: [slim, lean]
         default: slim
+      rids:
+        description: Runtime identifiers to build, comma-separated (empty for all)
+        type: string
+        default: ''
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  plan:
+    # The matrix, filtered by the manual run's rids input.
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - id: plan
+        shell: python
+        env:
+          RIDS: ${{ inputs.rids }}
+        run: |
+          import json, os
+          # A WebKit build needs about 10 GB of disk and runs for hours on the standard runners.
+          runtimes = [
+              # work: a short root on Windows, where WebKit's generated paths exceed MAX_PATH under the
+              # default workspace.
+              dict(rid='win-x64', runner='windows-2025', work='C:\\rw'),
+              dict(rid='linux-x64', runner='ubuntu-24.04', work='/mnt/rw'),
+              dict(rid='linux-arm64', runner='ubuntu-24.04-arm', work='/mnt/rw'),
+          ]
+          wanted = [r.strip() for r in os.environ.get('RIDS', '').split(',') if r.strip()]
+          include = [r for r in runtimes if not wanted or r['rid'] in wanted]
+          if not include:
+              raise SystemExit(f'no runtime matches {wanted}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('matrix=' + json.dumps(dict(include=include)) + '\n')
+
   native:
+    needs: plan
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - rid: win-x64
-            # A WebKit build needs about 10 GB of disk and runs for hours on 4 cores; a larger runner
-            # (repository variable RANVIER_WINDOWS_RUNNER) shortens it.
-            runner: windows-2025
-    runs-on: ${{ vars.RANVIER_WINDOWS_RUNNER || matrix.runner }}
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 360
     env:
       FLAVOR: ${{ inputs.flavor || 'slim' }}
-      # A short root: WebKit's generated paths exceed MAX_PATH under the default workspace.
-      RANVIER_WORK: C:\rw
-      VCPKG_DOWNLOADS: C:\rw\vcpkg-downloads
-      VCPKG_BINARY_SOURCES: clear;files,C:\rw\vcpkg-archives,readwrite
+      RANVIER_WORK: ${{ matrix.work }}
     steps:
       - uses: actions/checkout@v4
 
@@ -45,16 +68,33 @@ jobs:
           python-version: '3.14'
 
       - name: Install gperf
+        if: runner.os == 'Windows'
         run: choco install gperf --no-progress -y
 
-      - name: Tool versions
+      - name: Install the Linux packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          grep -v '^#' scripts/linux-packages.txt | xargs sudo apt-get install -y -q --no-install-recommends
+          sudo mkdir -p "$RANVIER_WORK" && sudo chown "$USER" "$RANVIER_WORK"
+
+      - name: Tool versions and disk
         shell: pwsh
         run: |
           python --version; perl -v | Select-Object -Skip 1 -First 1; ruby -v; gperf --version | Select-Object -First 1
           cmake --version | Select-Object -First 1; dotnet --version
-          New-Item -ItemType Directory -Force $env:VCPKG_DOWNLOADS, "$env:RANVIER_WORK\vcpkg-archives" | Out-Null
+          if ($IsWindows) {
+            $env:VCPKG_DOWNLOADS = "$env:RANVIER_WORK\vcpkg-downloads"
+            New-Item -ItemType Directory -Force $env:VCPKG_DOWNLOADS, "$env:RANVIER_WORK\vcpkg-archives" | Out-Null
+            Add-Content $env:GITHUB_ENV "VCPKG_DOWNLOADS=$env:VCPKG_DOWNLOADS"
+            Add-Content $env:GITHUB_ENV "VCPKG_BINARY_SOURCES=clear;files,$env:RANVIER_WORK\vcpkg-archives,readwrite"
+          } else {
+            clang --version | Select-Object -First 1
+            df -h $env:RANVIER_WORK
+          }
 
       - name: Restore vcpkg archives and downloads
+        if: runner.os == 'Windows'
         uses: actions/cache@v4
         with:
           path: |
@@ -64,6 +104,7 @@ jobs:
           restore-keys: vcpkg-${{ matrix.rid }}-${{ env.FLAVOR }}-
 
       - name: Restore LLVM
+        if: runner.os == 'Windows'
         uses: actions/cache@v4
         with:
           path: C:\rw\tools\llvm
@@ -74,13 +115,13 @@ jobs:
         shell: pwsh
         run: Add-Content $env:GITHUB_ENV "RANVIER_PACKAGE_VERSION=$($env:GITHUB_REF_NAME.Substring(1))"
 
-      - name: Fetch WebKit, vcpkg and LLVM
+      - name: Fetch WebKit (and on Windows vcpkg and LLVM)
         run: python scripts/build.py fetch --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
       - name: Apply patches and install the host
         run: python scripts/build.py prepare --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
-      - name: Configure (installs vcpkg packages)
+      - name: Configure (installs vcpkg packages on Windows)
         run: python scripts/build.py configure --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
       - name: Build
@@ -93,13 +134,13 @@ jobs:
         with:
           name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
           path: |
-            C:\rw\packages\*.nupkg
-            C:\rw\out\${{ env.FLAVOR }}\manifest.json
+            ${{ env.RANVIER_WORK }}/packages/*.nupkg
+            ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/manifest.json
 
       - uses: actions/upload-artifact@v4
         with:
           name: symbols-${{ matrix.rid }}-${{ env.FLAVOR }}
-          path: C:\rw\out\${{ env.FLAVOR }}\symbols
+          path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/symbols
 
       - name: Upload the CMake logs on failure
         if: failure()
@@ -107,17 +148,18 @@ jobs:
         with:
           name: logs-${{ matrix.rid }}-${{ env.FLAVOR }}
           path: |
-            C:\rw\build-${{ env.FLAVOR }}\CMakeCache.txt
-            C:\rw\build-${{ env.FLAVOR }}\CMakeFiles\CMakeConfigureLog.yaml
-            C:\rw\build-${{ env.FLAVOR }}\vcpkg-manifest-install.log
-            C:\rw\vcpkg\buildtrees\**\*.log
+            ${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}/CMakeCache.txt
+            ${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}/CMakeFiles/CMakeConfigureLog.yaml
+            ${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}/vcpkg-manifest-install.log
+            ${{ env.RANVIER_WORK }}/vcpkg/buildtrees/**/*.log
 
   publish:
     # On a version tag, pushes the packages to nuget.org through trusted publishing: the job exchanges
     # GitHub's OIDC token for a one-hour API key under the nuget.org account in the repository variable
     # NUGET_USER, whose trusted publishing policy names this file. Without NUGET_USER, the packages stay
-    # as workflow artifacts.
-    if: startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != ''
+    # as workflow artifacts. Each runtime's package stands alone, so the packages of the runtimes that built
+    # are pushed even when another runtime failed.
+    if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' }}
     needs: native
     runs-on: ubuntu-latest
     permissions:

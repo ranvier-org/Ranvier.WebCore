@@ -1,0 +1,35 @@
+# Debian and Ubuntu packages the linux-* build needs (Ubuntu 24.04 names). CI installs them with
+# `xargs -a scripts/linux-packages.txt apt-get install -y` after dropping the comments.
+# Tools
+clang
+ninja-build
+cmake
+gperf
+ruby
+perl
+python3
+unifdef
+patchelf
+# Libraries WPE requires
+libglib2.0-dev
+libharfbuzz-dev
+libicu-dev
+libjpeg-dev
+libepoxy-dev
+libgcrypt20-dev
+libsoup-3.0-dev
+libtasn1-6-dev
+libxkbcommon-dev
+libxml2-dev
+libpng-dev
+libsqlite3-dev
+libwebp-dev
+zlib1g-dev
+libfreetype-dev
+libfontconfig-dev
+libwoff-dev
+libdrm-dev
+libegl-dev
+libgles-dev
+# lean flavor only: colour management
+liblcms2-dev
