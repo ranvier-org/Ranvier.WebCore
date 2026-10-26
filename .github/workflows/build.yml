@@ -11,7 +11,7 @@ on:
       flavor:
         description: Build flavor
         type: choice
-        options: [slim, lean]
+        options: [slim, gpu, lean]
         default: slim
       rids:
         description: Runtime identifiers to build, comma-separated (empty for all)
