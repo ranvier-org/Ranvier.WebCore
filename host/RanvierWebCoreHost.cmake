@@ -14,6 +14,12 @@ if (ENABLE_WEBCORE)
         ${TESTWEBKITAPI_DIR}/RanvierAbi
     )
     set(RanvierWebCoreHost_DEFINITIONS BUILDING_TestWebCore NO_GTEST_USAGE)
+    # Accelerated compositing (rv_host_set_accelerated_compositing) needs GraphicsLayerTextureMapper, which
+    # coordinated graphics replaces, and the GPU code that patch 0004's USE_GPU_STUB removes.
+    if (USE_GRAPHICS_LAYER_TEXTURE_MAPPER AND NOT USE_GPU_STUB)
+        list(APPEND RanvierWebCoreHost_DEFINITIONS RANVIER_COMPOSITING=1)
+        list(APPEND RanvierWebCoreHost_LIBRARIES ANGLE::GLES)
+    endif ()
 
     add_library(RanvierWebCoreHost SHARED "${CMAKE_BINARY_DIR}/cmakeconfig.h")
     _WEBKIT_TARGET_LINK_FRAMEWORK(RanvierWebCoreHost)

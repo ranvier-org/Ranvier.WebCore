@@ -136,6 +136,12 @@ RV_EXPORT void rv_node_release(RvNode*);
 
 /* Lays out and paints the viewport into rgba (width*height*4 bytes, unpremultiplied RGBA8, sRGB). */
 RV_EXPORT int32_t rv_host_paint_rgba(RvHost*, uint8_t* rgba, int32_t length);
+/* Turns accelerated compositing on (enabled != 0) or off; it is off when a host is created. While it is on,
+ * rv_host_paint_rgba composites the page's layers with OpenGL ES (ANGLE on Windows) into an offscreen
+ * framebuffer and reads the frame back, so 3D transforms and backdrop filters render. Returns
+ * RV_ERR_UNSUPPORTED, and leaves compositing off, when the library was built without the GPU code or no GL
+ * context could be created. */
+RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t enabled);
 
 /* Registers a WebCore EventListener on target that calls callback(context, event). Returns NULL on a
  * NULL argument or the wrong thread. */

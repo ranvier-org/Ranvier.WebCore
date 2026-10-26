@@ -79,6 +79,17 @@
 #include <WebCore/PlatformDisplaySurfaceless.h>
 #endif
 
+// RANVIER_COMPOSITING: RanvierWebCoreHost.cmake defines it when WebCore has GraphicsLayerTextureMapper and the
+// GPU code (USE_GPU_STUB off).
+#if RANVIER_COMPOSITING
+#include <GLES2/gl2.h>
+#include <WebCore/GLContext.h>
+#include <WebCore/GraphicsLayerTextureMapper.h>
+#include <WebCore/PlatformDisplay.h>
+#include <WebCore/TextureMapper.h>
+#include <WebCore/TextureMapperLayer.h>
+#endif
+
 using namespace WebCore;
 
 // createPage and loadHTML follow WebCore's testing/TestPage.cpp (Copyright (C) 2026 Apple Inc., BSD-2-Clause).
@@ -116,12 +127,92 @@ static void loadHTML(LocalFrame& frame, const String& html)
         document->updateLayoutIgnorePendingStylesheets();
 }
 
+#if RANVIER_COMPOSITING
+// Composites the page's GraphicsLayerTextureMapper tree in this process, the way WebKit's
+// LayerTreeHostTextureMapper does, but into an offscreen framebuffer that paint reads back.
+//
+// As there, a root layer of the host's own paints the frame's content that has no layer of its own, under
+// the compositor's tree: on the Windows port the frame's root layer paints into the window, not into a
+// layer (RenderLayerBacking::paintsIntoWindow).
+struct RvCompositor final : GraphicsLayerClient {
+    std::unique_ptr<GLContext> context;
+    std::unique_ptr<TextureMapper> textureMapper;
+    RefPtr<GraphicsLayer> root;
+    // The compositor's root layer, a child of root; and the view root paints, during composite.
+    GraphicsLayer* attached { nullptr };
+    LocalFrameView* view { nullptr };
+    IntSize size;
+    GLuint texture { 0 };
+    GLuint depthStencil { 0 };
+    GLuint framebuffer { 0 };
+
+    static std::unique_ptr<RvCompositor> create(IntSize size)
+    {
+        auto compositor = std::make_unique<RvCompositor>();
+        compositor->size = size;
+        compositor->context = GLContext::create(PlatformDisplay::sharedDisplay().glDisplay(), GLContext::Target::Default);
+        if (!compositor->context || !compositor->context->makeContextCurrent())
+            return nullptr;
+        // The TextureMapper takes its shaders and limits from the current context.
+        compositor->textureMapper = TextureMapper::create();
+        compositor->root = GraphicsLayer::create(nullptr, *compositor);
+        compositor->root->setDrawsContent(true);
+        compositor->root->setContentsOpaque(true);
+        compositor->root->setSize(FloatSize { size });
+        glGenTextures(1, &compositor->texture);
+        glBindTexture(GL_TEXTURE_2D, compositor->texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width(), size.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        // TextureMapper clips with the stencil buffer and sorts 3D planes with the depth buffer.
+        glGenRenderbuffers(1, &compositor->depthStencil);
+        glBindRenderbuffer(GL_RENDERBUFFER, compositor->depthStencil);
+        glRenderbufferStorage(GL_RENDERBUFFER, 0x88F0 /* GL_DEPTH24_STENCIL8_OES */, size.width(), size.height());
+        glGenFramebuffers(1, &compositor->framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, compositor->framebuffer);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, compositor->texture, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, compositor->depthStencil);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, compositor->depthStencil);
+        bool complete = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        return complete ? WTF::move(compositor) : nullptr;
+    }
+
+    void paintContents(const GraphicsLayer&, GraphicsContext& context, const FloatRect& clip, OptionSet<GraphicsLayerPaintBehavior>) final
+    {
+        if (!view)
+            return;
+        context.save();
+        context.clip(clip);
+        view->paint(context, enclosingIntRect(clip));
+        context.restore();
+    }
+
+    ~RvCompositor()
+    {
+        if (!context || !context->makeContextCurrent())
+            return;
+        if (root)
+            root->removeAllChildren();
+        root = nullptr;
+        textureMapper = nullptr;
+        glDeleteFramebuffers(1, &framebuffer);
+        glDeleteRenderbuffers(1, &depthStencil);
+        glDeleteTextures(1, &texture);
+    }
+};
+#endif
+
 struct RvHost {
     Ref<Page> page;
     IntSize size;
     std::optional<JSC::DisallowVMEntry> noScript;
     RvResourceHandler resourceHandler { nullptr };
     void* resourceContext { nullptr };
+#if RANVIER_COMPOSITING
+    std::unique_ptr<RvCompositor> compositor;
+#endif
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
@@ -503,10 +594,52 @@ RvHost* rv_host_create(int32_t width, int32_t height)
     return host;
 }
 
+#if RANVIER_COMPOSITING
+static void setCompositing(RvHost& host, bool enabled)
+{
+    // ForceCompositingMode composites the root layer whatever the page holds, so every frame takes one path.
+    host.page->settings().setAcceleratedCompositingEnabled(enabled);
+    host.page->settings().setForceCompositingMode(enabled);
+    host.document().updateLayoutIgnorePendingStylesheets();
+    if (RefPtr view = host.frame().view())
+        view->updateLayoutAndStyleIfNeededRecursive();
+}
+#endif
+
+int32_t rv_host_set_accelerated_compositing(RvHost* host, int32_t enabled)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+#if RANVIER_COMPOSITING
+    if (!enabled) {
+        if (host->compositor) {
+            // The layers free their textures in the compositor's context.
+            host->compositor->context->makeContextCurrent();
+            setCompositing(*host, false);
+            host->compositor = nullptr;
+        }
+        return RV_OK;
+    }
+    if (!host->compositor) {
+        auto compositor = RvCompositor::create(host->size);
+        if (!compositor)
+            return RV_ERR_UNSUPPORTED;
+        host->compositor = WTF::move(compositor);
+        setCompositing(*host, true);
+    }
+    return RV_OK;
+#else
+    return enabled ? RV_ERR_UNSUPPORTED : RV_OK;
+#endif
+}
+
 void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread())
         return;
+    rv_host_set_accelerated_compositing(host, 0);
     host->noScript.reset();
     liveHosts.removeFirst(host);
     delete host;
@@ -626,6 +759,61 @@ void rv_node_release(RvNode* target)
         node(target)->deref();
 }
 
+#if RANVIER_COMPOSITING
+static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t* rgba)
+{
+    if (!compositor.context->makeContextCurrent())
+        return RV_ERR_PAINT_FAILED;
+    // The root of the frame's layer tree: RenderLayerCompositor::rootGraphicsLayer is not exported, and the
+    // frame's clip layer, which a view without a platform widget always has, is one of its descendants.
+    RefPtr<GraphicsLayer> frameRoot = view.clipLayer();
+    if (!frameRoot)
+        return RV_ERR_PAINT_FAILED;
+    while (frameRoot->parent() && frameRoot->parent() != compositor.root.get())
+        frameRoot = frameRoot->parent();
+    if (compositor.attached != frameRoot.get()) {
+        compositor.root->removeAllChildren();
+        compositor.root->addChild(*frameRoot);
+        compositor.attached = frameRoot.get();
+    }
+    // The content under the layers is repainted whole each frame.
+    compositor.view = &view;
+    compositor.root->setNeedsDisplay();
+    compositor.root->flushCompositingStateForThisLayerOnly();
+    view.flushCompositingStateIncludingSubframes();
+    auto& rootLayer = downcast<GraphicsLayerTextureMapper>(*compositor.root);
+    rootLayer.updateBackingStoreIncludingSubLayers(*compositor.textureMapper);
+    compositor.view = nullptr;
+
+    auto size = compositor.size;
+    glBindFramebuffer(GL_FRAMEBUFFER, compositor.framebuffer);
+    glViewport(0, 0, size.width(), size.height());
+    glClearColor(0, 0, 0, 0);
+    glClearStencil(0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    // FlipY::Yes puts the page's first row at the framebuffer's first row, which glReadPixels returns first.
+    compositor.textureMapper->beginPainting(TextureMapper::FlipY::Yes);
+    rootLayer.layer().paint(*compositor.textureMapper);
+    compositor.textureMapper->endPainting();
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(0, 0, size.width(), size.height(), GL_RGBA, GL_UNSIGNED_BYTE, rgba);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    if (glGetError() != GL_NO_ERROR)
+        return RV_ERR_PAINT_FAILED;
+    // The framebuffer holds premultiplied alpha; the ABI returns unpremultiplied.
+    size_t count = static_cast<size_t>(size.width()) * size.height();
+    for (size_t i = 0; i < count; ++i) {
+        uint8_t* pixel = rgba + i * 4;
+        uint8_t alpha = pixel[3];
+        if (alpha && alpha != 255) {
+            for (int c = 0; c < 3; ++c)
+                pixel[c] = static_cast<uint8_t>(std::min(255, (pixel[c] * 255 + alpha / 2) / alpha));
+        }
+    }
+    return RV_OK;
+}
+#endif
+
 int32_t rv_host_paint_rgba(RvHost* host, uint8_t* rgba, int32_t length)
 {
     if (!host || !rgba)
@@ -641,6 +829,10 @@ int32_t rv_host_paint_rgba(RvHost* host, uint8_t* rgba, int32_t length)
     if (!view)
         return RV_ERR_PAINT_FAILED;
     view->updateLayoutAndStyleIfNeededRecursive();
+#if RANVIER_COMPOSITING
+    if (host->compositor)
+        return composite(*host->compositor, *view, rgba);
+#endif
     auto buffer = ImageBuffer::create(FloatSize { size }, RenderingMode::Unaccelerated,
         RenderingPurpose::Unspecified, 1.0f, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
     if (!buffer)
