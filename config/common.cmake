@@ -1,12 +1,19 @@
 # Settings every flavor shares. Loaded with `cmake -C` before WebKit's own CMakeLists, so each value
-# here takes the place of a `-D` on the command line. scripts/build.py adds the paths that depend on the
-# machine: the compilers, the vcpkg toolchain file and VCPKG_INSTALLED_DIR.
+# here takes the place of a `-D` on the command line. scripts/build.py passes RANVIER_RID, the runtime
+# identifier, before this file, and on Windows adds the paths that depend on the machine: the compilers,
+# the vcpkg toolchain file and VCPKG_INSTALLED_DIR.
 
-set(PORT "Win" CACHE STRING "")
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "")
 
-# WebKit's overlay triplet (WebKitLibraries/triplets): x64, dynamic libraries, release only.
-set(VCPKG_TARGET_TRIPLET "x64-windows-webkit" CACHE STRING "")
+if (RANVIER_RID MATCHES "^win-(.+)$")
+    set(PORT "Win" CACHE STRING "")
+    # WebKit's overlay triplet (WebKitLibraries/triplets): dynamic libraries, release only.
+    set(VCPKG_TARGET_TRIPLET "${CMAKE_MATCH_1}-windows-webkit" CACHE STRING "")
+elseif (RANVIER_RID MATCHES "^linux-")
+    include("${CMAKE_CURRENT_LIST_DIR}/wpe.cmake")
+else ()
+    message(FATAL_ERROR "config/common.cmake: no port for RANVIER_RID '${RANVIER_RID}'")
+endif ()
 
 # Image formats WebKit's Windows port enables by default but presentation does not use.
 set(USE_JPEGXL OFF CACHE BOOL "")
@@ -26,6 +33,6 @@ set(ENABLE_WEBASSEMBLY OFF CACHE BOOL "")
 set(ENABLE_WEBASSEMBLY_BBQJIT OFF CACHE BOOL "")
 set(ENABLE_WEBASSEMBLY_OMGJIT OFF CACHE BOOL "")
 
-# bmalloc and libpas stay: the system malloc fails to compile on Windows (bmalloc.h calls aligned_alloc,
-# which the CRT lacks).
+# bmalloc and libpas stay on every port: the system malloc fails to compile on Windows (bmalloc.h calls
+# aligned_alloc, which the CRT lacks), and one allocator keeps the ports alike.
 set(USE_SYSTEM_MALLOC OFF CACHE BOOL "")

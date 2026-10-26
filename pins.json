@@ -13,8 +13,14 @@
   },
   "llvm": {
     "version": "23.1.4",
-    "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.4/clang+llvm-23.1.4-x86_64-pc-windows-msvc.tar.xz",
-    "sha256": "854bffcfc84528e0ee92490ff5c178920abd358a79c3e98f053e41e3e8e4c6d2"
+    "win-x64": {
+      "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.4/clang+llvm-23.1.4-x86_64-pc-windows-msvc.tar.xz",
+      "sha256": "854bffcfc84528e0ee92490ff5c178920abd358a79c3e98f053e41e3e8e4c6d2"
+    },
+    "win-arm64": {
+      "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.4/clang+llvm-23.1.4-aarch64-pc-windows-msvc.tar.xz",
+      "sha256": ""
+    }
   },
   "icu": {
     "version": "77_1",
