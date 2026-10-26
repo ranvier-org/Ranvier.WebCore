@@ -140,13 +140,7 @@ jobs:
         run: python scripts/build.py configure --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
       - name: Build
-        if: runner.os != 'macOS'
         run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
-
-      # TEMPORARY: keep going past compile errors, to collect them all in one run.
-      - name: Build (macOS, keep going)
-        if: runner.os == 'macOS'
-        run: cmake --build "$RANVIER_WORK/build-$FLAVOR" --target RanvierWebCoreHost -j 3 -- -k 0
 
       - name: Disk after the build (TEMPORARY)
         if: always() && runner.os == 'macOS'

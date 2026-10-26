@@ -19,4 +19,9 @@ if (ENABLE_WEBCORE)
     _WEBKIT_TARGET_LINK_FRAMEWORK(RanvierWebCoreHost)
     _WEBKIT_TARGET(RanvierWebCoreHost)
     set_target_properties(RanvierWebCoreHost PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/ranvier)
+    if (APPLE)
+        # WebCore.framework lets only the clients it names (-allowable_client) link it; the host links as
+        # TestWebCore, one of them.
+        target_link_options(RanvierWebCoreHost PRIVATE "LINKER:-client_name,TestWebCore")
+    endif ()
 endif ()
