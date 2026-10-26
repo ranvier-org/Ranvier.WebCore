@@ -2,33 +2,27 @@
 # use Skia, so its pixels differ from theirs. config/common.cmake includes this file for osx-* runtime
 # identifiers. The package links the system's frameworks and its ICU (libicucore) and does not carry them.
 #
-# The patch series hooks only the Windows and Linux platform files, so the USE_*_STUB options do nothing
-# here; what presentation does not need is cut with WebKit's own switches, as far as they go on this port.
+# The Cocoa sources compile only in configurations close to the port's defaults: with video, WebGPU or
+# WebRTC off, or WebAssembly off, WebCore fails to compile (docs/SETTINGS.md lists the errors). So this
+# file turns off only what builds without editing WebKit's C++, and the rest stays as the port has it.
+# It runs before slim.cmake's and common.cmake's own settings, and a cache entry set first is kept, so
+# the ON values below override theirs.
 
 set(PORT "Mac" CACHE STRING "")
 if (RANVIER_RID MATCHES "^osx-(.+)$")
     set(CMAKE_OSX_ARCHITECTURES "${CMAKE_MATCH_1}" CACHE STRING "")
 endif ()
 
-# The slim flavor's feature switches, for both flavors: the Mac port builds no Windows-only reference to
-# compare against.
+# Off, as in the slim flavor.
 set(ENABLE_WEBGL OFF CACHE BOOL "")
-set(ENABLE_VIDEO OFF CACHE BOOL "")
 set(ENABLE_XSLT OFF CACHE BOOL "")
 set(ENABLE_WEBDRIVER OFF CACHE BOOL "")
 
-# The remote inspector stays on: with it off, JavaScriptCore's API/JSRemoteInspector.cpp does not compile on
-# Cocoa (it calls RemoteInspector::singleton() under PLATFORM(COCOA) alone). This file runs before
-# slim.cmake's settings, and a cache entry set first is kept, so slim's OFF does not apply here.
+# On, unlike the slim flavor and common.cmake:
+# - video: the Cocoa media, WebCodecs, media session and picture-in-picture sources assume it;
+# - the remote inspector: API/JSRemoteInspector.cpp calls RemoteInspector::singleton() under PLATFORM(COCOA);
+# - WebAssembly: bindings/js/BindingsJSTZoneImpls.cpp names its source providers unconditionally. It runs
+#   on the in-place interpreter, since the JIT tiers stay off (common.cmake).
+set(ENABLE_VIDEO ON CACHE BOOL "")
 set(ENABLE_REMOTE_INSPECTOR ON CACHE BOOL "")
-
-# Cocoa features that build further libraries into or beside WebCore: WebGPU.framework, the dav1d AV1
-# decoder and WebRTC. With ENABLE_VIDEO off WebKit also turns off the media features that depend on it.
-set(ENABLE_WEBGPU OFF CACHE BOOL "")
-set(ENABLE_AV1 OFF CACHE BOOL "")
-set(ENABLE_WEB_RTC OFF CACHE BOOL "")
-set(ENABLE_MEDIA_STREAM OFF CACHE BOOL "")
-
-# The patch series (patches/). 0010: the media features PlatformEnableCocoa.h turns on by itself, off with
-# ENABLE_VIDEO; without it PlatformEnable.h rejects COCOA_WEBM_PLAYER, which requires MEDIA_SOURCE.
-set(USE_COCOA_WITHOUT_MEDIA ON CACHE BOOL "")
+set(ENABLE_WEBASSEMBLY ON CACHE BOOL "")

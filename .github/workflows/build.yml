@@ -43,7 +43,7 @@ jobs:
               dict(rid='linux-x64', runner='ubuntu-24.04', work='/mnt/rw'),
               dict(rid='linux-arm64', runner='ubuntu-24.04-arm', work='/mnt/rw'),
               # macOS runners have one volume; the home directory is on its data volume.
-              dict(rid='osx-arm64', runner='macos-15', work='/Users/runner/rw'),
+              dict(rid='osx-arm64', runner='macos-26', work='/Users/runner/rw'),
           ]
           wanted = [r.strip() for r in os.environ.get('RIDS', '').split(',') if r.strip()]
           include = [r for r in runtimes if not wanted or r['rid'] in wanted]
@@ -85,7 +85,7 @@ jobs:
         run: |
           # WebKit's CMake build for the Mac port wants the newest Xcode's SDK and Swift.
           ls -d /Applications/Xcode*.app
-          xcode=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          xcode=$(ls -d /Applications/Xcode_26*.app | grep -v -i beta | sort -V | tail -1)
           sudo xcode-select -s "$xcode/Contents/Developer"
           xcodebuild -version
           for tool in gperf ninja cmake; do command -v $tool >/dev/null || brew install $tool; done
