@@ -42,6 +42,21 @@ An incremental rebuild after vcpkg reinstalls packages can fail with clang rejec
 the reinstalled headers keep older modification times. Delete `cmake_pch.cxx.obj` under
 `<build>/Source` and build again. A fresh build, as in CI, does not hit this.
 
+## win-arm64
+
+Built natively on the `windows-11-arm` runner (Visual Studio 18 with the ARM64 C++ tools, MSVC 14.51.36231
+on 2026-10-26; Perl, Ruby, CMake and .NET come with the image) with LLVM's `aarch64-pc-windows-msvc`
+release and WebKit's `arm64-windows-webkit` triplet. Two differences from `win-x64`:
+
+- `build.py configure` sets `_LINK_=/BASE:0x180000000` and `VCPKG_KEEP_ENV_VARS=_LINK_`: the ICU port of
+  WebKit's registry links its DLLs with bases below 4 GB, which `link.exe` rejects for ARM64 (LNK1355).
+- `icu_data.py --machine ARM64` links the filtered ICU data DLL for ARM64.
+
+On 2026-10-26, with empty caches, the job took 1 h 3 min: fetch 4 min, configure (vcpkg) 16 min and the
+compile 38 min. The slim package holds 18 DLLs, every one `IMAGE_FILE_MACHINE_ARM64`, 74.73 MB against
+`win-x64`'s 77.59 MB. Nobody has loaded these DLLs on an ARM64 machine yet: the package is unverified at
+runtime.
+
 ## Other runtimes
 
 The patches change `OptionsWin.cmake` and the Windows platform CMake files, and `build.py` drives

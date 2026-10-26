@@ -19,7 +19,7 @@
     },
     "win-arm64": {
       "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.4/clang+llvm-23.1.4-aarch64-pc-windows-msvc.tar.xz",
-      "sha256": ""
+      "sha256": "f0d2e32424850ffb9b6aef190587a8298353d858a8a7260f490c173fe98d6811"
     }
   },
   "icu": {

@@ -40,6 +40,7 @@ jobs:
               # work: a short root on Windows, where WebKit's generated paths exceed MAX_PATH under the
               # default workspace.
               dict(rid='win-x64', runner='windows-2025', work='C:\\rw'),
+              dict(rid='win-arm64', runner='windows-11-arm', work='C:\\rw'),
               dict(rid='linux-x64', runner='ubuntu-24.04', work='/mnt/rw'),
               dict(rid='linux-arm64', runner='ubuntu-24.04-arm', work='/mnt/rw'),
           ]
