@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 12.
+ * Ranvier native WebCore C ABI, version 13.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -406,6 +406,70 @@ RV_EXPORT int32_t rv_event_number(RvEvent*, int32_t number, double* value);
 RV_EXPORT int32_t rv_event_string(RvEvent*, int32_t property, char* buffer, int32_t capacity, int32_t* length);
 /* The relatedTarget of a mouse or focus event when it is a node, else NULL. */
 RV_EXPORT RvNode* rv_event_related_target(RvEvent*);
+
+/* v13: "cursor", "scroll" and "ime" for rv_abi_has. */
+
+/* Cursors of rv_host_cursor, as the CSS cursor values. */
+enum {
+    RV_CURSOR_DEFAULT = 0,
+    RV_CURSOR_POINTER = 1,
+    RV_CURSOR_TEXT = 2,
+    RV_CURSOR_VERTICAL_TEXT = 3,
+    RV_CURSOR_CROSSHAIR = 4,
+    RV_CURSOR_MOVE = 5,
+    RV_CURSOR_ALL_SCROLL = 6,
+    RV_CURSOR_WAIT = 7,
+    RV_CURSOR_PROGRESS = 8,
+    RV_CURSOR_HELP = 9,
+    RV_CURSOR_CONTEXT_MENU = 10,
+    RV_CURSOR_CELL = 11,
+    RV_CURSOR_ALIAS = 12,
+    RV_CURSOR_COPY = 13,
+    RV_CURSOR_NO_DROP = 14,
+    RV_CURSOR_NOT_ALLOWED = 15,
+    RV_CURSOR_GRAB = 16,
+    RV_CURSOR_GRABBING = 17,
+    RV_CURSOR_ZOOM_IN = 18,
+    RV_CURSOR_ZOOM_OUT = 19,
+    RV_CURSOR_NONE = 20,
+    RV_CURSOR_COL_RESIZE = 21,
+    RV_CURSOR_ROW_RESIZE = 22,
+    RV_CURSOR_N_RESIZE = 23,
+    RV_CURSOR_E_RESIZE = 24,
+    RV_CURSOR_S_RESIZE = 25,
+    RV_CURSOR_W_RESIZE = 26,
+    RV_CURSOR_NE_RESIZE = 27,
+    RV_CURSOR_NW_RESIZE = 28,
+    RV_CURSOR_SE_RESIZE = 29,
+    RV_CURSOR_SW_RESIZE = 30,
+    RV_CURSOR_EW_RESIZE = 31,
+    RV_CURSOR_NS_RESIZE = 32,
+    RV_CURSOR_NESW_RESIZE = 33,
+    RV_CURSOR_NWSE_RESIZE = 34,
+    /* An image the page set with cursor: url(); the image is not available. */
+    RV_CURSOR_CUSTOM = 35,
+};
+
+/* The cursor for the mouse's position, as last set by rv_host_mouse: the app applies it after each mouse call. */
+RV_EXPORT int32_t rv_host_cursor(RvHost*);
+
+/* Writes the viewport's scroll position in CSS pixels. */
+RV_EXPORT int32_t rv_host_scroll_position(RvHost*, int32_t* x, int32_t* y);
+/* Scrolls the viewport to x, y CSS pixels, clamped to the document. The scroll event fires on the next
+ * rv_host_update. */
+RV_EXPORT int32_t rv_host_scroll_to(RvHost*, int32_t x, int32_t y);
+
+/* Input method composition in the focused editable element, as a platform's input method reports it. The
+ * composition is the underlined text being composed; selectionStart and selectionEnd are UTF-16 offsets of
+ * the selection within it. Setting it replaces the selection or the previous composition, and empty text
+ * removes it. */
+RV_EXPORT int32_t rv_host_ime_set_composition(RvHost*, const char* text, int32_t selectionStart, int32_t selectionEnd);
+/* Replaces the composition, or the selection when there is none, with text, as typed text. */
+RV_EXPORT int32_t rv_host_ime_commit(RvHost*, const char* text);
+RV_EXPORT int32_t rv_host_ime_cancel(RvHost*);
+/* Writes the bounds of the composition's first line, or of the caret, in CSS pixels of the viewport, where an
+ * input method places its candidate window, and returns 1; returns 0 and writes zeros when there is neither. */
+RV_EXPORT int32_t rv_host_ime_rect(RvHost*, int32_t* x, int32_t* y, int32_t* width, int32_t* height);
 
 #ifdef __cplusplus
 }

@@ -66,6 +66,10 @@
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/Chrome.h>
+#include <WebCore/CompositionHighlight.h>
+#include <WebCore/CompositionUnderline.h>
+#include <WebCore/Cursor.h>
+#include <WebCore/FrameSelection.h>
 #include <WebCore/DOMPasteAccess.h>
 #include <WebCore/Editor.h>
 #include <WebCore/EditorClient.h>
@@ -126,9 +130,64 @@ private:
         wantUpdate();
         return true;
     }
+    void setCursor(const Cursor&) final;
     void invalidate(const IntRect&);
     void wantUpdate();
 };
+
+// The RV_CURSOR_* value of a WebCore cursor.
+static int32_t cursorValue(Cursor::Type type)
+{
+    using enum Cursor::Type;
+    switch (type) {
+    case Hand: return RV_CURSOR_POINTER;
+    case IBeam: return RV_CURSOR_TEXT;
+    case VerticalText: return RV_CURSOR_VERTICAL_TEXT;
+    case Cross: return RV_CURSOR_CROSSHAIR;
+    case Move: return RV_CURSOR_MOVE;
+    case MiddlePanning:
+    case EastPanning:
+    case NorthPanning:
+    case NorthEastPanning:
+    case NorthWestPanning:
+    case SouthPanning:
+    case SouthEastPanning:
+    case SouthWestPanning:
+    case WestPanning: return RV_CURSOR_ALL_SCROLL;
+    case Wait: return RV_CURSOR_WAIT;
+    case Progress: return RV_CURSOR_PROGRESS;
+    case Help: return RV_CURSOR_HELP;
+    case ContextMenu: return RV_CURSOR_CONTEXT_MENU;
+    case Cell: return RV_CURSOR_CELL;
+    case Alias: return RV_CURSOR_ALIAS;
+    case Copy: return RV_CURSOR_COPY;
+    case NoDrop: return RV_CURSOR_NO_DROP;
+    case NotAllowed: return RV_CURSOR_NOT_ALLOWED;
+    case Grab: return RV_CURSOR_GRAB;
+    case Grabbing: return RV_CURSOR_GRABBING;
+    case ZoomIn: return RV_CURSOR_ZOOM_IN;
+    case ZoomOut: return RV_CURSOR_ZOOM_OUT;
+    case None: return RV_CURSOR_NONE;
+    case ColumnResize: return RV_CURSOR_COL_RESIZE;
+    case RowResize: return RV_CURSOR_ROW_RESIZE;
+    case NorthResize: return RV_CURSOR_N_RESIZE;
+    case EastResize: return RV_CURSOR_E_RESIZE;
+    case SouthResize: return RV_CURSOR_S_RESIZE;
+    case WestResize: return RV_CURSOR_W_RESIZE;
+    case NorthEastResize: return RV_CURSOR_NE_RESIZE;
+    case NorthWestResize: return RV_CURSOR_NW_RESIZE;
+    case SouthEastResize: return RV_CURSOR_SE_RESIZE;
+    case SouthWestResize: return RV_CURSOR_SW_RESIZE;
+    case EastWestResize: return RV_CURSOR_EW_RESIZE;
+    case NorthSouthResize: return RV_CURSOR_NS_RESIZE;
+    case NorthEastSouthWestResize: return RV_CURSOR_NESW_RESIZE;
+    case NorthWestSouthEastResize: return RV_CURSOR_NWSE_RESIZE;
+    case Custom: return RV_CURSOR_CUSTOM;
+    case Invalid:
+    case Pointer: return RV_CURSOR_DEFAULT;
+    }
+    return RV_CURSOR_DEFAULT;
+}
 
 // The editing command a key down runs, as Windows binds keys.
 static String keyCommand(const String& key, bool shift, bool control)
@@ -377,6 +436,7 @@ struct RvHost {
     // Inside rv_host_update or rv_host_paint_rgba, which call no callback.
     bool inFrame { false };
     bool updateWanted { false };
+    int32_t cursor { RV_CURSOR_DEFAULT };
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
@@ -396,6 +456,12 @@ void RvChromeClient::invalidate(const IntRect& rect)
         return;
     host->dirty.unite(intersection(rect, IntRect { { }, host->size }));
     host->requestFrame();
+}
+
+void RvChromeClient::setCursor(const Cursor& cursor)
+{
+    if (host)
+        host->cursor = cursorValue(cursor.type());
 }
 
 void RvChromeClient::wantUpdate()
@@ -757,7 +823,7 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 12; }
+int32_t rv_abi_version(void) { return 13; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -771,7 +837,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2009,4 +2075,118 @@ RvNode* rv_event_related_target(RvEvent* subject)
     if (!subject || !onOwningThread())
         return nullptr;
     return handleOrNull(dynamicDowncast<Node>(event(subject)->relatedTarget()));
+}
+
+int32_t rv_host_cursor(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return host->cursor;
+}
+
+int32_t rv_host_scroll_position(RvHost* host, int32_t* x, int32_t* y)
+{
+    if (!host || !x || !y)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr view = host->frame().view();
+    if (!view)
+        return RV_ERR_PAINT_FAILED;
+    auto position = view->scrollPosition();
+    *x = position.x();
+    *y = position.y();
+    return RV_OK;
+}
+
+int32_t rv_host_scroll_to(RvHost* host, int32_t x, int32_t y)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr view = host->frame().view();
+    if (!view)
+        return RV_ERR_PAINT_FAILED;
+    host->document().updateLayoutIgnorePendingStylesheets();
+    view->setScrollPosition({ x, y });
+    return RV_OK;
+}
+
+// Runs an input method call on the focused frame's editor, which dispatches composition and input events.
+template<typename Edit> static int32_t compose(RvHost& host, Edit&& edit)
+{
+    Ref frame = host.frame();
+    return handleInput(host, [&] {
+        edit(frame->editor());
+        return true;
+    }) < 0 ? RV_ERR_LISTENER_FAILED : RV_OK;
+}
+
+int32_t rv_host_ime_set_composition(RvHost* host, const char* text, int32_t selectionStart, int32_t selectionEnd)
+{
+    if (!host || !text)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto composition = utf8(text);
+    if (selectionStart < 0 || selectionEnd < selectionStart || static_cast<unsigned>(selectionEnd) > composition.length())
+        return RV_ERR_UNSUPPORTED;
+    Vector<CompositionUnderline> underlines;
+    if (!composition.isEmpty())
+        underlines.append({ 0, composition.length(), CompositionUnderlineColor::TextColor, Color::black, false });
+    return compose(*host, [&](Editor& editor) {
+        editor.setComposition(composition, underlines, { }, { }, selectionStart, selectionEnd);
+    });
+}
+
+int32_t rv_host_ime_commit(RvHost* host, const char* text)
+{
+    if (!host || !text)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto committed = utf8(text);
+    return compose(*host, [&](Editor& editor) { editor.confirmComposition(committed); });
+}
+
+int32_t rv_host_ime_cancel(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    // Editor::cancelComposition leaves the composition's text when the selection is a caret inside it; an
+    // empty composition selects the composition, deletes it and fires compositionend.
+    return compose(*host, [](Editor& editor) {
+        if (editor.hasComposition())
+            editor.setComposition(emptyString(), { }, { }, { }, 0, 0);
+    });
+}
+
+int32_t rv_host_ime_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, int32_t* height)
+{
+    if (!host || !x || !y || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref frame = host->frame();
+    RefPtr view = frame->view();
+    IntRect rect;
+    if (view) {
+        host->document().updateLayoutIgnorePendingStylesheets();
+        auto& editor = frame->editor();
+        if (auto range = editor.compositionRange())
+            rect = editor.firstRectForRange(*range);
+        else
+            rect = frame->selection().absoluteCaretBounds();
+        rect = view->contentsToRootView(rect);
+    }
+    *x = rect.x();
+    *y = rect.y();
+    *width = rect.width();
+    *height = rect.height();
+    return rect.isEmpty() ? 0 : 1;
 }
