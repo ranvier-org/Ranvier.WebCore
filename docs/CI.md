@@ -27,7 +27,7 @@ Homebrew install four times, and apt's `Acquire::Retries=5`.
 
 | Entry | Key | Saved after |
 |---|---|---|
-| gperf (Windows, from Chocolatey) | its version | its install |
+| gperf (Windows, from Chocolatey) | its version and the RID: a cache entry holds paths relative to the workspace, whose drive differs between the x64 and ARM64 images | its install |
 | LLVM (Windows) | the RID's archive hash in `pins.json` | fetch |
 | vcpkg binary archives and downloads (Windows) | the RID, the flavor, the vcpkg, WebKit and ICU pins, and `config/` | a successful configure |
 

@@ -162,7 +162,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: C:\rw\tools\gperf
-          key: gperf-3.1.0-windows
+          key: gperf-3.1.0-${{ matrix.rid }}
 
       - name: Install gperf
         if: runner.os == 'Windows' && steps.gperf.outputs.cache-hit != 'true'
@@ -183,7 +183,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: C:\rw\tools\gperf
-          key: gperf-3.1.0-windows
+          key: gperf-3.1.0-${{ matrix.rid }}
 
       - name: Put gperf on PATH
         if: runner.os == 'Windows'

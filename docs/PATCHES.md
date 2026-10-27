@@ -165,9 +165,9 @@ and macOS):
 - `EmptyClients.h` exports `EmptyChromeClient`, and its `invalidateRootView`,
   `invalidateContentsForSlowScroll`, `setCursor` and `triggerRenderingUpdate` become `override` instead of
   `final`.
-- `ChromeClient.h` exports the five virtual members defined out of line that `EmptyChromeClient` does not
-  override: the three shape detector factories, `getBarcodeDetectorSupportedFormats` and
-  `enterFullScreenForElement`.
+- `ChromeClient.h` exports the six virtual members defined out of line that `EmptyChromeClient` does not
+  override: the three shape detector factories, `getBarcodeDetectorSupportedFormats`,
+  `enterFullScreenForElement` and `requestPointerLock` (macOS only).
 - `Headers.cmake` forwards `dom/InputEvent.h`.
 
 ## Working on the series

@@ -54,7 +54,7 @@ index 97c2a7e662..511a2ace7a 100644
  #if PLATFORM(WIN)
      void AXStartFrameLoad() final { }
 diff --git a/Source/WebCore/page/ChromeClient.h b/Source/WebCore/page/ChromeClient.h
-index c884441710..665b9e3eb4 100644
+index c884441710..318e247119 100644
 --- a/Source/WebCore/page/ChromeClient.h
 +++ b/Source/WebCore/page/ChromeClient.h
 @@ -469,10 +469,10 @@ public:
@@ -81,3 +81,12 @@ index c884441710..665b9e3eb4 100644
  #if ENABLE(QUICKLOOK_FULLSCREEN)
      virtual void updateImageSource(Element&) { }
  #endif // ENABLE(QUICKLOOK_FULLSCREEN)
+@@ -610,7 +610,7 @@ public:
+     virtual bool isSVGImageChromeClient() const { return false; }
+ 
+ #if ENABLE(POINTER_LOCK)
+-    virtual void requestPointerLock(CompletionHandler<void(PointerLockRequestResult)>&&);
++    WEBCORE_EXPORT virtual void requestPointerLock(CompletionHandler<void(PointerLockRequestResult)>&&);
+     virtual void requestPointerUnlock(CompletionHandler<void(bool)>&& completionHandler) { completionHandler(false); }
+ #endif
+ 
