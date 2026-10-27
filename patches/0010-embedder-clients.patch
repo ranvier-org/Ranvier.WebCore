@@ -1,5 +1,5 @@
 diff --git a/Source/WebCore/Headers.cmake b/Source/WebCore/Headers.cmake
-index 481eb62ddd..d3e12e7903 100644
+index 481eb62..d3e12e7 100644
 --- a/Source/WebCore/Headers.cmake
 +++ b/Source/WebCore/Headers.cmake
 @@ -1351,6 +1351,26 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
@@ -30,10 +30,18 @@ index 481eb62ddd..d3e12e7903 100644
      dom/LiveNodeList.h
      dom/LiveNodeListInlines.h
 diff --git a/Source/WebCore/PlatformCocoa.cmake b/Source/WebCore/PlatformCocoa.cmake
-index 70e1096e41..814a3da6e4 100644
+index 70e1096..7e55c20 100644
 --- a/Source/WebCore/PlatformCocoa.cmake
 +++ b/Source/WebCore/PlatformCocoa.cmake
-@@ -727,7 +727,6 @@ list(REMOVE_ITEM WebCore_PRIVATE_FRAMEWORK_HEADERS
+@@ -718,7 +718,6 @@ list(REMOVE_ITEM WebCore_PRIVATE_FRAMEWORK_HEADERS
+     accessibility/AXGeometryManager.h
+     accessibility/AXListHelpers.h
+     accessibility/AXLogger.h
+-    accessibility/AXNotifications.h
+     accessibility/AXObjectCacheInlines.h
+     accessibility/AccessibilityMenuListPopup.h
+     accessibility/AccessibilityNodeObject.h
+@@ -727,7 +726,6 @@ list(REMOVE_ITEM WebCore_PRIVATE_FRAMEWORK_HEADERS
  
      animation/CustomAnimationOptions.h
      animation/KeyframeAnimationOptions.h
@@ -41,7 +49,7 @@ index 70e1096e41..814a3da6e4 100644
  
      bindings/js/CachedModuleScriptLoader.h
      bindings/js/JSDOMConvertXPathNSResolver.h
-@@ -739,7 +738,6 @@ list(REMOVE_ITEM WebCore_PRIVATE_FRAMEWORK_HEADERS
+@@ -739,7 +737,6 @@ list(REMOVE_ITEM WebCore_PRIVATE_FRAMEWORK_HEADERS
  
      contentextensions/SerializedNFA.h
  
@@ -49,8 +57,39 @@ index 70e1096e41..814a3da6e4 100644
      css/CSSCounterValue.h
      css/CSSFontPaletteValuesRule.h
      css/CSSQuadValue.h
+diff --git a/Source/WebCore/accessibility/AXCoreObject.h b/Source/WebCore/accessibility/AXCoreObject.h
+index 74d2b45..6047a0b 100644
+--- a/Source/WebCore/accessibility/AXCoreObject.h
++++ b/Source/WebCore/accessibility/AXCoreObject.h
+@@ -761,7 +761,7 @@ public:
+     virtual std::optional<bool> cachedIsIgnored() const = 0;
+ 
+     unsigned blockquoteLevel() const;
+-    unsigned headingLevel() const;
++    WEBCORE_EXPORT unsigned headingLevel() const;
+     virtual unsigned computedHeadingLevel() const { return 0; }
+     virtual AccessibilityButtonState checkboxOrRadioValue() const = 0;
+     virtual String valueDescription() const = 0;
+@@ -829,7 +829,7 @@ public:
+     virtual bool supportsHasPopup() const = 0;
+     virtual bool pressedIsPresent() const = 0;
+     virtual String explicitInvalidStatus() const = 0;
+-    String invalidStatus() const;
++    WEBCORE_EXPORT String invalidStatus() const;
+     virtual bool supportsExpanded() const = 0;
+     virtual bool supportsChecked() const = 0;
+     virtual AccessibilitySortDirection sortDirection() const = 0;
+@@ -1085,7 +1085,7 @@ public:
+     // True only when the author explicitly set role="group" on this object.
+     virtual bool hasExplicitGroupRole() const = 0;
+     // 1-based, to match the aria-level spec.
+-    unsigned hierarchicalLevel() const;
++    WEBCORE_EXPORT unsigned hierarchicalLevel() const;
+     virtual bool isInlineText() const = 0;
+ 
+     virtual void setFocused(bool) = 0;
 diff --git a/Source/WebCore/animation/CSSTransition.h b/Source/WebCore/animation/CSSTransition.h
-index dbdd5147be..6e8472468e 100644
+index dbdd514..6e84724 100644
 --- a/Source/WebCore/animation/CSSTransition.h
 +++ b/Source/WebCore/animation/CSSTransition.h
 @@ -49,7 +49,7 @@ public:
@@ -63,7 +102,7 @@ index dbdd5147be..6e8472468e 100644
      MonotonicTime generationTime() const { return m_generationTime; }
      const Style::ComputedStyle& targetStyle() const LIFETIME_BOUND { return *m_targetStyle; }
 diff --git a/Source/WebCore/animation/WebAnimation.h b/Source/WebCore/animation/WebAnimation.h
-index 44af53aba9..1195c2bcd3 100644
+index 44af53a..1195c2b 100644
 --- a/Source/WebCore/animation/WebAnimation.h
 +++ b/Source/WebCore/animation/WebAnimation.h
 @@ -96,14 +96,14 @@ public:
@@ -103,7 +142,7 @@ index 44af53aba9..1195c2bcd3 100644
      ExceptionOr<void> commitStyles();
  
 diff --git a/Source/WebCore/dom/ClipboardEvent.h b/Source/WebCore/dom/ClipboardEvent.h
-index de29befa1d..0b0d5b841d 100644
+index de29bef..0b0d5b8 100644
 --- a/Source/WebCore/dom/ClipboardEvent.h
 +++ b/Source/WebCore/dom/ClipboardEvent.h
 @@ -29,7 +29,7 @@ namespace WebCore {
@@ -116,7 +155,7 @@ index de29befa1d..0b0d5b841d 100644
  public:
      virtual ~ClipboardEvent();
 diff --git a/Source/WebCore/dom/DataTransfer.h b/Source/WebCore/dom/DataTransfer.h
-index 46a710b321..f53c0c9787 100644
+index 46a710b..f53c0c9 100644
 --- a/Source/WebCore/dom/DataTransfer.h
 +++ b/Source/WebCore/dom/DataTransfer.h
 @@ -50,19 +50,19 @@ public:
@@ -174,7 +213,7 @@ index 46a710b321..f53c0c9787 100644
  
      void setDragHasStarted() { m_shouldUpdateDragImage = true; }
 diff --git a/Source/WebCore/dom/Document.h b/Source/WebCore/dom/Document.h
-index 823e4cd420..5b5b95c1f4 100644
+index 823e4cd..5b5b95c 100644
 --- a/Source/WebCore/dom/Document.h
 +++ b/Source/WebCore/dom/Document.h
 @@ -1877,7 +1877,7 @@ public:
@@ -187,7 +226,7 @@ index 823e4cd420..5b5b95c1f4 100644
      AnimationTimelinesController* timelinesController() const { return m_timelinesController.get(); }
      WEBCORE_EXPORT AnimationTimelinesController& ensureTimelinesController();
 diff --git a/Source/WebCore/dom/DragEvent.h b/Source/WebCore/dom/DragEvent.h
-index 9bb5d9bbab..be7b039707 100644
+index 9bb5d9b..be7b039 100644
 --- a/Source/WebCore/dom/DragEvent.h
 +++ b/Source/WebCore/dom/DragEvent.h
 @@ -38,7 +38,7 @@ struct DragEventInit : public MouseEventInit {
@@ -200,7 +239,7 @@ index 9bb5d9bbab..be7b039707 100644
  public:
      using Init = DragEventInit;
 diff --git a/Source/WebCore/dom/Element.h b/Source/WebCore/dom/Element.h
-index 8216a2d09e..18b15c3b34 100644
+index 8216a2d..18b15c3 100644
 --- a/Source/WebCore/dom/Element.h
 +++ b/Source/WebCore/dom/Element.h
 @@ -884,7 +884,7 @@ public:
@@ -213,7 +252,7 @@ index 8216a2d09e..18b15c3b34 100644
      String description() const override;
      String debugDescription() const override;
 diff --git a/Source/WebCore/loader/EmptyClients.h b/Source/WebCore/loader/EmptyClients.h
-index 97c2a7e662..9337ab8240 100644
+index 97c2a7e..9337ab8 100644
 --- a/Source/WebCore/loader/EmptyClients.h
 +++ b/Source/WebCore/loader/EmptyClients.h
 @@ -57,7 +57,7 @@ enum class BroadcastFocusedElement : bool;
@@ -274,7 +313,7 @@ index 97c2a7e662..9337ab8240 100644
  #if PLATFORM(WIN)
      void AXStartFrameLoad() final { }
 diff --git a/Source/WebCore/page/ChromeClient.h b/Source/WebCore/page/ChromeClient.h
-index c884441710..318e247119 100644
+index c884441..318e247 100644
 --- a/Source/WebCore/page/ChromeClient.h
 +++ b/Source/WebCore/page/ChromeClient.h
 @@ -469,10 +469,10 @@ public:
@@ -311,7 +350,7 @@ index c884441710..318e247119 100644
  #endif
  
 diff --git a/Source/WebCore/page/IntersectionObserver.h b/Source/WebCore/page/IntersectionObserver.h
-index 5dc74daa93..74b868ae71 100644
+index 5dc74da..74b868a 100644
 --- a/Source/WebCore/page/IntersectionObserver.h
 +++ b/Source/WebCore/page/IntersectionObserver.h
 @@ -79,9 +79,9 @@ public:
@@ -340,7 +379,7 @@ index 5dc74daa93..74b868ae71 100644
      struct TakenRecords {
          Vector<Ref<IntersectionObserverEntry>> records;
 diff --git a/Source/WebCore/page/ResizeObserver.h b/Source/WebCore/page/ResizeObserver.h
-index 1ebd9edc2c..044e2b6b57 100644
+index 1ebd9ed..044e2b6 100644
 --- a/Source/WebCore/page/ResizeObserver.h
 +++ b/Source/WebCore/page/ResizeObserver.h
 @@ -58,17 +58,17 @@ using JSOrNativeResizeObserverCallback = Variant<Ref<ResizeObserverCallback>, Na
@@ -367,7 +406,7 @@ index 1ebd9edc2c..044e2b6b57 100644
  
      static size_t maxElementDepth() { return SIZE_MAX; }
 diff --git a/Source/WebCore/platform/StaticPasteboard.h b/Source/WebCore/platform/StaticPasteboard.h
-index aa8d7e25d1..8ecec3b451 100644
+index aa8d7e2..8ecec3b 100644
 --- a/Source/WebCore/platform/StaticPasteboard.h
 +++ b/Source/WebCore/platform/StaticPasteboard.h
 @@ -34,7 +34,7 @@ namespace WebCore {

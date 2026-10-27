@@ -46,154 +46,175 @@ type ClipboardWrite = delegate of context: nativeint * ``type``: nativeint * dat
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type ClipboardRead = delegate of context: nativeint * request: nativeint -> unit
 
+/// <summary>The <c>RvAxCallback</c> of the header.</summary>
+[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
+type AxCallback = delegate of context: nativeint * node: nativeint * event: int -> unit
+
 /// <summary>
 /// Per-function counts and Stopwatch ticks of the calls made while <c>On</c>, indexed as <c>Names</c>. The ticks of a
 /// call span its P/Invoke transition, marshalling and native work.
 /// </summary>
 module Calls =
     let Names =
-        [|
-            "rv_abi_version"
-            "rv_process_id"
-            "rv_host_create"
-            "rv_host_destroy"
-            "rv_host_load_html"
-            "rv_host_scripts_enabled"
-            "rv_host_vm_entry_disallowed"
-            "rv_document_body"
-            "rv_document_head"
-            "rv_document_get_element_by_id"
-            "rv_document_create_element"
-            "rv_document_create_text"
-            "rv_node_append_child"
-            "rv_node_set_text_content"
-            "rv_element_set_attribute"
-            "rv_node_release"
-            "rv_host_paint_rgba"
-            "rv_node_add_event_listener"
-            "rv_listener_remove"
-            "rv_node_dispatch_event"
-            "rv_element_click"
-            "rv_input_checked"
-            "rv_event_phase"
-            "rv_event_default_prevented"
-            "rv_event_prevent_default"
-            "rv_event_stop_propagation"
-            "rv_host_document"
-            "rv_document_create_comment"
-            "rv_document_create_fragment"
-            "rv_document_import_node"
-            "rv_node_parse_fragment"
-            "rv_node_type"
-            "rv_node_relative"
-            "rv_node_get_string"
-            "rv_node_set_string"
-            "rv_node_insert_before"
-            "rv_node_remove_child"
-            "rv_node_replace_child"
-            "rv_node_remove"
-            "rv_node_clone"
-            "rv_node_contains"
-            "rv_node_is_connected"
-            "rv_element_get_attribute"
-            "rv_element_remove_attribute"
-            "rv_input_set_checked"
-            "rv_event_retain"
-            "rv_event_release"
-            "rv_host_create_event"
-            "rv_node_dispatch"
-            "rv_event_interface"
-            "rv_event_flags"
-            "rv_event_type"
-            "rv_event_key"
-            "rv_event_target"
-            "rv_last_exception"
-            "rv_node_query_selector"
-            "rv_node_query_selector_all"
-            "rv_node_query_selector_all_uncached"
-            "rv_node_ref_count"
-            "rv_node_watch"
-            "rv_watch_alive"
-            "rv_watch_node"
-            "rv_watch_release"
-            "rv_release_memory"
-            "rv_collect_garbage"
-            "rv_collect_garbage_eden"
-            "rv_node_has_wrapper"
-            "rv_element_attribute_count"
-            "rv_element_attribute_at"
-            "rv_element_focus"
-            "rv_document_active_element"
-            "rv_run_loop_cycle"
-            "rv_host_set_resource_handler"
-            "rv_resource_load_finish"
-            "rv_resource_load_fail"
-            "rv_abi_has"
-            "rv_host_resize"
-            "rv_host_set_device_scale"
-            "rv_host_paint_size"
-            "rv_host_mouse"
-            "rv_host_wheel"
-            "rv_host_key"
-            "rv_host_set_focused"
-            "rv_host_set_frame_callback"
-            "rv_host_update"
-            "rv_host_dirty_rect"
-            "rv_event_number"
-            "rv_event_string"
-            "rv_event_related_target"
-            "rv_host_cursor"
-            "rv_host_scroll_position"
-            "rv_host_scroll_to"
-            "rv_host_ime_set_composition"
-            "rv_host_ime_commit"
-            "rv_host_ime_cancel"
-            "rv_host_ime_rect"
-            "rv_element_class"
-            "rv_element_set_style"
-            "rv_element_get_style"
-            "rv_element_computed_style"
-            "rv_element_rect"
-            "rv_host_element_at"
-            "rv_element_scroll_into_view"
-            "rv_element_scroll_metric"
-            "rv_element_scroll_to"
-            "rv_element_attach_shadow"
-            "rv_element_shadow_root"
-            "rv_text_selection"
-            "rv_text_set_selection"
-            "rv_element_animations"
-            "rv_host_animations"
-            "rv_animation_release"
-            "rv_animation_control"
-            "rv_animation_state"
-            "rv_animation_time"
-            "rv_animation_seek"
-            "rv_animation_set_rate"
-            "rv_animation_name"
-            "rv_animation_target"
-            "rv_node_retain"
-            "rv_host_observe_resize"
-            "rv_host_observe_intersection"
-            "rv_observer_observe"
-            "rv_observer_unobserve"
-            "rv_observer_release"
-            "rv_element_snapshot"
-            "rv_host_paint_rgba_rect"
-            "rv_host_set_popup_handler"
-            "rv_popup_item_count"
-            "rv_popup_item"
-            "rv_popup_choose"
-            "rv_host_tooltip"
-            "rv_host_set_clipboard"
-            "rv_clipboard_offer"
-            "rv_host_edit"
-            "rv_host_set_drag"
-            "rv_drag_data_create"
-            "rv_drag_data_add"
-            "rv_drag_data_release"
-            "rv_host_drag"
-        |]
+        [| "rv_abi_version"
+           "rv_process_id"
+           "rv_host_create"
+           "rv_host_destroy"
+           "rv_host_load_html"
+           "rv_host_scripts_enabled"
+           "rv_host_vm_entry_disallowed"
+           "rv_document_body"
+           "rv_document_head"
+           "rv_document_get_element_by_id"
+           "rv_document_create_element"
+           "rv_document_create_text"
+           "rv_node_append_child"
+           "rv_node_set_text_content"
+           "rv_element_set_attribute"
+           "rv_node_release"
+           "rv_host_paint_rgba"
+           "rv_node_add_event_listener"
+           "rv_listener_remove"
+           "rv_node_dispatch_event"
+           "rv_element_click"
+           "rv_input_checked"
+           "rv_event_phase"
+           "rv_event_default_prevented"
+           "rv_event_prevent_default"
+           "rv_event_stop_propagation"
+           "rv_host_document"
+           "rv_document_create_comment"
+           "rv_document_create_fragment"
+           "rv_document_import_node"
+           "rv_node_parse_fragment"
+           "rv_node_type"
+           "rv_node_relative"
+           "rv_node_get_string"
+           "rv_node_set_string"
+           "rv_node_insert_before"
+           "rv_node_remove_child"
+           "rv_node_replace_child"
+           "rv_node_remove"
+           "rv_node_clone"
+           "rv_node_contains"
+           "rv_node_is_connected"
+           "rv_element_get_attribute"
+           "rv_element_remove_attribute"
+           "rv_input_set_checked"
+           "rv_event_retain"
+           "rv_event_release"
+           "rv_host_create_event"
+           "rv_node_dispatch"
+           "rv_event_interface"
+           "rv_event_flags"
+           "rv_event_type"
+           "rv_event_key"
+           "rv_event_target"
+           "rv_last_exception"
+           "rv_node_query_selector"
+           "rv_node_query_selector_all"
+           "rv_node_query_selector_all_uncached"
+           "rv_node_ref_count"
+           "rv_node_watch"
+           "rv_watch_alive"
+           "rv_watch_node"
+           "rv_watch_release"
+           "rv_release_memory"
+           "rv_collect_garbage"
+           "rv_collect_garbage_eden"
+           "rv_node_has_wrapper"
+           "rv_element_attribute_count"
+           "rv_element_attribute_at"
+           "rv_element_focus"
+           "rv_document_active_element"
+           "rv_run_loop_cycle"
+           "rv_host_set_resource_handler"
+           "rv_resource_load_finish"
+           "rv_resource_load_fail"
+           "rv_abi_has"
+           "rv_host_resize"
+           "rv_host_set_device_scale"
+           "rv_host_paint_size"
+           "rv_host_mouse"
+           "rv_host_wheel"
+           "rv_host_key"
+           "rv_host_set_focused"
+           "rv_host_set_frame_callback"
+           "rv_host_update"
+           "rv_host_dirty_rect"
+           "rv_event_number"
+           "rv_event_string"
+           "rv_event_related_target"
+           "rv_host_cursor"
+           "rv_host_scroll_position"
+           "rv_host_scroll_to"
+           "rv_host_ime_set_composition"
+           "rv_host_ime_commit"
+           "rv_host_ime_cancel"
+           "rv_host_ime_rect"
+           "rv_element_class"
+           "rv_element_set_style"
+           "rv_element_get_style"
+           "rv_element_computed_style"
+           "rv_element_rect"
+           "rv_host_element_at"
+           "rv_element_scroll_into_view"
+           "rv_element_scroll_metric"
+           "rv_element_scroll_to"
+           "rv_element_attach_shadow"
+           "rv_element_shadow_root"
+           "rv_text_selection"
+           "rv_text_set_selection"
+           "rv_element_animations"
+           "rv_host_animations"
+           "rv_animation_release"
+           "rv_animation_control"
+           "rv_animation_state"
+           "rv_animation_time"
+           "rv_animation_seek"
+           "rv_animation_set_rate"
+           "rv_animation_name"
+           "rv_animation_target"
+           "rv_node_retain"
+           "rv_host_observe_resize"
+           "rv_host_observe_intersection"
+           "rv_observer_observe"
+           "rv_observer_unobserve"
+           "rv_observer_release"
+           "rv_element_snapshot"
+           "rv_host_paint_rgba_rect"
+           "rv_host_set_popup_handler"
+           "rv_popup_item_count"
+           "rv_popup_item"
+           "rv_popup_choose"
+           "rv_host_tooltip"
+           "rv_host_set_clipboard"
+           "rv_clipboard_offer"
+           "rv_host_edit"
+           "rv_host_set_drag"
+           "rv_drag_data_create"
+           "rv_drag_data_add"
+           "rv_drag_data_release"
+           "rv_host_drag"
+           "rv_host_set_accessibility"
+           "rv_host_ax_root"
+           "rv_host_ax_focus"
+           "rv_host_ax_hit_test"
+           "rv_node_ax"
+           "rv_ax_dom_node"
+           "rv_ax_retain"
+           "rv_ax_release"
+           "rv_ax_id"
+           "rv_ax_role"
+           "rv_ax_states"
+           "rv_ax_string"
+           "rv_ax_number"
+           "rv_ax_rect"
+           "rv_ax_parent"
+           "rv_ax_children"
+           "rv_ax_action"
+           "rv_ax_set_value"
+           "rv_ax_set_number" |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
     let Ticks: int64 array = Array.zeroCreate Names.Length
@@ -736,6 +757,63 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_drag(nativeint host, int action, int x, int y, int allowed, nativeint data, int modifiers)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_accessibility(nativeint host, int enabled, nativeint callback, nativeint context)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_host_ax_root(nativeint host)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_host_ax_focus(nativeint host)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_host_ax_hit_test(nativeint host, int x, int y)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_node_ax(nativeint node)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_ax_dom_node(nativeint ax)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_ax_retain(nativeint ax)
+
+    [<DllImport(Lib)>]
+    extern void rv_ax_release(nativeint ax)
+
+    [<DllImport(Lib)>]
+    extern int64 rv_ax_id(nativeint ax)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_role(nativeint ax)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_states(nativeint ax)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_string(nativeint ax, int property, byte[] buffer, int capacity, int[] length)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_number(nativeint ax, int property, double& value)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_rect(nativeint ax, double& x, double& y, double& width, double& height)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_ax_parent(nativeint ax)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_children(nativeint ax, nativeint[] nodes, int capacity, int& count)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_action(nativeint ax, int action)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_set_value(nativeint ax, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_set_number(nativeint ax, float value)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -2477,6 +2555,234 @@ let rv_host_drag (host: nativeint, action: int, x: int, y: int, allowed: int, da
     else
         Raw.rv_host_drag (host, action, x, y, allowed, data, modifiers)
 
+let rv_host_set_accessibility (host: nativeint, enabled: int, callback: nativeint, context: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_accessibility (host, enabled, callback, context)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[140] <- Calls.Counts[140] + 1L
+        Calls.Ticks[140] <- Calls.Ticks[140] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_accessibility (host, enabled, callback, context)
+
+let rv_host_ax_root (host: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_ax_root (host)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[141] <- Calls.Counts[141] + 1L
+        Calls.Ticks[141] <- Calls.Ticks[141] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_ax_root (host)
+
+let rv_host_ax_focus (host: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_ax_focus (host)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[142] <- Calls.Counts[142] + 1L
+        Calls.Ticks[142] <- Calls.Ticks[142] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_ax_focus (host)
+
+let rv_host_ax_hit_test (host: nativeint, x: int, y: int) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_ax_hit_test (host, x, y)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[143] <- Calls.Counts[143] + 1L
+        Calls.Ticks[143] <- Calls.Ticks[143] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_ax_hit_test (host, x, y)
+
+let rv_node_ax (node: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_node_ax (node)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[144] <- Calls.Counts[144] + 1L
+        Calls.Ticks[144] <- Calls.Ticks[144] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_node_ax (node)
+
+let rv_ax_dom_node (ax: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_dom_node (ax)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[145] <- Calls.Counts[145] + 1L
+        Calls.Ticks[145] <- Calls.Ticks[145] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_dom_node (ax)
+
+let rv_ax_retain (ax: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_retain (ax)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[146] <- Calls.Counts[146] + 1L
+        Calls.Ticks[146] <- Calls.Ticks[146] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_retain (ax)
+
+let rv_ax_release (ax: nativeint) : unit =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_release (ax)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[147] <- Calls.Counts[147] + 1L
+        Calls.Ticks[147] <- Calls.Ticks[147] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_release (ax)
+
+let rv_ax_id (ax: nativeint) : int64 =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_id (ax)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[148] <- Calls.Counts[148] + 1L
+        Calls.Ticks[148] <- Calls.Ticks[148] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_id (ax)
+
+let rv_ax_role (ax: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_role (ax)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[149] <- Calls.Counts[149] + 1L
+        Calls.Ticks[149] <- Calls.Ticks[149] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_role (ax)
+
+let rv_ax_states (ax: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_states (ax)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[150] <- Calls.Counts[150] + 1L
+        Calls.Ticks[150] <- Calls.Ticks[150] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_states (ax)
+
+let rv_ax_string (ax: nativeint, property: int, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_string (ax, property, buffer, capacity, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[151] <- Calls.Counts[151] + 1L
+        Calls.Ticks[151] <- Calls.Ticks[151] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_string (ax, property, buffer, capacity, length)
+
+let rv_ax_number (ax: nativeint, property: int, value: byref<double>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_number (ax, property, &value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[152] <- Calls.Counts[152] + 1L
+        Calls.Ticks[152] <- Calls.Ticks[152] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_number (ax, property, &value)
+
+let rv_ax_rect (ax: nativeint, x: byref<double>, y: byref<double>, width: byref<double>, height: byref<double>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_rect (ax, &x, &y, &width, &height)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[153] <- Calls.Counts[153] + 1L
+        Calls.Ticks[153] <- Calls.Ticks[153] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_rect (ax, &x, &y, &width, &height)
+
+let rv_ax_parent (ax: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_parent (ax)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[154] <- Calls.Counts[154] + 1L
+        Calls.Ticks[154] <- Calls.Ticks[154] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_parent (ax)
+
+let rv_ax_children (ax: nativeint, nodes: nativeint[], capacity: int, count: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_children (ax, nodes, capacity, &count)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[155] <- Calls.Counts[155] + 1L
+        Calls.Ticks[155] <- Calls.Ticks[155] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_children (ax, nodes, capacity, &count)
+
+let rv_ax_action (ax: nativeint, action: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_action (ax, action)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[156] <- Calls.Counts[156] + 1L
+        Calls.Ticks[156] <- Calls.Ticks[156] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_action (ax, action)
+
+let rv_ax_set_value (ax: nativeint, value: string) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_set_value (ax, value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[157] <- Calls.Counts[157] + 1L
+        Calls.Ticks[157] <- Calls.Ticks[157] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_set_value (ax, value)
+
+let rv_ax_set_number (ax: nativeint, value: float) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_set_number (ax, value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[158] <- Calls.Counts[158] + 1L
+        Calls.Ticks[158] <- Calls.Ticks[158] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_set_number (ax, value)
+
 // END GENERATED
 
 let WrongThread = -2
@@ -2850,7 +3156,7 @@ type Host(width: int, height: int) =
 
     member this.Paint() =
         let w, h = this.PaintSize
-        let pixels = Array.zeroCreate<byte>(w * h * 4)
+        let pixels = Array.zeroCreate<byte> (w * h * 4)
 
         rv_host_paint_rgba (handle, pixels, pixels.Length) |> check "paint_rgba"
 

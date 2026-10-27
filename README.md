@@ -26,6 +26,7 @@ without its JIT tiers. It is
 | `scripts/` | `build.py` (fetch, prepare, configure, build, package), `patches.py`, `icu_data.py`, `angle_stub.py` |
 | `packaging/` | The project `dotnet pack` turns the staged DLLs into a package |
 | `.github/workflows/build.yml` | CI (`docs/CI.md`) |
+| `docs/ACCESSIBILITY.md` | The accessibility tree and its events, for screen readers |
 | `docs/UPDATING.md` | Moving to a new WebKit commit |
 | `docs/VERIFICATION.md` | What the first build checked, and what it did not |
 

@@ -37,6 +37,7 @@ flavor's package is 125.84 MB in 31 files; the slim flavor's is 77.59 MB in 18 f
 | `USE_LCMS`, `ENABLE_XSLT` | OFF | Colour management and XSLT: 0.60 MB with libxslt. |
 | `ENABLE_WEBGL`, `ENABLE_VIDEO`, `ENABLE_REMOTE_INSPECTOR`, `ENABLE_WEBDRIVER` | OFF | Browser features with no use in presentation. With the link folding below, WebKit's own options remove 3.78 MB from `WebCore.dll`. |
 | `USE_*_STUB` | ON | The patch series; `docs/PATCHES.md`. |
+| `USE_AX_EMBEDDER_NOTIFICATIONS` | ON | Patch 0011: accessibility notifications reach the host's chrome client, for `RvAxCallback`; `docs/ACCESSIBILITY.md`. Adds 1.5 KB to `WebCore.dll`. |
 
 ## Outside CMake (slim only)
 
@@ -74,7 +75,7 @@ stream. The Cocoa port links libwebrtc into WebCore whatever these options say (
 in `OptionsCocoa.cmake`). Cutting these would need patches that edit WebKit's C++, which this repository's
 patch rules leave out.
 
-The patch series: the patches hook the Windows platform files, so on macOS only 0001 acts. Its option
+The patch series: the patches hook the Windows platform files, so on macOS only 0001 and 0011 act; 0011's option is declared in `OptionsCommon.cmake`, which every port reads. Its option
 lives in ANGLE's own `CMakeLists.txt`, which every port reads, so the slim flavor links `ANGLEStub` in
 place of ANGLE here too. 0005's hunk in `WebCore/CMakeLists.txt` keeps WebKit's event list unless a
 platform file names another. The lean flavor has not been built on macOS.

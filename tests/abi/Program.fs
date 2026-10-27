@@ -475,5 +475,6 @@ let main _ =
     Popup.run outDir
     Clipboard.run outDir
     Drop.run outDir
+    Accessibility.run outDir
     printfn "RANVIER_FSHARP_ABI PASS %s" (JsonSerializer.Serialize summary)
     0
