@@ -19,10 +19,25 @@ and no environment.
 
 ## Caches
 
-- **vcpkg** binary archives and downloads (`VCPKG_BINARY_SOURCES`, `VCPKG_DOWNLOADS`), keyed on
-  `pins.json` and `config/`. A hit skips building the dependencies. ICU's source archive is then not
-  downloaded by vcpkg, and `build.py` downloads it itself for the ICU filter, checking `pins.json`'s hash.
-- **LLVM**, keyed on `pins.json`.
+Each downloaded dependency has its own cache entry. The workflow restores it before the step that needs it
+and saves it right after the step that fetched it, so a failure later in the job keeps it, and an outage
+at a package host matters only on a miss. A step that downloads retries a failure: `build.py`'s
+downloads, git fetches and vcpkg bootstrap four times with a growing pause, Chocolatey four times, each
+Homebrew install four times, and apt's `Acquire::Retries=5`.
+
+| Entry | Key | Saved after |
+|---|---|---|
+| gperf (Windows, from Chocolatey) | its version | its install |
+| LLVM (Windows) | the RID's archive hash in `pins.json` | fetch |
+| vcpkg binary archives and downloads (Windows) | the RID, the flavor, the vcpkg, WebKit and ICU pins, and `config/` | a successful configure |
+
+- A vcpkg miss restores the newest entry of the RID and flavor: archives are named by their ABI hash, so
+  the packages that did not change are not rebuilt. ICU's source archive comes from vcpkg's downloads;
+  after a binary cache hit skipped vcpkg's download, `build.py` downloads it there itself for the ICU
+  filter, checking `pins.json`'s hash.
+- Not cached: the WebKit checkout (about 2 GB from GitHub, with retries), vcpkg's own checkout, and the
+  Linux and macOS packages. The repository's Actions cache holds 10 GB, and on 2026-10-27 it held
+  9.4 GB, most of it LLVM entries under the old keys that GitHub evicts as they go unused.
 - The WebKit build itself is not cached. A compiler cache (sccache with clang-cl) is the next step if
   build time matters.
 

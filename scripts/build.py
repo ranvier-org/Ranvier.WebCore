@@ -12,7 +12,7 @@
 # linux-* builds PORT=WPE against the distribution's libraries, osx-* builds PORT=Mac. Every path defaults
 # to a location under --work, so a fresh machine needs only the tools of docs/CI.md on PATH (or in
 # --tool-path) and Python 3.12 or later.
-import argparse, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, urllib.request
+import argparse, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, time, urllib.request
 
 root = pathlib.Path(__file__).resolve().parents[1]
 pins = json.loads((root / 'pins.json').read_text())
@@ -62,6 +62,20 @@ def git(*command, cwd=None):
     run(['git', *command], cwd=cwd)
 
 
+def retried(action, what, attempts=4):
+    """Runs action, retrying a failure up to attempts times with a growing pause: package hosts and mirrors
+    fail transiently (Chocolatey's feed returned 503 and 504 to CI on 2026-10-27)."""
+    for attempt in range(1, attempts + 1):
+        try:
+            return action()
+        except (OSError, subprocess.CalledProcessError) as error:
+            if attempt == attempts:
+                raise
+            pause = 15 * attempt
+            print(f'{what} failed ({error}); attempt {attempt + 1} of {attempts} in {pause} s', flush=True)
+            time.sleep(pause)
+
+
 def sha256(path):
     digest = hashlib.sha256()
     with open(path, 'rb') as stream:
@@ -76,8 +90,12 @@ def download(url, target, expected):
         target.parent.mkdir(parents=True, exist_ok=True)
         print('download', url, flush=True)
         partial = target.with_suffix(target.suffix + '.partial')
-        with urllib.request.urlopen(url) as response, open(partial, 'wb') as stream:
-            shutil.copyfileobj(response, stream)
+
+        def get():
+            with urllib.request.urlopen(url, timeout=60) as response, open(partial, 'wb') as stream:
+                shutil.copyfileobj(response, stream)
+
+        retried(get, f'download {url}')
         partial.replace(target)
     actual = sha256(target)
     print(f'{target.name} sha256 {actual}', flush=True)
@@ -100,7 +118,8 @@ def clone(repository, commit, target, exclude=()):
         git('remote', 'add', 'origin', repository, cwd=target)
         if exclude:
             git('sparse-checkout', 'set', '--no-cone', '/*', *(f'!/{name}/' for name in exclude), cwd=target)
-    git('fetch', '--depth', '1', *(['--filter=blob:none'] if exclude else []), 'origin', commit, cwd=target)
+    retried(lambda: git('fetch', '--depth', '1', *(['--filter=blob:none'] if exclude else []), 'origin', commit, cwd=target),
+            f'fetch {repository}')
     git('checkout', '-q', '--detach', commit, cwd=target)
 
 
@@ -139,7 +158,7 @@ def fetch():
         return
     clone(pins['vcpkg']['repository'], pins['vcpkg']['commit'], vcpkg)
     if not (vcpkg / 'vcpkg.exe').exists():
-        run([vcpkg / 'bootstrap-vcpkg.bat', '-disableMetrics'], cwd=vcpkg)
+        retried(lambda: run([vcpkg / 'bootstrap-vcpkg.bat', '-disableMetrics'], cwd=vcpkg), 'vcpkg bootstrap')
     if not args.llvm and not (llvm / 'clang-cl.exe').exists():
         pin = pins['llvm'][args.rid]
         archive = work / 'downloads' / pin['url'].rsplit('/', 1)[1]
@@ -186,11 +205,10 @@ def configure(env):
 
 
 def icu_data(env):
-    """ICU's data archive: from vcpkg's download cache, or downloaded when a binary cache hit skipped the download."""
+    """ICU's data archive: from vcpkg's download cache, or, when a binary cache hit skipped vcpkg's download,
+    downloaded into that cache rather than beside it."""
     icu = pins['icu']
-    name = icu['url'].rsplit('/', 1)[1]
-    cached = pathlib.Path(env.get('VCPKG_DOWNLOADS', vcpkg / 'downloads')) / name
-    archive = cached if cached.exists() else work / 'downloads' / name
+    archive = pathlib.Path(env.get('VCPKG_DOWNLOADS', vcpkg / 'downloads')) / icu['url'].rsplit('/', 1)[1]
     download(icu['url'], archive, icu['sha256'])
     data = build / 'icu-source' / pathlib.Path(icu['data']).name
     data.parent.mkdir(parents=True, exist_ok=True)

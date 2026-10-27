@@ -71,15 +71,64 @@ jobs:
         with:
           python-version: '3.14'
 
-      - name: Install gperf
+      # Each downloaded dependency has its own cache, restored before it is needed and saved as soon as it is
+      # fetched, so a later failure does not discard it and a package host's outage only matters on a miss.
+      - name: Cache keys
+        id: keys
+        shell: python
+        run: |
+          import hashlib, json, os
+          pins = json.load(open('pins.json'))
+          rid = '${{ matrix.rid }}'
+          # Keyed on the pins each one uses, not the whole file, which also holds the package version.
+          llvm = pins['llvm'].get(rid, {}).get('sha256', 'none')
+          vcpkg = hashlib.sha256(json.dumps([pins['vcpkg'], pins['webkit'], pins['icu']]).encode()).hexdigest()[:16]
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write(f"llvm=llvm-{rid}-{llvm}\nvcpkg=vcpkg-{rid}-{os.environ['FLAVOR']}-{vcpkg}\n")
+
+      - name: Restore gperf
+        id: gperf
         if: runner.os == 'Windows'
-        run: choco install gperf --no-progress -y
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\rw\tools\gperf
+          key: gperf-3.1.0-windows
+
+      - name: Install gperf
+        if: runner.os == 'Windows' && steps.gperf.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          # Chocolatey's feed fails transiently: 503 and 504 on 2026-10-27.
+          for ($attempt = 1; ; $attempt++) {
+            choco install gperf --version 3.1.0 --no-progress -y
+            if ($LASTEXITCODE -eq 0) { break }
+            if ($attempt -eq 4) { exit 1 }
+            Start-Sleep (30 * $attempt)
+          }
+          New-Item -ItemType Directory -Force C:\rw\tools\gperf | Out-Null
+          Copy-Item C:\ProgramData\chocolatey\lib\gperf\tools\* C:\rw\tools\gperf -Recurse -Exclude *.zip
+
+      - name: Save gperf
+        if: runner.os == 'Windows' && steps.gperf.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: C:\rw\tools\gperf
+          key: gperf-3.1.0-windows
+
+      - name: Put gperf on PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem C:\rw\tools\gperf -Recurse -Filter gperf.exe | Select-Object -First 1
+          if (-not $exe) { throw 'no gperf.exe under C:\rw\tools\gperf' }
+          Add-Content $env:GITHUB_PATH $exe.DirectoryName
 
       - name: Install the Linux packages
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update -q
-          grep -v '^#' scripts/linux-packages.txt | xargs sudo apt-get install -y -q --no-install-recommends
+          # Acquire::Retries retries a download that fails at the mirror.
+          sudo apt-get -o Acquire::Retries=5 update -q
+          grep -v '^#' scripts/linux-packages.txt | xargs sudo apt-get -o Acquire::Retries=5 install -y -q --no-install-recommends
           sudo mkdir -p "$RANVIER_WORK" && sudo chown "$USER" "$RANVIER_WORK"
 
       - name: Install the macOS tools
@@ -89,7 +138,16 @@ jobs:
           xcode=$(ls -d /Applications/Xcode_26*.app | grep -v -i beta | sort -V | tail -1)
           sudo xcode-select -s "$xcode/Contents/Developer"
           xcodebuild -version
-          for tool in gperf ninja cmake; do command -v $tool >/dev/null || brew install $tool; done
+          # No auto-update: it fetches Homebrew's taps, which installing a bottle does not need.
+          export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1
+          for tool in gperf ninja cmake; do
+            command -v $tool >/dev/null && continue
+            for attempt in 1 2 3 4; do
+              brew install $tool && break
+              [ $attempt = 4 ] && exit 1
+              sleep $((30 * attempt))
+            done
+          done
           mkdir -p "$RANVIER_WORK"
 
       - name: Tool versions and disk
@@ -108,21 +166,24 @@ jobs:
           }
 
       - name: Restore vcpkg archives and downloads
+        id: vcpkg
         if: runner.os == 'Windows'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             C:\rw\vcpkg-archives
             C:\rw\vcpkg-downloads
-          key: vcpkg-${{ matrix.rid }}-${{ env.FLAVOR }}-${{ hashFiles('pins.json', 'config/**') }}
+          # Archives are named by their ABI hash, so an older entry's archives are used where they still match.
+          key: ${{ steps.keys.outputs.vcpkg }}-${{ hashFiles('config/**') }}
           restore-keys: vcpkg-${{ matrix.rid }}-${{ env.FLAVOR }}-
 
       - name: Restore LLVM
+        id: llvm
         if: runner.os == 'Windows'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: C:\rw\tools\llvm
-          key: llvm-${{ matrix.rid }}-${{ hashFiles('pins.json') }}
+          key: ${{ steps.keys.outputs.llvm }}
 
       - name: Package version from the tag
         if: startsWith(github.ref, 'refs/tags/v')
@@ -132,11 +193,28 @@ jobs:
       - name: Fetch WebKit (and on Windows vcpkg and LLVM)
         run: python scripts/build.py fetch --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
+      - name: Save LLVM
+        if: runner.os == 'Windows' && steps.llvm.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: C:\rw\tools\llvm
+          key: ${{ steps.keys.outputs.llvm }}
+
       - name: Apply patches and install the host
         run: python scripts/build.py prepare --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
       - name: Configure (installs vcpkg packages on Windows)
         run: python scripts/build.py configure --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: Save vcpkg archives and downloads
+        # Only after a successful install: an entry saved under a key is never replaced.
+        if: runner.os == 'Windows' && steps.vcpkg.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            C:\rw\vcpkg-archives
+            C:\rw\vcpkg-downloads
+          key: ${{ steps.keys.outputs.vcpkg }}-${{ hashFiles('config/**') }}
 
       - name: Build
         run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
