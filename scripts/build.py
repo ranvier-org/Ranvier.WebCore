@@ -231,7 +231,9 @@ def imports(path):
 def closure():
     """(name, path) of each library the host loads, transitively, from the build (and vcpkg on Windows).
     Libraries of the system, and on Linux of the distribution, are not found there and stay out."""
-    dirs = [build / 'bin', build / 'lib/ranvier', triplet / 'bin'] if windows else [build / 'lib/ranvier', build / 'lib']
+    # The Mac port writes its frameworks to the build directory itself, and the imports name their bundle paths.
+    dirs = {'win': [build / 'bin', build / 'lib/ranvier', triplet / 'bin'], 'linux': [build / 'lib/ranvier', build / 'lib'],
+            'osx': [build / 'lib/ranvier', build]}[system]
     seen, todo = {}, [host]
     while todo:
         name = todo.pop()
@@ -243,6 +245,20 @@ def closure():
     return sorted(seen.values(), key=lambda item: item[0].lower())
 
 
+def staged_name(name):
+    """The file name a library is staged under: a framework's library (WebCore.framework/Versions/A/WebCore) as
+    a plain dylib (libWebCore.dylib), because a build with a runtime identifier flattens native assets into
+    one folder, where a bundle's layout would not survive. Other names stay as they are."""
+    match = re.fullmatch(r'(\w+)\.framework/(?:Versions/\w+/)?\1', name)
+    return f'lib{match.group(1)}.dylib' if match else name
+
+
+def rpaths(path):
+    """The LC_RPATH entries of a Mach-O library."""
+    text = subprocess.run(['otool', '-l', str(path)], capture_output=True, text=True, check=True).stdout
+    return re.findall(r'cmd LC_RPATH\n\s+cmdsize \d+\n\s+path (.+?) \(offset \d+\)', text)
+
+
 def package(env):
     if out.exists():
         shutil.rmtree(out)
@@ -251,9 +267,12 @@ def package(env):
     native.mkdir(parents=True)
     symbols.mkdir(parents=True)
     files = []
-    for name, path in closure():
-        # Under the name the importer asks for: on Linux a versioned symlink's name, holding the file it points to.
-        staged = native / name
+    libraries = closure()
+    renamed = {name: staged_name(name) for name, _ in libraries}
+    for name, path in libraries:
+        # Under the name the importer asks for: on Linux a versioned symlink's name, holding the file it points
+        # to; on macOS a framework's library under its flat name, which the importers are changed to ask for.
+        staged = native / renamed[name]
         shutil.copy2(path, staged)
         if windows:
             pdb = path.with_suffix('.pdb')
@@ -265,7 +284,23 @@ def package(env):
             run(['objcopy', '--only-keep-debug', staged, debug])
             run(['objcopy', '--strip-debug', '--strip-unneeded', f'--add-gnu-debuglink={debug}', staged])
             run(['patchelf', '--set-rpath', '$ORIGIN', staged])
-        files.append(dict(name=name, bytes=staged.stat().st_size, sha256=sha256(staged)))
+        else:
+            # dsymutil reads the debug map of the built library, so it runs before strip. Each library is
+            # identified as @rpath/<flat name> and finds its siblings through @loader_path instead of the
+            # build tree. Editing a Mach-O invalidates its signature, and arm64 loads only signed code, so the
+            # result is signed again, ad hoc, as the linker signed it.
+            run(['dsymutil', path, '-o', symbols / f'{staged.name}.dSYM'])
+            command = ['install_name_tool', '-id', f'@rpath/{staged.name}']
+            for imported in imports(staged):
+                if imported in renamed and imported != renamed[imported]:
+                    command += ['-change', f'@rpath/{imported}', f'@rpath/{renamed[imported]}']
+            for rpath in rpaths(staged):
+                command += ['-delete_rpath', rpath]
+            run(command + [staged])
+            run(['install_name_tool', '-add_rpath', '@loader_path', staged])
+            run(['strip', '-x', staged])
+            run(['codesign', '--force', '--sign', '-', staged])
+        files.append(dict(name=staged.name, bytes=staged.stat().st_size, sha256=sha256(staged)))
     # WebCore reads images from WebKit.resources next to WebCore.dll (WebCoreBundleWin.cpp): the icons hold
     # the broken-image and resize-corner images. Media controls (no video) and WebInspectorUI (no
     # inspector) have no reader in the slim flavor. The other ports compile their images in.

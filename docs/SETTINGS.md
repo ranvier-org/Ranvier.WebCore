@@ -50,6 +50,35 @@ flavor's package is 125.84 MB in 31 files; the slim flavor's is 77.59 MB in 18 f
   names, transliteration and every other locale. The input is `icudt77l.dat` from ICU's release archive,
   checked against `pins.json`; it is the same file vcpkg's ICU port builds from.
 
+## mac.cmake (osx-* runtimes)
+
+`common.cmake` includes `mac.cmake` for an `osx-*` runtime identifier, before its own settings and before
+`slim.cmake`'s. A `cmake -C` cache entry set first is kept, so where `mac.cmake` sets an option, the later
+settings of the other files do not apply. The package links the system's frameworks and ICU (`libicucore`)
+and carries only what the build produces: the slim package is 86.61 MB in four dylibs (run 40387342307),
+`libWebCore.dylib` 67.95 MB, `libJavaScriptCore.dylib` 15.71 MB, `libWebGPU.dylib` 2.82 MB and
+`libRanvierWebCoreHost.dylib` 0.13 MB, after `strip -x`. The `.nupkg` is 33.80 MB.
+
+| Setting | Value | Reason |
+|---|---|---|
+| `PORT` | Mac | WebKit's Cocoa port: CoreGraphics, CoreText and ImageIO in place of Skia, FreeType and the image libraries. |
+| `CMAKE_OSX_ARCHITECTURES` | arm64, from the runtime identifier | |
+| `ENABLE_WEBGL`, `ENABLE_XSLT`, `ENABLE_WEBDRIVER` | OFF | As in the slim flavor. |
+| `ENABLE_VIDEO` | ON | With it off, WebCore's Cocoa sources do not compile: the WebCodecs, media session, media source, picture-in-picture and Cocoa media sources use `VideoFrame`, `HTMLVideoElement` and `MediaSession` without the guard (run 40372523818, 33 translation units). `PlatformEnableCocoa.h` also turns on `COCOA_WEBM_PLAYER`, which `PlatformEnable.h` rejects without `MEDIA_SOURCE`. |
+| `ENABLE_REMOTE_INSPECTOR` | ON | With it off, `API/JSRemoteInspector.cpp` does not compile: it calls `RemoteInspector::singleton()` under `PLATFORM(COCOA)` alone (run 40370099336). |
+| `ENABLE_WEBASSEMBLY` | ON | With it off, `bindings/js/BindingsJSTZoneImpls.cpp` names the WebAssembly source providers unconditionally. It runs on the in-place interpreter: the JIT tiers stay off, from `common.cmake`. |
+
+Left at the port's defaults, because turning them off also breaks WebCore's Cocoa sources (run 40372523818):
+WebGPU (the package then carries `libWebGPU.dylib`, 2.8 MB, which WebCore links), WebRTC, AV1 and media
+stream. The Cocoa port links libwebrtc into WebCore whatever these options say (`USE_LIBWEBRTC` is set
+in `OptionsCocoa.cmake`). Cutting these would need patches that edit WebKit's C++, which this repository's
+patch rules leave out.
+
+The patch series: the patches hook the Windows platform files, so on macOS only 0001 acts. Its option
+lives in ANGLE's own `CMakeLists.txt`, which every port reads, so the slim flavor links `ANGLEStub` in
+place of ANGLE here too. 0005's hunk in `WebCore/CMakeLists.txt` keeps WebKit's event list unless a
+platform file names another. The lean flavor has not been built on macOS.
+
 ## Package contents
 
 `build.py package` stages the DLLs `RanvierWebCoreHost.dll` imports, transitively, from the build and

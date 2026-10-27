@@ -43,6 +43,9 @@ jobs:
               dict(rid='win-arm64', runner='windows-11-arm', work='C:\\rw'),
               dict(rid='linux-x64', runner='ubuntu-24.04', work='/mnt/rw'),
               dict(rid='linux-arm64', runner='ubuntu-24.04-arm', work='/mnt/rw'),
+              # macOS runners have one volume; the home directory is on its data volume. macos-26, because the
+              # newest Xcode on macos-15 (26.3) cannot build WebKit's Swift sources (docs/CI.md).
+              dict(rid='osx-arm64', runner='macos-26', work='/Users/runner/rw'),
           ]
           wanted = [r.strip() for r in os.environ.get('RIDS', '').split(',') if r.strip()]
           include = [r for r in runtimes if not wanted or r['rid'] in wanted]
@@ -78,6 +81,16 @@ jobs:
           sudo apt-get update -q
           grep -v '^#' scripts/linux-packages.txt | xargs sudo apt-get install -y -q --no-install-recommends
           sudo mkdir -p "$RANVIER_WORK" && sudo chown "$USER" "$RANVIER_WORK"
+
+      - name: Install the macOS tools
+        if: runner.os == 'macOS'
+        run: |
+          # WebKit's Mac port builds Swift sources that need a recent Xcode: the newest released Xcode 26.
+          xcode=$(ls -d /Applications/Xcode_26*.app | grep -v -i beta | sort -V | tail -1)
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
+          for tool in gperf ninja cmake; do command -v $tool >/dev/null || brew install $tool; done
+          mkdir -p "$RANVIER_WORK"
 
       - name: Tool versions and disk
         shell: pwsh
@@ -142,6 +155,41 @@ jobs:
         with:
           name: symbols-${{ matrix.rid }}-${{ env.FLAVOR }}
           path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/symbols
+
+      - name: Load the host and paint a page
+        # The library loads from the staged package, with its siblings found through @loader_path: no staged
+        # library names the build tree. Python's main thread is the process's main thread, which WebCore on
+        # Cocoa requires.
+        if: runner.os == 'macOS'
+        shell: python
+        run: |
+          import ctypes, json, os, pathlib, subprocess
+          out = pathlib.Path(os.environ['RANVIER_WORK']) / 'out' / os.environ['FLAVOR']
+          native = out / 'runtimes/${{ matrix.rid }}/native'
+          manifest = json.loads((out / 'manifest.json').read_text())
+          build = str(out.parents[1] / f"build-{os.environ['FLAVOR']}")
+          for path in sorted(native.glob('*.dylib')):
+              commands = subprocess.run(['otool', '-l', str(path)], capture_output=True, text=True, check=True).stdout
+              assert build not in commands, f'{path.name} names the build tree'
+          lib = ctypes.CDLL(str(native / 'libRanvierWebCoreHost.dylib'))
+          lib.rv_host_create.restype = ctypes.c_void_p
+          lib.rv_host_create.argtypes = [ctypes.c_int32, ctypes.c_int32]
+          lib.rv_host_load_html.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+          lib.rv_host_paint_rgba.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int32]
+          lib.rv_host_destroy.argtypes = [ctypes.c_void_p]
+          abi = lib.rv_abi_version()
+          print('rv_abi_version', abi, '- manifest', manifest['abi'])
+          assert abi == manifest['abi']
+          host = lib.rv_host_create(32, 32)
+          assert host
+          assert lib.rv_host_load_html(host, b'<body style="margin:0;background:#f00"><div style="width:8px;height:8px;background:#00f"></div>') == 0
+          rgba = ctypes.create_string_buffer(32 * 32 * 4)
+          assert lib.rv_host_paint_rgba(host, rgba, len(rgba)) == 0
+          pixel = lambda x, y: tuple(rgba.raw[(y * 32 + x) * 4:(y * 32 + x) * 4 + 4])
+          print('pixel (2, 2)', pixel(2, 2), 'pixel (20, 20)', pixel(20, 20))
+          near = lambda actual, expected: all(abs(a - e) <= 2 for a, e in zip(actual, expected))
+          assert near(pixel(2, 2), (0, 0, 255, 255)) and near(pixel(20, 20), (255, 0, 0, 255))
+          lib.rv_host_destroy(host)
 
       - name: Upload the CMake logs on failure
         if: failure()
