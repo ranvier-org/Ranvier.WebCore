@@ -13,6 +13,10 @@ if (RANVIER_RID MATCHES "^osx-(.+)$")
     set(CMAKE_OSX_ARCHITECTURES "${CMAKE_MATCH_1}" CACHE STRING "")
 endif ()
 
+# The oldest macOS the package loads on. OptionsMac.cmake otherwise takes the build machine's version,
+# which would tie the package to the runner's macOS.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "")
+
 # Off, as in the slim flavor.
 set(ENABLE_WEBGL OFF CACHE BOOL "")
 set(ENABLE_XSLT OFF CACHE BOOL "")
