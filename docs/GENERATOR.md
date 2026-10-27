@@ -42,8 +42,8 @@ glue builds from here and the WebKit checkout carries only the hook.
   `dllimport` in the host.
 - **macOS (`WebCore.framework`):** `WEBCORE_EXPORT` is default visibility. `WebCore.unexp` hides only C++
   standard library symbols, and the host already links the framework as an allowed client (`TestWebCore`).
-  The glue includes WebCore's own headers from WebCore's source directories, so the headers
-  `PlatformCocoa.cmake` leaves out of the framework do not matter to it.
+  The glue includes WebCore's own headers from WebCore's source directories, so it reads the
+  headers `PlatformCocoa.cmake` leaves out of the framework from source.
 - **Linux (WPE):** WebCore is an `OBJECT` library, so its objects, the glue among them, link into
   `libRanvierWebCoreHost.so` directly.
 
@@ -125,10 +125,10 @@ The glue calls each member as WebKit's JavaScript bindings do (`CodeGenerator.pm
 C++ signatures differ from member to member and change between WebKit commits in ways the IDL does not show:
 a getter returns `String`, `const AtomString&` or `ExceptionOr<String>`; a node comes back as `Element*`,
 `RefPtr<Element>` or `Ref<Element>`; an argument is taken as `const String&`, `String&&` or `StringView`, a node
-as `Node&`, `Node*` or `Ref<Node>&&`. The glue writes no C++ types for these. Templates in the glue's preamble
+as `Node&`, `Node*` or `Ref<Node>&&`. The glue leaves these types to the compiler: templates in the glue's preamble
 unwrap `ExceptionOr`, take the raw pointer of any reference or smart pointer, convert any string type, and
 convert each argument to the parameter the member takes (`StringArg`, `HandleArg`, `OptionalArg`). A WebKit
-change of these kinds rebuilds the glue with no edit to the generator.
+change of these kinds only rebuilds the glue.
 
 The C++ the IDL does not determine is listed in `gen/dom.json`: `atomArguments` names operations that take
 `AtomString` for a string argument the IDL does not mark `[AtomString]`.
