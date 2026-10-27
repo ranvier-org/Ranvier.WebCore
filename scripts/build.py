@@ -190,7 +190,7 @@ def prepare():
     api = source / 'Tools/TestWebKitAPI'
     (api / 'RanvierAbi').mkdir(exist_ok=True)
     # The generated DOM functions (gen/domgen.py): the host's half here; the glue compiles into WebCore from host/dom
-    # (patch 0011, config/common.cmake), and the host includes its header.
+    # (patch 0012, config/common.cmake), and the host includes its header.
     (api / 'RanvierAbi' / 'dom').mkdir(exist_ok=True)
     for name in ['RanvierWebCoreAbi.h', 'RanvierWebCoreAbi.cpp', 'RanvierWebCoreDom.h', 'RanvierWebCoreDom.cpp', 'dom/RanvierDomGlue.h']:
         shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)

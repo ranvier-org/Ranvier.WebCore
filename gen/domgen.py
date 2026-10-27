@@ -9,7 +9,7 @@ Outputs:
   host/RanvierWebCoreDom.h        the public C header: handle types, constants and the rv_dom_* functions
   host/RanvierWebCoreDom.cpp      the host's rv_dom_* functions, each calling its ranvier_dom_* twin in WebCore
   host/dom/RanvierDomGlue.h       the ranvier_dom_* functions WebCore exports, for the host
-  host/dom/RanvierDomGlue.cpp     their definitions, compiled into WebCore by patch 0011
+  host/dom/RanvierDomGlue.cpp     their definitions, compiled into WebCore by patch 0012
   tests/abi/NativeDom.fs          the F# P/Invoke declarations of the rv_dom_* functions
   gen/dom-report.txt              counts, and each member left out with the reason
 """
@@ -47,6 +47,8 @@ NUMBERS = {
     "unrestricted double": "double",
 }
 STRINGS = {"DOMString", "USVString", "ByteString"}
+# Interfaces of a string union that a C string stands for: the string is passed as the union's string.
+TRUSTED_TYPES = {"TrustedHTML", "TrustedScript", "TrustedScriptURL"}
 FSHARP_NUMBERS = {
     "int8_t": "sbyte",
     "uint8_t": "byte",
@@ -76,6 +78,10 @@ RESERVED = {"target", "buffer", "capacity", "length", "result", "present"}
 UNMAPPED = ["Custom", "EnabledForWorld", "EnabledByQuirk", "ForwardToMapLike", "ForwardToSetLike", "CustomBinding",
             "PrivateIdentifier", "LegacyFactoryFunction"]
 # CallWith values the glue supplies from the node's document.
+# How the glue reaches a document for the settings of [EnabledBySetting], by the root of an interface other than a node.
+SETTINGS_DOCUMENT = {"AbstractRange": "impl->startContainer().document()", "DOMStringMap": "impl->element().document()"}
+# The note a stub's comment carries.
+STUB_NOTE = "WebKit's IDL no longer has this member: a stub that returns RV_ERR_UNSUPPORTED"
 DOCUMENT_CALL_WITH = {"CurrentDocument", "RelevantDocument", "CurrentScriptExecutionContext",
                       "RelevantScriptExecutionContext"}
 
@@ -111,8 +117,9 @@ def attr_list(value):
 class Mapped:
     """A C mapping of an IDL type."""
 
-    def __init__(self, kind, nullable=False, ctype=None, interface=None, root=None, cls=None, enum=None):
-        self.kind = kind  # string, bool, number, enum, node, event, object, void
+    def __init__(self, kind, nullable=False, ctype=None, interface=None, root=None, cls=None, enum=None, atom=False):
+        self.kind = kind  # string, bool, number, enum, node, event, object, dict, void
+        self.atom = atom  # a string union whose DOMString is [AtomString]
         self.nullable = nullable
         self.ctype = ctype
         self.interface = interface
@@ -122,6 +129,8 @@ class Mapped:
 
     @property
     def handle(self):
+        if self.kind == "dict":
+            return f"RvDom{self.interface}"
         return {"node": "RvNode", "event": "RvEvent"}.get(self.kind) or f"Rv{self.root}"
 
 
@@ -139,8 +148,9 @@ class World:
         self.includes = {}  # target -> [(mixin, attrs)]
         self.typedefs = {}
         self.enums = {}  # name -> (values, attrs, file)
-        self.dictionaries = set()
+        self.dictionaries = {}  # name -> idl.Dictionary, with its partials' members
         self.callbacks = set()
+        self.dictionary_partials = {}
         for path in sorted(self.webcore.rglob("*.idl")):
             relative = path.relative_to(self.webcore).as_posix()
             if relative.startswith("bindings/scripts/test/"):
@@ -156,7 +166,12 @@ class World:
             self.typedefs.update(document.typedefs)
             for name, (values, attrs) in document.enums.items():
                 self.enums[name] = (values, attrs, relative)
-            self.dictionaries |= document.dictionaries
+            for name, dictionary in document.dictionaries.items():
+                if dictionary.partial:
+                    if not self.skipped(relative):
+                        self.dictionary_partials.setdefault(name, []).append(dictionary)
+                elif name not in self.dictionaries or not self.skipped(relative):
+                    self.dictionaries[name] = dictionary
             self.callbacks |= document.callbacks
         self.scope = config["interfaces"]
         missing = [name for name in self.scope if name not in self.interfaces]
@@ -222,6 +237,43 @@ class World:
             t = idl.Type(target.name, t.nullable or target.nullable, target.subtypes, {**target.attrs, **t.attrs})
         return t
 
+    def string_union(self, t: idl.Type):
+        """For a union of string types and Trusted Types, whether its DOMString is [AtomString]; else None."""
+        atom = False
+        for subtype in t.subtypes:
+            subtype = self.resolve(subtype)
+            if subtype.name == "union":
+                inner = self.string_union(subtype)
+                if inner is None:
+                    return None
+                atom = atom or inner
+            elif subtype.name in STRINGS:
+                atom = atom or "AtomString" in subtype.attrs
+            elif subtype.name not in TRUSTED_TYPES:
+                return None
+        return atom
+
+    def dictionary_fields(self, name):
+        """The members of a dictionary, its bases' first, as (member, Mapped), or raises Unsupported."""
+        if name not in self.dictionaries:
+            raise Unsupported(f"dictionary {name} not found")
+        dictionary = self.dictionaries[name]
+        found = self.dictionary_fields(dictionary.base) if dictionary.base else []
+        members = list(dictionary.members)
+        for partial in self.dictionary_partials.get(name, []):
+            members += partial.members
+        for member in members:
+            if "Conditional" in member.attrs or "EnabledBySetting" in member.attrs:
+                continue
+            try:
+                mapped = self.map(member.type)
+            except Unsupported as error:
+                raise Unsupported(f"dictionary {name}: member {member.name}: {error}")
+            if mapped.kind in ("dict", "object", "event") or mapped.interface == "EventTarget":
+                raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
+            found.append((member, mapped))
+        return found
+
     def map(self, t: idl.Type) -> Mapped:
         t = self.resolve(t)
         if t.name == "undefined":
@@ -255,11 +307,15 @@ class World:
                 raise Unsupported(f"interface {t.name} outside gen/dom.json")
             return Mapped("object", t.nullable, interface=t.name, root=root, cls=self.cpp_class(t.name))
         if t.name == "union":
-            raise Unsupported(f"union {t}")
+            strings = self.string_union(t)
+            if strings is None:
+                raise Unsupported(f"union {t}")
+            return Mapped("string", t.nullable, atom=strings)
         if t.name in ("sequence", "FrozenArray", "record", "Promise", "ObservableArray"):
             raise Unsupported(f"{t.name} type {t}")
         if t.name in self.dictionaries:
-            raise Unsupported(f"dictionary {t.name}")
+            self.dictionary_fields(t.name)
+            return Mapped("dict", t.nullable, interface=t.name)
         if t.name in self.callbacks or t.name in ("EventHandler", "OnErrorEventHandler", "OnBeforeUnloadEventHandler"):
             raise Unsupported(f"callback {t.name}")
         raise Unsupported(f"type {t}")
@@ -277,6 +333,7 @@ class Function:
         self.comment = comment
         self.body = []
         self.conditional = None
+        self.unused = False  # a stub, whose parameters the glue does not read
 
 
 def c_name(name):
@@ -295,6 +352,10 @@ class Generator:
         self.headers = {"HTMLNames.h", "ElementInlines.h", "NodeInlines.h", "Exception.h", "ExceptionOr.h"}
         excludes = world.config["exclude"]
         self.exclude = set(excludes)
+        self.dicts_used = {}  # name -> [(member, Mapped)] in struct order
+        self.lock, self.lock_structs = read_lock(OUT_HEADER)
+        self.stubs = []
+        self.changed = []  # names whose C signature differs from the lock
 
     def run(self):
         for name in self.world.scope:
@@ -303,10 +364,12 @@ class Generator:
             chain = self.world.chain(name)
             if "Node" not in chain and "Event" not in chain:
                 root = chain[-1]
-                if root != name:
-                    raise SystemExit(f"{name}: gen/dom.json lists an interface whose base {root} has the handle")
-                self.handles.append(name)
+                if root not in self.world.scope:
+                    raise SystemExit(f"{name}: gen/dom.json lists an interface without its base {root}, which names the handle")
+                if root == name:
+                    self.handles.append(name)
             self.interface(name)
+        self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
         if duplicates:
@@ -331,6 +394,8 @@ class Generator:
                 self.skip(name, member, "constructor")
                 continue
             if member.kind == "operation":
+                if not member.name and member.special in ("getter", "setter", "deleter") and member.arguments:
+                    member = self.special_name(member)
                 operations.setdefault(member.name, []).append(member)
             elif member.kind == "attribute":
                 self.attribute(name, member)
@@ -346,9 +411,67 @@ class Generator:
                                       self.world.map(member.type)))
                 except Unsupported as error:
                     self.skip(name, member, str(error))
-            for member, args, returns in supported:
-                suffix = f"_{len(member.arguments)}" if len(supported) > 1 else ""
+            plain = self.plain_overload(name, op_name, supported)
+            for index, (member, args, returns) in enumerate(supported):
+                suffix = "" if len(supported) == 1 or index == plain else f"_{len(member.arguments)}"
                 self.operation(name, member, args, returns, suffix)
+
+    def special_name(self, member):
+        """An unnamed getter, setter or deleter under the C++ name WebKit's bindings call: item and setItem for an
+        index, namedItem, setNamedItem and deleteNamedProperty for a name."""
+        index = self.world.resolve(member.arguments[0].type).name in NUMBERS
+        name = {("getter", True): "item", ("setter", True): "setItem", ("getter", False): "namedItem",
+                ("setter", False): "setNamedItem", ("deleter", False): "deleteNamedProperty"}.get((member.special, index))
+        if not name:
+            return member
+        result = idl.Member(**{k: v for k, v in member.__dict__.items()})
+        result.name = name
+        return result
+
+    def plain_overload(self, interface, op_name, supported):
+        """The index of the overload that keeps the name without a suffix: the one the lock gives it, so a new
+        overload upstream leaves the existing function as it is. None when the lock has none."""
+        if len(supported) < 2:
+            return None
+        name = f"{snake(interface)}_{snake(op_name)}"
+        locked = self.lock.get(name)
+        if not locked:
+            return None
+        locked_names = [n for _, n in locked["params"][1:]]
+        for index, (member, args, returns) in enumerate(supported):
+            # The overload whose arguments are the lock's parameters before the result's.
+            names = [c_name(a.name) for a in member.arguments]
+            rest = locked_names[len(names):]
+            if locked_names[:len(names)] == names and all(n in RESERVED for n in rest):
+                return index
+        return None
+
+    def add_stubs(self):
+        """Keeps each function of the lock that the IDL files no longer give, for a member still in scope, as a
+        stub returning RV_ERR_UNSUPPORTED with the locked signature."""
+        generated = {f.name: f for f in self.functions}
+        for name, locked in self.lock.items():
+            if name in generated:
+                if [tuple(p) for p in generated[name].params] != [tuple(p) for p in locked["params"]]:
+                    self.changed.append(name)
+                continue
+            match = re.match(r"(\w+)\.(\w+)", locked["comment"])
+            if not match:
+                continue
+            interface, member = match.groups()
+            if interface not in self.world.scope or f"{interface}.{member}" in self.exclude or member in self.exclude:
+                continue
+            comment = locked["comment"]
+            if STUB_NOTE not in comment:
+                comment += f"; {STUB_NOTE}"
+            function = Function(interface, None, "stub", name, [tuple(p) for p in locked["params"]], comment)
+            function.body = ["return RV_ERR_UNSUPPORTED;"]
+            function.unused = True
+            self.stubs.append(function)
+        # A stub goes after the functions of its interface, in lock order.
+        for stub in self.stubs:
+            last = max((i for i, f in enumerate(self.functions) if f.interface == stub.interface), default=len(self.functions) - 1)
+            self.functions.insert(last + 1, stub)
 
     def constant(self, interface, member):
         if member.name.lower().startswith("webkit"):
@@ -455,6 +578,108 @@ class Generator:
         if attribute == "HTMLNames::nameAttr":
             return "impl->getNameAttribute()"
         return f"impl->attributeWithoutSynchronization({attribute})"
+
+    def setting_check(self, interface, chain, setting):
+        """The glue that returns RV_ERR_UNSUPPORTED while a setting of [EnabledBySetting] is off, as WebKit's
+        bindings hide the member then: A&B needs both, A|B either."""
+        lines = []
+        if "Node" in chain:
+            document = "impl->document()"
+        elif "Event" in chain:
+            # An event reaches the settings through its target's document; one without a node target has none.
+            lines = ["RefPtr settingsNode = dynamicDowncast<Node>(impl->target());", "if (!settingsNode)",
+                     "    return RV_ERR_UNSUPPORTED;"]
+            document = "settingsNode->document()"
+        elif chain[-1] in SETTINGS_DOCUMENT:
+            document = SETTINGS_DOCUMENT[chain[-1]]
+        else:
+            raise Unsupported(f"[EnabledBySetting={setting}] on {interface}, which has no document")
+        self.headers |= {"DocumentSettingsValues.h", "Settings.h"}
+        terms = []
+        for conjunct in setting.split("&"):
+            alternatives = [f"settings.{to_method_name(flag)}" for flag in conjunct.split("|")]
+            terms.append(f"({' || '.join(alternatives)})" if len(alternatives) > 1 else alternatives[0])
+        return lines + [f"auto& settings = {document}.settingsValues();", f"if (!({' && '.join(terms)}))", "    return RV_ERR_UNSUPPORTED;"]
+
+    def dictionary_cpp(self, name):
+        dictionary = self.world.dictionaries[name]
+        value = dictionary.attrs.get("ImplementedAs")
+        if isinstance(value, str):
+            return value
+        # A dictionary declared in the IDL file of an interface is a member of that interface's class.
+        stem = pathlib.PurePosixPath(dictionary.file).stem
+        if stem != name and stem in self.world.interfaces and self.world.interfaces[stem].file == dictionary.file:
+            return f"{self.world.cpp_class(stem)}::{name}"
+        return name
+
+    def use_dictionary(self, name):
+        """The dictionary's fields in struct order: the lock's fields first, in its order, then new ones."""
+        if name in self.dicts_used:
+            return self.dicts_used[name]
+        fields = self.world.dictionary_fields(name)
+        self.headers.add(f"{pathlib.PurePosixPath(self.world.dictionaries[name].file).stem}.h")
+        locked = self.lock_structs.get(f"RvDom{name}", [])
+        current = {c_name(m.name) for m, _ in fields}
+        retired = [n for n in locked if n not in current]
+        if retired:
+            raise Unsupported(f"dictionary {name} lost the locked fields {retired}")
+        by_name = {c_name(m.name): (m, mp) for m, mp in fields}
+        ordered = [by_name[n] for n in locked]
+        ordered += [f for f in fields if c_name(f[0].name) not in locked]
+        for member, mapped in ordered:
+            if mapped.kind == "enum":
+                self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
+        self.dicts_used[name] = ordered
+        return ordered
+
+    @staticmethod
+    def field_ctype(member, mapped):
+        """The C type of a dictionary field: a pointer for an optional scalar without a default, NULL for absent."""
+        absent = mapped.nullable or (not member.required and member.default is None)
+        if mapped.kind == "string":
+            return "const char*"
+        if mapped.kind == "node":
+            return "RvNode*"
+        ctype = mapped.ctype
+        return f"const {ctype}*" if absent else ctype
+
+    def dictionary_field(self, pointer, struct, target, member, mapped):
+        """The glue that copies one field of a C dictionary into the C++ one, when the struct's size covers it."""
+        field = c_name(member.name)
+        cpp_field = member.attrs.get("ImplementedAs", member.name)
+        covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
+        ctype = self.field_ctype(member, mapped)
+        lines = []
+        if member.required:
+            lines += [f"if (!({covered}))", "    return RV_ERR_NULL_ARGUMENT;"]
+            covered = "true"
+        if mapped.kind == "string":
+            lines.append(f"if ({covered} && {pointer}->{field})")
+            lines.append(f"    assignString({target}.{cpp_field}, {pointer}->{field});")
+        elif mapped.kind == "node":
+            self.headers.add(f"{mapped.cls}.h")
+            lines.append(f"if ({covered} && {pointer}->{field}) {{")
+            if mapped.cls == "Node":
+                lines.append(f"    {target}.{cpp_field} = nodeOf({pointer}->{field});")
+            else:
+                lines.append(f"    RefPtr value = dynamicDowncast<{mapped.cls}>(*nodeOf({pointer}->{field}));")
+                lines.append("    if (!value)")
+                lines.append("        return RV_ERR_WRONG_INTERFACE;")
+                lines.append(f"    {target}.{cpp_field} = value.get();")
+            lines.append("}")
+        else:
+            pointer_field = ctype.endswith("*")
+            value = f"*{pointer}->{field}" if pointer_field else f"{pointer}->{field}"
+            guard = f"{covered} && {pointer}->{field}" if pointer_field else covered
+            if mapped.kind == "enum":
+                lines.append(f"if ({guard} && !assignEnumeration({target}.{cpp_field}, {value}, {enum_table(mapped.enum)}))")
+                lines.append("    return RV_ERR_UNSUPPORTED;")
+            else:
+                if mapped.kind == "bool":
+                    value = f"!!{value}"
+                lines.append(f"if ({guard})")
+                lines.append(f"    assignValue({target}.{cpp_field}, {value});")
+        return lines
 
     def setter_call(self, interface, member, mapped, value):
         attribute = self.reflect(member, True)
@@ -566,7 +791,7 @@ class Generator:
                 if not maybe_null:
                     checks.append(name)
                 prepare.append(f"StringArg a{index} {{ {name} }};")
-                atom = ("AtomString" in argument.attrs or "AtomString" in argument.type.attrs
+                atom = ("AtomString" in argument.attrs or "AtomString" in argument.type.attrs or mapped.atom
                         or f"{interface}.{member.name}" in self.world.config["atomArguments"])
                 if optional_no_default:
                     passed.append(f"a{index}")
@@ -592,13 +817,34 @@ class Generator:
                 prepare.append(f"if (!a{index})")
                 prepare.append("    return RV_ERR_UNSUPPORTED;")
                 passed.append(f"*a{index}")
+            elif mapped.kind == "dict":
+                if mapped.nullable:
+                    raise Unsupported(f"nullable dictionary {mapped.interface}")
+                fields = self.use_dictionary(mapped.interface)
+                struct = mapped.handle
+                params.append((f"const {struct}*", name))
+                if not argument.optional:
+                    checks.append(name)
+                else:
+                    notes.append(f"{name} may be NULL for the IDL default")
+                cpp = self.dictionary_cpp(mapped.interface)
+                prepare.append(f"{cpp} a{index} {{ }};")
+                prepare.append(f"if ({name}) {{")
+                for field_member, field_mapped in fields:
+                    prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped)]
+                prepare.append("}")
+                passed.append(f"std::move(a{index})")
             elif mapped.kind in ("node", "event", "object"):
-                if mapped.kind == "object" or mapped.interface == "EventTarget":
+                if mapped.interface == "EventTarget":
                     raise Unsupported(f"{mapped.interface} argument")
                 self.headers.add(f"{mapped.cls}.h")
                 params.append((f"{mapped.handle}*", name))
-                accessor = "nodeOf" if mapped.kind == "node" else "eventOf"
-                base = "Node" if mapped.kind == "node" else "Event"
+                if mapped.kind == "object":
+                    root_cls = self.world.cpp_class(mapped.root)
+                    accessor, base = f"reinterpret_cast<{root_cls}*>", root_cls
+                else:
+                    accessor = "nodeOf" if mapped.kind == "node" else "eventOf"
+                    base = "Node" if mapped.kind == "node" else "Event"
                 if not maybe_null:
                     checks.append(name)
                 if mapped.cls == base:
@@ -666,7 +912,16 @@ class Generator:
             else:
                 body += [f"RefPtr impl = dynamicDowncast<{cls}>(*eventOf(target));", "if (!impl)", "    return RV_ERR_WRONG_INTERFACE;"]
         else:
-            body.append(f"RefPtr<{cls}> impl = reinterpret_cast<{cls}*>(target);")
+            root_cls = self.world.cpp_class(chain[-1])
+            if root_cls == cls:
+                body.append(f"RefPtr<{cls}> impl = reinterpret_cast<{cls}*>(target);")
+            else:
+                body += [f"RefPtr impl = dynamicDowncast<{cls}>(*reinterpret_cast<{root_cls}*>(target));", "if (!impl)",
+                         "    return RV_ERR_WRONG_INTERFACE;"]
+        setting = member.attrs.get("EnabledBySetting")
+        if setting:
+            body += self.setting_check(interface, chain, setting)
+            notes.append(f"RV_ERR_UNSUPPORTED while the setting {setting} is off")
         if call_with:
             if "Node" not in chain:
                 raise Unsupported("[CallWith] on an interface other than a node")
@@ -713,7 +968,11 @@ class Generator:
             " *   NULL for null or absent.",
             " * - Handles out are new references: rv_node_release, rv_event_release, or the rv_dom_*_release of the type.",
             " * - A member that throws returns RV_ERR_DOM_EXCEPTION, with the exception in rv_last_exception.",
-            " * - A member WebKit compiles out on the platform returns RV_ERR_UNSUPPORTED.",
+            " * - A string union with Trusted Types, such as (TrustedHTML or DOMString), is a string. A dictionary is a",
+            " *   pointer to an RvDom<Dictionary> struct whose first field, size, is the struct's sizeof; NULL for an",
+            " *   optional dictionary takes the IDL defaults.",
+            " * - A member WebKit compiles out on the platform, or whose [EnabledBySetting] setting is off, returns",
+            " *   RV_ERR_UNSUPPORTED. So does a stub: a function this header had for a member WebKit's IDL no longer has.",
             " * - rv_abi_has(\"dom-generated\") is 1 when the library has these functions, and rv_abi_has(\"dom:<Interface>\")",
             " *   when it has those of an interface.",
             " */",
@@ -742,6 +1001,26 @@ class Generator:
             for index, value in enumerate(values):
                 lines.append(f"    RV_DOM_{snake(enum).upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', value).upper() or 'EMPTY'} = {index}, /* \"{value}\" */")
             lines.append("};")
+            lines.append("")
+        for name, fields in self.dicts_used.items():
+            struct = f"RvDom{name}"
+            lines.append(f"/* The IDL dictionary {name}. size is sizeof({struct}) as the caller compiles it; a field past")
+            lines.append(" * size takes its IDL default, so fields can be added at the end. */")
+            lines.append(f"typedef struct {struct} {{")
+            lines.append("    uint32_t size;")
+            for member, mapped in fields:
+                ctype = self.field_ctype(member, mapped)
+                note = f"{member.type}"
+                if member.required:
+                    note += ", required"
+                elif member.default is not None:
+                    note += f", default {member.default}"
+                elif ctype.endswith("*"):
+                    note += ", NULL for absent"
+                if mapped.kind == "enum":
+                    note += f", RV_DOM_{snake(mapped.enum).upper()}_*"
+                lines.append(f"    {ctype} {c_name(member.name)}; /* {note} */")
+            lines.append(f"}} {struct};")
             lines.append("")
         for name in self.handles:
             lines.append(f"/* Releases a handle to a {name}. */")
@@ -815,7 +1094,7 @@ class Generator:
 
     def glue(self):
         lines = [
-            "// The glue of the generated DOM functions, compiled into WebCore by patch 0011 (config/common.cmake names this",
+            "// The glue of the generated DOM functions, compiled into WebCore by patch 0012 (config/common.cmake names this",
             "// file). Each function checks its arguments and thread, calls the member as WebKit's JavaScript bindings call",
             "// it, and converts the result. Generated by gen/domgen.py from WebKit's IDL files; do not edit.",
             '#include "config.h"',
@@ -864,6 +1143,8 @@ class Generator:
             lines.append(f"// {function.comment}")
             lines.append(f"int32_t ranvier_dom_{function.name}({params_text(function.params)})")
             lines.append("{")
+            if function.unused:
+                lines += [f"    UNUSED_PARAM({n});" for _, n in function.params]
             if function.conditional:
                 lines.append(f"#if {function.conditional}")
             lines += ["    " + line if line else "" for line in function.body]
@@ -890,7 +1171,7 @@ class Generator:
             "",
             "/// <summary>RV_ERR_WRONG_INTERFACE: a handle's object does not implement the member's interface.</summary>",
             "[<Literal>]",
-            "let WrongInterface = -10",
+            "let WrongInterface = -11",
         ]
         for macro, value, _ in self.constants:
             lines += ["", "[<Literal>]", f"let {macro} = {int(value, 0)}"]
@@ -898,6 +1179,20 @@ class Generator:
             for index, value in enumerate(values):
                 macro = f"RV_DOM_{snake(enum).upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', value).upper() or 'EMPTY'}"
                 lines += ["", "[<Literal>]", f"let {macro} = {index}"]
+        for name, fields in self.dicts_used.items():
+            lines += ["", f"/// <summary>The IDL dictionary {name}; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>",
+                      "[<Struct; StructLayout(LayoutKind.Sequential)>]", f"type RvDom{name} =", "    val mutable size: uint32"]
+            for member, mapped in fields:
+                ctype = self.field_ctype(member, mapped)
+                field = c_name(member.name)
+                field = f"``{field}``" if field in FSHARP_KEYWORDS else field
+                if ctype == "const char*":
+                    lines.append("    [<MarshalAs(UnmanagedType.LPUTF8Str)>]")
+                    lines.append(f"    val mutable {field}: string")
+                elif ctype.endswith("*"):
+                    lines.append(f"    val mutable {field}: nativeint")
+                else:
+                    lines.append(f"    val mutable {field}: {FSHARP_NUMBERS[ctype]}")
         for name in self.handles:
             lines += ["", "[<DllImport(Lib)>]", f"extern void rv_dom_{snake(name)}_release(nativeint handle)"]
             lines += ["", "[<DllImport(Lib)>]", f"extern nativeint rv_dom_{snake(name)}_retain(nativeint handle)"]
@@ -916,12 +1211,15 @@ class Generator:
             f"interfaces {len(self.world.scope)}, functions {len(self.functions)} "
             f"(getters {sum(f.kind == 'getter' for f in self.functions)}, setters {sum(f.kind == 'setter' for f in self.functions)}, "
             f"operations {sum(f.kind == 'operation' for f in self.functions)}), handle types {len(self.handles)}, "
-            f"constants {len(self.constants)}, enumerations {len(self.enums_used)}, left out {len(self.excluded)}",
+            f"constants {len(self.constants)}, enumerations {len(self.enums_used)}, dictionaries {len(self.dicts_used)}, "
+            f"stubs {len(self.stubs)}, left out {len(self.excluded)}",
             "",
             "Functions per interface:",
         ]
         for name in self.world.scope:
             lines.append(f"  {name}: {sum(f.interface == name for f in self.functions)}")
+        lines += ["", "Stubs, for members of the lock that WebKit's IDL no longer has:"]
+        lines += [f"  rv_dom_{f.name}" for f in self.stubs] or ["  (none)"]
         lines += ["", "Left out:"]
         for label, reason in sorted(self.excluded):
             lines.append(f"  {label}: {reason}")
@@ -929,7 +1227,8 @@ class Generator:
         return "\n".join(lines) + "\n"
 
 
-RUNTIME = r"""#include <cstring>
+RUNTIME = r"""#include <cstddef>
+#include <cstring>
 #include <optional>
 #include <type_traits>
 #include <wtf/MainThread.h>
@@ -1062,6 +1361,33 @@ template<typename E, size_t N> std::optional<E> enumerationFromIndex(int32_t ind
     return parseEnumerationFromString<E>(String { names[index] });
 }
 
+template<typename T> struct Unwrapped { using Type = T; };
+template<typename T> struct Unwrapped<std::optional<T>> { using Type = T; };
+
+// Copies a dictionary field into the C++ dictionary's member, which may be optional.
+template<typename T, typename V> void assignValue(T& field, V value)
+{
+    field = static_cast<typename Unwrapped<T>::Type>(value);
+}
+
+template<typename T> void assignString(T& field, const char* text)
+{
+    using Type = typename Unwrapped<T>::Type;
+    if constexpr (std::is_same_v<Type, AtomString>)
+        field = AtomString::fromUTF8(text);
+    else
+        field = Type { String::fromUTF8(text) };
+}
+
+template<typename T, size_t N> bool assignEnumeration(T& field, int32_t index, const ASCIILiteral (&names)[N])
+{
+    auto value = enumerationFromIndex<typename Unwrapped<T>::Type>(index, names);
+    if (!value)
+        return false;
+    field = *value;
+    return true;
+}
+
 // The raw pointer of a pointer, reference, Ref or RefPtr result.
 template<typename Root, typename V> Root* rawPointer(V&& value)
 {
@@ -1127,6 +1453,40 @@ template<typename T> struct HandleArg {
 } // namespace"""
 
 
+def to_method_name(name):
+    """CodeGeneratorJS.pm's ToMethodName: a setting's accessor on SettingsValues."""
+    if name.startswith("CSSOM"):
+        return name
+    result = name[:1].lower() + name[1:]
+    for prefix, lower in (("cSS", "css"), ("dOM", "dom"), ("hTML", "html"), ("hDR", "hdr"), ("jS", "js"), ("uRL", "url"),
+                          ("xML", "xml"), ("xSLT", "xslt")):
+        if result.startswith(prefix):
+            result = lower + result[len(prefix):]
+    return result
+
+
+def read_lock(path):
+    """The committed header's functions, as name -> {params, comment}, and its dictionary structs, as struct name ->
+    [field names]: the lock that keeps the ABI's functions and field order as WebKit changes."""
+    if not path.exists():
+        return {}, {}
+    text = path.read_text(encoding="utf-8")
+    functions = {}
+    for match in re.finditer(r"(/\*(?:(?!\*/).)*\*/)\nRV_EXPORT int32_t rv_dom_(\w+)\((.*?)\);", text, re.S):
+        comment = " ".join(re.sub(r"^(/\*|\*/|\*)|\*/$", "", line.strip()) for line in match.group(1).splitlines())
+        comment = " ".join(comment.split())
+        params = []
+        for part in match.group(3).split(", "):
+            ctype, name = part.rsplit(" ", 1)
+            params.append((ctype, name))
+        functions[match.group(2)] = {"params": params, "comment": comment}
+    structs = {}
+    for match in re.finditer(r"typedef struct (RvDom\w+) \{(.*?)\} \1;", text, re.S):
+        names = re.findall(r"^\s+[^;/]*?(\w+);", match.group(2), re.M)
+        structs[match.group(1)] = [n for n in names if n != "size"]
+    return functions, structs
+
+
 def enum_table(name):
     return f"enumeration{name}"
 
@@ -1155,6 +1515,8 @@ def fsharp_param(ctype, name):
         return f"byte[] {fname}"
     if ctype == "int32_t*" and name == "length":
         return f"int[] {fname}"
+    if ctype.startswith("const RvDom") and ctype.endswith("*"):
+        return f"[<In>] {ctype[6:-1]}[] {fname}"
     if ctype.startswith("const ") and ctype.endswith("*"):
         return f"{FSHARP_NUMBERS[ctype[6:-1]]}[] {fname}"
     if ctype.endswith("**"):
@@ -1196,6 +1558,10 @@ def main():
             print(f"differs from the generator's output: {path.relative_to(ROOT).as_posix()}")
             differ += 1
     print(generator.report().splitlines()[2])
+    for stub in generator.stubs:
+        print(f"stub: rv_dom_{stub.name} ({stub.comment.split(' ', 1)[0]} is gone from WebKit's IDL)")
+    for name in generator.changed:
+        print(f"signature changed against the committed header: rv_dom_{name}")
     if args.mode == "check" and differ:
         print("run: python -I gen/domgen.py write --source <webkit>")
         return 1

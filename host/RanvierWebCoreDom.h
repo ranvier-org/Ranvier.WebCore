@@ -11,7 +11,11 @@
  *   NULL for null or absent.
  * - Handles out are new references: rv_node_release, rv_event_release, or the rv_dom_*_release of the type.
  * - A member that throws returns RV_ERR_DOM_EXCEPTION, with the exception in rv_last_exception.
- * - A member WebKit compiles out on the platform returns RV_ERR_UNSUPPORTED.
+ * - A string union with Trusted Types, such as (TrustedHTML or DOMString), is a string. A dictionary is a
+ *   pointer to an RvDom<Dictionary> struct whose first field, size, is the struct's sizeof; NULL for an
+ *   optional dictionary takes the IDL defaults.
+ * - A member WebKit compiles out on the platform, or whose [EnabledBySetting] setting is off, returns
+ *   RV_ERR_UNSUPPORTED. So does a stub: a function this header had for a member WebKit's IDL no longer has.
  * - rv_abi_has("dom-generated") is 1 when the library has these functions, and rv_abi_has("dom:<Interface>")
  *   when it has those of an interface.
  */
@@ -25,6 +29,9 @@ extern "C" {
 
 typedef struct RvCSSStyleDeclaration RvCSSStyleDeclaration;
 typedef struct RvDOMTokenList RvDOMTokenList;
+typedef struct RvDOMStringMap RvDOMStringMap;
+typedef struct RvAbstractRange RvAbstractRange;
+typedef struct RvDOMSelection RvDOMSelection;
 typedef struct RvDOMRectReadOnly RvDOMRectReadOnly;
 typedef struct RvNodeList RvNodeList;
 typedef struct RvHTMLCollection RvHTMLCollection;
@@ -50,6 +57,14 @@ enum {
     RV_DOM_NODE_DOCUMENT_POSITION_CONTAINS = 0x08, /* Node.DOCUMENT_POSITION_CONTAINS */
     RV_DOM_NODE_DOCUMENT_POSITION_CONTAINED_BY = 0x10, /* Node.DOCUMENT_POSITION_CONTAINED_BY */
     RV_DOM_NODE_DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 0x20, /* Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC */
+    RV_DOM_RANGE_START_TO_START = 0, /* Range.START_TO_START */
+    RV_DOM_RANGE_START_TO_END = 1, /* Range.START_TO_END */
+    RV_DOM_RANGE_END_TO_END = 2, /* Range.END_TO_END */
+    RV_DOM_RANGE_END_TO_START = 3, /* Range.END_TO_START */
+    RV_DOM_RANGE_NODE_BEFORE = 0, /* Range.NODE_BEFORE */
+    RV_DOM_RANGE_NODE_AFTER = 1, /* Range.NODE_AFTER */
+    RV_DOM_RANGE_NODE_BEFORE_AND_AFTER = 2, /* Range.NODE_BEFORE_AND_AFTER */
+    RV_DOM_RANGE_NODE_INSIDE = 3, /* Range.NODE_INSIDE */
     RV_DOM_EVENT_NONE = 0, /* Event.NONE */
     RV_DOM_EVENT_CAPTURING_PHASE = 1, /* Event.CAPTURING_PHASE */
     RV_DOM_EVENT_AT_TARGET = 2, /* Event.AT_TARGET */
@@ -63,11 +78,31 @@ enum {
     RV_DOM_KEYBOARD_EVENT_DOM_KEY_LOCATION_NUMPAD = 0x03, /* KeyboardEvent.DOM_KEY_LOCATION_NUMPAD */
 };
 
+/* The values of the IDL enumeration AriaNotificationInterrupt. */
+enum {
+    RV_DOM_ARIA_NOTIFICATION_INTERRUPT_NONE = 0, /* "none" */
+    RV_DOM_ARIA_NOTIFICATION_INTERRUPT_ALL = 1, /* "all" */
+    RV_DOM_ARIA_NOTIFICATION_INTERRUPT_PENDING = 2, /* "pending" */
+};
+
+/* The values of the IDL enumeration AriaNotificationPriority. */
+enum {
+    RV_DOM_ARIA_NOTIFICATION_PRIORITY_NORMAL = 0, /* "normal" */
+    RV_DOM_ARIA_NOTIFICATION_PRIORITY_HIGH = 1, /* "high" */
+};
+
 /* The values of the IDL enumeration DocumentReadyState. */
 enum {
     RV_DOM_DOCUMENT_READY_STATE_LOADING = 0, /* "loading" */
     RV_DOM_DOCUMENT_READY_STATE_INTERACTIVE = 1, /* "interactive" */
     RV_DOM_DOCUMENT_READY_STATE_COMPLETE = 2, /* "complete" */
+};
+
+/* The values of the IDL enumeration ScrollBehavior. */
+enum {
+    RV_DOM_SCROLL_BEHAVIOR_AUTO = 0, /* "auto" */
+    RV_DOM_SCROLL_BEHAVIOR_INSTANT = 1, /* "instant" */
+    RV_DOM_SCROLL_BEHAVIOR_SMOOTH = 2, /* "smooth" */
 };
 
 /* The values of the IDL enumeration ShadowRootMode. */
@@ -89,6 +124,67 @@ enum {
     RV_DOM_VISIBILITY_STATE_VISIBLE = 1, /* "visible" */
 };
 
+/* The IDL dictionary GetRootNodeOptions. size is sizeof(RvDomGetRootNodeOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomGetRootNodeOptions {
+    uint32_t size;
+    int32_t composed; /* boolean, default false */
+} RvDomGetRootNodeOptions;
+
+/* The IDL dictionary AriaNotifyOptions. size is sizeof(RvDomAriaNotifyOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomAriaNotifyOptions {
+    uint32_t size;
+    const int32_t* priority; /* AriaNotificationPriority, NULL for absent, RV_DOM_ARIA_NOTIFICATION_PRIORITY_* */
+    const int32_t* interrupt; /* AriaNotificationInterrupt, NULL for absent, RV_DOM_ARIA_NOTIFICATION_INTERRUPT_* */
+} RvDomAriaNotifyOptions;
+
+/* The IDL dictionary ShadowRootInit. size is sizeof(RvDomShadowRootInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomShadowRootInit {
+    uint32_t size;
+    int32_t mode; /* ShadowRootMode, required, RV_DOM_SHADOW_ROOT_MODE_* */
+    int32_t delegates_focus; /* boolean, default false */
+    int32_t clonable; /* boolean, default false */
+    int32_t serializable; /* boolean, default false */
+    int32_t slot_assignment; /* SlotAssignmentMode, default "named", RV_DOM_SLOT_ASSIGNMENT_MODE_* */
+} RvDomShadowRootInit;
+
+/* The IDL dictionary CheckVisibilityOptions. size is sizeof(RvDomCheckVisibilityOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomCheckVisibilityOptions {
+    uint32_t size;
+    int32_t opacity_property; /* boolean, default false */
+    int32_t visibility_property; /* boolean, default false */
+    int32_t content_visibility_auto; /* boolean, default false */
+    int32_t check_opacity; /* boolean, default false */
+    int32_t check_visibility_css; /* boolean, default false */
+} RvDomCheckVisibilityOptions;
+
+/* The IDL dictionary ScrollToOptions. size is sizeof(RvDomScrollToOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomScrollToOptions {
+    uint32_t size;
+    int32_t behavior; /* ScrollBehavior, default "auto", RV_DOM_SCROLL_BEHAVIOR_* */
+    const double* left; /* unrestricted double, NULL for absent */
+    const double* top; /* unrestricted double, NULL for absent */
+} RvDomScrollToOptions;
+
+/* The IDL dictionary ShowPopoverOptions. size is sizeof(RvDomShowPopoverOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomShowPopoverOptions {
+    uint32_t size;
+    RvNode* source; /* HTMLElement, NULL for absent */
+} RvDomShowPopoverOptions;
+
+/* The IDL dictionary FocusOptions. size is sizeof(RvDomFocusOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomFocusOptions {
+    uint32_t size;
+    int32_t prevent_scroll; /* boolean, default false */
+    const int32_t* focus_visible; /* boolean, NULL for absent */
+} RvDomFocusOptions;
+
 /* Releases a handle to a CSSStyleDeclaration. */
 RV_EXPORT void rv_dom_css_style_declaration_release(RvCSSStyleDeclaration*);
 /* Adds a reference to a CSSStyleDeclaration and returns it. */
@@ -97,6 +193,18 @@ RV_EXPORT RvCSSStyleDeclaration* rv_dom_css_style_declaration_retain(RvCSSStyleD
 RV_EXPORT void rv_dom_dom_token_list_release(RvDOMTokenList*);
 /* Adds a reference to a DOMTokenList and returns it. */
 RV_EXPORT RvDOMTokenList* rv_dom_dom_token_list_retain(RvDOMTokenList*);
+/* Releases a handle to a DOMStringMap. */
+RV_EXPORT void rv_dom_dom_string_map_release(RvDOMStringMap*);
+/* Adds a reference to a DOMStringMap and returns it. */
+RV_EXPORT RvDOMStringMap* rv_dom_dom_string_map_retain(RvDOMStringMap*);
+/* Releases a handle to a AbstractRange. */
+RV_EXPORT void rv_dom_abstract_range_release(RvAbstractRange*);
+/* Adds a reference to a AbstractRange and returns it. */
+RV_EXPORT RvAbstractRange* rv_dom_abstract_range_retain(RvAbstractRange*);
+/* Releases a handle to a DOMSelection. */
+RV_EXPORT void rv_dom_dom_selection_release(RvDOMSelection*);
+/* Adds a reference to a DOMSelection and returns it. */
+RV_EXPORT RvDOMSelection* rv_dom_dom_selection_retain(RvDOMSelection*);
 /* Releases a handle to a DOMRectReadOnly. */
 RV_EXPORT void rv_dom_dom_rect_read_only_release(RvDOMRectReadOnly*);
 /* Adds a reference to a DOMRectReadOnly and returns it. */
@@ -146,6 +254,9 @@ RV_EXPORT int32_t rv_dom_node_set_node_value(RvNode* target, const char* value);
 RV_EXPORT int32_t rv_dom_node_get_text_content(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Node.textContent setter: attribute DOMString? textContent; value may be NULL (null) */
 RV_EXPORT int32_t rv_dom_node_set_text_content(RvNode* target, const char* value);
+/* Node.getRootNode(optional GetRootNodeOptions options = {}) -> Node; options defaults to {} in IDL; options may be
+ * NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_node_get_root_node(RvNode* target, const RvDomGetRootNodeOptions* options, RvNode** result);
 /* Node.hasChildNodes() -> boolean */
 RV_EXPORT int32_t rv_dom_node_has_child_nodes(RvNode* target, int32_t* result);
 /* Node.normalize() -> undefined */
@@ -204,6 +315,8 @@ RV_EXPORT int32_t rv_dom_character_data_remove(RvNode* target);
 
 /* Text.wholeText getter: readonly attribute DOMString wholeText */
 RV_EXPORT int32_t rv_dom_text_get_whole_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* Text.assignedSlot getter: readonly attribute HTMLSlotElement? assignedSlot; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_text_get_assigned_slot(RvNode* target, RvNode** result);
 /* Text.splitText(unsigned long offset) -> Text; *result is a new reference */
 RV_EXPORT int32_t rv_dom_text_split_text(RvNode* target, uint32_t offset, RvNode** result);
 /* DocumentFragment */
@@ -218,7 +331,8 @@ RV_EXPORT int32_t rv_dom_document_fragment_get_first_element_child(RvNode* targe
 RV_EXPORT int32_t rv_dom_document_fragment_get_last_element_child(RvNode* target, RvNode** result);
 /* DocumentFragment.childElementCount getter: readonly attribute unsigned long childElementCount */
 RV_EXPORT int32_t rv_dom_document_fragment_get_child_element_count(RvNode* target, uint32_t* result);
-/* DocumentFragment.moveBefore(Node node, Node? child) -> undefined; child may be NULL */
+/* DocumentFragment.moveBefore(Node node, Node? child) -> undefined; child may be NULL; RV_ERR_UNSUPPORTED while the
+ * setting MoveBeforeEnabled is off */
 RV_EXPORT int32_t rv_dom_document_fragment_move_before(RvNode* target, RvNode* node, RvNode* child);
 /* DocumentFragment.querySelector(DOMString selectors) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_fragment_query_selector(RvNode* target, const char* selectors, RvNode** result);
@@ -240,9 +354,11 @@ RV_EXPORT int32_t rv_dom_shadow_root_get_clonable(RvNode* target, int32_t* resul
 RV_EXPORT int32_t rv_dom_shadow_root_get_serializable(RvNode* target, int32_t* result);
 /* ShadowRoot.host getter: readonly attribute Element? host; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_shadow_root_get_host(RvNode* target, RvNode** result);
-/* ShadowRoot.referenceTarget getter: attribute DOMString referenceTarget */
+/* ShadowRoot.referenceTarget getter: attribute DOMString referenceTarget; RV_ERR_UNSUPPORTED while the setting
+ * ShadowRootReferenceTargetEnabled is off */
 RV_EXPORT int32_t rv_dom_shadow_root_get_reference_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* ShadowRoot.referenceTarget setter: attribute DOMString referenceTarget */
+/* ShadowRoot.referenceTarget setter: attribute DOMString referenceTarget; RV_ERR_UNSUPPORTED while the setting
+ * ShadowRootReferenceTargetEnabled is off */
 RV_EXPORT int32_t rv_dom_shadow_root_set_reference_target(RvNode* target, const char* value);
 /* ShadowRoot.activeElement getter: readonly attribute Element? activeElement; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_shadow_root_get_active_element(RvNode* target, RvNode** result);
@@ -250,10 +366,17 @@ RV_EXPORT int32_t rv_dom_shadow_root_get_active_element(RvNode* target, RvNode**
  * NULL; RV_ERR_UNSUPPORTED where WebKit builds without FULLSCREEN_API */
 RV_EXPORT int32_t rv_dom_shadow_root_get_fullscreen_element(RvNode* target, RvNode** result);
 /* ShadowRoot.pointerLockElement getter: readonly attribute Element? pointerLockElement; *result is a new reference,
- * or NULL; RV_ERR_UNSUPPORTED where WebKit builds without POINTER_LOCK */
+ * or NULL; RV_ERR_UNSUPPORTED while the setting PointerLockEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds
+ * without POINTER_LOCK */
 RV_EXPORT int32_t rv_dom_shadow_root_get_pointer_lock_element(RvNode* target, RvNode** result);
+/* ShadowRoot.innerHTML getter: attribute (TrustedHTML or DOMString) innerHTML */
+RV_EXPORT int32_t rv_dom_shadow_root_get_inner_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* ShadowRoot.innerHTML setter: attribute (TrustedHTML or DOMString) innerHTML */
+RV_EXPORT int32_t rv_dom_shadow_root_set_inner_html(RvNode* target, const char* value);
 /* ShadowRoot.elementFromPoint(double x, double y) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_shadow_root_element_from_point(RvNode* target, double x, double y, RvNode** result);
+/* ShadowRoot.setHTMLUnsafe((TrustedHTML or DOMString) html) -> undefined */
+RV_EXPORT int32_t rv_dom_shadow_root_set_html_unsafe(RvNode* target, const char* html);
 /* Document */
 
 /* Document.compatMode getter: readonly attribute DOMString compatMode */
@@ -333,12 +456,24 @@ RV_EXPORT int32_t rv_dom_document_create_attribute(RvNode* target, const char* l
 RV_EXPORT int32_t rv_dom_document_create_attribute_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, RvNode** result);
 /* Document.createEvent(DOMString type) -> Event; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_create_event(RvNode* target, const char* type, RvEvent** result);
-/* Document.ariaNotify(DOMString announcement) -> undefined */
+/* Document.createRange() -> Range; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_create_range(RvNode* target, RvAbstractRange** result);
+/* Document.caretRangeFromPoint(optional long x = 0, optional long y = 0) -> Range?; x defaults to 0 in IDL; y
+ * defaults to 0 in IDL; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_document_caret_range_from_point(RvNode* target, int32_t x, int32_t y, RvAbstractRange** result);
+/* Document.ariaNotify(DOMString announcement) -> undefined; RV_ERR_UNSUPPORTED while the setting IsARIANotifyEnabled
+ * is off */
 RV_EXPORT int32_t rv_dom_document_aria_notify(RvNode* target, const char* announcement);
+/* Document.ariaNotify(DOMString announcement, AriaNotifyOptions options) -> undefined; RV_ERR_UNSUPPORTED while the
+ * setting IsARIANotifyEnabled is off */
+RV_EXPORT int32_t rv_dom_document_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options);
 /* Document.getElementsByName(DOMString elementName) -> NodeList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_get_elements_by_name(RvNode* target, const char* element_name, RvNodeList** result);
 /* Document.hasFocus() -> boolean */
 RV_EXPORT int32_t rv_dom_document_has_focus(RvNode* target, int32_t* result);
+/* Document.execCommand(DOMString commandId, optional boolean showUI = false, optional (DOMString or TrustedHTML)
+ * value = "") -> boolean; show_ui defaults to false in IDL; value defaults to "" in IDL */
+RV_EXPORT int32_t rv_dom_document_exec_command(RvNode* target, const char* command_id, int32_t show_ui, const char* value, int32_t* result);
 /* Document.queryCommandEnabled(DOMString commandId) -> boolean */
 RV_EXPORT int32_t rv_dom_document_query_command_enabled(RvNode* target, const char* command_id, int32_t* result);
 /* Document.queryCommandIndeterm(DOMString commandId) -> boolean */
@@ -349,7 +484,10 @@ RV_EXPORT int32_t rv_dom_document_query_command_state(RvNode* target, const char
 RV_EXPORT int32_t rv_dom_document_query_command_supported(RvNode* target, const char* command_id, int32_t* result);
 /* Document.queryCommandValue(DOMString commandId) -> DOMString */
 RV_EXPORT int32_t rv_dom_document_query_command_value(RvNode* target, const char* command_id, char* buffer, int32_t capacity, int32_t* length);
-/* Document.moveBefore(Node node, Node? child) -> undefined; child may be NULL */
+/* Document.getSelection() -> DOMSelection?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_document_get_selection(RvNode* target, RvDOMSelection** result);
+/* Document.moveBefore(Node node, Node? child) -> undefined; child may be NULL; RV_ERR_UNSUPPORTED while the setting
+ * MoveBeforeEnabled is off */
 RV_EXPORT int32_t rv_dom_document_move_before(RvNode* target, RvNode* node, RvNode* child);
 /* Document.querySelector(DOMString selectors) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_query_selector(RvNode* target, const char* selectors, RvNode** result);
@@ -405,8 +543,13 @@ RV_EXPORT int32_t rv_dom_element_get_client_left(RvNode* target, int32_t* result
 RV_EXPORT int32_t rv_dom_element_get_client_width(RvNode* target, int32_t* result);
 /* Element.clientHeight getter: readonly attribute long clientHeight */
 RV_EXPORT int32_t rv_dom_element_get_client_height(RvNode* target, int32_t* result);
-/* Element.currentCSSZoom getter: readonly attribute double currentCSSZoom */
+/* Element.currentCSSZoom getter: readonly attribute double currentCSSZoom; RV_ERR_UNSUPPORTED while the setting
+ * EnableElementCurrentCSSZoom is off */
 RV_EXPORT int32_t rv_dom_element_get_current_css_zoom(RvNode* target, double* result);
+/* Element.outerHTML getter: attribute (TrustedHTML or DOMString) outerHTML */
+RV_EXPORT int32_t rv_dom_element_get_outer_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* Element.outerHTML setter: attribute (TrustedHTML or DOMString) outerHTML */
+RV_EXPORT int32_t rv_dom_element_set_outer_html(RvNode* target, const char* value);
 /* Element.role getter: attribute DOMString? role */
 RV_EXPORT int32_t rv_dom_element_get_role(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.role setter: attribute DOMString? role; value may be NULL (null) */
@@ -604,6 +747,12 @@ RV_EXPORT int32_t rv_dom_element_get_first_element_child(RvNode* target, RvNode*
 RV_EXPORT int32_t rv_dom_element_get_last_element_child(RvNode* target, RvNode** result);
 /* Element.childElementCount getter: readonly attribute unsigned long childElementCount */
 RV_EXPORT int32_t rv_dom_element_get_child_element_count(RvNode* target, uint32_t* result);
+/* Element.assignedSlot getter: readonly attribute HTMLSlotElement? assignedSlot; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_element_get_assigned_slot(RvNode* target, RvNode** result);
+/* Element.innerHTML getter: attribute (TrustedHTML or DOMString) innerHTML */
+RV_EXPORT int32_t rv_dom_element_get_inner_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* Element.innerHTML setter: attribute (TrustedHTML or DOMString) innerHTML */
+RV_EXPORT int32_t rv_dom_element_set_inner_html(RvNode* target, const char* value);
 /* Element.hasAttributes() -> boolean */
 RV_EXPORT int32_t rv_dom_element_has_attributes(RvNode* target, int32_t* result);
 /* Element.getAttribute(DOMString qualifiedName) -> DOMString? */
@@ -611,6 +760,11 @@ RV_EXPORT int32_t rv_dom_element_get_attribute(RvNode* target, const char* quali
 /* Element.getAttributeNS(DOMString? namespaceURI, DOMString localName) -> DOMString?; namespace_uri may be NULL
  * (null) */
 RV_EXPORT int32_t rv_dom_element_get_attribute_ns(RvNode* target, const char* namespace_uri, const char* local_name, char* buffer, int32_t capacity, int32_t* length);
+/* Element.setAttribute(DOMString qualifiedName, (TrustedType or DOMString) value) -> undefined */
+RV_EXPORT int32_t rv_dom_element_set_attribute(RvNode* target, const char* qualified_name, const char* value);
+/* Element.setAttributeNS(DOMString? namespaceURI, DOMString qualifiedName, (TrustedType or DOMString) value) ->
+ * undefined; namespace_uri may be NULL (null) */
+RV_EXPORT int32_t rv_dom_element_set_attribute_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, const char* value);
 /* Element.removeAttribute(DOMString qualifiedName) -> undefined */
 RV_EXPORT int32_t rv_dom_element_remove_attribute(RvNode* target, const char* qualified_name);
 /* Element.removeAttributeNS(DOMString? namespaceURI, DOMString localName) -> undefined; namespace_uri may be NULL
@@ -633,6 +787,8 @@ RV_EXPORT int32_t rv_dom_element_set_attribute_node(RvNode* target, RvNode* attr
 RV_EXPORT int32_t rv_dom_element_set_attribute_node_ns(RvNode* target, RvNode* attr, RvNode** result);
 /* Element.removeAttributeNode(Attr attr) -> Attr; *result is a new reference */
 RV_EXPORT int32_t rv_dom_element_remove_attribute_node(RvNode* target, RvNode* attr, RvNode** result);
+/* Element.attachShadow(ShadowRootInit init) -> ShadowRoot; *result is a new reference */
+RV_EXPORT int32_t rv_dom_element_attach_shadow(RvNode* target, const RvDomShadowRootInit* init, RvNode** result);
 /* Element.closest(DOMString selectors) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_element_closest(RvNode* target, const char* selectors, RvNode** result);
 /* Element.matches(DOMString selectors) -> boolean */
@@ -648,19 +804,37 @@ RV_EXPORT int32_t rv_dom_element_get_elements_by_class_name(RvNode* target, cons
 RV_EXPORT int32_t rv_dom_element_insert_adjacent_element(RvNode* target, const char* where, RvNode* element, RvNode** result);
 /* Element.insertAdjacentText(DOMString where, DOMString data) -> undefined */
 RV_EXPORT int32_t rv_dom_element_insert_adjacent_text(RvNode* target, const char* where, const char* data);
-/* Element.ariaNotify(DOMString announcement) -> undefined */
+/* Element.ariaNotify(DOMString announcement) -> undefined; RV_ERR_UNSUPPORTED while the setting IsARIANotifyEnabled
+ * is off */
 RV_EXPORT int32_t rv_dom_element_aria_notify(RvNode* target, const char* announcement);
+/* Element.ariaNotify(DOMString announcement, AriaNotifyOptions options) -> undefined; RV_ERR_UNSUPPORTED while the
+ * setting IsARIANotifyEnabled is off */
+RV_EXPORT int32_t rv_dom_element_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options);
 /* Element.getBoundingClientRect() -> DOMRect; *result is a new reference */
 RV_EXPORT int32_t rv_dom_element_get_bounding_client_rect(RvNode* target, RvDOMRectReadOnly** result);
+/* Element.checkVisibility(optional CheckVisibilityOptions options = {}) -> boolean; options defaults to {} in IDL;
+ * options may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_element_check_visibility(RvNode* target, const RvDomCheckVisibilityOptions* options, int32_t* result);
+/* Element.scroll(optional ScrollToOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
+ * NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_element_scroll_1(RvNode* target, const RvDomScrollToOptions* options);
 /* Element.scroll(unrestricted double x, unrestricted double y) -> undefined */
 RV_EXPORT int32_t rv_dom_element_scroll(RvNode* target, double x, double y);
+/* Element.scrollTo(optional ScrollToOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
+ * NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_element_scroll_to_1(RvNode* target, const RvDomScrollToOptions* options);
 /* Element.scrollTo(unrestricted double x, unrestricted double y) -> undefined */
 RV_EXPORT int32_t rv_dom_element_scroll_to(RvNode* target, double x, double y);
+/* Element.scrollBy(optional ScrollToOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
+ * NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_element_scroll_by_1(RvNode* target, const RvDomScrollToOptions* options);
 /* Element.scrollBy(unrestricted double x, unrestricted double y) -> undefined */
 RV_EXPORT int32_t rv_dom_element_scroll_by(RvNode* target, double x, double y);
 /* Element.scrollIntoViewIfNeeded(optional boolean centerIfNeeded = true) -> undefined; center_if_needed defaults to
  * true in IDL */
 RV_EXPORT int32_t rv_dom_element_scroll_into_view_if_needed(RvNode* target, int32_t center_if_needed);
+/* Element.insertAdjacentHTML(DOMString position, (TrustedHTML or DOMString) text) -> undefined */
+RV_EXPORT int32_t rv_dom_element_insert_adjacent_html(RvNode* target, const char* position, const char* text);
 /* Element.setPointerCapture(long pointerId) -> undefined */
 RV_EXPORT int32_t rv_dom_element_set_pointer_capture(RvNode* target, int32_t pointer_id);
 /* Element.releasePointerCapture(long pointerId) -> undefined */
@@ -669,12 +843,15 @@ RV_EXPORT int32_t rv_dom_element_release_pointer_capture(RvNode* target, int32_t
 RV_EXPORT int32_t rv_dom_element_has_pointer_capture(RvNode* target, int32_t pointer_id, int32_t* result);
 /* Element.remove() -> undefined */
 RV_EXPORT int32_t rv_dom_element_remove(RvNode* target);
-/* Element.moveBefore(Node node, Node? child) -> undefined; child may be NULL */
+/* Element.moveBefore(Node node, Node? child) -> undefined; child may be NULL; RV_ERR_UNSUPPORTED while the setting
+ * MoveBeforeEnabled is off */
 RV_EXPORT int32_t rv_dom_element_move_before(RvNode* target, RvNode* node, RvNode* child);
 /* Element.querySelector(DOMString selectors) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_element_query_selector(RvNode* target, const char* selectors, RvNode** result);
 /* Element.querySelectorAll(DOMString selectors) -> NodeList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_element_query_selector_all(RvNode* target, const char* selectors, RvNodeList** result);
+/* Element.setHTMLUnsafe((TrustedHTML or DOMString) html) -> undefined */
+RV_EXPORT int32_t rv_dom_element_set_html_unsafe(RvNode* target, const char* html);
 /* Attr */
 
 /* Attr.namespaceURI getter: readonly attribute DOMString? namespaceURI */
@@ -749,17 +926,23 @@ RV_EXPORT int32_t rv_dom_html_element_set_inner_text(RvNode* target, const char*
 RV_EXPORT int32_t rv_dom_html_element_get_inert(RvNode* target, int32_t* result);
 /* HTMLElement.inert setter: attribute boolean inert */
 RV_EXPORT int32_t rv_dom_html_element_set_inert(RvNode* target, int32_t value);
-/* HTMLElement.headingOffset getter: attribute unsigned long headingOffset */
+/* HTMLElement.headingOffset getter: attribute unsigned long headingOffset; RV_ERR_UNSUPPORTED while the setting
+ * HeadingOffsetEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_get_heading_offset(RvNode* target, uint32_t* result);
-/* HTMLElement.headingOffset setter: attribute unsigned long headingOffset */
+/* HTMLElement.headingOffset setter: attribute unsigned long headingOffset; RV_ERR_UNSUPPORTED while the setting
+ * HeadingOffsetEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_set_heading_offset(RvNode* target, uint32_t value);
-/* HTMLElement.headingReset getter: attribute boolean headingReset */
+/* HTMLElement.headingReset getter: attribute boolean headingReset; RV_ERR_UNSUPPORTED while the setting
+ * HeadingOffsetEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_get_heading_reset(RvNode* target, int32_t* result);
-/* HTMLElement.headingReset setter: attribute boolean headingReset */
+/* HTMLElement.headingReset setter: attribute boolean headingReset; RV_ERR_UNSUPPORTED while the setting
+ * HeadingOffsetEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_set_heading_reset(RvNode* target, int32_t value);
-/* HTMLElement.popover getter: attribute DOMString? popover */
+/* HTMLElement.popover getter: attribute DOMString? popover; RV_ERR_UNSUPPORTED while the setting
+ * PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_get_popover(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLElement.popover setter: attribute DOMString? popover; value may be NULL (null) */
+/* HTMLElement.popover setter: attribute DOMString? popover; value may be NULL (null); RV_ERR_UNSUPPORTED while the
+ * setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_set_popover(RvNode* target, const char* value);
 /* HTMLElement.outerText getter: attribute DOMString outerText */
 RV_EXPORT int32_t rv_dom_html_element_get_outer_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -791,9 +974,11 @@ RV_EXPORT int32_t rv_dom_html_element_get_offset_height(RvNode* target, int32_t*
 RV_EXPORT int32_t rv_dom_html_element_get_content_editable(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.contentEditable setter: attribute DOMString contentEditable */
 RV_EXPORT int32_t rv_dom_html_element_set_content_editable(RvNode* target, const char* value);
-/* HTMLElement.enterKeyHint getter: attribute DOMString enterKeyHint */
+/* HTMLElement.enterKeyHint getter: attribute DOMString enterKeyHint; RV_ERR_UNSUPPORTED while the setting
+ * EnterKeyHintEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_get_enter_key_hint(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLElement.enterKeyHint setter: attribute DOMString enterKeyHint */
+/* HTMLElement.enterKeyHint setter: attribute DOMString enterKeyHint; RV_ERR_UNSUPPORTED while the setting
+ * EnterKeyHintEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_set_enter_key_hint(RvNode* target, const char* value);
 /* HTMLElement.isContentEditable getter: readonly attribute boolean isContentEditable */
 RV_EXPORT int32_t rv_dom_html_element_get_is_content_editable(RvNode* target, int32_t* result);
@@ -801,6 +986,8 @@ RV_EXPORT int32_t rv_dom_html_element_get_is_content_editable(RvNode* target, in
 RV_EXPORT int32_t rv_dom_html_element_get_input_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.inputMode setter: attribute DOMString inputMode */
 RV_EXPORT int32_t rv_dom_html_element_set_input_mode(RvNode* target, const char* value);
+/* HTMLElement.dataset getter: readonly attribute DOMStringMap dataset; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_element_get_dataset(RvNode* target, RvDOMStringMap** result);
 /* HTMLElement.nonce getter: attribute DOMString nonce */
 RV_EXPORT int32_t rv_dom_html_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.nonce setter: attribute DOMString nonce */
@@ -817,8 +1004,14 @@ RV_EXPORT int32_t rv_dom_html_element_set_tab_index(RvNode* target, int32_t valu
 RV_EXPORT int32_t rv_dom_html_element_get_style(RvNode* target, RvCSSStyleDeclaration** result);
 /* HTMLElement.click() -> undefined */
 RV_EXPORT int32_t rv_dom_html_element_click(RvNode* target);
-/* HTMLElement.hidePopover() -> undefined */
+/* HTMLElement.showPopover(optional ShowPopoverOptions options = {}) -> undefined; options defaults to {} in IDL;
+ * options may be NULL for the IDL default; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off */
+RV_EXPORT int32_t rv_dom_html_element_show_popover(RvNode* target, const RvDomShowPopoverOptions* options);
+/* HTMLElement.hidePopover() -> undefined; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_hide_popover(RvNode* target);
+/* HTMLElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
+ * NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_html_element_focus(RvNode* target, const RvDomFocusOptions* options);
 /* HTMLElement.blur() -> undefined */
 RV_EXPORT int32_t rv_dom_html_element_blur(RvNode* target);
 /* HTMLAnchorElement */
@@ -831,9 +1024,11 @@ RV_EXPORT int32_t rv_dom_html_anchor_element_set_charset(RvNode* target, const c
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_coords(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.coords setter: attribute DOMString coords */
 RV_EXPORT int32_t rv_dom_html_anchor_element_set_coords(RvNode* target, const char* value);
-/* HTMLAnchorElement.download getter: attribute DOMString download */
+/* HTMLAnchorElement.download getter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting
+ * DownloadAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_download(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLAnchorElement.download setter: attribute DOMString download */
+/* HTMLAnchorElement.download setter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting
+ * DownloadAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_anchor_element_set_download(RvNode* target, const char* value);
 /* HTMLAnchorElement.hreflang getter: attribute DOMString hreflang */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_hreflang(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -982,13 +1177,16 @@ RV_EXPORT int32_t rv_dom_html_button_element_get_value(RvNode* target, char* buf
 /* HTMLButtonElement.value setter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_html_button_element_set_value(RvNode* target, const char* value);
 /* HTMLButtonElement.commandForElement getter: attribute Element? commandForElement; *result is a new reference, or
- * NULL */
+ * NULL; RV_ERR_UNSUPPORTED while the setting CommandAttributesEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_get_command_for_element(RvNode* target, RvNode** result);
-/* HTMLButtonElement.commandForElement setter: attribute Element? commandForElement; value may be NULL */
+/* HTMLButtonElement.commandForElement setter: attribute Element? commandForElement; value may be NULL;
+ * RV_ERR_UNSUPPORTED while the setting CommandAttributesEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_set_command_for_element(RvNode* target, RvNode* value);
-/* HTMLButtonElement.command getter: attribute DOMString command */
+/* HTMLButtonElement.command getter: attribute DOMString command; RV_ERR_UNSUPPORTED while the setting
+ * CommandAttributesEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_get_command(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLButtonElement.command setter: attribute DOMString command */
+/* HTMLButtonElement.command setter: attribute DOMString command; RV_ERR_UNSUPPORTED while the setting
+ * CommandAttributesEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_set_command(RvNode* target, const char* value);
 /* HTMLButtonElement.willValidate getter: readonly attribute boolean willValidate */
 RV_EXPORT int32_t rv_dom_html_button_element_get_will_validate(RvNode* target, int32_t* result);
@@ -999,17 +1197,21 @@ RV_EXPORT int32_t rv_dom_html_button_element_get_validation_message(RvNode* targ
 /* HTMLButtonElement.labels getter: readonly attribute NodeList? labels; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_button_element_get_labels(RvNode* target, RvNodeList** result);
 /* HTMLButtonElement.popoverTargetElement getter: attribute Element? popoverTargetElement; *result is a new reference,
- * or NULL */
+ * or NULL; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_get_popover_target_element(RvNode* target, RvNode** result);
-/* HTMLButtonElement.popoverTargetElement setter: attribute Element? popoverTargetElement; value may be NULL */
+/* HTMLButtonElement.popoverTargetElement setter: attribute Element? popoverTargetElement; value may be NULL;
+ * RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_set_popover_target_element(RvNode* target, RvNode* value);
-/* HTMLButtonElement.popoverTargetAction getter: attribute DOMString popoverTargetAction */
+/* HTMLButtonElement.popoverTargetAction getter: attribute DOMString popoverTargetAction; RV_ERR_UNSUPPORTED while the
+ * setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_get_popover_target_action(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLButtonElement.popoverTargetAction setter: attribute DOMString popoverTargetAction */
+/* HTMLButtonElement.popoverTargetAction setter: attribute DOMString popoverTargetAction; RV_ERR_UNSUPPORTED while the
+ * setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_set_popover_target_action(RvNode* target, const char* value);
 /* HTMLButtonElement.checkValidity() -> boolean */
 RV_EXPORT int32_t rv_dom_html_button_element_check_validity(RvNode* target, int32_t* result);
-/* HTMLButtonElement.reportValidity() -> boolean */
+/* HTMLButtonElement.reportValidity() -> boolean; RV_ERR_UNSUPPORTED while the setting
+ * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLButtonElement.setCustomValidity(DOMString error) -> undefined */
 RV_EXPORT int32_t rv_dom_html_button_element_set_custom_validity(RvNode* target, const char* error);
@@ -1033,9 +1235,11 @@ RV_EXPORT int32_t rv_dom_html_dialog_element_set_open(RvNode* target, int32_t va
 RV_EXPORT int32_t rv_dom_html_dialog_element_get_return_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLDialogElement.returnValue setter: attribute DOMString returnValue */
 RV_EXPORT int32_t rv_dom_html_dialog_element_set_return_value(RvNode* target, const char* value);
-/* HTMLDialogElement.closedBy getter: attribute DOMString closedBy */
+/* HTMLDialogElement.closedBy getter: attribute DOMString closedBy; RV_ERR_UNSUPPORTED while the setting
+ * CloseWatcherEnabled is off */
 RV_EXPORT int32_t rv_dom_html_dialog_element_get_closed_by(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLDialogElement.closedBy setter: attribute DOMString closedBy */
+/* HTMLDialogElement.closedBy setter: attribute DOMString closedBy; RV_ERR_UNSUPPORTED while the setting
+ * CloseWatcherEnabled is off */
 RV_EXPORT int32_t rv_dom_html_dialog_element_set_closed_by(RvNode* target, const char* value);
 /* HTMLDialogElement.show() -> undefined */
 RV_EXPORT int32_t rv_dom_html_dialog_element_show(RvNode* target);
@@ -1075,7 +1279,8 @@ RV_EXPORT int32_t rv_dom_html_field_set_element_get_validity(RvNode* target, RvV
 RV_EXPORT int32_t rv_dom_html_field_set_element_get_validation_message(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFieldSetElement.checkValidity() -> boolean */
 RV_EXPORT int32_t rv_dom_html_field_set_element_check_validity(RvNode* target, int32_t* result);
-/* HTMLFieldSetElement.reportValidity() -> boolean */
+/* HTMLFieldSetElement.reportValidity() -> boolean; RV_ERR_UNSUPPORTED while the setting
+ * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_field_set_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLFieldSetElement.setCustomValidity(DOMString error) -> undefined */
 RV_EXPORT int32_t rv_dom_html_field_set_element_set_custom_validity(RvNode* target, const char* error);
@@ -1127,11 +1332,14 @@ RV_EXPORT int32_t rv_dom_html_form_element_get_rel_list(RvNode* target, RvDOMTok
 RV_EXPORT int32_t rv_dom_html_form_element_get_elements(RvNode* target, RvHTMLCollection** result);
 /* HTMLFormElement.length getter: readonly attribute unsigned long length */
 RV_EXPORT int32_t rv_dom_html_form_element_get_length(RvNode* target, uint32_t* result);
+/* HTMLFormElement.item(unsigned long index) -> Element?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_form_element_item(RvNode* target, uint32_t index, RvNode** result);
 /* HTMLFormElement.reset() -> undefined */
 RV_EXPORT int32_t rv_dom_html_form_element_reset(RvNode* target);
 /* HTMLFormElement.checkValidity() -> boolean */
 RV_EXPORT int32_t rv_dom_html_form_element_check_validity(RvNode* target, int32_t* result);
-/* HTMLFormElement.reportValidity() -> boolean */
+/* HTMLFormElement.reportValidity() -> boolean; RV_ERR_UNSUPPORTED while the setting InteractiveFormValidationEnabled
+ * is off */
 RV_EXPORT int32_t rv_dom_html_form_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLImageElement */
 
@@ -1163,11 +1371,11 @@ RV_EXPORT int32_t rv_dom_html_image_element_set_use_map(RvNode* target, const ch
 RV_EXPORT int32_t rv_dom_html_image_element_get_is_map(RvNode* target, int32_t* result);
 /* HTMLImageElement.isMap setter: attribute boolean isMap */
 RV_EXPORT int32_t rv_dom_html_image_element_set_is_map(RvNode* target, int32_t value);
-/* HTMLImageElement.controls getter: attribute boolean controls; RV_ERR_UNSUPPORTED where WebKit builds without
- * SPATIAL_IMAGE_CONTROLS */
+/* HTMLImageElement.controls getter: attribute boolean controls; RV_ERR_UNSUPPORTED while the setting
+ * SpatialImageControlsEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without SPATIAL_IMAGE_CONTROLS */
 RV_EXPORT int32_t rv_dom_html_image_element_get_controls(RvNode* target, int32_t* result);
-/* HTMLImageElement.controls setter: attribute boolean controls; RV_ERR_UNSUPPORTED where WebKit builds without
- * SPATIAL_IMAGE_CONTROLS */
+/* HTMLImageElement.controls setter: attribute boolean controls; RV_ERR_UNSUPPORTED while the setting
+ * SpatialImageControlsEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without SPATIAL_IMAGE_CONTROLS */
 RV_EXPORT int32_t rv_dom_html_image_element_set_controls(RvNode* target, int32_t value);
 /* HTMLImageElement.width getter: attribute unsigned long width */
 RV_EXPORT int32_t rv_dom_html_image_element_get_width(RvNode* target, uint32_t* result);
@@ -1193,9 +1401,11 @@ RV_EXPORT int32_t rv_dom_html_image_element_set_referrer_policy(RvNode* target, 
 RV_EXPORT int32_t rv_dom_html_image_element_get_decoding(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.decoding setter: attribute DOMString decoding */
 RV_EXPORT int32_t rv_dom_html_image_element_set_decoding(RvNode* target, const char* value);
-/* HTMLImageElement.loading getter: attribute DOMString loading */
+/* HTMLImageElement.loading getter: attribute DOMString loading; RV_ERR_UNSUPPORTED while the setting
+ * LazyImageLoadingEnabled is off */
 RV_EXPORT int32_t rv_dom_html_image_element_get_loading(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLImageElement.loading setter: attribute DOMString loading */
+/* HTMLImageElement.loading setter: attribute DOMString loading; RV_ERR_UNSUPPORTED while the setting
+ * LazyImageLoadingEnabled is off */
 RV_EXPORT int32_t rv_dom_html_image_element_set_loading(RvNode* target, const char* value);
 /* HTMLImageElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_image_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -1242,9 +1452,11 @@ RV_EXPORT int32_t rv_dom_html_image_element_get_y(RvNode* target, int32_t* resul
 RV_EXPORT int32_t rv_dom_html_input_element_get_accept(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.accept setter: attribute DOMString accept */
 RV_EXPORT int32_t rv_dom_html_input_element_set_accept(RvNode* target, const char* value);
-/* HTMLInputElement.alpha getter: attribute boolean alpha */
+/* HTMLInputElement.alpha getter: attribute boolean alpha; RV_ERR_UNSUPPORTED while the setting
+ * InputTypeColorEnhancementsEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_get_alpha(RvNode* target, int32_t* result);
-/* HTMLInputElement.alpha setter: attribute boolean alpha */
+/* HTMLInputElement.alpha setter: attribute boolean alpha; RV_ERR_UNSUPPORTED while the setting
+ * InputTypeColorEnhancementsEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_set_alpha(RvNode* target, int32_t value);
 /* HTMLInputElement.alt getter: attribute DOMString alt */
 RV_EXPORT int32_t rv_dom_html_input_element_get_alt(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -1262,9 +1474,11 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_default_checked(RvNode* target, 
 RV_EXPORT int32_t rv_dom_html_input_element_get_checked(RvNode* target, int32_t* result);
 /* HTMLInputElement.checked setter: attribute boolean checked */
 RV_EXPORT int32_t rv_dom_html_input_element_set_checked(RvNode* target, int32_t value);
-/* HTMLInputElement.colorSpace getter: attribute DOMString colorSpace */
+/* HTMLInputElement.colorSpace getter: attribute DOMString colorSpace; RV_ERR_UNSUPPORTED while the setting
+ * InputTypeColorEnhancementsEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_get_color_space(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLInputElement.colorSpace setter: attribute DOMString colorSpace */
+/* HTMLInputElement.colorSpace setter: attribute DOMString colorSpace; RV_ERR_UNSUPPORTED while the setting
+ * InputTypeColorEnhancementsEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_set_color_space(RvNode* target, const char* value);
 /* HTMLInputElement.dirName getter: attribute DOMString dirName */
 RV_EXPORT int32_t rv_dom_html_input_element_get_dir_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -1358,9 +1572,11 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_src(RvNode* target, const char* 
 RV_EXPORT int32_t rv_dom_html_input_element_get_step(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.step setter: attribute DOMString step */
 RV_EXPORT int32_t rv_dom_html_input_element_set_step(RvNode* target, const char* value);
-/* HTMLInputElement.switch getter: attribute boolean switch */
+/* HTMLInputElement.switch getter: attribute boolean switch; RV_ERR_UNSUPPORTED while the setting SwitchControlEnabled
+ * is off */
 RV_EXPORT int32_t rv_dom_html_input_element_get_switch(RvNode* target, int32_t* result);
-/* HTMLInputElement.switch setter: attribute boolean switch */
+/* HTMLInputElement.switch setter: attribute boolean switch; RV_ERR_UNSUPPORTED while the setting SwitchControlEnabled
+ * is off */
 RV_EXPORT int32_t rv_dom_html_input_element_set_switch(RvNode* target, int32_t value);
 /* HTMLInputElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_input_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -1419,13 +1635,16 @@ RV_EXPORT int32_t rv_dom_html_input_element_get_capture(RvNode* target, char* bu
  * MEDIA_CAPTURE */
 RV_EXPORT int32_t rv_dom_html_input_element_set_capture(RvNode* target, const char* value);
 /* HTMLInputElement.popoverTargetElement getter: attribute Element? popoverTargetElement; *result is a new reference,
- * or NULL */
+ * or NULL; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_get_popover_target_element(RvNode* target, RvNode** result);
-/* HTMLInputElement.popoverTargetElement setter: attribute Element? popoverTargetElement; value may be NULL */
+/* HTMLInputElement.popoverTargetElement setter: attribute Element? popoverTargetElement; value may be NULL;
+ * RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_set_popover_target_element(RvNode* target, RvNode* value);
-/* HTMLInputElement.popoverTargetAction getter: attribute DOMString popoverTargetAction */
+/* HTMLInputElement.popoverTargetAction getter: attribute DOMString popoverTargetAction; RV_ERR_UNSUPPORTED while the
+ * setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_get_popover_target_action(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLInputElement.popoverTargetAction setter: attribute DOMString popoverTargetAction */
+/* HTMLInputElement.popoverTargetAction setter: attribute DOMString popoverTargetAction; RV_ERR_UNSUPPORTED while the
+ * setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_set_popover_target_action(RvNode* target, const char* value);
 /* HTMLInputElement.stepUp(optional long n = 1) -> undefined; n defaults to 1 in IDL */
 RV_EXPORT int32_t rv_dom_html_input_element_step_up(RvNode* target, int32_t n);
@@ -1433,7 +1652,8 @@ RV_EXPORT int32_t rv_dom_html_input_element_step_up(RvNode* target, int32_t n);
 RV_EXPORT int32_t rv_dom_html_input_element_step_down(RvNode* target, int32_t n);
 /* HTMLInputElement.checkValidity() -> boolean */
 RV_EXPORT int32_t rv_dom_html_input_element_check_validity(RvNode* target, int32_t* result);
-/* HTMLInputElement.reportValidity() -> boolean */
+/* HTMLInputElement.reportValidity() -> boolean; RV_ERR_UNSUPPORTED while the setting InteractiveFormValidationEnabled
+ * is off */
 RV_EXPORT int32_t rv_dom_html_input_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLInputElement.setCustomValidity(DOMString error) -> undefined */
 RV_EXPORT int32_t rv_dom_html_input_element_set_custom_validity(RvNode* target, const char* error);
@@ -1591,7 +1811,8 @@ RV_EXPORT int32_t rv_dom_html_output_element_get_validation_message(RvNode* targ
 RV_EXPORT int32_t rv_dom_html_output_element_get_labels(RvNode* target, RvNodeList** result);
 /* HTMLOutputElement.checkValidity() -> boolean */
 RV_EXPORT int32_t rv_dom_html_output_element_check_validity(RvNode* target, int32_t* result);
-/* HTMLOutputElement.reportValidity() -> boolean */
+/* HTMLOutputElement.reportValidity() -> boolean; RV_ERR_UNSUPPORTED while the setting
+ * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_output_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLOutputElement.setCustomValidity(DOMString error) -> undefined */
 RV_EXPORT int32_t rv_dom_html_output_element_set_custom_validity(RvNode* target, const char* error);
@@ -1678,12 +1899,21 @@ RV_EXPORT int32_t rv_dom_html_select_element_named_item(RvNode* target, const ch
 RV_EXPORT int32_t rv_dom_html_select_element_remove_0(RvNode* target);
 /* HTMLSelectElement.remove(long index) -> undefined */
 RV_EXPORT int32_t rv_dom_html_select_element_remove_1(RvNode* target, int32_t index);
+/* HTMLSelectElement.setItem(unsigned long index, HTMLOptionElement? option) -> undefined; option may be NULL */
+RV_EXPORT int32_t rv_dom_html_select_element_set_item(RvNode* target, uint32_t index, RvNode* option);
 /* HTMLSelectElement.checkValidity() -> boolean */
 RV_EXPORT int32_t rv_dom_html_select_element_check_validity(RvNode* target, int32_t* result);
-/* HTMLSelectElement.reportValidity() -> boolean */
+/* HTMLSelectElement.reportValidity() -> boolean; RV_ERR_UNSUPPORTED while the setting
+ * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_select_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLSelectElement.setCustomValidity(DOMString error) -> undefined */
 RV_EXPORT int32_t rv_dom_html_select_element_set_custom_validity(RvNode* target, const char* error);
+/* HTMLSlotElement */
+
+/* HTMLSlotElement.name getter: attribute DOMString name */
+RV_EXPORT int32_t rv_dom_html_slot_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLSlotElement.name setter: attribute DOMString name */
+RV_EXPORT int32_t rv_dom_html_slot_element_set_name(RvNode* target, const char* value);
 /* HTMLTextAreaElement */
 
 /* HTMLTextAreaElement.dirName getter: attribute DOMString dirName */
@@ -1770,7 +2000,8 @@ RV_EXPORT int32_t rv_dom_html_text_area_element_get_autocomplete(RvNode* target,
 RV_EXPORT int32_t rv_dom_html_text_area_element_set_autocomplete(RvNode* target, const char* value);
 /* HTMLTextAreaElement.checkValidity() -> boolean */
 RV_EXPORT int32_t rv_dom_html_text_area_element_check_validity(RvNode* target, int32_t* result);
-/* HTMLTextAreaElement.reportValidity() -> boolean */
+/* HTMLTextAreaElement.reportValidity() -> boolean; RV_ERR_UNSUPPORTED while the setting
+ * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_text_area_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLTextAreaElement.setCustomValidity(DOMString error) -> undefined */
 RV_EXPORT int32_t rv_dom_html_text_area_element_set_custom_validity(RvNode* target, const char* error);
@@ -1831,6 +2062,142 @@ RV_EXPORT int32_t rv_dom_dom_token_list_toggle(RvDOMTokenList* target, const cha
 RV_EXPORT int32_t rv_dom_dom_token_list_replace(RvDOMTokenList* target, const char* token, const char* new_token, int32_t* result);
 /* DOMTokenList.supports(DOMString token) -> boolean */
 RV_EXPORT int32_t rv_dom_dom_token_list_supports(RvDOMTokenList* target, const char* token, int32_t* result);
+/* DOMStringMap */
+
+/* DOMStringMap.namedItem(DOMString name) -> DOMString */
+RV_EXPORT int32_t rv_dom_dom_string_map_named_item(RvDOMStringMap* target, const char* name, char* buffer, int32_t capacity, int32_t* length);
+/* DOMStringMap.setNamedItem(DOMString name, DOMString value) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_string_map_set_named_item(RvDOMStringMap* target, const char* name, const char* value);
+/* DOMStringMap.deleteNamedProperty(DOMString name) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_string_map_delete_named_property(RvDOMStringMap* target, const char* name);
+/* AbstractRange */
+
+/* AbstractRange.startContainer getter: readonly attribute Node startContainer; *result is a new reference */
+RV_EXPORT int32_t rv_dom_abstract_range_get_start_container(RvAbstractRange* target, RvNode** result);
+/* AbstractRange.startOffset getter: readonly attribute unsigned long startOffset */
+RV_EXPORT int32_t rv_dom_abstract_range_get_start_offset(RvAbstractRange* target, uint32_t* result);
+/* AbstractRange.endContainer getter: readonly attribute Node endContainer; *result is a new reference */
+RV_EXPORT int32_t rv_dom_abstract_range_get_end_container(RvAbstractRange* target, RvNode** result);
+/* AbstractRange.endOffset getter: readonly attribute unsigned long endOffset */
+RV_EXPORT int32_t rv_dom_abstract_range_get_end_offset(RvAbstractRange* target, uint32_t* result);
+/* AbstractRange.collapsed getter: readonly attribute boolean collapsed */
+RV_EXPORT int32_t rv_dom_abstract_range_get_collapsed(RvAbstractRange* target, int32_t* result);
+/* Range */
+
+/* Range.commonAncestorContainer getter: readonly attribute Node? commonAncestorContainer; *result is a new reference,
+ * or NULL */
+RV_EXPORT int32_t rv_dom_range_get_common_ancestor_container(RvAbstractRange* target, RvNode** result);
+/* Range.setStart(Node node, unsigned long offset) -> undefined */
+RV_EXPORT int32_t rv_dom_range_set_start(RvAbstractRange* target, RvNode* node, uint32_t offset);
+/* Range.setEnd(Node node, unsigned long offset) -> undefined */
+RV_EXPORT int32_t rv_dom_range_set_end(RvAbstractRange* target, RvNode* node, uint32_t offset);
+/* Range.setStartBefore(Node node) -> undefined */
+RV_EXPORT int32_t rv_dom_range_set_start_before(RvAbstractRange* target, RvNode* node);
+/* Range.setStartAfter(Node node) -> undefined */
+RV_EXPORT int32_t rv_dom_range_set_start_after(RvAbstractRange* target, RvNode* node);
+/* Range.setEndBefore(Node node) -> undefined */
+RV_EXPORT int32_t rv_dom_range_set_end_before(RvAbstractRange* target, RvNode* node);
+/* Range.setEndAfter(Node node) -> undefined */
+RV_EXPORT int32_t rv_dom_range_set_end_after(RvAbstractRange* target, RvNode* node);
+/* Range.collapse(optional boolean toStart = false) -> undefined; to_start defaults to false in IDL */
+RV_EXPORT int32_t rv_dom_range_collapse(RvAbstractRange* target, int32_t to_start);
+/* Range.selectNode(Node node) -> undefined */
+RV_EXPORT int32_t rv_dom_range_select_node(RvAbstractRange* target, RvNode* node);
+/* Range.selectNodeContents(Node node) -> undefined */
+RV_EXPORT int32_t rv_dom_range_select_node_contents(RvAbstractRange* target, RvNode* node);
+/* Range.compareBoundaryPoints(unsigned short how, Range sourceRange) -> short */
+RV_EXPORT int32_t rv_dom_range_compare_boundary_points(RvAbstractRange* target, uint16_t how, RvAbstractRange* source_range, int16_t* result);
+/* Range.deleteContents() -> undefined */
+RV_EXPORT int32_t rv_dom_range_delete_contents(RvAbstractRange* target);
+/* Range.extractContents() -> DocumentFragment; *result is a new reference */
+RV_EXPORT int32_t rv_dom_range_extract_contents(RvAbstractRange* target, RvNode** result);
+/* Range.cloneContents() -> DocumentFragment; *result is a new reference */
+RV_EXPORT int32_t rv_dom_range_clone_contents(RvAbstractRange* target, RvNode** result);
+/* Range.insertNode(Node node) -> undefined */
+RV_EXPORT int32_t rv_dom_range_insert_node(RvAbstractRange* target, RvNode* node);
+/* Range.surroundContents(Node newParent) -> undefined */
+RV_EXPORT int32_t rv_dom_range_surround_contents(RvAbstractRange* target, RvNode* new_parent);
+/* Range.cloneRange() -> Range; *result is a new reference */
+RV_EXPORT int32_t rv_dom_range_clone_range(RvAbstractRange* target, RvAbstractRange** result);
+/* Range.detach() -> undefined */
+RV_EXPORT int32_t rv_dom_range_detach(RvAbstractRange* target);
+/* Range.isPointInRange(Node node, unsigned long offset) -> boolean */
+RV_EXPORT int32_t rv_dom_range_is_point_in_range(RvAbstractRange* target, RvNode* node, uint32_t offset, int32_t* result);
+/* Range.comparePoint(Node node, unsigned long offset) -> short */
+RV_EXPORT int32_t rv_dom_range_compare_point(RvAbstractRange* target, RvNode* node, uint32_t offset, int16_t* result);
+/* Range.intersectsNode(Node node) -> boolean */
+RV_EXPORT int32_t rv_dom_range_intersects_node(RvAbstractRange* target, RvNode* node, int32_t* result);
+/* Range.expand(optional DOMString unit) -> undefined; unit may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_range_expand(RvAbstractRange* target, const char* unit);
+/* Range.compareNode(Node node) -> short */
+RV_EXPORT int32_t rv_dom_range_compare_node(RvAbstractRange* target, RvNode* node, int16_t* result);
+/* Range.getBoundingClientRect() -> DOMRect; *result is a new reference */
+RV_EXPORT int32_t rv_dom_range_get_bounding_client_rect(RvAbstractRange* target, RvDOMRectReadOnly** result);
+/* Range.createContextualFragment((TrustedHTML or DOMString) fragment) -> DocumentFragment; *result is a new reference */
+RV_EXPORT int32_t rv_dom_range_create_contextual_fragment(RvAbstractRange* target, const char* fragment, RvNode** result);
+/* DOMSelection */
+
+/* DOMSelection.anchorNode getter: readonly attribute Node? anchorNode; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_dom_selection_get_anchor_node(RvDOMSelection* target, RvNode** result);
+/* DOMSelection.anchorOffset getter: readonly attribute unsigned long anchorOffset */
+RV_EXPORT int32_t rv_dom_dom_selection_get_anchor_offset(RvDOMSelection* target, uint32_t* result);
+/* DOMSelection.focusNode getter: readonly attribute Node? focusNode; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_dom_selection_get_focus_node(RvDOMSelection* target, RvNode** result);
+/* DOMSelection.focusOffset getter: readonly attribute unsigned long focusOffset */
+RV_EXPORT int32_t rv_dom_dom_selection_get_focus_offset(RvDOMSelection* target, uint32_t* result);
+/* DOMSelection.isCollapsed getter: readonly attribute boolean isCollapsed */
+RV_EXPORT int32_t rv_dom_dom_selection_get_is_collapsed(RvDOMSelection* target, int32_t* result);
+/* DOMSelection.rangeCount getter: readonly attribute unsigned long rangeCount */
+RV_EXPORT int32_t rv_dom_dom_selection_get_range_count(RvDOMSelection* target, uint32_t* result);
+/* DOMSelection.type getter: readonly attribute DOMString type */
+RV_EXPORT int32_t rv_dom_dom_selection_get_type(RvDOMSelection* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMSelection.direction getter: readonly attribute DOMString direction */
+RV_EXPORT int32_t rv_dom_dom_selection_get_direction(RvDOMSelection* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMSelection.baseNode getter: readonly attribute Node? baseNode; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_dom_selection_get_base_node(RvDOMSelection* target, RvNode** result);
+/* DOMSelection.baseOffset getter: readonly attribute unsigned long baseOffset */
+RV_EXPORT int32_t rv_dom_dom_selection_get_base_offset(RvDOMSelection* target, uint32_t* result);
+/* DOMSelection.extentNode getter: readonly attribute Node? extentNode; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_dom_selection_get_extent_node(RvDOMSelection* target, RvNode** result);
+/* DOMSelection.extentOffset getter: readonly attribute unsigned long extentOffset */
+RV_EXPORT int32_t rv_dom_dom_selection_get_extent_offset(RvDOMSelection* target, uint32_t* result);
+/* DOMSelection.getRangeAt(unsigned long index) -> Range; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_selection_get_range_at(RvDOMSelection* target, uint32_t index, RvAbstractRange** result);
+/* DOMSelection.addRange(Range range) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_selection_add_range(RvDOMSelection* target, RvAbstractRange* range);
+/* DOMSelection.removeRange(Range range) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_selection_remove_range(RvDOMSelection* target, RvAbstractRange* range);
+/* DOMSelection.removeAllRanges() -> undefined */
+RV_EXPORT int32_t rv_dom_dom_selection_remove_all_ranges(RvDOMSelection* target);
+/* DOMSelection.empty() -> undefined */
+RV_EXPORT int32_t rv_dom_dom_selection_empty(RvDOMSelection* target);
+/* DOMSelection.collapse(Node? node, optional unsigned long offset = 0) -> undefined; node may be NULL; offset
+ * defaults to 0 in IDL */
+RV_EXPORT int32_t rv_dom_dom_selection_collapse(RvDOMSelection* target, RvNode* node, uint32_t offset);
+/* DOMSelection.setPosition(Node? node, optional unsigned long offset = 0) -> undefined; node may be NULL; offset
+ * defaults to 0 in IDL */
+RV_EXPORT int32_t rv_dom_dom_selection_set_position(RvDOMSelection* target, RvNode* node, uint32_t offset);
+/* DOMSelection.collapseToStart() -> undefined */
+RV_EXPORT int32_t rv_dom_dom_selection_collapse_to_start(RvDOMSelection* target);
+/* DOMSelection.collapseToEnd() -> undefined */
+RV_EXPORT int32_t rv_dom_dom_selection_collapse_to_end(RvDOMSelection* target);
+/* DOMSelection.extend(Node node, optional unsigned long offset = 0) -> undefined; offset defaults to 0 in IDL */
+RV_EXPORT int32_t rv_dom_dom_selection_extend(RvDOMSelection* target, RvNode* node, uint32_t offset);
+/* DOMSelection.setBaseAndExtent(Node anchorNode, unsigned long anchorOffset, Node focusNode, unsigned long
+ * focusOffset) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_selection_set_base_and_extent(RvDOMSelection* target, RvNode* anchor_node, uint32_t anchor_offset, RvNode* focus_node, uint32_t focus_offset);
+/* DOMSelection.selectAllChildren(Node node) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_selection_select_all_children(RvDOMSelection* target, RvNode* node);
+/* DOMSelection.deleteFromDocument() -> undefined */
+RV_EXPORT int32_t rv_dom_dom_selection_delete_from_document(RvDOMSelection* target);
+/* DOMSelection.containsNode(Node node, optional boolean allowPartialContainment = false) -> boolean;
+ * allow_partial_containment defaults to false in IDL */
+RV_EXPORT int32_t rv_dom_dom_selection_contains_node(RvDOMSelection* target, RvNode* node, int32_t allow_partial_containment, int32_t* result);
+/* DOMSelection.toString() -> DOMString */
+RV_EXPORT int32_t rv_dom_dom_selection_to_string(RvDOMSelection* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMSelection.modify(optional DOMString alter, optional DOMString direction, optional DOMString granularity) ->
+ * undefined; alter may be NULL (absent); direction may be NULL (absent); granularity may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_dom_selection_modify(RvDOMSelection* target, const char* alter, const char* direction, const char* granularity);
 /* DOMRectReadOnly */
 
 /* DOMRectReadOnly.x getter: readonly attribute unrestricted double x */
@@ -2000,9 +2367,11 @@ RV_EXPORT int32_t rv_dom_pointer_event_get_tilt_x(RvEvent* target, int32_t* resu
 RV_EXPORT int32_t rv_dom_pointer_event_get_tilt_y(RvEvent* target, int32_t* result);
 /* PointerEvent.twist getter: readonly attribute long twist */
 RV_EXPORT int32_t rv_dom_pointer_event_get_twist(RvEvent* target, int32_t* result);
-/* PointerEvent.altitudeAngle getter: readonly attribute double altitudeAngle */
+/* PointerEvent.altitudeAngle getter: readonly attribute double altitudeAngle; RV_ERR_UNSUPPORTED while the setting
+ * AltitudeAngleEnabled is off */
 RV_EXPORT int32_t rv_dom_pointer_event_get_altitude_angle(RvEvent* target, double* result);
-/* PointerEvent.azimuthAngle getter: readonly attribute double azimuthAngle */
+/* PointerEvent.azimuthAngle getter: readonly attribute double azimuthAngle; RV_ERR_UNSUPPORTED while the setting
+ * AzimuthAngleEnabled is off */
 RV_EXPORT int32_t rv_dom_pointer_event_get_azimuth_angle(RvEvent* target, double* result);
 /* PointerEvent.pointerType getter: readonly attribute DOMString pointerType */
 RV_EXPORT int32_t rv_dom_pointer_event_get_pointer_type(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);

@@ -59,7 +59,7 @@ enum {
     RV_ERR_NOT_INPUT = -8,
     RV_ERR_UNSUPPORTED = -9,
     /* A generated function's handle argument is an object of another interface (RanvierWebCoreDom.h). */
-    RV_ERR_WRONG_INTERFACE = -10,
+    RV_ERR_WRONG_INTERFACE = -11,
 };
 
 /* String properties of rv_node_get_string and rv_node_set_string. */

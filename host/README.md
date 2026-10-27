@@ -12,7 +12,7 @@ The C ABI Ranvier's WebCore view calls, built as `RanvierWebCoreHost.dll`.
     did.
 - `RanvierWebCoreDom.h`, `RanvierWebCoreDom.cpp` and `dom/`: the generated DOM functions, one per IDL member
   of the interfaces `gen/dom.json` lists (`docs/GENERATOR.md`). `dom/RanvierDomGlue.cpp` compiles into WebCore
-  through patch 0011, and the host re-exports each of its functions under its `rv_dom_` name. Written by
+  through patch 0012, and the host re-exports each of its functions under its `rv_dom_` name. Written by
   `gen/domgen.py`; edit the generator or `gen/dom.json`, then run it.
 - `RanvierWebCoreHost.cmake`: appended to `Tools/TestWebKitAPI/CMakeLists.txt` by `build.py prepare`. The
   target links TestWebCore's libraries without `gtest` and `WebCoreTestSupport`.

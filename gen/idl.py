@@ -78,13 +78,32 @@ class Interface:
 
 
 @dataclass
+class DictionaryMember:
+    name: str
+    type: Type
+    required: bool = False
+    default: str | None = None
+    attrs: dict = field(default_factory=dict)
+
+
+@dataclass
+class Dictionary:
+    name: str
+    base: str | None = None
+    partial: bool = False
+    attrs: dict = field(default_factory=dict)
+    members: list = field(default_factory=list)
+    file: str = ""
+
+
+@dataclass
 class Document:
     file: str
     interfaces: list = field(default_factory=list)
     includes: list = field(default_factory=list)  # (target, mixin, attrs)
     typedefs: dict = field(default_factory=dict)
     enums: dict = field(default_factory=dict)  # name -> (values, attrs)
-    dictionaries: set = field(default_factory=set)
+    dictionaries: dict = field(default_factory=dict)  # name -> Dictionary
     callbacks: set = field(default_factory=set)
 
 
@@ -180,6 +199,8 @@ class Parser:
                         if part != ",":
                             parts.append(part)
                     value = parts
+                elif self.peek() in ("[", "{"):
+                    value = self.take() + self.take()
                 else:
                     parts = [self.take()]
                     # Values such as Conditional=A&B, A|B or a qualified name.
@@ -330,8 +351,28 @@ class Parser:
                 continue
             if word == "dictionary":
                 self.take()
-                document.dictionaries.add(self.take())
-                self.skip_to_semicolon()
+                name = self.take()
+                base = self.take() if self.accept(":") else None
+                dictionary = Dictionary(name, base, partial, attrs, file=self.file)
+                self.take("{")
+                while not self.accept("}"):
+                    member_attrs = self.extended_attributes()
+                    required = self.accept("required")
+                    member_type = self.type()
+                    member_name = self.take()
+                    default = None
+                    if self.accept("="):
+                        if self.peek() in ("[", "{"):
+                            default = self.take() + self.take()
+                        else:
+                            default = self.take()
+                    self.take(";")
+                    dictionary.members.append(DictionaryMember(member_name, member_type, required, default, member_attrs))
+                self.take(";")
+                if partial and name in document.dictionaries:
+                    document.dictionaries[name].members += dictionary.members
+                else:
+                    document.dictionaries.setdefault(name, dictionary) if partial else document.dictionaries.__setitem__(name, dictionary)
                 continue
             if word == "enum":
                 self.take()

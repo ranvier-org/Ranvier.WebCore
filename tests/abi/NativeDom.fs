@@ -9,7 +9,7 @@ let private Lib = "RanvierWebCoreHost"
 
 /// <summary>RV_ERR_WRONG_INTERFACE: a handle's object does not implement the member's interface.</summary>
 [<Literal>]
-let WrongInterface = -10
+let WrongInterface = -11
 
 [<Literal>]
 let RV_DOM_NODE_ELEMENT_NODE = 1
@@ -66,6 +66,30 @@ let RV_DOM_NODE_DOCUMENT_POSITION_CONTAINED_BY = 16
 let RV_DOM_NODE_DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32
 
 [<Literal>]
+let RV_DOM_RANGE_START_TO_START = 0
+
+[<Literal>]
+let RV_DOM_RANGE_START_TO_END = 1
+
+[<Literal>]
+let RV_DOM_RANGE_END_TO_END = 2
+
+[<Literal>]
+let RV_DOM_RANGE_END_TO_START = 3
+
+[<Literal>]
+let RV_DOM_RANGE_NODE_BEFORE = 0
+
+[<Literal>]
+let RV_DOM_RANGE_NODE_AFTER = 1
+
+[<Literal>]
+let RV_DOM_RANGE_NODE_BEFORE_AND_AFTER = 2
+
+[<Literal>]
+let RV_DOM_RANGE_NODE_INSIDE = 3
+
+[<Literal>]
 let RV_DOM_EVENT_NONE = 0
 
 [<Literal>]
@@ -99,6 +123,21 @@ let RV_DOM_KEYBOARD_EVENT_DOM_KEY_LOCATION_RIGHT = 2
 let RV_DOM_KEYBOARD_EVENT_DOM_KEY_LOCATION_NUMPAD = 3
 
 [<Literal>]
+let RV_DOM_ARIA_NOTIFICATION_INTERRUPT_NONE = 0
+
+[<Literal>]
+let RV_DOM_ARIA_NOTIFICATION_INTERRUPT_ALL = 1
+
+[<Literal>]
+let RV_DOM_ARIA_NOTIFICATION_INTERRUPT_PENDING = 2
+
+[<Literal>]
+let RV_DOM_ARIA_NOTIFICATION_PRIORITY_NORMAL = 0
+
+[<Literal>]
+let RV_DOM_ARIA_NOTIFICATION_PRIORITY_HIGH = 1
+
+[<Literal>]
 let RV_DOM_DOCUMENT_READY_STATE_LOADING = 0
 
 [<Literal>]
@@ -106,6 +145,15 @@ let RV_DOM_DOCUMENT_READY_STATE_INTERACTIVE = 1
 
 [<Literal>]
 let RV_DOM_DOCUMENT_READY_STATE_COMPLETE = 2
+
+[<Literal>]
+let RV_DOM_SCROLL_BEHAVIOR_AUTO = 0
+
+[<Literal>]
+let RV_DOM_SCROLL_BEHAVIOR_INSTANT = 1
+
+[<Literal>]
+let RV_DOM_SCROLL_BEHAVIOR_SMOOTH = 2
 
 [<Literal>]
 let RV_DOM_SHADOW_ROOT_MODE_USER_AGENT = 0
@@ -128,6 +176,60 @@ let RV_DOM_VISIBILITY_STATE_HIDDEN = 0
 [<Literal>]
 let RV_DOM_VISIBILITY_STATE_VISIBLE = 1
 
+/// <summary>The IDL dictionary GetRootNodeOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomGetRootNodeOptions =
+    val mutable size: uint32
+    val mutable composed: int
+
+/// <summary>The IDL dictionary AriaNotifyOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomAriaNotifyOptions =
+    val mutable size: uint32
+    val mutable priority: nativeint
+    val mutable interrupt: nativeint
+
+/// <summary>The IDL dictionary ShadowRootInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomShadowRootInit =
+    val mutable size: uint32
+    val mutable mode: int
+    val mutable delegates_focus: int
+    val mutable clonable: int
+    val mutable serializable: int
+    val mutable slot_assignment: int
+
+/// <summary>The IDL dictionary CheckVisibilityOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomCheckVisibilityOptions =
+    val mutable size: uint32
+    val mutable opacity_property: int
+    val mutable visibility_property: int
+    val mutable content_visibility_auto: int
+    val mutable check_opacity: int
+    val mutable check_visibility_css: int
+
+/// <summary>The IDL dictionary ScrollToOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomScrollToOptions =
+    val mutable size: uint32
+    val mutable behavior: int
+    val mutable left: nativeint
+    val mutable top: nativeint
+
+/// <summary>The IDL dictionary ShowPopoverOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomShowPopoverOptions =
+    val mutable size: uint32
+    val mutable source: nativeint
+
+/// <summary>The IDL dictionary FocusOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomFocusOptions =
+    val mutable size: uint32
+    val mutable prevent_scroll: int
+    val mutable focus_visible: nativeint
+
 [<DllImport(Lib)>]
 extern void rv_dom_css_style_declaration_release(nativeint handle)
 
@@ -139,6 +241,24 @@ extern void rv_dom_dom_token_list_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_dom_token_list_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_dom_string_map_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_dom_string_map_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_abstract_range_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_abstract_range_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_dom_selection_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_dom_selection_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern void rv_dom_dom_rect_read_only_release(nativeint handle)
@@ -208,6 +328,9 @@ extern int rv_dom_node_get_text_content(nativeint target, byte[] buffer, int cap
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_set_text_content(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_node_get_root_node(nativeint target, [<In>] RvDomGetRootNodeOptions[] options, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_has_child_nodes(nativeint target, int& result)
@@ -288,6 +411,9 @@ extern int rv_dom_character_data_remove(nativeint target)
 extern int rv_dom_text_get_whole_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
+extern int rv_dom_text_get_assigned_slot(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_text_split_text(nativeint target, uint32 offset, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -348,7 +474,16 @@ extern int rv_dom_shadow_root_get_fullscreen_element(nativeint target, nativeint
 extern int rv_dom_shadow_root_get_pointer_lock_element(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_shadow_root_get_inner_html(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_shadow_root_set_inner_html(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_shadow_root_element_from_point(nativeint target, float x, float y, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_shadow_root_set_html_unsafe(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string html)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_compat_mode(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -462,13 +597,25 @@ extern int rv_dom_document_create_attribute_ns(nativeint target, [<MarshalAs(Unm
 extern int rv_dom_document_create_event(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_document_create_range(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_caret_range_from_point(nativeint target, int x, int y, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_document_aria_notify(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_aria_notify_2(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement, [<In>] RvDomAriaNotifyOptions[] options)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_elements_by_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string element_name, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_has_focus(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_exec_command(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string command_id, int show_ui, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_query_command_enabled(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string command_id, int& result)
@@ -484,6 +631,9 @@ extern int rv_dom_document_query_command_supported(nativeint target, [<MarshalAs
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_query_command_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string command_id, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_get_selection(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_move_before(nativeint target, nativeint node, nativeint child)
@@ -568,6 +718,12 @@ extern int rv_dom_element_get_client_height(nativeint target, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_current_css_zoom(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_get_outer_html(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_outer_html(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_role(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -858,6 +1014,15 @@ extern int rv_dom_element_get_last_element_child(nativeint target, nativeint& re
 extern int rv_dom_element_get_child_element_count(nativeint target, uint32& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_element_get_assigned_slot(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_get_inner_html(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_inner_html(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_element_has_attributes(nativeint target, int& result)
 
 [<DllImport(Lib)>]
@@ -865,6 +1030,12 @@ extern int rv_dom_element_get_attribute(nativeint target, [<MarshalAs(UnmanagedT
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_attribute_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_attribute(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_attribute_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_remove_attribute(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name)
@@ -897,6 +1068,9 @@ extern int rv_dom_element_set_attribute_node_ns(nativeint target, nativeint attr
 extern int rv_dom_element_remove_attribute_node(nativeint target, nativeint attr, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_element_attach_shadow(nativeint target, [<In>] RvDomShadowRootInit[] init, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_element_closest(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -921,19 +1095,37 @@ extern int rv_dom_element_insert_adjacent_text(nativeint target, [<MarshalAs(Unm
 extern int rv_dom_element_aria_notify(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement)
 
 [<DllImport(Lib)>]
+extern int rv_dom_element_aria_notify_2(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement, [<In>] RvDomAriaNotifyOptions[] options)
+
+[<DllImport(Lib)>]
 extern int rv_dom_element_get_bounding_client_rect(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_check_visibility(nativeint target, [<In>] RvDomCheckVisibilityOptions[] options, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_scroll_1(nativeint target, [<In>] RvDomScrollToOptions[] options)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_scroll(nativeint target, float x, float y)
 
 [<DllImport(Lib)>]
+extern int rv_dom_element_scroll_to_1(nativeint target, [<In>] RvDomScrollToOptions[] options)
+
+[<DllImport(Lib)>]
 extern int rv_dom_element_scroll_to(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_scroll_by_1(nativeint target, [<In>] RvDomScrollToOptions[] options)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_scroll_by(nativeint target, float x, float y)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_scroll_into_view_if_needed(nativeint target, int center_if_needed)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_insert_adjacent_html(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string position, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string text)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_set_pointer_capture(nativeint target, int pointer_id)
@@ -955,6 +1147,9 @@ extern int rv_dom_element_query_selector(nativeint target, [<MarshalAs(Unmanaged
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_query_selector_all(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_set_html_unsafe(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string html)
 
 [<DllImport(Lib)>]
 extern int rv_dom_attr_get_namespace_uri(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -1131,6 +1326,9 @@ extern int rv_dom_html_element_get_input_mode(nativeint target, byte[] buffer, i
 extern int rv_dom_html_element_set_input_mode(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_html_element_get_dataset(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_html_element_get_nonce(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
@@ -1155,7 +1353,13 @@ extern int rv_dom_html_element_get_style(nativeint target, nativeint& result)
 extern int rv_dom_html_element_click(nativeint target)
 
 [<DllImport(Lib)>]
+extern int rv_dom_html_element_show_popover(nativeint target, [<In>] RvDomShowPopoverOptions[] options)
+
+[<DllImport(Lib)>]
 extern int rv_dom_html_element_hide_popover(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_element_focus(nativeint target, [<In>] RvDomFocusOptions[] options)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_blur(nativeint target)
@@ -1591,6 +1795,9 @@ extern int rv_dom_html_form_element_get_elements(nativeint target, nativeint& re
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_length(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_form_element_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_reset(nativeint target)
@@ -2364,6 +2571,9 @@ extern int rv_dom_html_select_element_remove_0(nativeint target)
 extern int rv_dom_html_select_element_remove_1(nativeint target, int index)
 
 [<DllImport(Lib)>]
+extern int rv_dom_html_select_element_set_item(nativeint target, uint32 index, nativeint option)
+
+[<DllImport(Lib)>]
 extern int rv_dom_html_select_element_check_validity(nativeint target, int& result)
 
 [<DllImport(Lib)>]
@@ -2371,6 +2581,12 @@ extern int rv_dom_html_select_element_report_validity(nativeint target, int& res
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_select_element_set_custom_validity(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string error)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_slot_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_slot_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_dir_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -2575,6 +2791,189 @@ extern int rv_dom_dom_token_list_replace(nativeint target, [<MarshalAs(Unmanaged
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_token_list_supports(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string token, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_string_map_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_string_map_set_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_string_map_delete_named_property(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name)
+
+[<DllImport(Lib)>]
+extern int rv_dom_abstract_range_get_start_container(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_abstract_range_get_start_offset(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_abstract_range_get_end_container(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_abstract_range_get_end_offset(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_abstract_range_get_collapsed(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_get_common_ancestor_container(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_set_start(nativeint target, nativeint node, uint32 offset)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_set_end(nativeint target, nativeint node, uint32 offset)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_set_start_before(nativeint target, nativeint node)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_set_start_after(nativeint target, nativeint node)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_set_end_before(nativeint target, nativeint node)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_set_end_after(nativeint target, nativeint node)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_collapse(nativeint target, int to_start)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_select_node(nativeint target, nativeint node)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_select_node_contents(nativeint target, nativeint node)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_compare_boundary_points(nativeint target, uint16 how, nativeint source_range, int16& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_delete_contents(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_extract_contents(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_clone_contents(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_insert_node(nativeint target, nativeint node)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_surround_contents(nativeint target, nativeint new_parent)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_clone_range(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_detach(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_is_point_in_range(nativeint target, nativeint node, uint32 offset, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_compare_point(nativeint target, nativeint node, uint32 offset, int16& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_intersects_node(nativeint target, nativeint node, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_expand(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string unit)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_compare_node(nativeint target, nativeint node, int16& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_get_bounding_client_rect(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_range_create_contextual_fragment(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string fragment, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_anchor_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_anchor_offset(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_focus_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_focus_offset(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_is_collapsed(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_range_count(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_direction(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_base_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_base_offset(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_extent_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_extent_offset(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_get_range_at(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_add_range(nativeint target, nativeint range)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_remove_range(nativeint target, nativeint range)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_remove_all_ranges(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_empty(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_collapse(nativeint target, nativeint node, uint32 offset)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_set_position(nativeint target, nativeint node, uint32 offset)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_collapse_to_start(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_collapse_to_end(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_extend(nativeint target, nativeint node, uint32 offset)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_set_base_and_extent(nativeint target, nativeint anchor_node, uint32 anchor_offset, nativeint focus_node, uint32 focus_offset)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_select_all_children(nativeint target, nativeint node)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_delete_from_document(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_contains_node(nativeint target, nativeint node, int allow_partial_containment, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_to_string(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_selection_modify(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string alter, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string direction, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string granularity)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_rect_read_only_get_x(nativeint target, float& result)

@@ -1,10 +1,11 @@
 # The patch series
 
 `patches/series` lists twelve patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010 and 0011, changes nothing unless
+`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010 and 0012, changes nothing unless
 its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
 WebKit's own sources. 0010 changes which symbols WebCore exports and which members the host may override,
-and no behavior. 0011 adds the sources an embedder names to WebCore.
+and no behavior. 0012 adds the sources an embedder names to WebCore. Number 0011 belongs to the accessibility
+series, which is merged separately.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in two places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
@@ -27,7 +28,7 @@ The sizes are the reduction each patch measured when it was added, on Windows x6
 | 0008-inspector-stub | `USE_INSPECTOR_STUB` | | 1.44 MB |
 | 0009-jsc-inspector-stub | `USE_JSC_INSPECTOR_STUB` | `USE_INSPECTOR_STUB` | 0.98 MB |
 | 0010-embedder-clients | none, always applies | | |
-| 0011-embedder-sources | none, always applies; `WebCore_EMBEDDER_SOURCES` names the sources | | |
+| 0012-embedder-sources | none, always applies; `WebCore_EMBEDDER_SOURCES` names the sources | | |
 
 ## Conventions
 
@@ -202,7 +203,7 @@ macOS). It changes symbol visibility and `final` keywords, and no behavior.
 - `PlatformCocoa.cmake` keeps `css/CSSComputedStyleDeclaration.h` and `animation/KeyframeEffect.h` among the
   forwarded headers. On macOS it removes both by default.
 
-## 0011-embedder-sources
+## 0012-embedder-sources
 
 Adds the sources of the cache variable `WebCore_EMBEDDER_SOURCES` to WebCore's, outside the unified build, in
 `Source/WebCore/CMakeLists.txt`. With the variable empty it adds none. `config/common.cmake` sets it to

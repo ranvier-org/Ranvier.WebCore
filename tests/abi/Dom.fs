@@ -1,6 +1,7 @@
 /// Checks the generated DOM functions of RanvierWebCoreDom.h (gen/domgen.py): attribute getters and setters of each
 /// type mapping, operations with optional and nullable arguments, interface checks, DOM exceptions, the object
-/// handle types, enumerations, events and the thread check.
+/// handle types, enumerations, events, string unions, dictionaries, Range and Selection, settings and the thread
+/// check.
 module RanvierWebCoreAbi.Dom
 
 open System.Threading
@@ -270,6 +271,140 @@ let run (_: string) =
 
     first.Click ()
     require (List.ofSeq seen = [ "click:1:True:True" ]) $"event getters in a listener: {List.ofSeq seen}"
+
+    // String unions: innerHTML and setAttribute take (TrustedHTML or DOMString) as a C string.
+    use holder = host.CreateElement "div"
+
+    rv_dom_element_set_inner_html (holder.Handle, "<b>bold</b>")
+    |> check "element_set_inner_html"
+
+    let inner =
+        text "element_get_inner_html" (fun b c l -> rv_dom_element_get_inner_html (holder.Handle, b, c, l))
+
+    require (inner = "<b>bold</b>") $"Element.innerHTML through a string union: {inner}"
+
+    rv_dom_element_set_attribute (holder.Handle, "data-y", "2")
+    |> check "element_set_attribute"
+
+    let dataY =
+        text "element_get_attribute" (fun b c l -> rv_dom_element_get_attribute (holder.Handle, "data-y", b, c, l))
+
+    require (dataY = "2") "Element.setAttribute through a string union"
+
+    // DOMStringMap: the named getter, setter and deleter of dataset.
+    let mutable dataset = 0n
+
+    rv_dom_html_element_get_dataset (box.Handle, &dataset)
+    |> check "html_element_get_dataset"
+
+    let named key =
+        text "dom_string_map_named_item" (fun b c l -> rv_dom_dom_string_map_named_item (dataset, key, b, c, l))
+
+    require (named "x" = "1") "dataset.x"
+
+    rv_dom_dom_string_map_set_named_item (dataset, "fooBar", "v")
+    |> check "dom_string_map_set_named_item"
+
+    require (attribute "data-foo-bar" = "v") "dataset.fooBar sets data-foo-bar"
+
+    rv_dom_dom_string_map_delete_named_property (dataset, "fooBar")
+    |> check "dom_string_map_delete_named_property"
+
+    require (isNull (attribute "data-foo-bar")) "deleting dataset.fooBar removes data-foo-bar"
+    rv_dom_dom_string_map_release dataset
+
+    // Range and Selection: a Range handle is an RvAbstractRange, and Selection takes it.
+    let mutable range = 0n
+
+    rv_dom_document_create_range (document.Handle, &range)
+    |> check "document_create_range"
+
+    rv_dom_range_select_node_contents (range, first.Handle)
+    |> check "range_select_node_contents"
+
+    let mutable collapsed = -1
+
+    rv_dom_abstract_range_get_collapsed (range, &collapsed)
+    |> check "abstract_range_get_collapsed"
+
+    require (collapsed = 0) "a range over a span's contents is not collapsed"
+    let mutable selection = 0n
+
+    rv_dom_document_get_selection (document.Handle, &selection)
+    |> check "document_get_selection"
+
+    rv_dom_dom_selection_remove_all_ranges selection
+    |> check "dom_selection_remove_all_ranges"
+
+    rv_dom_dom_selection_add_range (selection, range)
+    |> check "dom_selection_add_range"
+
+    let mutable ranges = 0u
+
+    rv_dom_dom_selection_get_range_count (selection, &ranges)
+    |> check "dom_selection_get_range_count"
+
+    let selected =
+        text "dom_selection_to_string" (fun b c l -> rv_dom_dom_selection_to_string (selection, b, c, l))
+
+    require (ranges = 1u && selected = "one") $"Selection.addRange and toString: {ranges} {selected}"
+
+    rv_dom_dom_selection_remove_all_ranges selection
+    |> check "dom_selection_remove_all_ranges"
+
+    rv_dom_dom_selection_release selection
+    rv_dom_abstract_range_release range
+
+    // HTMLSlotElement.
+    use slot = host.CreateElement "slot"
+
+    rv_dom_html_slot_element_set_name (slot.Handle, "header")
+    |> check "html_slot_element_set_name"
+
+    let slotName =
+        text "html_slot_element_get_name" (fun b c l -> rv_dom_html_slot_element_get_name (slot.Handle, b, c, l))
+
+    require (slotName = "header") "HTMLSlotElement.name"
+
+    // A dictionary argument: getRootNode({ composed }) from inside a shadow tree, with NULL for the defaults and a
+    // size that leaves composed out.
+    use page = host.Body ()
+    use shadowHost = host.CreateElement "div"
+    page.Append shadowHost
+    let mutable attachStatus = 0
+    use openShadow = new Node(rv_element_attach_shadow (shadowHost.Handle, &attachStatus))
+    use inShadow = host.CreateElement "span"
+    openShadow.Append inShadow
+
+    let rootOf (options: RvDomGetRootNodeOptions[]) =
+        let mutable root = 0n
+
+        rv_dom_node_get_root_node (inShadow.Handle, options, &root)
+        |> check "node_get_root_node"
+
+        rv_node_release root
+        root
+
+    let full =
+        System.Runtime.InteropServices.Marshal.SizeOf<RvDomGetRootNodeOptions> () |> uint32
+
+    let mutable composed = RvDomGetRootNodeOptions ()
+    composed.size <- full
+    composed.composed <- 1
+    let mutable truncated = composed
+    truncated.size <- 4u
+    require (rootOf null = openShadow.Handle) "getRootNode with NULL options is the shadow root"
+    require (rootOf [| composed |] = document.Handle) "getRootNode({ composed: true }) is the document"
+    require (rootOf [| truncated |] = openShadow.Handle) "a field past size takes its IDL default"
+
+    // [EnabledBySetting]: InputTypeColorEnhancementsEnabled is off by default, HeadingOffsetEnabled on.
+    let mutable alpha = 0
+    let alphaStatus = rv_dom_html_input_element_get_alpha (field.Handle, &alpha)
+    require (alphaStatus = -9) $"a member whose setting is off returns RV_ERR_UNSUPPORTED, got {alphaStatus}"
+    let mutable offset = 0u
+
+    rv_dom_html_element_get_heading_offset (box.Handle, &offset)
+    |> check "html_element_get_heading_offset"
 
     // The thread check.
     let mutable threadStatus = 0
