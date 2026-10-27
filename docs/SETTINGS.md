@@ -75,7 +75,7 @@ stream. The Cocoa port links libwebrtc into WebCore whatever these options say (
 in `OptionsCocoa.cmake`). Cutting these would need patches that edit WebKit's C++, which this repository's
 patch rules leave out.
 
-The patch series: the patches hook the Windows platform files, so on macOS only 0001 and 0011 act; 0011's option is declared in `OptionsCommon.cmake`, which every port reads. Its option
+The patch series: the patches hook the Windows platform files, so on macOS only 0001, 0011 and 0013 act; 0011's option is declared in `OptionsCommon.cmake`, which every port reads, and 0013's, `USE_UNBUNDLED_LOCALIZED_STRINGS`, in `OptionsMac.cmake`, set by `mac.cmake` for every flavor because the package loads WebCore outside its framework bundle. 0001's option
 lives in ANGLE's own `CMakeLists.txt`, which every port reads, so the slim flavor links `ANGLEStub` in
 place of ANGLE here too. 0005's hunk in `WebCore/CMakeLists.txt` keeps WebKit's event list unless a
 platform file names another. The lean flavor has not been built on macOS.

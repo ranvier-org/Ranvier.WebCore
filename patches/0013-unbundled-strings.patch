@@ -1,0 +1,35 @@
+diff --git a/Source/WebCore/platform/LocalizedStrings.cpp b/Source/WebCore/platform/LocalizedStrings.cpp
+index a46b587..2f0bbb4 100644
+--- a/Source/WebCore/platform/LocalizedStrings.cpp
++++ b/Source/WebCore/platform/LocalizedStrings.cpp
+@@ -101,6 +101,12 @@ RetainPtr<CFStringRef> copyLocalizedString(CFStringRef key)
+ {
+     static CFStringRef notFound = CFSTR("localized string not found");
+ 
++#if USE(UNBUNDLED_LOCALIZED_STRINGS)
++    // CFBundleCopyLocalizedString dereferences a null bundle.
++    if (!webCoreBundleSingleton())
++        return key;
++#endif
++
+     auto result = adoptCF(CFBundleCopyLocalizedString(webCoreBundleSingleton(), key, notFound, nullptr));
+ 
+ #if ASSERT_ENABLED
+diff --git a/Source/cmake/OptionsMac.cmake b/Source/cmake/OptionsMac.cmake
+index a490228..cac324c 100644
+--- a/Source/cmake/OptionsMac.cmake
++++ b/Source/cmake/OptionsMac.cmake
+@@ -143,6 +143,13 @@ WEBKIT_OPTION_DEFAULT_PORT_VALUE(ENABLE_IPC_TESTING_SWIFT PRIVATE ON)
+ 
+ WEBKIT_OPTION_END()
+ 
++# WebCore loaded outside its framework bundle, as a plain dylib, has no bundle to read its localized strings from.
++# With this option each localized string is its key, the English text, as on the Windows port.
++option(USE_UNBUNDLED_LOCALIZED_STRINGS "Answer WebCore's localized strings with their keys when WebCore has no bundle" OFF)
++if (USE_UNBUNDLED_LOCALIZED_STRINGS)
++    SET_AND_EXPOSE_TO_BUILD(USE_UNBUNDLED_LOCALIZED_STRINGS ON)
++endif ()
++
+ # -----------------------------------------------------------------------------
+ # Toolchain / SDK resolution
+ # -----------------------------------------------------------------------------

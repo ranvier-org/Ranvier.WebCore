@@ -38,12 +38,17 @@ def report_crash(started, stage, rid, temp):
     symbols = stage / 'symbols' / rid
     for report in found:
         print('== crash report', report.name, flush=True)
-        text = report.read_text(errors='replace')
-        header, _, body = text.partition(chr(10))
-        try:
-            crash = json.loads(body)
-        except ValueError:
-            print(text[:20000], flush=True)
+        # ReportCrash may still be writing the report: read it until its body parses.
+        crash = None
+        for _ in range(15):
+            header, _, body = report.read_text(errors='replace').partition(chr(10))
+            try:
+                crash = json.loads(body)
+                break
+            except ValueError:
+                time.sleep(2)
+        if crash is None:
+            print(body[:4000], flush=True)
             continue
         print(json.dumps({k: crash.get(k) for k in ('exception', 'termination', 'faultingThread', 'asi')}, indent=1)[:4000], flush=True)
         images = crash.get('usedImages', [])
