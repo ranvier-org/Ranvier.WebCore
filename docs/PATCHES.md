@@ -178,10 +178,10 @@ macOS). It changes symbol visibility and `final` keywords, and no behavior.
 - `ResizeObserver.h` and `IntersectionObserver.h` export each observer's `create`, `observe`, `unobserve`,
   `disconnect` and destructor.
 - `ClipboardEvent.h`, `DragEvent.h` and `StaticPasteboard.h` export their classes. `DataTransfer.h`
-  exports eight members:
+  exports nine members:
   - `createForCopyAndPaste` and `createForDrop`;
   - `types`, `getData` and `setData`;
-  - `dropEffect`, `destinationOperationMask` and `setSourceOperationMask`.
+  - `dropEffect`, `sourceOperationMask`, `destinationOperationMask` and `setSourceOperationMask`.
 
   With them the host fires `copy`, `cut`, `paste` and the drag events with a `clipboardData` or
   `dataTransfer` the page can read and set.

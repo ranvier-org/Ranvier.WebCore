@@ -68,6 +68,11 @@
 #include <WebCore/Chrome.h>
 #include <WebCore/ClipboardEvent.h>
 #include <WebCore/DragActions.h>
+#include <WebCore/DragClient.h>
+#include <WebCore/DragController.h>
+#include <WebCore/DragItem.h>
+#include <WebCore/HTMLNames.h>
+#include <wtf/SetForScope.h>
 #include <WebCore/DragEvent.h>
 #include <WebCore/VisiblePosition.h>
 #include <WebCore/DataTransfer.h>
@@ -429,6 +434,17 @@ private:
     TextChecker m_textCheckerClient;
 };
 
+// The host whose rv_host_mouse call is running; the drag client reads it, having no page of its own.
+static RvHost* inputHost;
+
+// Hands drags out of the page to the app's drag start callback, in the App drag style.
+class RvDragClient final : public DragClient {
+    void willPerformDragDestinationAction(DragDestinationAction, const DragData&) final { }
+    void willPerformDragSourceAction(DragSourceAction, const IntPoint&, DataTransfer&) final { }
+    OptionSet<DragSourceAction> dragSourceActionMaskForPoint(const IntPoint&) final;
+    void startDrag(DragItem, DataTransfer&, Frame&, const std::optional<NodeIdentifier>&) final;
+};
+
 // createPage and loadHTML follow WebCore's testing/TestPage.cpp (Copyright (C) 2026 Apple Inc., BSD-2-Clause).
 static Ref<Page> createPage(IntSize viewportSize)
 {
@@ -440,6 +456,7 @@ static Ref<Page> createPage(IntSize viewportSize)
     auto configuration = pageConfigurationWithEmptyClients(std::nullopt, PAL::SessionID::defaultSessionID());
     configuration.chromeClient = makeUniqueRef<RvChromeClient>();
     configuration.editorClient = makeUniqueRef<RvEditorClient>();
+    configuration.dragClient = makeUnique<RvDragClient>();
     Ref page = Page::create(WTF::move(configuration));
     page->settings().setScriptEnabled(false);
     page->settings().setScrollAnimatorEnabled(false);
@@ -495,6 +512,10 @@ struct RvHost {
     int32_t dragStyle { RV_DRAG_DOM };
     // The element under a drag from outside, which received dragenter.
     RefPtr<Element> dragTarget;
+    // Where the last mouse press was, in CSS pixels of the viewport: where a drag out of the page starts.
+    IntPoint pressPoint;
+    RvDragStartCallback dragStartCallback { nullptr };
+    void* dragStartContext { nullptr };
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
@@ -942,7 +963,7 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 19; }
+int32_t rv_abi_version(void) { return 20; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -956,7 +977,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2008,6 +2029,10 @@ int32_t rv_host_mouse(RvHost* host, int32_t action, int32_t x, int32_t y, int32_
     PlatformMouseEvent mouse(position, position, button == RV_BUTTON_NONE ? MouseButton::None : static_cast<MouseButton>(button),
         types[action], clickCount, platformModifiers(modifiers), MonotonicTime::now(), 0, SyntheticClickType::NoTap, MouseEventInputSource::UserDriven);
     Ref frame = host->frame();
+    if (action == RV_MOUSE_DOWN)
+        host->pressPoint = { x, y };
+    // The drag client finds the host of a drag that starts during this call here.
+    SetForScope dragHost { inputHost, host };
     return handleInput(*host, [&] {
         auto& handler = frame->eventHandler();
         switch (action) {
@@ -3315,4 +3340,146 @@ int32_t rv_host_drag(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t
     });
     host->document().updateStyleIfNeeded();
     return status == RV_OK ? operation : status;
+}
+
+struct RvDrag {
+    RvHost* host;
+    Vector<std::pair<String, String>> items;
+    // The dragged element; null for a selection.
+    RefPtr<Element> source;
+    IntPoint start;
+};
+
+static int32_t dropMask(OptionSet<DragOperation> operations)
+{
+    return (operations.containsAny({ DragOperation::Copy, DragOperation::Generic }) ? RV_DROP_COPY : 0)
+        | (operations.contains(DragOperation::Move) ? RV_DROP_MOVE : 0)
+        | (operations.contains(DragOperation::Link) ? RV_DROP_LINK : 0);
+}
+
+OptionSet<DragSourceAction> RvDragClient::dragSourceActionMaskForPoint(const IntPoint&)
+{
+    if (!inputHost || inputHost->dragStyle != RV_DRAG_APP || !inputHost->dragStartCallback)
+        return { };
+    return anyDragSourceAction();
+}
+
+// The element a drag from the press point moves: the nearest draggable element, link or image around it.
+static RefPtr<Element> dragSource(Document& document, IntPoint point)
+{
+    for (RefPtr element = document.elementFromPoint(point.x(), point.y(), HitTestSource::User); element; element = element->parentElement()) {
+        if (equalLettersIgnoringASCIICase(element->attributeWithoutSynchronization(HTMLNames::draggableAttr), "true"_s)
+            || element->hasTagName(HTMLNames::imgTag) || (element->hasTagName(HTMLNames::aTag) && element->hasAttributeWithoutSynchronization(HTMLNames::hrefAttr)))
+            return element;
+    }
+    return nullptr;
+}
+
+void RvDragClient::startDrag(DragItem item, DataTransfer& dataTransfer, Frame&, const std::optional<NodeIdentifier>&)
+{
+    auto* host = inputHost;
+    if (!host || !host->dragStartCallback)
+        return;
+    auto* drag = new RvDrag { host, { }, nullptr, host->pressPoint };
+    // The DataTransfer is no longer readable; its pasteboard holds the page's data and WebCore's own.
+    auto& pasteboard = dataTransfer.pasteboard();
+    for (auto& type : pasteboard.typesForLegacyUnsafeBindings()) {
+        auto value = pasteboard.readString(type);
+        if (value.isEmpty())
+            value = pasteboard.readStringInCustomData(type);
+        drag->items.append({ type, value });
+    }
+    if (drag->items.isEmpty() && !item.url.isEmpty()) {
+        drag->items.append({ "text/uri-list"_s, item.url.string() });
+        drag->items.append({ "text/plain"_s, item.url.string() });
+    }
+    if (drag->items.isEmpty() && item.sourceAction == DragSourceAction::Selection) {
+        auto& editor = host->frame().editor();
+        drag->items.append({ "text/plain"_s, editor.selectedText() });
+        if (auto range = host->frame().selection().selection().toNormalizedRange())
+            drag->items.append({ "text/html"_s, serializePreservingVisualAppearance(*range) });
+    }
+    if (item.sourceAction != DragSourceAction::Selection)
+        drag->source = dragSource(host->document(), host->pressPoint);
+    host->dragStartCallback(host->dragStartContext, reinterpret_cast<RvDrag*>(drag), drag->start.x(), drag->start.y(),
+        dropMask(dataTransfer.sourceOperationMask()));
+}
+
+int32_t rv_host_set_drag_start(RvHost* host, RvDragStartCallback callback, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->dragStartCallback = callback;
+    host->dragStartContext = callback ? context : nullptr;
+    return RV_OK;
+}
+
+int32_t rv_drag_item_count(RvDrag* drag)
+{
+    if (!drag)
+        return RV_ERR_NULL_ARGUMENT;
+    return static_cast<int32_t>(drag->items.size());
+}
+
+int32_t rv_drag_item_type(RvDrag* drag, int32_t index, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!drag)
+        return RV_ERR_NULL_ARGUMENT;
+    if (index < 0 || static_cast<size_t>(index) >= drag->items.size())
+        return RV_ERR_UNSUPPORTED;
+    return copyString(drag->items[index].first, buffer, capacity, length);
+}
+
+int32_t rv_drag_item_value(RvDrag* drag, int32_t index, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!drag)
+        return RV_ERR_NULL_ARGUMENT;
+    if (index < 0 || static_cast<size_t>(index) >= drag->items.size())
+        return RV_ERR_UNSUPPORTED;
+    return copyString(drag->items[index].second, buffer, capacity, length);
+}
+
+RvDragData* rv_drag_data(RvDrag* drag)
+{
+    if (!drag)
+        return nullptr;
+    return new RvDragData { drag->items };
+}
+
+int32_t rv_drag_image(RvDrag* drag, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height, int32_t* offsetX, int32_t* offsetY)
+{
+    if (!drag || !width || !height || !offsetX || !offsetY)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!drag->source)
+        return RV_ERR_UNSUPPORTED;
+    auto rect = drag->source->boundingClientRect();
+    auto scale = drag->host->deviceScale;
+    *offsetX = static_cast<int32_t>((drag->start.x() - rect.x()) * scale);
+    *offsetY = static_cast<int32_t>((drag->start.y() - rect.y()) * scale);
+    return rv_element_snapshot(reinterpret_cast<RvNode*>(drag->source.get()), rgba, length, width, height);
+}
+
+int32_t rv_drag_end(RvDrag* drag, int32_t x, int32_t y, int32_t operation)
+{
+    if (!drag)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    std::unique_ptr<RvDrag> ended { drag };
+    auto& host = *drag->host;
+    Ref frame = host.frame();
+    DoublePoint position { static_cast<double>(x), static_cast<double>(y) };
+    PlatformMouseEvent release(position, position, MouseButton::Left, PlatformEvent::Type::MouseReleased, 0, { }, MonotonicTime::now(), 0,
+        SyntheticClickType::NoTap, MouseEventInputSource::UserDriven);
+    auto status = dispatchCountingFailures([&] {
+        frame->eventHandler().dragSourceEndedAt(release, dragOperations(operation));
+        if (RefPtr page = frame->page())
+            page->dragController().dragEnded();
+    });
+    host.document().updateStyleIfNeeded();
+    return status;
 }

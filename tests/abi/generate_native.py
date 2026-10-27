@@ -156,6 +156,10 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvClipboardRead</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ClipboardRead = delegate of context: nativeint * request: nativeint -> unit",
+        "",
+        "/// <summary>The <c>RvDragStartCallback</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type DragStartCallback = delegate of context: nativeint * drag: nativeint * x: int * y: int * allowed: int -> unit",
     ]
 
     found = declarations(header)

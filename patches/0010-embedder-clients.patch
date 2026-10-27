@@ -116,7 +116,7 @@ index de29befa1d..0b0d5b841d 100644
  public:
      virtual ~ClipboardEvent();
 diff --git a/Source/WebCore/dom/DataTransfer.h b/Source/WebCore/dom/DataTransfer.h
-index 46a710b321..f53c0c9787 100644
+index 46a710b321..c25d2ef380 100644
 --- a/Source/WebCore/dom/DataTransfer.h
 +++ b/Source/WebCore/dom/DataTransfer.h
 @@ -50,19 +50,19 @@ public:
@@ -165,9 +165,10 @@ index 46a710b321..f53c0c9787 100644
  
      bool dropEffectIsUninitialized() const { return m_dropEffect == "uninitialized"_s; }
  
-     OptionSet<DragOperation> sourceOperationMask() const;
+-    OptionSet<DragOperation> sourceOperationMask() const;
 -    OptionSet<DragOperation> destinationOperationMask() const;
 -    void setSourceOperationMask(OptionSet<DragOperation>);
++    WEBCORE_EXPORT OptionSet<DragOperation> sourceOperationMask() const;
 +    WEBCORE_EXPORT OptionSet<DragOperation> destinationOperationMask() const;
 +    WEBCORE_EXPORT void setSourceOperationMask(OptionSet<DragOperation>);
      void setDestinationOperationMask(OptionSet<DragOperation>);

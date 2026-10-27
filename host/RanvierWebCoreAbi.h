@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 19.
+ * Ranvier native WebCore C ABI, version 20.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -747,6 +747,34 @@ RV_EXPORT void rv_drag_data_release(RvDragData*);
  * when a listener cancelled dragover, else RV_DROP_COPY for text over editable content, else RV_DROP_NONE.
  * A drop that no listener cancels inserts the text, or the HTML, into editable content at the point. */
 RV_EXPORT int32_t rv_host_drag(RvHost*, int32_t action, int32_t x, int32_t y, int32_t allowed, RvDragData* data, int32_t modifiers);
+
+/* v20: "drag-out" for rv_abi_has: drags that start in the page. */
+
+typedef struct RvDrag RvDrag;
+
+/* Called on the host thread when the user drags a draggable element, a link, an image or a selection with
+ * the mouse, in the App drag style, after the page's dragstart listeners have set the data. x and y are where
+ * the press was, in CSS pixels of the viewport; allowed holds the RV_DROP_* operations the page allows. The
+ * app reads the drag's data and image, runs the drag, such as an OS drag session or a drag inside the page
+ * fed back through rv_host_drag, and ends it with rv_drag_end. */
+typedef void (*RvDragStartCallback)(void* context, RvDrag* drag, int32_t x, int32_t y, int32_t allowed);
+
+/* Sets the host's drag start callback, or with a NULL callback removes it. Without one, or in the DOM style,
+ * no drag starts in the page. */
+RV_EXPORT int32_t rv_host_set_drag_start(RvHost*, RvDragStartCallback callback, void* context);
+RV_EXPORT int32_t rv_drag_item_count(RvDrag*);
+/* Copies the type or the value of the drag's item at index. */
+RV_EXPORT int32_t rv_drag_item_type(RvDrag*, int32_t index, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_drag_item_value(RvDrag*, int32_t index, char* buffer, int32_t capacity, int32_t* length);
+/* A copy of the drag's items as drag data, for rv_host_drag; released with rv_drag_data_release. */
+RV_EXPORT RvDragData* rv_drag_data(RvDrag*);
+/* Paints the dragged element as rv_element_snapshot does, and writes where the press was within the image,
+ * in device pixels, to *offsetX and *offsetY. RV_ERR_UNSUPPORTED for a selection drag, which has no element. */
+RV_EXPORT int32_t rv_drag_image(RvDrag*, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height, int32_t* offsetX, int32_t* offsetY);
+/* Ends the drag at x, y CSS pixels of the viewport with the RV_DROP_* operation the drop target accepted, or
+ * RV_DROP_NONE when the drag was cancelled: the page's dragend fires with it. The drag is invalid after the
+ * call. */
+RV_EXPORT int32_t rv_drag_end(RvDrag*, int32_t x, int32_t y, int32_t operation);
 
 #ifdef __cplusplus
 }
