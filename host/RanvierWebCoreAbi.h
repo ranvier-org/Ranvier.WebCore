@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 15.
+ * Ranvier native WebCore C ABI, version 16.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -609,6 +609,15 @@ RV_EXPORT void rv_observer_release(RvObserver*);
  * *width and *height; when length is below width * height * 4 it returns RV_ERR_BUFFER_TOO_SMALL with the
  * size written and rgba untouched. */
 RV_EXPORT int32_t rv_element_snapshot(RvNode*, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height);
+
+/* v16: "partial-paint" for rv_abi_has. */
+
+/* Paints the area x, y, width, height, in CSS pixels of the viewport and clipped to it, into its place in
+ * rgba, an image of rv_host_paint_size as rv_host_paint_rgba writes, and leaves the rest of rgba as it was.
+ * After a full paint, painting rv_host_dirty_rect each frame keeps the image current. The dirty rectangle is
+ * cleared when the area contains it. At a fractional device scale the area's edges are rounded down to whole
+ * device pixels. */
+RV_EXPORT int32_t rv_host_paint_rgba_rect(RvHost*, uint8_t* rgba, int32_t length, int32_t x, int32_t y, int32_t width, int32_t height);
 
 #ifdef __cplusplus
 }

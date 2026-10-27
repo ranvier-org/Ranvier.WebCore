@@ -846,7 +846,7 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 15; }
+int32_t rv_abi_version(void) { return 16; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -860,7 +860,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1015,45 +1015,79 @@ void rv_node_release(RvNode* target)
         node(target)->deref();
 }
 
+// Paints area, in CSS pixels of the viewport, into its place in rgba, an image of paintSize.
+static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect area)
+{
+    auto pixelSize = paintSize(host);
+    size_t required = static_cast<size_t>(pixelSize.width()) * pixelSize.height() * 4;
+    if (length < 0 || static_cast<size_t>(length) < required)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    area.intersect({ { }, host.size });
+    host.inFrame = true;
+    host.frameRequested = false;
+    host.document().updateLayoutIgnorePendingStylesheets();
+    RefPtr view = host.frame().view();
+    if (!view) {
+        host.inFrame = false;
+        return RV_ERR_PAINT_FAILED;
+    }
+    view->updateLayoutAndStyleIfNeededRecursive();
+    RefPtr<ImageBuffer> buffer;
+    if (!area.isEmpty()) {
+        buffer = ImageBuffer::create(FloatSize { area.size() }, RenderingMode::Unaccelerated,
+            RenderingPurpose::Unspecified, host.deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+        if (buffer) {
+            buffer->context().translate(-area.x(), -area.y());
+            view->paint(buffer->context(), area);
+        }
+    }
+    // A paint of part of the viewport leaves invalidations outside it for a later paint.
+    if (area.contains(host.dirty))
+        host.dirty = { };
+    host.inFrame = false;
+    if (area.isEmpty())
+        return RV_OK;
+    if (!buffer)
+        return RV_ERR_PAINT_FAILED;
+    buffer->flushDrawingContext();
+    PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
+    // getPixelBuffer takes CSS pixels and scales them as paintSize does.
+    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, area.size() });
+    if (!pixels)
+        return RV_ERR_PAINT_FAILED;
+    auto origin = area.location();
+    origin.scale(host.deviceScale);
+    auto columns = std::min(pixels->size().width(), pixelSize.width() - origin.x());
+    auto rows = std::min(pixels->size().height(), pixelSize.height() - origin.y());
+    auto source = pixels->bytes();
+    for (int row = 0; row < rows; ++row) {
+        std::memcpy(rgba + (static_cast<size_t>(origin.y() + row) * pixelSize.width() + origin.x()) * 4,
+            source.data() + static_cast<size_t>(row) * pixels->size().width() * 4, static_cast<size_t>(columns) * 4);
+    }
+    // An update wanted during the paint, such as a layout that started an animation, needs another frame.
+    if (host.updateWanted)
+        host.requestFrame();
+    return RV_OK;
+}
+
 int32_t rv_host_paint_rgba(RvHost* host, uint8_t* rgba, int32_t length)
 {
     if (!host || !rgba)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    auto size = host->size;
-    auto pixelSize = paintSize(*host);
-    size_t required = static_cast<size_t>(pixelSize.width()) * pixelSize.height() * 4;
-    if (length < 0 || static_cast<size_t>(length) < required)
-        return RV_ERR_BUFFER_TOO_SMALL;
-    host->inFrame = true;
-    host->frameRequested = false;
-    host->document().updateLayoutIgnorePendingStylesheets();
-    RefPtr view = host->frame().view();
-    if (!view) {
-        host->inFrame = false;
-        return RV_ERR_PAINT_FAILED;
-    }
-    view->updateLayoutAndStyleIfNeededRecursive();
-    auto buffer = ImageBuffer::create(FloatSize { size }, RenderingMode::Unaccelerated,
-        RenderingPurpose::Unspecified, host->deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
-    if (buffer)
-        view->paint(buffer->context(), IntRect { { }, size });
-    host->dirty = { };
-    host->inFrame = false;
-    if (!buffer)
-        return RV_ERR_PAINT_FAILED;
-    buffer->flushDrawingContext();
-    PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
-    // getPixelBuffer takes CSS pixels and scales them as paintSize does.
-    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, size });
-    if (!pixels || pixels->bytes().size() != required)
-        return RV_ERR_PAINT_FAILED;
-    std::memcpy(rgba, pixels->bytes().data(), required);
-    // An update wanted during the paint, such as a layout that started an animation, needs another frame.
-    if (host->updateWanted)
-        host->requestFrame();
-    return RV_OK;
+    return paintArea(*host, rgba, length, { { }, host->size });
+}
+
+int32_t rv_host_paint_rgba_rect(RvHost* host, uint8_t* rgba, int32_t length, int32_t x, int32_t y, int32_t width, int32_t height)
+{
+    if (!host || !rgba)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (width < 0 || height < 0)
+        return RV_ERR_UNSUPPORTED;
+    return paintArea(*host, rgba, length, { x, y, width, height });
 }
 
 RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t capture,
