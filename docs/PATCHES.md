@@ -9,7 +9,7 @@ and no behavior. 0011 adds the sources an embedder names to WebCore.
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in two places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
 `CryptoKeyRSA.h`, and 0010 changes `EmptyClients.h`, `ChromeClient.h`, `WebAnimation.h`, `CSSTransition.h`, `Element.h` and
-`Document.h`, and exports from `ResizeObserver.h` and `IntersectionObserver.h`. It also changes `PlatformCocoa.cmake`. The patches touch 63 files in all.
+`Document.h`, and exports from `ResizeObserver.h`, `IntersectionObserver.h` and `Pasteboard.h`. It also changes `PlatformCocoa.cmake`. The patches touch 68 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -186,6 +186,11 @@ macOS). It changes symbol visibility and `final` keywords, and no behavior.
 
   With them the host fires `copy`, `cut`, `paste` and the drag events with a `clipboardData` or
   `dataTransfer` the page can read and set.
+- `Pasteboard.h` declares `Pasteboard`'s allocator with `WTF_MAKE_TZONE_ALLOCATED_EXPORT(Pasteboard,
+  WEBCORE_EXPORT)` in place of `WTF_MAKE_TZONE_ALLOCATED`. On macOS, where TZone allocation is on, this
+  exports `Pasteboard::operatorNewSlow`, which the host's `makeUnique<StaticPasteboard>()` calls through the
+  inherited `operator new`; without it `RanvierWebCoreHost` fails to link. Elsewhere the macro falls back to
+  fast malloc either way.
 - `Headers.cmake` forwards these headers:
   - `dom/InputEvent.h`, `dom/ShadowRootInit.h`, `dom/ClipboardEvent.h` and `dom/DragEvent.h`;
   - `platform/StaticPasteboard.h`;
