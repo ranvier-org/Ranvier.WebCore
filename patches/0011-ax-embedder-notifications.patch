@@ -1,5 +1,5 @@
 diff --git a/Source/WebCore/accessibility/AXObjectCache.cpp b/Source/WebCore/accessibility/AXObjectCache.cpp
-index eb66c9a..f16a621 100644
+index eb66c9a..ac46b61 100644
 --- a/Source/WebCore/accessibility/AXObjectCache.cpp
 +++ b/Source/WebCore/accessibility/AXObjectCache.cpp
 @@ -1722,6 +1722,9 @@ void AXObjectCache::handleAllDeferredChildrenChanged()
@@ -57,15 +57,16 @@ index eb66c9a..f16a621 100644
  #endif
      platformHandleFocusedUIElementChanged(protect(getOrCreate(oldElement)), protect(getOrCreate(newElement)));
  
-@@ -3024,6 +3051,7 @@ void AXObjectCache::postTextStateChangeNotification(Node* node, const AXTextStat
- #if PLATFORM(COCOA) || USE(ATSPI)
-     stopCachingComputedObjectAttributes();
+@@ -3080,6 +3107,8 @@ void AXObjectCache::postTextStateChangeNotification(AccessibilityObject* object,
+         axObject = rootWebArea();
  
-+    postEmbedderTextNotification(getOrCreate(*node), AXNotification::SelectedTextChanged);
-     postTextStateChangeNotification(protect(getOrCreate(*node)), intent, selection);
- #else
-     postNotification(node->renderer(), AXNotification::SelectedTextChanged, PostTarget::ObservableParent);
-@@ -3115,6 +3143,7 @@ void AXObjectCache::postTextStateChangeNotification(Node* node, AXTextEditType t
+     if (axObject) {
++        // The Cocoa and AT-SPI layers post selection changes directly; Windows queues them (FrameSelection.cpp).
++        postEmbedderNotification(*axObject, AXNotification::SelectedTextChanged);
+         const AXTextStateChangeIntent& newIntent = (intent.type == AXTextStateChangeType::Unknown || (m_isSynchronizingSelection && m_textSelectionIntent.type != AXTextStateChangeType::Unknown)) ? m_textSelectionIntent : intent;
+ 
+ #if PLATFORM(COCOA)
+@@ -3115,6 +3144,7 @@ void AXObjectCache::postTextStateChangeNotification(Node* node, AXTextEditType t
      stopCachingComputedObjectAttributes();
  
      RefPtr object = getOrCreate(node);
@@ -73,7 +74,7 @@ index eb66c9a..f16a621 100644
  #if PLATFORM(COCOA) || USE(ATSPI)
      if (object)
          object = object->observableObject();
-@@ -3152,6 +3181,7 @@ void AXObjectCache::postTextReplacementNotification(Node* node, AXTextEditType d
+@@ -3152,6 +3182,7 @@ void AXObjectCache::postTextReplacementNotification(Node* node, AXTextEditType d
      stopCachingComputedObjectAttributes();
  
      RefPtr object = getOrCreate(*node);
@@ -81,7 +82,7 @@ index eb66c9a..f16a621 100644
  #if PLATFORM(COCOA) || USE(ATSPI)
      if (object)
          object = object->observableObject();
-@@ -3175,6 +3205,7 @@ void AXObjectCache::postTextReplacementNotificationForTextControl(HTMLTextFormCo
+@@ -3175,6 +3206,7 @@ void AXObjectCache::postTextReplacementNotificationForTextControl(HTMLTextFormCo
      stopCachingComputedObjectAttributes();
  
      RefPtr object = getOrCreate(textControl);
@@ -89,7 +90,7 @@ index eb66c9a..f16a621 100644
  #if PLATFORM(COCOA) || USE(ATSPI)
      if (object)
          object = object->observableObject();
-@@ -3475,6 +3506,7 @@ void AXObjectCache::handleActiveDescendantChange(Element& element, const AtomStr
+@@ -3475,6 +3507,7 @@ void AXObjectCache::handleActiveDescendantChange(Element& element, const AtomStr
  #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
          setIsolatedTreeFocusedObject(activeDescendant.get());
  #endif
@@ -97,7 +98,7 @@ index eb66c9a..f16a621 100644
          postPlatformNotification(*activeDescendant, AXNotification::FocusedUIElementChanged);
      }
  
-@@ -3501,6 +3533,7 @@ void AXObjectCache::handleActiveDescendantChange(Element& element, const AtomStr
+@@ -3501,6 +3534,7 @@ void AXObjectCache::handleActiveDescendantChange(Element& element, const AtomStr
          updateIsolatedTree(target.get(), AXNotification::ActiveDescendantChanged);
  #endif
  
@@ -105,7 +106,7 @@ index eb66c9a..f16a621 100644
      postPlatformNotification(*target, AXNotification::ActiveDescendantChanged);
  
      // Table cell active descendant changes should trigger selected cell changes.
-@@ -5742,6 +5775,7 @@ void AXObjectCache::handleMenuListValueChanged(Element& element)
+@@ -5742,6 +5776,7 @@ void AXObjectCache::handleMenuListValueChanged(Element& element)
      updateIsolatedTree(*object, AXNotification::MenuListValueChanged);
  #endif
  
