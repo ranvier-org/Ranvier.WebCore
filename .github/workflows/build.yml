@@ -24,17 +24,25 @@ concurrency:
 
 jobs:
   plan:
-    # The matrix, filtered by the manual run's rids input.
+    # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
+    # package, attached by scripts/release.py as the repository owner, that runtime goes to prebuilt instead.
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
+      prebuilt: ${{ steps.plan.outputs.prebuilt }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: pins.json
+          sparse-checkout-cone-mode: false
       - id: plan
         shell: python
         env:
           RIDS: ${{ inputs.rids }}
+          FLAVOR: ${{ inputs.flavor || 'slim' }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          import json, os
+          import json, os, urllib.error, urllib.request
           # A WebKit build needs about 10 GB of disk and runs for hours on the standard runners.
           runtimes = [
               # work: a short root on Windows, where WebKit's generated paths exceed MAX_PATH under the
@@ -51,11 +59,73 @@ jobs:
           include = [r for r in runtimes if not wanted or r['rid'] in wanted]
           if not include:
               raise SystemExit(f'no runtime matches {wanted}')
+          prebuilt = []
+          ref, owner = os.environ['GITHUB_REF'], os.environ['GITHUB_REPOSITORY_OWNER']
+          if ref.startswith('refs/tags/v'):
+              tag = ref.removeprefix('refs/tags/')
+              request = urllib.request.Request(
+                  f"{os.environ['GITHUB_API_URL']}/repos/{os.environ['GITHUB_REPOSITORY']}/releases/tags/{tag}",
+                  headers={'Authorization': f"Bearer {os.environ['GH_TOKEN']}", 'Accept': 'application/vnd.github+json'})
+              try:
+                  release = json.load(urllib.request.urlopen(request, timeout=60))
+              except urllib.error.HTTPError as error:
+                  if error.code != 404:
+                      raise
+                  release = None
+              # Only the owner's: anyone who can push a tag could otherwise attach a package to be published.
+              assets = {a['name'] for a in release['assets'] if a['uploader']['login'] == owner} \
+                  if release and release['author']['login'] == owner else set()
+              package = json.load(open('pins.json'))['package']['id'] + ('' if os.environ['FLAVOR'] == 'slim' else '.Lean')
+              for runtime in include:
+                  name = f"{package}.{runtime['rid']}.{tag[1:]}.nupkg"
+                  if name in assets:
+                      prebuilt.append(dict(runtime, asset=name))
+          build = [r for r in include if r['rid'] not in {p['rid'] for p in prebuilt}]
+          print('build:', *(r['rid'] for r in build), '- prebuilt:', *(p['rid'] for p in prebuilt))
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
-              out.write('matrix=' + json.dumps(dict(include=include)) + '\n')
+              # An empty string for an empty list, which the jobs' conditions test.
+              out.write('matrix=' + (json.dumps(dict(include=build)) if build else '') + '\n')
+              out.write('prebuilt=' + (json.dumps(dict(include=prebuilt)) if prebuilt else '') + '\n')
+
+  prebuilt:
+    # A runtime whose package was built and checked on the owner's machine by scripts/release.py: checked
+    # again here, on a clean runner of its platform, against the tag's commit, then passed to publish.
+    needs: plan
+    if: needs.plan.outputs.prebuilt != ''
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.prebuilt) }}
+    runs-on: ${{ matrix.runner }}
+    env:
+      FLAVOR: ${{ inputs.flavor || 'slim' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Download the package from the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download "$GITHUB_REF_NAME" --pattern '${{ matrix.asset }}' --dir packages
+
+      - name: Check the package and paint a page
+        shell: bash
+        run: >-
+          python scripts/smoke.py --package 'packages/${{ matrix.asset }}' --expect-commit "$GITHUB_SHA"
+          --expect-version "${GITHUB_REF_NAME#v}" --expect-flavor "$FLAVOR"
+          ${{ startsWith(matrix.rid, 'linux') && '--no-load' || '' }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: packages/*.nupkg
 
   native:
     needs: plan
+    if: needs.plan.outputs.matrix != ''
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
@@ -234,40 +304,10 @@ jobs:
           name: symbols-${{ matrix.rid }}-${{ env.FLAVOR }}
           path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/symbols
 
-      - name: Load the host and paint a page
-        # The library loads from the staged package, with its siblings found through @loader_path: no staged
-        # library names the build tree. Python's main thread is the process's main thread, which WebCore on
-        # Cocoa requires.
-        if: runner.os == 'macOS'
-        shell: python
-        run: |
-          import ctypes, json, os, pathlib, subprocess
-          out = pathlib.Path(os.environ['RANVIER_WORK']) / 'out' / os.environ['FLAVOR']
-          native = out / 'runtimes/${{ matrix.rid }}/native'
-          manifest = json.loads((out / 'manifest.json').read_text())
-          build = str(out.parents[1] / f"build-{os.environ['FLAVOR']}")
-          for path in sorted(native.glob('*.dylib')):
-              commands = subprocess.run(['otool', '-l', str(path)], capture_output=True, text=True, check=True).stdout
-              assert build not in commands, f'{path.name} names the build tree'
-          lib = ctypes.CDLL(str(native / 'libRanvierWebCoreHost.dylib'))
-          lib.rv_host_create.restype = ctypes.c_void_p
-          lib.rv_host_create.argtypes = [ctypes.c_int32, ctypes.c_int32]
-          lib.rv_host_load_html.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
-          lib.rv_host_paint_rgba.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int32]
-          lib.rv_host_destroy.argtypes = [ctypes.c_void_p]
-          abi = lib.rv_abi_version()
-          print('rv_abi_version', abi, '- manifest', manifest['abi'])
-          assert abi == manifest['abi']
-          host = lib.rv_host_create(32, 32)
-          assert host
-          assert lib.rv_host_load_html(host, b'<body style="margin:0;background:#f00"><div style="width:8px;height:8px;background:#00f"></div>') == 0
-          rgba = ctypes.create_string_buffer(32 * 32 * 4)
-          assert lib.rv_host_paint_rgba(host, rgba, len(rgba)) == 0
-          pixel = lambda x, y: tuple(rgba.raw[(y * 32 + x) * 4:(y * 32 + x) * 4 + 4])
-          print('pixel (2, 2)', pixel(2, 2), 'pixel (20, 20)', pixel(20, 20))
-          near = lambda actual, expected: all(abs(a - e) <= 2 for a, e in zip(actual, expected))
-          assert near(pixel(2, 2), (0, 0, 255, 255)) and near(pixel(20, 20), (255, 0, 0, 255))
-          lib.rv_host_destroy(host)
+      - name: Check the staged files and paint a page
+        # scripts/smoke.py, as a local build.py all runs it: the host loads from the staged package, and on macOS
+        # no staged library names the build tree. On Linux, loading is untested and the step checks the manifest.
+        run: python scripts/build.py smoke --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
       - name: Upload the CMake logs on failure
         if: failure()
@@ -284,10 +324,10 @@ jobs:
     # On a version tag, pushes the packages to nuget.org through trusted publishing: the job exchanges
     # GitHub's OIDC token for a one-hour API key under the nuget.org account in the repository variable
     # NUGET_USER, whose trusted publishing policy names this file. Without NUGET_USER, the packages stay
-    # as workflow artifacts. Each runtime's package stands alone, so the packages of the runtimes that built
-    # are pushed even when another runtime failed.
+    # as workflow artifacts. Each runtime's package stands alone, so the packages that built, or that the
+    # release held and prebuilt checked, are pushed even when another runtime failed.
     if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' }}
-    needs: native
+    needs: [native, prebuilt]
     runs-on: ubuntu-latest
     permissions:
       id-token: write

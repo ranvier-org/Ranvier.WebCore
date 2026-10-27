@@ -7,6 +7,8 @@
 #
 #   patches.py apply  --source DIR                   reset the series' files to the pin, then apply the series
 #   patches.py check  COMMIT --source DIR            dry-run the series against another WebKit commit
+#   patches.py verify [PATH...] --source DIR         fail if a tracked file differs from the pin and neither the series
+#                                                    nor PATHs write it: an edit that apply leaves in place
 #   patches.py export NAME PATH... --source DIR      write NAME.patch from PATHs' changes against the pin with the
 #                                                    patches before NAME in series applied (all of them for a new NAME)
 import argparse, json, pathlib, re, subprocess, sys, tempfile
@@ -14,7 +16,7 @@ import argparse, json, pathlib, re, subprocess, sys, tempfile
 here = pathlib.Path(__file__).resolve().parents[1] / 'patches'
 pin = json.loads((here.parent / 'pins.json').read_text())['webkit']['commit']
 parser = argparse.ArgumentParser()
-parser.add_argument('command', choices=['apply', 'check', 'export'])
+parser.add_argument('command', choices=['apply', 'check', 'verify', 'export'])
 parser.add_argument('args', nargs='*')
 parser.add_argument('--source', required=True)
 args = parser.parse_args()
@@ -46,6 +48,14 @@ if args.command == 'apply':
         print(patch.name, 'applied' if not result.returncode else 'FAILED\n' + result.stderr)
         if result.returncode:
             sys.exit(1)
+elif args.command == 'verify':
+    # apply resets only the series' files, so an edit to any other file survives into a build.
+    written = set(args.args) | {path for patch in series() for path in touched(patch)}
+    changed = git('diff', '--name-only', pin).stdout.splitlines()
+    strays = sorted(set(changed) - written)
+    for path in strays:
+        print('differs from the pin, outside the series:', path)
+    sys.exit(1 if strays else 0)
 elif args.command == 'check':
     commit, = args.args
     failed = 0

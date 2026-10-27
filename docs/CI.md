@@ -43,15 +43,46 @@ Homebrew install four times, and apt's `Acquire::Retries=5`.
 
 ## Local runs
 
-The same steps run on a workstation:
+The same steps run on a workstation, ending with the same check CI runs (`scripts/smoke.py`: the staged
+files match the manifest, and the host loads from them and paints a page):
 
 ```
 python -I scripts/build.py all --work C:/rw
 ```
 
 Options point at existing checkouts and tools instead of fetching them: `--source`, `--vcpkg`, `--llvm`,
-and `--tool-path` (repeatable) for Perl, Ruby, gperf and Python. `--flavor lean` builds the reference
-flavor into `<work>/build-lean` and packs it as `Ranvier.WebCore.Native.Lean.<rid>`.
+and `--tool-path` (repeatable, or `RANVIER_TOOL_PATH` separated as `PATH` is) for Perl, Ruby, gperf and
+Python. `RANVIER_WORK` sets `--work`. `--flavor lean` builds the reference flavor into `<work>/build-lean`
+and packs it as `Ranvier.WebCore.Native.Lean.<rid>`. A 24-thread workstation compiles WebKit in about
+9 minutes, against 65 on `windows-2025`.
+
+### Releasing from a workstation
+
+A release can take some packages from the owner's machine and build the rest in CI:
+
+```
+python -I scripts/release.py --rid win-x64 --work C:/rw
+```
+
+`release.py` refuses a working tree with changes, a commit that is on no remote branch, and a version
+(`pins.json` `package.version`) whose tag exists. It builds each `--rid` with `build.py --strict`, whose
+prepare step fails when the WebKit checkout has edits the patch series does not make (`patches.py verify`).
+It checks the packed `.nupkg` with `smoke.py` against the commit, version and flavor, then creates the
+GitHub release `v<version>` with `gh`, attaching the packages. `--dry-run` stops before the release.
+Options it does not know go to `build.py`.
+
+Creating the release pushes its tag, and the tag's run of this workflow:
+
+- `plan` reads the release. A runtime whose package is attached goes to `prebuilt` instead of `native`, if
+  the repository owner created the release and uploaded that package. Anyone who can push a tag could
+  otherwise get a package of their own published.
+- `prebuilt` downloads the package on a clean runner of its platform and runs `smoke.py` on it. The
+  manifest must name the tag's commit, from a clean tree, and the tag's version. Loading on clean
+  runners also catches a library the package lacks that the workstation happened to have.
+- `native` builds the other runtimes as usual, and `publish` pushes every package that passed.
+
+A tag pushed without a release builds every runtime in CI, as before. A package built on a workstation
+records `"builder": "local"` in the `source` field of its `manifest.json`; CI's record `"ci"`.
 
 An incremental rebuild after vcpkg reinstalls packages can fail with clang rejecting a precompiled header:
 the reinstalled headers keep older modification times. Delete `cmake_pch.cxx.obj` under

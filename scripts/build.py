@@ -6,6 +6,8 @@
 #   build.py configure  run CMake with config/<flavor>.cmake; on Windows vcpkg installs the dependencies here
 #   build.py build      build RanvierWebCoreHost; for slim on Windows, also write the filtered ICU data DLL
 #   build.py package    stage the libraries RanvierWebCoreHost loads and pack the NuGet package
+#   build.py smoke      check the staged files against the manifest and paint a page with them (scripts/smoke.py);
+#                       on Linux the manifest check only, as loading there is untested
 #   build.py all        every step above, in order
 #
 # The runtime identifier (--rid) picks the WebKit port: win-* builds PORT=Win with clang-cl and vcpkg,
@@ -16,7 +18,7 @@ import argparse, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfil
 
 root = pathlib.Path(__file__).resolve().parents[1]
 pins = json.loads((root / 'pins.json').read_text())
-steps = ['fetch', 'prepare', 'configure', 'build', 'package']
+steps = ['fetch', 'prepare', 'configure', 'build', 'package', 'smoke']
 
 parser = argparse.ArgumentParser()
 parser.add_argument('step', choices=steps + ['all'])
@@ -29,8 +31,13 @@ parser.add_argument('--build-dir', help='build directory (default <work>/build-<
 parser.add_argument('--vcpkg', help='vcpkg root (default <work>/vcpkg)')
 parser.add_argument('--llvm', help="LLVM's bin directory (default <work>/tools/llvm/bin, which fetch fills)")
 parser.add_argument('--webkit-repo', default=pins['webkit']['repository'], help='where fetch clones WebKit from')
-parser.add_argument('--tool-path', action='append', default=[], help='a directory put first on PATH (perl, ruby, gperf, python); repeatable')
+parser.add_argument('--tool-path', action='append',
+                    default=[p for p in os.environ.get('RANVIER_TOOL_PATH', '').split(os.pathsep) if p],
+                    help='a directory put first on PATH (perl, ruby, gperf, python); repeatable (default RANVIER_TOOL_PATH, '
+                         'separated as PATH is)')
 parser.add_argument('--jobs', type=int, default=os.cpu_count())
+parser.add_argument('--strict', action='store_true',
+                    help='prepare fails when the WebKit checkout has edits the series does not make (release.py)')
 parser.add_argument('--rid', default='win-x64', choices=['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64'])
 parser.add_argument('--version', default=os.environ.get('RANVIER_PACKAGE_VERSION') or pins['package']['version'],
                     help='package version (default RANVIER_PACKAGE_VERSION, else pins.json)')
@@ -184,6 +191,11 @@ def prepare():
     cmake = api / 'CMakeLists.txt'
     cmake.write_text(cmake.read_text() + (root / 'host/RanvierWebCoreHost.cmake').read_text(), newline='\n')
     print('host installed into', api, flush=True)
+    # A checkout that has been worked in can keep edits the series does not reset; a release builds none of them.
+    verify = subprocess.run([sys.executable, '-I', root / 'scripts/patches.py', 'verify', 'Tools/TestWebKitAPI/CMakeLists.txt',
+                             '--source', source])
+    if verify.returncode and args.strict:
+        sys.exit('the WebKit checkout has edits outside the series')
 
 
 def configure(env):
@@ -330,7 +342,11 @@ def package(env):
     (out / 'include').mkdir()
     shutil.copy2(root / 'host/RanvierWebCoreAbi.h', out / 'include')
     abi = re.search(r'rv_abi_version\(void\) \{ return (\d+); \}', (root / 'host/RanvierWebCoreAbi.cpp').read_text())
+    # Where the build came from, which a release checks: this repository's commit and whether the tree had changes.
+    head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
+    dirty = bool(subprocess.run(['git', 'status', '--porcelain'], cwd=root, capture_output=True, text=True, check=True).stdout.strip())
     manifest = dict(flavor=args.flavor, rid=args.rid, version=args.version, webkit=commit, abi=int(abi.group(1)),
+                    source=dict(commit=head, dirty=dirty, builder='ci' if os.environ.get('GITHUB_ACTIONS') else 'local'),
                     total_bytes=sum(f['bytes'] for f in files), files=files)
     (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     targets = (root / 'packaging/buildTransitive.targets').read_text().replace('@RID@', args.rid)
@@ -353,6 +369,10 @@ for step in selected:
         continue
     if step == 'prepare':
         prepare()
+        continue
+    if step == 'smoke':
+        run([sys.executable, '-I', root / 'scripts/smoke.py', '--stage', out, '--build-dir', build]
+            + (['--no-load'] if system == 'linux' else []))
         continue
     env = env or toolchain_env()
     {'configure': configure, 'build': build_step, 'package': package}[step](env)
