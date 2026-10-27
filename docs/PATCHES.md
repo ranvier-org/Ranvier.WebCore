@@ -1,17 +1,19 @@
 # The patch series
 
-`patches/series` lists twelve patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000 and 0010, changes nothing unless
+`patches/series` lists thirteen patches, applied in order over the WebKit commit in `pins.json` by
+`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010 and 0012, changes nothing unless
 its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
 WebKit's own sources. 0010 changes which symbols WebCore exports and which members the host may override,
-and no behavior.
+and no behavior. 0012 adds the sources an embedder names to WebCore. Number 0011 belongs to the accessibility
+series, which is merged separately.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in three places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
 `CryptoKeyRSA.h`; 0010 changes `EmptyClients.h`, `ChromeClient.h`, `WebAnimation.h`, `CSSTransition.h`, `Element.h`,
 `Document.h` and `AXCoreObject.h`, and exports from `ResizeObserver.h`, `IntersectionObserver.h` and `Pasteboard.h`,
 and also changes `PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjectCache.cpp`, `FrameSelection.h`,
-`FrameSelection.cpp`, `ChromeClient.h` and `OptionsCommon.cmake`. The patches touch 73 files in all.
+`FrameSelection.cpp`, `ChromeClient.h` and `OptionsCommon.cmake`. 0012 adds a CMake hook to `Source/WebCore/CMakeLists.txt`.
+The patches touch 73 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -30,6 +32,7 @@ The sizes are the reduction each patch measured when it was added, on Windows x6
 | 0009-jsc-inspector-stub | `USE_JSC_INSPECTOR_STUB` | `USE_INSPECTOR_STUB` | 0.98 MB |
 | 0010-embedder-clients | none, always applies | | |
 | 0011-ax-embedder-notifications | `USE_AX_EMBEDDER_NOTIFICATIONS` | | none: it adds code (see `docs/ACCESSIBILITY.md`) |
+| 0012-embedder-sources | none, always applies; `WebCore_EMBEDDER_SOURCES` names the sources | | |
 
 ## Conventions
 
@@ -236,6 +239,14 @@ does, so the cache queues `SelectedTextChanged` for the observable object.
 With the option off, `postEmbedderNotification` and `postEmbedderTextNotification` are empty inline members, and `AXObjectCache` compiles to
 what it was. The slim flavor turns the option on; the lean flavor keeps it off, and the host then reports
 `rv_abi_has("accessibility-events")` as 0.
+
+## 0012-embedder-sources
+
+Adds the sources of the cache variable `WebCore_EMBEDDER_SOURCES` to WebCore's, outside the unified build, in
+`Source/WebCore/CMakeLists.txt`. With the variable empty it adds none. `config/common.cmake` sets it to
+`host/dom/RanvierDomGlue.cpp`, the glue of the generated DOM functions (`docs/GENERATOR.md`): compiled as part
+of WebCore, the glue calls members WebCore does not export and exports plain C functions in their place. The
+hunk stays the same as functions are added, so the generated surface grows without patch changes.
 
 ## Working on the series
 

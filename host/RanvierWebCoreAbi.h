@@ -58,6 +58,8 @@ enum {
     RV_ERR_LISTENER_FAILED = -7,
     RV_ERR_NOT_INPUT = -8,
     RV_ERR_UNSUPPORTED = -9,
+    /* A generated function's handle argument is an object of another interface (RanvierWebCoreDom.h). */
+    RV_ERR_WRONG_INTERFACE = -11,
 };
 
 /* String properties of rv_node_get_string and rv_node_set_string. */
@@ -1092,6 +1094,9 @@ RV_EXPORT int32_t rv_ax_text_rects(RvAxNode*, int32_t start, int32_t end, double
 /* The offset in the node's text nearest x, y CSS pixels of the viewport, or -1 when that point's text lies outside
  * the node. */
 RV_EXPORT int32_t rv_ax_text_offset_at(RvAxNode*, int32_t x, int32_t y);
+
+/* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
+ * IDL member of the interfaces gen/dom.json lists, from the same library. */
 
 #ifdef __cplusplus
 }

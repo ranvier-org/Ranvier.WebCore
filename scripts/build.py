@@ -2,7 +2,8 @@
 # runtime identifier, and packages them.
 #
 #   build.py fetch      clone WebKit at its pin into the work directory; on Windows also vcpkg, and LLVM unless --llvm
-#   build.py prepare    apply patches/series to WebKit and install host/ into Tools/TestWebKitAPI
+#   build.py prepare    check the generated DOM functions against WebKit's IDL (gen/domgen.py), apply
+#                       patches/series to WebKit and install host/ into Tools/TestWebKitAPI
 #   build.py configure  run CMake with config/<flavor>.cmake; on Windows vcpkg installs the dependencies here
 #   build.py build      build RanvierWebCoreHost; for slim on Windows, also write the filtered ICU data DLL
 #   build.py package    stage the libraries RanvierWebCoreHost loads and pack the NuGet package
@@ -182,11 +183,16 @@ def fetch():
 
 
 def prepare():
+    # The generated DOM functions must match the checkout's IDL files: a WebKit bump that changes them fails here.
+    run([sys.executable, '-I', root / 'gen/domgen.py', 'check', '--source', source])
     run([sys.executable, '-I', root / 'scripts/patches.py', 'apply', '--source', source])
     # The host is a new target over WebKit's TestWebCore libraries, so it lives in the API test tree.
     api = source / 'Tools/TestWebKitAPI'
     (api / 'RanvierAbi').mkdir(exist_ok=True)
-    for name in ['RanvierWebCoreAbi.h', 'RanvierWebCoreAbi.cpp']:
+    # The generated DOM functions (gen/domgen.py): the host's half here; the glue compiles into WebCore from host/dom
+    # (patch 0012, config/common.cmake), and the host includes its header.
+    (api / 'RanvierAbi' / 'dom').mkdir(exist_ok=True)
+    for name in ['RanvierWebCoreAbi.h', 'RanvierWebCoreAbi.cpp', 'RanvierWebCoreDom.h', 'RanvierWebCoreDom.cpp', 'dom/RanvierDomGlue.h']:
         shutil.copy2(root / 'host' / name, api / 'RanvierAbi' / name)
     git('checkout', commit, '--', 'Tools/TestWebKitAPI/CMakeLists.txt', cwd=source)
     cmake = api / 'CMakeLists.txt'
@@ -341,7 +347,8 @@ def package(env):
         shutil.copy2(path, target)
         files.append(dict(name=f'WebKit.resources/icons/{path.name}', bytes=path.stat().st_size, sha256=sha256(path)))
     (out / 'include').mkdir()
-    shutil.copy2(root / 'host/RanvierWebCoreAbi.h', out / 'include')
+    for name in ['RanvierWebCoreAbi.h', 'RanvierWebCoreDom.h']:
+        shutil.copy2(root / 'host' / name, out / 'include')
     abi = re.search(r'rv_abi_version\(void\) \{ return (\d+); \}', (root / 'host/RanvierWebCoreAbi.cpp').read_text())
     # Where the build came from, which a release checks: this repository's commit and whether the tree had changes.
     head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
