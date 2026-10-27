@@ -7,8 +7,9 @@ open System.Runtime.InteropServices
 open System.Text.Json
 open RanvierWebCoreAbi.Native
 
+// appearance:none keeps the select at its CSS height: on macOS the native menu list theme sets its own height.
 let private html =
-    "<!doctype html><html><head><style>body{margin:0}#s{position:absolute;left:10px;top:10px;width:120px;height:24px}#tip{position:absolute;left:10px;top:60px;width:50px;height:20px;background:#ccc}</style></head><body><select id=s><option>One</option><optgroup label=More><option>Two</option><option disabled>Three</option></optgroup><option>Four</option></select><div id=tip title=\"A native tooltip\"></div></body></html>"
+    "<!doctype html><html><head><style>body{margin:0}#s{position:absolute;left:10px;top:10px;width:120px;height:24px;appearance:none}#tip{position:absolute;left:10px;top:60px;width:50px;height:20px;background:#ccc}</style></head><body><select id=s><option>One</option><optgroup label=More><option>Two</option><option disabled>Three</option></optgroup><option>Four</option></select><div id=tip title=\"A native tooltip\"></div></body></html>"
 
 let private require condition (message: string) =
     if not condition then
