@@ -6,8 +6,9 @@
 #   build.py configure  run CMake with config/<flavor>.cmake; on Windows vcpkg installs the dependencies here
 #   build.py build      build RanvierWebCoreHost; for slim on Windows, also write the filtered ICU data DLL
 #   build.py package    stage the libraries RanvierWebCoreHost loads and pack the NuGet package
-#   build.py smoke      check the staged files against the manifest and paint a page with them (scripts/smoke.py);
-#                       on Linux the manifest check only, as loading there is untested
+#   build.py smoke      check the staged files against the manifest and paint a page with them (scripts/smoke.py),
+#                       then run the F# ABI tests against them (scripts/abi_tests.py); on Linux the manifest
+#                       check only, as loading there is untested
 #   build.py all        every step above, in order
 #
 # The runtime identifier (--rid) picks the WebKit port: win-* builds PORT=Win with clang-cl and vcpkg,
@@ -373,6 +374,8 @@ for step in selected:
     if step == 'smoke':
         run([sys.executable, '-I', root / 'scripts/smoke.py', '--stage', out, '--build-dir', build]
             + (['--no-load'] if system == 'linux' else []))
+        if system != 'linux':
+            run([sys.executable, '-I', root / 'scripts/abi_tests.py', '--stage', out, '--source', source])
         continue
     env = env or toolchain_env()
     {'configure': configure, 'build': build_step, 'package': package}[step](env)
