@@ -3998,6 +3998,13 @@ static String axName(AXCoreObject& object)
 // alternative gave the name.
 static String axDescription(AXCoreObject& object)
 {
+    // aria-describedby first. The Cocoa ports leave it out of the text alternatives, which carry it elsewhere
+    // as help text, so it is read directly on every port.
+    if (auto* accessibility = dynamicDowncast<AccessibilityObject>(object)) {
+        auto describedBy = accessibility->ariaDescribedByAttribute();
+        if (!describedBy.isEmpty())
+            return describedBy;
+    }
     Vector<AccessibilityText> texts;
     object.accessibilityText(texts);
     bool named = false;
@@ -4108,9 +4115,9 @@ int32_t rv_ax_rect(RvAxNode* handle, double* x, double* y, double* width, double
         return RV_ERR_DETACHED;
     RefPtr view = object->documentFrameView();
     FloatRect rect;
-    // The root is the viewport; its element rectangle is the whole document.
+    // The root is the viewport, scroll bars included; its element rectangle is the whole document.
     if (isTreeRoot(object) && view)
-        rect = FloatRect { { }, view->visibleContentRect().size() };
+        rect = FloatRect { { }, view->frameRect().size() };
     else if (view)
         rect = view->contentsToRootView(snappedIntRect(object->elementRect()));
     *x = rect.x();
