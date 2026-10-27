@@ -26,7 +26,7 @@ let run (_: string) =
     require (rv_abi_has "dom:HTMLMarqueeElement" = 0) "rv_abi_has of an interface outside the generated set"
     require (RV_DOM_NODE_ELEMENT_NODE = 1) "Node.ELEMENT_NODE"
 
-    use host = new Host (200, 100)
+    use host = new Host(200, 100)
     host.LoadHtml html
     use box = host.GetElementById "box"
     use field = host.GetElementById "field"
@@ -112,7 +112,8 @@ let run (_: string) =
     |> check "input_set_disabled"
 
     let disabledAttribute =
-        readString "element_get_attribute" (fun b c l -> rv_dom_element_get_attribute (field.Handle, "disabled", b, c, l))
+        readString "element_get_attribute" (fun b c l ->
+            rv_dom_element_get_attribute (field.Handle, "disabled", b, c, l))
 
     require (disabledAttribute = "") "a reflected boolean sets its content attribute"
 
@@ -122,8 +123,7 @@ let run (_: string) =
     require (exceptionName () = "IndexSizeError") "the exception is IndexSizeError"
 
     // The interface check: an input member on a div.
-    let wrong =
-        rv_dom_html_input_element_set_value (box.Handle, "x")
+    let wrong = rv_dom_html_input_element_set_value (box.Handle, "x")
 
     require (wrong = WrongInterface) $"an HTMLInputElement member on a div returns RV_ERR_WRONG_INTERFACE, got {wrong}"
 
@@ -206,13 +206,16 @@ let run (_: string) =
     require (className = "a b c") "Element.className follows classList"
 
     let mutable style = 0n
-    rv_dom_html_element_get_style (box.Handle, &style) |> check "html_element_get_style"
+
+    rv_dom_html_element_get_style (box.Handle, &style)
+    |> check "html_element_get_style"
 
     rv_dom_css_style_declaration_set_property (style, "color", "rgb(1, 2, 3)", "")
     |> check "css_style_declaration_set_property"
 
     let color =
-        text "get_property_value" (fun b c l -> rv_dom_css_style_declaration_get_property_value (style, "color", b, c, l))
+        text "get_property_value" (fun b c l ->
+            rv_dom_css_style_declaration_get_property_value (style, "color", b, c, l))
 
     require (color = "rgb(1, 2, 3)") "CSSStyleDeclaration.setProperty and getPropertyValue"
     rv_dom_css_style_declaration_release style
@@ -246,7 +249,7 @@ let run (_: string) =
     let seen = ResizeArray<string>()
 
     use _click =
-        first.Listen (
+        first.Listen(
             "click",
             false,
             fun e ->
@@ -269,7 +272,7 @@ let run (_: string) =
                 seen.Add $"{kind}:{bubbles}:{detail >= 0}:{current = first.Handle}"
         )
 
-    first.Click ()
+    first.Click()
     require (List.ofSeq seen = [ "click:1:True:True" ]) $"event getters in a listener: {List.ofSeq seen}"
 
     // String unions: innerHTML and setAttribute take (TrustedHTML or DOMString) as a C string.
@@ -368,11 +371,14 @@ let run (_: string) =
 
     // A dictionary argument: getRootNode({ composed }) from inside a shadow tree, with NULL for the defaults and a
     // size that leaves composed out.
-    use page = host.Body ()
+    use page = host.Body()
     use shadowHost = host.CreateElement "div"
     page.Append shadowHost
     let mutable attachStatus = 0
-    use openShadow = new Node(rv_element_attach_shadow (shadowHost.Handle, &attachStatus))
+
+    use openShadow =
+        new Node(rv_element_attach_shadow (shadowHost.Handle, &attachStatus))
+
     use inShadow = host.CreateElement "span"
     openShadow.Append inShadow
 
@@ -386,9 +392,10 @@ let run (_: string) =
         root
 
     let full =
-        System.Runtime.InteropServices.Marshal.SizeOf<RvDomGetRootNodeOptions> () |> uint32
+        System.Runtime.InteropServices.Marshal.SizeOf<RvDomGetRootNodeOptions>()
+        |> uint32
 
-    let mutable composed = RvDomGetRootNodeOptions ()
+    let mutable composed = RvDomGetRootNodeOptions()
     composed.size <- full
     composed.composed <- 1
     let mutable truncated = composed
@@ -397,10 +404,16 @@ let run (_: string) =
     require (rootOf [| composed |] = document.Handle) "getRootNode({ composed: true }) is the document"
     require (rootOf [| truncated |] = openShadow.Handle) "a field past size takes its IDL default"
 
-    // [EnabledBySetting]: InputTypeColorEnhancementsEnabled is off by default, HeadingOffsetEnabled on.
+    // [EnabledBySetting]: InputTypeColorEnhancementsEnabled is on by default on Cocoa only, HeadingOffsetEnabled on
+    // everywhere.
     let mutable alpha = 0
     let alphaStatus = rv_dom_html_input_element_get_alpha (field.Handle, &alpha)
-    require (alphaStatus = -9) $"a member whose setting is off returns RV_ERR_UNSUPPORTED, got {alphaStatus}"
+
+    if System.OperatingSystem.IsMacOS() then
+        require (alphaStatus = 0) $"a member whose setting is on succeeds, got {alphaStatus}"
+    else
+        require (alphaStatus = -9) $"a member whose setting is off returns RV_ERR_UNSUPPORTED, got {alphaStatus}"
+
     let mutable offset = 0u
 
     rv_dom_html_element_get_heading_offset (box.Handle, &offset)
@@ -410,10 +423,10 @@ let run (_: string) =
     let mutable threadStatus = 0
 
     let worker =
-        Thread (fun () -> threadStatus <- rv_dom_element_set_id (box.Handle, "elsewhere"))
+        Thread(fun () -> threadStatus <- rv_dom_element_set_id (box.Handle, "elsewhere"))
 
-    worker.Start ()
-    worker.Join ()
+    worker.Start()
+    worker.Join()
     require (threadStatus = WrongThread) "a generated function on another thread returns RV_ERR_WRONG_THREAD"
     require (id () = "box") "the call on another thread changed nothing"
 
