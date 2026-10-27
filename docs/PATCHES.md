@@ -1,13 +1,14 @@
 # The patch series
 
-`patches/series` lists ten patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000, changes nothing unless its
-CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
-WebKit's own sources.
+`patches/series` lists eleven patches, applied in order over the WebKit commit in `pins.json` by
+`scripts/patches.py apply`. Each patch carries one concern and, except 0000 and 0010, changes nothing unless
+its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
+WebKit's own sources. 0010 changes which symbols WebCore exports and which members the host may override,
+and no behavior.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
-They edit no upstream C++ or IDL file, with one exception: 0003 changes `CryptoDigestWin.cpp`,
-`CryptoKeyEC.h` and `CryptoKeyRSA.h`. The patches touch 52 files in all.
+They edit upstream C++ in two places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
+`CryptoKeyRSA.h`, and 0010 changes `EmptyClients.h` and `ChromeClient.h`. The patches touch 55 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -24,6 +25,7 @@ The sizes are the reduction each patch measured when it was added, on Windows x6
 | 0007-browser-api-stub | `USE_BROWSER_API_STUB` | `USE_WEB_API_STUB` | 1.44 MB |
 | 0008-inspector-stub | `USE_INSPECTOR_STUB` | | 1.44 MB |
 | 0009-jsc-inspector-stub | `USE_JSC_INSPECTOR_STUB` | `USE_INSPECTOR_STUB` | 0.98 MB |
+| 0010-embedder-clients | none, always applies | | |
 
 ## Conventions
 
@@ -154,6 +156,19 @@ console clients and WebCore call them.
 registry, frontend router, backend dispatcher, injected script host and manager).
 `InspectorDebuggerAgent::currentParentStackTrace` returns null. Members that serve a frontend or an
 injected script are release assertions.
+
+## 0010-embedder-clients
+
+Lets the host's chrome client derive from `EmptyChromeClient` where WebCore is a shared library (Windows
+and macOS):
+
+- `EmptyClients.h` exports `EmptyChromeClient`, and its `invalidateRootView`,
+  `invalidateContentsForSlowScroll`, `setCursor` and `triggerRenderingUpdate` become `override` instead of
+  `final`.
+- `ChromeClient.h` exports the five virtual members defined out of line that `EmptyChromeClient` does not
+  override: the three shape detector factories, `getBarcodeDetectorSupportedFormats` and
+  `enterFullScreenForElement`.
+- `Headers.cmake` forwards `dom/InputEvent.h`.
 
 ## Working on the series
 

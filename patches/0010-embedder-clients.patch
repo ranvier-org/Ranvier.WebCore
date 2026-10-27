@@ -1,0 +1,83 @@
+diff --git a/Source/WebCore/Headers.cmake b/Source/WebCore/Headers.cmake
+index 481eb62ddd..2a88f264cd 100644
+--- a/Source/WebCore/Headers.cmake
++++ b/Source/WebCore/Headers.cmake
+@@ -1351,6 +1351,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
+     dom/ImageOverlay.h
+     dom/ImportNodeOptions.h
+     dom/InlineStyleSheetOwner.h
++    dom/InputEvent.h
+     dom/KeyboardEvent.h
+     dom/LiveNodeList.h
+     dom/LiveNodeListInlines.h
+diff --git a/Source/WebCore/loader/EmptyClients.h b/Source/WebCore/loader/EmptyClients.h
+index 97c2a7e662..511a2ace7a 100644
+--- a/Source/WebCore/loader/EmptyClients.h
++++ b/Source/WebCore/loader/EmptyClients.h
+@@ -57,7 +57,7 @@ enum class BroadcastFocusedElement : bool;
+ enum class ContentChange : uint8_t;
+ struct FocusOptions;
+ 
+-class EmptyChromeClient : public ChromeClient {
++class WEBCORE_EXPORT EmptyChromeClient : public ChromeClient {
+     WTF_MAKE_TZONE_ALLOCATED(EmptyChromeClient);
+ 
+     void chromeDestroyed() override { }
+@@ -111,9 +111,9 @@ class EmptyChromeClient : public ChromeClient {
+     std::optional<PointerCharacteristics> pointerCharacteristicsOfPrimaryPointingDevice() const final { return std::nullopt; };
+     OptionSet<PointerCharacteristics> pointerCharacteristicsOfAllAvailablePointingDevices() const final { return { }; }
+ 
+-    void invalidateRootView(const IntRect&) final { }
++    void invalidateRootView(const IntRect&) override { }
+     void invalidateContentsAndRootView(const IntRect&) override { }
+-    void invalidateContentsForSlowScroll(const IntRect&) final { }
++    void invalidateContentsForSlowScroll(const IntRect&) override { }
+     void scroll(const IntSize&, const IntRect&, const IntRect&) final { }
+ 
+     IntPoint screenToRootView(const IntPoint& p) const final { return p; }
+@@ -158,7 +158,7 @@ class EmptyChromeClient : public ChromeClient {
+     void elementDidFocus(Element&, const FocusOptions&) final { }
+     void elementDidBlur(Element&) final { }
+ 
+-    void setCursor(const Cursor&) final { }
++    void setCursor(const Cursor&) override { }
+     void setCursorHiddenUntilMouseMoves(bool) final { }
+ 
+     void scrollContainingScrollViewsToRevealRect(const IntRect&) const final { }
+@@ -167,7 +167,7 @@ class EmptyChromeClient : public ChromeClient {
+     void attachRootGraphicsLayer(LocalFrame&, GraphicsLayer*) final { }
+     void attachViewOverlayGraphicsLayer(GraphicsLayer*) final { }
+     void setNeedsOneShotDrawingSynchronization() final { }
+-    void triggerRenderingUpdate() final { }
++    void triggerRenderingUpdate() override { }
+ 
+ #if PLATFORM(WIN)
+     void AXStartFrameLoad() final { }
+diff --git a/Source/WebCore/page/ChromeClient.h b/Source/WebCore/page/ChromeClient.h
+index c884441710..665b9e3eb4 100644
+--- a/Source/WebCore/page/ChromeClient.h
++++ b/Source/WebCore/page/ChromeClient.h
+@@ -469,10 +469,10 @@ public:
+ #if HAVE(WEBGPU_IMPLEMENTATION)
+     virtual RefPtr<WebGPU::GPU> createGPUForWebGPU() const { return nullptr; }
+ #endif
+-    virtual RefPtr<ShapeDetection::BarcodeDetector> createBarcodeDetector(const ShapeDetection::BarcodeDetectorOptions&) const;
+-    virtual void getBarcodeDetectorSupportedFormats(CompletionHandler<void(Vector<ShapeDetection::BarcodeFormat>&&)>&&) const;
+-    virtual RefPtr<ShapeDetection::FaceDetector> createFaceDetector(const ShapeDetection::FaceDetectorOptions&) const;
+-    virtual RefPtr<ShapeDetection::TextDetector> createTextDetector() const;
++    WEBCORE_EXPORT virtual RefPtr<ShapeDetection::BarcodeDetector> createBarcodeDetector(const ShapeDetection::BarcodeDetectorOptions&) const;
++    WEBCORE_EXPORT virtual void getBarcodeDetectorSupportedFormats(CompletionHandler<void(Vector<ShapeDetection::BarcodeFormat>&&)>&&) const;
++    WEBCORE_EXPORT virtual RefPtr<ShapeDetection::FaceDetector> createFaceDetector(const ShapeDetection::FaceDetectorOptions&) const;
++    WEBCORE_EXPORT virtual RefPtr<ShapeDetection::TextDetector> createTextDetector() const;
+ 
+     virtual void registerBlobPathForTesting(const String&, CompletionHandler<void()>&&) { }
+ 
+@@ -548,7 +548,7 @@ public:
+ 
+ #if ENABLE(FULLSCREEN_API)
+     virtual bool supportsFullScreenForElement(const Element&, bool) { return false; }
+-    virtual void enterFullScreenForElement(Element&, HTMLMediaElementEnums::VideoFullscreenMode, CompletionHandler<void(ExceptionOr<void>)>&& willEnterFullscreen, CompletionHandler<bool(bool)>&& didEnterFullscreen);
++    WEBCORE_EXPORT virtual void enterFullScreenForElement(Element&, HTMLMediaElementEnums::VideoFullscreenMode, CompletionHandler<void(ExceptionOr<void>)>&& willEnterFullscreen, CompletionHandler<bool(bool)>&& didEnterFullscreen);
+ #if ENABLE(QUICKLOOK_FULLSCREEN)
+     virtual void updateImageSource(Element&) { }
+ #endif // ENABLE(QUICKLOOK_FULLSCREEN)
