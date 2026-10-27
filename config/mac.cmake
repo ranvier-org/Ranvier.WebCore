@@ -14,8 +14,10 @@ if (RANVIER_RID MATCHES "^osx-(.+)$")
 endif ()
 
 # The oldest macOS the package loads on. OptionsMac.cmake otherwise takes the build machine's version,
-# which would tie the package to the runner's macOS.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "")
+# which would tie the package to the runner's minor release. 15.0 compiles, but then Swift links WebGPU
+# to its back-deployment library libswiftCompatibilitySpan.dylib, which the package does not carry, and
+# the host fails to load (run 40434056095).
+set(CMAKE_OSX_DEPLOYMENT_TARGET "26.0" CACHE STRING "")
 
 # Off, as in the slim flavor.
 set(ENABLE_WEBGL OFF CACHE BOOL "")
