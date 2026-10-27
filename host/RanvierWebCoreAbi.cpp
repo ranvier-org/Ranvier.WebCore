@@ -3,6 +3,15 @@
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
+#include <WebCore/AXCoreObject.h>
+#include <WebCore/AXNotifications.h>
+#include <WebCore/AXObjectCache.h>
+#include <WebCore/AccessibilityObject.h>
+#include <WebCore/BoundaryPoint.h>
+#include <WebCore/RenderObject.h>
+#include <WebCore/TextControlInnerElements.h>
+#include <WebCore/TextIterator.h>
+#include <WebCore/VisibleUnits.h>
 #include <WebCore/DocumentView.h>
 #include <WebCore/AbortSignal.h>
 #include <WebCore/AddEventListenerOptions.h>
@@ -171,6 +180,9 @@ private:
     void setCursor(const Cursor&) final;
     void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection) final;
     RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
+#if USE(AX_EMBEDDER_NOTIFICATIONS)
+    void postAccessibilityNotification(AccessibilityObject&, AXNotification) final;
+#endif
     void invalidate(const IntRect&);
     void wantUpdate();
 };
@@ -516,6 +528,12 @@ struct RvHost {
     IntPoint pressPoint;
     RvDragStartCallback dragStartCallback { nullptr };
     void* dragStartContext { nullptr };
+    bool accessibility { false };
+    RvAxCallback axCallback { nullptr };
+    void* axContext { nullptr };
+    // Accessibility events posted since the last delivery, and whether a delivery is scheduled.
+    Vector<std::pair<Ref<AXCoreObject>, int32_t>> axPending;
+    bool axDeliveryScheduled { false };
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
@@ -977,10 +995,15 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
+#if USE(AX_EMBEDDER_NOTIFICATIONS)
+    // WebCore hands its accessibility notifications to the host (patch 0011).
+    if (!std::strcmp(feature, "accessibility-events"))
+        return 1;
+#endif
     return 0;
 }
 
@@ -1013,6 +1036,7 @@ void rv_host_destroy(RvHost* host)
     if (!host || !onOwningThread())
         return;
     host->noScript.reset();
+    rv_host_set_accessibility(host, 0, nullptr, nullptr);
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = nullptr;
     liveHosts.removeFirst(host);
     delete host;
@@ -1025,6 +1049,9 @@ int32_t rv_host_load_html(RvHost* host, const char* html)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     loadHTML(host->frame(), utf8(html));
+    // The new document posts accessibility notifications once its cache exists.
+    if (host->accessibility)
+        host->document().axObjectCache();
     return RV_OK;
 }
 
@@ -1335,7 +1362,7 @@ RvNode* rv_node_parse_fragment(RvNode* context, const char* markup)
 {
     if (!context || !markup || !onOwningThread())
         return nullptr;
-    Ref range = Range::create(node(context)->document());
+    Ref range = WebCore::Range::create(node(context)->document());
     if (range->selectNodeContents(*node(context)).hasException())
         return nullptr;
     auto fragment = range->createContextualFragment(Variant<Ref<TrustedHTML>, String> { utf8(markup) });
@@ -3482,4 +3509,966 @@ int32_t rv_drag_end(RvDrag* drag, int32_t x, int32_t y, int32_t operation)
     });
     host.document().updateStyleIfNeeded();
     return status;
+}
+
+// Accessibility: the tree of WebCore's accessibility objects, as docs/ACCESSIBILITY.md describes.
+
+// The hosts with accessibility on; WebCore's accessibility mode is on while there is one.
+static int accessibilityHosts;
+
+static AXCoreObject* axObject(RvAxNode* handle) { return reinterpret_cast<AXCoreObject*>(handle); }
+
+// Whether WebCore removed the object from its tree. AccessibilityObject::isDetached tells only on ports that
+// attach a platform wrapper to every object; Windows attaches none, so the cache is asked instead.
+static bool isGone(AXCoreObject& object)
+{
+    auto* accessibility = dynamicDowncast<AccessibilityObject>(object);
+    if (!accessibility)
+        return object.isDetached();
+    RefPtr document = accessibility->document();
+    auto* cache = document ? document->axObjectCache() : nullptr;
+    return !cache || cache->objectForID(object.objectID()) != accessibility;
+}
+
+static RvAxNode* axHandle(AXCoreObject* object)
+{
+    if (!object)
+        return nullptr;
+    object->ref();
+    return reinterpret_cast<RvAxNode*>(object);
+}
+
+// The RV_ROLE_* value of a WebCore role.
+static int32_t roleValue(AccessibilityRole role)
+{
+    using enum AccessibilityRole;
+    switch (role) {
+    case WebArea:
+    case Document:
+    case GraphicsDocument: return RV_ROLE_DOCUMENT;
+    case Application:
+    case WebApplication: return RV_ROLE_APPLICATION;
+    case Generic:
+    case Inline:
+    case TextGroup:
+    case Emphasis:
+    case Strong:
+    case Code:
+    case Mark:
+    case Subscript:
+    case Superscript:
+    case Deletion:
+    case Insertion:
+    case RubyInline:
+    case RubyText:
+    case Pre:
+    case Time:
+    case SVGText:
+    case SVGTSpan:
+    case SVGTextPath:
+    case SectionHeader:
+    case SectionFooter:
+    case Suggestion:
+    case SliderThumb: return RV_ROLE_GENERIC;
+    case Group:
+    case Details:
+    case Blockquote:
+    case RowGroup:
+    case TableHeaderContainer:
+    case Audio:
+    case Video:
+    case Model:
+    case FrameHost:
+    case LocalFrame:
+    case RemoteFrame:
+    case ScrollArea:
+    case GraphicsSymbol: return RV_ROLE_GROUP;
+    case StaticText:
+    case ListMarker:
+    case LineBreak: return RV_ROLE_TEXT;
+    case Paragraph: return RV_ROLE_PARAGRAPH;
+    case Heading: return RV_ROLE_HEADING;
+    case Link: return RV_ROLE_LINK;
+    case Button:
+    case Summary:
+    case SpinButtonPart: return RV_ROLE_BUTTON;
+    case ToggleButton: return RV_ROLE_TOGGLE_BUTTON;
+    case Checkbox: return RV_ROLE_CHECKBOX;
+    case RadioButton: return RV_ROLE_RADIO;
+    case RadioGroup: return RV_ROLE_RADIO_GROUP;
+    case Switch: return RV_ROLE_SWITCH;
+    case TextField:
+    case SearchField:
+    case DateTime:
+    case ColorWell: return RV_ROLE_TEXT_FIELD;
+    case TextArea: return RV_ROLE_TEXT_AREA;
+    case ComboBox:
+    case PopUpButton: return RV_ROLE_COMBO_BOX;
+    case ListBox:
+    case MenuListPopup: return RV_ROLE_LIST_BOX;
+    case ListBoxOption:
+    case MenuListOption: return RV_ROLE_OPTION;
+    case Menu: return RV_ROLE_MENU;
+    case MenuBar: return RV_ROLE_MENU_BAR;
+    case MenuItem: return RV_ROLE_MENU_ITEM;
+    case MenuItemCheckbox: return RV_ROLE_MENU_ITEM_CHECKBOX;
+    case MenuItemRadio: return RV_ROLE_MENU_ITEM_RADIO;
+    case Slider: return RV_ROLE_SLIDER;
+    case SpinButton: return RV_ROLE_SPIN_BUTTON;
+    case ProgressIndicator: return RV_ROLE_PROGRESS;
+    case Meter: return RV_ROLE_METER;
+    case ScrollBar: return RV_ROLE_SCROLL_BAR;
+    case Image:
+    case ImageMap:
+    case Canvas:
+    case SVGRoot:
+    case GraphicsObject: return RV_ROLE_IMAGE;
+    case List:
+    case DescriptionList:
+    case Directory: return RV_ROLE_LIST;
+    case ListItem: return RV_ROLE_LIST_ITEM;
+    case DescriptionListTerm:
+    case Term: return RV_ROLE_TERM;
+    case DescriptionListDetail:
+    case Definition: return RV_ROLE_DEFINITION;
+    case Table: return RV_ROLE_TABLE;
+    case Grid: return RV_ROLE_GRID;
+    case TreeGrid: return RV_ROLE_TREE_GRID;
+    case Row: return RV_ROLE_ROW;
+    case Cell:
+    case GridCell: return RV_ROLE_CELL;
+    case ColumnHeader: return RV_ROLE_COLUMN_HEADER;
+    case RowHeader: return RV_ROLE_ROW_HEADER;
+    case Tree: return RV_ROLE_TREE;
+    case TreeItem: return RV_ROLE_TREE_ITEM;
+    case TabList:
+    case TabGroup: return RV_ROLE_TAB_LIST;
+    case Tab: return RV_ROLE_TAB;
+    case TabPanel: return RV_ROLE_TAB_PANEL;
+    case ApplicationDialog: return RV_ROLE_DIALOG;
+    case ApplicationAlertDialog: return RV_ROLE_ALERT_DIALOG;
+    case ApplicationAlert: return RV_ROLE_ALERT;
+    case ApplicationStatus: return RV_ROLE_STATUS;
+    case ApplicationLog: return RV_ROLE_LOG;
+    case ApplicationMarquee: return RV_ROLE_MARQUEE;
+    case ApplicationTimer: return RV_ROLE_TIMER;
+    case UserInterfaceTooltip: return RV_ROLE_TOOLTIP;
+    case Toolbar: return RV_ROLE_TOOLBAR;
+    case HorizontalRule:
+    case Splitter: return RV_ROLE_SEPARATOR;
+    case LandmarkBanner: return RV_ROLE_BANNER;
+    case LandmarkNavigation: return RV_ROLE_NAVIGATION;
+    case LandmarkMain: return RV_ROLE_MAIN;
+    case LandmarkComplementary: return RV_ROLE_COMPLEMENTARY;
+    case LandmarkContentInfo: return RV_ROLE_CONTENT_INFO;
+    case LandmarkRegion:
+    case LandmarkDocRegion: return RV_ROLE_REGION;
+    case LandmarkSearch: return RV_ROLE_SEARCH;
+    case Form: return RV_ROLE_FORM;
+    case DocumentArticle: return RV_ROLE_ARTICLE;
+    case Feed: return RV_ROLE_FEED;
+    case Figure: return RV_ROLE_FIGURE;
+    case DocumentNote:
+    case Footnote: return RV_ROLE_NOTE;
+    case DocumentMath:
+    case MathElement: return RV_ROLE_MATH;
+    case Label:
+    case Legend:
+    case Caption: return RV_ROLE_LABEL;
+    case Column:
+    case Ignored:
+    case Presentational:
+    case Unknown: return RV_ROLE_UNKNOWN;
+    }
+    return RV_ROLE_UNKNOWN;
+}
+
+#if USE(AX_EMBEDDER_NOTIFICATIONS)
+// The RV_AX_EVENT_* value of a WebCore notification, or nothing for one the ABI does not report.
+static std::optional<int32_t> axEvent(AXNotification notification)
+{
+    using enum AXNotification;
+    switch (notification) {
+    case FocusedUIElementChanged: return RV_AX_EVENT_FOCUS;
+    case ChildrenChanged: return RV_AX_EVENT_CHILDREN;
+    case ValueChanged:
+    case MenuListValueChanged:
+    case MaximumValueChanged:
+    case MinimumValueChanged: return RV_AX_EVENT_VALUE;
+    case CheckedStateChanged:
+    case DisabledStateChanged:
+    case ExpandedChanged:
+    case PressedStateChanged:
+    case RequiredStatusChanged:
+    case InvalidStatusChanged:
+    case ReadOnlyStatusChanged:
+    case ElementBusyChanged:
+    case FocusableStateChanged:
+    case VisitedStateChanged:
+    case HasPopupChanged:
+    case MultiSelectableStateChanged: return RV_AX_EVENT_STATE;
+    case LabelChanged:
+    case NameChanged:
+    case TextUnderElementChanged: return RV_AX_EVENT_NAME;
+    case DescribedByChanged:
+    case ExtendedDescriptionChanged: return RV_AX_EVENT_DESCRIPTION;
+    case RoleChanged: return RV_AX_EVENT_ROLE;
+    case SelectedStateChanged:
+    case SelectedChildrenChanged:
+    case SelectedCellsChanged:
+    case MenuListItemSelected: return RV_AX_EVENT_SELECTION;
+    case LiveRegionChanged:
+    case LiveRegionAnnouncement: return RV_AX_EVENT_LIVE_REGION;
+    case LoadComplete:
+    case NewDocumentLoadComplete: return RV_AX_EVENT_LOAD_COMPLETE;
+    case LayoutComplete:
+    case PageScrolled:
+    case ScrolledToAnchor: return RV_AX_EVENT_LAYOUT;
+    case MenuOpened: return RV_AX_EVENT_MENU_OPENED;
+    case MenuClosed: return RV_AX_EVENT_MENU_CLOSED;
+    case TextChanged: return RV_AX_EVENT_TEXT;
+    case SelectedTextChanged: return RV_AX_EVENT_TEXT_SELECTION;
+    default:
+        return std::nullopt;
+    }
+}
+
+static bool isLive(RvHost* host) { return host && liveHosts.contains(host); }
+
+// Calls the host's accessibility callback for each event posted since the last delivery.
+static void deliverAccessibilityEvents(RvHost& host)
+{
+    host.axDeliveryScheduled = false;
+    auto pending = std::exchange(host.axPending, { });
+    for (auto& [object, event] : pending) {
+        // A callback may turn accessibility off, or destroy the host.
+        if (!isLive(&host) || !host.axCallback)
+            return;
+        if (isGone(object))
+            continue;
+        host.axCallback(host.axContext, reinterpret_cast<RvAxNode*>(object.ptr()), event);
+    }
+}
+
+// WebCore posts a notification while it updates its tree, which may be inside an ABI call (patch 0011); the
+// host queues it and delivers it on the next run loop cycle.
+void RvChromeClient::postAccessibilityNotification(AccessibilityObject& object, AXNotification notification)
+{
+    if (!host || !host->accessibility || !host->axCallback)
+        return;
+    auto event = axEvent(notification);
+    if (!event)
+        return;
+    AXCoreObject& core = object;
+    for (auto& [queued, queuedEvent] : host->axPending) {
+        if (queued.ptr() == &core && queuedEvent == *event)
+            return;
+    }
+    host->axPending.append({ Ref { core }, *event });
+    if (host->axDeliveryScheduled)
+        return;
+    host->axDeliveryScheduled = true;
+    RunLoop::mainSingleton().dispatch([target = host] {
+        if (isLive(target) && target->axDeliveryScheduled)
+            deliverAccessibilityEvents(*target);
+    });
+}
+#endif
+
+// Brings the tree of a document up to date: layout, then the cache's deferred updates.
+static AXObjectCache* updatedCache(Document* document)
+{
+    if (!document)
+        return nullptr;
+    document->updateLayoutIgnorePendingStylesheets();
+    auto* cache = document->axObjectCache();
+    if (cache)
+        cache->performDeferredCacheUpdate(ForceLayout::Yes);
+    return cache;
+}
+
+// The host's cache with its tree up to date, or null while the host has accessibility off.
+static AXObjectCache* updatedCache(RvHost& host)
+{
+    return host.accessibility ? updatedCache(&host.document()) : nullptr;
+}
+
+// The object itself when exposed, else its nearest exposed ancestor.
+static AXCoreObject* exposed(AXCoreObject* object)
+{
+    while (object && object->isIgnored())
+        object = object->parentObject();
+    return object;
+}
+
+// The web area of a main frame's document: the root of a host's tree.
+static bool isTreeRoot(AXCoreObject& object)
+{
+    if (!object.isWebArea())
+        return false;
+    RefPtr document = object.document();
+    RefPtr frame = document ? document->frame() : nullptr;
+    return frame && frame->isMainFrame();
+}
+
+int32_t rv_host_set_accessibility(RvHost* host, int32_t enabled, RvAxCallback callback, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    bool on = !!enabled;
+    if (on != host->accessibility) {
+        host->accessibility = on;
+        accessibilityHosts += on ? 1 : -1;
+        if (on && !AXObjectCache::accessibilityEnabled())
+            std::ignore = AXObjectCache::attemptMainThreadModeTransition();
+        if (!on && !accessibilityHosts)
+            AXObjectCache::disableAccessibilityForTesting();
+    }
+    host->axCallback = on ? callback : nullptr;
+    host->axContext = host->axCallback ? context : nullptr;
+    if (!host->axCallback) {
+        host->axPending.clear();
+        host->axDeliveryScheduled = false;
+    }
+    if (!on)
+        return RV_OK;
+    // WebCore posts notifications only for a document whose cache exists.
+    return host->document().axObjectCache() ? RV_OK : RV_ERR_UNSUPPORTED;
+}
+
+RvAxNode* rv_host_ax_root(RvHost* host)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    auto* cache = updatedCache(*host);
+    return cache ? axHandle(cache->exportedGetOrCreate(host->document())) : nullptr;
+}
+
+RvAxNode* rv_host_ax_focus(RvHost* host)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    auto* cache = updatedCache(*host);
+    if (!cache)
+        return nullptr;
+    AXCoreObject* focused = cache->focusedObjectForPage(host->page.ptr());
+    return axHandle(focused ? focused : cache->exportedGetOrCreate(host->document()));
+}
+
+RvAxNode* rv_host_ax_hit_test(RvHost* host, int32_t x, int32_t y)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    auto* cache = updatedCache(*host);
+    RefPtr view = host->frame().view();
+    if (!cache || !view || x < 0 || y < 0 || x >= host->size.width() || y >= host->size.height())
+        return nullptr;
+    RefPtr<AXCoreObject> root = cache->exportedGetOrCreate(host->document());
+    if (!root)
+        return nullptr;
+    auto hit = root->accessibilityHitTest(view->rootViewToContents(IntPoint { x, y }));
+    return axHandle(exposed(hit ? hit.get() : root.get()));
+}
+
+RvAxNode* rv_node_ax(RvNode* target)
+{
+    if (!target || !onOwningThread())
+        return nullptr;
+    Ref subject = *node(target);
+    auto* host = hostForPage(subject->document().page());
+    if (!host)
+        return nullptr;
+    auto* cache = updatedCache(*host);
+    AXCoreObject* object = cache ? cache->exportedGetOrCreate(subject.get()) : nullptr;
+    return object && !object->isIgnored() ? axHandle(object) : nullptr;
+}
+
+RvNode* rv_ax_dom_node(RvAxNode* handle)
+{
+    if (!handle || !onOwningThread() || isGone(*axObject(handle)))
+        return nullptr;
+    return handleOrNull(axObject(handle)->node());
+}
+
+RvAxNode* rv_ax_retain(RvAxNode* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    axObject(handle)->ref();
+    return handle;
+}
+
+void rv_ax_release(RvAxNode* handle)
+{
+    if (handle && onOwningThread())
+        axObject(handle)->deref();
+}
+
+// The checks every function on a node starts with: RV_OK, or the status to return.
+static int32_t axStatus(RvAxNode* handle)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (isGone(*axObject(handle)))
+        return RV_ERR_DETACHED;
+    return RV_OK;
+}
+
+int64_t rv_ax_id(RvAxNode* handle)
+{
+    if (auto status = axStatus(handle))
+        return status;
+    return static_cast<int64_t>(axObject(handle)->objectID().toUInt64());
+}
+
+int32_t rv_ax_role(RvAxNode* handle)
+{
+    if (auto status = axStatus(handle))
+        return status;
+    return roleValue(axObject(handle)->role());
+}
+
+int32_t rv_ax_states(RvAxNode* handle)
+{
+    if (auto status = axStatus(handle))
+        return status;
+    auto& object = *axObject(handle);
+    int32_t states = 0;
+    auto set = [&](int32_t bit, bool value) {
+        if (value)
+            states |= bit;
+    };
+    set(RV_AX_FOCUSABLE, object.canSetFocusAttribute());
+    set(RV_AX_FOCUSED, object.isFocused());
+    set(RV_AX_DISABLED, !object.isEnabled());
+    if (object.supportsCheckedState()) {
+        states |= RV_AX_CHECKABLE;
+        auto checked = object.checkboxOrRadioValue();
+        set(RV_AX_CHECKED, checked == AccessibilityButtonState::On);
+        set(RV_AX_MIXED, checked == AccessibilityButtonState::Mixed);
+    }
+    set(RV_AX_PRESSED, object.isPressed());
+    if (object.supportsExpanded()) {
+        states |= RV_AX_EXPANDABLE;
+        set(RV_AX_EXPANDED, object.isExpanded());
+    }
+    set(RV_AX_SELECTABLE, object.canSetSelectedAttribute());
+    set(RV_AX_SELECTED, object.isSelected());
+    set(RV_AX_MULTISELECTABLE, object.isMultiSelectable());
+    set(RV_AX_EDITABLE, object.canSetValueAttribute());
+    set(RV_AX_REQUIRED, object.isRequired());
+    auto invalid = object.invalidStatus();
+    set(RV_AX_INVALID, !invalid.isEmpty() && invalid != "false"_s);
+    set(RV_AX_MULTILINE, object.role() == AccessibilityRole::TextArea);
+    set(RV_AX_PROTECTED, object.isSecureField());
+    set(RV_AX_VISITED, object.isVisited());
+    set(RV_AX_BUSY, object.isBusy());
+    set(RV_AX_MODAL, object.isModalNode());
+    set(RV_AX_HAS_POPUP, object.popupValue() != AccessibilityPopupValue::False);
+    set(RV_AX_OFFSCREEN, object.isOffScreen());
+    set(RV_AX_LIVE_REGION, AXCoreObject::liveRegionStatusIsEnabled(AtomString { object.liveRegionStatus() }));
+    return states;
+}
+
+// The accessible name, taken from WebCore's text alternatives as the AT-SPI port takes it
+// (accessibility/atspi/AccessibilityObjectAtspi.cpp, Copyright (C) 2021 Igalia S.L., LGPL-2.1-or-later): the
+// first alternative that is not help text or a summary; an option's value first.
+static String axName(AXCoreObject& object)
+{
+    if (object.role() == AccessibilityRole::ListBoxOption || object.role() == AccessibilityRole::MenuListOption) {
+        auto value = object.stringValue();
+        if (!value.isEmpty())
+            return value;
+    }
+    Vector<AccessibilityText> texts;
+    object.accessibilityText(texts);
+    for (auto& text : texts) {
+        if (!text.text.isEmpty() && text.textSource != AccessibilityTextSource::Help && text.textSource != AccessibilityTextSource::Summary)
+            return text.text;
+    }
+    // A run of text is named by the text itself.
+    if (object.isStaticText())
+        return object.stringValue();
+    return emptyString();
+}
+
+// The accessible description, as the AT-SPI port takes it: help text or a summary, or a title tag when another
+// alternative gave the name.
+static String axDescription(AXCoreObject& object)
+{
+    Vector<AccessibilityText> texts;
+    object.accessibilityText(texts);
+    bool named = false;
+    for (auto& text : texts) {
+        if (text.textSource == AccessibilityTextSource::Help || text.textSource == AccessibilityTextSource::Summary)
+            return text.text;
+        if (text.textSource == AccessibilityTextSource::TitleTag && named)
+            return text.text;
+        named = true;
+    }
+    return emptyString();
+}
+
+int32_t rv_ax_string(RvAxNode* handle, int32_t property, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (auto status = axStatus(handle))
+        return status;
+    auto& object = *axObject(handle);
+    String value;
+    switch (property) {
+    case RV_AX_NAME:
+        value = axName(object);
+        break;
+    case RV_AX_DESCRIPTION:
+        value = axDescription(object);
+        break;
+    case RV_AX_VALUE:
+        value = object.isSecureField() ? emptyString() : object.stringValue();
+        break;
+    case RV_AX_ROLE_NAME:
+        value = object.computedRoleString();
+        break;
+    case RV_AX_ROLE_DESCRIPTION:
+        value = object.ariaRoleDescription();
+        break;
+    case RV_AX_PLACEHOLDER:
+        value = object.placeholderValue();
+        break;
+    case RV_AX_KEY_SHORTCUTS:
+        value = object.keyShortcuts();
+        break;
+    case RV_AX_URL:
+        value = object.isLink() ? object.url().string() : emptyString();
+        break;
+    case RV_AX_LIVE: {
+        auto live = object.liveRegionStatus();
+        value = AXCoreObject::liveRegionStatusIsEnabled(AtomString { live }) ? live : emptyString();
+        break;
+    }
+    case RV_AX_TEXT:
+        value = object.textUnderElement();
+        break;
+    default:
+        return RV_ERR_UNSUPPORTED;
+    }
+    return copyString(value.isNull() ? emptyString() : value, buffer, capacity, length);
+}
+
+static bool isRange(const AXCoreObject& object)
+{
+    switch (object.role()) {
+    case AccessibilityRole::Slider:
+    case AccessibilityRole::SpinButton:
+    case AccessibilityRole::ProgressIndicator:
+    case AccessibilityRole::Meter:
+    case AccessibilityRole::ScrollBar:
+        return true;
+    default:
+        return false;
+    }
+}
+
+int32_t rv_ax_number(RvAxNode* handle, int32_t property, double* value)
+{
+    if (!value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = axStatus(handle))
+        return status;
+    auto& object = *axObject(handle);
+    switch (property) {
+    case RV_AX_NUMBER_VALUE:
+    case RV_AX_NUMBER_MIN:
+    case RV_AX_NUMBER_MAX:
+        if (!isRange(object))
+            return RV_ERR_UNSUPPORTED;
+        *value = property == RV_AX_NUMBER_VALUE ? object.valueForRange() : property == RV_AX_NUMBER_MIN ? object.minValueForRange() : object.maxValueForRange();
+        return RV_OK;
+    case RV_AX_NUMBER_LEVEL: {
+        unsigned level = object.isHeading() ? object.headingLevel() : object.role() == AccessibilityRole::TreeItem ? object.hierarchicalLevel() : 0;
+        if (!level)
+            return RV_ERR_UNSUPPORTED;
+        *value = level;
+        return RV_OK;
+    }
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_ax_rect(RvAxNode* handle, double* x, double* y, double* width, double* height)
+{
+    if (!x || !y || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = axStatus(handle))
+        return status;
+    Ref object = *axObject(handle);
+    updatedCache(object->document());
+    if (isGone(object))
+        return RV_ERR_DETACHED;
+    RefPtr view = object->documentFrameView();
+    FloatRect rect;
+    // The root is the viewport; its element rectangle is the whole document.
+    if (isTreeRoot(object) && view)
+        rect = FloatRect { { }, view->visibleContentRect().size() };
+    else if (view)
+        rect = view->contentsToRootView(snappedIntRect(object->elementRect()));
+    *x = rect.x();
+    *y = rect.y();
+    *width = rect.width();
+    *height = rect.height();
+    return RV_OK;
+}
+
+RvAxNode* rv_ax_parent(RvAxNode* handle)
+{
+    if (axStatus(handle))
+        return nullptr;
+    auto& object = *axObject(handle);
+    if (isTreeRoot(object))
+        return nullptr;
+    return axHandle(object.parentObjectUnignored());
+}
+
+int32_t rv_ax_children(RvAxNode* handle, RvAxNode** nodes, int32_t capacity, int32_t* count)
+{
+    if (!count)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = axStatus(handle))
+        return status;
+    Ref object = *axObject(handle);
+    updatedCache(object->document());
+    if (isGone(object))
+        return RV_ERR_DETACHED;
+    auto children = object->unignoredChildren();
+    *count = static_cast<int32_t>(children.size());
+    if (!nodes || capacity < *count)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (size_t i = 0; i < children.size(); ++i)
+        nodes[i] = axHandle(children[i].ptr());
+    return RV_OK;
+}
+
+int32_t rv_ax_action(RvAxNode* handle, int32_t action)
+{
+    if (auto status = axStatus(handle))
+        return status;
+    Ref object = *axObject(handle);
+    switch (action) {
+    case RV_AX_PRESS: {
+        bool pressed = false;
+        auto status = dispatchCountingFailures([&] { pressed = object->press(); });
+        return status ? status : pressed ? 1 : 0;
+    }
+    case RV_AX_FOCUS:
+        if (!object->canSetFocusAttribute())
+            return 0;
+        object->setFocused(true);
+        return 1;
+    case RV_AX_SCROLL_INTO_VIEW:
+        object->scrollToMakeVisible();
+        return 1;
+    case RV_AX_INCREMENT:
+    case RV_AX_DECREMENT:
+        if (!isRange(object) || !object->canSetValueAttribute())
+            return 0;
+        if (action == RV_AX_INCREMENT)
+            object->increment();
+        else
+            object->decrement();
+        return 1;
+    case RV_AX_EXPAND:
+    case RV_AX_COLLAPSE: {
+        if (!object->supportsExpanded())
+            return 0;
+        bool expand = action == RV_AX_EXPAND;
+        if (object->isExpanded() != expand)
+            object->setIsExpanded(expand);
+        return object->isExpanded() == expand ? 1 : 0;
+    }
+    case RV_AX_SELECT:
+        if (!object->canSetSelectedAttribute())
+            return 0;
+        object->setSelected(true);
+        return 1;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_ax_set_value(RvAxNode* handle, const char* value)
+{
+    if (!value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto status = axStatus(handle))
+        return status;
+    Ref object = *axObject(handle);
+    if (!object->canSetValueAttribute() || isRange(object))
+        return 0;
+    // A form field's value changes as a user's edit does, with input and change.
+    if (RefPtr input = dynamicDowncast<HTMLInputElement>(object->node())) {
+        auto result = input->setValue(utf8(value), DispatchInputAndChangeEvent);
+        return result.hasException() ? fail(result.exception()) : 1;
+    }
+    if (RefPtr area = dynamicDowncast<HTMLTextAreaElement>(object->node())) {
+        area->setValue(utf8(value), DispatchInputAndChangeEvent);
+        return 1;
+    }
+    return object->setValue(utf8(value)) ? 1 : 0;
+}
+
+int32_t rv_ax_set_number(RvAxNode* handle, double value)
+{
+    if (auto status = axStatus(handle))
+        return status;
+    Ref object = *axObject(handle);
+    if (!object->canSetValueAttribute() || !isRange(object))
+        return 0;
+    auto clamped = std::clamp<double>(value, object->minValueForRange(), object->maxValueForRange());
+    // A range input's value changes as a user's drag does, with input and change.
+    if (RefPtr input = dynamicDowncast<HTMLInputElement>(object->node())) {
+        auto result = input->setValue(String::number(clamped), DispatchInputAndChangeEvent);
+        return result.hasException() ? fail(result.exception()) : 1;
+    }
+    return object->setValue(static_cast<float>(clamped)) ? 1 : 0;
+}
+
+// Accessibility text: a node's text as UTF-16 offsets, for the platforms' text interfaces (docs/ACCESSIBILITY.md).
+
+// The DOM range whose text is the node's text: a text field's inner editor, else the node's contents. Null for a
+// node without a DOM node.
+static std::optional<SimpleRange> textScope(AXCoreObject& object)
+{
+    RefPtr subject = object.node();
+    if (!subject)
+        return std::nullopt;
+    subject->document().updateLayoutIgnorePendingStylesheets();
+    if (RefPtr control = dynamicDowncast<HTMLTextFormControlElement>(*subject)) {
+        RefPtr inner = control->innerTextElement();
+        if (!inner)
+            return std::nullopt;
+        return makeRangeSelectingNodeContents(*inner);
+    }
+    return makeRangeSelectingNodeContents(*subject);
+}
+
+// The offset of a boundary point in the scope, clamped to it.
+static int32_t textOffset(const SimpleRange& scope, const std::optional<BoundaryPoint>& point)
+{
+    if (!point || is_lteq(treeOrder<ComposedTree>(*point, scope.start)))
+        return 0;
+    if (is_gteq(treeOrder<ComposedTree>(*point, scope.end)))
+        return static_cast<int32_t>(characterCount(scope));
+    return static_cast<int32_t>(characterCount({ scope.start, *point }));
+}
+
+static int32_t textOffset(const SimpleRange& scope, const VisiblePosition& position)
+{
+    return textOffset(scope, makeBoundaryPoint(position));
+}
+
+// Whether a boundary point lies in the scope, its ends included.
+static bool inScope(const SimpleRange& scope, const std::optional<BoundaryPoint>& point)
+{
+    return point && is_gteq(treeOrder<ComposedTree>(*point, scope.start)) && is_lteq(treeOrder<ComposedTree>(*point, scope.end));
+}
+
+static SimpleRange textRange(const SimpleRange& scope, int32_t start, int32_t end)
+{
+    return resolveCharacterRange(scope, { static_cast<uint64_t>(start), static_cast<uint64_t>(end - start) });
+}
+
+static VisiblePosition textPosition(const SimpleRange& scope, int32_t offset)
+{
+    return VisiblePosition { makeContainerOffsetPosition(textRange(scope, offset, offset).start) };
+}
+
+// The checks the text functions start with, and the scope of the node's text.
+static int32_t textStatus(RvAxNode* handle, std::optional<SimpleRange>& scope)
+{
+    if (auto status = axStatus(handle))
+        return status;
+    scope = textScope(*axObject(handle));
+    return scope ? RV_OK : RV_ERR_UNSUPPORTED;
+}
+
+// The text of the scope, with a password field's characters masked.
+static String scopeText(AXCoreObject& object, const SimpleRange& scope)
+{
+    auto text = plainText(scope);
+    if (!object.isSecureField())
+        return text;
+    StringBuilder masked;
+    for (unsigned i = 0; i < text.length(); ++i)
+        masked.append(static_cast<char16_t>(0x2022));
+    return masked.toString();
+}
+
+int32_t rv_ax_text_length(RvAxNode* handle)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    return static_cast<int32_t>(characterCount(*scope));
+}
+
+int32_t rv_ax_text(RvAxNode* handle, int32_t start, int32_t end, char* buffer, int32_t capacity, int32_t* length)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    auto text = scopeText(*axObject(handle), *scope);
+    if (start < 0 || end < start || static_cast<unsigned>(end) > text.length())
+        return RV_ERR_UNSUPPORTED;
+    return copyString(text.substring(start, end - start), buffer, capacity, length);
+}
+
+int32_t rv_ax_text_boundary(RvAxNode* handle, int32_t offset, int32_t unit, int32_t* start, int32_t* end)
+{
+    if (!start || !end)
+        return RV_ERR_NULL_ARGUMENT;
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    auto text = plainText(*scope);
+    int32_t length = static_cast<int32_t>(text.length());
+    if (offset < 0 || offset > length)
+        return RV_ERR_UNSUPPORTED;
+    if (unit == RV_TEXT_CHARACTER) {
+        // A character at the end of the text is the empty unit there; a surrogate pair is one character.
+        *start = offset;
+        *end = offset < length ? offset + (U16_IS_LEAD(text[offset]) && offset + 1 < length && U16_IS_TRAIL(text[offset + 1]) ? 2 : 1) : offset;
+        return RV_OK;
+    }
+    auto position = textPosition(*scope, offset);
+    VisiblePosition first, last;
+    switch (unit) {
+    case RV_TEXT_WORD:
+        first = startOfWord(position);
+        last = endOfWord(position);
+        break;
+    case RV_TEXT_LINE:
+        first = startOfLine(position);
+        last = endOfLine(position);
+        break;
+    case RV_TEXT_SENTENCE:
+        first = startOfSentence(position);
+        last = endOfSentence(position);
+        break;
+    case RV_TEXT_PARAGRAPH:
+        first = startOfParagraph(position);
+        last = endOfParagraph(position);
+        break;
+    default:
+        return RV_ERR_UNSUPPORTED;
+    }
+    *start = first.isNull() ? offset : textOffset(*scope, first);
+    *end = last.isNull() ? offset : textOffset(*scope, last);
+    // The unit ends before the newline that separates it from the next, which belongs to it.
+    if (unit != RV_TEXT_WORD && *end < length && text[*end] == '\n')
+        ++*end;
+    if (*end < *start)
+        *end = *start;
+    return RV_OK;
+}
+
+int32_t rv_ax_text_selection(RvAxNode* handle, int32_t* start, int32_t* end)
+{
+    if (!start || !end)
+        return RV_ERR_NULL_ARGUMENT;
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    *start = *end = -1;
+    RefPtr frame = axObject(handle)->node()->document().frame();
+    if (!frame)
+        return 0;
+    auto selection = frame->selection().selection();
+    auto range = selection.firstRange();
+    if (!range)
+        return 0;
+    auto overlap = intersection(*range, *scope);
+    // A caret is in the scope when its point is; a range when it overlaps the scope.
+    if (selection.isCaret() ? !inScope(*scope, range->start) : (!overlap || overlap->collapsed()))
+        return 0;
+    auto found = overlap ? *overlap : *range;
+    *start = textOffset(*scope, found.start);
+    *end = textOffset(*scope, found.end);
+    return 1;
+}
+
+int32_t rv_ax_text_caret(RvAxNode* handle)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    RefPtr frame = axObject(handle)->node()->document().frame();
+    if (!frame)
+        return -1;
+    auto selection = frame->selection().selection();
+    if (selection.isNone())
+        return -1;
+    auto focus = makeBoundaryPoint(selection.visibleExtent());
+    return inScope(*scope, focus) ? textOffset(*scope, focus) : -1;
+}
+
+int32_t rv_ax_text_set_selection(RvAxNode* handle, int32_t start, int32_t end)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    int32_t length = static_cast<int32_t>(characterCount(*scope));
+    if (start < 0 || end < start || end > length)
+        return RV_ERR_UNSUPPORTED;
+    RefPtr frame = axObject(handle)->node()->document().frame();
+    if (!frame)
+        return RV_ERR_UNSUPPORTED;
+    frame->selection().setSelection(VisibleSelection { textRange(*scope, start, end) });
+    return RV_OK;
+}
+
+int32_t rv_ax_text_rects(RvAxNode* handle, int32_t start, int32_t end, double* rects, int32_t capacity, int32_t* count)
+{
+    if (!count)
+        return RV_ERR_NULL_ARGUMENT;
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    int32_t length = static_cast<int32_t>(characterCount(*scope));
+    if (start < 0 || end < start || end > length)
+        return RV_ERR_UNSUPPORTED;
+    RefPtr view = axObject(handle)->node()->document().view();
+    if (!view)
+        return RV_ERR_UNSUPPORTED;
+    Vector<IntRect> found;
+    if (start == end)
+        found.append(textPosition(*scope, start).absoluteCaretBounds());
+    else
+        found = RenderObject::absoluteTextRects(textRange(*scope, start, end));
+    found.removeAllMatching([](auto& rect) { return rect.isEmpty() && !rect.height(); });
+    *count = static_cast<int32_t>(found.size());
+    if (!rects || capacity < *count)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (size_t i = 0; i < found.size(); ++i) {
+        auto rect = view->contentsToRootView(found[i]);
+        rects[i * 4] = rect.x();
+        rects[i * 4 + 1] = rect.y();
+        rects[i * 4 + 2] = rect.width();
+        rects[i * 4 + 3] = rect.height();
+    }
+    return RV_OK;
+}
+
+int32_t rv_ax_text_offset_at(RvAxNode* handle, int32_t x, int32_t y)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    RefPtr frame = axObject(handle)->node()->document().frame();
+    RefPtr view = frame ? frame->view() : nullptr;
+    if (!view)
+        return -1;
+    auto point = makeBoundaryPoint(frame->visiblePositionForPoint(view->rootViewToContents(IntPoint { x, y })));
+    return inScope(*scope, point) ? textOffset(*scope, point) : -1;
 }

@@ -36,7 +36,7 @@ KEYWORDS = set(
 )
 
 # The parameter name for an unnamed handle, by its pointee type.
-HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation"}
+HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax"}
 
 
 def strip_comments(text: str) -> str:
@@ -91,7 +91,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     if ctype == "double":
         return "float", ""
     if ctype == "double*":
-        return "double&", ""
+        # An array the function fills, such as rv_ax_text_rects's rectangles; else one value.
+        return ("float[]", "[<In; Out>] ") if name == "rects" else ("double&", "")
     if ctype == "const char*":
         return "string", "[<MarshalAs(UnmanagedType.LPUTF8Str)>] "
     if ctype == "char*":
@@ -160,6 +161,9 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvDragStartCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type DragStartCallback = delegate of context: nativeint * drag: nativeint * x: int * y: int * allowed: int -> unit",
+        "/// <summary>The <c>RvAxCallback</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type AxCallback = delegate of context: nativeint * node: nativeint * event: int -> unit",
     ]
 
     found = declarations(header)

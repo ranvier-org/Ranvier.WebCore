@@ -31,3 +31,4 @@ set(USE_SQLITE_STUB ON CACHE BOOL "")         # 0006: no SQLite (requires USE_WE
 set(USE_BROWSER_API_STUB ON CACHE BOOL "")    # 0007: no WebGPU, WebXR, File System, WebTransport (requires USE_WEB_API_STUB)
 set(USE_INSPECTOR_STUB ON CACHE BOOL "")      # 0008: no WebCore inspector
 set(USE_JSC_INSPECTOR_STUB ON CACHE BOOL "")  # 0009: no JavaScriptCore inspector (requires USE_INSPECTOR_STUB)
+set(USE_AX_EMBEDDER_NOTIFICATIONS ON CACHE BOOL "")  # 0011: accessibility notifications reach the host

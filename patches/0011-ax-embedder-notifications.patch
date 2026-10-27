@@ -1,0 +1,207 @@
+diff --git a/Source/WebCore/accessibility/AXObjectCache.cpp b/Source/WebCore/accessibility/AXObjectCache.cpp
+index eb66c9a..f16a621 100644
+--- a/Source/WebCore/accessibility/AXObjectCache.cpp
++++ b/Source/WebCore/accessibility/AXObjectCache.cpp
+@@ -1722,6 +1722,9 @@ void AXObjectCache::handleAllDeferredChildrenChanged()
+             tree->updateChildrenForObjects(deferredChildrenChangedList);
+ #endif
+ 
++        for (auto& object : deferredChildrenChangedList)
++            postEmbedderNotification(object, AXNotification::ChildrenChanged);
++
+ #if !PLATFORM(COCOA)
+         // Neither the MAC nor IOS_FAMILY ports map AXChildrenChanged to a platform notification.
+         for (auto& object : deferredChildrenChangedList)
+@@ -2058,6 +2061,25 @@ void AXObjectCache::rowIndexChanged(AccessibilityObject& object)
+ }
+ #endif // ENABLE(ACCESSIBILITY_ISOLATED_TREE)
+ 
++#if USE(AX_EMBEDDER_NOTIFICATIONS)
++void AXObjectCache::postEmbedderNotification(AccessibilityObject& object, AXNotification notification)
++{
++    if (RefPtr page = object.page())
++        page->chrome().client().postAccessibilityNotification(object, notification);
++}
++
++void AXObjectCache::postEmbedderTextNotification(AccessibilityObject* object, AXNotification notification)
++{
++    if (!object)
++        return;
++    // A text field's own object, rather than its inner editor's.
++    if (RefPtr observable = object->observableObject())
++        postEmbedderNotification(*observable, notification);
++    else
++        postEmbedderNotification(*object, notification);
++}
++#endif
++
+ void AXObjectCache::notificationPostTimerFired()
+ {
+     AXTRACE(makeString("AXObjectCache::notificationPostTimerFired 0x"_s, hex(reinterpret_cast<uintptr_t>(this))));
+@@ -2110,6 +2132,7 @@ void AXObjectCache::notificationPostTimerFired()
+ #endif
+ 
+     for (const auto& note : notificationsToPost) {
++        postEmbedderNotification(note.first, note.second.notification);
+         WTF::switchOn(note.second.data,
+             [&](const AriaNotifyData& data) {
+                 postPlatformARIANotifyNotification(note.first, data);
+@@ -2557,6 +2580,10 @@ void AXObjectCache::handleFocusedUIElementChanged(Element* oldElement, Element*
+     // cross-frame to the real focused element.
+     updateAncestorFramesFocusedObject();
+ #endif
++#endif
++#if USE(AX_EMBEDDER_NOTIFICATIONS)
++    if (RefPtr focus = getOrCreate(newElement))
++        postEmbedderNotification(*focus, AXNotification::FocusedUIElementChanged);
+ #endif
+     platformHandleFocusedUIElementChanged(protect(getOrCreate(oldElement)), protect(getOrCreate(newElement)));
+ 
+@@ -3024,6 +3051,7 @@ void AXObjectCache::postTextStateChangeNotification(Node* node, const AXTextStat
+ #if PLATFORM(COCOA) || USE(ATSPI)
+     stopCachingComputedObjectAttributes();
+ 
++    postEmbedderTextNotification(getOrCreate(*node), AXNotification::SelectedTextChanged);
+     postTextStateChangeNotification(protect(getOrCreate(*node)), intent, selection);
+ #else
+     postNotification(node->renderer(), AXNotification::SelectedTextChanged, PostTarget::ObservableParent);
+@@ -3115,6 +3143,7 @@ void AXObjectCache::postTextStateChangeNotification(Node* node, AXTextEditType t
+     stopCachingComputedObjectAttributes();
+ 
+     RefPtr object = getOrCreate(node);
++    postEmbedderTextNotification(object.get(), AXNotification::TextChanged);
+ #if PLATFORM(COCOA) || USE(ATSPI)
+     if (object)
+         object = object->observableObject();
+@@ -3152,6 +3181,7 @@ void AXObjectCache::postTextReplacementNotification(Node* node, AXTextEditType d
+     stopCachingComputedObjectAttributes();
+ 
+     RefPtr object = getOrCreate(*node);
++    postEmbedderTextNotification(object.get(), AXNotification::TextChanged);
+ #if PLATFORM(COCOA) || USE(ATSPI)
+     if (object)
+         object = object->observableObject();
+@@ -3175,6 +3205,7 @@ void AXObjectCache::postTextReplacementNotificationForTextControl(HTMLTextFormCo
+     stopCachingComputedObjectAttributes();
+ 
+     RefPtr object = getOrCreate(textControl);
++    postEmbedderTextNotification(object.get(), AXNotification::TextChanged);
+ #if PLATFORM(COCOA) || USE(ATSPI)
+     if (object)
+         object = object->observableObject();
+@@ -3475,6 +3506,7 @@ void AXObjectCache::handleActiveDescendantChange(Element& element, const AtomStr
+ #if ENABLE(ACCESSIBILITY_ISOLATED_TREE)
+         setIsolatedTreeFocusedObject(activeDescendant.get());
+ #endif
++        postEmbedderNotification(*activeDescendant, AXNotification::FocusedUIElementChanged);
+         postPlatformNotification(*activeDescendant, AXNotification::FocusedUIElementChanged);
+     }
+ 
+@@ -3501,6 +3533,7 @@ void AXObjectCache::handleActiveDescendantChange(Element& element, const AtomStr
+         updateIsolatedTree(target.get(), AXNotification::ActiveDescendantChanged);
+ #endif
+ 
++    postEmbedderNotification(*target, AXNotification::ActiveDescendantChanged);
+     postPlatformNotification(*target, AXNotification::ActiveDescendantChanged);
+ 
+     // Table cell active descendant changes should trigger selected cell changes.
+@@ -5742,6 +5775,7 @@ void AXObjectCache::handleMenuListValueChanged(Element& element)
+     updateIsolatedTree(*object, AXNotification::MenuListValueChanged);
+ #endif
+ 
++    postEmbedderNotification(*object, AXNotification::MenuListValueChanged);
+     postPlatformNotification(*object, AXNotification::MenuListValueChanged);
+ }
+ 
+diff --git a/Source/WebCore/accessibility/AXObjectCache.h b/Source/WebCore/accessibility/AXObjectCache.h
+index c9905e7..db42390 100644
+--- a/Source/WebCore/accessibility/AXObjectCache.h
++++ b/Source/WebCore/accessibility/AXObjectCache.h
+@@ -834,6 +834,15 @@ private:
+ 
+ protected:
+     void postPlatformNotification(AccessibilityObject&, AXNotification);
++#if USE(AX_EMBEDDER_NOTIFICATIONS)
++    // Hands a notification to the page's ChromeClient, before the platform layer posts it.
++    void postEmbedderNotification(AccessibilityObject&, AXNotification);
++    // Hands a text notification to the page's ChromeClient for a text field's object, or else the object's.
++    void postEmbedderTextNotification(AccessibilityObject*, AXNotification);
++#else
++    void postEmbedderNotification(AccessibilityObject&, AXNotification) { }
++    void postEmbedderTextNotification(AccessibilityObject*, AXNotification) { }
++#endif
+     void platformHandleFocusedUIElementChanged(AccessibilityObject* oldFocus, AccessibilityObject* newFocus);
+ 
+     void platformPerformDeferredCacheUpdate();
+diff --git a/Source/WebCore/editing/FrameSelection.cpp b/Source/WebCore/editing/FrameSelection.cpp
+index d289ecc..8d3a252 100644
+--- a/Source/WebCore/editing/FrameSelection.cpp
++++ b/Source/WebCore/editing/FrameSelection.cpp
+@@ -3137,6 +3137,21 @@ void FrameSelection::updateOrDisassociateLiveRange(bool shouldMaintainLiveRange)
+         disassociateLiveRange();
+ }
+ 
++#if USE(AX_EMBEDDER_NOTIFICATIONS) && !(PLATFORM(COCOA) || USE(ATSPI))
++// Posts the selection change to the accessibility cache, as the AT-SPI port does, so that the embedder hears it.
++void FrameSelection::notifyAccessibilityForSelectionChange(const AXTextStateChangeIntent& intent)
++{
++    if (!AXObjectCache::accessibilityEnabled())
++        return;
++
++    if (!m_selection.start().isNotNull() || !m_selection.end().isNotNull())
++        return;
++
++    if (CheckedPtr cache = protect(m_document)->existingAXObjectCache())
++        cache->postTextStateChangeNotification(m_selection.start(), intent, m_selection);
++}
++#endif
++
+ }
+ 
+ #if ENABLE(TREE_DEBUGGING)
+diff --git a/Source/WebCore/editing/FrameSelection.h b/Source/WebCore/editing/FrameSelection.h
+index bf4380f..9154bde 100644
+--- a/Source/WebCore/editing/FrameSelection.h
++++ b/Source/WebCore/editing/FrameSelection.h
+@@ -414,7 +414,7 @@ inline EditingStyle* FrameSelection::typingStyle() const
+     return m_typingStyle.get();
+ }
+ 
+-#if !(PLATFORM(COCOA) || USE(ATSPI))
++#if !(PLATFORM(COCOA) || USE(ATSPI) || USE(AX_EMBEDDER_NOTIFICATIONS))
+ 
+ inline void FrameSelection::notifyAccessibilityForSelectionChange(const AXTextStateChangeIntent&)
+ {
+diff --git a/Source/WebCore/page/ChromeClient.h b/Source/WebCore/page/ChromeClient.h
+index 318e247..6227fdb 100644
+--- a/Source/WebCore/page/ChromeClient.h
++++ b/Source/WebCore/page/ChromeClient.h
+@@ -595,6 +595,10 @@ public:
+     virtual void postAccessibilityNodeTextChangeNotification(AccessibilityObject*, AXTextChange, unsigned, const String&) = 0;
+     virtual void postAccessibilityFrameLoadingEventNotification(AccessibilityObject*, AXLoadingEvent) = 0;
+ #endif
++#if USE(AX_EMBEDDER_NOTIFICATIONS) && !PLATFORM(PLAYSTATION) && !PLATFORM(HAIKU)
++    // Receives each accessibility notification AXObjectCache delivers, before the platform layer posts it.
++    virtual void postAccessibilityNotification(AccessibilityObject&, AXNotification) { }
++#endif
+ 
+     // Checks if there is an opened popup, called by RenderMenuList::showPopup().
+     virtual RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const = 0;
+diff --git a/Source/cmake/OptionsCommon.cmake b/Source/cmake/OptionsCommon.cmake
+index 9893a69..782235f 100644
+--- a/Source/cmake/OptionsCommon.cmake
++++ b/Source/cmake/OptionsCommon.cmake
+@@ -190,6 +190,13 @@ if (DEBUG_FISSION)
+     endif ()
+ endif ()
+ 
++# Hands each accessibility notification AXObjectCache delivers to the page's ChromeClient as well, on every
++# port, for an embedder that presents the accessibility tree through the platform API itself.
++option(USE_AX_EMBEDDER_NOTIFICATIONS "Hand AXObjectCache notifications to ChromeClient::postAccessibilityNotification" OFF)
++if (USE_AX_EMBEDDER_NOTIFICATIONS)
++    SET_AND_EXPOSE_TO_BUILD(USE_AX_EMBEDDER_NOTIFICATIONS ON)
++endif ()
++
+ option(CLANG_TIME_TRACE "Generate Clang time trace profiling output" OFF)
+ if (CLANG_TIME_TRACE AND COMPILER_IS_CLANG)
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ftime-trace")
