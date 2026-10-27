@@ -1,6 +1,7 @@
 # Runs the F# ABI driver (tests/abi) against a staged runtime: the frames and events of every ABI version,
-# then the teardown probes. The driver's P/Invoke declarations are checked against host/RanvierWebCoreAbi.h
-# first. The staged libraries are copied next to the built driver, where .NET finds them on every platform.
+# then the teardown probes. The driver's P/Invoke declarations are checked against host/RanvierWebCoreAbi.h,
+# and the generated DOM functions against the checkout's IDL files (gen/domgen.py), first. The staged libraries
+# are copied next to the built driver, where .NET finds them on every platform.
 #
 #   abi_tests.py --stage DIR --source DIR    a directory build.py package staged, and the WebKit checkout
 #                                            (the resources test serves its Ahem font)
@@ -22,6 +23,7 @@ def run(command, **kw):
 
 
 run([sys.executable, '-I', tests / 'generate_native.py', 'check'])
+run([sys.executable, '-I', root / 'gen' / 'domgen.py', 'check', '--source', args.source])
 stage = pathlib.Path(args.stage)
 rid = json.loads((stage / 'manifest.json').read_text())['rid']
 with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:

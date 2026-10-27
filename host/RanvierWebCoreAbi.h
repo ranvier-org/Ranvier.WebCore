@@ -58,6 +58,8 @@ enum {
     RV_ERR_LISTENER_FAILED = -7,
     RV_ERR_NOT_INPUT = -8,
     RV_ERR_UNSUPPORTED = -9,
+    /* A generated function's handle argument is an object of another interface (RanvierWebCoreDom.h). */
+    RV_ERR_WRONG_INTERFACE = -10,
 };
 
 /* String properties of rv_node_get_string and rv_node_set_string. */
@@ -747,6 +749,9 @@ RV_EXPORT void rv_drag_data_release(RvDragData*);
  * when a listener cancelled dragover, else RV_DROP_COPY for text over editable content, else RV_DROP_NONE.
  * A drop that no listener cancels inserts the text, or the HTML, into editable content at the point. */
 RV_EXPORT int32_t rv_host_drag(RvHost*, int32_t action, int32_t x, int32_t y, int32_t allowed, RvDragData* data, int32_t modifiers);
+
+/* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
+ * IDL member of the interfaces gen/dom.json lists, from the same library. */
 
 #ifdef __cplusplus
 }

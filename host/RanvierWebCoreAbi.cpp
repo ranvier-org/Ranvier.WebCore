@@ -1,5 +1,6 @@
 #include "config.h"
 #include "RanvierWebCoreAbi.h"
+#include "dom/RanvierDomGlue.h"
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
@@ -929,16 +930,9 @@ static int32_t copyString(const String& value, char* buffer, int32_t capacity, i
     return RV_OK;
 }
 
-// The exception of the latest call that returned RV_ERR_DOM_EXCEPTION, on the owning thread.
-static std::optional<ExceptionCode> lastExceptionCode;
-static String lastExceptionMessage;
-
-static int32_t fail(const Exception& exception)
-{
-    lastExceptionCode = exception.code();
-    lastExceptionMessage = exception.message();
-    return RV_ERR_DOM_EXCEPTION;
-}
+// The exception of the latest call that returned RV_ERR_DOM_EXCEPTION, on the owning thread, is kept in WebCore
+// with the generated functions' (host/dom/RanvierDomGlue.h), so rv_last_exception reports either.
+static int32_t fail(const Exception& exception) { return Ranvier::recordException(exception); }
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
@@ -960,7 +954,8 @@ int32_t rv_abi_has(const char* feature)
         if (!std::strcmp(feature, name))
             return 1;
     }
-    return 0;
+    // "dom-generated" and "dom:<Interface>": the generated functions of RanvierWebCoreDom.h.
+    return ranvier_dom_has(feature);
 }
 
 int64_t rv_process_id(void) { return static_cast<int64_t>(getCurrentProcessID()); }
@@ -1679,13 +1674,14 @@ int32_t rv_last_exception(int32_t part, char* buffer, int32_t capacity, int32_t*
 {
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    if (!lastExceptionCode)
+    auto code = Ranvier::lastExceptionCode();
+    if (!code)
         return copyString(String { }, buffer, capacity, length);
     switch (part) {
     case RV_EXCEPTION_NAME:
-        return copyString(String { DOMException::name(*lastExceptionCode) }, buffer, capacity, length);
+        return copyString(String { DOMException::name(*code) }, buffer, capacity, length);
     case RV_EXCEPTION_MESSAGE:
-        return copyString(lastExceptionMessage, buffer, capacity, length);
+        return copyString(Ranvier::lastExceptionMessage(), buffer, capacity, length);
     }
     return RV_ERR_UNSUPPORTED;
 }
