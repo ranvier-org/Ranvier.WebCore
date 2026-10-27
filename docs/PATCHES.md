@@ -10,8 +10,8 @@ The patches add new files (under a `stub/` directory next to the code they stand
 They edit upstream C++ in three places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
 `CryptoKeyRSA.h`; 0010 changes `EmptyClients.h`, `ChromeClient.h`, `WebAnimation.h`, `CSSTransition.h`, `Element.h`,
 `Document.h` and `AXCoreObject.h`, and exports from `ResizeObserver.h` and `IntersectionObserver.h`, and also changes
-`PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjectCache.cpp`, `ChromeClient.h` and `OptionsCommon.cmake`. The patches
-touch 70 files in all.
+`PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjectCache.cpp`, `FrameSelection.h`, `FrameSelection.cpp`, `ChromeClient.h` and `OptionsCommon.cmake`. The patches
+touch 72 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -211,7 +211,7 @@ the one WebCore's PlayStation and Haiku ports post through; `ChromeClient.h` dec
 too, with an empty body, when the option is on. The Windows, macOS and AT-SPI layers post to the platform API
 directly, and the Windows layer only for a page with an `HWND`, which an offscreen host has none of.
 
-`AXObjectCache::postEmbedderNotification` is called at six places in `AXObjectCache.cpp`:
+`AXObjectCache::postEmbedderNotification` is called from these places in `AXObjectCache.cpp`:
 
 - for each notification of the queue, in `notificationPostTimerFired`;
 - for each object of a children change, in `handleAllDeferredChildrenChanged`, also on Cocoa, whose
@@ -219,8 +219,16 @@ directly, and the Windows layer only for a page with an `HWND`, which an offscre
 - for the newly focused object, in `handleFocusedUIElementChanged`;
 - for focus moving to an active descendant, an active descendant change, and a `<select>`'s value change,
   which `AXObjectCache` posts to the platform layer directly.
+- for text edits (`TextChanged`), in `postTextStateChangeNotification`, `postTextReplacementNotification` and
+  `postTextReplacementNotificationForTextControl`, and for selection changes (`SelectedTextChanged`) on Cocoa
+  and AT-SPI, whose layers post them directly; Windows already queues them. `postEmbedderTextNotification`
+  posts on the text field's object when the edit is inside one.
 
-With the option off, `postEmbedderNotification` is an empty inline member, and `AXObjectCache` compiles to
+On Windows `FrameSelection` reports no selection change to accessibility (`notifyAccessibilityForSelectionChange`
+is empty outside Cocoa and AT-SPI). With the option on, `FrameSelection.cpp` defines it as the AT-SPI port
+does, so the cache queues `SelectedTextChanged` for the observable object.
+
+With the option off, `postEmbedderNotification` and `postEmbedderTextNotification` are empty inline members, and `AXObjectCache` compiles to
 what it was. The slim flavor turns the option on; the lean flavor keeps it off, and the host then reports
 `rv_abi_has("accessibility-events")` as 0.
 

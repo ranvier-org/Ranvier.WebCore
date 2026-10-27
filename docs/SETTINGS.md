@@ -37,7 +37,7 @@ flavor's package is 125.84 MB in 31 files; the slim flavor's is 77.59 MB in 18 f
 | `USE_LCMS`, `ENABLE_XSLT` | OFF | Colour management and XSLT: 0.60 MB with libxslt. |
 | `ENABLE_WEBGL`, `ENABLE_VIDEO`, `ENABLE_REMOTE_INSPECTOR`, `ENABLE_WEBDRIVER` | OFF | Browser features with no use in presentation. With the link folding below, WebKit's own options remove 3.78 MB from `WebCore.dll`. |
 | `USE_*_STUB` | ON | The patch series; `docs/PATCHES.md`. |
-| `USE_AX_EMBEDDER_NOTIFICATIONS` | ON | Patch 0011: accessibility notifications reach the host's chrome client, for `RvAxCallback`; `docs/ACCESSIBILITY.md`. Adds 1.5 KB to `WebCore.dll`. |
+| `USE_AX_EMBEDDER_NOTIFICATIONS` | ON | Patch 0011: accessibility notifications reach the host's chrome client, for `RvAxCallback`; `docs/ACCESSIBILITY.md`. Adds 2.5 KB to `WebCore.dll`. |
 
 ## Outside CMake (slim only)
 

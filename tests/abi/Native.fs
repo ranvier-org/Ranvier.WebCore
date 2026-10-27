@@ -214,7 +214,15 @@ module Calls =
            "rv_ax_children"
            "rv_ax_action"
            "rv_ax_set_value"
-           "rv_ax_set_number" |]
+           "rv_ax_set_number"
+           "rv_ax_text_length"
+           "rv_ax_text"
+           "rv_ax_text_boundary"
+           "rv_ax_text_selection"
+           "rv_ax_text_caret"
+           "rv_ax_text_set_selection"
+           "rv_ax_text_rects"
+           "rv_ax_text_offset_at" |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
     let Ticks: int64 array = Array.zeroCreate Names.Length
@@ -814,6 +822,37 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_ax_set_number(nativeint ax, float value)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_text_length(nativeint ax)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_text(nativeint ax, int start, int ``end``, byte[] buffer, int capacity, int[] length)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_text_boundary(nativeint ax, int offset, int unit, int& start, int& ``end``)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_text_selection(nativeint ax, int& start, int& ``end``)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_text_caret(nativeint ax)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_text_set_selection(nativeint ax, int start, int ``end``)
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_text_rects(
+        nativeint ax,
+        int start,
+        int ``end``,
+        [<In; Out>] float[] rects,
+        int capacity,
+        int& count
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_ax_text_offset_at(nativeint ax, int x, int y)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -2782,6 +2821,102 @@ let rv_ax_set_number (ax: nativeint, value: float) : int =
         result
     else
         Raw.rv_ax_set_number (ax, value)
+
+let rv_ax_text_length (ax: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_text_length (ax)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[159] <- Calls.Counts[159] + 1L
+        Calls.Ticks[159] <- Calls.Ticks[159] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_text_length (ax)
+
+let rv_ax_text (ax: nativeint, start: int, ``end``: int, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_text (ax, start, ``end``, buffer, capacity, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[160] <- Calls.Counts[160] + 1L
+        Calls.Ticks[160] <- Calls.Ticks[160] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_text (ax, start, ``end``, buffer, capacity, length)
+
+let rv_ax_text_boundary (ax: nativeint, offset: int, unit: int, start: byref<int>, ``end``: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_text_boundary (ax, offset, unit, &start, &``end``)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[161] <- Calls.Counts[161] + 1L
+        Calls.Ticks[161] <- Calls.Ticks[161] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_text_boundary (ax, offset, unit, &start, &``end``)
+
+let rv_ax_text_selection (ax: nativeint, start: byref<int>, ``end``: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_text_selection (ax, &start, &``end``)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[162] <- Calls.Counts[162] + 1L
+        Calls.Ticks[162] <- Calls.Ticks[162] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_text_selection (ax, &start, &``end``)
+
+let rv_ax_text_caret (ax: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_text_caret (ax)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[163] <- Calls.Counts[163] + 1L
+        Calls.Ticks[163] <- Calls.Ticks[163] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_text_caret (ax)
+
+let rv_ax_text_set_selection (ax: nativeint, start: int, ``end``: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_text_set_selection (ax, start, ``end``)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[164] <- Calls.Counts[164] + 1L
+        Calls.Ticks[164] <- Calls.Ticks[164] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_text_set_selection (ax, start, ``end``)
+
+let rv_ax_text_rects (ax: nativeint, start: int, ``end``: int, rects: float[], capacity: int, count: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_text_rects (ax, start, ``end``, rects, capacity, &count)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[165] <- Calls.Counts[165] + 1L
+        Calls.Ticks[165] <- Calls.Ticks[165] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_text_rects (ax, start, ``end``, rects, capacity, &count)
+
+let rv_ax_text_offset_at (ax: nativeint, x: int, y: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_ax_text_offset_at (ax, x, y)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[166] <- Calls.Counts[166] + 1L
+        Calls.Ticks[166] <- Calls.Ticks[166] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_ax_text_offset_at (ax, x, y)
 
 // END GENERATED
 

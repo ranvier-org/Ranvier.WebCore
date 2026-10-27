@@ -7,6 +7,11 @@
 #include <WebCore/AXNotifications.h>
 #include <WebCore/AXObjectCache.h>
 #include <WebCore/AccessibilityObject.h>
+#include <WebCore/BoundaryPoint.h>
+#include <WebCore/RenderObject.h>
+#include <WebCore/TextControlInnerElements.h>
+#include <WebCore/TextIterator.h>
+#include <WebCore/VisibleUnits.h>
 #include <WebCore/DocumentView.h>
 #include <WebCore/AbortSignal.h>
 #include <WebCore/AddEventListenerOptions.h>
@@ -969,7 +974,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "accessibility" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "accessibility", "accessibility-text" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -3554,6 +3559,8 @@ static std::optional<int32_t> axEvent(AXNotification notification)
     case ScrolledToAnchor: return RV_AX_EVENT_LAYOUT;
     case MenuOpened: return RV_AX_EVENT_MENU_OPENED;
     case MenuClosed: return RV_AX_EVENT_MENU_CLOSED;
+    case TextChanged: return RV_AX_EVENT_TEXT;
+    case SelectedTextChanged: return RV_AX_EVENT_TEXT_SELECTION;
     default:
         return std::nullopt;
     }
@@ -4058,4 +4065,243 @@ int32_t rv_ax_set_number(RvAxNode* handle, double value)
         return result.hasException() ? fail(result.exception()) : 1;
     }
     return object->setValue(static_cast<float>(clamped)) ? 1 : 0;
+}
+
+// Accessibility text: a node's text as UTF-16 offsets, for the platforms' text interfaces (docs/ACCESSIBILITY.md).
+
+// The DOM range whose text is the node's text: a text field's inner editor, else the node's contents. Null for a
+// node without a DOM node.
+static std::optional<SimpleRange> textScope(AXCoreObject& object)
+{
+    RefPtr subject = object.node();
+    if (!subject)
+        return std::nullopt;
+    subject->document().updateLayoutIgnorePendingStylesheets();
+    if (RefPtr control = dynamicDowncast<HTMLTextFormControlElement>(*subject)) {
+        RefPtr inner = control->innerTextElement();
+        if (!inner)
+            return std::nullopt;
+        return makeRangeSelectingNodeContents(*inner);
+    }
+    return makeRangeSelectingNodeContents(*subject);
+}
+
+// The offset of a boundary point in the scope, clamped to it.
+static int32_t textOffset(const SimpleRange& scope, const std::optional<BoundaryPoint>& point)
+{
+    if (!point || is_lteq(treeOrder<ComposedTree>(*point, scope.start)))
+        return 0;
+    if (is_gteq(treeOrder<ComposedTree>(*point, scope.end)))
+        return static_cast<int32_t>(characterCount(scope));
+    return static_cast<int32_t>(characterCount({ scope.start, *point }));
+}
+
+static int32_t textOffset(const SimpleRange& scope, const VisiblePosition& position)
+{
+    return textOffset(scope, makeBoundaryPoint(position));
+}
+
+// Whether a boundary point lies in the scope, its ends included.
+static bool inScope(const SimpleRange& scope, const std::optional<BoundaryPoint>& point)
+{
+    return point && is_gteq(treeOrder<ComposedTree>(*point, scope.start)) && is_lteq(treeOrder<ComposedTree>(*point, scope.end));
+}
+
+static SimpleRange textRange(const SimpleRange& scope, int32_t start, int32_t end)
+{
+    return resolveCharacterRange(scope, { static_cast<uint64_t>(start), static_cast<uint64_t>(end - start) });
+}
+
+static VisiblePosition textPosition(const SimpleRange& scope, int32_t offset)
+{
+    return VisiblePosition { makeContainerOffsetPosition(textRange(scope, offset, offset).start) };
+}
+
+// The checks the text functions start with, and the scope of the node's text.
+static int32_t textStatus(RvAxNode* handle, std::optional<SimpleRange>& scope)
+{
+    if (auto status = axStatus(handle))
+        return status;
+    scope = textScope(*axObject(handle));
+    return scope ? RV_OK : RV_ERR_UNSUPPORTED;
+}
+
+// The text of the scope, with a password field's characters masked.
+static String scopeText(AXCoreObject& object, const SimpleRange& scope)
+{
+    auto text = plainText(scope);
+    if (!object.isSecureField())
+        return text;
+    StringBuilder masked;
+    for (unsigned i = 0; i < text.length(); ++i)
+        masked.append(static_cast<char16_t>(0x2022));
+    return masked.toString();
+}
+
+int32_t rv_ax_text_length(RvAxNode* handle)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    return static_cast<int32_t>(characterCount(*scope));
+}
+
+int32_t rv_ax_text(RvAxNode* handle, int32_t start, int32_t end, char* buffer, int32_t capacity, int32_t* length)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    auto text = scopeText(*axObject(handle), *scope);
+    if (start < 0 || end < start || static_cast<unsigned>(end) > text.length())
+        return RV_ERR_UNSUPPORTED;
+    return copyString(text.substring(start, end - start), buffer, capacity, length);
+}
+
+int32_t rv_ax_text_boundary(RvAxNode* handle, int32_t offset, int32_t unit, int32_t* start, int32_t* end)
+{
+    if (!start || !end)
+        return RV_ERR_NULL_ARGUMENT;
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    auto text = plainText(*scope);
+    int32_t length = static_cast<int32_t>(text.length());
+    if (offset < 0 || offset > length)
+        return RV_ERR_UNSUPPORTED;
+    if (unit == RV_TEXT_CHARACTER) {
+        // A character at the end of the text is the empty unit there; a surrogate pair is one character.
+        *start = offset;
+        *end = offset < length ? offset + (U16_IS_LEAD(text[offset]) && offset + 1 < length && U16_IS_TRAIL(text[offset + 1]) ? 2 : 1) : offset;
+        return RV_OK;
+    }
+    auto position = textPosition(*scope, offset);
+    VisiblePosition first, last;
+    switch (unit) {
+    case RV_TEXT_WORD:
+        first = startOfWord(position);
+        last = endOfWord(position);
+        break;
+    case RV_TEXT_LINE:
+        first = startOfLine(position);
+        last = endOfLine(position);
+        break;
+    case RV_TEXT_SENTENCE:
+        first = startOfSentence(position);
+        last = endOfSentence(position);
+        break;
+    case RV_TEXT_PARAGRAPH:
+        first = startOfParagraph(position);
+        last = endOfParagraph(position);
+        break;
+    default:
+        return RV_ERR_UNSUPPORTED;
+    }
+    *start = first.isNull() ? offset : textOffset(*scope, first);
+    *end = last.isNull() ? offset : textOffset(*scope, last);
+    // The unit ends before the newline that separates it from the next, which belongs to it.
+    if (unit != RV_TEXT_WORD && *end < length && text[*end] == '\n')
+        ++*end;
+    if (*end < *start)
+        *end = *start;
+    return RV_OK;
+}
+
+int32_t rv_ax_text_selection(RvAxNode* handle, int32_t* start, int32_t* end)
+{
+    if (!start || !end)
+        return RV_ERR_NULL_ARGUMENT;
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    *start = *end = -1;
+    RefPtr frame = axObject(handle)->node()->document().frame();
+    if (!frame)
+        return 0;
+    auto selection = frame->selection().selection();
+    auto range = selection.firstRange();
+    if (!range)
+        return 0;
+    auto overlap = intersection(*range, *scope);
+    // A caret is in the scope when its point is; a range when it overlaps the scope.
+    if (selection.isCaret() ? !inScope(*scope, range->start) : (!overlap || overlap->collapsed()))
+        return 0;
+    auto found = overlap ? *overlap : *range;
+    *start = textOffset(*scope, found.start);
+    *end = textOffset(*scope, found.end);
+    return 1;
+}
+
+int32_t rv_ax_text_caret(RvAxNode* handle)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    RefPtr frame = axObject(handle)->node()->document().frame();
+    if (!frame)
+        return -1;
+    auto selection = frame->selection().selection();
+    if (selection.isNone())
+        return -1;
+    auto focus = makeBoundaryPoint(selection.visibleExtent());
+    return inScope(*scope, focus) ? textOffset(*scope, focus) : -1;
+}
+
+int32_t rv_ax_text_set_selection(RvAxNode* handle, int32_t start, int32_t end)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    int32_t length = static_cast<int32_t>(characterCount(*scope));
+    if (start < 0 || end < start || end > length)
+        return RV_ERR_UNSUPPORTED;
+    RefPtr frame = axObject(handle)->node()->document().frame();
+    if (!frame)
+        return RV_ERR_UNSUPPORTED;
+    frame->selection().setSelection(VisibleSelection { textRange(*scope, start, end) });
+    return RV_OK;
+}
+
+int32_t rv_ax_text_rects(RvAxNode* handle, int32_t start, int32_t end, double* rects, int32_t capacity, int32_t* count)
+{
+    if (!count)
+        return RV_ERR_NULL_ARGUMENT;
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    int32_t length = static_cast<int32_t>(characterCount(*scope));
+    if (start < 0 || end < start || end > length)
+        return RV_ERR_UNSUPPORTED;
+    RefPtr view = axObject(handle)->node()->document().view();
+    if (!view)
+        return RV_ERR_UNSUPPORTED;
+    Vector<IntRect> found;
+    if (start == end)
+        found.append(textPosition(*scope, start).absoluteCaretBounds());
+    else
+        found = RenderObject::absoluteTextRects(textRange(*scope, start, end));
+    found.removeAllMatching([](auto& rect) { return rect.isEmpty() && !rect.height(); });
+    *count = static_cast<int32_t>(found.size());
+    if (!rects || capacity < *count)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (size_t i = 0; i < found.size(); ++i) {
+        auto rect = view->contentsToRootView(found[i]);
+        rects[i * 4] = rect.x();
+        rects[i * 4 + 1] = rect.y();
+        rects[i * 4 + 2] = rect.width();
+        rects[i * 4 + 3] = rect.height();
+    }
+    return RV_OK;
+}
+
+int32_t rv_ax_text_offset_at(RvAxNode* handle, int32_t x, int32_t y)
+{
+    std::optional<SimpleRange> scope;
+    if (auto status = textStatus(handle, scope))
+        return status;
+    RefPtr frame = axObject(handle)->node()->document().frame();
+    RefPtr view = frame ? frame->view() : nullptr;
+    if (!view)
+        return -1;
+    auto point = makeBoundaryPoint(frame->visiblePositionForPoint(view->rootViewToContents(IntPoint { x, y })));
+    return inScope(*scope, point) ? textOffset(*scope, point) : -1;
 }

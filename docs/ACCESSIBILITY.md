@@ -16,8 +16,8 @@ port is the platform layer that turns the tree into the platform API:
 | Port | Platform layer in WebCore | How it reaches assistive technology | Relevance to the host |
 |---|---|---|---|
 | Windows (`PORT=Win`) | `accessibility/win`: 4 files. MSAA event posting with `NotifyWinEvent`, and an abstract `AccessibilityObjectWrapper` (an `IUnknown`) with no implementation in WebCore | WebKitLegacy implemented the MSAA objects; it is gone from WebKit. Events need the page's `HWND` (`ChromeClient::platformPageClient`), which an offscreen host has none of | The app writes the UI Automation provider; the ABI is the only path. |
-| macOS (`PORT=Mac`) | `accessibility/mac` and `cocoa`: `WebAccessibilityObjectWrapperMac`, an `NSAccessibility` element per object, posting notifications itself. The isolated tree (`ENABLE_ACCESSIBILITY_ISOLATED_TREE`) answers queries off the main thread | Through the wrappers, which an `NSView` returns as its accessibility children (`AXCoreObject::platformElement()` is exported) | Two routes: mirror the ABI's tree, or hand the wrappers to AppKit. See the decisions below. |
-| Linux (`PORT=WPE`) | `accessibility/atspi`: a complete AT-SPI implementation over D-Bus (`USE_ATSPI` is always on for WPE; `USE_ATK`, which `config/wpe.cmake` turns off, only adds the ATK bridge) | `AccessibilityAtspi::connect(busAddress)` registers the page on the accessibility bus; WPE's UI process normally does this | Two routes as on macOS: mirror the ABI's tree, or connect WebCore's own AT-SPI objects and plug them into the app's tree. |
+| macOS (`PORT=Mac`) | `accessibility/mac` and `cocoa`: `WebAccessibilityObjectWrapperMac`, an `NSAccessibility` element per object, posting notifications itself. The isolated tree (`ENABLE_ACCESSIBILITY_ISOLATED_TREE`) answers queries off the main thread | Through the wrappers, which an `NSView` returns as its accessibility children (`AXCoreObject::platformElement()` is exported) | The app mirrors the ABI's tree, as on Windows (see Decisions); the wrappers stay unused. |
+| Linux (`PORT=WPE`) | `accessibility/atspi`: a complete AT-SPI implementation over D-Bus (`USE_ATSPI` is always on for WPE; `USE_ATK`, which `config/wpe.cmake` turns off, only adds the ATK bridge) | `AccessibilityAtspi::connect(busAddress)` registers the page on the accessibility bus; WPE's UI process normally does this | The app mirrors the ABI's tree, as on Windows (see Decisions); WebCore's AT-SPI objects stay unconnected. |
 
 So the tree is present, built and correct on every port; an offscreen host lacks only a way to read it and
 to hear its changes. The ABI adds both, on every port alike.
@@ -148,15 +148,64 @@ mapping is `roleValue` in `host/RanvierWebCoreAbi.cpp`. A sketch of the bridge's
 | `DIALOG`, `ALERT_DIALOG`, `ALERT`, `STATUS`, `LOG`, `MARQUEE`, `TIMER`, `TOOLTIP` | `Window` (dialogs), `Text`, `StatusBar`, `ToolTip` | `AXGroup` with a subrole | `dialog`, `alert`, `status-bar`, `log`, `marquee`, `timer`, `tool-tip` |
 | `TOOLBAR`, `SEPARATOR`, `MATH` | `ToolBar`, `Separator`, `Group` | `AXToolbar`, `AXSplitter`, `AXGroup` | `tool-bar`, `separator`, `math` |
 
+## Text
+
+`rv_abi_has("accessibility-text")` adds a node's text, enough to back UI Automation's `TextPattern` and
+`TextRange`, NSAccessibility's text attributes (`AXValue`, `AXSelectedTextRange`, `AXInsertionPointLineNumber`,
+`AXStringForRange`, `AXBoundsForRange`, `AXRangeForPosition`) and AT-SPI's `Text` interface, from one model:
+
+- **The text.** A node's text is its DOM node's text as WebCore's `TextIterator` reads it (`plainText`): the
+  rendered text, with a newline between blocks. A text field's text is its inner editor's, so its value; a
+  password field's is masked with U+2022. The root's text is the whole document's.
+- **Offsets** are UTF-16 code units, as in UI Automation, `NSRange` and the DOM. AT-SPI counts characters,
+  so the bridge converts there.
+- **Units.** `rv_ax_text_boundary(offset, unit)` returns the character, word, line, sentence or paragraph
+  containing an offset, from WebCore's own `startOfWord`, `startOfLine` (lines as laid out),
+  `startOfSentence` and `startOfParagraph`. A `TextRange.Move` or `ExpandToEnclosingUnit` and AT-SPI's
+  `GetStringAtOffset` are calls to it; a line, sentence or paragraph includes the newline that ends it.
+- **Caret and selection.** `rv_ax_text_selection` clips the page's selection to the node's text,
+  `rv_ax_text_caret` gives the selection's moving end, and `rv_ax_text_set_selection` sets either. The page
+  has one selection, as a browser has.
+- **Geometry.** `rv_ax_text_rects` gives a rectangle per line box of the range (UI Automation's
+  `GetBoundingRectangles`), or the caret's rectangle for an empty range; `rv_ax_text_offset_at` is the
+  reverse (`RangeFromPoint`, `GetOffsetAtPoint`).
+- **Events.** `RV_AX_EVENT_TEXT` (`UIA_Text_TextChangedEventId`, `object:text-changed`,
+  `AXValueChanged`) and `RV_AX_EVENT_TEXT_SELECTION` (`UIA_Text_TextSelectionChangedEventId`,
+  `object:text-caret-moved`, `AXSelectedTextChanged`). Patch 0011 hands WebCore's text edit and selection
+  notifications to the host on every port; WebCore's own platform layers post them through different paths
+  (Windows through its queue as `SelectedTextChanged`, Cocoa and AT-SPI directly). WebCore reports a
+  selection change in the rendering update after it, so the event follows the app's next `rv_host_update`.
+- **Form fields in the root's text.** `TextIterator` does not enter text fields, so the root's text holds
+  the page's text runs without the fields' values; each field's own node has its value as text.
+
+The host computes these from WebCore's editing primitives (`TextIterator`, `VisibleUnits`, the frame
+selection), which WebCore already exports, rather than from `AXTextMarker`, whose members are not exported
+and differ between the Cocoa and other ports. So the text functions add no export to patch 0010.
+
+## Decisions
+
+Settled by the user on 2026-10-27:
+
+- **Version.** The branch keeps `rv_abi_version` 19 with the `rv_abi_has` groups `accessibility`,
+  `accessibility-events` and `accessibility-text`; it merges into the version 20 batch.
+- **Lifecycle.** WebCore's accessibility mode is per process: on while any host has accessibility on, and
+  back off when the last host turns it off.
+- **Lean flavor.** Patch 0011 stays off in the lean flavor, which therefore has the tree and no events.
+- **One bridge.** macOS and Linux use the same ABI tree as Windows, not WebCore's own NSAccessibility
+  wrappers or AT-SPI objects.
+- **Text ranges** are in scope (the section above).
+- **Roles.** The 71 folded `RV_ROLE_*` values stay; `RV_AX_ROLE_NAME` gives the finer ARIA role.
+- **Events** are delivered asynchronously on the next run loop cycle, with no flush call.
+
 ## Size
 
 Measured on Windows x64, slim flavor, against the same build without these changes (2026-10-27):
 
 | File | Before | After | Change |
 |---|---|---|---|
-| `WebCore.dll` | 45,457,920 | 45,459,456 | +1,536 bytes: patch 0011's hook and three exports |
-| `RanvierWebCoreHost.dll` | 160,256 | 175,104 | +14,848 bytes: the ABI's accessibility functions |
-| Package (24 files) | 77,688,017 | 77,704,401 | +16,384 bytes |
+| `WebCore.dll` | 45,457,920 | 45,460,480 | +2,560 bytes: patch 0011's hooks and three exports |
+| `RanvierWebCoreHost.dll` | 160,256 | 189,440 | +29,184 bytes: the ABI's accessibility and text functions |
+| Package (24 files) | 77,688,017 | 77,719,761 | +31,744 bytes |
 
 The tree itself costs nothing in the package: WebCore compiles it on every port whether or not anything
 reads it. At run time a host with accessibility on keeps an accessibility object per exposed node and
@@ -165,10 +214,11 @@ with it off costs nothing.
 
 ## Not covered
 
-- **Text ranges.** UI Automation's `TextPattern`, NSAccessibility's text marker APIs and AT-SPI's `Text`
-  interface (caret, selection, character and line bounds, text attributes) need WebCore's
-  `AXTextMarker` ranges, which the ABI does not expose. A screen reader can read names and values, and a
-  text field's whole value, but not navigate inside text by character or line.
+- **Text attributes.** Font, size, weight, colour, language and misspelling over a text range (UI
+  Automation's `GetAttributeValue`, AT-SPI's `GetAttributeRun`) are not exposed.
+- **Text inside a single object only.** A text range lives in one node's text; a UI Automation range that
+  spans the document uses the root's text, which holds every text run but not the fields' values. Embedded objects (an image or a
+  button inside a paragraph) are not marked in the text with U+FFFC as AT-SPI's hypertext expects.
 - **Tables.** Row and column counts, indexes, spans and headers (`AXTableHelpers`) are not exposed; the
   app sees rows and cells as children.
 - **Relations.** `aria-controls`, `aria-owns`, `aria-flowto`, `aria-details` and `aria-errormessage`

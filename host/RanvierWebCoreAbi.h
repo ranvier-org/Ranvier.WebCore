@@ -959,6 +959,11 @@ enum {
     RV_AX_EVENT_LAYOUT = 10,
     RV_AX_EVENT_MENU_OPENED = 11,
     RV_AX_EVENT_MENU_CLOSED = 12,
+    /* "accessibility-text": text was inserted into or deleted from the editable content at node, which is a text
+     * field or the editable node where the edit happened; the app reads its text again. */
+    RV_AX_EVENT_TEXT = 13,
+    /* "accessibility-text": the selection or caret moved within the text of node, or of the text field node. */
+    RV_AX_EVENT_TEXT_SELECTION = 14,
 };
 
 /* Called on the host thread from rv_run_loop_cycle, once per node and event since the previous call, in the
@@ -1016,6 +1021,49 @@ RV_EXPORT int32_t rv_ax_set_value(RvAxNode*, const char* value);
 /* Sets the value of a range, such as a slider, clamped to its minimum and maximum; a range <input> fires input
  * and change. Returns as rv_ax_set_value. */
 RV_EXPORT int32_t rv_ax_set_number(RvAxNode*, double value);
+
+/* "accessibility-text" for rv_abi_has: a node's text, for UI Automation's TextPattern, NSAccessibility's text
+ * attributes and AT-SPI's Text interface. A node's text is its DOM node's rendered text as the page reads it,
+ * with a newline between blocks; a text field's is its value, masked with U+2022 for a password field. Offsets
+ * are UTF-16 code units from 0 to rv_ax_text_length. Each function returns RV_ERR_UNSUPPORTED for a node
+ * without a DOM node, such as a list marker, and for an offset or range outside the text. Layout is updated
+ * first. */
+
+/* Units of rv_ax_text_boundary. */
+enum {
+    /* One character: a UTF-16 code unit, or a surrogate pair. */
+    RV_TEXT_CHARACTER = 0,
+    RV_TEXT_WORD = 1,
+    /* A line as laid out, which wraps with the width of its box. */
+    RV_TEXT_LINE = 2,
+    RV_TEXT_SENTENCE = 3,
+    RV_TEXT_PARAGRAPH = 4,
+};
+
+/* The length of the node's text in UTF-16 code units, or a negative status. */
+RV_EXPORT int32_t rv_ax_text_length(RvAxNode*);
+/* Copies the text from start to end, UTF-16 offsets, as UTF-8. */
+RV_EXPORT int32_t rv_ax_text(RvAxNode*, int32_t start, int32_t end, char* buffer, int32_t capacity, int32_t* length);
+/* Writes the start and end of the unit that contains offset: for a word, the word or the space after it as
+ * WebCore's word breaking finds them; for a line, sentence or paragraph, the unit with the newline that ends it.
+ * At the end of the text, the last unit, or for a character an empty range. A UI Automation text range moves by
+ * calling this at its ends; AT-SPI's GetStringAtOffset and NSAccessibility's ranges for a line read it once. */
+RV_EXPORT int32_t rv_ax_text_boundary(RvAxNode*, int32_t offset, int32_t unit, int32_t* start, int32_t* end);
+/* Writes the part of the page's selection within the node's text and returns 1: a caret as start equal to end,
+ * a selection clipped to the text. Returns 0 and writes -1 when the selection lies outside the text. */
+RV_EXPORT int32_t rv_ax_text_selection(RvAxNode*, int32_t* start, int32_t* end);
+/* The offset of the caret, the selection's moving end, in the node's text, or -1 when it lies outside it. */
+RV_EXPORT int32_t rv_ax_text_caret(RvAxNode*);
+/* Selects the text from start to end, or places the caret when they are equal, as the page's selection. */
+RV_EXPORT int32_t rv_ax_text_set_selection(RvAxNode*, int32_t start, int32_t end);
+/* Writes *count, then x, y, width, height for each rectangle the text from start to end covers, in CSS pixels of
+ * the viewport: one per line box of each text run, or the caret's rectangle when start equals end. rects holds
+ * capacity rectangles, 4 doubles each; when capacity is below *count it returns RV_ERR_BUFFER_TOO_SMALL and
+ * writes none. */
+RV_EXPORT int32_t rv_ax_text_rects(RvAxNode*, int32_t start, int32_t end, double* rects, int32_t capacity, int32_t* count);
+/* The offset in the node's text nearest x, y CSS pixels of the viewport, or -1 when that point's text lies outside
+ * the node. */
+RV_EXPORT int32_t rv_ax_text_offset_at(RvAxNode*, int32_t x, int32_t y);
 
 #ifdef __cplusplus
 }

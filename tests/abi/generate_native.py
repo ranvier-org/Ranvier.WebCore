@@ -91,7 +91,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     if ctype == "double":
         return "float", ""
     if ctype == "double*":
-        return "double&", ""
+        # An array the function fills, such as rv_ax_text_rects's rectangles; else one value.
+        return ("float[]", "[<In; Out>] ") if name == "rects" else ("double&", "")
     if ctype == "const char*":
         return "string", "[<MarshalAs(UnmanagedType.LPUTF8Str)>] "
     if ctype == "char*":
