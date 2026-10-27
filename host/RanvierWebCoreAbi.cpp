@@ -66,6 +66,10 @@
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/Chrome.h>
+#include <WebCore/ClipboardEvent.h>
+#include <WebCore/DataTransfer.h>
+#include <WebCore/StaticPasteboard.h>
+#include <WebCore/markup.h>
 #include <WebCore/HitTestResult.h>
 #include <WebCore/PopupMenu.h>
 #include <WebCore/PopupMenuClient.h>
@@ -249,6 +253,9 @@ static String keyCommand(const String& key, bool shift, bool control)
 // An editor client that allows every edit and binds keys to editing commands, as WebKitLegacy's Windows client
 // did. The rest follows EmptyEditorClient in WebCore's loader/EmptyClients.cpp (Copyright (C) 2006 Eric Seidel,
 // 2008-2025 Apple Inc., Research In Motion Limited 2011; BSD-2-Clause).
+// Runs an RV_EDIT_* command for the page's host; defined with rv_host_edit.
+static int32_t runEdit(Page*, int32_t command);
+
 class RvEditorClient final : public EditorClient {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(RvEditorClient);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(RvEditorClient);
@@ -263,6 +270,16 @@ private:
             return;
         auto& editor = frame->editor();
         if (event.type() == eventNames().keydownEvent) {
+            // Control+C, X and V run the host's clipboard commands, in the host's clipboard style.
+            if (event.ctrlKey() && event.key().length() == 1) {
+                auto letter = toASCIILower(event.key()[0]);
+                auto clipboard = letter == 'c' ? RV_EDIT_COPY : letter == 'x' ? RV_EDIT_CUT : letter == 'v' ? (event.shiftKey() ? RV_EDIT_PASTE_PLAIN : RV_EDIT_PASTE) : -1;
+                if (clipboard >= 0) {
+                    if (runEdit(frame->page(), clipboard) > 0)
+                        event.setDefaultHandled();
+                    return;
+                }
+            }
             auto command = keyCommand(event.key(), event.shiftKey(), event.ctrlKey());
             if (!command.isEmpty() && editor.command(command).execute(&event))
                 event.setDefaultHandled();
@@ -468,6 +485,10 @@ struct RvHost {
     String tooltip;
     RvPopupCallback popupCallback { nullptr };
     void* popupContext { nullptr };
+    int32_t clipboardStyle { RV_CLIPBOARD_DOM };
+    RvClipboardWrite clipboardWrite { nullptr };
+    RvClipboardRead clipboardRead { nullptr };
+    void* clipboardContext { nullptr };
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
@@ -915,7 +936,7 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 17; }
+int32_t rv_abi_version(void) { return 18; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -929,7 +950,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2960,4 +2981,172 @@ int32_t rv_host_tooltip(RvHost* host, char* buffer, int32_t capacity, int32_t* l
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     return copyString(host->tooltip.isNull() ? emptyString() : host->tooltip, buffer, capacity, length);
+}
+
+struct RvClipboardRequest {
+    Vector<std::pair<String, String>> items;
+};
+
+int32_t rv_host_set_clipboard(RvHost* host, int32_t style, RvClipboardWrite write, RvClipboardRead read, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (style < RV_CLIPBOARD_APP || style > RV_CLIPBOARD_DOM)
+        return RV_ERR_UNSUPPORTED;
+#if PLATFORM(GTK) || PLATFORM(WPE)
+    if (style == RV_CLIPBOARD_NATIVE)
+        return RV_ERR_UNSUPPORTED;
+#endif
+    host->clipboardStyle = style;
+    host->clipboardWrite = style == RV_CLIPBOARD_APP ? write : nullptr;
+    host->clipboardRead = style == RV_CLIPBOARD_APP ? read : nullptr;
+    host->clipboardContext = style == RV_CLIPBOARD_APP ? context : nullptr;
+    return RV_OK;
+}
+
+int32_t rv_clipboard_offer(RvClipboardRequest* request, const char* type, const char* data)
+{
+    if (!request || !type || !data)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    request->items.append({ utf8(type), utf8(data) });
+    return RV_OK;
+}
+
+// The element a clipboard event targets: the focused element, else the body.
+static RefPtr<Element> clipboardTarget(Document& document)
+{
+    if (RefPtr focused = document.focusedElement())
+        return focused;
+    return document.body();
+}
+
+// Copy or cut in the App and DOM styles: the event, then the page's data or the selection, then the delete.
+static int32_t copyOrCut(RvHost& host, bool cut)
+{
+    Ref document = host.document();
+    Ref frame = host.frame();
+    auto& editor = frame->editor();
+    RefPtr target = clipboardTarget(document);
+    if (!target)
+        return 0;
+    Ref dataTransfer = DataTransfer::createForCopyAndPaste(document, DataTransfer::StoreMode::ReadWrite, makeUnique<StaticPasteboard>());
+    Ref event = ClipboardEvent::create(cut ? eventNames().cutEvent : eventNames().copyEvent, dataTransfer.copyRef());
+    target->dispatchEvent(event);
+    Vector<std::pair<String, String>> items;
+    if (event->defaultPrevented()) {
+        for (auto& type : dataTransfer->types(document))
+            items.append({ type, dataTransfer->getData(document, type) });
+    } else {
+        auto range = frame->selection().selection().toNormalizedRange();
+        if (!range || !(cut ? editor.canCut() : editor.canCopy()))
+            return 0;
+        items.append({ "text/plain"_s, editor.selectedText() });
+        items.append({ "text/html"_s, serializePreservingVisualAppearance(*range) });
+        if (cut)
+            editor.performDelete();
+    }
+    if (host.clipboardStyle == RV_CLIPBOARD_APP && host.clipboardWrite) {
+        bool first = true;
+        for (auto& [type, data] : items) {
+            host.clipboardWrite(host.clipboardContext, type.utf8().data(), data.utf8().data(), first ? 1 : 0);
+            first = false;
+        }
+    }
+    return 1;
+}
+
+// Paste in the App and DOM styles: the app's data, the event, then the insertion.
+static int32_t paste(RvHost& host, bool plain)
+{
+    Ref document = host.document();
+    Ref frame = host.frame();
+    RvClipboardRequest request;
+    if (host.clipboardStyle == RV_CLIPBOARD_APP && host.clipboardRead)
+        host.clipboardRead(host.clipboardContext, &request);
+    auto pasteboard = makeUnique<StaticPasteboard>();
+    String text;
+    String html;
+    for (auto& [type, data] : request.items) {
+        if (plain && type != "text/plain"_s)
+            continue;
+        pasteboard->writeString(type, data);
+        if (type == "text/plain"_s)
+            text = data;
+        else if (type == "text/html"_s)
+            html = data;
+    }
+    RefPtr target = clipboardTarget(document);
+    if (!target)
+        return 0;
+    Ref dataTransfer = DataTransfer::createForCopyAndPaste(document, DataTransfer::StoreMode::Readonly, WTF::move(pasteboard));
+    Ref event = ClipboardEvent::create(eventNames().pasteEvent, dataTransfer.copyRef());
+    target->dispatchEvent(event);
+    if (event->defaultPrevented())
+        return 1;
+    auto& editor = frame->editor();
+    if (!html.isEmpty())
+        editor.pasteAsFragment(createFragmentFromMarkup(document, html, emptyString(), { }), false, false);
+    else if (!text.isEmpty())
+        editor.pasteAsPlainText(text, false);
+    else
+        return 0;
+    return 1;
+}
+
+static int32_t runEdit(RvHost& host, int32_t command)
+{
+    Ref frame = host.frame();
+    auto& editor = frame->editor();
+    bool native = host.clipboardStyle == RV_CLIPBOARD_NATIVE;
+    switch (command) {
+    case RV_EDIT_COPY:
+        if (native) {
+            editor.copy(Editor::FromMenuOrKeyBinding::Yes);
+            return 1;
+        }
+        return copyOrCut(host, false);
+    case RV_EDIT_CUT:
+        if (native) {
+            editor.cut(Editor::FromMenuOrKeyBinding::Yes);
+            return 1;
+        }
+        return copyOrCut(host, true);
+    case RV_EDIT_PASTE:
+    case RV_EDIT_PASTE_PLAIN:
+        if (native) {
+            if (command == RV_EDIT_PASTE)
+                editor.paste(Editor::FromMenuOrKeyBinding::Yes);
+            else
+                editor.pasteAsPlainText(Editor::FromMenuOrKeyBinding::Yes);
+            return 1;
+        }
+        return paste(host, command == RV_EDIT_PASTE_PLAIN);
+    case RV_EDIT_SELECT_ALL:
+        return editor.command("SelectAll"_s).execute() ? 1 : 0;
+    case RV_EDIT_DELETE:
+        return editor.command("Delete"_s).execute() ? 1 : 0;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+static int32_t runEdit(Page* page, int32_t command)
+{
+    auto* host = hostForPage(page);
+    return host ? runEdit(*host, command) : 0;
+}
+
+int32_t rv_host_edit(RvHost* host, int32_t command)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    int32_t result = 0;
+    auto status = dispatchCountingFailures([&] { result = runEdit(*host, command); });
+    host->document().updateStyleIfNeeded();
+    return status == RV_OK ? result : status;
 }

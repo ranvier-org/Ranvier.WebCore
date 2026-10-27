@@ -17,6 +17,7 @@
         <Compile Include="Observe.fs" />
         <Compile Include="Paint.fs" />
         <Compile Include="Popup.fs" />
+        <Compile Include="Clipboard.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

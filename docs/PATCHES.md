@@ -177,8 +177,12 @@ macOS). It changes symbol visibility and `final` keywords, and no behavior.
   - `CSSTransition::transitionProperty`.
 - `ResizeObserver.h` and `IntersectionObserver.h` export each observer's `create`, `observe`, `unobserve`,
   `disconnect` and destructor.
+- `ClipboardEvent.h` and `StaticPasteboard.h` export their classes, and `DataTransfer.h` exports
+  `createForCopyAndPaste`, `types`, `getData` and `setData`. With them the host fires `copy`, `cut` and
+  `paste` with a `clipboardData` the page can read and set.
 - `Headers.cmake` forwards these headers:
-  - `dom/InputEvent.h` and `dom/ShadowRootInit.h`;
+  - `dom/InputEvent.h`, `dom/ShadowRootInit.h` and `dom/ClipboardEvent.h`;
+  - `platform/StaticPasteboard.h`;
   - `page/ScrollToOptions.h`;
   - the resize and intersection observer headers under `page/`, with their callbacks, entries and options;
   - `animation/CSSTransition.h`, `animation/GetAnimationsOptions.h` and `animation/BlendingKeyframes.h`;

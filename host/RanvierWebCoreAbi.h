@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 17.
+ * Ranvier native WebCore C ABI, version 18.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -660,6 +660,48 @@ RV_EXPORT int32_t rv_popup_choose(RvPopup*, int32_t index);
 /* Copies the tooltip for the mouse's position, the title attribute of the element under it, as last set by
  * rv_host_mouse: empty when there is none. The app shows it after its own hover delay. */
 RV_EXPORT int32_t rv_host_tooltip(RvHost*, char* buffer, int32_t capacity, int32_t* length);
+
+/* v18: "clipboard" for rv_abi_has. docs/CLIPBOARD-DND.md describes the styles. */
+
+/* Clipboard styles of rv_host_set_clipboard. */
+enum {
+    /* The app moves the data, through the write and read callbacks. */
+    RV_CLIPBOARD_APP = 0,
+    /* WebCore's own platform clipboard code: Windows and macOS. */
+    RV_CLIPBOARD_NATIVE = 1,
+    /* Only the page sees the data, through copy, cut and paste events. A host starts in this style. */
+    RV_CLIPBOARD_DOM = 2,
+};
+
+/* Editing commands of rv_host_edit. */
+enum {
+    RV_EDIT_COPY = 0,
+    RV_EDIT_CUT = 1,
+    RV_EDIT_PASTE = 2,
+    /* Pastes text/plain only. */
+    RV_EDIT_PASTE_PLAIN = 3,
+    RV_EDIT_SELECT_ALL = 4,
+    RV_EDIT_DELETE = 5,
+};
+
+typedef struct RvClipboardRequest RvClipboardRequest;
+
+/* App style: called once per copied type, such as "text/plain" and "text/html", in order. first is 1 for the
+ * first type of a copy or cut, when the app replaces what its clipboard held. */
+typedef void (*RvClipboardWrite)(void* context, const char* type, const char* data, int32_t first);
+/* App style: called at a paste; the app offers each type it holds with rv_clipboard_offer before it returns. */
+typedef void (*RvClipboardRead)(void* context, RvClipboardRequest* request);
+
+/* Sets the host's clipboard style. The callbacks are for RV_CLIPBOARD_APP and NULL otherwise.
+ * RV_CLIPBOARD_NATIVE returns RV_ERR_UNSUPPORTED where WebCore has no platform clipboard (Linux). */
+RV_EXPORT int32_t rv_host_set_clipboard(RvHost*, int32_t style, RvClipboardWrite write, RvClipboardRead read, void* context);
+/* Offers one type of the clipboard's content to a paste, during RvClipboardRead. */
+RV_EXPORT int32_t rv_clipboard_offer(RvClipboardRequest*, const char* type, const char* data);
+/* Runs an editing command on the selection of the host's document, as a menu would; Control+C, X and V in
+ * rv_host_key run the same commands. Copy, cut and paste fire their DOM events first, and a page that
+ * cancels one supplies or takes the data itself. Returns 1 when the command ran, 0 when it does not apply,
+ * such as a copy with nothing selected, or a negative status. */
+RV_EXPORT int32_t rv_host_edit(RvHost*, int32_t command);
 
 #ifdef __cplusplus
 }

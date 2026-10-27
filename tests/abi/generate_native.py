@@ -107,7 +107,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return ("int[]", "") if name == "length" else ("int&", "")
     if re.fullmatch(r"Rv\w+\*\*", ctype):
         return "nativeint[]", ""
-    if re.fullmatch(r"Rv\w+\*", ctype) or re.fullmatch(r"Rv\w+(Callback|Handler)", ctype) or ctype == "void*":
+    # An Rv type without a pointer is a function pointer typedef; the header passes every struct by pointer.
+    if re.fullmatch(r"Rv\w+\*?", ctype) or ctype == "void*":
         return "nativeint", ""
     raise ValueError(f"unmapped parameter type {ctype} {name}")
 
@@ -147,6 +148,14 @@ def generated(header: str) -> str:
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type PopupCallback =",
         "    delegate of context: nativeint * popup: nativeint * action: int * x: int * y: int * width: int * height: int * selected: int -> unit",
+        "",
+        "/// <summary>The <c>RvClipboardWrite</c> of the header; <c>type</c> and <c>data</c> are NUL-terminated UTF-8.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type ClipboardWrite = delegate of context: nativeint * ``type``: nativeint * data: nativeint * first: int -> unit",
+        "",
+        "/// <summary>The <c>RvClipboardRead</c> of the header.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type ClipboardRead = delegate of context: nativeint * request: nativeint -> unit",
     ]
 
     found = declarations(header)
