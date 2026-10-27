@@ -2512,6 +2512,7 @@ let check (operation: string) (status: int) =
 /// A native WebCore event, valid only inside the handler that receives it.
 [<Struct>]
 type Event(handle: nativeint) =
+    member _.Handle = handle
     member _.Phase = rv_event_phase handle
     member _.DefaultPrevented = rv_event_default_prevented handle = 1
 
