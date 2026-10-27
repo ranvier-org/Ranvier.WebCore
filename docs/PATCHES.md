@@ -9,7 +9,7 @@ and no behavior.
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in two places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
 `CryptoKeyRSA.h`, and 0010 changes `EmptyClients.h`, `ChromeClient.h`, `WebAnimation.h`, `CSSTransition.h`, `Element.h` and
-`Document.h`, and exports from `ResizeObserver.h` and `IntersectionObserver.h`. The patches touch 61 files in all.
+`Document.h`, and exports from `ResizeObserver.h` and `IntersectionObserver.h`. It also changes `PlatformCocoa.cmake`. The patches touch 62 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -163,9 +163,9 @@ injected script are release assertions.
 Makes WebCore's internals that the host uses reachable where WebCore is a shared library (Windows and
 macOS). It changes symbol visibility and `final` keywords, and no behavior.
 
-- `EmptyClients.h` exports `EmptyChromeClient`. Its `invalidateRootView`, `invalidateContentsForSlowScroll`,
-  `setCursor` and `triggerRenderingUpdate` become `override` instead of `final`, so the host's chrome
-  client can derive from it.
+- `EmptyClients.h` exports `EmptyChromeClient`. Six of its members become `override` instead of `final`,
+  so the host's chrome client can derive from it: `invalidateRootView`, `invalidateContentsForSlowScroll`,
+  `setCursor`, `triggerRenderingUpdate`, `createPopupMenu` and `mouseDidMoveOverElement`.
 - `ChromeClient.h` exports the six virtual members defined out of line that `EmptyChromeClient` does not
   override: the three shape detector factories, `getBarcodeDetectorSupportedFormats`,
   `enterFullScreenForElement` and `requestPointerLock` (macOS only).
@@ -184,6 +184,8 @@ macOS). It changes symbol visibility and `final` keywords, and no behavior.
   - `animation/CSSTransition.h`, `animation/GetAnimationsOptions.h` and `animation/BlendingKeyframes.h`;
   - `style/StyleExtractor.h` and `style/StyleExtractorState.h`, which `CSSComputedStyleDeclaration.h`
     includes.
+- `PlatformCocoa.cmake` keeps `css/CSSComputedStyleDeclaration.h` and `animation/KeyframeEffect.h` among the
+  forwarded headers. On macOS it removes both by default.
 
 ## Working on the series
 

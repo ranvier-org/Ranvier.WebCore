@@ -26,6 +26,26 @@ index 481eb62ddd..dabcb8cfed 100644
      dom/KeyboardEvent.h
      dom/LiveNodeList.h
      dom/LiveNodeListInlines.h
+diff --git a/Source/WebCore/PlatformCocoa.cmake b/Source/WebCore/PlatformCocoa.cmake
+index 70e1096e41..814a3da6e4 100644
+--- a/Source/WebCore/PlatformCocoa.cmake
++++ b/Source/WebCore/PlatformCocoa.cmake
+@@ -727,7 +727,6 @@ list(REMOVE_ITEM WebCore_PRIVATE_FRAMEWORK_HEADERS
+ 
+     animation/CustomAnimationOptions.h
+     animation/KeyframeAnimationOptions.h
+-    animation/KeyframeEffect.h
+ 
+     bindings/js/CachedModuleScriptLoader.h
+     bindings/js/JSDOMConvertXPathNSResolver.h
+@@ -739,7 +738,6 @@ list(REMOVE_ITEM WebCore_PRIVATE_FRAMEWORK_HEADERS
+ 
+     contentextensions/SerializedNFA.h
+ 
+-    css/CSSComputedStyleDeclaration.h
+     css/CSSCounterValue.h
+     css/CSSFontPaletteValuesRule.h
+     css/CSSQuadValue.h
 diff --git a/Source/WebCore/animation/CSSTransition.h b/Source/WebCore/animation/CSSTransition.h
 index dbdd5147be..6e8472468e 100644
 --- a/Source/WebCore/animation/CSSTransition.h
@@ -106,7 +126,7 @@ index 8216a2d09e..18b15c3b34 100644
      String description() const override;
      String debugDescription() const override;
 diff --git a/Source/WebCore/loader/EmptyClients.h b/Source/WebCore/loader/EmptyClients.h
-index 97c2a7e662..511a2ace7a 100644
+index 97c2a7e662..9337ab8240 100644
 --- a/Source/WebCore/loader/EmptyClients.h
 +++ b/Source/WebCore/loader/EmptyClients.h
 @@ -57,7 +57,7 @@ enum class BroadcastFocusedElement : bool;
@@ -118,6 +138,15 @@ index 97c2a7e662..511a2ace7a 100644
      WTF_MAKE_TZONE_ALLOCATED(EmptyChromeClient);
  
      void chromeDestroyed() override { }
+@@ -100,7 +100,7 @@ class EmptyChromeClient : public ChromeClient {
+     bool runJavaScriptConfirm(LocalFrame&, const String&) final { return false; }
+     bool runJavaScriptPrompt(LocalFrame&, const String&, const String&, String&) final { return false; }
+ 
+-    RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
++    RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const override;
+     RefPtr<SearchPopupMenu> createSearchPopupMenu(PopupMenuClient&) const final;
+ 
+     KeyboardUIMode keyboardUIMode() final { return KeyboardAccessDefault; }
 @@ -111,9 +111,9 @@ class EmptyChromeClient : public ChromeClient {
      std::optional<PointerCharacteristics> pointerCharacteristicsOfPrimaryPointingDevice() const final { return std::nullopt; };
      OptionSet<PointerCharacteristics> pointerCharacteristicsOfAllAvailablePointingDevices() const final { return { }; }
@@ -130,6 +159,15 @@ index 97c2a7e662..511a2ace7a 100644
      void scroll(const IntSize&, const IntRect&, const IntRect&) final { }
  
      IntPoint screenToRootView(const IntPoint& p) const final { return p; }
+@@ -133,7 +133,7 @@ class EmptyChromeClient : public ChromeClient {
+     void contentsSizeChanged(LocalFrame&, const IntSize&) const final { }
+     void intrinsicContentsSizeChanged(const IntSize&) const final { }
+ 
+-    void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String&, TextDirection) final { }
++    void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String&, TextDirection) override { }
+ 
+     void print(LocalFrame&, const StringWithDirection&) final { }
+ 
 @@ -158,7 +158,7 @@ class EmptyChromeClient : public ChromeClient {
      void elementDidFocus(Element&, const FocusOptions&) final { }
      void elementDidBlur(Element&) final { }

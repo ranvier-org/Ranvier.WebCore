@@ -66,6 +66,9 @@
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/Chrome.h>
+#include <WebCore/HitTestResult.h>
+#include <WebCore/PopupMenu.h>
+#include <WebCore/PopupMenuClient.h>
 #include <WebCore/DOMRectReadOnly.h>
 #include <WebCore/FrameSnapshotting.h>
 #include <WebCore/IntersectionObserver.h>
@@ -154,6 +157,8 @@ private:
         return true;
     }
     void setCursor(const Cursor&) final;
+    void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection) final;
+    RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
     void invalidate(const IntRect&);
     void wantUpdate();
 };
@@ -460,6 +465,9 @@ struct RvHost {
     bool inFrame { false };
     bool updateWanted { false };
     int32_t cursor { RV_CURSOR_DEFAULT };
+    String tooltip;
+    RvPopupCallback popupCallback { nullptr };
+    void* popupContext { nullptr };
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
@@ -485,6 +493,67 @@ void RvChromeClient::setCursor(const Cursor& cursor)
 {
     if (host)
         host->cursor = cursorValue(cursor.type());
+}
+
+void RvChromeClient::mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection)
+{
+    if (host)
+        host->tooltip = toolTip;
+}
+
+// A <select>'s menu, shown by the app's popup handler. It holds a reference to itself while shown, which
+// rv_popup_choose or a hide releases.
+class RvPopupMenu final : public PopupMenu {
+public:
+    RvPopupMenu(RvHost* host, PopupMenuClient& client)
+        : host(host)
+        , client(&client)
+    {
+    }
+
+    RvHost* host;
+    PopupMenuClient* client;
+    bool shown { false };
+
+    void end()
+    {
+        if (!shown)
+            return;
+        shown = false;
+        deref();
+    }
+
+private:
+    void show(const IntRect& rect, LocalFrameView& view, int selectedIndex) final
+    {
+        if (shown || !host || !host->popupCallback)
+            return;
+        auto box = view.contentsToRootView(rect);
+        shown = true;
+        ref();
+        host->popupCallback(host->popupContext, reinterpret_cast<RvPopup*>(this), RV_POPUP_SHOW, box.x(), box.y(), box.width(), box.height(), selectedIndex);
+    }
+
+    void hide() final
+    {
+        if (!shown)
+            return;
+        Ref protectedThis { *this };
+        if (host && host->popupCallback)
+            host->popupCallback(host->popupContext, reinterpret_cast<RvPopup*>(this), RV_POPUP_HIDE, 0, 0, 0, 0, -1);
+        if (client)
+            client->popupDidHide();
+        end();
+    }
+
+    void updateFromElement() final { }
+    void disconnectClient() final { client = nullptr; }
+};
+
+// Without a popup handler, or a host, the menu shows nothing, as WebCore's empty popup menu.
+RefPtr<PopupMenu> RvChromeClient::createPopupMenu(PopupMenuClient& client) const
+{
+    return adoptRef(*new RvPopupMenu(host, client));
 }
 
 void RvChromeClient::wantUpdate()
@@ -846,7 +915,7 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 16; }
+int32_t rv_abi_version(void) { return 17; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -860,7 +929,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2820,4 +2889,75 @@ int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32
         return RV_ERR_BUFFER_TOO_SMALL;
     std::memcpy(rgba, pixels->bytes().data(), required);
     return RV_OK;
+}
+
+int32_t rv_host_set_popup_handler(RvHost* host, RvPopupCallback callback, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->popupCallback = callback;
+    host->popupContext = callback ? context : nullptr;
+    return RV_OK;
+}
+
+static RvPopupMenu* popupMenu(RvPopup* handle) { return reinterpret_cast<RvPopupMenu*>(handle); }
+
+int32_t rv_popup_item_count(RvPopup* handle)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* client = popupMenu(handle)->client;
+    return client ? client->listSize() : 0;
+}
+
+int32_t rv_popup_item(RvPopup* handle, int32_t index, int32_t* kind, int32_t* enabled, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!handle || !kind || !enabled)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* client = popupMenu(handle)->client;
+    if (!client || index < 0 || index >= client->listSize())
+        return RV_ERR_UNSUPPORTED;
+    unsigned item = index;
+    *kind = client->itemIsSeparator(item) ? RV_POPUP_ITEM_SEPARATOR : client->itemIsLabel(item) ? RV_POPUP_ITEM_GROUP : RV_POPUP_ITEM_OPTION;
+    *enabled = client->itemIsEnabled(item) ? 1 : 0;
+    return copyString(client->itemText(item), buffer, capacity, length);
+}
+
+int32_t rv_popup_choose(RvPopup* handle, int32_t index)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref popup = *popupMenu(handle);
+    if (!popup->shown)
+        return RV_ERR_UNSUPPORTED;
+    auto* client = popup->client;
+    if (client && index >= client->listSize())
+        return RV_ERR_UNSUPPORTED;
+    auto status = dispatchCountingFailures([&] {
+        if (client && index >= 0)
+            client->valueChanged(index);
+        if (popup->client)
+            popup->client->popupDidHide();
+    });
+    popup->end();
+    if (popup->host)
+        popup->host->document().updateStyleIfNeeded();
+    return status;
+}
+
+int32_t rv_host_tooltip(RvHost* host, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return copyString(host->tooltip.isNull() ? emptyString() : host->tooltip, buffer, capacity, length);
 }

@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 16.
+ * Ranvier native WebCore C ABI, version 17.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -618,6 +618,48 @@ RV_EXPORT int32_t rv_element_snapshot(RvNode*, uint8_t* rgba, int32_t length, in
  * cleared when the area contains it. At a fractional device scale the area's edges are rounded down to whole
  * device pixels. */
 RV_EXPORT int32_t rv_host_paint_rgba_rect(RvHost*, uint8_t* rgba, int32_t length, int32_t x, int32_t y, int32_t width, int32_t height);
+
+/* v17: "popups" and "tooltip" for rv_abi_has. */
+
+typedef struct RvPopup RvPopup;
+
+/* Actions of RvPopupCallback. */
+enum {
+    /* A <select> opens its menu: the app shows the items at the select's box, x, y, width, height in CSS
+     * pixels of the viewport, with item selected highlighted, then calls rv_popup_choose. */
+    RV_POPUP_SHOW = 0,
+    /* The page closes the menu, such as when the select is removed: the app hides it, and the popup is
+     * invalid once the callback returns. */
+    RV_POPUP_HIDE = 1,
+};
+
+/* Kinds of rv_popup_item. */
+enum {
+    RV_POPUP_ITEM_OPTION = 0,
+    RV_POPUP_ITEM_SEPARATOR = 1,
+    /* An <optgroup> label. */
+    RV_POPUP_ITEM_GROUP = 2,
+};
+
+/* Called on the host thread for a <select>'s menu. */
+typedef void (*RvPopupCallback)(void* context, RvPopup* popup, int32_t action, int32_t x, int32_t y, int32_t width, int32_t height,
+    int32_t selected);
+
+/* Sets the host's popup handler, which shows <select> menus as the app's own native menus, or with a NULL
+ * handler removes it. Without a handler a select opens no menu, and the page draws its own, such as on
+ * mousedown. */
+RV_EXPORT int32_t rv_host_set_popup_handler(RvHost*, RvPopupCallback callback, void* context);
+RV_EXPORT int32_t rv_popup_item_count(RvPopup*);
+/* Writes the item's kind and whether it is enabled, and copies its text as WebCore's own menus show it: the
+ * options of an <optgroup> are indented by four spaces, and a group label is not enabled. */
+RV_EXPORT int32_t rv_popup_item(RvPopup*, int32_t index, int32_t* kind, int32_t* enabled, char* buffer, int32_t capacity, int32_t* length);
+/* Ends the menu with the item at index chosen, which selects it and fires input and change, or with -1 for
+ * none. The popup is invalid after the call. */
+RV_EXPORT int32_t rv_popup_choose(RvPopup*, int32_t index);
+
+/* Copies the tooltip for the mouse's position, the title attribute of the element under it, as last set by
+ * rv_host_mouse: empty when there is none. The app shows it after its own hover delay. */
+RV_EXPORT int32_t rv_host_tooltip(RvHost*, char* buffer, int32_t capacity, int32_t* length);
 
 #ifdef __cplusplus
 }
