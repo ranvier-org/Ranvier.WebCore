@@ -177,6 +177,11 @@ def configure(env):
         command += [f'-DCMAKE_C_COMPILER={clang}', f'-DCMAKE_CXX_COMPILER={clang}',
                     f'-DCMAKE_TOOLCHAIN_FILE={(vcpkg / "scripts/buildsystems/vcpkg.cmake").as_posix()}',
                     f'-DVCPKG_INSTALLED_DIR={installed.as_posix()}']
+    if windows and arch == 'arm64':
+        # The ICU port of WebKit's registry bases its DLLs below 4 GB (-base:0x4a800000 and up), which link.exe
+        # rejects for ARM64 (LNK1355). link.exe appends _LINK_ after the command line, so this base wins, and
+        # VCPKG_KEEP_ENV_VARS passes it to the port builds. ARM64 images are always relocatable: the base is a preference.
+        env = dict(env, _LINK_='/BASE:0x180000000', VCPKG_KEEP_ENV_VARS='_LINK_')
     run(command, env=env, cwd=source)
 
 
@@ -194,7 +199,7 @@ def icu_data(env):
     if sha256(data) != icu['data_sha256']:
         sys.exit(f'{data}: sha256 differs from pins.json')
     run([sys.executable, '-I', root / 'scripts/icu_data.py', '--data', data, '--icu-tools', triplet / 'tools/icu',
-         '--icu-bin', triplet / 'bin', '--linker', llvm / 'lld-link.exe', '--out', build / 'bin'], env=env)
+         '--icu-bin', triplet / 'bin', '--linker', llvm / 'lld-link.exe', '--out', build / 'bin', '--machine', arch.upper()], env=env)
 
 
 def build_step(env):

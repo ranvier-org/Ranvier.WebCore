@@ -42,6 +42,21 @@ An incremental rebuild after vcpkg reinstalls packages can fail with clang rejec
 the reinstalled headers keep older modification times. Delete `cmake_pch.cxx.obj` under
 `<build>/Source` and build again. A fresh build, as in CI, does not hit this.
 
+## win-arm64
+
+Built natively on the `windows-11-arm` runner (Visual Studio 18 with the ARM64 C++ tools, MSVC 14.51.36231
+on 2026-10-26; Perl, Ruby, CMake and .NET come with the image) with LLVM's `aarch64-pc-windows-msvc`
+release and WebKit's `arm64-windows-webkit` triplet. Two differences from `win-x64`:
+
+- `build.py configure` sets `_LINK_=/BASE:0x180000000` and `VCPKG_KEEP_ENV_VARS=_LINK_`: the ICU port of
+  WebKit's registry links its DLLs with bases below 4 GB, which `link.exe` rejects for ARM64 (LNK1355).
+- `icu_data.py --machine ARM64` links the filtered ICU data DLL for ARM64.
+
+On 2026-10-26, with empty caches, the job took 1 h 3 min: fetch 4 min, configure (vcpkg) 16 min and the
+compile 38 min. The slim package holds 18 DLLs, every one `IMAGE_FILE_MACHINE_ARM64`, 74.73 MB against
+`win-x64`'s 77.59 MB. Nobody has loaded these DLLs on an ARM64 machine yet: the package is unverified at
+runtime.
+
 ## macOS (osx-arm64)
 
 `osx-arm64` builds WebKit's Cocoa port (`PORT=Mac`, `config/mac.cmake`) with Xcode's AppleClang and Swift,
@@ -51,7 +66,7 @@ match the Skia ports'.
 | Need | Value | Note |
 |---|---|---|
 | Image | `macos-26` (arm64, standard runner) | `macos-15`'s newest Xcode, 26.3 with the macOS 26.2 SDK, cannot build the pin: PAL's Swift module fails on a module cycle (`_DarwinFoundation3` and `CxxStdlib`), and its Swift and clang warn that they do not know some of the warning flags WebKit passes. Measured 2026-10-26, run 40372523818. |
-| Xcode | the newest released Xcode 26 on the image, chosen with `xcode-select` | 26.6 with the macOS 26.5 SDK and Apple clang 21.0.0 on 2026-10-26. The deployment target is the runner's macOS version, WebKit's default. |
+| Xcode | the newest released Xcode 26 on the image, chosen with `xcode-select` | 26.6 with the macOS 26.5 SDK and Apple clang 21.0.0 on 2026-10-26. `config/mac.cmake` sets the deployment target to macOS 15.0; WebKit's default is the build machine's version. |
 | Disk | 4.2 GB used: source 1.7 GB, build 2.1 GB | `macos-26` had 96 GB free before the build and 92 GB at its lowest; `macos-15` had 43 GB free. No disk was freed. |
 | Time | 19 to 38 min for the job | Run 40387342307 on 2026-10-26: fetch 1 min 10 s, prepare 10 s, configure 29 s, build 35 min 16 s (9,436 steps, including libwebrtc, which the Cocoa port always links into WebCore), package 32 s. Run 40393579564, the same build an hour later: job 18 min 40 s, build 16 min 54 s. |
 | Tools | Python 3.12+, CMake, Ninja, gperf, Perl, Ruby, .NET SDK | The image has them; the workflow installs CMake, Ninja or gperf with Homebrew only when one is missing. |

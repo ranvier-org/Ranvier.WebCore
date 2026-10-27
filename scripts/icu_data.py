@@ -4,7 +4,7 @@
 # of every tree. Removed: converters (.cnv), character names, transliteration, and every other
 # locale's data.
 #
-#   icu_data.py --data DAT --icu-tools DIR --icu-bin DIR --linker LLD-LINK --out DIR
+#   icu_data.py --data DAT --icu-tools DIR --icu-bin DIR --linker LLD-LINK --out DIR [--machine X64|ARM64]
 #
 # --icu-tools holds icupkg.exe and genccode.exe (vcpkg's tools/icu/bin), --icu-bin the ICU DLLs they load.
 import argparse, os, pathlib, re, subprocess
@@ -15,6 +15,7 @@ parser.add_argument('--icu-tools', required=True)
 parser.add_argument('--icu-bin', required=True)
 parser.add_argument('--linker', required=True)
 parser.add_argument('--out', required=True)
+parser.add_argument('--machine', default='X64', help="lld-link's /MACHINE: the target architecture")
 args = parser.parse_args()
 source, tools, out = pathlib.Path(args.data), pathlib.Path(args.icu_tools), pathlib.Path(args.out)
 env = dict(os.environ, PATH=args.icu_bin + os.pathsep + os.environ['PATH'])
@@ -44,6 +45,6 @@ data.unlink(missing_ok=True)
 subprocess.run([str(tools / 'icupkg.exe'), '-r', str(work / 'removed.txt'), str(source), str(data)], check=True, env=env)
 subprocess.run([str(tools / 'genccode.exe'), '-o', '-e', 'icudt77', '-d', str(work), str(data)], check=True, env=env)
 obj = next(work.glob('icudt77l_dat.obj'))
-subprocess.run([args.linker, '/DLL', '/NOENTRY', '/MACHINE:X64', '/OPT:REF', '/EXPORT:icudt77_dat,DATA', f'/OUT:{out / "icudt77.dll"}', str(obj)], check=True, env=env)
+subprocess.run([args.linker, '/DLL', '/NOENTRY', f'/MACHINE:{args.machine}', '/OPT:REF', '/EXPORT:icudt77_dat,DATA', f'/OUT:{out / "icudt77.dll"}', str(obj)], check=True, env=env)
 print(f'icu: {source} ({source.stat().st_size} bytes), {len(items)} items; kept {len(items) - len(removed)}, '
       f'removed {len(removed)} (listed in {work / "removed.txt"}); icudt77.dll {(out / "icudt77.dll").stat().st_size} bytes')
