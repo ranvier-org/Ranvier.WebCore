@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 14.
+ * Ranvier native WebCore C ABI, version 15.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -575,6 +575,40 @@ RV_EXPORT int32_t rv_animation_set_rate(RvAnimation*, double rate);
 RV_EXPORT int32_t rv_animation_name(RvAnimation*, char* buffer, int32_t capacity, int32_t* length);
 /* A strong handle to the element the animation's effect targets, or NULL. */
 RV_EXPORT RvNode* rv_animation_target(RvAnimation*);
+
+/* v15: "observers" and "snapshot" for rv_abi_has. */
+
+/* Adds a reference to the node and returns it, for keeping a node an observer callback passes. */
+RV_EXPORT RvNode* rv_node_retain(RvNode*);
+
+typedef struct RvObserver RvObserver;
+
+/* Called on the host thread during rv_host_update, once per observed element whose content box changed size,
+ * and once for each element when it is first observed. width and height are CSS pixels. The target is valid
+ * for the callback; rv_node_retain keeps it. The callback may call any function of this ABI. */
+typedef void (*RvResizeCallback)(void* context, RvNode* target, double width, double height);
+/* Called on the host thread during rv_host_update, once per observed element whose intersection with the
+ * viewport crossed one of the observer's thresholds, and once for each element when it is first observed.
+ * ratio is the visible fraction of the element, from 0 to 1. The target is as for RvResizeCallback. */
+typedef void (*RvIntersectionCallback)(void* context, RvNode* target, int32_t intersecting, double ratio);
+
+/* A ResizeObserver, observing elements' content boxes. */
+RV_EXPORT RvObserver* rv_host_observe_resize(RvHost*, RvResizeCallback callback, void* context);
+/* An IntersectionObserver with the viewport as its root. rootMargin is a CSS margin, such as "0px" or
+ * "100px 0px", that grows or shrinks the viewport, or NULL for none; thresholds are the ratios that report,
+ * ascending from 0 to 1, or NULL with count 0 for 0 alone. NULL for an invalid margin or threshold. */
+RV_EXPORT RvObserver* rv_host_observe_intersection(RvHost*, RvIntersectionCallback callback, void* context, const char* rootMargin,
+    const double* thresholds, int32_t thresholdCount);
+RV_EXPORT int32_t rv_observer_observe(RvObserver*, RvNode* element);
+RV_EXPORT int32_t rv_observer_unobserve(RvObserver*, RvNode* element);
+/* Disconnects the observer and frees it, before rv_host_destroy. Its callback will not run after this returns. */
+RV_EXPORT void rv_observer_release(RvObserver*);
+
+/* Paints the element and its descendants alone, without what lies behind or over them, at the host's device
+ * scale, into unpremultiplied RGBA8, such as for a drag image. Writes the image's size in device pixels to
+ * *width and *height; when length is below width * height * 4 it returns RV_ERR_BUFFER_TOO_SMALL with the
+ * size written and rgba untouched. */
+RV_EXPORT int32_t rv_element_snapshot(RvNode*, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height);
 
 #ifdef __cplusplus
 }

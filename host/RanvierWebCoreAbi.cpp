@@ -66,6 +66,14 @@
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/Chrome.h>
+#include <WebCore/DOMRectReadOnly.h>
+#include <WebCore/FrameSnapshotting.h>
+#include <WebCore/IntersectionObserver.h>
+#include <WebCore/IntersectionObserverCallback.h>
+#include <WebCore/IntersectionObserverEntry.h>
+#include <WebCore/ResizeObserver.h>
+#include <WebCore/ResizeObserverCallback.h>
+#include <WebCore/ResizeObserverEntry.h>
 #include <WebCore/CSSAnimation.h>
 #include <WebCore/CSSComputedStyleDeclaration.h>
 #include <WebCore/CSSStyleDeclaration.h>
@@ -838,7 +846,7 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 14; }
+int32_t rv_abi_version(void) { return 15; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -852,7 +860,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2576,4 +2584,206 @@ RvNode* rv_animation_target(RvAnimation* handle)
         return nullptr;
     auto* effect = dynamicDowncast<KeyframeEffect>(animation(handle)->effect());
     return handleOrNull(effect ? effect->target() : nullptr);
+}
+
+RvNode* rv_node_retain(RvNode* target)
+{
+    if (!target || !onOwningThread())
+        return nullptr;
+    node(target)->ref();
+    return target;
+}
+
+struct RvObserver {
+    RefPtr<ResizeObserver> resize;
+    RefPtr<IntersectionObserver> intersection;
+    RefPtr<IntersectionObserverCallback> delivery;
+    RefPtr<ResizeObserverCallback> resizeDelivery;
+    RvResizeCallback resizeCallback { nullptr };
+    RvIntersectionCallback intersectionCallback { nullptr };
+    void* context { nullptr };
+};
+
+// WebCore registers a resize observer with its document only when it has a callback object; a native callback
+// function is never delivered to.
+class RvResizeDelivery final : public ResizeObserverCallback {
+public:
+    static Ref<RvResizeDelivery> create(ScriptExecutionContext& context) { return adoptRef(*new RvResizeDelivery(context)); }
+
+    // Null once the observer is released; WebCore can hold the callback longer.
+    RvObserver* owner { nullptr };
+
+private:
+    explicit RvResizeDelivery(ScriptExecutionContext& context)
+        : ResizeObserverCallback(&context)
+    {
+    }
+
+    bool hasCallback() const final { return true; }
+
+    CallbackResult<void> invoke(ResizeObserver&, const Vector<Ref<ResizeObserverEntry>>& entries, ResizeObserver&) final
+    {
+        for (auto& entry : entries) {
+            if (!owner)
+                break;
+            Ref target = entry->target();
+            auto& rect = entry->contentRect();
+            owner->resizeCallback(owner->context, reinterpret_cast<RvNode*>(target.ptr()), rect.width(), rect.height());
+        }
+        return { };
+    }
+
+    CallbackResult<void> invokeRethrowingException(ResizeObserver& observer, const Vector<Ref<ResizeObserverEntry>>& entries, ResizeObserver& thisObserver) final
+    {
+        return invoke(observer, entries, thisObserver);
+    }
+};
+
+class RvIntersectionDelivery final : public IntersectionObserverCallback {
+public:
+    static Ref<RvIntersectionDelivery> create(ScriptExecutionContext& context) { return adoptRef(*new RvIntersectionDelivery(context)); }
+
+    RvObserver* owner { nullptr };
+
+private:
+    explicit RvIntersectionDelivery(ScriptExecutionContext& context)
+        : IntersectionObserverCallback(&context)
+    {
+    }
+
+    bool hasCallback() const final { return true; }
+
+    CallbackResult<void> invoke(IntersectionObserver&, const Vector<Ref<IntersectionObserverEntry>>& entries, IntersectionObserver&) final
+    {
+        for (auto& entry : entries) {
+            if (!owner)
+                break;
+            Ref target = entry->target();
+            owner->intersectionCallback(owner->context, reinterpret_cast<RvNode*>(target.ptr()), entry->isIntersecting() ? 1 : 0, entry->intersectionRatio());
+        }
+        return { };
+    }
+
+    CallbackResult<void> invokeRethrowingException(IntersectionObserver& observer, const Vector<Ref<IntersectionObserverEntry>>& entries, IntersectionObserver& thisObserver) final
+    {
+        return invoke(observer, entries, thisObserver);
+    }
+};
+
+RvObserver* rv_host_observe_resize(RvHost* host, RvResizeCallback callback, void* context)
+{
+    if (!host || !callback || !onOwningThread())
+        return nullptr;
+    Ref document = host->document();
+    Ref delivery = RvResizeDelivery::create(document.get());
+    auto* observer = new RvObserver;
+    observer->resizeCallback = callback;
+    observer->context = context;
+    observer->resize = ResizeObserver::create(document.get(), delivery.copyRef());
+    delivery->owner = observer;
+    observer->resizeDelivery = WTF::move(delivery);
+    return observer;
+}
+
+RvObserver* rv_host_observe_intersection(RvHost* host, RvIntersectionCallback callback, void* context, const char* rootMargin,
+    const double* thresholds, int32_t thresholdCount)
+{
+    if (!host || !callback || thresholdCount < 0 || (thresholdCount && !thresholds) || !onOwningThread())
+        return nullptr;
+    Ref document = host->document();
+    Ref delivery = RvIntersectionDelivery::create(document.get());
+    IntersectionObserver::Init init;
+    init.rootMargin = rootMargin ? utf8(rootMargin) : "0px"_s;
+    init.scrollMargin = "0px"_s;
+    if (thresholdCount)
+        init.threshold = Vector<double> { std::span { thresholds, static_cast<size_t>(thresholdCount) } };
+    else
+        init.threshold = 0.0;
+    auto created = IntersectionObserver::create(document.get(), delivery.copyRef(), WTF::move(init));
+    if (created.hasException()) {
+        fail(created.exception());
+        return nullptr;
+    }
+    auto* observer = new RvObserver;
+    observer->intersection = created.releaseReturnValue();
+    observer->intersectionCallback = callback;
+    observer->context = context;
+    delivery->owner = observer;
+    observer->delivery = WTF::move(delivery);
+    return observer;
+}
+
+int32_t rv_observer_observe(RvObserver* observer, RvNode* target)
+{
+    if (!observer || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    if (observer->resize)
+        observer->resize->observe(*element);
+    else
+        observer->intersection->observe(*element);
+    return RV_OK;
+}
+
+int32_t rv_observer_unobserve(RvObserver* observer, RvNode* target)
+{
+    if (!observer || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    if (observer->resize)
+        observer->resize->unobserve(*element);
+    else
+        observer->intersection->unobserve(*element);
+    return RV_OK;
+}
+
+void rv_observer_release(RvObserver* observer)
+{
+    if (!observer || !onOwningThread())
+        return;
+    if (observer->resize) {
+        static_cast<RvResizeDelivery*>(observer->resizeDelivery.get())->owner = nullptr;
+        observer->resize->disconnect();
+    }
+    if (observer->intersection) {
+        observer->intersection->disconnect();
+        // The callback outlives the observer while WebCore holds it; it stops delivering here.
+        static_cast<RvIntersectionDelivery*>(observer->delivery.get())->owner = nullptr;
+    }
+    delete observer;
+}
+
+int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height)
+{
+    if (!target || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref subject = *node(target);
+    RefPtr frame = subject->document().frame();
+    if (!frame)
+        return RV_ERR_PAINT_FAILED;
+    subject->document().updateLayoutIgnorePendingStylesheets();
+    auto buffer = snapshotNode(*frame, subject, { { }, PixelFormat::BGRA8, DestinationColorSpace::SRGB() });
+    if (!buffer)
+        return RV_ERR_PAINT_FAILED;
+    PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
+    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, buffer->truncatedLogicalSize() });
+    if (!pixels)
+        return RV_ERR_PAINT_FAILED;
+    *width = pixels->size().width();
+    *height = pixels->size().height();
+    size_t required = pixels->bytes().size();
+    if (!rgba || length < 0 || static_cast<size_t>(length) < required)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    std::memcpy(rgba, pixels->bytes().data(), required);
+    return RV_OK;
 }

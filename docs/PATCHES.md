@@ -9,7 +9,7 @@ and no behavior.
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in two places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
 `CryptoKeyRSA.h`, and 0010 changes `EmptyClients.h`, `ChromeClient.h`, `WebAnimation.h`, `CSSTransition.h`, `Element.h` and
-`Document.h`. The patches touch 59 files in all.
+`Document.h`, and exports from `ResizeObserver.h` and `IntersectionObserver.h`. The patches touch 61 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -175,9 +175,12 @@ macOS). It changes symbol visibility and `final` keywords, and no behavior.
     `updatePlaybackRate`;
   - `getAnimations` on `Element` and `Document`;
   - `CSSTransition::transitionProperty`.
+- `ResizeObserver.h` and `IntersectionObserver.h` export each observer's `create`, `observe`, `unobserve`,
+  `disconnect` and destructor.
 - `Headers.cmake` forwards these headers:
   - `dom/InputEvent.h` and `dom/ShadowRootInit.h`;
   - `page/ScrollToOptions.h`;
+  - the resize and intersection observer headers under `page/`, with their callbacks, entries and options;
   - `animation/CSSTransition.h`, `animation/GetAnimationsOptions.h` and `animation/BlendingKeyframes.h`;
   - `style/StyleExtractor.h` and `style/StyleExtractorState.h`, which `CSSComputedStyleDeclaration.h`
     includes.

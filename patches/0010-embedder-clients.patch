@@ -1,8 +1,8 @@
 diff --git a/Source/WebCore/Headers.cmake b/Source/WebCore/Headers.cmake
-index 481eb62ddd..352ea48a21 100644
+index 481eb62ddd..dabcb8cfed 100644
 --- a/Source/WebCore/Headers.cmake
 +++ b/Source/WebCore/Headers.cmake
-@@ -1351,6 +1351,14 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
+@@ -1351,6 +1351,23 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
      dom/ImageOverlay.h
      dom/ImportNodeOptions.h
      dom/InlineStyleSheetOwner.h
@@ -14,6 +14,15 @@ index 481eb62ddd..352ea48a21 100644
 +    style/StyleExtractor.h
 +    style/StyleExtractorState.h
 +    animation/BlendingKeyframes.h
++    page/IntersectionObserver.h
++    page/IntersectionObserverCallback.h
++    page/IntersectionObserverEntry.h
++    page/ResizeObservation.h
++    page/ResizeObserver.h
++    page/ResizeObserverBoxOptions.h
++    page/ResizeObserverCallback.h
++    page/ResizeObserverEntry.h
++    page/ResizeObserverSize.h
      dom/KeyboardEvent.h
      dom/LiveNodeList.h
      dom/LiveNodeListInlines.h
@@ -176,3 +185,59 @@ index c884441710..318e247119 100644
      virtual void requestPointerUnlock(CompletionHandler<void(bool)>&& completionHandler) { completionHandler(false); }
  #endif
  
+diff --git a/Source/WebCore/page/IntersectionObserver.h b/Source/WebCore/page/IntersectionObserver.h
+index 5dc74daa93..74b868ae71 100644
+--- a/Source/WebCore/page/IntersectionObserver.h
++++ b/Source/WebCore/page/IntersectionObserver.h
+@@ -79,9 +79,9 @@ public:
+         Variant<double, Vector<double>> threshold;
+     };
+ 
+-    static ExceptionOr<Ref<IntersectionObserver>> create(Document&, Ref<IntersectionObserverCallback>&&, Init&&, IncludeObscuredInsets = IncludeObscuredInsets::No);
++    WEBCORE_EXPORT static ExceptionOr<Ref<IntersectionObserver>> create(Document&, Ref<IntersectionObserverCallback>&&, Init&&, IncludeObscuredInsets = IncludeObscuredInsets::No);
+ 
+-    ~IntersectionObserver();
++    WEBCORE_EXPORT ~IntersectionObserver();
+ 
+     // Local: root is in the same process as the observer.
+     // Remote: root is in different process as the observer.
+@@ -102,9 +102,9 @@ public:
+     bool hasObservationTargets() const { return !m_observationTargets.isEmptyIgnoringNullReferences(); }
+     bool NODELETE isObserving(const Element&) const;
+ 
+-    void observe(Element&);
+-    void unobserve(Element&);
+-    void disconnect();
++    WEBCORE_EXPORT void observe(Element&);
++    WEBCORE_EXPORT void unobserve(Element&);
++    WEBCORE_EXPORT void disconnect();
+ 
+     struct TakenRecords {
+         Vector<Ref<IntersectionObserverEntry>> records;
+diff --git a/Source/WebCore/page/ResizeObserver.h b/Source/WebCore/page/ResizeObserver.h
+index 1ebd9edc2c..044e2b6b57 100644
+--- a/Source/WebCore/page/ResizeObserver.h
++++ b/Source/WebCore/page/ResizeObserver.h
+@@ -58,17 +58,17 @@ using JSOrNativeResizeObserverCallback = Variant<Ref<ResizeObserverCallback>, Na
+ class ResizeObserver : public RefCountedAndCanMakeWeakPtr<ResizeObserver> {
+     WTF_MAKE_TZONE_ALLOCATED(ResizeObserver);
+ public:
+-    static Ref<ResizeObserver> create(Document&, Ref<ResizeObserverCallback>&&);
++    WEBCORE_EXPORT static Ref<ResizeObserver> create(Document&, Ref<ResizeObserverCallback>&&);
+     static Ref<ResizeObserver> createNativeObserver(Document&, NativeResizeObserverCallback&&);
+-    ~ResizeObserver();
++    WEBCORE_EXPORT ~ResizeObserver();
+ 
+     bool hasObservations() const { return m_observations.size(); }
+     bool hasActiveObservations() const { return m_activeObservations.size(); }
+ 
+-    void observe(Element&);
++    WEBCORE_EXPORT void observe(Element&);
+     void observe(Element&, const ResizeObserverOptions&);
+-    void unobserve(Element&);
+-    void disconnect();
++    WEBCORE_EXPORT void unobserve(Element&);
++    WEBCORE_EXPORT void disconnect();
+     void targetDestroyed(Element&);
+ 
+     static size_t maxElementDepth() { return SIZE_MAX; }
