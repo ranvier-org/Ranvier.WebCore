@@ -41,16 +41,22 @@ int32_t rv_host_set_clipboard(RvHost*, int32_t style, RvClipboardWrite write, Rv
 
 ```c
 enum { RV_DRAG_APP = 0, RV_DRAG_NATIVE = 1, RV_DRAG_DOM = 2 };
-int32_t rv_host_set_drag(RvHost*, int32_t style, RvDragStart start, void* context);
+int32_t rv_host_set_drag(RvHost*, int32_t style);
 ```
 
-- **Dragging into the page** (App and Native):
-  1. The app forwards the OS drag events with `rv_host_drag(host, RV_DRAG_ENTER | OVER | LEAVE | DROP, x, y,
-     allowedOperations, data)`.
+- **Dragging into the page**, the App style (ABI 19):
+  1. The app forwards the OS drag events with `rv_host_drag(host, RV_DRAG_OVER | LEAVE | DROP, x, y,
+     allowedOperations, data, modifiers)`.
   2. `data` is an `RvDragData` built with `rv_drag_data_create` and `rv_drag_data_add(type, value)`, with
-     types such as `text/plain`, `text/html`, `text/uri-list` and `Files` (file paths).
-  3. The return value is the operation the page accepts (copy, move or link), which the app shows as the
-     cursor. The page's `dragenter`, `dragover` and `drop` listeners decide it.
+     types such as `text/plain`, `text/html` and `text/uri-list`. Files go as file URLs in
+     `text/uri-list`, because `dataTransfer.files` needs file objects the ABI does not make yet.
+  3. The host fires `dragenter` and `dragleave` as the element under the point changes, then `dragover`,
+     or `drop` on release, at that element. It fires them itself, as for the clipboard, so the same code
+     runs on every platform.
+  4. The return value is the operation the page accepts (copy, move or link), which the app shows as the
+     cursor. A cancelled `dragover` accepts its `dropEffect`; with no listener, text over editable
+     content is a copy; anything else is refused.
+  5. A drop that no listener cancels inserts the text, or the HTML, at the point.
 - **Dragging out of the page:**
   1. When the user drags a draggable element, a link, an image or a selection, the host calls `start` with
      an `RvDrag`: its data types and values, a drag image from `rv_element_snapshot`'s path, the offset of
@@ -65,8 +71,9 @@ int32_t rv_host_set_drag(RvHost*, int32_t style, RvDragStart start, void* contex
 
 ## Order of work
 
-1. **Clipboard, App and DOM styles.** One code path on every platform.
-2. **Drag and drop, App and DOM styles.** A host `DragClient`, and `DragData` built per platform from
-   `RvDragData`.
-3. **Native styles.** Windows first, where WebCore's code already talks to OLE, then macOS, which needs a
-   pasteboard strategy that calls NSPasteboard.
+1. **Done:** clipboard in the App, DOM and Native styles (ABI 18). The Native clipboard style calls
+   WebCore's own commands.
+2. **Done:** drags into the page in the App and DOM styles (ABI 19).
+3. **Next:** drags out of the page, through a host `DragClient`, with `start` and `rv_drag_end`.
+4. **Then:** the Native drag style. Windows first, where WebCore's code already talks to OLE, then macOS,
+   which needs a pasteboard strategy that calls NSPasteboard. After that, `dataTransfer.files`.

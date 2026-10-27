@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 18.
+ * Ranvier native WebCore C ABI, version 19.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -702,6 +702,51 @@ RV_EXPORT int32_t rv_clipboard_offer(RvClipboardRequest*, const char* type, cons
  * cancels one supplies or takes the data itself. Returns 1 when the command ran, 0 when it does not apply,
  * such as a copy with nothing selected, or a negative status. */
 RV_EXPORT int32_t rv_host_edit(RvHost*, int32_t command);
+
+/* v19: "drop" for rv_abi_has: drags from outside into the page. docs/CLIPBOARD-DND.md describes the styles. */
+
+/* Drag styles of rv_host_set_drag. */
+enum {
+    /* The app forwards the OS drag with rv_host_drag, and the host fires the DOM drag events. */
+    RV_DRAG_APP = 0,
+    /* WebCore's own platform drag code. Not yet supported: rv_host_set_drag returns RV_ERR_UNSUPPORTED. */
+    RV_DRAG_NATIVE = 1,
+    /* No drag reaches the page: rv_host_drag fires nothing. A host starts in this style. */
+    RV_DRAG_DOM = 2,
+};
+
+/* Bits of the operations of rv_host_drag, as the DataTransfer effects copy, move and link. */
+enum {
+    RV_DROP_NONE = 0,
+    RV_DROP_COPY = 1,
+    RV_DROP_MOVE = 2,
+    RV_DROP_LINK = 4,
+};
+
+/* Actions of rv_host_drag. */
+enum {
+    /* The drag entered the view or moved over it. */
+    RV_DRAG_OVER = 0,
+    /* The drag left the view or was cancelled. */
+    RV_DRAG_LEAVE = 1,
+    /* The drag was released over the view. */
+    RV_DRAG_DROP = 2,
+};
+
+typedef struct RvDragData RvDragData;
+
+RV_EXPORT int32_t rv_host_set_drag(RvHost*, int32_t style);
+/* The data of a drag, of types such as "text/plain", "text/html" and "text/uri-list" (file URLs for files). */
+RV_EXPORT RvDragData* rv_drag_data_create(void);
+RV_EXPORT int32_t rv_drag_data_add(RvDragData*, const char* type, const char* data);
+RV_EXPORT void rv_drag_data_release(RvDragData*);
+/* Forwards a drag from outside the page at x, y CSS pixels of the viewport, with the RV_DROP_* operations
+ * the source allows. As the element under the point changes the host fires dragleave and dragenter, then
+ * dragover, or drop for RV_DRAG_DROP, each with a dataTransfer holding data; drop's data is readable. Returns
+ * the RV_DROP_* operation the page accepts, which the app shows as the cursor: the dataTransfer's dropEffect
+ * when a listener cancelled dragover, else RV_DROP_COPY for text over editable content, else RV_DROP_NONE.
+ * A drop that no listener cancels inserts the text, or the HTML, into editable content at the point. */
+RV_EXPORT int32_t rv_host_drag(RvHost*, int32_t action, int32_t x, int32_t y, int32_t allowed, RvDragData* data, int32_t modifiers);
 
 #ifdef __cplusplus
 }

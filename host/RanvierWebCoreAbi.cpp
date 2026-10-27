@@ -67,6 +67,9 @@
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/Chrome.h>
 #include <WebCore/ClipboardEvent.h>
+#include <WebCore/DragActions.h>
+#include <WebCore/DragEvent.h>
+#include <WebCore/VisiblePosition.h>
 #include <WebCore/DataTransfer.h>
 #include <WebCore/StaticPasteboard.h>
 #include <WebCore/markup.h>
@@ -489,6 +492,9 @@ struct RvHost {
     RvClipboardWrite clipboardWrite { nullptr };
     RvClipboardRead clipboardRead { nullptr };
     void* clipboardContext { nullptr };
+    int32_t dragStyle { RV_DRAG_DOM };
+    // The element under a drag from outside, which received dragenter.
+    RefPtr<Element> dragTarget;
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
@@ -936,7 +942,7 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 18; }
+int32_t rv_abi_version(void) { return 19; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -950,7 +956,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -3149,4 +3155,164 @@ int32_t rv_host_edit(RvHost* host, int32_t command)
     auto status = dispatchCountingFailures([&] { result = runEdit(*host, command); });
     host->document().updateStyleIfNeeded();
     return status == RV_OK ? result : status;
+}
+
+struct RvDragData {
+    Vector<std::pair<String, String>> items;
+};
+
+int32_t rv_host_set_drag(RvHost* host, int32_t style)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (style != RV_DRAG_APP && style != RV_DRAG_DOM)
+        return RV_ERR_UNSUPPORTED;
+    host->dragStyle = style;
+    host->dragTarget = nullptr;
+    return RV_OK;
+}
+
+RvDragData* rv_drag_data_create(void)
+{
+    return new RvDragData;
+}
+
+int32_t rv_drag_data_add(RvDragData* data, const char* type, const char* value)
+{
+    if (!data || !type || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    data->items.append({ utf8(type), utf8(value) });
+    return RV_OK;
+}
+
+void rv_drag_data_release(RvDragData* data)
+{
+    delete data;
+}
+
+static OptionSet<DragOperation> dragOperations(int32_t operations)
+{
+    OptionSet<DragOperation> result;
+    if (operations & RV_DROP_COPY)
+        result.add(DragOperation::Copy);
+    if (operations & RV_DROP_MOVE)
+        result.add(DragOperation::Move);
+    if (operations & RV_DROP_LINK)
+        result.add(DragOperation::Link);
+    return result;
+}
+
+// The one RV_DROP_* operation of a negotiated mask, preferring copy, then move, then link.
+static int32_t dropOperation(OptionSet<DragOperation> operations, int32_t allowed)
+{
+    if (operations.contains(DragOperation::Copy) && (allowed & RV_DROP_COPY))
+        return RV_DROP_COPY;
+    if (operations.contains(DragOperation::Move) && (allowed & RV_DROP_MOVE))
+        return RV_DROP_MOVE;
+    if (operations.contains(DragOperation::Link) && (allowed & RV_DROP_LINK))
+        return RV_DROP_LINK;
+    return RV_DROP_NONE;
+}
+
+static String dragItem(const RvDragData* data, ASCIILiteral type)
+{
+    if (data) {
+        for (auto& [itemType, value] : data->items) {
+            if (itemType == type)
+                return value;
+        }
+    }
+    return { };
+}
+
+static Ref<DataTransfer> dropTransfer(Document& document, const RvDragData* data, int32_t allowed)
+{
+    auto pasteboard = makeUnique<StaticPasteboard>();
+    if (data) {
+        for (auto& [type, value] : data->items)
+            pasteboard->writeString(type, value);
+    }
+    return DataTransfer::createForDrop(document, WTF::move(pasteboard), dragOperations(allowed), false);
+}
+
+// Fires a trusted drag event at the target and returns whether a listener cancelled it.
+static bool fireDrag(Document& document, Element& target, const AtomString& type, DataTransfer* dataTransfer, IntPoint point,
+    int32_t modifiers, Element* related = nullptr)
+{
+    bool cancelable = type != eventNames().dragleaveEvent;
+    Ref event = DragEvent::create(type, Event::CanBubble::Yes, cancelable ? Event::IsCancelable::Yes : Event::IsCancelable::No,
+        Event::IsComposed::Yes, MonotonicTime::now(), document.windowProxy(), 0, point, point, 0, 0, platformModifiers(modifiers),
+        MouseButton::Left, 1, related, 0, SyntheticClickType::NoTap, dataTransfer);
+    target.dispatchEvent(event);
+    return event->defaultPrevented();
+}
+
+static bool editableForDrop(Element& element)
+{
+    return is<HTMLTextFormControlElement>(element) || element.isContentEditable();
+}
+
+int32_t rv_host_drag(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t allowed, RvDragData* data, int32_t modifiers)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (action < RV_DRAG_OVER || action > RV_DRAG_DROP)
+        return RV_ERR_UNSUPPORTED;
+    if (host->dragStyle != RV_DRAG_APP)
+        return RV_DROP_NONE;
+    Ref document = host->document();
+    Ref frame = host->frame();
+    IntPoint point { x, y };
+    int32_t operation = RV_DROP_NONE;
+    auto status = dispatchCountingFailures([&] {
+        if (action == RV_DRAG_LEAVE) {
+            if (RefPtr previous = std::exchange(host->dragTarget, nullptr))
+                fireDrag(document, *previous, eventNames().dragleaveEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers);
+            return;
+        }
+        RefPtr target = document->elementFromPoint(x, y, HitTestSource::User);
+        if (target != host->dragTarget) {
+            if (RefPtr previous = host->dragTarget)
+                fireDrag(document, *previous, eventNames().dragleaveEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers, target.get());
+            host->dragTarget = target;
+            if (target)
+                fireDrag(document, *target, eventNames().dragenterEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers);
+        }
+        if (!target)
+            return;
+        auto hasText = !dragItem(data, "text/plain"_s).isEmpty() || !dragItem(data, "text/html"_s).isEmpty();
+        Ref over = dropTransfer(document, data, allowed);
+        if (fireDrag(document, *target, eventNames().dragoverEvent, over.ptr(), point, modifiers))
+            operation = dropOperation(over->destinationOperationMask(), allowed);
+        else if (hasText && editableForDrop(*target))
+            operation = allowed & RV_DROP_COPY ? RV_DROP_COPY : dropOperation(dragOperations(allowed), allowed);
+        if (action != RV_DRAG_DROP)
+            return;
+        host->dragTarget = nullptr;
+        if (operation == RV_DROP_NONE) {
+            fireDrag(document, *target, eventNames().dragleaveEvent, over.ptr(), point, modifiers);
+            return;
+        }
+        if (fireDrag(document, *target, eventNames().dropEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers))
+            return;
+        if (!editableForDrop(*target) || !hasText) {
+            operation = RV_DROP_NONE;
+            return;
+        }
+        // The default action: insert at the point, as typing would.
+        RefPtr view = frame->view();
+        auto position = frame->visiblePositionForPoint(view ? view->rootViewToContents(point) : point);
+        frame->selection().setSelection(VisibleSelection { position });
+        auto html = dragItem(data, "text/html"_s);
+        if (!html.isEmpty())
+            frame->editor().pasteAsFragment(createFragmentFromMarkup(document, html, emptyString(), { }), false, false);
+        else
+            frame->editor().insertText(dragItem(data, "text/plain"_s), nullptr);
+    });
+    host->document().updateStyleIfNeeded();
+    return status == RV_OK ? operation : status;
 }

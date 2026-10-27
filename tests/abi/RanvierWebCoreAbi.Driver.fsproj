@@ -18,6 +18,7 @@
         <Compile Include="Paint.fs" />
         <Compile Include="Popup.fs" />
         <Compile Include="Clipboard.fs" />
+        <Compile Include="Drop.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

@@ -188,6 +188,11 @@ module Calls =
             "rv_host_set_clipboard"
             "rv_clipboard_offer"
             "rv_host_edit"
+            "rv_host_set_drag"
+            "rv_drag_data_create"
+            "rv_drag_data_add"
+            "rv_drag_data_release"
+            "rv_host_drag"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -712,6 +717,25 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_edit(nativeint host, int command)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_drag(nativeint host, int style)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_drag_data_create()
+
+    [<DllImport(Lib)>]
+    extern int rv_drag_data_add(
+        nativeint value,
+        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
+        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data
+    )
+
+    [<DllImport(Lib)>]
+    extern void rv_drag_data_release(nativeint value)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_drag(nativeint host, int action, int x, int y, int allowed, nativeint data, int modifiers)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -2392,6 +2416,66 @@ let rv_host_edit (host: nativeint, command: int) : int =
         result
     else
         Raw.rv_host_edit (host, command)
+
+let rv_host_set_drag (host: nativeint, style: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_drag (host, style)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[135] <- Calls.Counts[135] + 1L
+        Calls.Ticks[135] <- Calls.Ticks[135] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_drag (host, style)
+
+let rv_drag_data_create () : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_drag_data_create ()
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[136] <- Calls.Counts[136] + 1L
+        Calls.Ticks[136] <- Calls.Ticks[136] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_drag_data_create ()
+
+let rv_drag_data_add (value: nativeint, ``type``: string, data: string) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_drag_data_add (value, ``type``, data)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[137] <- Calls.Counts[137] + 1L
+        Calls.Ticks[137] <- Calls.Ticks[137] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_drag_data_add (value, ``type``, data)
+
+let rv_drag_data_release (value: nativeint) : unit =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_drag_data_release (value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[138] <- Calls.Counts[138] + 1L
+        Calls.Ticks[138] <- Calls.Ticks[138] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_drag_data_release (value)
+
+let rv_host_drag (host: nativeint, action: int, x: int, y: int, allowed: int, data: nativeint, modifiers: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_drag (host, action, x, y, allowed, data, modifiers)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[139] <- Calls.Counts[139] + 1L
+        Calls.Ticks[139] <- Calls.Ticks[139] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_drag (host, action, x, y, allowed, data, modifiers)
 
 // END GENERATED
 

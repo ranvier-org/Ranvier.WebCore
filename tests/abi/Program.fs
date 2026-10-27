@@ -51,7 +51,7 @@ let main _ =
         | dir -> dir
 
     Directory.CreateDirectory outDir |> ignore
-    require (rv_abi_version () = 18) "ABI version 18"
+    require (rv_abi_version () = 19) "ABI version 19"
 
     // RANVIER_WEBCORE_PROBE=teardown runs the teardown probes instead of the frames.
     if Environment.GetEnvironmentVariable "RANVIER_WEBCORE_PROBE" = "teardown" then
@@ -474,5 +474,6 @@ let main _ =
     Paint.run outDir
     Popup.run outDir
     Clipboard.run outDir
+    Drop.run outDir
     printfn "RANVIER_FSHARP_ABI PASS %s" (JsonSerializer.Serialize summary)
     0
