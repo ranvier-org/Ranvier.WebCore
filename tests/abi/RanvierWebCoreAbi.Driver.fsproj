@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <InvariantGlobalization>true</InvariantGlobalization>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Native.fs" />
+        <Compile Include="Teardown.fs" />
+        <Compile Include="Resources.fs" />
+        <Compile Include="Window.fs" />
+        <Compile Include="Surface.fs" />
+        <Compile Include="Observe.fs" />
+        <Compile Include="Paint.fs" />
+        <Compile Include="Popup.fs" />
+        <Compile Include="Clipboard.fs" />
+        <Compile Include="Drop.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+</Project>

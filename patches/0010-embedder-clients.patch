@@ -1,17 +1,219 @@
 diff --git a/Source/WebCore/Headers.cmake b/Source/WebCore/Headers.cmake
-index 481eb62ddd..2a88f264cd 100644
+index 481eb62ddd..d3e12e7903 100644
 --- a/Source/WebCore/Headers.cmake
 +++ b/Source/WebCore/Headers.cmake
-@@ -1351,6 +1351,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
+@@ -1351,6 +1351,26 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
      dom/ImageOverlay.h
      dom/ImportNodeOptions.h
      dom/InlineStyleSheetOwner.h
 +    dom/InputEvent.h
++    dom/ShadowRootInit.h
++    dom/ClipboardEvent.h
++    dom/DragEvent.h
++    platform/StaticPasteboard.h
++    animation/CSSTransition.h
++    animation/GetAnimationsOptions.h
++    page/ScrollToOptions.h
++    style/StyleExtractor.h
++    style/StyleExtractorState.h
++    animation/BlendingKeyframes.h
++    page/IntersectionObserver.h
++    page/IntersectionObserverCallback.h
++    page/IntersectionObserverEntry.h
++    page/ResizeObservation.h
++    page/ResizeObserver.h
++    page/ResizeObserverBoxOptions.h
++    page/ResizeObserverCallback.h
++    page/ResizeObserverEntry.h
++    page/ResizeObserverSize.h
      dom/KeyboardEvent.h
      dom/LiveNodeList.h
      dom/LiveNodeListInlines.h
+diff --git a/Source/WebCore/PlatformCocoa.cmake b/Source/WebCore/PlatformCocoa.cmake
+index 70e1096e41..814a3da6e4 100644
+--- a/Source/WebCore/PlatformCocoa.cmake
++++ b/Source/WebCore/PlatformCocoa.cmake
+@@ -727,7 +727,6 @@ list(REMOVE_ITEM WebCore_PRIVATE_FRAMEWORK_HEADERS
+ 
+     animation/CustomAnimationOptions.h
+     animation/KeyframeAnimationOptions.h
+-    animation/KeyframeEffect.h
+ 
+     bindings/js/CachedModuleScriptLoader.h
+     bindings/js/JSDOMConvertXPathNSResolver.h
+@@ -739,7 +738,6 @@ list(REMOVE_ITEM WebCore_PRIVATE_FRAMEWORK_HEADERS
+ 
+     contentextensions/SerializedNFA.h
+ 
+-    css/CSSComputedStyleDeclaration.h
+     css/CSSCounterValue.h
+     css/CSSFontPaletteValuesRule.h
+     css/CSSQuadValue.h
+diff --git a/Source/WebCore/animation/CSSTransition.h b/Source/WebCore/animation/CSSTransition.h
+index dbdd5147be..6e8472468e 100644
+--- a/Source/WebCore/animation/CSSTransition.h
++++ b/Source/WebCore/animation/CSSTransition.h
+@@ -49,7 +49,7 @@ public:
+ 
+     virtual ~CSSTransition();
+ 
+-    const AtomString transitionProperty() const;
++    WEBCORE_EXPORT const AtomString transitionProperty() const;
+     AnimatableCSSProperty property() const { return m_property; }
+     MonotonicTime generationTime() const { return m_generationTime; }
+     const Style::ComputedStyle& targetStyle() const LIFETIME_BOUND { return *m_targetStyle; }
+diff --git a/Source/WebCore/animation/WebAnimation.h b/Source/WebCore/animation/WebAnimation.h
+index 44af53aba9..1195c2bcd3 100644
+--- a/Source/WebCore/animation/WebAnimation.h
++++ b/Source/WebCore/animation/WebAnimation.h
+@@ -96,14 +96,14 @@ public:
+     AnimationTimeline* timeline() const { return m_timeline.get(); }
+     virtual void setTimeline(RefPtr<AnimationTimeline>&&);
+ 
+-    std::optional<WebAnimationTime> currentTime(UseCachedCurrentTime = UseCachedCurrentTime::Yes) const;
+-    ExceptionOr<void> setCurrentTime(std::optional<WebAnimationTime>);
++    WEBCORE_EXPORT std::optional<WebAnimationTime> currentTime(UseCachedCurrentTime = UseCachedCurrentTime::Yes) const;
++    WEBCORE_EXPORT ExceptionOr<void> setCurrentTime(std::optional<WebAnimationTime>);
+ 
+     double playbackRate() const { return m_playbackRate + 0; }
+     void setPlaybackRate(double);
+ 
+     enum class PlayState : uint8_t { Idle, Running, Paused, Finished };
+-    PlayState playState() const;
++    WEBCORE_EXPORT PlayState playState() const;
+ 
+     enum class ReplaceState : uint8_t { Active, Removed, Persisted };
+     ReplaceState replaceState() const { return m_replaceState; }
+@@ -119,12 +119,12 @@ public:
+ 
+     enum class Silently : bool { No, Yes };
+     virtual void cancel(Silently = Silently::No);
+-    ExceptionOr<void> finish();
+-    ExceptionOr<void> play();
+-    void updatePlaybackRate(double);
+-    ExceptionOr<void> pause();
++    WEBCORE_EXPORT ExceptionOr<void> finish();
++    WEBCORE_EXPORT ExceptionOr<void> play();
++    WEBCORE_EXPORT void updatePlaybackRate(double);
++    WEBCORE_EXPORT ExceptionOr<void> pause();
+     virtual ExceptionOr<void> bindingsReverse();
+-    ExceptionOr<void> reverse();
++    WEBCORE_EXPORT ExceptionOr<void> reverse();
+     void persist();
+     ExceptionOr<void> commitStyles();
+ 
+diff --git a/Source/WebCore/dom/ClipboardEvent.h b/Source/WebCore/dom/ClipboardEvent.h
+index de29befa1d..0b0d5b841d 100644
+--- a/Source/WebCore/dom/ClipboardEvent.h
++++ b/Source/WebCore/dom/ClipboardEvent.h
+@@ -29,7 +29,7 @@ namespace WebCore {
+ 
+ class DataTransfer;
+ 
+-class ClipboardEvent final : public Event {
++class WEBCORE_EXPORT ClipboardEvent final : public Event {
+     WTF_MAKE_TZONE_ALLOCATED(ClipboardEvent);
+ public:
+     virtual ~ClipboardEvent();
+diff --git a/Source/WebCore/dom/DataTransfer.h b/Source/WebCore/dom/DataTransfer.h
+index 46a710b321..f53c0c9787 100644
+--- a/Source/WebCore/dom/DataTransfer.h
++++ b/Source/WebCore/dom/DataTransfer.h
+@@ -50,19 +50,19 @@ public:
+     enum class StoreMode { Invalid, ReadWrite, Readonly, Protected };
+ 
+     static Ref<DataTransfer> create();
+-    static Ref<DataTransfer> createForCopyAndPaste(const Document&, StoreMode, std::unique_ptr<Pasteboard>&&);
++    WEBCORE_EXPORT static Ref<DataTransfer> createForCopyAndPaste(const Document&, StoreMode, std::unique_ptr<Pasteboard>&&);
+     static Ref<DataTransfer> createForInputEvent(const String& plainText, const String& htmlText);
+ 
+     WEBCORE_EXPORT ~DataTransfer();
+ 
+-    String dropEffect() const;
++    WEBCORE_EXPORT String dropEffect() const;
+     void setDropEffect(const String&);
+ 
+     String NODELETE effectAllowed() const;
+     void setEffectAllowed(const String&);
+ 
+     DataTransferItemList& items(Document&);
+-    Vector<String> types(Document&) const;
++    WEBCORE_EXPORT Vector<String> types(Document&) const;
+     Vector<String> typesForItemList(Document&) const;
+ 
+     FileList& files(Document*) const;
+@@ -70,10 +70,10 @@ public:
+ 
+     void clearData(const String& type = String());
+ 
+-    String getData(Document&, const String& type) const;
++    WEBCORE_EXPORT String getData(Document&, const String& type) const;
+     String getDataForItem(Document&, const String& type) const;
+ 
+-    void setData(Document&, const String& type, const String& data);
++    WEBCORE_EXPORT void setData(Document&, const String& type, const String& data);
+     void setDataFromItemList(Document&, const String& type, const String& data);
+ 
+     void setDragImage(Ref<Element>&&, int x, int y);
+@@ -93,14 +93,14 @@ public:
+ #if ENABLE(DRAG_SUPPORT)
+     static Ref<DataTransfer> createForDrag(const Document&);
+     static Ref<DataTransfer> createForDragStartEvent(const Document&);
+-    static Ref<DataTransfer> createForDrop(const Document&, std::unique_ptr<Pasteboard>&&, OptionSet<DragOperation>, bool draggingFiles);
++    WEBCORE_EXPORT static Ref<DataTransfer> createForDrop(const Document&, std::unique_ptr<Pasteboard>&&, OptionSet<DragOperation>, bool draggingFiles);
+     static Ref<DataTransfer> createForUpdatingDropTarget(const Document&, std::unique_ptr<Pasteboard>&&, OptionSet<DragOperation>, bool draggingFiles);
+ 
+     bool dropEffectIsUninitialized() const { return m_dropEffect == "uninitialized"_s; }
+ 
+     OptionSet<DragOperation> sourceOperationMask() const;
+-    OptionSet<DragOperation> destinationOperationMask() const;
+-    void setSourceOperationMask(OptionSet<DragOperation>);
++    WEBCORE_EXPORT OptionSet<DragOperation> destinationOperationMask() const;
++    WEBCORE_EXPORT void setSourceOperationMask(OptionSet<DragOperation>);
+     void setDestinationOperationMask(OptionSet<DragOperation>);
+ 
+     void setDragHasStarted() { m_shouldUpdateDragImage = true; }
+diff --git a/Source/WebCore/dom/Document.h b/Source/WebCore/dom/Document.h
+index 823e4cd420..5b5b95c1f4 100644
+--- a/Source/WebCore/dom/Document.h
++++ b/Source/WebCore/dom/Document.h
+@@ -1877,7 +1877,7 @@ public:
+ #endif
+     WEBCORE_EXPORT DocumentTimeline& timeline();
+     DocumentTimeline* existingTimeline() const { return m_timeline.get(); }
+-    Vector<Ref<WebAnimation>> getAnimations();
++    WEBCORE_EXPORT Vector<Ref<WebAnimation>> getAnimations();
+     Vector<Ref<WebAnimation>> matchingAnimations(NOESCAPE const Function<bool(Element&)>&);
+     AnimationTimelinesController* timelinesController() const { return m_timelinesController.get(); }
+     WEBCORE_EXPORT AnimationTimelinesController& ensureTimelinesController();
+diff --git a/Source/WebCore/dom/DragEvent.h b/Source/WebCore/dom/DragEvent.h
+index 9bb5d9bbab..be7b039707 100644
+--- a/Source/WebCore/dom/DragEvent.h
++++ b/Source/WebCore/dom/DragEvent.h
+@@ -38,7 +38,7 @@ struct DragEventInit : public MouseEventInit {
+     RefPtr<DataTransfer> dataTransfer;
+ };
+ 
+-class DragEvent final : public MouseEvent {
++class WEBCORE_EXPORT DragEvent final : public MouseEvent {
+     WTF_MAKE_TZONE_ALLOCATED(DragEvent);
+ public:
+     using Init = DragEventInit;
+diff --git a/Source/WebCore/dom/Element.h b/Source/WebCore/dom/Element.h
+index 8216a2d09e..18b15c3b34 100644
+--- a/Source/WebCore/dom/Element.h
++++ b/Source/WebCore/dom/Element.h
+@@ -884,7 +884,7 @@ public:
+     RefPtr<Element> findAnchorElementForLink(String& outAnchorName);
+ 
+     ExceptionOr<Ref<WebAnimation>> animate(JSC::JSGlobalObject&, JSC::Strong<JSC::JSObject>&&, Variant<double, KeyframeAnimationOptions>&&);
+-    Vector<Ref<WebAnimation>> getAnimations(std::optional<GetAnimationsOptions>);
++    WEBCORE_EXPORT Vector<Ref<WebAnimation>> getAnimations(std::optional<GetAnimationsOptions>);
+ 
+     String description() const override;
+     String debugDescription() const override;
 diff --git a/Source/WebCore/loader/EmptyClients.h b/Source/WebCore/loader/EmptyClients.h
-index 97c2a7e662..511a2ace7a 100644
+index 97c2a7e662..9337ab8240 100644
 --- a/Source/WebCore/loader/EmptyClients.h
 +++ b/Source/WebCore/loader/EmptyClients.h
 @@ -57,7 +57,7 @@ enum class BroadcastFocusedElement : bool;
@@ -23,6 +225,15 @@ index 97c2a7e662..511a2ace7a 100644
      WTF_MAKE_TZONE_ALLOCATED(EmptyChromeClient);
  
      void chromeDestroyed() override { }
+@@ -100,7 +100,7 @@ class EmptyChromeClient : public ChromeClient {
+     bool runJavaScriptConfirm(LocalFrame&, const String&) final { return false; }
+     bool runJavaScriptPrompt(LocalFrame&, const String&, const String&, String&) final { return false; }
+ 
+-    RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
++    RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const override;
+     RefPtr<SearchPopupMenu> createSearchPopupMenu(PopupMenuClient&) const final;
+ 
+     KeyboardUIMode keyboardUIMode() final { return KeyboardAccessDefault; }
 @@ -111,9 +111,9 @@ class EmptyChromeClient : public ChromeClient {
      std::optional<PointerCharacteristics> pointerCharacteristicsOfPrimaryPointingDevice() const final { return std::nullopt; };
      OptionSet<PointerCharacteristics> pointerCharacteristicsOfAllAvailablePointingDevices() const final { return { }; }
@@ -35,6 +246,15 @@ index 97c2a7e662..511a2ace7a 100644
      void scroll(const IntSize&, const IntRect&, const IntRect&) final { }
  
      IntPoint screenToRootView(const IntPoint& p) const final { return p; }
+@@ -133,7 +133,7 @@ class EmptyChromeClient : public ChromeClient {
+     void contentsSizeChanged(LocalFrame&, const IntSize&) const final { }
+     void intrinsicContentsSizeChanged(const IntSize&) const final { }
+ 
+-    void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String&, TextDirection) final { }
++    void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String&, TextDirection) override { }
+ 
+     void print(LocalFrame&, const StringWithDirection&) final { }
+ 
 @@ -158,7 +158,7 @@ class EmptyChromeClient : public ChromeClient {
      void elementDidFocus(Element&, const FocusOptions&) final { }
      void elementDidBlur(Element&) final { }
@@ -90,3 +310,85 @@ index c884441710..318e247119 100644
      virtual void requestPointerUnlock(CompletionHandler<void(bool)>&& completionHandler) { completionHandler(false); }
  #endif
  
+diff --git a/Source/WebCore/page/IntersectionObserver.h b/Source/WebCore/page/IntersectionObserver.h
+index 5dc74daa93..74b868ae71 100644
+--- a/Source/WebCore/page/IntersectionObserver.h
++++ b/Source/WebCore/page/IntersectionObserver.h
+@@ -79,9 +79,9 @@ public:
+         Variant<double, Vector<double>> threshold;
+     };
+ 
+-    static ExceptionOr<Ref<IntersectionObserver>> create(Document&, Ref<IntersectionObserverCallback>&&, Init&&, IncludeObscuredInsets = IncludeObscuredInsets::No);
++    WEBCORE_EXPORT static ExceptionOr<Ref<IntersectionObserver>> create(Document&, Ref<IntersectionObserverCallback>&&, Init&&, IncludeObscuredInsets = IncludeObscuredInsets::No);
+ 
+-    ~IntersectionObserver();
++    WEBCORE_EXPORT ~IntersectionObserver();
+ 
+     // Local: root is in the same process as the observer.
+     // Remote: root is in different process as the observer.
+@@ -102,9 +102,9 @@ public:
+     bool hasObservationTargets() const { return !m_observationTargets.isEmptyIgnoringNullReferences(); }
+     bool NODELETE isObserving(const Element&) const;
+ 
+-    void observe(Element&);
+-    void unobserve(Element&);
+-    void disconnect();
++    WEBCORE_EXPORT void observe(Element&);
++    WEBCORE_EXPORT void unobserve(Element&);
++    WEBCORE_EXPORT void disconnect();
+ 
+     struct TakenRecords {
+         Vector<Ref<IntersectionObserverEntry>> records;
+diff --git a/Source/WebCore/page/ResizeObserver.h b/Source/WebCore/page/ResizeObserver.h
+index 1ebd9edc2c..044e2b6b57 100644
+--- a/Source/WebCore/page/ResizeObserver.h
++++ b/Source/WebCore/page/ResizeObserver.h
+@@ -58,17 +58,17 @@ using JSOrNativeResizeObserverCallback = Variant<Ref<ResizeObserverCallback>, Na
+ class ResizeObserver : public RefCountedAndCanMakeWeakPtr<ResizeObserver> {
+     WTF_MAKE_TZONE_ALLOCATED(ResizeObserver);
+ public:
+-    static Ref<ResizeObserver> create(Document&, Ref<ResizeObserverCallback>&&);
++    WEBCORE_EXPORT static Ref<ResizeObserver> create(Document&, Ref<ResizeObserverCallback>&&);
+     static Ref<ResizeObserver> createNativeObserver(Document&, NativeResizeObserverCallback&&);
+-    ~ResizeObserver();
++    WEBCORE_EXPORT ~ResizeObserver();
+ 
+     bool hasObservations() const { return m_observations.size(); }
+     bool hasActiveObservations() const { return m_activeObservations.size(); }
+ 
+-    void observe(Element&);
++    WEBCORE_EXPORT void observe(Element&);
+     void observe(Element&, const ResizeObserverOptions&);
+-    void unobserve(Element&);
+-    void disconnect();
++    WEBCORE_EXPORT void unobserve(Element&);
++    WEBCORE_EXPORT void disconnect();
+     void targetDestroyed(Element&);
+ 
+     static size_t maxElementDepth() { return SIZE_MAX; }
+diff --git a/Source/WebCore/platform/Pasteboard.h b/Source/WebCore/platform/Pasteboard.h
+index de2f5bf37b..33021695bf 100644
+--- a/Source/WebCore/platform/Pasteboard.h
++++ b/Source/WebCore/platform/Pasteboard.h
+@@ -194,7 +194,7 @@ struct PasteboardFileReader {
+ };
+ 
+ class Pasteboard {
+-    WTF_MAKE_TZONE_ALLOCATED(Pasteboard);
++    WTF_MAKE_TZONE_ALLOCATED_EXPORT(Pasteboard, WEBCORE_EXPORT);
+     WTF_MAKE_NONCOPYABLE(Pasteboard);
+ public:
+     explicit Pasteboard(std::unique_ptr<PasteboardContext>&&);
+diff --git a/Source/WebCore/platform/StaticPasteboard.h b/Source/WebCore/platform/StaticPasteboard.h
+index aa8d7e25d1..8ecec3b451 100644
+--- a/Source/WebCore/platform/StaticPasteboard.h
++++ b/Source/WebCore/platform/StaticPasteboard.h
+@@ -34,7 +34,7 @@ namespace WebCore {
+ 
+ class SharedBuffer;
+ 
+-class StaticPasteboard final : public Pasteboard {
++class WEBCORE_EXPORT StaticPasteboard final : public Pasteboard {
+ public:
+     StaticPasteboard();
+     ~StaticPasteboard();

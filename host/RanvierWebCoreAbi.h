@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 12.
+ * Ranvier native WebCore C ABI, version 19.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -426,6 +426,347 @@ RV_EXPORT int32_t rv_event_number(RvEvent*, int32_t number, double* value);
 RV_EXPORT int32_t rv_event_string(RvEvent*, int32_t property, char* buffer, int32_t capacity, int32_t* length);
 /* The relatedTarget of a mouse or focus event when it is a node, else NULL. */
 RV_EXPORT RvNode* rv_event_related_target(RvEvent*);
+
+/* v13: "cursor", "scroll" and "ime" for rv_abi_has. */
+
+/* Cursors of rv_host_cursor, as the CSS cursor values. */
+enum {
+    RV_CURSOR_DEFAULT = 0,
+    RV_CURSOR_POINTER = 1,
+    RV_CURSOR_TEXT = 2,
+    RV_CURSOR_VERTICAL_TEXT = 3,
+    RV_CURSOR_CROSSHAIR = 4,
+    RV_CURSOR_MOVE = 5,
+    RV_CURSOR_ALL_SCROLL = 6,
+    RV_CURSOR_WAIT = 7,
+    RV_CURSOR_PROGRESS = 8,
+    RV_CURSOR_HELP = 9,
+    RV_CURSOR_CONTEXT_MENU = 10,
+    RV_CURSOR_CELL = 11,
+    RV_CURSOR_ALIAS = 12,
+    RV_CURSOR_COPY = 13,
+    RV_CURSOR_NO_DROP = 14,
+    RV_CURSOR_NOT_ALLOWED = 15,
+    RV_CURSOR_GRAB = 16,
+    RV_CURSOR_GRABBING = 17,
+    RV_CURSOR_ZOOM_IN = 18,
+    RV_CURSOR_ZOOM_OUT = 19,
+    RV_CURSOR_NONE = 20,
+    RV_CURSOR_COL_RESIZE = 21,
+    RV_CURSOR_ROW_RESIZE = 22,
+    RV_CURSOR_N_RESIZE = 23,
+    RV_CURSOR_E_RESIZE = 24,
+    RV_CURSOR_S_RESIZE = 25,
+    RV_CURSOR_W_RESIZE = 26,
+    RV_CURSOR_NE_RESIZE = 27,
+    RV_CURSOR_NW_RESIZE = 28,
+    RV_CURSOR_SE_RESIZE = 29,
+    RV_CURSOR_SW_RESIZE = 30,
+    RV_CURSOR_EW_RESIZE = 31,
+    RV_CURSOR_NS_RESIZE = 32,
+    RV_CURSOR_NESW_RESIZE = 33,
+    RV_CURSOR_NWSE_RESIZE = 34,
+    /* An image the page set with cursor: url(); the image is not available. */
+    RV_CURSOR_CUSTOM = 35,
+};
+
+/* The cursor for the mouse's position, as last set by rv_host_mouse: the app applies it after each mouse call. */
+RV_EXPORT int32_t rv_host_cursor(RvHost*);
+
+/* Writes the viewport's scroll position in CSS pixels. */
+RV_EXPORT int32_t rv_host_scroll_position(RvHost*, int32_t* x, int32_t* y);
+/* Scrolls the viewport to x, y CSS pixels, clamped to the document. The scroll event fires on the next
+ * rv_host_update. */
+RV_EXPORT int32_t rv_host_scroll_to(RvHost*, int32_t x, int32_t y);
+
+/* Input method composition in the focused editable element, as a platform's input method reports it. The
+ * composition is the underlined text being composed; selectionStart and selectionEnd are UTF-16 offsets of
+ * the selection within it. Setting it replaces the selection or the previous composition, and empty text
+ * removes it. */
+RV_EXPORT int32_t rv_host_ime_set_composition(RvHost*, const char* text, int32_t selectionStart, int32_t selectionEnd);
+/* Replaces the composition, or the selection when there is none, with text, as typed text. */
+RV_EXPORT int32_t rv_host_ime_commit(RvHost*, const char* text);
+RV_EXPORT int32_t rv_host_ime_cancel(RvHost*);
+/* Writes the bounds of the composition's first line, or of the caret, in CSS pixels of the viewport, where an
+ * input method places its candidate window, and returns 1; returns 0 and writes zeros when there is neither. */
+RV_EXPORT int32_t rv_host_ime_rect(RvHost*, int32_t* x, int32_t* y, int32_t* width, int32_t* height);
+
+/* v14: "style", "geometry", "animation", "shadow" and "text-selection" for rv_abi_has. */
+
+/* Operations of rv_element_class on Element.classList. */
+enum {
+    RV_CLASS_CONTAINS = 0,
+    RV_CLASS_ADD = 1,
+    RV_CLASS_REMOVE = 2,
+    RV_CLASS_TOGGLE = 3,
+};
+
+/* Applies the operation to a class token and returns 1 when the element has the class afterwards, else 0. */
+RV_EXPORT int32_t rv_element_class(RvNode*, const char* token, int32_t operation);
+/* Sets an inline style property, as CSSStyleDeclaration.setProperty with "important" priority when important
+ * is 1. An empty value removes the property, and an invalid one leaves it unchanged, as in CSS. */
+RV_EXPORT int32_t rv_element_set_style(RvNode*, const char* property, const char* value, int32_t important);
+/* Copies an inline style property's value, empty when the element does not set it. */
+RV_EXPORT int32_t rv_element_get_style(RvNode*, const char* property, char* buffer, int32_t capacity, int32_t* length);
+/* Copies a property of the element's computed style, as getComputedStyle, with style updated first. */
+RV_EXPORT int32_t rv_element_computed_style(RvNode*, const char* property, char* buffer, int32_t capacity, int32_t* length);
+
+/* Writes Element.getBoundingClientRect() in CSS pixels of the viewport, with layout updated first. */
+RV_EXPORT int32_t rv_element_rect(RvNode*, double* x, double* y, double* width, double* height);
+/* The topmost element at x, y CSS pixels of the viewport, as Document.elementFromPoint, or NULL. */
+RV_EXPORT RvNode* rv_host_element_at(RvHost*, int32_t x, int32_t y);
+
+/* Alignments of rv_element_scroll_into_view, as ScrollLogicalPosition. */
+enum {
+    RV_ALIGN_START = 0,
+    RV_ALIGN_CENTER = 1,
+    RV_ALIGN_END = 2,
+    RV_ALIGN_NEAREST = 3,
+};
+
+/* Scrolls the element's scrollable ancestors and the viewport to show it, aligned on each axis. With smooth
+ * set, the scroll animates over the following rendering updates. */
+RV_EXPORT int32_t rv_element_scroll_into_view(RvNode*, int32_t block, int32_t inlineAlignment, int32_t smooth);
+
+/* Metrics of rv_element_scroll_metric, as the Element properties of the same names. */
+enum {
+    RV_SCROLL_LEFT = 0,
+    RV_SCROLL_TOP = 1,
+    RV_SCROLL_WIDTH = 2,
+    RV_SCROLL_HEIGHT = 3,
+    RV_CLIENT_WIDTH = 4,
+    RV_CLIENT_HEIGHT = 5,
+};
+
+/* Writes a scroll metric of the element in CSS pixels, with layout updated first. */
+RV_EXPORT int32_t rv_element_scroll_metric(RvNode*, int32_t metric, int32_t* value);
+/* Scrolls the element's content to left, top CSS pixels, as Element.scrollTo; with smooth set, animated. */
+RV_EXPORT int32_t rv_element_scroll_to(RvNode*, int32_t left, int32_t top, int32_t smooth);
+
+/* Attaches an open shadow root to the element, as Element.attachShadow({ mode: "open" }), and returns it: a
+ * node of type 11 that takes children, styles and slots. NULL on failure, with *status
+ * RV_ERR_DOM_EXCEPTION and the exception in rv_last_exception. */
+RV_EXPORT RvNode* rv_element_attach_shadow(RvNode*, int32_t* status);
+/* The element's open shadow root, or NULL. */
+RV_EXPORT RvNode* rv_element_shadow_root(RvNode*);
+
+/* Writes the selection of an input or textarea as UTF-16 offsets into its value. */
+RV_EXPORT int32_t rv_text_selection(RvNode*, int32_t* start, int32_t* end);
+/* Selects start to end of an input or textarea's value, clamped to it. */
+RV_EXPORT int32_t rv_text_set_selection(RvNode*, int32_t start, int32_t end);
+
+typedef struct RvAnimation RvAnimation;
+
+/* Writes *count, then a strong handle to each animation of the element, which includes CSS animations and
+ * transitions; with subtree set, also its descendants'. Each handle is released with rv_animation_release
+ * before rv_host_destroy. When capacity is below *count it returns RV_ERR_BUFFER_TOO_SMALL and writes no
+ * handles. */
+RV_EXPORT int32_t rv_element_animations(RvNode*, int32_t subtree, RvAnimation** animations, int32_t capacity, int32_t* count);
+/* The same for every animation of the host's document. */
+RV_EXPORT int32_t rv_host_animations(RvHost*, RvAnimation** animations, int32_t capacity, int32_t* count);
+RV_EXPORT void rv_animation_release(RvAnimation*);
+
+/* Actions of rv_animation_control, as the Animation methods of the same names. */
+enum {
+    RV_ANIMATION_PLAY = 0,
+    RV_ANIMATION_PAUSE = 1,
+    RV_ANIMATION_REVERSE = 2,
+    RV_ANIMATION_FINISH = 3,
+    RV_ANIMATION_CANCEL = 4,
+};
+
+/* Play states of rv_animation_state, as Animation.playState. */
+enum {
+    RV_ANIMATION_IDLE = 0,
+    RV_ANIMATION_RUNNING = 1,
+    RV_ANIMATION_PAUSED = 2,
+    RV_ANIMATION_FINISHED = 3,
+};
+
+RV_EXPORT int32_t rv_animation_control(RvAnimation*, int32_t action);
+RV_EXPORT int32_t rv_animation_state(RvAnimation*);
+/* Writes Animation.currentTime in milliseconds and returns 1, or returns 0 when it is unresolved. */
+RV_EXPORT int32_t rv_animation_time(RvAnimation*, double* milliseconds);
+/* Sets Animation.currentTime in milliseconds. */
+RV_EXPORT int32_t rv_animation_seek(RvAnimation*, double milliseconds);
+/* Sets the playback rate, as Animation.updatePlaybackRate: 1 is normal speed, negative plays backward. */
+RV_EXPORT int32_t rv_animation_set_rate(RvAnimation*, double rate);
+/* Copies the CSS animation's name, the CSS transition's property, or the animation's id. */
+RV_EXPORT int32_t rv_animation_name(RvAnimation*, char* buffer, int32_t capacity, int32_t* length);
+/* A strong handle to the element the animation's effect targets, or NULL. */
+RV_EXPORT RvNode* rv_animation_target(RvAnimation*);
+
+/* v15: "observers" and "snapshot" for rv_abi_has. */
+
+/* Adds a reference to the node and returns it, for keeping a node an observer callback passes. */
+RV_EXPORT RvNode* rv_node_retain(RvNode*);
+
+typedef struct RvObserver RvObserver;
+
+/* Called on the host thread during rv_host_update, once per observed element whose content box changed size,
+ * and once for each element when it is first observed. width and height are CSS pixels. The target is valid
+ * for the callback; rv_node_retain keeps it. The callback may call any function of this ABI. */
+typedef void (*RvResizeCallback)(void* context, RvNode* target, double width, double height);
+/* Called on the host thread during rv_host_update, once per observed element whose intersection with the
+ * viewport crossed one of the observer's thresholds, and once for each element when it is first observed.
+ * ratio is the visible fraction of the element, from 0 to 1. The target is as for RvResizeCallback. */
+typedef void (*RvIntersectionCallback)(void* context, RvNode* target, int32_t intersecting, double ratio);
+
+/* A ResizeObserver, observing elements' content boxes. */
+RV_EXPORT RvObserver* rv_host_observe_resize(RvHost*, RvResizeCallback callback, void* context);
+/* An IntersectionObserver with the viewport as its root. rootMargin is a CSS margin, such as "0px" or
+ * "100px 0px", that grows or shrinks the viewport, or NULL for none; thresholds are the ratios that report,
+ * ascending from 0 to 1, or NULL with count 0 for 0 alone. NULL for an invalid margin or threshold. */
+RV_EXPORT RvObserver* rv_host_observe_intersection(RvHost*, RvIntersectionCallback callback, void* context, const char* rootMargin,
+    const double* thresholds, int32_t thresholdCount);
+RV_EXPORT int32_t rv_observer_observe(RvObserver*, RvNode* element);
+RV_EXPORT int32_t rv_observer_unobserve(RvObserver*, RvNode* element);
+/* Disconnects the observer and frees it, before rv_host_destroy. Its callback will not run after this returns. */
+RV_EXPORT void rv_observer_release(RvObserver*);
+
+/* Paints the element and its descendants alone, without what lies behind or over them, at the host's device
+ * scale, into unpremultiplied RGBA8, such as for a drag image. Writes the image's size in device pixels to
+ * *width and *height; when length is below width * height * 4 it returns RV_ERR_BUFFER_TOO_SMALL with the
+ * size written and rgba untouched. */
+RV_EXPORT int32_t rv_element_snapshot(RvNode*, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height);
+
+/* v16: "partial-paint" for rv_abi_has. */
+
+/* Paints the area x, y, width, height, in CSS pixels of the viewport and clipped to it, into its place in
+ * rgba, an image of rv_host_paint_size as rv_host_paint_rgba writes, and leaves the rest of rgba as it was.
+ * After a full paint, painting rv_host_dirty_rect each frame keeps the image current. The dirty rectangle is
+ * cleared when the area contains it. At a fractional device scale the area's edges are rounded down to whole
+ * device pixels. */
+RV_EXPORT int32_t rv_host_paint_rgba_rect(RvHost*, uint8_t* rgba, int32_t length, int32_t x, int32_t y, int32_t width, int32_t height);
+
+/* v17: "popups" and "tooltip" for rv_abi_has. */
+
+typedef struct RvPopup RvPopup;
+
+/* Actions of RvPopupCallback. */
+enum {
+    /* A <select> opens its menu: the app shows the items at the select's box, x, y, width, height in CSS
+     * pixels of the viewport, with item selected highlighted, then calls rv_popup_choose. */
+    RV_POPUP_SHOW = 0,
+    /* The page closes the menu, such as when the select is removed: the app hides it, and the popup is
+     * invalid once the callback returns. */
+    RV_POPUP_HIDE = 1,
+};
+
+/* Kinds of rv_popup_item. */
+enum {
+    RV_POPUP_ITEM_OPTION = 0,
+    RV_POPUP_ITEM_SEPARATOR = 1,
+    /* An <optgroup> label. */
+    RV_POPUP_ITEM_GROUP = 2,
+};
+
+/* Called on the host thread for a <select>'s menu. */
+typedef void (*RvPopupCallback)(void* context, RvPopup* popup, int32_t action, int32_t x, int32_t y, int32_t width, int32_t height,
+    int32_t selected);
+
+/* Sets the host's popup handler, which shows <select> menus as the app's own native menus, or with a NULL
+ * handler removes it. Without a handler a select opens no menu, and the page draws its own, such as on
+ * mousedown. */
+RV_EXPORT int32_t rv_host_set_popup_handler(RvHost*, RvPopupCallback callback, void* context);
+RV_EXPORT int32_t rv_popup_item_count(RvPopup*);
+/* Writes the item's kind and whether it is enabled, and copies its text as WebCore's own menus show it: the
+ * options of an <optgroup> are indented by four spaces, and a group label is not enabled. */
+RV_EXPORT int32_t rv_popup_item(RvPopup*, int32_t index, int32_t* kind, int32_t* enabled, char* buffer, int32_t capacity, int32_t* length);
+/* Ends the menu with the item at index chosen, which selects it and fires input and change, or with -1 for
+ * none. The popup is invalid after the call. */
+RV_EXPORT int32_t rv_popup_choose(RvPopup*, int32_t index);
+
+/* Copies the tooltip for the mouse's position, the title attribute of the element under it, as last set by
+ * rv_host_mouse: empty when there is none. The app shows it after its own hover delay. */
+RV_EXPORT int32_t rv_host_tooltip(RvHost*, char* buffer, int32_t capacity, int32_t* length);
+
+/* v18: "clipboard" for rv_abi_has. docs/CLIPBOARD-DND.md describes the styles. */
+
+/* Clipboard styles of rv_host_set_clipboard. */
+enum {
+    /* The app moves the data, through the write and read callbacks. */
+    RV_CLIPBOARD_APP = 0,
+    /* WebCore's own platform clipboard code: Windows and macOS. */
+    RV_CLIPBOARD_NATIVE = 1,
+    /* Only the page sees the data, through copy, cut and paste events. A host starts in this style. */
+    RV_CLIPBOARD_DOM = 2,
+};
+
+/* Editing commands of rv_host_edit. */
+enum {
+    RV_EDIT_COPY = 0,
+    RV_EDIT_CUT = 1,
+    RV_EDIT_PASTE = 2,
+    /* Pastes text/plain only. */
+    RV_EDIT_PASTE_PLAIN = 3,
+    RV_EDIT_SELECT_ALL = 4,
+    RV_EDIT_DELETE = 5,
+};
+
+typedef struct RvClipboardRequest RvClipboardRequest;
+
+/* App style: called once per copied type, such as "text/plain" and "text/html", in order. first is 1 for the
+ * first type of a copy or cut, when the app replaces what its clipboard held. */
+typedef void (*RvClipboardWrite)(void* context, const char* type, const char* data, int32_t first);
+/* App style: called at a paste; the app offers each type it holds with rv_clipboard_offer before it returns. */
+typedef void (*RvClipboardRead)(void* context, RvClipboardRequest* request);
+
+/* Sets the host's clipboard style. The callbacks are for RV_CLIPBOARD_APP and NULL otherwise.
+ * RV_CLIPBOARD_NATIVE returns RV_ERR_UNSUPPORTED where WebCore has no platform clipboard (Linux). */
+RV_EXPORT int32_t rv_host_set_clipboard(RvHost*, int32_t style, RvClipboardWrite write, RvClipboardRead read, void* context);
+/* Offers one type of the clipboard's content to a paste, during RvClipboardRead. */
+RV_EXPORT int32_t rv_clipboard_offer(RvClipboardRequest*, const char* type, const char* data);
+/* Runs an editing command on the selection of the host's document, as a menu would; Control+C, X and V in
+ * rv_host_key run the same commands. Copy, cut and paste fire their DOM events first, and a page that
+ * cancels one supplies or takes the data itself. Returns 1 when the command ran, 0 when it does not apply,
+ * such as a copy with nothing selected, or a negative status. */
+RV_EXPORT int32_t rv_host_edit(RvHost*, int32_t command);
+
+/* v19: "drop" for rv_abi_has: drags from outside into the page. docs/CLIPBOARD-DND.md describes the styles. */
+
+/* Drag styles of rv_host_set_drag. */
+enum {
+    /* The app forwards the OS drag with rv_host_drag, and the host fires the DOM drag events. */
+    RV_DRAG_APP = 0,
+    /* WebCore's own platform drag code. Not yet supported: rv_host_set_drag returns RV_ERR_UNSUPPORTED. */
+    RV_DRAG_NATIVE = 1,
+    /* No drag reaches the page: rv_host_drag fires nothing. A host starts in this style. */
+    RV_DRAG_DOM = 2,
+};
+
+/* Bits of the operations of rv_host_drag, as the DataTransfer effects copy, move and link. */
+enum {
+    RV_DROP_NONE = 0,
+    RV_DROP_COPY = 1,
+    RV_DROP_MOVE = 2,
+    RV_DROP_LINK = 4,
+};
+
+/* Actions of rv_host_drag. */
+enum {
+    /* The drag entered the view or moved over it. */
+    RV_DRAG_OVER = 0,
+    /* The drag left the view or was cancelled. */
+    RV_DRAG_LEAVE = 1,
+    /* The drag was released over the view. */
+    RV_DRAG_DROP = 2,
+};
+
+typedef struct RvDragData RvDragData;
+
+RV_EXPORT int32_t rv_host_set_drag(RvHost*, int32_t style);
+/* The data of a drag, of types such as "text/plain", "text/html" and "text/uri-list" (file URLs for files). */
+RV_EXPORT RvDragData* rv_drag_data_create(void);
+RV_EXPORT int32_t rv_drag_data_add(RvDragData*, const char* type, const char* data);
+RV_EXPORT void rv_drag_data_release(RvDragData*);
+/* Forwards a drag from outside the page at x, y CSS pixels of the viewport, with the RV_DROP_* operations
+ * the source allows. As the element under the point changes the host fires dragleave and dragenter, then
+ * dragover, or drop for RV_DRAG_DROP, each with a dataTransfer holding data; drop's data is readable. Returns
+ * the RV_DROP_* operation the page accepts, which the app shows as the cursor: the dataTransfer's dropEffect
+ * when a listener cancelled dragover, else RV_DROP_COPY for text over editable content, else RV_DROP_NONE.
+ * A drop that no listener cancels inserts the text, or the HTML, into editable content at the point. */
+RV_EXPORT int32_t rv_host_drag(RvHost*, int32_t action, int32_t x, int32_t y, int32_t allowed, RvDragData* data, int32_t modifiers);
 
 #ifdef __cplusplus
 }

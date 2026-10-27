@@ -43,8 +43,12 @@ Homebrew install four times, and apt's `Acquire::Retries=5`.
 
 ## Local runs
 
-The same steps run on a workstation, ending with the same check CI runs (`scripts/smoke.py`: the staged
-files match the manifest, and the host loads from them and paints a page):
+The same steps run on a workstation, ending with the same check CI runs:
+
+- `scripts/smoke.py` checks that the staged files match the manifest, and that the host loads from them and
+  paints a page.
+- On Windows and macOS, `scripts/abi_tests.py` then runs the F# ABI tests in `tests/abi` against the staged
+  files. They need the .NET 10 SDK, and the WebKit checkout for a test font.
 
 ```
 python -I scripts/build.py all --work C:/rw

@@ -66,6 +66,43 @@
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/Chrome.h>
+#include <WebCore/ClipboardEvent.h>
+#include <WebCore/DragActions.h>
+#include <WebCore/DragEvent.h>
+#include <WebCore/VisiblePosition.h>
+#include <WebCore/DataTransfer.h>
+#include <WebCore/StaticPasteboard.h>
+#include <WebCore/markup.h>
+#include <WebCore/HitTestResult.h>
+#include <WebCore/PopupMenu.h>
+#include <WebCore/PopupMenuClient.h>
+#include <WebCore/DOMRectReadOnly.h>
+#include <WebCore/FrameSnapshotting.h>
+#include <WebCore/IntersectionObserver.h>
+#include <WebCore/IntersectionObserverCallback.h>
+#include <WebCore/IntersectionObserverEntry.h>
+#include <WebCore/ResizeObserver.h>
+#include <WebCore/ResizeObserverCallback.h>
+#include <WebCore/ResizeObserverEntry.h>
+#include <WebCore/CSSAnimation.h>
+#include <WebCore/CSSComputedStyleDeclaration.h>
+#include <WebCore/CSSStyleDeclaration.h>
+#include <WebCore/CSSTransition.h>
+#include <WebCore/DOMTokenList.h>
+#include <WebCore/GetAnimationsOptions.h>
+#include <WebCore/HTMLTextFormControlElement.h>
+#include <WebCore/KeyframeEffect.h>
+#include <WebCore/ScrollIntoViewOptions.h>
+#include <WebCore/ScrollToOptions.h>
+#include <WebCore/ShadowRoot.h>
+#include <WebCore/ShadowRootInit.h>
+#include <WebCore/StyledElement.h>
+#include <WebCore/WebAnimation.h>
+#include <WebCore/WebAnimationTime.h>
+#include <WebCore/CompositionHighlight.h>
+#include <WebCore/CompositionUnderline.h>
+#include <WebCore/Cursor.h>
+#include <WebCore/FrameSelection.h>
 #include <WebCore/DOMPasteAccess.h>
 #include <WebCore/Editor.h>
 #include <WebCore/EditorClient.h>
@@ -137,9 +174,66 @@ private:
         wantUpdate();
         return true;
     }
+    void setCursor(const Cursor&) final;
+    void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection) final;
+    RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
     void invalidate(const IntRect&);
     void wantUpdate();
 };
+
+// The RV_CURSOR_* value of a WebCore cursor.
+static int32_t cursorValue(Cursor::Type type)
+{
+    using enum Cursor::Type;
+    switch (type) {
+    case Hand: return RV_CURSOR_POINTER;
+    case IBeam: return RV_CURSOR_TEXT;
+    case VerticalText: return RV_CURSOR_VERTICAL_TEXT;
+    case Cross: return RV_CURSOR_CROSSHAIR;
+    case Move: return RV_CURSOR_MOVE;
+    case MiddlePanning:
+    case EastPanning:
+    case NorthPanning:
+    case NorthEastPanning:
+    case NorthWestPanning:
+    case SouthPanning:
+    case SouthEastPanning:
+    case SouthWestPanning:
+    case WestPanning: return RV_CURSOR_ALL_SCROLL;
+    case Wait: return RV_CURSOR_WAIT;
+    case Progress: return RV_CURSOR_PROGRESS;
+    case Help: return RV_CURSOR_HELP;
+    case ContextMenu: return RV_CURSOR_CONTEXT_MENU;
+    case Cell: return RV_CURSOR_CELL;
+    case Alias: return RV_CURSOR_ALIAS;
+    case Copy: return RV_CURSOR_COPY;
+    case NoDrop: return RV_CURSOR_NO_DROP;
+    case NotAllowed: return RV_CURSOR_NOT_ALLOWED;
+    case Grab: return RV_CURSOR_GRAB;
+    case Grabbing: return RV_CURSOR_GRABBING;
+    case ZoomIn: return RV_CURSOR_ZOOM_IN;
+    case ZoomOut: return RV_CURSOR_ZOOM_OUT;
+    case None: return RV_CURSOR_NONE;
+    case ColumnResize: return RV_CURSOR_COL_RESIZE;
+    case RowResize: return RV_CURSOR_ROW_RESIZE;
+    case NorthResize: return RV_CURSOR_N_RESIZE;
+    case EastResize: return RV_CURSOR_E_RESIZE;
+    case SouthResize: return RV_CURSOR_S_RESIZE;
+    case WestResize: return RV_CURSOR_W_RESIZE;
+    case NorthEastResize: return RV_CURSOR_NE_RESIZE;
+    case NorthWestResize: return RV_CURSOR_NW_RESIZE;
+    case SouthEastResize: return RV_CURSOR_SE_RESIZE;
+    case SouthWestResize: return RV_CURSOR_SW_RESIZE;
+    case EastWestResize: return RV_CURSOR_EW_RESIZE;
+    case NorthSouthResize: return RV_CURSOR_NS_RESIZE;
+    case NorthEastSouthWestResize: return RV_CURSOR_NESW_RESIZE;
+    case NorthWestSouthEastResize: return RV_CURSOR_NWSE_RESIZE;
+    case Custom: return RV_CURSOR_CUSTOM;
+    case Invalid:
+    case Pointer: return RV_CURSOR_DEFAULT;
+    }
+    return RV_CURSOR_DEFAULT;
+}
 
 // The editing command a key down runs, as Windows binds keys.
 static String keyCommand(const String& key, bool shift, bool control)
@@ -173,6 +267,9 @@ static String keyCommand(const String& key, bool shift, bool control)
 // An editor client that allows every edit and binds keys to editing commands, as WebKitLegacy's Windows client
 // did. The rest follows EmptyEditorClient in WebCore's loader/EmptyClients.cpp (Copyright (C) 2006 Eric Seidel,
 // 2008-2025 Apple Inc., Research In Motion Limited 2011; BSD-2-Clause).
+// Runs an RV_EDIT_* command for the page's host; defined with rv_host_edit.
+static int32_t runEdit(Page*, int32_t command);
+
 class RvEditorClient final : public EditorClient {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(RvEditorClient);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(RvEditorClient);
@@ -187,6 +284,16 @@ private:
             return;
         auto& editor = frame->editor();
         if (event.type() == eventNames().keydownEvent) {
+            // Control+C, X and V run the host's clipboard commands, in the host's clipboard style.
+            if (event.ctrlKey() && event.key().length() == 1) {
+                auto letter = toASCIILower(event.key()[0]);
+                auto clipboard = letter == 'c' ? RV_EDIT_COPY : letter == 'x' ? RV_EDIT_CUT : letter == 'v' ? (event.shiftKey() ? RV_EDIT_PASTE_PLAIN : RV_EDIT_PASTE) : -1;
+                if (clipboard >= 0) {
+                    if (runEdit(frame->page(), clipboard) > 0)
+                        event.setDefaultHandled();
+                    return;
+                }
+            }
             auto command = keyCommand(event.key(), event.shiftKey(), event.ctrlKey());
             if (!command.isEmpty() && editor.command(command).execute(&event))
                 event.setDefaultHandled();
@@ -480,6 +587,17 @@ struct RvHost {
     // Inside rv_host_update or rv_host_paint_rgba, which call no callback.
     bool inFrame { false };
     bool updateWanted { false };
+    int32_t cursor { RV_CURSOR_DEFAULT };
+    String tooltip;
+    RvPopupCallback popupCallback { nullptr };
+    void* popupContext { nullptr };
+    int32_t clipboardStyle { RV_CLIPBOARD_DOM };
+    RvClipboardWrite clipboardWrite { nullptr };
+    RvClipboardRead clipboardRead { nullptr };
+    void* clipboardContext { nullptr };
+    int32_t dragStyle { RV_DRAG_DOM };
+    // The element under a drag from outside, which received dragenter.
+    RefPtr<Element> dragTarget;
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
@@ -499,6 +617,73 @@ void RvChromeClient::invalidate(const IntRect& rect)
         return;
     host->dirty.unite(intersection(rect, IntRect { { }, host->size }));
     host->requestFrame();
+}
+
+void RvChromeClient::setCursor(const Cursor& cursor)
+{
+    if (host)
+        host->cursor = cursorValue(cursor.type());
+}
+
+void RvChromeClient::mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection)
+{
+    if (host)
+        host->tooltip = toolTip;
+}
+
+// A <select>'s menu, shown by the app's popup handler. It holds a reference to itself while shown, which
+// rv_popup_choose or a hide releases.
+class RvPopupMenu final : public PopupMenu {
+public:
+    RvPopupMenu(RvHost* host, PopupMenuClient& client)
+        : host(host)
+        , client(&client)
+    {
+    }
+
+    RvHost* host;
+    PopupMenuClient* client;
+    bool shown { false };
+
+    void end()
+    {
+        if (!shown)
+            return;
+        shown = false;
+        deref();
+    }
+
+private:
+    void show(const IntRect& rect, LocalFrameView& view, int selectedIndex) final
+    {
+        if (shown || !host || !host->popupCallback)
+            return;
+        auto box = view.contentsToRootView(rect);
+        shown = true;
+        ref();
+        host->popupCallback(host->popupContext, reinterpret_cast<RvPopup*>(this), RV_POPUP_SHOW, box.x(), box.y(), box.width(), box.height(), selectedIndex);
+    }
+
+    void hide() final
+    {
+        if (!shown)
+            return;
+        Ref protectedThis { *this };
+        if (host && host->popupCallback)
+            host->popupCallback(host->popupContext, reinterpret_cast<RvPopup*>(this), RV_POPUP_HIDE, 0, 0, 0, 0, -1);
+        if (client)
+            client->popupDidHide();
+        end();
+    }
+
+    void updateFromElement() final { }
+    void disconnectClient() final { client = nullptr; }
+};
+
+// Without a popup handler, or a host, the menu shows nothing, as WebCore's empty popup menu.
+RefPtr<PopupMenu> RvChromeClient::createPopupMenu(PopupMenuClient& client) const
+{
+    return adoptRef(*new RvPopupMenu(host, client));
 }
 
 void RvChromeClient::wantUpdate()
@@ -860,7 +1045,7 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 12; }
+int32_t rv_abi_version(void) { return 19; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -874,7 +1059,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1145,66 +1330,102 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
 }
 #endif
 
+// Paints area, in CSS pixels of the viewport, into its place in rgba, an image of paintSize.
+static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect area)
+{
+    auto pixelSize = paintSize(host);
+    size_t required = static_cast<size_t>(pixelSize.width()) * pixelSize.height() * 4;
+    if (length < 0 || static_cast<size_t>(length) < required)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    area.intersect({ { }, host.size });
+    host.inFrame = true;
+    host.frameRequested = false;
+    host.document().updateLayoutIgnorePendingStylesheets();
+    RefPtr view = host.frame().view();
+    if (!view) {
+        host.inFrame = false;
+        return RV_ERR_PAINT_FAILED;
+    }
+    view->updateLayoutAndStyleIfNeededRecursive();
+#if RANVIER_COMPOSITING
+    // A paint of the whole viewport composites when the host is in compositing mode. In
+    // RV_COMPOSITING_WHEN_NEEDED a frame without a clip layer is not in compositing mode and takes the CPU path.
+    // The compositor paints CSS pixels one to one, so a device scale other than 1 takes the CPU path too, as
+    // does a paint of part of the viewport.
+    if (area == IntRect { { }, host.size } && host.compositingMode != RV_COMPOSITING_OFF && view->clipLayer() && host.deviceScale == 1) {
+        // A resize since the compositor was made needs a framebuffer of the new size.
+        if (host.compositor && host.compositor->size != host.size)
+            host.compositor = nullptr;
+        if (!host.compositor)
+            host.compositor = RvCompositor::create(host.size);
+        if (host.compositor) {
+            auto result = composite(*host.compositor, *view, rgba);
+            host.dirty = { };
+            host.inFrame = false;
+            if (host.updateWanted)
+                host.requestFrame();
+            return result;
+        }
+        // No GL: the host stays on the CPU path, as with RV_COMPOSITING_OFF.
+        setCompositing(host, RV_COMPOSITING_OFF);
+    }
+#endif
+    RefPtr<ImageBuffer> buffer;
+    if (!area.isEmpty()) {
+        buffer = ImageBuffer::create(FloatSize { area.size() }, RenderingMode::Unaccelerated,
+            RenderingPurpose::Unspecified, host.deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+        if (buffer) {
+            buffer->context().translate(-area.x(), -area.y());
+            view->paint(buffer->context(), area);
+        }
+    }
+    // A paint of part of the viewport leaves invalidations outside it for a later paint.
+    if (area.contains(host.dirty))
+        host.dirty = { };
+    host.inFrame = false;
+    if (area.isEmpty())
+        return RV_OK;
+    if (!buffer)
+        return RV_ERR_PAINT_FAILED;
+    buffer->flushDrawingContext();
+    PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
+    // getPixelBuffer takes CSS pixels and scales them as paintSize does.
+    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, area.size() });
+    if (!pixels)
+        return RV_ERR_PAINT_FAILED;
+    auto origin = area.location();
+    origin.scale(host.deviceScale);
+    auto columns = std::min(pixels->size().width(), pixelSize.width() - origin.x());
+    auto rows = std::min(pixels->size().height(), pixelSize.height() - origin.y());
+    auto source = pixels->bytes();
+    for (int row = 0; row < rows; ++row) {
+        std::memcpy(rgba + (static_cast<size_t>(origin.y() + row) * pixelSize.width() + origin.x()) * 4,
+            source.data() + static_cast<size_t>(row) * pixels->size().width() * 4, static_cast<size_t>(columns) * 4);
+    }
+    // An update wanted during the paint, such as a layout that started an animation, needs another frame.
+    if (host.updateWanted)
+        host.requestFrame();
+    return RV_OK;
+}
+
 int32_t rv_host_paint_rgba(RvHost* host, uint8_t* rgba, int32_t length)
 {
     if (!host || !rgba)
         return RV_ERR_NULL_ARGUMENT;
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
-    auto size = host->size;
-    auto pixelSize = paintSize(*host);
-    size_t required = static_cast<size_t>(pixelSize.width()) * pixelSize.height() * 4;
-    if (length < 0 || static_cast<size_t>(length) < required)
-        return RV_ERR_BUFFER_TOO_SMALL;
-    host->inFrame = true;
-    host->frameRequested = false;
-    host->document().updateLayoutIgnorePendingStylesheets();
-    RefPtr view = host->frame().view();
-    if (!view) {
-        host->inFrame = false;
-        return RV_ERR_PAINT_FAILED;
-    }
-    view->updateLayoutAndStyleIfNeededRecursive();
-#if RANVIER_COMPOSITING
-    // In RV_COMPOSITING_WHEN_NEEDED a frame without a clip layer is not in compositing mode and takes the CPU path.
-    // The compositor paints CSS pixels one to one, so a device scale other than 1 takes the CPU path too.
-    if (host->compositingMode != RV_COMPOSITING_OFF && view->clipLayer() && host->deviceScale == 1) {
-        // A resize since the compositor was made needs a framebuffer of the new size.
-        if (host->compositor && host->compositor->size != host->size)
-            host->compositor = nullptr;
-        if (!host->compositor)
-            host->compositor = RvCompositor::create(host->size);
-        if (host->compositor) {
-            auto result = composite(*host->compositor, *view, rgba);
-            host->dirty = { };
-            host->inFrame = false;
-            if (host->updateWanted)
-                host->requestFrame();
-            return result;
-        }
-        // No GL: the host stays on the CPU path, as with RV_COMPOSITING_OFF.
-        setCompositing(*host, RV_COMPOSITING_OFF);
-    }
-#endif
-    auto buffer = ImageBuffer::create(FloatSize { size }, RenderingMode::Unaccelerated,
-        RenderingPurpose::Unspecified, host->deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
-    if (buffer)
-        view->paint(buffer->context(), IntRect { { }, size });
-    host->dirty = { };
-    host->inFrame = false;
-    if (!buffer)
-        return RV_ERR_PAINT_FAILED;
-    buffer->flushDrawingContext();
-    PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
-    // getPixelBuffer takes CSS pixels and scales them as paintSize does.
-    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, size });
-    if (!pixels || pixels->bytes().size() != required)
-        return RV_ERR_PAINT_FAILED;
-    std::memcpy(rgba, pixels->bytes().data(), required);
-    // An update wanted during the paint, such as a layout that started an animation, needs another frame.
-    if (host->updateWanted)
-        host->requestFrame();
-    return RV_OK;
+    return paintArea(*host, rgba, length, { { }, host->size });
+}
+
+int32_t rv_host_paint_rgba_rect(RvHost* host, uint8_t* rgba, int32_t length, int32_t x, int32_t y, int32_t width, int32_t height)
+{
+    if (!host || !rgba)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (width < 0 || height < 0)
+        return RV_ERR_UNSUPPORTED;
+    return paintArea(*host, rgba, length, { x, y, width, height });
 }
 
 RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t capture,
@@ -2249,4 +2470,1091 @@ RvNode* rv_event_related_target(RvEvent* subject)
     if (!subject || !onOwningThread())
         return nullptr;
     return handleOrNull(dynamicDowncast<Node>(event(subject)->relatedTarget()));
+}
+
+int32_t rv_host_cursor(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return host->cursor;
+}
+
+int32_t rv_host_scroll_position(RvHost* host, int32_t* x, int32_t* y)
+{
+    if (!host || !x || !y)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr view = host->frame().view();
+    if (!view)
+        return RV_ERR_PAINT_FAILED;
+    auto position = view->scrollPosition();
+    *x = position.x();
+    *y = position.y();
+    return RV_OK;
+}
+
+int32_t rv_host_scroll_to(RvHost* host, int32_t x, int32_t y)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr view = host->frame().view();
+    if (!view)
+        return RV_ERR_PAINT_FAILED;
+    host->document().updateLayoutIgnorePendingStylesheets();
+    view->setScrollPosition({ x, y });
+    return RV_OK;
+}
+
+// Runs an input method call on the focused frame's editor, which dispatches composition and input events.
+template<typename Edit> static int32_t compose(RvHost& host, Edit&& edit)
+{
+    Ref frame = host.frame();
+    return handleInput(host, [&] {
+        edit(frame->editor());
+        return true;
+    }) < 0 ? RV_ERR_LISTENER_FAILED : RV_OK;
+}
+
+int32_t rv_host_ime_set_composition(RvHost* host, const char* text, int32_t selectionStart, int32_t selectionEnd)
+{
+    if (!host || !text)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto composition = utf8(text);
+    if (selectionStart < 0 || selectionEnd < selectionStart || static_cast<unsigned>(selectionEnd) > composition.length())
+        return RV_ERR_UNSUPPORTED;
+    Vector<CompositionUnderline> underlines;
+    if (!composition.isEmpty())
+        underlines.append({ 0, composition.length(), CompositionUnderlineColor::TextColor, Color::black, false });
+    return compose(*host, [&](Editor& editor) {
+        editor.setComposition(composition, underlines, { }, { }, selectionStart, selectionEnd);
+    });
+}
+
+int32_t rv_host_ime_commit(RvHost* host, const char* text)
+{
+    if (!host || !text)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto committed = utf8(text);
+    return compose(*host, [&](Editor& editor) { editor.confirmComposition(committed); });
+}
+
+int32_t rv_host_ime_cancel(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    // Editor::cancelComposition leaves the composition's text when the selection is a caret inside it; an
+    // empty composition selects the composition, deletes it and fires compositionend.
+    return compose(*host, [](Editor& editor) {
+        if (editor.hasComposition())
+            editor.setComposition(emptyString(), { }, { }, { }, 0, 0);
+    });
+}
+
+int32_t rv_host_ime_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, int32_t* height)
+{
+    if (!host || !x || !y || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref frame = host->frame();
+    RefPtr view = frame->view();
+    IntRect rect;
+    if (view) {
+        host->document().updateLayoutIgnorePendingStylesheets();
+        auto& editor = frame->editor();
+        if (auto range = editor.compositionRange())
+            rect = editor.firstRectForRange(*range);
+        else
+            rect = frame->selection().absoluteCaretBounds();
+        rect = view->contentsToRootView(rect);
+    }
+    *x = rect.x();
+    *y = rect.y();
+    *width = rect.width();
+    *height = rect.height();
+    return rect.isEmpty() ? 0 : 1;
+}
+
+static Element* elementOf(RvNode* handle) { return handle ? dynamicDowncast<Element>(*node(handle)) : nullptr; }
+
+int32_t rv_element_class(RvNode* target, const char* token, int32_t operation)
+{
+    if (!target || !token)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    auto name = AtomString::fromUTF8(token);
+    Ref classes = element->classList();
+    std::optional<bool> force;
+    switch (operation) {
+    case RV_CLASS_CONTAINS:
+        return classes->contains(name) ? 1 : 0;
+    case RV_CLASS_ADD:
+        force = true;
+        break;
+    case RV_CLASS_REMOVE:
+        force = false;
+        break;
+    case RV_CLASS_TOGGLE:
+        break;
+    default:
+        return RV_ERR_UNSUPPORTED;
+    }
+    auto result = classes->toggle(name, force);
+    if (result.hasException())
+        return fail(result.exception());
+    return result.returnValue() ? 1 : 0;
+}
+
+int32_t rv_element_set_style(RvNode* target, const char* property, const char* value, int32_t important)
+{
+    if (!target || !property || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = dynamicDowncast<StyledElement>(*node(target));
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    Ref<CSSStyleDeclaration> style = element->cssomStyle();
+    return status(style->setProperty(utf8(property), utf8(value), important ? "important"_s : emptyString()));
+}
+
+int32_t rv_element_get_style(RvNode* target, const char* property, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !property)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = dynamicDowncast<StyledElement>(*node(target));
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    Ref<CSSStyleDeclaration> style = element->cssomStyle();
+    return copyString(style->getPropertyValue(utf8(property)), buffer, capacity, length);
+}
+
+int32_t rv_element_computed_style(RvNode* target, const char* property, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !property)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    Ref<CSSStyleDeclaration> style = CSSComputedStyleDeclaration::create(*element, CSSComputedStyleDeclaration::AllowVisited::No);
+    return copyString(style->getPropertyValue(utf8(property)), buffer, capacity, length);
+}
+
+int32_t rv_element_rect(RvNode* target, double* x, double* y, double* width, double* height)
+{
+    if (!target || !x || !y || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    auto rect = element->boundingClientRect();
+    *x = rect.x();
+    *y = rect.y();
+    *width = rect.width();
+    *height = rect.height();
+    return RV_OK;
+}
+
+RvNode* rv_host_element_at(RvHost* host, int32_t x, int32_t y)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    Ref document = host->document();
+    RefPtr element = document->elementFromPoint(x, y, HitTestSource::User);
+    return handleOrNull(element.get());
+}
+
+static std::optional<ScrollLogicalPosition> alignment(int32_t value)
+{
+    if (value < RV_ALIGN_START || value > RV_ALIGN_NEAREST)
+        return std::nullopt;
+    return static_cast<ScrollLogicalPosition>(value);
+}
+
+int32_t rv_element_scroll_into_view(RvNode* target, int32_t block, int32_t inlineAlignment, int32_t smooth)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    auto blockPosition = alignment(block);
+    auto inlinePosition = alignment(inlineAlignment);
+    if (!blockPosition || !inlinePosition)
+        return RV_ERR_UNSUPPORTED;
+    ScrollIntoViewOptions options;
+    options.behavior = smooth ? ScrollBehavior::Smooth : ScrollBehavior::Instant;
+    options.blockPosition = blockPosition;
+    options.inlinePosition = inlinePosition;
+    element->scrollIntoView(Variant<bool, ScrollIntoViewOptions> { WTF::move(options) });
+    return RV_OK;
+}
+
+int32_t rv_element_scroll_metric(RvNode* target, int32_t metric, int32_t* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    switch (metric) {
+    case RV_SCROLL_LEFT:
+        *value = element->scrollLeft();
+        return RV_OK;
+    case RV_SCROLL_TOP:
+        *value = element->scrollTop();
+        return RV_OK;
+    case RV_SCROLL_WIDTH:
+        *value = element->scrollWidth();
+        return RV_OK;
+    case RV_SCROLL_HEIGHT:
+        *value = element->scrollHeight();
+        return RV_OK;
+    case RV_CLIENT_WIDTH:
+        *value = element->clientWidth();
+        return RV_OK;
+    case RV_CLIENT_HEIGHT:
+        *value = element->clientHeight();
+        return RV_OK;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_element_scroll_to(RvNode* target, int32_t left, int32_t top, int32_t smooth)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    ScrollToOptions options;
+    options.behavior = smooth ? ScrollBehavior::Smooth : ScrollBehavior::Instant;
+    options.left = left;
+    options.top = top;
+    element->scrollTo(options);
+    return RV_OK;
+}
+
+RvNode* rv_element_attach_shadow(RvNode* target, int32_t* status)
+{
+    auto report = [&](int32_t value) -> RvNode* {
+        if (status)
+            *status = value;
+        return nullptr;
+    };
+    if (!target)
+        return report(RV_ERR_NULL_ARGUMENT);
+    if (!onOwningThread())
+        return report(RV_ERR_WRONG_THREAD);
+    RefPtr element = elementOf(target);
+    if (!element)
+        return report(RV_ERR_NOT_ELEMENT);
+    auto root = element->attachShadow({ ShadowRootMode::Open });
+    if (root.hasException())
+        return report(fail(root.exception()));
+    if (status)
+        *status = RV_OK;
+    return handle(Ref<Node> { root.releaseReturnValue() });
+}
+
+RvNode* rv_element_shadow_root(RvNode* target)
+{
+    if (!target || !onOwningThread())
+        return nullptr;
+    RefPtr element = elementOf(target);
+    RefPtr root = element ? element->shadowRoot() : nullptr;
+    if (!root || root->mode() != ShadowRootMode::Open)
+        return nullptr;
+    return handle(root.releaseNonNull());
+}
+
+int32_t rv_text_selection(RvNode* target, int32_t* start, int32_t* end)
+{
+    if (!target || !start || !end)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr control = dynamicDowncast<HTMLTextFormControlElement>(*node(target));
+    if (!control)
+        return RV_ERR_NOT_INPUT;
+    *start = control->selectionStart();
+    *end = control->selectionEnd();
+    return RV_OK;
+}
+
+int32_t rv_text_set_selection(RvNode* target, int32_t start, int32_t end)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr control = dynamicDowncast<HTMLTextFormControlElement>(*node(target));
+    if (!control)
+        return RV_ERR_NOT_INPUT;
+    if (start < 0 || end < start)
+        return RV_ERR_UNSUPPORTED;
+    control->setSelectionRange(start, end);
+    return RV_OK;
+}
+
+static WebAnimation* animation(RvAnimation* handle) { return reinterpret_cast<WebAnimation*>(handle); }
+
+static int32_t copyAnimations(const Vector<Ref<WebAnimation>>& found, RvAnimation** animations, int32_t capacity, int32_t* count)
+{
+    *count = static_cast<int32_t>(found.size());
+    if (capacity < *count)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (size_t i = 0; i < found.size(); ++i)
+        animations[i] = reinterpret_cast<RvAnimation*>(&Ref { found[i] }.leakRef());
+    return RV_OK;
+}
+
+int32_t rv_element_animations(RvNode* target, int32_t subtree, RvAnimation** animations, int32_t capacity, int32_t* count)
+{
+    if (!target || !count || (capacity > 0 && !animations))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    return copyAnimations(element->getAnimations(GetAnimationsOptions { !!subtree }), animations, capacity, count);
+}
+
+int32_t rv_host_animations(RvHost* host, RvAnimation** animations, int32_t capacity, int32_t* count)
+{
+    if (!host || !count || (capacity > 0 && !animations))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return copyAnimations(host->document().getAnimations(), animations, capacity, count);
+}
+
+void rv_animation_release(RvAnimation* handle)
+{
+    if (handle && onOwningThread())
+        animation(handle)->deref();
+}
+
+int32_t rv_animation_control(RvAnimation* handle, int32_t action)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref subject = *animation(handle);
+    switch (action) {
+    case RV_ANIMATION_PLAY:
+        return status(subject->play());
+    case RV_ANIMATION_PAUSE:
+        return status(subject->pause());
+    case RV_ANIMATION_REVERSE:
+        return status(subject->reverse());
+    case RV_ANIMATION_FINISH:
+        return status(subject->finish());
+    case RV_ANIMATION_CANCEL:
+        subject->cancel();
+        return RV_OK;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_animation_state(RvAnimation* handle)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    switch (animation(handle)->playState()) {
+    case WebAnimation::PlayState::Idle:
+        return RV_ANIMATION_IDLE;
+    case WebAnimation::PlayState::Running:
+        return RV_ANIMATION_RUNNING;
+    case WebAnimation::PlayState::Paused:
+        return RV_ANIMATION_PAUSED;
+    case WebAnimation::PlayState::Finished:
+        return RV_ANIMATION_FINISHED;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_animation_time(RvAnimation* handle, double* milliseconds)
+{
+    if (!handle || !milliseconds)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto current = animation(handle)->currentTime();
+    auto seconds = current ? current->time() : std::nullopt;
+    *milliseconds = seconds ? seconds->milliseconds() : 0;
+    return seconds ? 1 : 0;
+}
+
+int32_t rv_animation_seek(RvAnimation* handle, double milliseconds)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return status(animation(handle)->setCurrentTime(WebAnimationTime { Seconds::fromMilliseconds(milliseconds) }));
+}
+
+int32_t rv_animation_set_rate(RvAnimation* handle, double rate)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    animation(handle)->updatePlaybackRate(rate);
+    return RV_OK;
+}
+
+int32_t rv_animation_name(RvAnimation* handle, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& subject = *animation(handle);
+    if (auto* css = dynamicDowncast<CSSAnimation>(subject))
+        return copyString(css->animationName(), buffer, capacity, length);
+    if (auto* transition = dynamicDowncast<CSSTransition>(subject))
+        return copyString(transition->transitionProperty(), buffer, capacity, length);
+    return copyString(subject.id(), buffer, capacity, length);
+}
+
+RvNode* rv_animation_target(RvAnimation* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    auto* effect = dynamicDowncast<KeyframeEffect>(animation(handle)->effect());
+    return handleOrNull(effect ? effect->target() : nullptr);
+}
+
+RvNode* rv_node_retain(RvNode* target)
+{
+    if (!target || !onOwningThread())
+        return nullptr;
+    node(target)->ref();
+    return target;
+}
+
+struct RvObserver {
+    RefPtr<ResizeObserver> resize;
+    RefPtr<IntersectionObserver> intersection;
+    RefPtr<IntersectionObserverCallback> delivery;
+    RefPtr<ResizeObserverCallback> resizeDelivery;
+    RvResizeCallback resizeCallback { nullptr };
+    RvIntersectionCallback intersectionCallback { nullptr };
+    void* context { nullptr };
+};
+
+// WebCore registers a resize observer with its document only when it has a callback object; a native callback
+// function is never delivered to.
+class RvResizeDelivery final : public ResizeObserverCallback {
+public:
+    static Ref<RvResizeDelivery> create(ScriptExecutionContext& context) { return adoptRef(*new RvResizeDelivery(context)); }
+
+    // Null once the observer is released; WebCore can hold the callback longer.
+    RvObserver* owner { nullptr };
+
+private:
+    explicit RvResizeDelivery(ScriptExecutionContext& context)
+        : ResizeObserverCallback(&context)
+    {
+    }
+
+    bool hasCallback() const final { return true; }
+
+    CallbackResult<void> invoke(ResizeObserver&, const Vector<Ref<ResizeObserverEntry>>& entries, ResizeObserver&) final
+    {
+        for (auto& entry : entries) {
+            if (!owner)
+                break;
+            Ref target = entry->target();
+            auto& rect = entry->contentRect();
+            owner->resizeCallback(owner->context, reinterpret_cast<RvNode*>(target.ptr()), rect.width(), rect.height());
+        }
+        return { };
+    }
+
+    CallbackResult<void> invokeRethrowingException(ResizeObserver& observer, const Vector<Ref<ResizeObserverEntry>>& entries, ResizeObserver& thisObserver) final
+    {
+        return invoke(observer, entries, thisObserver);
+    }
+};
+
+class RvIntersectionDelivery final : public IntersectionObserverCallback {
+public:
+    static Ref<RvIntersectionDelivery> create(ScriptExecutionContext& context) { return adoptRef(*new RvIntersectionDelivery(context)); }
+
+    RvObserver* owner { nullptr };
+
+private:
+    explicit RvIntersectionDelivery(ScriptExecutionContext& context)
+        : IntersectionObserverCallback(&context)
+    {
+    }
+
+    bool hasCallback() const final { return true; }
+
+    CallbackResult<void> invoke(IntersectionObserver&, const Vector<Ref<IntersectionObserverEntry>>& entries, IntersectionObserver&) final
+    {
+        for (auto& entry : entries) {
+            if (!owner)
+                break;
+            Ref target = entry->target();
+            owner->intersectionCallback(owner->context, reinterpret_cast<RvNode*>(target.ptr()), entry->isIntersecting() ? 1 : 0, entry->intersectionRatio());
+        }
+        return { };
+    }
+
+    CallbackResult<void> invokeRethrowingException(IntersectionObserver& observer, const Vector<Ref<IntersectionObserverEntry>>& entries, IntersectionObserver& thisObserver) final
+    {
+        return invoke(observer, entries, thisObserver);
+    }
+};
+
+RvObserver* rv_host_observe_resize(RvHost* host, RvResizeCallback callback, void* context)
+{
+    if (!host || !callback || !onOwningThread())
+        return nullptr;
+    Ref document = host->document();
+    Ref delivery = RvResizeDelivery::create(document.get());
+    auto* observer = new RvObserver;
+    observer->resizeCallback = callback;
+    observer->context = context;
+    observer->resize = ResizeObserver::create(document.get(), delivery.copyRef());
+    delivery->owner = observer;
+    observer->resizeDelivery = WTF::move(delivery);
+    return observer;
+}
+
+RvObserver* rv_host_observe_intersection(RvHost* host, RvIntersectionCallback callback, void* context, const char* rootMargin,
+    const double* thresholds, int32_t thresholdCount)
+{
+    if (!host || !callback || thresholdCount < 0 || (thresholdCount && !thresholds) || !onOwningThread())
+        return nullptr;
+    Ref document = host->document();
+    Ref delivery = RvIntersectionDelivery::create(document.get());
+    IntersectionObserver::Init init;
+    init.rootMargin = rootMargin ? utf8(rootMargin) : "0px"_s;
+    init.scrollMargin = "0px"_s;
+    if (thresholdCount)
+        init.threshold = Vector<double> { std::span { thresholds, static_cast<size_t>(thresholdCount) } };
+    else
+        init.threshold = 0.0;
+    auto created = IntersectionObserver::create(document.get(), delivery.copyRef(), WTF::move(init));
+    if (created.hasException()) {
+        fail(created.exception());
+        return nullptr;
+    }
+    auto* observer = new RvObserver;
+    observer->intersection = created.releaseReturnValue();
+    observer->intersectionCallback = callback;
+    observer->context = context;
+    delivery->owner = observer;
+    observer->delivery = WTF::move(delivery);
+    return observer;
+}
+
+int32_t rv_observer_observe(RvObserver* observer, RvNode* target)
+{
+    if (!observer || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    if (observer->resize)
+        observer->resize->observe(*element);
+    else
+        observer->intersection->observe(*element);
+    return RV_OK;
+}
+
+int32_t rv_observer_unobserve(RvObserver* observer, RvNode* target)
+{
+    if (!observer || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    if (observer->resize)
+        observer->resize->unobserve(*element);
+    else
+        observer->intersection->unobserve(*element);
+    return RV_OK;
+}
+
+void rv_observer_release(RvObserver* observer)
+{
+    if (!observer || !onOwningThread())
+        return;
+    if (observer->resize) {
+        static_cast<RvResizeDelivery*>(observer->resizeDelivery.get())->owner = nullptr;
+        observer->resize->disconnect();
+    }
+    if (observer->intersection) {
+        observer->intersection->disconnect();
+        // The callback outlives the observer while WebCore holds it; it stops delivering here.
+        static_cast<RvIntersectionDelivery*>(observer->delivery.get())->owner = nullptr;
+    }
+    delete observer;
+}
+
+int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height)
+{
+    if (!target || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref subject = *node(target);
+    RefPtr frame = subject->document().frame();
+    if (!frame)
+        return RV_ERR_PAINT_FAILED;
+    subject->document().updateLayoutIgnorePendingStylesheets();
+    auto buffer = snapshotNode(*frame, subject, { { }, PixelFormat::BGRA8, DestinationColorSpace::SRGB() });
+    if (!buffer)
+        return RV_ERR_PAINT_FAILED;
+    PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
+    auto pixels = buffer->getPixelBuffer(format, IntRect { { }, buffer->truncatedLogicalSize() });
+    if (!pixels)
+        return RV_ERR_PAINT_FAILED;
+    *width = pixels->size().width();
+    *height = pixels->size().height();
+    size_t required = pixels->bytes().size();
+    if (!rgba || length < 0 || static_cast<size_t>(length) < required)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    std::memcpy(rgba, pixels->bytes().data(), required);
+    return RV_OK;
+}
+
+int32_t rv_host_set_popup_handler(RvHost* host, RvPopupCallback callback, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->popupCallback = callback;
+    host->popupContext = callback ? context : nullptr;
+    return RV_OK;
+}
+
+static RvPopupMenu* popupMenu(RvPopup* handle) { return reinterpret_cast<RvPopupMenu*>(handle); }
+
+int32_t rv_popup_item_count(RvPopup* handle)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* client = popupMenu(handle)->client;
+    return client ? client->listSize() : 0;
+}
+
+int32_t rv_popup_item(RvPopup* handle, int32_t index, int32_t* kind, int32_t* enabled, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!handle || !kind || !enabled)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* client = popupMenu(handle)->client;
+    if (!client || index < 0 || index >= client->listSize())
+        return RV_ERR_UNSUPPORTED;
+    unsigned item = index;
+    *kind = client->itemIsSeparator(item) ? RV_POPUP_ITEM_SEPARATOR : client->itemIsLabel(item) ? RV_POPUP_ITEM_GROUP : RV_POPUP_ITEM_OPTION;
+    *enabled = client->itemIsEnabled(item) ? 1 : 0;
+    return copyString(client->itemText(item), buffer, capacity, length);
+}
+
+int32_t rv_popup_choose(RvPopup* handle, int32_t index)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref popup = *popupMenu(handle);
+    if (!popup->shown)
+        return RV_ERR_UNSUPPORTED;
+    auto* client = popup->client;
+    if (client && index >= client->listSize())
+        return RV_ERR_UNSUPPORTED;
+    auto status = dispatchCountingFailures([&] {
+        if (client && index >= 0)
+            client->valueChanged(index);
+        if (popup->client)
+            popup->client->popupDidHide();
+    });
+    popup->end();
+    if (popup->host)
+        popup->host->document().updateStyleIfNeeded();
+    return status;
+}
+
+int32_t rv_host_tooltip(RvHost* host, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return copyString(host->tooltip.isNull() ? emptyString() : host->tooltip, buffer, capacity, length);
+}
+
+struct RvClipboardRequest {
+    Vector<std::pair<String, String>> items;
+};
+
+int32_t rv_host_set_clipboard(RvHost* host, int32_t style, RvClipboardWrite write, RvClipboardRead read, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (style < RV_CLIPBOARD_APP || style > RV_CLIPBOARD_DOM)
+        return RV_ERR_UNSUPPORTED;
+#if PLATFORM(GTK) || PLATFORM(WPE)
+    if (style == RV_CLIPBOARD_NATIVE)
+        return RV_ERR_UNSUPPORTED;
+#endif
+    host->clipboardStyle = style;
+    host->clipboardWrite = style == RV_CLIPBOARD_APP ? write : nullptr;
+    host->clipboardRead = style == RV_CLIPBOARD_APP ? read : nullptr;
+    host->clipboardContext = style == RV_CLIPBOARD_APP ? context : nullptr;
+    return RV_OK;
+}
+
+int32_t rv_clipboard_offer(RvClipboardRequest* request, const char* type, const char* data)
+{
+    if (!request || !type || !data)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    request->items.append({ utf8(type), utf8(data) });
+    return RV_OK;
+}
+
+// The element a clipboard event targets: the focused element, else the body.
+static RefPtr<Element> clipboardTarget(Document& document)
+{
+    if (RefPtr focused = document.focusedElement())
+        return focused;
+    return document.body();
+}
+
+// Copy or cut in the App and DOM styles: the event, then the page's data or the selection, then the delete.
+static int32_t copyOrCut(RvHost& host, bool cut)
+{
+    Ref document = host.document();
+    Ref frame = host.frame();
+    auto& editor = frame->editor();
+    RefPtr target = clipboardTarget(document);
+    if (!target)
+        return 0;
+    Ref dataTransfer = DataTransfer::createForCopyAndPaste(document, DataTransfer::StoreMode::ReadWrite, makeUnique<StaticPasteboard>());
+    Ref event = ClipboardEvent::create(cut ? eventNames().cutEvent : eventNames().copyEvent, dataTransfer.copyRef());
+    target->dispatchEvent(event);
+    Vector<std::pair<String, String>> items;
+    if (event->defaultPrevented()) {
+        for (auto& type : dataTransfer->types(document))
+            items.append({ type, dataTransfer->getData(document, type) });
+    } else {
+        auto range = frame->selection().selection().toNormalizedRange();
+        if (!range || !(cut ? editor.canCut() : editor.canCopy()))
+            return 0;
+        items.append({ "text/plain"_s, editor.selectedText() });
+        items.append({ "text/html"_s, serializePreservingVisualAppearance(*range) });
+        if (cut)
+            editor.performDelete();
+    }
+    if (host.clipboardStyle == RV_CLIPBOARD_APP && host.clipboardWrite) {
+        bool first = true;
+        for (auto& [type, data] : items) {
+            host.clipboardWrite(host.clipboardContext, type.utf8().data(), data.utf8().data(), first ? 1 : 0);
+            first = false;
+        }
+    }
+    return 1;
+}
+
+// Paste in the App and DOM styles: the app's data, the event, then the insertion.
+static int32_t paste(RvHost& host, bool plain)
+{
+    Ref document = host.document();
+    Ref frame = host.frame();
+    RvClipboardRequest request;
+    if (host.clipboardStyle == RV_CLIPBOARD_APP && host.clipboardRead)
+        host.clipboardRead(host.clipboardContext, &request);
+    auto pasteboard = makeUnique<StaticPasteboard>();
+    String text;
+    String html;
+    for (auto& [type, data] : request.items) {
+        if (plain && type != "text/plain"_s)
+            continue;
+        pasteboard->writeString(type, data);
+        if (type == "text/plain"_s)
+            text = data;
+        else if (type == "text/html"_s)
+            html = data;
+    }
+    RefPtr target = clipboardTarget(document);
+    if (!target)
+        return 0;
+    Ref dataTransfer = DataTransfer::createForCopyAndPaste(document, DataTransfer::StoreMode::Readonly, WTF::move(pasteboard));
+    Ref event = ClipboardEvent::create(eventNames().pasteEvent, dataTransfer.copyRef());
+    target->dispatchEvent(event);
+    if (event->defaultPrevented())
+        return 1;
+    auto& editor = frame->editor();
+    if (!html.isEmpty())
+        editor.pasteAsFragment(createFragmentFromMarkup(document, html, emptyString(), { }), false, false);
+    else if (!text.isEmpty())
+        editor.pasteAsPlainText(text, false);
+    else
+        return 0;
+    return 1;
+}
+
+static int32_t runEdit(RvHost& host, int32_t command)
+{
+    Ref frame = host.frame();
+    auto& editor = frame->editor();
+    bool native = host.clipboardStyle == RV_CLIPBOARD_NATIVE;
+    switch (command) {
+    case RV_EDIT_COPY:
+        if (native) {
+            editor.copy(Editor::FromMenuOrKeyBinding::Yes);
+            return 1;
+        }
+        return copyOrCut(host, false);
+    case RV_EDIT_CUT:
+        if (native) {
+            editor.cut(Editor::FromMenuOrKeyBinding::Yes);
+            return 1;
+        }
+        return copyOrCut(host, true);
+    case RV_EDIT_PASTE:
+    case RV_EDIT_PASTE_PLAIN:
+        if (native) {
+            if (command == RV_EDIT_PASTE)
+                editor.paste(Editor::FromMenuOrKeyBinding::Yes);
+            else
+                editor.pasteAsPlainText(Editor::FromMenuOrKeyBinding::Yes);
+            return 1;
+        }
+        return paste(host, command == RV_EDIT_PASTE_PLAIN);
+    case RV_EDIT_SELECT_ALL:
+        return editor.command("SelectAll"_s).execute() ? 1 : 0;
+    case RV_EDIT_DELETE:
+        return editor.command("Delete"_s).execute() ? 1 : 0;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+static int32_t runEdit(Page* page, int32_t command)
+{
+    auto* host = hostForPage(page);
+    return host ? runEdit(*host, command) : 0;
+}
+
+int32_t rv_host_edit(RvHost* host, int32_t command)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    int32_t result = 0;
+    auto status = dispatchCountingFailures([&] { result = runEdit(*host, command); });
+    host->document().updateStyleIfNeeded();
+    return status == RV_OK ? result : status;
+}
+
+struct RvDragData {
+    Vector<std::pair<String, String>> items;
+};
+
+int32_t rv_host_set_drag(RvHost* host, int32_t style)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (style != RV_DRAG_APP && style != RV_DRAG_DOM)
+        return RV_ERR_UNSUPPORTED;
+    host->dragStyle = style;
+    host->dragTarget = nullptr;
+    return RV_OK;
+}
+
+RvDragData* rv_drag_data_create(void)
+{
+    return new RvDragData;
+}
+
+int32_t rv_drag_data_add(RvDragData* data, const char* type, const char* value)
+{
+    if (!data || !type || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    data->items.append({ utf8(type), utf8(value) });
+    return RV_OK;
+}
+
+void rv_drag_data_release(RvDragData* data)
+{
+    delete data;
+}
+
+static OptionSet<DragOperation> dragOperations(int32_t operations)
+{
+    OptionSet<DragOperation> result;
+    if (operations & RV_DROP_COPY)
+        result.add(DragOperation::Copy);
+    if (operations & RV_DROP_MOVE)
+        result.add(DragOperation::Move);
+    if (operations & RV_DROP_LINK)
+        result.add(DragOperation::Link);
+    return result;
+}
+
+// The one RV_DROP_* operation of a negotiated mask, preferring copy, then move, then link.
+static int32_t dropOperation(OptionSet<DragOperation> operations, int32_t allowed)
+{
+    if (operations.contains(DragOperation::Copy) && (allowed & RV_DROP_COPY))
+        return RV_DROP_COPY;
+    if (operations.contains(DragOperation::Move) && (allowed & RV_DROP_MOVE))
+        return RV_DROP_MOVE;
+    if (operations.contains(DragOperation::Link) && (allowed & RV_DROP_LINK))
+        return RV_DROP_LINK;
+    return RV_DROP_NONE;
+}
+
+static String dragItem(const RvDragData* data, ASCIILiteral type)
+{
+    if (data) {
+        for (auto& [itemType, value] : data->items) {
+            if (itemType == type)
+                return value;
+        }
+    }
+    return { };
+}
+
+static Ref<DataTransfer> dropTransfer(Document& document, const RvDragData* data, int32_t allowed)
+{
+    auto pasteboard = makeUnique<StaticPasteboard>();
+    if (data) {
+        for (auto& [type, value] : data->items)
+            pasteboard->writeString(type, value);
+    }
+    return DataTransfer::createForDrop(document, WTF::move(pasteboard), dragOperations(allowed), false);
+}
+
+// Fires a trusted drag event at the target and returns whether a listener cancelled it.
+static bool fireDrag(Document& document, Element& target, const AtomString& type, DataTransfer* dataTransfer, IntPoint point,
+    int32_t modifiers, Element* related = nullptr)
+{
+    bool cancelable = type != eventNames().dragleaveEvent;
+    Ref event = DragEvent::create(type, Event::CanBubble::Yes, cancelable ? Event::IsCancelable::Yes : Event::IsCancelable::No,
+        Event::IsComposed::Yes, MonotonicTime::now(), document.windowProxy(), 0, point, point, 0, 0, platformModifiers(modifiers),
+        MouseButton::Left, 1, related, 0, SyntheticClickType::NoTap, dataTransfer);
+    target.dispatchEvent(event);
+    return event->defaultPrevented();
+}
+
+static bool editableForDrop(Element& element)
+{
+    return is<HTMLTextFormControlElement>(element) || element.isContentEditable();
+}
+
+int32_t rv_host_drag(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t allowed, RvDragData* data, int32_t modifiers)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (action < RV_DRAG_OVER || action > RV_DRAG_DROP)
+        return RV_ERR_UNSUPPORTED;
+    if (host->dragStyle != RV_DRAG_APP)
+        return RV_DROP_NONE;
+    Ref document = host->document();
+    Ref frame = host->frame();
+    IntPoint point { x, y };
+    int32_t operation = RV_DROP_NONE;
+    auto status = dispatchCountingFailures([&] {
+        if (action == RV_DRAG_LEAVE) {
+            if (RefPtr previous = std::exchange(host->dragTarget, nullptr))
+                fireDrag(document, *previous, eventNames().dragleaveEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers);
+            return;
+        }
+        RefPtr target = document->elementFromPoint(x, y, HitTestSource::User);
+        if (target != host->dragTarget) {
+            if (RefPtr previous = host->dragTarget)
+                fireDrag(document, *previous, eventNames().dragleaveEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers, target.get());
+            host->dragTarget = target;
+            if (target)
+                fireDrag(document, *target, eventNames().dragenterEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers);
+        }
+        if (!target)
+            return;
+        auto hasText = !dragItem(data, "text/plain"_s).isEmpty() || !dragItem(data, "text/html"_s).isEmpty();
+        Ref over = dropTransfer(document, data, allowed);
+        if (fireDrag(document, *target, eventNames().dragoverEvent, over.ptr(), point, modifiers))
+            operation = dropOperation(over->destinationOperationMask(), allowed);
+        else if (hasText && editableForDrop(*target))
+            operation = allowed & RV_DROP_COPY ? RV_DROP_COPY : dropOperation(dragOperations(allowed), allowed);
+        if (action != RV_DRAG_DROP)
+            return;
+        host->dragTarget = nullptr;
+        if (operation == RV_DROP_NONE) {
+            fireDrag(document, *target, eventNames().dragleaveEvent, over.ptr(), point, modifiers);
+            return;
+        }
+        if (fireDrag(document, *target, eventNames().dropEvent, dropTransfer(document, data, allowed).ptr(), point, modifiers))
+            return;
+        if (!editableForDrop(*target) || !hasText) {
+            operation = RV_DROP_NONE;
+            return;
+        }
+        // The default action: insert at the point, as typing would.
+        RefPtr view = frame->view();
+        auto position = frame->visiblePositionForPoint(view ? view->rootViewToContents(point) : point);
+        frame->selection().setSelection(VisibleSelection { position });
+        auto html = dragItem(data, "text/html"_s);
+        if (!html.isEmpty())
+            frame->editor().pasteAsFragment(createFragmentFromMarkup(document, html, emptyString(), { }), false, false);
+        else
+            frame->editor().insertText(dragItem(data, "text/plain"_s), nullptr);
+    });
+    host->document().updateStyleIfNeeded();
+    return status == RV_OK ? operation : status;
 }
