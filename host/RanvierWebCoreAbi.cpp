@@ -65,6 +65,31 @@
 #include <WebCore/ResourceLoaderTypes.h>
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SubresourceLoader.h>
+#include <WebCore/Chrome.h>
+#include <WebCore/DOMPasteAccess.h>
+#include <WebCore/Editor.h>
+#include <WebCore/EditorClient.h>
+#include <WebCore/EventNames.h>
+#include <WebCore/FrameDestructionObserverInlines.h>
+#include <WebCore/StyleProperties.h>
+#include <WebCore/TextCheckerClient.h>
+#include <WebCore/TextChecking.h>
+#include <WebCore/UndoStep.h>
+#include <WebCore/VisibleSelection.h>
+#include <WebCore/EventHandler.h>
+#include <WebCore/FocusController.h>
+#include <WebCore/HandleUserInputEventResult.h>
+#include <WebCore/InputEvent.h>
+#include <WebCore/MouseEvent.h>
+#include <WebCore/MouseEventTypes.h>
+#include <WebCore/PlatformKeyboardEvent.h>
+#include <WebCore/PlatformMouseEvent.h>
+#include <WebCore/PlatformWheelEvent.h>
+#include <WebCore/ScrollingCoordinatorTypes.h>
+#include <WebCore/WheelEvent.h>
+#if PLATFORM(COCOA)
+#include <WebCore/AttributedString.h>
+#endif
 #include <mutex>
 #include <pal/SessionID.h>
 #include <cstring>
@@ -73,6 +98,7 @@
 #include <wtf/MainThread.h>
 #include <wtf/ProcessID.h>
 #include <wtf/RunLoop.h>
+#include <wtf/HexNumber.h>
 #include <wtf/text/MakeString.h>
 
 #if PLATFORM(GTK) || PLATFORM(WPE)
@@ -92,6 +118,221 @@
 
 using namespace WebCore;
 
+struct RvHost;
+
+// Reports the page's invalidations and rendering update requests to its host, which turns them into a dirty
+// rectangle and a frame callback.
+class RvChromeClient final : public EmptyChromeClient {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(RvChromeClient);
+public:
+    RvHost* host { nullptr };
+
+private:
+    void invalidateRootView(const IntRect& rect) final { invalidate(rect); }
+    void invalidateContentsAndRootView(const IntRect& rect) final { invalidate(rect); }
+    void invalidateContentsForSlowScroll(const IntRect& rect) final { invalidate(rect); }
+    void triggerRenderingUpdate() final { wantUpdate(); }
+    bool scheduleRenderingUpdate() final
+    {
+        wantUpdate();
+        return true;
+    }
+    void invalidate(const IntRect&);
+    void wantUpdate();
+};
+
+// The editing command a key down runs, as Windows binds keys.
+static String keyCommand(const String& key, bool shift, bool control)
+{
+    auto move = [&](ASCIILiteral command, ASCIILiteral withControl) {
+        return makeString(control ? withControl : command, shift ? "AndModifySelection"_s : ""_s);
+    };
+    if (key == "ArrowLeft"_s)
+        return move("MoveLeft"_s, "MoveWordLeft"_s);
+    if (key == "ArrowRight"_s)
+        return move("MoveRight"_s, "MoveWordRight"_s);
+    if (key == "ArrowUp"_s)
+        return move("MoveUp"_s, "MoveUp"_s);
+    if (key == "ArrowDown"_s)
+        return move("MoveDown"_s, "MoveDown"_s);
+    if (key == "Home"_s)
+        return move("MoveToBeginningOfLine"_s, "MoveToBeginningOfDocument"_s);
+    if (key == "End"_s)
+        return move("MoveToEndOfLine"_s, "MoveToEndOfDocument"_s);
+    if (key == "Backspace"_s)
+        return control ? "DeleteWordBackward"_s : "DeleteBackward"_s;
+    if (key == "Delete"_s)
+        return control ? "DeleteWordForward"_s : "DeleteForward"_s;
+    if (key == "Enter"_s)
+        return shift ? "InsertLineBreak"_s : "InsertNewline"_s;
+    if (control && (key == "a"_s || key == "A"_s))
+        return "SelectAll"_s;
+    return { };
+}
+
+// An editor client that allows every edit and binds keys to editing commands, as WebKitLegacy's Windows client
+// did. The rest follows EmptyEditorClient in WebCore's loader/EmptyClients.cpp (Copyright (C) 2006 Eric Seidel,
+// 2008-2025 Apple Inc., Research In Motion Limited 2011; BSD-2-Clause).
+class RvEditorClient final : public EditorClient {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(RvEditorClient);
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(RvEditorClient);
+private:
+    // Key down runs the key's editing command; key press inserts the characters it produced.
+    void handleKeyboardEvent(KeyboardEvent& event) final
+    {
+        RefPtr node = dynamicDowncast<Node>(event.target());
+        RefPtr frame = node ? node->document().frame() : nullptr;
+        auto* platformEvent = event.underlyingPlatformEvent();
+        if (!frame || !platformEvent)
+            return;
+        auto& editor = frame->editor();
+        if (event.type() == eventNames().keydownEvent) {
+            auto command = keyCommand(event.key(), event.shiftKey(), event.ctrlKey());
+            if (!command.isEmpty() && editor.command(command).execute(&event))
+                event.setDefaultHandled();
+            return;
+        }
+        auto text = platformEvent->text();
+        if (event.type() == eventNames().keypressEvent && !event.ctrlKey() && !event.metaKey() && !text.isEmpty() && text[0] >= ' ' && editor.insertText(text, &event))
+            event.setDefaultHandled();
+    }
+    void handleInputMethodKeydown(KeyboardEvent&) final { }
+
+    bool shouldDeleteRange(const std::optional<SimpleRange>&) final { return true; }
+    bool smartInsertDeleteEnabled() final { return false; }
+    bool isSelectTrailingWhitespaceEnabled() const final { return false; }
+    bool isContinuousSpellCheckingEnabled() final { return false; }
+    void toggleContinuousSpellChecking() final { }
+    bool isGrammarCheckingEnabled() final { return false; }
+    void toggleGrammarChecking() final { }
+    int spellCheckerDocumentTag() final { return -1; }
+
+    bool shouldBeginEditing(const SimpleRange&) final { return true; }
+    bool shouldEndEditing(const SimpleRange&) final { return true; }
+    bool shouldInsertNode(Node&, const std::optional<SimpleRange>&, EditorInsertAction) final { return true; }
+    bool shouldInsertText(const String&, const std::optional<SimpleRange>&, EditorInsertAction) final { return true; }
+    bool shouldChangeSelectedRange(const std::optional<SimpleRange>&, const std::optional<SimpleRange>&, Affinity, bool) final { return true; }
+
+    bool shouldApplyStyle(const StyleProperties&, const std::optional<SimpleRange>&) final { return true; }
+    void didApplyStyle() final { }
+    bool shouldMoveRangeAfterDelete(const SimpleRange&, const SimpleRange&) final { return true; }
+
+    void didBeginEditing() final { }
+    void respondToChangedContents() final { }
+    void respondToChangedSelection(LocalFrame*) final { }
+    void updateEditorStateAfterLayoutIfEditabilityChanged() final { }
+    void discardedComposition(const Document&) final { }
+    void canceledComposition() final { }
+    void didUpdateComposition() final { }
+    void didEndEditing() final { }
+    void didEndUserTriggeredSelectionChanges() final { }
+    void willWriteSelectionToPasteboard(const std::optional<SimpleRange>&) final { }
+    void didWriteSelectionToPasteboard() final { }
+    void getClientPasteboardData(const std::optional<SimpleRange>&, Vector<std::pair<String, RefPtr<SharedBuffer>>>&) final { }
+    void requestCandidatesForSelection(const VisibleSelection&) final { }
+    void handleAcceptedCandidateWithSoftSpaces(TextCheckingResult) final { }
+
+    void registerUndoStep(UndoStep&) final { }
+    void registerRedoStep(UndoStep&) final { }
+    void clearUndoRedoOperations() final { }
+
+    DOMPasteAccessResponse requestDOMPasteAccess(DOMPasteAccessCategory, FrameIdentifier, const String&) final { return DOMPasteAccessResponse::DeniedForGesture; }
+#if PLATFORM(COCOA)
+    HashMap<FrameIdentifier, AttributedString> collectAttributedStringsForRemoteFrames(FrameIdentifier, const Vector<FrameIdentifier>&) final { return { }; }
+#endif
+
+    bool canCopyCut(LocalFrame*, bool defaultValue) const final { return defaultValue; }
+    bool canPaste(LocalFrame*, bool defaultValue) const final { return defaultValue; }
+    bool canUndo() const final { return false; }
+    bool canRedo() const final { return false; }
+
+    void undo() final { }
+    void redo() final { }
+
+    void textFieldDidBeginEditing(Element&) final { }
+    void textFieldDidEndEditing(Element&) final { }
+    void textDidChangeInTextField(Element&) final { }
+    bool doTextFieldCommandFromEvent(Element&, KeyboardEvent*) final { return false; }
+    void textWillBeDeletedInTextField(Element&) final { }
+    void textDidChangeInTextArea(Element&) final { }
+    void overflowScrollPositionChanged() final { }
+    void subFrameScrollPositionChanged() final { }
+
+#if PLATFORM(IOS_FAMILY)
+    void startDelayingAndCoalescingContentChangeNotifications() final { }
+    void stopDelayingAndCoalescingContentChangeNotifications() final { }
+    bool hasRichlyEditableSelection() final { return false; }
+    int getPasteboardItemsCount() final { return 0; }
+    RefPtr<DocumentFragment> documentFragmentFromDelegate(int) final { return nullptr; }
+    bool performsTwoStepPaste(DocumentFragment*) final { return false; }
+    void updateStringForFind(const String&) final { }
+#endif
+
+    bool performTwoStepDrop(DocumentFragment&, const SimpleRange&, bool) final { return false; }
+
+#if PLATFORM(COCOA)
+    void setInsertionPasteboard(const String&) final { };
+#endif
+
+#if USE(APPKIT)
+    void uppercaseWord() final { }
+    void lowercaseWord() final { }
+    void capitalizeWord() final { }
+    bool canApplyCaseTransformations(const String&) final { return true; }
+    bool canConvertToTraditionalChinese(const String&) final { return false; }
+    bool canConvertToSimplifiedChinese(const String&) final { return false; }
+    void convertToTraditionalChinese() final { }
+    void convertToSimplifiedChinese() final { }
+#endif
+
+#if USE(AUTOMATIC_TEXT_REPLACEMENT)
+    void showSubstitutionsPanel(bool) final { }
+    bool substitutionsPanelIsShowing() final { return false; }
+    void toggleSmartInsertDelete() final { }
+    bool isAutomaticQuoteSubstitutionEnabled() final { return false; }
+    void toggleAutomaticQuoteSubstitution() final { }
+    bool isAutomaticLinkDetectionEnabled() final { return false; }
+    void toggleAutomaticLinkDetection() final { }
+    bool isAutomaticDashSubstitutionEnabled() final { return false; }
+    void toggleAutomaticDashSubstitution() final { }
+    bool isAutomaticTextReplacementEnabled() final { return false; }
+    void toggleAutomaticTextReplacement() final { }
+    bool isAutomaticSpellingCorrectionEnabled() final { return false; }
+    void toggleAutomaticSpellingCorrection() final { }
+    bool isSmartListsEnabled() final { return false; }
+    void toggleSmartLists() { }
+#endif
+
+#if PLATFORM(GTK)
+    bool shouldShowUnicodeMenu() final { return false; }
+#endif
+
+    TextCheckerClient* textChecker() final { return &m_textCheckerClient; }
+
+    void updateSpellingUIWithGrammarString(const String&, const GrammarDetail&) final { }
+    void updateSpellingUIWithMisspelledWord(const String&) final { }
+    void showSpellingUI(bool) final { }
+    bool spellingUIIsShowing() final { return false; }
+
+    void setInputMethodState(Element*) final { }
+
+    class TextChecker final : public TextCheckerClient {
+        bool shouldEraseMarkersAfterChangeSelection(TextCheckingType) const final { return true; }
+        void ignoreWordInSpellDocument(const String&) final { }
+        void learnWord(const String&) final { }
+        void checkSpellingOfString(StringView, int*, int*) final { }
+        void checkGrammarOfString(StringView, Vector<GrammarDetail>&, int*, int*) final { }
+#if USE(UNIFIED_TEXT_CHECKING)
+        Vector<TextCheckingResult> checkTextOfParagraph(StringView, OptionSet<TextCheckingType>, const VisibleSelection&) final { return { }; }
+#endif
+        void getGuessesForWord(const String&, const String&, const VisibleSelection&, Vector<String>&) final { }
+        void requestCheckingOfString(TextCheckingRequest&, const VisibleSelection&) final { }
+        void requestExtendedCheckingOfString(TextCheckingRequest&, const VisibleSelection&) final { }
+    };
+
+    TextChecker m_textCheckerClient;
+};
+
 // createPage and loadHTML follow WebCore's testing/TestPage.cpp (Copyright (C) 2026 Apple Inc., BSD-2-Clause).
 static Ref<Page> createPage(IntSize viewportSize)
 {
@@ -100,8 +341,12 @@ static Ref<Page> createPage(IntSize viewportSize)
         return true;
     }();
     UNUSED_VARIABLE(prewarmed);
-    Ref page = Page::create(pageConfigurationWithEmptyClients(std::nullopt, PAL::SessionID::defaultSessionID()));
+    auto configuration = pageConfigurationWithEmptyClients(std::nullopt, PAL::SessionID::defaultSessionID());
+    configuration.chromeClient = makeUniqueRef<RvChromeClient>();
+    configuration.editorClient = makeUniqueRef<RvEditorClient>();
+    Ref page = Page::create(WTF::move(configuration));
     page->settings().setScriptEnabled(false);
+    page->settings().setScrollAnimatorEnabled(false);
     page->settings().setAcceleratedCompositingEnabled(false);
     page->settings().setLoadsImagesAutomatically(true);
 #if ENABLE(VIDEO)
@@ -225,10 +470,44 @@ struct RvHost {
     // Created on the first frame that composites, so a page that never needs a layer never creates a GL context.
     std::unique_ptr<RvCompositor> compositor;
 #endif
+    float deviceScale { 1 };
+    // The viewport area invalidated since the last paint.
+    IntRect dirty;
+    RvFrameCallback frameCallback { nullptr };
+    void* frameContext { nullptr };
+    // The callback ran and no frame has started since.
+    bool frameRequested { false };
+    // Inside rv_host_update or rv_host_paint_rgba, which call no callback.
+    bool inFrame { false };
+    bool updateWanted { false };
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
+
+    void requestFrame()
+    {
+        if (inFrame || frameRequested || !frameCallback)
+            return;
+        frameRequested = true;
+        frameCallback(frameContext);
+    }
 };
+
+void RvChromeClient::invalidate(const IntRect& rect)
+{
+    if (!host)
+        return;
+    host->dirty.unite(intersection(rect, IntRect { { }, host->size }));
+    host->requestFrame();
+}
+
+void RvChromeClient::wantUpdate()
+{
+    if (!host)
+        return;
+    host->updateWanted = true;
+    host->requestFrame();
+}
 
 static bool onOwningThread() { return isMainThread(); }
 
@@ -581,7 +860,30 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 11; }
+int32_t rv_abi_version(void) { return 12; }
+
+// The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
+static IntSize paintSize(const RvHost& host)
+{
+    auto size = host.size;
+    size.scale(host.deviceScale);
+    return size;
+}
+
+int32_t rv_abi_has(const char* feature)
+{
+    if (!feature)
+        return 0;
+    for (auto* name : { "resize", "input", "frame", "event-details" }) {
+        if (!std::strcmp(feature, name))
+            return 1;
+    }
+#if RANVIER_COMPOSITING
+    if (!std::strcmp(feature, "compositing"))
+        return 1;
+#endif
+    return 0;
+}
 
 int64_t rv_process_id(void) { return static_cast<int64_t>(getCurrentProcessID()); }
 
@@ -612,6 +914,7 @@ RvHost* rv_host_create(int32_t width, int32_t height)
     if (!onOwningThread() || width <= 0 || height <= 0)
         return nullptr;
     auto* host = new RvHost { createPage({ width, height }), { width, height }, std::nullopt };
+    static_cast<RvChromeClient&>(host->page->chrome().client()).host = host;
     host->noScript.emplace(host->document().vm());
 #if RANVIER_COMPOSITING
     applyCompositingMode(*host, RV_COMPOSITING_WHEN_NEEDED);
@@ -668,6 +971,7 @@ void rv_host_destroy(RvHost* host)
         return;
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
+    static_cast<RvChromeClient&>(host->page->chrome().client()).host = nullptr;
     liveHosts.removeFirst(host);
     delete host;
 }
@@ -848,36 +1152,58 @@ int32_t rv_host_paint_rgba(RvHost* host, uint8_t* rgba, int32_t length)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     auto size = host->size;
-    size_t required = static_cast<size_t>(size.width()) * size.height() * 4;
+    auto pixelSize = paintSize(*host);
+    size_t required = static_cast<size_t>(pixelSize.width()) * pixelSize.height() * 4;
     if (length < 0 || static_cast<size_t>(length) < required)
         return RV_ERR_BUFFER_TOO_SMALL;
+    host->inFrame = true;
+    host->frameRequested = false;
     host->document().updateLayoutIgnorePendingStylesheets();
     RefPtr view = host->frame().view();
-    if (!view)
+    if (!view) {
+        host->inFrame = false;
         return RV_ERR_PAINT_FAILED;
+    }
     view->updateLayoutAndStyleIfNeededRecursive();
 #if RANVIER_COMPOSITING
     // In RV_COMPOSITING_WHEN_NEEDED a frame without a clip layer is not in compositing mode and takes the CPU path.
-    if (host->compositingMode != RV_COMPOSITING_OFF && view->clipLayer()) {
+    // The compositor paints CSS pixels one to one, so a device scale other than 1 takes the CPU path too.
+    if (host->compositingMode != RV_COMPOSITING_OFF && view->clipLayer() && host->deviceScale == 1) {
+        // A resize since the compositor was made needs a framebuffer of the new size.
+        if (host->compositor && host->compositor->size != host->size)
+            host->compositor = nullptr;
         if (!host->compositor)
             host->compositor = RvCompositor::create(host->size);
-        if (host->compositor)
-            return composite(*host->compositor, *view, rgba);
+        if (host->compositor) {
+            auto result = composite(*host->compositor, *view, rgba);
+            host->dirty = { };
+            host->inFrame = false;
+            if (host->updateWanted)
+                host->requestFrame();
+            return result;
+        }
         // No GL: the host stays on the CPU path, as with RV_COMPOSITING_OFF.
         setCompositing(*host, RV_COMPOSITING_OFF);
     }
 #endif
     auto buffer = ImageBuffer::create(FloatSize { size }, RenderingMode::Unaccelerated,
-        RenderingPurpose::Unspecified, 1.0f, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+        RenderingPurpose::Unspecified, host->deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
+    if (buffer)
+        view->paint(buffer->context(), IntRect { { }, size });
+    host->dirty = { };
+    host->inFrame = false;
     if (!buffer)
         return RV_ERR_PAINT_FAILED;
-    view->paintContents(buffer->context(), IntRect { { }, size });
     buffer->flushDrawingContext();
     PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, DestinationColorSpace::SRGB() };
+    // getPixelBuffer takes CSS pixels and scales them as paintSize does.
     auto pixels = buffer->getPixelBuffer(format, IntRect { { }, size });
     if (!pixels || pixels->bytes().size() != required)
         return RV_ERR_PAINT_FAILED;
     std::memcpy(rgba, pixels->bytes().data(), required);
+    // An update wanted during the paint, such as a layout that started an animation, needs another frame.
+    if (host->updateWanted)
+        host->requestFrame();
     return RV_OK;
 }
 
@@ -1616,4 +1942,311 @@ int32_t rv_resource_load_finish(RvResourceLoad* load, const uint8_t* data, int32
 int32_t rv_resource_load_fail(RvResourceLoad* load)
 {
     return complete(load, nullptr, { });
+}
+
+int32_t rv_host_resize(RvHost* host, int32_t width, int32_t height)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (width <= 0 || height <= 0)
+        return RV_ERR_UNSUPPORTED;
+    RefPtr view = host->frame().view();
+    if (!view)
+        return RV_ERR_PAINT_FAILED;
+    host->size = { width, height };
+    view->resize(host->size);
+    host->dirty = { { }, host->size };
+    host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_set_device_scale(RvHost* host, float scale)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!(scale >= 0.25f && scale <= 8))
+        return RV_ERR_UNSUPPORTED;
+    host->deviceScale = scale;
+    host->page->setDeviceScaleFactor(scale);
+    host->dirty = { { }, host->size };
+    host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_paint_size(RvHost* host, int32_t* width, int32_t* height)
+{
+    if (!host || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto size = paintSize(*host);
+    *width = size.width();
+    *height = size.height();
+    return RV_OK;
+}
+
+static OptionSet<PlatformEvent::Modifier> platformModifiers(int32_t bits)
+{
+    OptionSet<PlatformEvent::Modifier> modifiers;
+    if (bits & RV_MODIFIER_SHIFT)
+        modifiers.add(PlatformEvent::Modifier::ShiftKey);
+    if (bits & RV_MODIFIER_CONTROL)
+        modifiers.add(PlatformEvent::Modifier::ControlKey);
+    if (bits & RV_MODIFIER_ALT)
+        modifiers.add(PlatformEvent::Modifier::AltKey);
+    if (bits & RV_MODIFIER_META)
+        modifiers.add(PlatformEvent::Modifier::MetaKey);
+    return modifiers;
+}
+
+// Runs an input function's WebCore call, which dispatches DOM events, and returns 1 or 0 for whether it was
+// handled, or RV_ERR_LISTENER_FAILED. Styles the input changed, such as :hover and :focus, apply before it
+// returns, so their invalidations and frame request do too.
+template<typename Handle> static int32_t handleInput(RvHost& host, Handle&& handle)
+{
+    bool handled = false;
+    auto status = dispatchCountingFailures([&] { handled = handle(); });
+    host.document().updateStyleIfNeeded();
+    if (RefPtr view = host.frame().view(); view && view->needsLayout())
+        host.requestFrame();
+    return status == RV_OK ? (handled ? 1 : 0) : status;
+}
+
+int32_t rv_host_mouse(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t button, int32_t clickCount, int32_t modifiers)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (action < RV_MOUSE_MOVE || action > RV_MOUSE_UP || button < RV_BUTTON_NONE || button > RV_BUTTON_RIGHT || clickCount < 0)
+        return RV_ERR_UNSUPPORTED;
+    static constexpr PlatformEvent::Type types[] = { PlatformEvent::Type::MouseMoved, PlatformEvent::Type::MousePressed, PlatformEvent::Type::MouseReleased };
+    DoublePoint position { static_cast<double>(x), static_cast<double>(y) };
+    PlatformMouseEvent mouse(position, position, button == RV_BUTTON_NONE ? MouseButton::None : static_cast<MouseButton>(button),
+        types[action], clickCount, platformModifiers(modifiers), MonotonicTime::now(), 0, SyntheticClickType::NoTap, MouseEventInputSource::UserDriven);
+    Ref frame = host->frame();
+    return handleInput(*host, [&] {
+        auto& handler = frame->eventHandler();
+        switch (action) {
+        case RV_MOUSE_MOVE:
+            return handler.mouseMoved(mouse).wasHandled();
+        case RV_MOUSE_DOWN:
+            return handler.handleMousePressEvent(mouse).wasHandled();
+        default:
+            return handler.handleMouseReleaseEvent(mouse).wasHandled();
+        }
+    });
+}
+
+int32_t rv_host_wheel(RvHost* host, int32_t x, int32_t y, float deltaX, float deltaY, int32_t modifiers)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    IntPoint position { x, y };
+    // PlatformWheelEvent's deltas are positive towards the top left, and a tick is a 40-pixel line (E).
+    PlatformWheelEvent wheel(position, position, -deltaX, -deltaY, -deltaX / 40, -deltaY / 40, PlatformWheelEventGranularity::ScrollByPixelWheelEvent,
+        modifiers & RV_MODIFIER_SHIFT, modifiers & RV_MODIFIER_CONTROL, modifiers & RV_MODIFIER_ALT, modifiers & RV_MODIFIER_META);
+    Ref frame = host->frame();
+    return handleInput(*host, [&] {
+        return frame->eventHandler().handleWheelEvent(wheel, { WheelEventProcessingSteps::SynchronousScrolling, WheelEventProcessingSteps::BlockingDOMEventDispatch }).first.wasHandled();
+    });
+}
+
+// The keyIdentifier and Windows virtual key code WebCore's key handling reads, from the DOM key and code.
+static std::pair<String, int> legacyKey(const String& key, const String& code)
+{
+    static constexpr std::tuple<ASCIILiteral, ASCIILiteral, int> named[] = {
+        { "Tab"_s, "U+0009"_s, 0x09 }, { "Backspace"_s, "U+0008"_s, 0x08 }, { "Enter"_s, "Enter"_s, 0x0D },
+        { "Escape"_s, "U+001B"_s, 0x1B }, { "Delete"_s, "U+007F"_s, 0x2E }, { "ArrowLeft"_s, "Left"_s, 0x25 },
+        { "ArrowUp"_s, "Up"_s, 0x26 }, { "ArrowRight"_s, "Right"_s, 0x27 }, { "ArrowDown"_s, "Down"_s, 0x28 },
+        { "PageUp"_s, "PageUp"_s, 0x21 }, { "PageDown"_s, "PageDown"_s, 0x22 }, { "End"_s, "End"_s, 0x23 },
+        { "Home"_s, "Home"_s, 0x24 }, { "Shift"_s, "Shift"_s, 0x10 }, { "Control"_s, "Control"_s, 0x11 },
+        { "Alt"_s, "Alt"_s, 0x12 },
+    };
+    for (auto& [name, identifier, virtualKey] : named) {
+        if (key == name)
+            return { identifier, virtualKey };
+    }
+    int virtualKey = 0;
+    if (code.length() == 4 && code.startsWith("Key"_s) && isASCIIUpper(code[3]))
+        virtualKey = code[3];
+    else if (code.length() == 6 && code.startsWith("Digit"_s) && isASCIIDigit(code[5]))
+        virtualKey = code[5];
+    else if (code == "Space"_s)
+        virtualKey = 0x20;
+    if (key.length() == 1)
+        return { makeString("U+"_s, hex(toASCIIUpper(key[0]), 4)), virtualKey };
+    return { key, virtualKey };
+}
+
+int32_t rv_host_key(RvHost* host, int32_t action, const char* key, const char* code, const char* text, int32_t modifiers, int32_t repeat)
+{
+    if (!host || !key || !code)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (action < RV_KEY_DOWN || action > RV_KEY_CHAR)
+        return RV_ERR_UNSUPPORTED;
+    static constexpr PlatformEvent::Type types[] = { PlatformEvent::Type::RawKeyDown, PlatformEvent::Type::KeyUp, PlatformEvent::Type::Char };
+    auto keyValue = utf8(key);
+    auto codeValue = utf8(code);
+    auto characters = action == RV_KEY_CHAR && text ? utf8(text) : String { emptyString() };
+    auto [identifier, virtualKey] = legacyKey(keyValue, codeValue);
+    PlatformKeyboardEvent keyboard(types[action], characters, characters, keyValue, codeValue, identifier, virtualKey,
+        !!repeat, false, modifiers & RV_MODIFIER_ALT, platformModifiers(modifiers), MonotonicTime::now());
+    Ref frame = host->frame();
+    return handleInput(*host, [&] { return frame->eventHandler().keyEvent(keyboard); });
+}
+
+int32_t rv_host_set_focused(RvHost* host, int32_t focused)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& focus = host->page->focusController();
+    return dispatchCountingFailures([&] {
+        focus.setActive(!!focused);
+        focus.setFocused(!!focused);
+    });
+}
+
+int32_t rv_host_set_frame_callback(RvHost* host, RvFrameCallback callback, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->frameCallback = callback;
+    host->frameContext = callback ? context : nullptr;
+    host->frameRequested = false;
+    // A page that already wants a frame asks for it at once.
+    if (host->updateWanted || !host->dirty.isEmpty())
+        host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_update(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref page = host->page;
+    host->inFrame = true;
+    host->frameRequested = false;
+    host->updateWanted = false;
+    page->updateRendering();
+    page->finalizeRenderingUpdate({ });
+    host->inFrame = false;
+    // A running animation asked for the next frame during this one.
+    if (host->updateWanted)
+        host->requestFrame();
+    return RV_OK;
+}
+
+int32_t rv_host_dirty_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, int32_t* height)
+{
+    if (!host || !x || !y || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& dirty = host->dirty;
+    *x = dirty.x();
+    *y = dirty.y();
+    *width = dirty.width();
+    *height = dirty.height();
+    return dirty.isEmpty() ? 0 : 1;
+}
+
+int32_t rv_event_number(RvEvent* handle, int32_t number, double* value)
+{
+    if (!handle || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& subject = *event(handle);
+    RefPtr mouse = dynamicDowncast<MouseEvent>(subject);
+    RefPtr keyboard = dynamicDowncast<KeyboardEvent>(subject);
+    UIEventWithKeyState* keyState = mouse ? static_cast<UIEventWithKeyState*>(mouse.get()) : keyboard.get();
+    std::optional<double> result;
+    switch (number) {
+    case RV_NUMBER_CLIENT_X:
+        if (mouse)
+            result = mouse->clientX();
+        break;
+    case RV_NUMBER_CLIENT_Y:
+        if (mouse)
+            result = mouse->clientY();
+        break;
+    case RV_NUMBER_BUTTON:
+        if (mouse)
+            result = mouse->buttonAsShort();
+        break;
+    case RV_NUMBER_BUTTONS:
+        if (mouse)
+            result = mouse->buttons();
+        break;
+    case RV_NUMBER_MODIFIERS:
+        if (keyState) {
+            result = (keyState->shiftKey() ? RV_MODIFIER_SHIFT : 0) | (keyState->ctrlKey() ? RV_MODIFIER_CONTROL : 0)
+                | (keyState->altKey() ? RV_MODIFIER_ALT : 0) | (keyState->metaKey() ? RV_MODIFIER_META : 0);
+        }
+        break;
+    case RV_NUMBER_DETAIL:
+        if (RefPtr ui = dynamicDowncast<UIEvent>(subject))
+            result = ui->detail();
+        break;
+    case RV_NUMBER_DELTA_X:
+    case RV_NUMBER_DELTA_Y:
+        if (RefPtr wheel = dynamicDowncast<WheelEvent>(subject))
+            result = number == RV_NUMBER_DELTA_X ? wheel->deltaX() : wheel->deltaY();
+        break;
+    case RV_NUMBER_KEY_LOCATION:
+        if (keyboard)
+            result = keyboard->location();
+        break;
+    case RV_NUMBER_KEY_REPEAT:
+        if (keyboard)
+            result = keyboard->repeat() ? 1 : 0;
+        break;
+    }
+    if (!result)
+        return RV_ERR_UNSUPPORTED;
+    *value = *result;
+    return RV_OK;
+}
+
+int32_t rv_event_string(RvEvent* handle, int32_t property, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& subject = *event(handle);
+    switch (property) {
+    case RV_EVENT_STRING_CODE:
+        if (RefPtr keyboard = dynamicDowncast<KeyboardEvent>(subject))
+            return copyString(keyboard->code(), buffer, capacity, length);
+        break;
+    case RV_EVENT_STRING_DATA:
+    case RV_EVENT_STRING_INPUT_TYPE:
+        if (RefPtr input = dynamicDowncast<InputEvent>(subject))
+            return copyString(property == RV_EVENT_STRING_DATA ? input->data() : input->inputType(), buffer, capacity, length);
+        break;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+RvNode* rv_event_related_target(RvEvent* subject)
+{
+    if (!subject || !onOwningThread())
+        return nullptr;
+    return handleOrNull(dynamicDowncast<Node>(event(subject)->relatedTarget()));
 }

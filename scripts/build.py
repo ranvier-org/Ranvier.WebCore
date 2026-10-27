@@ -6,17 +6,19 @@
 #   build.py configure  run CMake with config/<flavor>.cmake; on Windows vcpkg installs the dependencies here
 #   build.py build      build RanvierWebCoreHost; for slim on Windows, also write the filtered ICU data DLL
 #   build.py package    stage the libraries RanvierWebCoreHost loads and pack the NuGet package
+#   build.py smoke      check the staged files against the manifest and paint a page with them (scripts/smoke.py);
+#                       on Linux the manifest check only, as loading there is untested
 #   build.py all        every step above, in order
 #
 # The runtime identifier (--rid) picks the WebKit port: win-* builds PORT=Win with clang-cl and vcpkg,
 # linux-* builds PORT=WPE against the distribution's libraries, osx-* builds PORT=Mac. Every path defaults
 # to a location under --work, so a fresh machine needs only the tools of docs/CI.md on PATH (or in
 # --tool-path) and Python 3.12 or later.
-import argparse, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, urllib.request
+import argparse, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, time, urllib.request
 
 root = pathlib.Path(__file__).resolve().parents[1]
 pins = json.loads((root / 'pins.json').read_text())
-steps = ['fetch', 'prepare', 'configure', 'build', 'package']
+steps = ['fetch', 'prepare', 'configure', 'build', 'package', 'smoke']
 
 parser = argparse.ArgumentParser()
 parser.add_argument('step', choices=steps + ['all'])
@@ -29,8 +31,13 @@ parser.add_argument('--build-dir', help='build directory (default <work>/build-<
 parser.add_argument('--vcpkg', help='vcpkg root (default <work>/vcpkg)')
 parser.add_argument('--llvm', help="LLVM's bin directory (default <work>/tools/llvm/bin, which fetch fills)")
 parser.add_argument('--webkit-repo', default=pins['webkit']['repository'], help='where fetch clones WebKit from')
-parser.add_argument('--tool-path', action='append', default=[], help='a directory put first on PATH (perl, ruby, gperf, python); repeatable')
+parser.add_argument('--tool-path', action='append',
+                    default=[p for p in os.environ.get('RANVIER_TOOL_PATH', '').split(os.pathsep) if p],
+                    help='a directory put first on PATH (perl, ruby, gperf, python); repeatable (default RANVIER_TOOL_PATH, '
+                         'separated as PATH is)')
 parser.add_argument('--jobs', type=int, default=os.cpu_count())
+parser.add_argument('--strict', action='store_true',
+                    help='prepare fails when the WebKit checkout has edits the series does not make (release.py)')
 parser.add_argument('--rid', default='win-x64', choices=['win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64'])
 parser.add_argument('--version', default=os.environ.get('RANVIER_PACKAGE_VERSION') or pins['package']['version'],
                     help='package version (default RANVIER_PACKAGE_VERSION, else pins.json)')
@@ -62,6 +69,20 @@ def git(*command, cwd=None):
     run(['git', *command], cwd=cwd)
 
 
+def retried(action, what, attempts=4):
+    """Runs action, retrying a failure up to attempts times with a growing pause: package hosts and mirrors
+    fail transiently (Chocolatey's feed returned 503 and 504 to CI on 2026-10-27)."""
+    for attempt in range(1, attempts + 1):
+        try:
+            return action()
+        except (OSError, subprocess.CalledProcessError) as error:
+            if attempt == attempts:
+                raise
+            pause = 15 * attempt
+            print(f'{what} failed ({error}); attempt {attempt + 1} of {attempts} in {pause} s', flush=True)
+            time.sleep(pause)
+
+
 def sha256(path):
     digest = hashlib.sha256()
     with open(path, 'rb') as stream:
@@ -76,8 +97,12 @@ def download(url, target, expected):
         target.parent.mkdir(parents=True, exist_ok=True)
         print('download', url, flush=True)
         partial = target.with_suffix(target.suffix + '.partial')
-        with urllib.request.urlopen(url) as response, open(partial, 'wb') as stream:
-            shutil.copyfileobj(response, stream)
+
+        def get():
+            with urllib.request.urlopen(url, timeout=60) as response, open(partial, 'wb') as stream:
+                shutil.copyfileobj(response, stream)
+
+        retried(get, f'download {url}')
         partial.replace(target)
     actual = sha256(target)
     print(f'{target.name} sha256 {actual}', flush=True)
@@ -100,7 +125,8 @@ def clone(repository, commit, target, exclude=()):
         git('remote', 'add', 'origin', repository, cwd=target)
         if exclude:
             git('sparse-checkout', 'set', '--no-cone', '/*', *(f'!/{name}/' for name in exclude), cwd=target)
-    git('fetch', '--depth', '1', *(['--filter=blob:none'] if exclude else []), 'origin', commit, cwd=target)
+    retried(lambda: git('fetch', '--depth', '1', *(['--filter=blob:none'] if exclude else []), 'origin', commit, cwd=target),
+            f'fetch {repository}')
     git('checkout', '-q', '--detach', commit, cwd=target)
 
 
@@ -139,7 +165,7 @@ def fetch():
         return
     clone(pins['vcpkg']['repository'], pins['vcpkg']['commit'], vcpkg)
     if not (vcpkg / 'vcpkg.exe').exists():
-        run([vcpkg / 'bootstrap-vcpkg.bat', '-disableMetrics'], cwd=vcpkg)
+        retried(lambda: run([vcpkg / 'bootstrap-vcpkg.bat', '-disableMetrics'], cwd=vcpkg), 'vcpkg bootstrap')
     if not args.llvm and not (llvm / 'clang-cl.exe').exists():
         pin = pins['llvm'][args.rid]
         archive = work / 'downloads' / pin['url'].rsplit('/', 1)[1]
@@ -165,6 +191,11 @@ def prepare():
     cmake = api / 'CMakeLists.txt'
     cmake.write_text(cmake.read_text() + (root / 'host/RanvierWebCoreHost.cmake').read_text(), newline='\n')
     print('host installed into', api, flush=True)
+    # A checkout that has been worked in can keep edits the series does not reset; a release builds none of them.
+    verify = subprocess.run([sys.executable, '-I', root / 'scripts/patches.py', 'verify', 'Tools/TestWebKitAPI/CMakeLists.txt',
+                             '--source', source])
+    if verify.returncode and args.strict:
+        sys.exit('the WebKit checkout has edits outside the series')
 
 
 def configure(env):
@@ -186,11 +217,10 @@ def configure(env):
 
 
 def icu_data(env):
-    """ICU's data archive: from vcpkg's download cache, or downloaded when a binary cache hit skipped the download."""
+    """ICU's data archive: from vcpkg's download cache, or, when a binary cache hit skipped vcpkg's download,
+    downloaded into that cache rather than beside it."""
     icu = pins['icu']
-    name = icu['url'].rsplit('/', 1)[1]
-    cached = pathlib.Path(env.get('VCPKG_DOWNLOADS', vcpkg / 'downloads')) / name
-    archive = cached if cached.exists() else work / 'downloads' / name
+    archive = pathlib.Path(env.get('VCPKG_DOWNLOADS', vcpkg / 'downloads')) / icu['url'].rsplit('/', 1)[1]
     download(icu['url'], archive, icu['sha256'])
     data = build / 'icu-source' / pathlib.Path(icu['data']).name
     data.parent.mkdir(parents=True, exist_ok=True)
@@ -234,7 +264,9 @@ def imports(path):
 def closure():
     """(name, path) of each library the host loads, transitively, from the build (and vcpkg on Windows).
     Libraries of the system, and on Linux of the distribution, are not found there and stay out."""
-    dirs = [build / 'bin', build / 'lib/ranvier', triplet / 'bin'] if windows else [build / 'lib/ranvier', build / 'lib']
+    # The Mac port writes its frameworks to the build directory itself, and the imports name their bundle paths.
+    dirs = {'win': [build / 'bin', build / 'lib/ranvier', triplet / 'bin'], 'linux': [build / 'lib/ranvier', build / 'lib'],
+            'osx': [build / 'lib/ranvier', build]}[system]
     seen, todo = {}, [host]
     while todo:
         name = todo.pop()
@@ -246,6 +278,20 @@ def closure():
     return sorted(seen.values(), key=lambda item: item[0].lower())
 
 
+def staged_name(name):
+    """The file name a library is staged under: a framework's library (WebCore.framework/Versions/A/WebCore) as
+    a plain dylib (libWebCore.dylib), because a build with a runtime identifier flattens native assets into
+    one folder, where a bundle's layout would not survive. Other names stay as they are."""
+    match = re.fullmatch(r'(\w+)\.framework/(?:Versions/\w+/)?\1', name)
+    return f'lib{match.group(1)}.dylib' if match else name
+
+
+def rpaths(path):
+    """The LC_RPATH entries of a Mach-O library."""
+    text = subprocess.run(['otool', '-l', str(path)], capture_output=True, text=True, check=True).stdout
+    return re.findall(r'cmd LC_RPATH\n\s+cmdsize \d+\n\s+path (.+?) \(offset \d+\)', text)
+
+
 def package(env):
     if out.exists():
         shutil.rmtree(out)
@@ -254,9 +300,12 @@ def package(env):
     native.mkdir(parents=True)
     symbols.mkdir(parents=True)
     files = []
-    for name, path in closure():
-        # Under the name the importer asks for: on Linux a versioned symlink's name, holding the file it points to.
-        staged = native / name
+    libraries = closure()
+    renamed = {name: staged_name(name) for name, _ in libraries}
+    for name, path in libraries:
+        # Under the name the importer asks for: on Linux a versioned symlink's name, holding the file it points
+        # to; on macOS a framework's library under its flat name, which the importers are changed to ask for.
+        staged = native / renamed[name]
         shutil.copy2(path, staged)
         if windows:
             pdb = path.with_suffix('.pdb')
@@ -268,7 +317,23 @@ def package(env):
             run(['objcopy', '--only-keep-debug', staged, debug])
             run(['objcopy', '--strip-debug', '--strip-unneeded', f'--add-gnu-debuglink={debug}', staged])
             run(['patchelf', '--set-rpath', '$ORIGIN', staged])
-        files.append(dict(name=name, bytes=staged.stat().st_size, sha256=sha256(staged)))
+        else:
+            # dsymutil reads the debug map of the built library, so it runs before strip. Each library is
+            # identified as @rpath/<flat name> and finds its siblings through @loader_path instead of the
+            # build tree. Editing a Mach-O invalidates its signature, and arm64 loads only signed code, so the
+            # result is signed again, ad hoc, as the linker signed it.
+            run(['dsymutil', path, '-o', symbols / f'{staged.name}.dSYM'])
+            command = ['install_name_tool', '-id', f'@rpath/{staged.name}']
+            for imported in imports(staged):
+                if imported in renamed and imported != renamed[imported]:
+                    command += ['-change', f'@rpath/{imported}', f'@rpath/{renamed[imported]}']
+            for rpath in rpaths(staged):
+                command += ['-delete_rpath', rpath]
+            run(command + [staged])
+            run(['install_name_tool', '-add_rpath', '@loader_path', staged])
+            run(['strip', '-x', staged])
+            run(['codesign', '--force', '--sign', '-', staged])
+        files.append(dict(name=staged.name, bytes=staged.stat().st_size, sha256=sha256(staged)))
     # WebCore reads images from WebKit.resources next to WebCore.dll (WebCoreBundleWin.cpp): the icons hold
     # the broken-image and resize-corner images. Media controls (no video) and WebInspectorUI (no
     # inspector) have no reader in the slim flavor. The other ports compile their images in.
@@ -280,7 +345,11 @@ def package(env):
     (out / 'include').mkdir()
     shutil.copy2(root / 'host/RanvierWebCoreAbi.h', out / 'include')
     abi = re.search(r'rv_abi_version\(void\) \{ return (\d+); \}', (root / 'host/RanvierWebCoreAbi.cpp').read_text())
+    # Where the build came from, which a release checks: this repository's commit and whether the tree had changes.
+    head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
+    dirty = bool(subprocess.run(['git', 'status', '--porcelain'], cwd=root, capture_output=True, text=True, check=True).stdout.strip())
     manifest = dict(flavor=args.flavor, rid=args.rid, version=args.version, webkit=commit, abi=int(abi.group(1)),
+                    source=dict(commit=head, dirty=dirty, builder='ci' if os.environ.get('GITHUB_ACTIONS') else 'local'),
                     total_bytes=sum(f['bytes'] for f in files), files=files)
     (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     targets = (root / 'packaging/buildTransitive.targets').read_text().replace('@RID@', args.rid)
@@ -303,6 +372,10 @@ for step in selected:
         continue
     if step == 'prepare':
         prepare()
+        continue
+    if step == 'smoke':
+        run([sys.executable, '-I', root / 'scripts/smoke.py', '--stage', out, '--build-dir', build]
+            + (['--no-load'] if system == 'linux' else []))
         continue
     env = env or toolchain_env()
     {'configure': configure, 'build': build_step, 'package': package}[step](env)

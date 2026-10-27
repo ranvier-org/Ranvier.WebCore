@@ -19,24 +19,70 @@ and no environment.
 
 ## Caches
 
-- **vcpkg** binary archives and downloads (`VCPKG_BINARY_SOURCES`, `VCPKG_DOWNLOADS`), keyed on
-  `pins.json` and `config/`. A hit skips building the dependencies. ICU's source archive is then not
-  downloaded by vcpkg, and `build.py` downloads it itself for the ICU filter, checking `pins.json`'s hash.
-- **LLVM**, keyed on `pins.json`.
+Each downloaded dependency has its own cache entry. The workflow restores it before the step that needs it
+and saves it right after the step that fetched it, so a failure later in the job keeps it, and an outage
+at a package host matters only on a miss. A step that downloads retries a failure: `build.py`'s
+downloads, git fetches and vcpkg bootstrap four times with a growing pause, Chocolatey four times, each
+Homebrew install four times, and apt's `Acquire::Retries=5`.
+
+| Entry | Key | Saved after |
+|---|---|---|
+| gperf (Windows, from Chocolatey) | its version and the RID: a cache entry holds paths relative to the workspace, whose drive differs between the x64 and ARM64 images | its install |
+| LLVM (Windows) | the RID's archive hash in `pins.json` | fetch |
+| vcpkg binary archives and downloads (Windows) | the RID, the flavor, the vcpkg, WebKit and ICU pins, and `config/` | a successful configure |
+
+- A vcpkg miss restores the newest entry of the RID and flavor: archives are named by their ABI hash, so
+  the packages that did not change are not rebuilt. ICU's source archive comes from vcpkg's downloads;
+  after a binary cache hit skipped vcpkg's download, `build.py` downloads it there itself for the ICU
+  filter, checking `pins.json`'s hash.
+- Not cached: the WebKit checkout (about 2 GB from GitHub, with retries), vcpkg's own checkout, and the
+  Linux and macOS packages. The repository's Actions cache holds 10 GB, and on 2026-10-27 it held
+  9.4 GB, most of it LLVM entries under the old keys that GitHub evicts as they go unused.
 - The WebKit build itself is not cached. A compiler cache (sccache with clang-cl) is the next step if
   build time matters.
 
 ## Local runs
 
-The same steps run on a workstation:
+The same steps run on a workstation, ending with the same check CI runs (`scripts/smoke.py`: the staged
+files match the manifest, and the host loads from them and paints a page):
 
 ```
 python -I scripts/build.py all --work C:/rw
 ```
 
 Options point at existing checkouts and tools instead of fetching them: `--source`, `--vcpkg`, `--llvm`,
-and `--tool-path` (repeatable) for Perl, Ruby, gperf and Python. `--flavor lean` builds the reference
-flavor into `<work>/build-lean` and packs it as `Ranvier.WebCore.Native.Lean.<rid>`.
+and `--tool-path` (repeatable, or `RANVIER_TOOL_PATH` separated as `PATH` is) for Perl, Ruby, gperf and
+Python. `RANVIER_WORK` sets `--work`. `--flavor lean` builds the reference flavor into `<work>/build-lean`
+and packs it as `Ranvier.WebCore.Native.Lean.<rid>`. A 24-thread workstation compiles WebKit in about
+9 minutes, against 65 on `windows-2025`.
+
+### Releasing from a workstation
+
+A release can take some packages from the owner's machine and build the rest in CI:
+
+```
+python -I scripts/release.py --rid win-x64 --work C:/rw
+```
+
+`release.py` refuses a working tree with changes, a commit that is on no remote branch, and a version
+(`pins.json` `package.version`) whose tag exists. It builds each `--rid` with `build.py --strict`, whose
+prepare step fails when the WebKit checkout has edits the patch series does not make (`patches.py verify`).
+It checks the packed `.nupkg` with `smoke.py` against the commit, version and flavor, then creates the
+GitHub release `v<version>` with `gh`, attaching the packages. `--dry-run` stops before the release.
+Options it does not know go to `build.py`.
+
+Creating the release pushes its tag, and the tag's run of this workflow:
+
+- `plan` reads the release. A runtime whose package is attached goes to `prebuilt` instead of `native`, if
+  the repository owner created the release and uploaded that package. Anyone who can push a tag could
+  otherwise get a package of their own published.
+- `prebuilt` downloads the package on a clean runner of its platform and runs `smoke.py` on it. The
+  manifest must name the tag's commit, from a clean tree, and the tag's version. Loading on clean
+  runners also catches a library the package lacks that the workstation happened to have.
+- `native` builds the other runtimes as usual, and `publish` pushes every package that passed.
+
+A tag pushed without a release builds every runtime in CI, as before. A package built on a workstation
+records `"builder": "local"` in the `source` field of its `manifest.json`; CI's record `"ci"`.
 
 An incremental rebuild after vcpkg reinstalls packages can fail with clang rejecting a precompiled header:
 the reinstalled headers keep older modification times. Delete `cmake_pch.cxx.obj` under
@@ -56,6 +102,30 @@ On 2026-10-26, with empty caches, the job took 1 h 3 min: fetch 4 min, configure
 compile 38 min. The slim package holds 18 DLLs, every one `IMAGE_FILE_MACHINE_ARM64`, 74.73 MB against
 `win-x64`'s 77.59 MB. Nobody has loaded these DLLs on an ARM64 machine yet: the package is unverified at
 runtime.
+
+## macOS (osx-arm64)
+
+`osx-arm64` builds WebKit's Cocoa port (`PORT=Mac`, `config/mac.cmake`) with Xcode's AppleClang and Swift,
+and packs `Ranvier.WebCore.Native.osx-arm64`. It draws with CoreGraphics and CoreText, so its pixels do not
+match the Skia ports'.
+
+| Need | Value | Note |
+|---|---|---|
+| Image | `macos-26` (arm64, standard runner) | `macos-15`'s newest Xcode, 26.3 with the macOS 26.2 SDK, cannot build the pin: PAL's Swift module fails on a module cycle (`_DarwinFoundation3` and `CxxStdlib`), and its Swift and clang warn that they do not know some of the warning flags WebKit passes. Measured 2026-10-26, run 40372523818. |
+| Xcode | the newest released Xcode 26 on the image, chosen with `xcode-select` | 26.6 with the macOS 26.5 SDK and Apple clang 21.0.0 on 2026-10-26. `config/mac.cmake` sets the deployment target to macOS 26.0; WebKit's default is the build machine's version. Targeting 15.0 compiles but needs Swift's `libswiftCompatibilitySpan.dylib`, which the package does not carry. |
+| Disk | 4.2 GB used: source 1.7 GB, build 2.1 GB | `macos-26` had 96 GB free before the build and 92 GB at its lowest; `macos-15` had 43 GB free. No disk was freed. |
+| Time | 19 to 38 min for the job | Run 40387342307 on 2026-10-26: fetch 1 min 10 s, prepare 10 s, configure 29 s, build 35 min 16 s (9,436 steps, including libwebrtc, which the Cocoa port always links into WebCore), package 32 s. Run 40393579564, the same build an hour later: job 18 min 40 s, build 16 min 54 s. |
+| Tools | Python 3.12+, CMake, Ninja, gperf, Perl, Ruby, .NET SDK | The image has them; the workflow installs CMake, Ninja or gperf with Homebrew only when one is missing. |
+
+`build.py package` stages each framework's library as a plain dylib (`WebCore.framework/Versions/A/WebCore`
+as `libWebCore.dylib`), because a build with a runtime identifier flattens native assets into one folder.
+It changes the install names to `@rpath/<file>`, replaces the build tree's rpaths with `@loader_path`,
+writes a dSYM per library to `symbols/` (the symbol tables: the Release build has no DWARF), strips local
+symbols with `strip -x` and signs each library again ad hoc, since arm64 macOS loads only signed code.
+
+The workflow's last macOS step loads `libRanvierWebCoreHost.dylib` from the staged package with Python's
+`ctypes`, checks that no staged library names the build tree, compares `rv_abi_version()` with the manifest,
+and paints a 32 by 32 page with a blue square on red, checking one pixel of each.
 
 ## Other runtimes
 

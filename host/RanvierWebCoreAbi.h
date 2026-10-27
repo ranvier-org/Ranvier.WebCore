@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, experiment v7.
+ * Ranvier native WebCore C ABI, version 12.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -308,6 +308,124 @@ RV_EXPORT int32_t rv_host_set_resource_handler(RvHost*, RvResourceHandler handle
 RV_EXPORT int32_t rv_resource_load_finish(RvResourceLoad*, const uint8_t* data, int32_t length, const char* contentType);
 /* Completes the load with a network error, at the same time as rv_resource_load_finish would. */
 RV_EXPORT int32_t rv_resource_load_fail(RvResourceLoad*);
+
+/* v12 */
+
+/* 1 when this library has the named group of functions, else 0, so a caller can test for a group instead of
+ * an exact rv_abi_version: "resize" (rv_host_resize, rv_host_set_device_scale, rv_host_paint_size), "input"
+ * (rv_host_mouse, rv_host_wheel, rv_host_key, rv_host_set_focused), "frame" (rv_host_set_frame_callback,
+ * rv_host_update, rv_host_dirty_rect) and "event-details" (rv_event_number, rv_event_string,
+ * rv_event_related_target). "compositing" is 1 when rv_host_set_accelerated_compositing can composite: the
+ * library was built with the GPU code. */
+RV_EXPORT int32_t rv_abi_has(const char* feature);
+
+/* Sets the viewport to width by height CSS pixels, as rv_host_create does. Input coordinates and dirty
+ * rectangles are in CSS pixels of the viewport. */
+RV_EXPORT int32_t rv_host_resize(RvHost*, int32_t width, int32_t height);
+/* Sets the device pixels per CSS pixel, 1 at creation, from 0.25 to 8. rv_host_paint_rgba then paints
+ * rv_host_paint_size pixels: the viewport's CSS size times the scale, rounded down. */
+RV_EXPORT int32_t rv_host_set_device_scale(RvHost*, float scale);
+/* Writes the size in device pixels of the image rv_host_paint_rgba paints. */
+RV_EXPORT int32_t rv_host_paint_size(RvHost*, int32_t* width, int32_t* height);
+
+/* Actions of rv_host_mouse. */
+enum {
+    RV_MOUSE_MOVE = 0,
+    RV_MOUSE_DOWN = 1,
+    RV_MOUSE_UP = 2,
+};
+
+/* Buttons of rv_host_mouse, as MouseEvent.button, and RV_BUTTON_NONE for a move with no button pressed. */
+enum {
+    RV_BUTTON_NONE = -1,
+    RV_BUTTON_LEFT = 0,
+    RV_BUTTON_MIDDLE = 1,
+    RV_BUTTON_RIGHT = 2,
+};
+
+/* Bits of the modifiers of the input functions and of RV_NUMBER_MODIFIERS. */
+enum {
+    RV_MODIFIER_SHIFT = 1,
+    RV_MODIFIER_CONTROL = 2,
+    RV_MODIFIER_ALT = 4,
+    RV_MODIFIER_META = 8,
+};
+
+/* Actions of rv_host_key. */
+enum {
+    RV_KEY_DOWN = 0,
+    RV_KEY_UP = 1,
+    RV_KEY_CHAR = 2,
+};
+
+/* Native input, handled as the user's: WebCore hit-tests it and dispatches trusted DOM events, then runs each
+ * event's default action unless a listener cancelled it, which updates :hover and :active, focus, selection,
+ * scrolling and the value of an edited field. x and y are CSS pixels in the viewport. clickCount is 1 for a
+ * single press, 2 for a double; a move takes 0. Each returns 1 when the page or WebCore handled the event,
+ * 0 when not, or a negative status. */
+RV_EXPORT int32_t rv_host_mouse(RvHost*, int32_t action, int32_t x, int32_t y, int32_t button, int32_t clickCount, int32_t modifiers);
+/* A wheel event at x, y, which scrolls by deltaX and deltaY CSS pixels, positive right and down. */
+RV_EXPORT int32_t rv_host_wheel(RvHost*, int32_t x, int32_t y, float deltaX, float deltaY, int32_t modifiers);
+/* key and code are KeyboardEvent.key and KeyboardEvent.code values, such as "a" and "KeyA", or "Enter" for
+ * both. A platform sends RV_KEY_DOWN, then RV_KEY_CHAR with text for a key that produces characters, then
+ * RV_KEY_UP; text is NULL or empty for the others. RV_KEY_DOWN runs the key's editing command (Backspace,
+ * Delete, the arrows, Home, End, Enter, Control+A), and Tab moves focus; RV_KEY_CHAR inserts text into the
+ * focused editable element. */
+RV_EXPORT int32_t rv_host_key(RvHost*, int32_t action, const char* key, const char* code, const char* text, int32_t modifiers, int32_t repeat);
+/* Sets whether the host's window has keyboard focus and is active, as the platform window's focus changes.
+ * A host starts unfocused: no caret blinks and :focus-visible does not match until it is focused. */
+RV_EXPORT int32_t rv_host_set_focused(RvHost*, int32_t focused);
+
+/* Called on the host thread when the page wants a frame: part of it was invalidated, or WebCore asked for a
+ * rendering update, as a running animation or transition does each frame. It is called once until the next
+ * rv_host_update or rv_host_paint_rgba, never during them, and must not call this ABI: the app schedules a
+ * frame, such as on its next vertical blank, that calls rv_host_update and then rv_host_paint_rgba. */
+typedef void (*RvFrameCallback)(void* context);
+
+/* Sets the host's frame callback, or with a NULL callback removes it. */
+RV_EXPORT int32_t rv_host_set_frame_callback(RvHost*, RvFrameCallback callback, void* context);
+/* Runs WebCore's rendering update for now: animations and transitions advance, resize and intersection
+ * observers run, and style and layout update. */
+RV_EXPORT int32_t rv_host_update(RvHost*);
+/* Writes the bounds of the viewport area invalidated since the last rv_host_paint_rgba, in CSS pixels, and
+ * returns 1, or returns 0 and writes zeros when no area was. A scroll of the viewport invalidates all of it. */
+RV_EXPORT int32_t rv_host_dirty_rect(RvHost*, int32_t* x, int32_t* y, int32_t* width, int32_t* height);
+
+/* Numbers of rv_event_number. */
+enum {
+    /* MouseEvent.clientX and clientY, in CSS pixels. */
+    RV_NUMBER_CLIENT_X = 0,
+    RV_NUMBER_CLIENT_Y = 1,
+    /* MouseEvent.button and buttons. */
+    RV_NUMBER_BUTTON = 2,
+    RV_NUMBER_BUTTONS = 3,
+    /* The RV_MODIFIER_* bits of a mouse, wheel or keyboard event. */
+    RV_NUMBER_MODIFIERS = 4,
+    /* UIEvent.detail: the click count of a mouse event. */
+    RV_NUMBER_DETAIL = 5,
+    /* WheelEvent.deltaX and deltaY. */
+    RV_NUMBER_DELTA_X = 6,
+    RV_NUMBER_DELTA_Y = 7,
+    /* KeyboardEvent.location and repeat (1 or 0). */
+    RV_NUMBER_KEY_LOCATION = 8,
+    RV_NUMBER_KEY_REPEAT = 9,
+};
+
+/* Strings of rv_event_string. */
+enum {
+    /* KeyboardEvent.code. */
+    RV_EVENT_STRING_CODE = 0,
+    /* InputEvent.data and inputType. */
+    RV_EVENT_STRING_DATA = 1,
+    RV_EVENT_STRING_INPUT_TYPE = 2,
+};
+
+/* Writes a number of the event to *value, or returns RV_ERR_UNSUPPORTED when its interface has none. */
+RV_EXPORT int32_t rv_event_number(RvEvent*, int32_t number, double* value);
+/* Copies a string of the event, or returns RV_ERR_UNSUPPORTED when its interface has none. */
+RV_EXPORT int32_t rv_event_string(RvEvent*, int32_t property, char* buffer, int32_t capacity, int32_t* length);
+/* The relatedTarget of a mouse or focus event when it is a node, else NULL. */
+RV_EXPORT RvNode* rv_event_related_target(RvEvent*);
 
 #ifdef __cplusplus
 }

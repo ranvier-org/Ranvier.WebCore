@@ -24,17 +24,25 @@ concurrency:
 
 jobs:
   plan:
-    # The matrix, filtered by the manual run's rids input.
+    # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
+    # package, attached by scripts/release.py as the repository owner, that runtime goes to prebuilt instead.
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
+      prebuilt: ${{ steps.plan.outputs.prebuilt }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: pins.json
+          sparse-checkout-cone-mode: false
       - id: plan
         shell: python
         env:
           RIDS: ${{ inputs.rids }}
+          FLAVOR: ${{ inputs.flavor || 'slim' }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          import json, os
+          import json, os, urllib.error, urllib.request
           # A WebKit build needs about 10 GB of disk and runs for hours on the standard runners.
           runtimes = [
               # work: a short root on Windows, where WebKit's generated paths exceed MAX_PATH under the
@@ -43,16 +51,81 @@ jobs:
               dict(rid='win-arm64', runner='windows-11-arm', work='C:\\rw'),
               dict(rid='linux-x64', runner='ubuntu-24.04', work='/mnt/rw'),
               dict(rid='linux-arm64', runner='ubuntu-24.04-arm', work='/mnt/rw'),
+              # macOS runners have one volume; the home directory is on its data volume. macos-26, because the
+              # newest Xcode on macos-15 (26.3) cannot build WebKit's Swift sources (docs/CI.md).
+              dict(rid='osx-arm64', runner='macos-26', work='/Users/runner/rw'),
           ]
           wanted = [r.strip() for r in os.environ.get('RIDS', '').split(',') if r.strip()]
           include = [r for r in runtimes if not wanted or r['rid'] in wanted]
           if not include:
               raise SystemExit(f'no runtime matches {wanted}')
+          prebuilt = []
+          ref, owner = os.environ['GITHUB_REF'], os.environ['GITHUB_REPOSITORY_OWNER']
+          if ref.startswith('refs/tags/v'):
+              tag = ref.removeprefix('refs/tags/')
+              request = urllib.request.Request(
+                  f"{os.environ['GITHUB_API_URL']}/repos/{os.environ['GITHUB_REPOSITORY']}/releases/tags/{tag}",
+                  headers={'Authorization': f"Bearer {os.environ['GH_TOKEN']}", 'Accept': 'application/vnd.github+json'})
+              try:
+                  release = json.load(urllib.request.urlopen(request, timeout=60))
+              except urllib.error.HTTPError as error:
+                  if error.code != 404:
+                      raise
+                  release = None
+              # Only the owner's: anyone who can push a tag could otherwise attach a package to be published.
+              assets = {a['name'] for a in release['assets'] if a['uploader']['login'] == owner} \
+                  if release and release['author']['login'] == owner else set()
+              package = json.load(open('pins.json'))['package']['id'] + ('' if os.environ['FLAVOR'] == 'slim' else '.Lean')
+              for runtime in include:
+                  name = f"{package}.{runtime['rid']}.{tag[1:]}.nupkg"
+                  if name in assets:
+                      prebuilt.append(dict(runtime, asset=name))
+          build = [r for r in include if r['rid'] not in {p['rid'] for p in prebuilt}]
+          print('build:', *(r['rid'] for r in build), '- prebuilt:', *(p['rid'] for p in prebuilt))
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
-              out.write('matrix=' + json.dumps(dict(include=include)) + '\n')
+              # An empty string for an empty list, which the jobs' conditions test.
+              out.write('matrix=' + (json.dumps(dict(include=build)) if build else '') + '\n')
+              out.write('prebuilt=' + (json.dumps(dict(include=prebuilt)) if prebuilt else '') + '\n')
+
+  prebuilt:
+    # A runtime whose package was built and checked on the owner's machine by scripts/release.py: checked
+    # again here, on a clean runner of its platform, against the tag's commit, then passed to publish.
+    needs: plan
+    if: needs.plan.outputs.prebuilt != ''
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.prebuilt) }}
+    runs-on: ${{ matrix.runner }}
+    env:
+      FLAVOR: ${{ inputs.flavor || 'slim' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Download the package from the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download "$GITHUB_REF_NAME" --pattern '${{ matrix.asset }}' --dir packages
+
+      - name: Check the package and paint a page
+        shell: bash
+        run: >-
+          python scripts/smoke.py --package 'packages/${{ matrix.asset }}' --expect-commit "$GITHUB_SHA"
+          --expect-version "${GITHUB_REF_NAME#v}" --expect-flavor "$FLAVOR"
+          ${{ startsWith(matrix.rid, 'linux') && '--no-load' || '' }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: packages/*.nupkg
 
   native:
     needs: plan
+    if: needs.plan.outputs.matrix != ''
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
@@ -68,16 +141,84 @@ jobs:
         with:
           python-version: '3.14'
 
-      - name: Install gperf
+      # Each downloaded dependency has its own cache, restored before it is needed and saved as soon as it is
+      # fetched, so a later failure does not discard it and a package host's outage only matters on a miss.
+      - name: Cache keys
+        id: keys
+        shell: python
+        run: |
+          import hashlib, json, os
+          pins = json.load(open('pins.json'))
+          rid = '${{ matrix.rid }}'
+          # Keyed on the pins each one uses, not the whole file, which also holds the package version.
+          llvm = pins['llvm'].get(rid, {}).get('sha256', 'none')
+          vcpkg = hashlib.sha256(json.dumps([pins['vcpkg'], pins['webkit'], pins['icu']]).encode()).hexdigest()[:16]
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write(f"llvm=llvm-{rid}-{llvm}\nvcpkg=vcpkg-{rid}-{os.environ['FLAVOR']}-{vcpkg}\n")
+
+      - name: Restore gperf
+        id: gperf
         if: runner.os == 'Windows'
-        run: choco install gperf --no-progress -y
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\rw\tools\gperf
+          key: gperf-3.1.0-${{ matrix.rid }}
+
+      - name: Install gperf
+        if: runner.os == 'Windows' && steps.gperf.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          # Chocolatey's feed fails transiently: 503 and 504 on 2026-10-27.
+          for ($attempt = 1; ; $attempt++) {
+            choco install gperf --version 3.1.0 --no-progress -y
+            if ($LASTEXITCODE -eq 0) { break }
+            if ($attempt -eq 4) { exit 1 }
+            Start-Sleep (30 * $attempt)
+          }
+          New-Item -ItemType Directory -Force C:\rw\tools\gperf | Out-Null
+          Copy-Item C:\ProgramData\chocolatey\lib\gperf\tools\* C:\rw\tools\gperf -Recurse -Exclude *.zip
+
+      - name: Save gperf
+        if: runner.os == 'Windows' && steps.gperf.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: C:\rw\tools\gperf
+          key: gperf-3.1.0-${{ matrix.rid }}
+
+      - name: Put gperf on PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem C:\rw\tools\gperf -Recurse -Filter gperf.exe | Select-Object -First 1
+          if (-not $exe) { throw 'no gperf.exe under C:\rw\tools\gperf' }
+          Add-Content $env:GITHUB_PATH $exe.DirectoryName
 
       - name: Install the Linux packages
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update -q
-          grep -v '^#' scripts/linux-packages.txt | xargs sudo apt-get install -y -q --no-install-recommends
+          # Acquire::Retries retries a download that fails at the mirror.
+          sudo apt-get -o Acquire::Retries=5 update -q
+          grep -v '^#' scripts/linux-packages.txt | xargs sudo apt-get -o Acquire::Retries=5 install -y -q --no-install-recommends
           sudo mkdir -p "$RANVIER_WORK" && sudo chown "$USER" "$RANVIER_WORK"
+
+      - name: Install the macOS tools
+        if: runner.os == 'macOS'
+        run: |
+          # WebKit's Mac port builds Swift sources that need a recent Xcode: the newest released Xcode 26.
+          xcode=$(ls -d /Applications/Xcode_26*.app | grep -v -i beta | sort -V | tail -1)
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
+          # No auto-update: it fetches Homebrew's taps, which installing a bottle does not need.
+          export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1
+          for tool in gperf ninja cmake; do
+            command -v $tool >/dev/null && continue
+            for attempt in 1 2 3 4; do
+              brew install $tool && break
+              [ $attempt = 4 ] && exit 1
+              sleep $((30 * attempt))
+            done
+          done
+          mkdir -p "$RANVIER_WORK"
 
       - name: Tool versions and disk
         shell: pwsh
@@ -95,21 +236,24 @@ jobs:
           }
 
       - name: Restore vcpkg archives and downloads
+        id: vcpkg
         if: runner.os == 'Windows'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             C:\rw\vcpkg-archives
             C:\rw\vcpkg-downloads
-          key: vcpkg-${{ matrix.rid }}-${{ env.FLAVOR }}-${{ hashFiles('pins.json', 'config/**') }}
+          # Archives are named by their ABI hash, so an older entry's archives are used where they still match.
+          key: ${{ steps.keys.outputs.vcpkg }}-${{ hashFiles('config/**') }}
           restore-keys: vcpkg-${{ matrix.rid }}-${{ env.FLAVOR }}-
 
       - name: Restore LLVM
+        id: llvm
         if: runner.os == 'Windows'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: C:\rw\tools\llvm
-          key: llvm-${{ matrix.rid }}-${{ hashFiles('pins.json') }}
+          key: ${{ steps.keys.outputs.llvm }}
 
       - name: Package version from the tag
         if: startsWith(github.ref, 'refs/tags/v')
@@ -119,11 +263,28 @@ jobs:
       - name: Fetch WebKit (and on Windows vcpkg and LLVM)
         run: python scripts/build.py fetch --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
+      - name: Save LLVM
+        if: runner.os == 'Windows' && steps.llvm.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: C:\rw\tools\llvm
+          key: ${{ steps.keys.outputs.llvm }}
+
       - name: Apply patches and install the host
         run: python scripts/build.py prepare --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
 
       - name: Configure (installs vcpkg packages on Windows)
         run: python scripts/build.py configure --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: Save vcpkg archives and downloads
+        # Only after a successful install: an entry saved under a key is never replaced.
+        if: runner.os == 'Windows' && steps.vcpkg.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            C:\rw\vcpkg-archives
+            C:\rw\vcpkg-downloads
+          key: ${{ steps.keys.outputs.vcpkg }}-${{ hashFiles('config/**') }}
 
       - name: Build
         run: python scripts/build.py build --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
@@ -143,6 +304,11 @@ jobs:
           name: symbols-${{ matrix.rid }}-${{ env.FLAVOR }}
           path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/symbols
 
+      - name: Check the staged files and paint a page
+        # scripts/smoke.py, as a local build.py all runs it: the host loads from the staged package, and on macOS
+        # no staged library names the build tree. On Linux, loading is untested and the step checks the manifest.
+        run: python scripts/build.py smoke --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
       - name: Upload the CMake logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -158,10 +324,10 @@ jobs:
     # On a version tag, pushes the packages to nuget.org through trusted publishing: the job exchanges
     # GitHub's OIDC token for a one-hour API key under the nuget.org account in the repository variable
     # NUGET_USER, whose trusted publishing policy names this file. Without NUGET_USER, the packages stay
-    # as workflow artifacts. Each runtime's package stands alone, so the packages of the runtimes that built
-    # are pushed even when another runtime failed.
+    # as workflow artifacts. Each runtime's package stands alone, so the packages that built, or that the
+    # release held and prebuilt checked, are pushed even when another runtime failed.
     if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' }}
-    needs: native
+    needs: [native, prebuilt]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
