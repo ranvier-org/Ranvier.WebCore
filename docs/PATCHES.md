@@ -8,7 +8,8 @@ and no behavior.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in two places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
-`CryptoKeyRSA.h`, and 0010 changes `EmptyClients.h` and `ChromeClient.h`. The patches touch 55 files in all.
+`CryptoKeyRSA.h`, and 0010 changes `EmptyClients.h`, `ChromeClient.h`, `WebAnimation.h`, `CSSTransition.h`, `Element.h` and
+`Document.h`. The patches touch 59 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -159,16 +160,27 @@ injected script are release assertions.
 
 ## 0010-embedder-clients
 
-Lets the host's chrome client derive from `EmptyChromeClient` where WebCore is a shared library (Windows
-and macOS):
+Makes WebCore's internals that the host uses reachable where WebCore is a shared library (Windows and
+macOS). It changes symbol visibility and `final` keywords, and no behavior.
 
-- `EmptyClients.h` exports `EmptyChromeClient`, and its `invalidateRootView`,
-  `invalidateContentsForSlowScroll`, `setCursor` and `triggerRenderingUpdate` become `override` instead of
-  `final`.
+- `EmptyClients.h` exports `EmptyChromeClient`. Its `invalidateRootView`, `invalidateContentsForSlowScroll`,
+  `setCursor` and `triggerRenderingUpdate` become `override` instead of `final`, so the host's chrome
+  client can derive from it.
 - `ChromeClient.h` exports the six virtual members defined out of line that `EmptyChromeClient` does not
   override: the three shape detector factories, `getBarcodeDetectorSupportedFormats`,
   `enterFullScreenForElement` and `requestPointerLock` (macOS only).
-- `Headers.cmake` forwards `dom/InputEvent.h`.
+- `WebAnimation.h`, `Element.h`, `Document.h` and `CSSTransition.h` export the animation members the host
+  calls:
+  - `WebAnimation`: `play`, `pause`, `reverse`, `finish`, `currentTime`, `setCurrentTime`, `playState` and
+    `updatePlaybackRate`;
+  - `getAnimations` on `Element` and `Document`;
+  - `CSSTransition::transitionProperty`.
+- `Headers.cmake` forwards these headers:
+  - `dom/InputEvent.h` and `dom/ShadowRootInit.h`;
+  - `page/ScrollToOptions.h`;
+  - `animation/CSSTransition.h`, `animation/GetAnimationsOptions.h` and `animation/BlendingKeyframes.h`;
+  - `style/StyleExtractor.h` and `style/StyleExtractorState.h`, which `CSSComputedStyleDeclaration.h`
+    includes.
 
 ## Working on the series
 

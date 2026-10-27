@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 13.
+ * Ranvier native WebCore C ABI, version 14.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -470,6 +470,111 @@ RV_EXPORT int32_t rv_host_ime_cancel(RvHost*);
 /* Writes the bounds of the composition's first line, or of the caret, in CSS pixels of the viewport, where an
  * input method places its candidate window, and returns 1; returns 0 and writes zeros when there is neither. */
 RV_EXPORT int32_t rv_host_ime_rect(RvHost*, int32_t* x, int32_t* y, int32_t* width, int32_t* height);
+
+/* v14: "style", "geometry", "animation", "shadow" and "text-selection" for rv_abi_has. */
+
+/* Operations of rv_element_class on Element.classList. */
+enum {
+    RV_CLASS_CONTAINS = 0,
+    RV_CLASS_ADD = 1,
+    RV_CLASS_REMOVE = 2,
+    RV_CLASS_TOGGLE = 3,
+};
+
+/* Applies the operation to a class token and returns 1 when the element has the class afterwards, else 0. */
+RV_EXPORT int32_t rv_element_class(RvNode*, const char* token, int32_t operation);
+/* Sets an inline style property, as CSSStyleDeclaration.setProperty with "important" priority when important
+ * is 1. An empty value removes the property, and an invalid one leaves it unchanged, as in CSS. */
+RV_EXPORT int32_t rv_element_set_style(RvNode*, const char* property, const char* value, int32_t important);
+/* Copies an inline style property's value, empty when the element does not set it. */
+RV_EXPORT int32_t rv_element_get_style(RvNode*, const char* property, char* buffer, int32_t capacity, int32_t* length);
+/* Copies a property of the element's computed style, as getComputedStyle, with style updated first. */
+RV_EXPORT int32_t rv_element_computed_style(RvNode*, const char* property, char* buffer, int32_t capacity, int32_t* length);
+
+/* Writes Element.getBoundingClientRect() in CSS pixels of the viewport, with layout updated first. */
+RV_EXPORT int32_t rv_element_rect(RvNode*, double* x, double* y, double* width, double* height);
+/* The topmost element at x, y CSS pixels of the viewport, as Document.elementFromPoint, or NULL. */
+RV_EXPORT RvNode* rv_host_element_at(RvHost*, int32_t x, int32_t y);
+
+/* Alignments of rv_element_scroll_into_view, as ScrollLogicalPosition. */
+enum {
+    RV_ALIGN_START = 0,
+    RV_ALIGN_CENTER = 1,
+    RV_ALIGN_END = 2,
+    RV_ALIGN_NEAREST = 3,
+};
+
+/* Scrolls the element's scrollable ancestors and the viewport to show it, aligned on each axis. With smooth
+ * set, the scroll animates over the following rendering updates. */
+RV_EXPORT int32_t rv_element_scroll_into_view(RvNode*, int32_t block, int32_t inlineAlignment, int32_t smooth);
+
+/* Metrics of rv_element_scroll_metric, as the Element properties of the same names. */
+enum {
+    RV_SCROLL_LEFT = 0,
+    RV_SCROLL_TOP = 1,
+    RV_SCROLL_WIDTH = 2,
+    RV_SCROLL_HEIGHT = 3,
+    RV_CLIENT_WIDTH = 4,
+    RV_CLIENT_HEIGHT = 5,
+};
+
+/* Writes a scroll metric of the element in CSS pixels, with layout updated first. */
+RV_EXPORT int32_t rv_element_scroll_metric(RvNode*, int32_t metric, int32_t* value);
+/* Scrolls the element's content to left, top CSS pixels, as Element.scrollTo; with smooth set, animated. */
+RV_EXPORT int32_t rv_element_scroll_to(RvNode*, int32_t left, int32_t top, int32_t smooth);
+
+/* Attaches an open shadow root to the element, as Element.attachShadow({ mode: "open" }), and returns it: a
+ * node of type 11 that takes children, styles and slots. NULL on failure, with *status
+ * RV_ERR_DOM_EXCEPTION and the exception in rv_last_exception. */
+RV_EXPORT RvNode* rv_element_attach_shadow(RvNode*, int32_t* status);
+/* The element's open shadow root, or NULL. */
+RV_EXPORT RvNode* rv_element_shadow_root(RvNode*);
+
+/* Writes the selection of an input or textarea as UTF-16 offsets into its value. */
+RV_EXPORT int32_t rv_text_selection(RvNode*, int32_t* start, int32_t* end);
+/* Selects start to end of an input or textarea's value, clamped to it. */
+RV_EXPORT int32_t rv_text_set_selection(RvNode*, int32_t start, int32_t end);
+
+typedef struct RvAnimation RvAnimation;
+
+/* Writes *count, then a strong handle to each animation of the element, which includes CSS animations and
+ * transitions; with subtree set, also its descendants'. Each handle is released with rv_animation_release
+ * before rv_host_destroy. When capacity is below *count it returns RV_ERR_BUFFER_TOO_SMALL and writes no
+ * handles. */
+RV_EXPORT int32_t rv_element_animations(RvNode*, int32_t subtree, RvAnimation** animations, int32_t capacity, int32_t* count);
+/* The same for every animation of the host's document. */
+RV_EXPORT int32_t rv_host_animations(RvHost*, RvAnimation** animations, int32_t capacity, int32_t* count);
+RV_EXPORT void rv_animation_release(RvAnimation*);
+
+/* Actions of rv_animation_control, as the Animation methods of the same names. */
+enum {
+    RV_ANIMATION_PLAY = 0,
+    RV_ANIMATION_PAUSE = 1,
+    RV_ANIMATION_REVERSE = 2,
+    RV_ANIMATION_FINISH = 3,
+    RV_ANIMATION_CANCEL = 4,
+};
+
+/* Play states of rv_animation_state, as Animation.playState. */
+enum {
+    RV_ANIMATION_IDLE = 0,
+    RV_ANIMATION_RUNNING = 1,
+    RV_ANIMATION_PAUSED = 2,
+    RV_ANIMATION_FINISHED = 3,
+};
+
+RV_EXPORT int32_t rv_animation_control(RvAnimation*, int32_t action);
+RV_EXPORT int32_t rv_animation_state(RvAnimation*);
+/* Writes Animation.currentTime in milliseconds and returns 1, or returns 0 when it is unresolved. */
+RV_EXPORT int32_t rv_animation_time(RvAnimation*, double* milliseconds);
+/* Sets Animation.currentTime in milliseconds. */
+RV_EXPORT int32_t rv_animation_seek(RvAnimation*, double milliseconds);
+/* Sets the playback rate, as Animation.updatePlaybackRate: 1 is normal speed, negative plays backward. */
+RV_EXPORT int32_t rv_animation_set_rate(RvAnimation*, double rate);
+/* Copies the CSS animation's name, the CSS transition's property, or the animation's id. */
+RV_EXPORT int32_t rv_animation_name(RvAnimation*, char* buffer, int32_t capacity, int32_t* length);
+/* A strong handle to the element the animation's effect targets, or NULL. */
+RV_EXPORT RvNode* rv_animation_target(RvAnimation*);
 
 #ifdef __cplusplus
 }

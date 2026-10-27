@@ -66,6 +66,21 @@
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/Chrome.h>
+#include <WebCore/CSSAnimation.h>
+#include <WebCore/CSSComputedStyleDeclaration.h>
+#include <WebCore/CSSStyleDeclaration.h>
+#include <WebCore/CSSTransition.h>
+#include <WebCore/DOMTokenList.h>
+#include <WebCore/GetAnimationsOptions.h>
+#include <WebCore/HTMLTextFormControlElement.h>
+#include <WebCore/KeyframeEffect.h>
+#include <WebCore/ScrollIntoViewOptions.h>
+#include <WebCore/ScrollToOptions.h>
+#include <WebCore/ShadowRoot.h>
+#include <WebCore/ShadowRootInit.h>
+#include <WebCore/StyledElement.h>
+#include <WebCore/WebAnimation.h>
+#include <WebCore/WebAnimationTime.h>
 #include <WebCore/CompositionHighlight.h>
 #include <WebCore/CompositionUnderline.h>
 #include <WebCore/Cursor.h>
@@ -823,7 +838,7 @@ static int32_t fail(const Exception& exception)
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 13; }
+int32_t rv_abi_version(void) { return 14; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -837,7 +852,7 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2189,4 +2204,376 @@ int32_t rv_host_ime_rect(RvHost* host, int32_t* x, int32_t* y, int32_t* width, i
     *width = rect.width();
     *height = rect.height();
     return rect.isEmpty() ? 0 : 1;
+}
+
+static Element* elementOf(RvNode* handle) { return handle ? dynamicDowncast<Element>(*node(handle)) : nullptr; }
+
+int32_t rv_element_class(RvNode* target, const char* token, int32_t operation)
+{
+    if (!target || !token)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    auto name = AtomString::fromUTF8(token);
+    Ref classes = element->classList();
+    std::optional<bool> force;
+    switch (operation) {
+    case RV_CLASS_CONTAINS:
+        return classes->contains(name) ? 1 : 0;
+    case RV_CLASS_ADD:
+        force = true;
+        break;
+    case RV_CLASS_REMOVE:
+        force = false;
+        break;
+    case RV_CLASS_TOGGLE:
+        break;
+    default:
+        return RV_ERR_UNSUPPORTED;
+    }
+    auto result = classes->toggle(name, force);
+    if (result.hasException())
+        return fail(result.exception());
+    return result.returnValue() ? 1 : 0;
+}
+
+int32_t rv_element_set_style(RvNode* target, const char* property, const char* value, int32_t important)
+{
+    if (!target || !property || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = dynamicDowncast<StyledElement>(*node(target));
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    Ref<CSSStyleDeclaration> style = element->cssomStyle();
+    return status(style->setProperty(utf8(property), utf8(value), important ? "important"_s : emptyString()));
+}
+
+int32_t rv_element_get_style(RvNode* target, const char* property, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !property)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = dynamicDowncast<StyledElement>(*node(target));
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    Ref<CSSStyleDeclaration> style = element->cssomStyle();
+    return copyString(style->getPropertyValue(utf8(property)), buffer, capacity, length);
+}
+
+int32_t rv_element_computed_style(RvNode* target, const char* property, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !property)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    Ref<CSSStyleDeclaration> style = CSSComputedStyleDeclaration::create(*element, CSSComputedStyleDeclaration::AllowVisited::No);
+    return copyString(style->getPropertyValue(utf8(property)), buffer, capacity, length);
+}
+
+int32_t rv_element_rect(RvNode* target, double* x, double* y, double* width, double* height)
+{
+    if (!target || !x || !y || !width || !height)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    auto rect = element->boundingClientRect();
+    *x = rect.x();
+    *y = rect.y();
+    *width = rect.width();
+    *height = rect.height();
+    return RV_OK;
+}
+
+RvNode* rv_host_element_at(RvHost* host, int32_t x, int32_t y)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    Ref document = host->document();
+    RefPtr element = document->elementFromPoint(x, y, HitTestSource::User);
+    return handleOrNull(element.get());
+}
+
+static std::optional<ScrollLogicalPosition> alignment(int32_t value)
+{
+    if (value < RV_ALIGN_START || value > RV_ALIGN_NEAREST)
+        return std::nullopt;
+    return static_cast<ScrollLogicalPosition>(value);
+}
+
+int32_t rv_element_scroll_into_view(RvNode* target, int32_t block, int32_t inlineAlignment, int32_t smooth)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    auto blockPosition = alignment(block);
+    auto inlinePosition = alignment(inlineAlignment);
+    if (!blockPosition || !inlinePosition)
+        return RV_ERR_UNSUPPORTED;
+    ScrollIntoViewOptions options;
+    options.behavior = smooth ? ScrollBehavior::Smooth : ScrollBehavior::Instant;
+    options.blockPosition = blockPosition;
+    options.inlinePosition = inlinePosition;
+    element->scrollIntoView(Variant<bool, ScrollIntoViewOptions> { WTF::move(options) });
+    return RV_OK;
+}
+
+int32_t rv_element_scroll_metric(RvNode* target, int32_t metric, int32_t* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    switch (metric) {
+    case RV_SCROLL_LEFT:
+        *value = element->scrollLeft();
+        return RV_OK;
+    case RV_SCROLL_TOP:
+        *value = element->scrollTop();
+        return RV_OK;
+    case RV_SCROLL_WIDTH:
+        *value = element->scrollWidth();
+        return RV_OK;
+    case RV_SCROLL_HEIGHT:
+        *value = element->scrollHeight();
+        return RV_OK;
+    case RV_CLIENT_WIDTH:
+        *value = element->clientWidth();
+        return RV_OK;
+    case RV_CLIENT_HEIGHT:
+        *value = element->clientHeight();
+        return RV_OK;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_element_scroll_to(RvNode* target, int32_t left, int32_t top, int32_t smooth)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    ScrollToOptions options;
+    options.behavior = smooth ? ScrollBehavior::Smooth : ScrollBehavior::Instant;
+    options.left = left;
+    options.top = top;
+    element->scrollTo(options);
+    return RV_OK;
+}
+
+RvNode* rv_element_attach_shadow(RvNode* target, int32_t* status)
+{
+    auto report = [&](int32_t value) -> RvNode* {
+        if (status)
+            *status = value;
+        return nullptr;
+    };
+    if (!target)
+        return report(RV_ERR_NULL_ARGUMENT);
+    if (!onOwningThread())
+        return report(RV_ERR_WRONG_THREAD);
+    RefPtr element = elementOf(target);
+    if (!element)
+        return report(RV_ERR_NOT_ELEMENT);
+    auto root = element->attachShadow({ ShadowRootMode::Open });
+    if (root.hasException())
+        return report(fail(root.exception()));
+    if (status)
+        *status = RV_OK;
+    return handle(Ref<Node> { root.releaseReturnValue() });
+}
+
+RvNode* rv_element_shadow_root(RvNode* target)
+{
+    if (!target || !onOwningThread())
+        return nullptr;
+    RefPtr element = elementOf(target);
+    RefPtr root = element ? element->shadowRoot() : nullptr;
+    if (!root || root->mode() != ShadowRootMode::Open)
+        return nullptr;
+    return handle(root.releaseNonNull());
+}
+
+int32_t rv_text_selection(RvNode* target, int32_t* start, int32_t* end)
+{
+    if (!target || !start || !end)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr control = dynamicDowncast<HTMLTextFormControlElement>(*node(target));
+    if (!control)
+        return RV_ERR_NOT_INPUT;
+    *start = control->selectionStart();
+    *end = control->selectionEnd();
+    return RV_OK;
+}
+
+int32_t rv_text_set_selection(RvNode* target, int32_t start, int32_t end)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr control = dynamicDowncast<HTMLTextFormControlElement>(*node(target));
+    if (!control)
+        return RV_ERR_NOT_INPUT;
+    if (start < 0 || end < start)
+        return RV_ERR_UNSUPPORTED;
+    control->setSelectionRange(start, end);
+    return RV_OK;
+}
+
+static WebAnimation* animation(RvAnimation* handle) { return reinterpret_cast<WebAnimation*>(handle); }
+
+static int32_t copyAnimations(const Vector<Ref<WebAnimation>>& found, RvAnimation** animations, int32_t capacity, int32_t* count)
+{
+    *count = static_cast<int32_t>(found.size());
+    if (capacity < *count)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    for (size_t i = 0; i < found.size(); ++i)
+        animations[i] = reinterpret_cast<RvAnimation*>(&Ref { found[i] }.leakRef());
+    return RV_OK;
+}
+
+int32_t rv_element_animations(RvNode* target, int32_t subtree, RvAnimation** animations, int32_t capacity, int32_t* count)
+{
+    if (!target || !count || (capacity > 0 && !animations))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    return copyAnimations(element->getAnimations(GetAnimationsOptions { !!subtree }), animations, capacity, count);
+}
+
+int32_t rv_host_animations(RvHost* host, RvAnimation** animations, int32_t capacity, int32_t* count)
+{
+    if (!host || !count || (capacity > 0 && !animations))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return copyAnimations(host->document().getAnimations(), animations, capacity, count);
+}
+
+void rv_animation_release(RvAnimation* handle)
+{
+    if (handle && onOwningThread())
+        animation(handle)->deref();
+}
+
+int32_t rv_animation_control(RvAnimation* handle, int32_t action)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref subject = *animation(handle);
+    switch (action) {
+    case RV_ANIMATION_PLAY:
+        return status(subject->play());
+    case RV_ANIMATION_PAUSE:
+        return status(subject->pause());
+    case RV_ANIMATION_REVERSE:
+        return status(subject->reverse());
+    case RV_ANIMATION_FINISH:
+        return status(subject->finish());
+    case RV_ANIMATION_CANCEL:
+        subject->cancel();
+        return RV_OK;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_animation_state(RvAnimation* handle)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    switch (animation(handle)->playState()) {
+    case WebAnimation::PlayState::Idle:
+        return RV_ANIMATION_IDLE;
+    case WebAnimation::PlayState::Running:
+        return RV_ANIMATION_RUNNING;
+    case WebAnimation::PlayState::Paused:
+        return RV_ANIMATION_PAUSED;
+    case WebAnimation::PlayState::Finished:
+        return RV_ANIMATION_FINISHED;
+    }
+    return RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_animation_time(RvAnimation* handle, double* milliseconds)
+{
+    if (!handle || !milliseconds)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto current = animation(handle)->currentTime();
+    auto seconds = current ? current->time() : std::nullopt;
+    *milliseconds = seconds ? seconds->milliseconds() : 0;
+    return seconds ? 1 : 0;
+}
+
+int32_t rv_animation_seek(RvAnimation* handle, double milliseconds)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return status(animation(handle)->setCurrentTime(WebAnimationTime { Seconds::fromMilliseconds(milliseconds) }));
+}
+
+int32_t rv_animation_set_rate(RvAnimation* handle, double rate)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    animation(handle)->updatePlaybackRate(rate);
+    return RV_OK;
+}
+
+int32_t rv_animation_name(RvAnimation* handle, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!handle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto& subject = *animation(handle);
+    if (auto* css = dynamicDowncast<CSSAnimation>(subject))
+        return copyString(css->animationName(), buffer, capacity, length);
+    if (auto* transition = dynamicDowncast<CSSTransition>(subject))
+        return copyString(transition->transitionProperty(), buffer, capacity, length);
+    return copyString(subject.id(), buffer, capacity, length);
+}
+
+RvNode* rv_animation_target(RvAnimation* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    auto* effect = dynamicDowncast<KeyframeEffect>(animation(handle)->effect());
+    return handleOrNull(effect ? effect->target() : nullptr);
 }
