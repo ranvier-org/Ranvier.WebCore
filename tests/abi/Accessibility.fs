@@ -56,17 +56,28 @@ let private focusable, focused, checkable, isChecked, expandable, expanded, edit
 
 let private has bit states = states &&& bit <> 0
 
+// RANVIER_TRACE=1 prints each step to stderr before it runs, so a native crash names the call that made it.
+let private tracing = System.Environment.GetEnvironmentVariable "RANVIER_TRACE" = "1"
+
+let private step (name: string) =
+    if tracing then
+        eprintfn "RANVIER_STEP %s" name
+        stderr.Flush()
+
 let run (outDir: string) =
     require (rv_abi_has "accessibility" = 1) "rv_abi_has accessibility"
     // The lean flavor builds WebCore without patch 0011's notifications: the tree, and no events.
+    step "Accessibility: let hasEvents = rv_abi_has 'accessibility-events' = 1"
     let hasEvents = rv_abi_has "accessibility-events" = 1
     use host = new Host(300, 200)
+    step "Accessibility: host.LoadHtml html"
     host.LoadHtml html
 
     let ax (id: string) =
         use node = host.GetElementById id
         rv_node_ax node.Handle
 
+    step "Accessibility: let rootBefore = rv_host_ax_root host.Handle"
     let rootBefore = rv_host_ax_root host.Handle
 
     let events = ResizeArray<nativeint * int>()
@@ -76,12 +87,16 @@ let run (outDir: string) =
             // Kept until the end of the test; each is released there.
             events.Add(rv_ax_retain node, event))
 
+    step "Accessibility: rv_host_set_accessibility (host.Handle, 1, Marshal.GetFunctionPointerForDelegate onEvent, "
     rv_host_set_accessibility (host.Handle, 1, Marshal.GetFunctionPointerForDelegate onEvent, 0n)
     |> check "host_set_accessibility"
 
+    step "Accessibility: let root = rv_host_ax_root host.Handle"
     let root = rv_host_ax_root host.Handle
     require (root <> 0n) "a root once accessibility is on"
+    step "Accessibility: let rootRole = rv_ax_role root"
     let rootRole = rv_ax_role root
+    step "Accessibility: let rootParent = rv_ax_parent root"
     let rootParent = rv_ax_parent root
     let rootRect = rect root
 
@@ -101,35 +116,58 @@ let run (outDir: string) =
 
     let tree = walk root 0
 
+    step "Accessibility: let h = ax 'h'"
     let h = ax "h"
+    step "Accessibility: let b = ax 'b'"
     let b = ax "b"
+    step "Accessibility: let c = ax 'c'"
     let c = ax "c"
+    step "Accessibility: let t = ax 't'"
     let t = ax "t"
+    step "Accessibility: let s = ax 's'"
     let s = ax "s"
+    step "Accessibility: let link = ax 'link'"
     let link = ax "link"
+    step "Accessibility: let list = ax 'list'"
     let list = ax "list"
+    step "Accessibility: let live = ax 'live'"
     let live = ax "live"
+    step "Accessibility: let det = ax 'det'"
     let det = ax "det"
+    step "Accessibility: let far = ax 'far'"
     let far = ax "far"
+    step "Accessibility: use hiddenDiv = host.GetElementById 'hidden'"
     use hiddenDiv = host.GetElementById "hidden"
+    step "Accessibility: use hiddenButton = new Node(rv_node_relative (hiddenDiv.Handle, 1))"
     use hiddenButton = new Node(rv_node_relative (hiddenDiv.Handle, 1))
+    step "Accessibility: let hidden = rv_node_ax hiddenButton.Handle"
     let hidden = rv_node_ax hiddenButton.Handle
 
+    step "Accessibility: use bNode = host.GetElementById 'b'"
     use bNode = host.GetElementById "b"
+    step "Accessibility: let bDom = rv_ax_dom_node b"
     let bDom = rv_ax_dom_node b
     let bDomSame = (bDom = bNode.Handle)
+    step "Accessibility: rv_node_release bDom"
     rv_node_release bDom
+    step "Accessibility: let bParent = rv_ax_parent b"
     let bParent = rv_ax_parent b
+    step "Accessibility: let bParentRole = rv_ax_role bParent"
     let bParentRole = rv_ax_role bParent
+    step "Accessibility: rv_ax_release bParent"
     rv_ax_release bParent
     let bRect = rect b
     let bElementRect = elementRect bNode
 
     // Hit testing the button's centre finds the button, or the text inside it.
+    step "Accessibility: let hit = rv_host_ax_hit_test (host.Handle, 60, 25)"
     let hit = rv_host_ax_hit_test (host.Handle, 60, 25)
+    step "Accessibility: let hitParent = rv_ax_parent hit"
     let hitParent = rv_ax_parent hit
     let hitIsButton = hit = b || hitParent = b
+    step "Accessibility: rv_ax_release hitParent"
     rv_ax_release hitParent
+    step "Accessibility: rv_ax_release hit"
     rv_ax_release hit
 
     let summaryBefore =
@@ -145,29 +183,43 @@ let run (outDir: string) =
            farStates = rv_ax_states far |}
 
     let listChildren = children list
+    step "Accessibility: let listItemRoles = listChildren |> Array.map rv_ax_role |> List.ofArray"
     let listItemRoles = listChildren |> Array.map rv_ax_role |> List.ofArray
     listChildren |> Array.iter rv_ax_release
 
     // Actions.
+    step "Accessibility: let pressChecked = rv_ax_action (c, 0)"
     let pressChecked = rv_ax_action (c, 0)
+    step "Accessibility: let checkedAfterPress = rv_ax_states c"
     let checkedAfterPress = rv_ax_states c
     let input = ResizeArray<string>()
+    step "Accessibility: use tNode = host.GetElementById 't'"
     use tNode = host.GetElementById "t"
     tNode.Listen("input", false, (fun e -> input.Add e.Type)) |> ignore
+    step "Accessibility: let focusResult = rv_ax_action (t, 1)"
     let focusResult = rv_ax_action (t, 1)
+    step "Accessibility: let focusNode = rv_host_ax_focus host.Handle"
     let focusNode = rv_host_ax_focus host.Handle
     let focusIsText = focusNode = t
+    step "Accessibility: rv_ax_release focusNode"
     rv_ax_release focusNode
+    step "Accessibility: let setValue = rv_ax_set_value (t, 'Bob')"
     let setValue = rv_ax_set_value (t, "Bob")
     let valueAfter = axString t 2
+    step "Accessibility: let setNumber = rv_ax_set_number (s, 7.0)"
     let setNumber = rv_ax_set_number (s, 7.0)
     let sliderAfterSet = axNumber s 0
+    step "Accessibility: let increment = rv_ax_action (s, 3)"
     let increment = rv_ax_action (s, 3)
     let sliderAfterIncrement = axNumber s 0
+    step "Accessibility: let expandResult = rv_ax_action (det, 5)"
     let expandResult = rv_ax_action (det, 5)
+    step "Accessibility: let detailsAfterExpand = rv_ax_states det"
     let detailsAfterExpand = rv_ax_states det
+    step "Accessibility: let notRange = rv_ax_action (b, 3)"
     let notRange = rv_ax_action (b, 3)
     events.Clear()
+    step "Accessibility: host.CycleRunLoop 50"
     host.CycleRunLoop 50
 
     let eventsAfterActions =
@@ -182,14 +234,19 @@ let run (outDir: string) =
 
     // Page changes: a list item added, live region text, the button removed.
     events.Clear()
+    step "Accessibility: use listNode = host.GetElementById 'list'"
     use listNode = host.GetElementById "list"
+    step "Accessibility: use item = host.CreateElement 'li'"
     use item = host.CreateElement "li"
     item.SetText "Three"
     listNode.Append item
+    step "Accessibility: use liveNode = host.GetElementById 'live'"
     use liveNode = host.GetElementById "live"
     liveNode.SetText "Saved"
     // WebCore updates its tree during the rendering update the app runs for the frame the change requested.
+    step "Accessibility: host.Update()"
     host.Update()
+    step "Accessibility: host.CycleRunLoop 50"
     host.CycleRunLoop 50
     let changeEvents =
         events |> Seq.map (fun (n, e) -> $"{rv_ax_role n}:{e}") |> List.ofSeq
@@ -199,11 +256,16 @@ let run (outDir: string) =
     let listCountAfter = (children list).Length
     let liveText = axString live 9
 
+    step "Accessibility: rv_node_remove bNode.Handle |> check 'remove button'"
     rv_node_remove bNode.Handle |> check "remove button"
+    step "Accessibility: host.CycleRunLoop 50"
     host.CycleRunLoop 50
+    step "Accessibility: let detachedRole = rv_ax_role b"
     let detachedRole = rv_ax_role b
 
+    step "Accessibility: rv_host_set_accessibility (host.Handle, 0, 0n, 0n) |> check 'accessibility off'"
     rv_host_set_accessibility (host.Handle, 0, 0n, 0n) |> check "accessibility off"
+    step "Accessibility: let rootAfterOff = rv_host_ax_root host.Handle"
     let rootAfterOff = rv_host_ax_root host.Handle
 
     for node, _ in events do
