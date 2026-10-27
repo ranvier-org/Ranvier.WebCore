@@ -367,6 +367,19 @@ index 1ebd9edc2c..044e2b6b57 100644
      void targetDestroyed(Element&);
  
      static size_t maxElementDepth() { return SIZE_MAX; }
+diff --git a/Source/WebCore/platform/Pasteboard.h b/Source/WebCore/platform/Pasteboard.h
+index de2f5bf37b..33021695bf 100644
+--- a/Source/WebCore/platform/Pasteboard.h
++++ b/Source/WebCore/platform/Pasteboard.h
+@@ -194,7 +194,7 @@ struct PasteboardFileReader {
+ };
+ 
+ class Pasteboard {
+-    WTF_MAKE_TZONE_ALLOCATED(Pasteboard);
++    WTF_MAKE_TZONE_ALLOCATED_EXPORT(Pasteboard, WEBCORE_EXPORT);
+     WTF_MAKE_NONCOPYABLE(Pasteboard);
+ public:
+     explicit Pasteboard(std::unique_ptr<PasteboardContext>&&);
 diff --git a/Source/WebCore/platform/StaticPasteboard.h b/Source/WebCore/platform/StaticPasteboard.h
 index aa8d7e25d1..8ecec3b451 100644
 --- a/Source/WebCore/platform/StaticPasteboard.h
