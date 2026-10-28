@@ -104,6 +104,39 @@ def main():
         body = pointer()
         ok(get_body(second, c.byref(body)))
         owned.append(body)
+        callback_type = c.CFUNCTYPE(c.c_int32, pointer, pointer)
+        add_listener = bind('rv_node_add_event_listener', [pointer, c.c_char_p, c.c_int32, callback_type, pointer], pointer)
+        remove_listener = bind('rv_listener_remove', [pointer])
+        dispatch = bind('rv_node_dispatch_event', [pointer, c.c_char_p, c.c_int32, c.c_int32, c.POINTER(c.c_int32)])
+        prevent_default = bind('rv_event_prevent_default', [pointer], None)
+        event_phase = bind('rv_event_phase', [pointer])
+        event_child = pointer()
+        ok(create_ns(second, b'http://www.w3.org/1999/xhtml', b'button', None, c.byref(event_child)))
+        owned.append(event_child)
+        event_nodes = (NodeOrString * 1)(NodeOrString(1, 1, event_child, None))
+        ok(append(body, c.byref(Sequence(1, 1, c.cast(event_nodes, pointer)))))
+        for flags in (0, 1, 6, 7, 4, 5, 2, 3):
+            phases = []
+
+            @callback_type
+            def cancel_event(context, event):
+                phases.append(event_phase(event))
+                prevent_default(event)
+                return 0
+
+            listener = add_listener(body, b'ranvier-passive-test', flags, cancel_event, None)
+            assert listener
+            try:
+                prevented = c.c_int32(-1)
+                ok(dispatch(event_child, b'ranvier-passive-test', 1, 1, c.byref(prevented)))
+                expected = 0 if flags & 4 and flags & 2 else 1
+                assert prevented.value == expected, f'flags {flags}: defaultPrevented={prevented.value}, expected {expected}'
+                assert phases == [1 if flags & 1 else 3], f'flags {flags}: capture phase {phases}'
+            finally:
+                ok(remove_listener(listener))
+            ok(dispatch(event_child, b'ranvier-passive-test', 1, 1, c.byref(prevented)))
+            assert prevented.value == 0 and len(phases) == 1, f'flags {flags}: removed listener still ran'
+        print('NATIVE_EVENT_OPTIONS PASS: passive true/false/unspecified, capture phases, removal')
         svg = pointer()
         ok(create_ns(second, b'http://www.w3.org/2000/svg', b'svg:svg', None, c.byref(svg)))
         owned.append(svg)

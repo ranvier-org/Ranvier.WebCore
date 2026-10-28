@@ -182,8 +182,18 @@ RV_EXPORT int32_t rv_gpu_frame_info(RvGpuFrame*, void** texture, int32_t* width,
  * The SDL wrapper and all frame handles must be disposed before unloading their native DLLs. */
 RV_EXPORT int32_t rv_gpu_frame_release(RvGpuFrame*);
 
-/* Registers a WebCore EventListener on target that calls callback(context, event). Returns NULL on a
- * NULL argument or the wrong thread. */
+/* Bits of the capture parameter of rv_node_add_event_listener. Values 0 and 1 retain their original
+ * bubbling/capturing behavior. PASSIVE has an effect only together with PASSIVE_SPECIFIED; omitting
+ * PASSIVE_SPECIFIED preserves WebCore's event-specific passive default. */
+enum {
+    RV_LISTENER_CAPTURE = 1,
+    RV_LISTENER_PASSIVE = 2,
+    RV_LISTENER_PASSIVE_SPECIFIED = 4,
+};
+
+/* Registers a WebCore EventListener on target that calls callback(context, event). capture contains
+ * RV_LISTENER_* bits. Explicit passive true ignores preventDefault; explicit false permits it for
+ * cancelable events. Returns NULL on a NULL argument or the wrong thread. */
 RV_EXPORT RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t capture,
     RvEventCallback callback, void* context);
 /* Unregisters the listener and frees the handle. The callback will not run after this returns, also

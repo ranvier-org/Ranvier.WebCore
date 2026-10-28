@@ -1600,9 +1600,11 @@ RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t
     if (!target || !type || !callback || !onOwningThread())
         return nullptr;
     auto* listener = new RvListener { RvEventListener::create(callback, context), *node(target),
-        AtomString::fromUTF8(type), !!capture };
+        AtomString::fromUTF8(type), !!(capture & RV_LISTENER_CAPTURE) };
     AddEventListenerOptions options;
     options.capture = listener->capture;
+    if (capture & RV_LISTENER_PASSIVE_SPECIFIED)
+        options.passive = !!(capture & RV_LISTENER_PASSIVE);
     listener->target->addEventListener(listener->type, listener->listener.copyRef(), options);
     return listener;
 }
