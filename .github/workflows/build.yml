@@ -31,6 +31,23 @@ jobs:
         with:
           python-version: '3.14'
       - run: python -I tests/test_package_contract.py
+      - run: python -I tests/generator/test_domgen.py
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: dotnet tool restore
+      - name: Compile the full shared contracts on .NET
+        run: dotnet build tests/generator/Contracts.fsproj -c Release
+      - name: Check the generated F# layout
+        run: dotnet fantomas --check gen/Ranvier.Dom.fs
+      - name: Compile and execute the browser union adapters
+        run: |
+          python -I tests/generator/write_fable_fixture.py artifacts/dom-fixture
+          dotnet fickl artifacts/dom-fixture/Fixture.fsproj --outDir artifacts/dom-fixture/js
+          node artifacts/dom-fixture/js/Program.js
 
   plan:
     # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
@@ -84,7 +101,7 @@ jobs:
               # Only the owner's: anyone who can push a tag could otherwise attach a package to be published.
               assets = {a['name'] for a in release['assets'] if a['uploader']['login'] == owner} \
                   if release and release['author']['login'] == owner else set()
-              package = json.load(open('pins.json'))['package']['id'] + ('' if os.environ['FLAVOR'] == 'slim' else '.Lean')
+              package = json.load(open('pins.json'))['package']['id'] + {'slim': '', 'gpu': '.Gpu', 'lean': '.Lean'}[os.environ['FLAVOR']]
               for runtime in include:
                   name = f"{package}.{runtime['rid']}.{tag[1:]}.nupkg"
                   if name in assets:
