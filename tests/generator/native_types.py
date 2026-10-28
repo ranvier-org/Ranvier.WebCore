@@ -19,6 +19,14 @@ class Hidden(c.Structure):
     _fields_ = [('present', c.c_int32), ('tag', c.c_int32), ('arm0', c.c_int32), ('arm1', c.c_double), ('arm2', c.c_void_p)]
 
 
+class ImportOptions(c.Structure):
+    _fields_ = [('size', c.c_uint32), ('self_only', c.c_int32)]
+
+
+class ImportUnion(c.Structure):
+    _fields_ = [('present', c.c_int32), ('tag', c.c_int32), ('arm0', c.c_int32), ('arm1', c.POINTER(ImportOptions))]
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--native-dir', required=True)
@@ -57,6 +65,7 @@ def main():
     create_ns = bind('rv_dom_document_create_element_ns', [pointer, c.c_char_p, c.c_char_p, pointer, out])
     get_body = bind('rv_dom_document_get_body', [pointer, out])
     append = bind('rv_dom_element_append', [pointer, c.POINTER(Sequence)])
+    import_node = bind('rv_dom_document_import_node', [pointer, pointer, c.POINTER(ImportUnion), out])
     get_hidden = bind('rv_dom_html_element_get_hidden', [pointer, c.POINTER(Hidden)])
     set_hidden = bind('rv_dom_html_element_set_hidden', [pointer, c.POINTER(Hidden)])
     clear_hidden = bind('rv_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release', [c.POINTER(Hidden)], None)
@@ -113,6 +122,29 @@ def main():
         mixed = Sequence(1, len(parts), c.cast(parts, pointer))
         ok(append(body, c.byref(mixed)))
         assert text('rv_dom_node_get_text_content', body) == 'tail'
+        shallow_options = ImportOptions(c.sizeof(ImportOptions), 1)
+        deep_options = ImportOptions(c.sizeof(ImportOptions), 0)
+        for options, expected_text in [
+            (None, ''), (ImportUnion(1, 1, 0, None), ''), (ImportUnion(1, 1, 1, None), 'tail'),
+            (ImportUnion(1, 2, 0, c.pointer(shallow_options)), ''),
+            (ImportUnion(1, 2, 0, c.pointer(deep_options)), 'tail'),
+        ]:
+            imported = pointer()
+            ok(import_node(document, body, c.byref(options) if options is not None else None, c.byref(imported)))
+            owned.append(imported)
+            assert imported.value != body.value, 'importNode must clone, not adopt the source object'
+            assert text('rv_dom_node_get_text_content', imported) == expected_text
+            imported_owner = pointer()
+            ok(bind('rv_dom_node_get_owner_document', [pointer, out])(imported, c.byref(imported_owner)))
+            assert imported_owner.value == document
+            release(imported_owner)
+            if expected_text:
+                child = pointer()
+                ok(bind('rv_dom_node_get_first_child', [pointer, out])(imported, c.byref(child)))
+                assert child.value != svg.value
+                assert text('rv_dom_element_get_namespace_uri', child) == 'http://www.w3.org/2000/svg'
+                release(child)
+        assert text('rv_dom_node_get_text_content', body) == 'tail', 'importNode must leave the source tree intact'
         invalid = (NodeOrString * 1)(NodeOrString(1, 99, None, None))
         invalid_sequence = Sequence(1, 1, c.cast(invalid, pointer))
         assert append(body, c.byref(invalid_sequence)) == -9
@@ -153,7 +185,7 @@ def main():
                 assert found.value == 1
         finally:
             release_classes(classes)
-        print('NATIVE_DOM_TYPES PASS: namespaces, second-document identity/lifetime, mixed append, union results, sequences, validation, owned release')
+        print('NATIVE_DOM_TYPES PASS: namespaces, second-document identity/lifetime, cross-document import, mixed append, union results, sequences, validation, owned release')
     finally:
         for handle in reversed(owned):
             release(handle)

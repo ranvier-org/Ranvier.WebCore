@@ -67,6 +67,7 @@
 #include "HTMLTemplateElement.h"
 #include "HTMLTextAreaElement.h"
 #include "HTMLUListElement.h"
+#include "ImportNodeOptions.h"
 #include "InputEvent.h"
 #include "KeyboardEvent.h"
 #include "LiveNodeList.h"
@@ -540,6 +541,42 @@ void clearRvDomUnionDOMStringOrElementCreationOptions(RvDomUnionDOMStringOrEleme
     switch (value->tag) {
     case 1:
         std::free(const_cast<char*>(value->arm0));
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+std::optional<Variant<bool, ImportNodeOptions>> decodeRvDomUnionBooleanOrImportNodeOptions(const RvDomUnionBooleanOrImportNodeOptions* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<bool, ImportNodeOptions> { Variant<bool, ImportNodeOptions> { WTF::InPlaceIndex<0>, static_cast<bool>(source->arm0) } };
+    }
+    case 2: {
+        ImportNodeOptions arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomImportNodeOptions, self_only) + sizeof(source->arm1->self_only))
+                    assignValue(arm1.selfOnly, !!source->arm1->self_only);
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<bool, ImportNodeOptions> { Variant<bool, ImportNodeOptions> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionBooleanOrImportNodeOptions(RvDomUnionBooleanOrImportNodeOptions* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
         break;
     case 2:
         break;
@@ -1115,6 +1152,11 @@ void ranvier_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value)
 void ranvier_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value)
 {
     if (isMainThread()) clearRvDomUnionDOMStringOrElementCreationOptions(value);
+}
+
+void ranvier_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value)
+{
+    if (isMainThread()) clearRvDomUnionBooleanOrImportNodeOptions(value);
 }
 
 void ranvier_dom_sequence_dom_string_release(RvDomSequenceDOMString* value)
@@ -2848,6 +2890,24 @@ int32_t ranvier_dom_document_create_comment(RvNode* target, const char* data, Rv
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { data };
     return deliver([&]() -> decltype(auto) { return impl->createComment(a0.string()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// Document.importNode(Node node, optional (boolean or ImportNodeOptions) options = false) -> Node; options defaults to false in IDL; *result is a new reference
+int32_t ranvier_dom_document_import_node(RvNode* target, RvNode* node, const RvDomUnionBooleanOrImportNodeOptions* options, RvNode** result)
+{
+    if (!target || !node || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<Node> a0 = nodeOf(node);
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionBooleanOrImportNodeOptions(options, status1);
+    if (!options) { a1 = Variant<bool, ImportNodeOptions> { WTF::InPlaceIndex<0>, false }; status1 = RV_OK; }
+    if (status1 != RV_OK) return status1;
+    return deliver([&]() -> decltype(auto) { return impl->importNode(HandleArg<Node> { a0.get() }, std::move(*a1)); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // Document.adoptNode(Node node) -> Node; *result is a new reference

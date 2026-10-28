@@ -4,8 +4,14 @@ module FullBrowserContracts
 open Ranvier.Dom
 open Fable.Core
 
-[<Emit("(globalThis.Element = class Element {}, globalThis.RadioNodeList = class RadioNodeList {}, Object.assign(new globalThis.Element(), {append(...nodes) {this.received = nodes;}, hidden: false}))")>]
+[<Emit("(globalThis.Element = class Element {}, globalThis.RadioNodeList = class RadioNodeList {}, Object.assign(new globalThis.Element(), {nodeType: 1, append(...nodes) {this.received = nodes;}, hidden: false}))")>]
 let private createElement (): obj = jsNative
+
+[<Import("runInNewContext", "node:vm")>]
+let private runOtherRealm (_: string): obj = jsNative
+
+[<Emit("$0 !== null && !($0 instanceof globalThis.Element)")>]
+let private isForeign (_: obj): bool = jsNative
 
 [<Emit("({ item: $0 })")>]
 let private createForm (_: obj): HTMLFormElement = jsNative
@@ -42,6 +48,16 @@ let main _ =
     match (createForm raw).namedItem "item" with
     | Some(RadioNodeListOrElement.Element returned) when identical (box returned) raw -> ()
     | _ -> failwith "An interface union result lost browser object identity"
+    for foreign in [| runOtherRealm "new class HTMLDivElement { constructor() { this.nodeType = 1; this.ownerDocument = {defaultView: globalThis}; } }";
+                     runOtherRealm "new class SVGSVGElement { constructor() { this.nodeType = 1; this.ownerDocument = {defaultView: null}; } }" |] do
+        if not (isForeign foreign) then failwith "Fixture did not create a separate realm"
+        match (createForm foreign).namedItem "item" with
+        | Some(RadioNodeListOrElement.Element returned) when identical (box returned) foreign -> ()
+        | _ -> failwith "A foreign-realm/detached element was rejected or lost identity"
+    let foreignList = runOtherRealm "new class RadioNodeList { get [Symbol.toStringTag]() { return 'RadioNodeList'; } }"
+    match (createForm foreignList).namedItem "item" with
+    | Some(RadioNodeListOrElement.RadioNodeList returned) when identical (box returned) foreignList -> ()
+    | _ -> failwith "A foreign-realm RadioNodeList was rejected or lost identity"
     let selection = createSelection ()
     let root = createRoot ()
     selection.getComposedRanges(shadowRoots = [| root |]) |> ignore

@@ -36,12 +36,10 @@ class InterfaceEmitter:
         self.dictionaries = {}
         self.callbacks = set()
         self.adapters = []
+        self.attribute_access = {}
         self.enums = set()
-        self.names = list(self.world.scope)
-        for name in list(self.names):
-            for ancestor in self.world.chain(name)[1:]:
-                if ancestor not in self.names:
-                    self.names.insert(0, ancestor)
+        self.sources = {self.world.public_name(name): name for name in self.world.contract_types}
+        self.names = list(self.sources)
 
     def type(self, value):
         value = self.world.resolve(value)
@@ -111,6 +109,16 @@ class InterfaceEmitter:
             params.append(('[<System.ParamArray>] ' if argument.variadic and not raw else '') + f'{name}: {ftype}')
         return ' * '.join(params) or 'unit'
 
+    def supporting_functions(self, owner, member):
+        source = self.sources.get(owner, owner)
+        key = self.world.member_key(member)
+        owners = [source]
+        if self.world.interfaces[source].mixin:
+            owners = [name for name in self.world.scope if source in self.world.contract_mixins(name)]
+        return [function for function in self.generator.functions
+                if function.interface in owners and function.member
+                and self.world.member_key(function.member) == key and not function.unused]
+
     def emit_member(self, owner, member):
         if member.kind not in ('attribute', 'operation'):
             return []
@@ -125,9 +133,8 @@ class InterfaceEmitter:
                     f'    abstract member {member.name}: eventType: string * listener: EventListenerObject * ?capture: bool -> unit']
         if not special_listener and self.generator.member_reason(owner, member):
             return []
-        if not special_listener and not any(function.interface == owner and function.member is member for function in self.generator.functions):
-            if not any(function.interface == owner and function.member and function.member.name == member.name and function.kind != 'stub' for function in self.generator.functions):
-                return []
+        if not special_listener and not self.supporting_functions(owner, member):
+            return []
         try:
             result = self.type(member.type)
             for argument in member.arguments:
@@ -137,13 +144,19 @@ class InterfaceEmitter:
         needs_adapter = self.complex(member)
         lines = ([''] if needs_adapter or anonymous_property else []) + [f'    /// <summary>{owner}.{member.name}.</summary>']
         if member.kind == 'attribute':
-            access = 'get' if member.readonly else 'get, set'
+            functions = self.supporting_functions(owner, member)
+            getter = any(function.kind == 'getter' for function in functions)
+            setter = any(function.kind == 'setter' for function in functions)
+            self.attribute_access[(owner, self.world.member_key(member))] = (getter, setter)
+            access = ', '.join(name for name, available in [('get', getter), ('set', setter)] if available)
             signature = f'    abstract member {identifier(member.name)}: {result} with {access}'
             if not needs_adapter:
                 return lines + [signature]
-            lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("$0.{member.name}")>]',
-                      f'    abstract member __ranvier_get_{member.name}: unit -> obj']
-            if not member.readonly:
+            lines += ['#if FABLE_COMPILER']
+            if getter:
+                lines += [f'    [<Fable.Core.Emit("$0.{member.name}")>]',
+                          f'    abstract member __ranvier_get_{member.name}: unit -> obj']
+            if setter:
                 lines += ['', f'    [<Fable.Core.Emit("$0.{member.name} = $1")>]',
                           f'    abstract member __ranvier_set_{member.name}: value: obj -> unit']
             lines += ['#else', signature, '#endif']
@@ -208,7 +221,8 @@ class InterfaceEmitter:
             if self.union(t):
                 result_interfaces.update(child.name for child in t.subtypes if child.name in self.names)
         for name in sorted(result_interfaces):
-            lines += [f'    [<Fable.Core.Emit("$0 instanceof globalThis.{name}")>]',
+            predicate = '$0 != null && $0.nodeType === 1' if name == 'Element' else f'Object.prototype.toString.call($0) === \'[object {name}]\''
+            lines += [f'    [<Fable.Core.Emit("{predicate}")>]',
                       f'    let private is{name} (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         for name, children in self.unions.items():
             lines += ['', f'    let private box{name} (value: {name}) : obj =', '        match value with']
@@ -231,17 +245,20 @@ class InterfaceEmitter:
                     continue
                 result = self.type(member.type)
                 if member.kind == 'attribute':
+                    getter, setter = self.attribute_access[(owner, self.world.member_key(member))]
                     union_name = label(self.world.resolve(member.type))
-                    lines += [f'        member this.{identifier(member.name)}', f'            with get (): {result} =',
-                              f'                let value = this.__ranvier_get_{member.name} ()']
-                    if self.world.resolve(member.type).nullable:
-                        lines += ['', '                if isNull value then', '                    None', '                else',
-                                  f'                    Some (unbox{union_name} value)']
-                    else:
-                        lines += [f'                unbox{union_name} value']
-                    if not member.readonly:
+                    lines += [f'        member this.{identifier(member.name)}']
+                    if getter:
+                        lines += [f'            with get (): {result} =',
+                                  f'                let value = this.__ranvier_get_{member.name} ()']
+                        if self.world.resolve(member.type).nullable:
+                            lines += ['', '                if isNull value then', '                    None', '                else',
+                                      f'                    Some (unbox{union_name} value)']
+                        else:
+                            lines += [f'                unbox{union_name} value']
+                    if setter:
                         boxed = f'value |> Option.map box{union_name} |> Option.defaultValue null' if self.world.resolve(member.type).nullable else f'box{union_name} value'
-                        lines += [f'            and set (value: {result}) =']
+                        lines += [f'            {"and" if getter else "with"} set (value: {result}) =']
                         if self.world.resolve(member.type).nullable:
                             lines += [f'                this.__ranvier_set_{member.name} (', '                    value',
                                       f'                    |> Option.map box{union_name}', '                    |> Option.defaultValue null', '                )']
@@ -291,8 +308,12 @@ class InterfaceEmitter:
         bodies = []
         for name in self.names:
             members = []
-            for member in self.world.members(name):
-                members += self.emit_member(name, member)
+            source = self.sources[name]
+            if source in self.world.scope or self.world.interfaces[source].mixin or source == 'EventTarget':
+                for member in self.world.members(source):
+                    if not self.world.interfaces[source].mixin and self.world.contract_owner(source, member) != name:
+                        continue
+                    members += self.emit_member(name, member)
             bodies.append((name, members))
         lines = ['// <auto-generated>', 'namespace Ranvier.Dom', '', 'open System', '',
                  '#if FABLE_COMPILER', 'type internal DomStringEnumAttribute = Fable.Core.StringEnumAttribute',
@@ -303,8 +324,10 @@ class InterfaceEmitter:
                  '    inherit Attribute()', '#endif', '']
         declarations = []
         for name, members in bodies:
-            base = self.world.interfaces[name].base
-            body = ([f'    inherit {base}'] if base in self.names else []) + members
+            source = self.sources[name]
+            base = self.world.public_name(self.world.interfaces[source].base)
+            mixins = [self.world.public_name(mixin) for mixin in self.world.contract_mixins(source)]
+            body = ([f'    inherit {base}'] if base in self.names else []) + [f'    inherit {mixin}' for mixin in mixins] + members
             declarations.append((name, '[<AllowNullLiteral>]', body or ['    interface end']))
         for name, children in self.unions.items():
             declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | {label(child)} of {self.type(child)}' for child in children]))
@@ -343,7 +366,11 @@ class InterfaceEmitter:
                 lines += [f'{prefix} [<DomStringEnum; RequireQualifiedAccess>] {name} =']
             else:
                 if index == 0:
-                    lines += [attrs, f'type {name} =']
+                    if body == ['    interface end'] or body == ['    class end']:
+                        lines += [attrs, f'type {name} = {body[0].strip()}']
+                        body = []
+                    else:
+                        lines += [attrs, f'type {name} =']
                 elif body == ['    interface end'] or body == ['    class end'] or attrs == '':
                     lines += [f'{prefix}{" " + attrs if attrs else ""} {name} = {body[0].strip()}']
                     body = []

@@ -43,6 +43,7 @@ typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceElement RvDomSequenceElement;
 typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
+typedef struct RvDomUnionBooleanOrImportNodeOptions RvDomUnionBooleanOrImportNodeOptions;
 typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
 typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
 typedef struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable;
@@ -173,6 +174,13 @@ typedef struct RvDomElementCreationOptions {
     uint32_t size;
 } RvDomElementCreationOptions;
 
+/* The IDL dictionary ImportNodeOptions. size is sizeof(RvDomImportNodeOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomImportNodeOptions {
+    uint32_t size;
+    int32_t self_only; /* boolean, default false */
+} RvDomImportNodeOptions;
+
 /* The IDL dictionary AriaNotifyOptions. size is sizeof(RvDomAriaNotifyOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomAriaNotifyOptions {
@@ -263,6 +271,7 @@ typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceElement RvDomSequenceElement;
 typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
+typedef struct RvDomUnionBooleanOrImportNodeOptions RvDomUnionBooleanOrImportNodeOptions;
 typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
 typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
 typedef struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable;
@@ -325,6 +334,19 @@ struct RvDomUnionDOMStringOrElementCreationOptions {
     int32_t tag;
     const char* arm0;
     const RvDomElementCreationOptions* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_BOOLEAN_OR_IMPORT_NODE_OPTIONS_BOOL = 1,
+    RV_DOM_UNION_BOOLEAN_OR_IMPORT_NODE_OPTIONS_IMPORT_NODE_OPTIONS = 2,
+};
+struct RvDomUnionBooleanOrImportNodeOptions {
+    int32_t present;
+    int32_t tag;
+    int32_t arm0;
+    const RvDomImportNodeOptions* arm1;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -477,6 +499,7 @@ RV_EXPORT void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOM
 RV_EXPORT void rv_dom_sequence_element_release(RvDomSequenceElement* value);
 RV_EXPORT void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value);
 RV_EXPORT void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value);
+RV_EXPORT void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value);
 RV_EXPORT void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString* value);
 RV_EXPORT void rv_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value);
 RV_EXPORT void rv_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value);
@@ -789,6 +812,9 @@ RV_EXPORT int32_t rv_dom_document_create_document_fragment(RvNode* target, RvNod
 RV_EXPORT int32_t rv_dom_document_create_text_node(RvNode* target, const char* data, RvNode** result);
 /* Document.createComment(DOMString data) -> Comment; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_create_comment(RvNode* target, const char* data, RvNode** result);
+/* Document.importNode(Node node, optional (boolean or ImportNodeOptions) options = false) -> Node; options defaults
+ * to false in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_import_node(RvNode* target, RvNode* node, const RvDomUnionBooleanOrImportNodeOptions* options, RvNode** result);
 /* Document.adoptNode(Node node) -> Node; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_adopt_node(RvNode* target, RvNode* node, RvNode** result);
 /* Document.createAttribute(DOMString localName) -> Attr; *result is a new reference */

@@ -190,6 +190,59 @@ class World:
         missing = [name for name in self.scope if name not in self.interfaces]
         if missing:
             raise SystemExit(f"gen/dom.json names interfaces the IDL files do not define: {missing}")
+        self.contract_config = config.get("contract", {})
+        self.contract_aliases = self.contract_config.get("aliases", {}) | self.contract_config.get("mixins", {})
+        self.contract_types = list(self.scope)
+        self.tag_interfaces = []
+        for key, namespace, namespace_uri in [("htmlTags", "HTML", "http://www.w3.org/1999/xhtml"),
+                                              ("svgTags", "SVG", "http://www.w3.org/2000/svg")]:
+            catalogue = self.contract_config.get(key)
+            if not catalogue:
+                continue
+            for raw in (self.webcore / catalogue).read_text(encoding="utf-8").splitlines():
+                raw = raw.split("#", 1)[0].strip()
+                if not raw or "=" in raw.split()[0]:
+                    continue
+                tag, _, options = raw.partition(" ")
+                properties = dict(re.findall(r"(\w+)\s*=\s*([^,\s]+)", options))
+                # Match make_names.pl's SVG FE capitalization before its ucfirst conversion.
+                capitalized = "FE" + tag[2:3].upper() + tag[3:] if namespace == "SVG" and tag.startswith("fe") else tag[:1].upper() + tag[1:]
+                implementation = properties.get("interfaceName", namespace + capitalized + "Element")
+                public = properties.get("JSInterfaceName", implementation)
+                if public not in self.interfaces:
+                    raise SystemExit(f"{catalogue}: {tag} names missing IDL interface {public}")
+                self.tag_interfaces.append({"tag": tag, "namespaceURI": namespace_uri,
+                                            "interface": public, "implementationInterface": implementation})
+                if public not in self.contract_types:
+                    self.contract_types.append(public)
+        for name in self.contract_config.get("interfaces", []) + list(self.contract_aliases):
+            if name not in self.interfaces:
+                raise SystemExit(f"contract interface {name} has no WebKit IDL definition")
+            if name not in self.contract_types:
+                self.contract_types.append(name)
+        for name in list(self.contract_types):
+            for ancestor in self.chain(name)[1:]:
+                if ancestor not in self.contract_types:
+                    self.contract_types.insert(0, ancestor)
+
+    def public_name(self, name):
+        return self.contract_aliases.get(name, name)
+
+    def contract_mixins(self, name):
+        return [mixin for mixin, _, file in self.includes.get(name, [])
+                if mixin in self.contract_config.get("mixins", {}) and not self.skipped(file)]
+
+    @staticmethod
+    def member_key(member):
+        return (member.kind, member.name, str(member.type), member.special,
+                tuple((str(arg.type), arg.optional, arg.variadic) for arg in member.arguments))
+
+    def contract_owner(self, interface, member):
+        key = self.member_key(member)
+        for mixin in self.contract_mixins(interface):
+            if any(self.member_key(candidate) == key for candidate in self.members(mixin)):
+                return self.public_name(mixin)
+        return self.public_name(interface)
 
     def skipped(self, file):
         return any(file.startswith(prefix) for prefix in self.skip)
@@ -1048,6 +1101,7 @@ class Generator(ComplexGeneratorMixin):
                 continue
             functions.append({
                 "interface": function.interface, "member": function.member.name,
+                "contractOwner": self.world.contract_owner(function.interface, function.member),
                 "kind": function.kind, "function": "rv_dom_" + function.name,
                 "conditional": function.conditional,
                 "parameters": [{"ctype": ctype, "name": name} for ctype, name in function.params],
@@ -1059,6 +1113,14 @@ class Generator(ComplexGeneratorMixin):
             "schemaVersion": 1,
             "interfaces": [{"name": name, "base": self.world.interfaces[name].base}
                            for name in self.world.scope],
+            "contractInterfaces": [{"name": self.world.public_name(name), "idlName": name,
+                                    "base": self.world.public_name(self.world.interfaces[name].base),
+                                    "mixins": [self.world.public_name(mixin) for mixin in self.world.contract_mixins(name)],
+                                    "mixin": self.world.interfaces[name].mixin,
+                                    "contractOnly": name not in self.world.scope,
+                                    "source": self.world.interfaces[name].file}
+                                   for name in self.world.contract_types],
+            "tagInterfaces": self.world.tag_interfaces,
             "functions": functions,
             "enumerations": self.enums_used,
             "containers": [{"mapping": self.describe_mapping(mapped),
@@ -1357,6 +1419,26 @@ class Generator(ComplexGeneratorMixin):
         lines += ["", "Left out:"]
         for label, reason in sorted(self.excluded + [(name, "excluded dictionary field by gen/dom.json") for name in self.world.dictionary_exclusions]):
             lines.append(f"  {label}: {reason}")
+        lines += ["", "Contract-only interfaces (own members have no native exports):"]
+        for name in self.world.contract_types:
+            if name in self.world.scope or self.world.interfaces[name].mixin or name == "EventTarget":
+                continue
+            lines.append(f"  {self.world.public_name(name)}: {self.world.interfaces[name].file}")
+            for member in self.world.interfaces[name].members:
+                label = member.name or member.special or member.kind
+                lines.append(f"    {name}.{label}: contract-only interface; member omitted")
+        lines += ["", "Contract mixins (only members mapped by scoped concrete interfaces are declared):"]
+        for name in self.world.contract_types:
+            if not self.world.interfaces[name].mixin:
+                continue
+            public = self.world.public_name(name)
+            mapped = {self.world.member_key(function.member) for function in self.functions
+                      if function.member and self.world.contract_owner(function.interface, function.member) == public}
+            lines.append(f"  {public}: {self.world.interfaces[name].file}")
+            for member in self.world.members(name):
+                if self.world.member_key(member) not in mapped:
+                    label = member.name or member.special or member.kind
+                    lines.append(f"    {public}.{label}: no scoped concrete native export; member omitted")
         del interfaces
         return "\n".join(lines) + "\n"
 

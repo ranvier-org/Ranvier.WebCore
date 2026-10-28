@@ -206,6 +206,12 @@ type RvDomGetHTMLOptions =
 type RvDomElementCreationOptions =
     val mutable size: uint32
 
+/// <summary>The IDL dictionary ImportNodeOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomImportNodeOptions =
+    val mutable size: uint32
+    val mutable self_only: int
+
 /// <summary>The IDL dictionary AriaNotifyOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomAriaNotifyOptions =
@@ -328,6 +334,20 @@ type RvDomUnionDOMStringOrElementCreationOptions =
     val mutable present: int
     val mutable tag: int
     val mutable arm0: nativeint
+    val mutable arm1: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_BOOLEAN_OR_IMPORT_NODE_OPTIONS_BOOL = 1
+
+[<Literal>]
+let RV_DOM_UNION_BOOLEAN_OR_IMPORT_NODE_OPTIONS_IMPORT_NODE_OPTIONS = 2
+
+/// <summary>ABI transport for BooleanOrImportNodeOptions; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionBooleanOrImportNodeOptions =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: int
     val mutable arm1: nativeint
 
 /// <summary>ABI transport for DOMString sequence; result contents are owned until the matching release call.</summary>
@@ -495,6 +515,9 @@ extern void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString& value)
@@ -936,6 +959,9 @@ extern int rv_dom_document_create_text_node(nativeint target, [<MarshalAs(Unmana
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_create_comment(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_import_node(nativeint target, nativeint node, [<In>] RvDomUnionBooleanOrImportNodeOptions[] options, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_adopt_node(nativeint target, nativeint node, nativeint& result)

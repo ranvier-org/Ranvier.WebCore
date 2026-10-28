@@ -21,6 +21,7 @@ callback EventListener = undefined(Event event);
 interface Event { readonly attribute DOMString type; };
 interface Node : EventTarget {
     [CustomGetter] readonly attribute unsigned short nodeType;
+    [CustomGetter] attribute DOMString writeOnly;
     boolean checkOptions(optional ProbeOptions options = {});
     readonly attribute Mode mode;
     attribute (boolean or DOMString) state;
@@ -30,10 +31,22 @@ interface Node : EventTarget {
     undefined take(sequence<Node> nodes);
 };
 dictionary ElementCreationOptions { DOMString is; };
+interface mixin AriaAttributes { attribute DOMString ariaLabel; };
+interface mixin ParentNode { undefined replaceChildren((Node or DOMString)... nodes); };
 interface Element : Node { attribute DOMString id; };
+Element includes AriaAttributes;
+Element includes ParentNode;
+interface HTMLElement : Element {};
+interface HTMLMediaElement : HTMLElement { undefined play(); };
+interface HTMLAudioElement : HTMLMediaElement {};
+interface HTMLHeadingElement : HTMLElement {};
+interface SVGElement : Element {};
+interface SVGSVGElement : SVGElement {};
+dictionary ImportNodeOptions { boolean selfOnly = false; Outside customElementRegistry; };
 interface Document : Node {
     readonly attribute DOMImplementation implementation;
     Element createElementNS(DOMString? namespaceURI, DOMString name, optional (DOMString or ElementCreationOptions) options = {});
+    Node importNode(Node node, optional (boolean or ImportNodeOptions) options = false);
 };
 interface HTMLDocument : Document {};
 interface DOMImplementation { HTMLDocument createHTMLDocument(optional DOMString title); };
@@ -49,8 +62,13 @@ class GeneratorTests(unittest.TestCase):
         directory = self.source / 'Source/WebCore/dom'
         directory.mkdir(parents=True)
         (directory / 'Fixture.idl').write_text(IDL)
+        tags = self.source / 'Source/WebCore/html/HTMLTagNames.in'
+        tags.parent.mkdir()
+        tags.write_text('audio\nh1 interfaceName=HTMLHeadingElement\narticle interfaceName=HTMLArticleElement, JSInterfaceName=HTMLElement\n')
         config = dict(interfaces=['Node', 'Element', 'Document', 'HTMLDocument', 'DOMImplementation', 'Event', 'DOMStringMap'],
-                      skipDirectories=[], exclude=[], atomArguments=[], customGetters=['Node.nodeType'])
+                      skipDirectories=[], exclude=['ImportNodeOptions.customElementRegistry'], atomArguments=[], customGetters=['Node.nodeType'],
+                      contract=dict(htmlTags='html/HTMLTagNames.in', interfaces=['SVGElement', 'SVGSVGElement'],
+                                    mixins={'AriaAttributes': 'ARIAMixin', 'ParentNode': 'ParentNode'}))
         self.world = domgen.World(self.source, config)
         self.generator = domgen.Generator(self.world)
         self.generator.lock = {}
@@ -102,6 +120,9 @@ class GeneratorTests(unittest.TestCase):
     def test_explicit_custom_getter_override_maps_node_type_only(self):
         self.assertIn('node_get_node_type', {function.name for function in self.generator.functions})
 
+    def test_interface_accessors_match_the_native_accessor_subset(self):
+        self.assertIn('abstract member writeOnly: string with set', self.generator.interfaces())
+
     def test_transport_model_describes_variadic_union_and_dictionary_fields(self):
         model = json.loads(self.generator.api_model())
         append = next(function for function in model['functions'] if function['function'] == 'rv_dom_node_append')
@@ -111,6 +132,29 @@ class GeneratorTests(unittest.TestCase):
         self.assertEqual(argument['mapping']['subtypes'][0]['kind'], 'union')
         self.assertEqual([arm['kind'] for arm in argument['mapping']['subtypes'][0]['subtypes']], ['node', 'string'])
         self.assertEqual(model['schemaVersion'], 1)
+
+    def test_contract_markers_and_mixins_do_not_expand_native_exports(self):
+        source = self.generator.interfaces()
+        self.assertIn('HTMLAudioElement =', source)
+        self.assertIn('inherit HTMLMediaElement', source)
+        self.assertIn('SVGSVGElement =', source)
+        self.assertIn('inherit SVGElement', source)
+        self.assertIn('ARIAMixin =', source)
+        self.assertIn('inherit ARIAMixin', source)
+        self.assertIn('inherit ParentNode', source)
+        self.assertNotIn('abstract member play:', source)
+        self.assertNotIn('HTMLArticleElement', source)
+        self.assertFalse(any(function.interface == 'HTMLMediaElement' for function in self.generator.functions))
+        model = json.loads(self.generator.api_model())
+        self.assertEqual(next(tag for tag in model['tagInterfaces'] if tag['tag'] == 'article')['interface'], 'HTMLElement')
+        self.assertIn('HTMLMediaElement.play', self.generator.report())
+
+    def test_import_node_maps_both_boolean_and_dictionary_options(self):
+        functions = {function.name for function in self.generator.functions}
+        self.assertIn('document_import_node', functions)
+        source = self.generator.interfaces()
+        self.assertIn('importNode: node: Node * options: bool -> Node', source)
+        self.assertIn('importNode: node: Node * options: ImportNodeOptions -> Node', source)
 
 
 if __name__ == '__main__':

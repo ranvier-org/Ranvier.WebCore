@@ -16,9 +16,47 @@ type internal DomDictionaryAttribute() =
     inherit Attribute()
 #endif
 
-/// <summary>EventTarget in the scoped DOM interface model.</summary>
+/// <summary>StylePropertyMapReadOnly in the scoped DOM interface model.</summary>
 [<AllowNullLiteral>]
-type EventTarget =
+type StylePropertyMapReadOnly = interface end
+
+/// <summary>StyleSheet in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] StyleSheet = interface end
+
+/// <summary>SVGTextContentElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTextContentElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGTextPositioningElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTextPositioningElement =
+    inherit SVGTextContentElement
+
+/// <summary>SVGGradientElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGGradientElement =
+    inherit SVGElement
+
+/// <summary>SVGComponentTransferFunctionElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGComponentTransferFunctionElement =
+    inherit SVGElement
+
+/// <summary>SVGGeometryElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGGeometryElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGAnimationElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimationElement =
+    inherit SVGElement
+
+/// <summary>SVGGraphicsElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGGraphicsElement =
+    inherit SVGElement
+
+/// <summary>HTMLMediaElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLMediaElement =
+    inherit HTMLElement
+
+/// <summary>EventTarget in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] EventTarget =
     /// <summary>EventTarget.addEventListener registers or removes an event callback.</summary>
     abstract member addEventListener: eventType: string * listener: EventListener * ?capture: bool -> unit
     abstract member addEventListener: eventType: string * listener: EventListenerObject * ?capture: bool -> unit
@@ -93,6 +131,8 @@ and [<AllowNullLiteral>] Node =
 /// <summary>CharacterData in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CharacterData =
     inherit Node
+    inherit ChildNode
+    inherit NonDocumentTypeChildNode
     /// <summary>CharacterData.data.</summary>
     abstract member data: string with get, set
     /// <summary>CharacterData.length.</summary>
@@ -108,45 +148,14 @@ and [<AllowNullLiteral>] CharacterData =
     /// <summary>CharacterData.replaceData.</summary>
     abstract member replaceData: offset: uint32 * count: uint32 * data: string -> unit
 
-    /// <summary>CharacterData.before.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.before(...$1)")>]
-    abstract member __ranvier_before: nodes: obj array -> unit
-#else
-    abstract member before: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>CharacterData.after.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.after(...$1)")>]
-    abstract member __ranvier_after: nodes: obj array -> unit
-#else
-    abstract member after: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>CharacterData.replaceWith.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.replaceWith(...$1)")>]
-    abstract member __ranvier_replaceWith: nodes: obj array -> unit
-#else
-    abstract member replaceWith: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-    /// <summary>CharacterData.remove.</summary>
-    abstract member remove: unit -> unit
-    /// <summary>CharacterData.previousElementSibling.</summary>
-    abstract member previousElementSibling: Element with get
-    /// <summary>CharacterData.nextElementSibling.</summary>
-    abstract member nextElementSibling: Element with get
-
 /// <summary>Text in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] Text =
     inherit CharacterData
+    inherit Slottable
     /// <summary>Text.splitText.</summary>
     abstract member splitText: offset: uint32 -> Text
     /// <summary>Text.wholeText.</summary>
     abstract member wholeText: string with get
-    /// <summary>Text.assignedSlot.</summary>
-    abstract member assignedSlot: HTMLSlotElement with get
 
 /// <summary>Comment in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] Comment =
@@ -155,44 +164,7 @@ and [<AllowNullLiteral>] Comment =
 /// <summary>DocumentFragment in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DocumentFragment =
     inherit Node
-    /// <summary>DocumentFragment.children.</summary>
-    abstract member children: HTMLCollection with get
-    /// <summary>DocumentFragment.firstElementChild.</summary>
-    abstract member firstElementChild: Element with get
-    /// <summary>DocumentFragment.lastElementChild.</summary>
-    abstract member lastElementChild: Element with get
-    /// <summary>DocumentFragment.childElementCount.</summary>
-    abstract member childElementCount: uint32 with get
-
-    /// <summary>DocumentFragment.prepend.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.prepend(...$1)")>]
-    abstract member __ranvier_prepend: nodes: obj array -> unit
-#else
-    abstract member prepend: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>DocumentFragment.append.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.append(...$1)")>]
-    abstract member __ranvier_append: nodes: obj array -> unit
-#else
-    abstract member append: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>DocumentFragment.replaceChildren.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.replaceChildren(...$1)")>]
-    abstract member __ranvier_replaceChildren: nodes: obj array -> unit
-#else
-    abstract member replaceChildren: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-    /// <summary>DocumentFragment.moveBefore.</summary>
-    abstract member moveBefore: node: Node * child: Node -> unit
-    /// <summary>DocumentFragment.querySelector.</summary>
-    abstract member querySelector: selectors: string -> Element
-    /// <summary>DocumentFragment.querySelectorAll.</summary>
-    abstract member querySelectorAll: selectors: string -> NodeList
+    inherit ParentNode
     /// <summary>DocumentFragment.getElementById.</summary>
     abstract member getElementById: elementId: string -> Element
 
@@ -233,6 +205,8 @@ and [<AllowNullLiteral>] ShadowRoot =
 /// <summary>Document in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] Document =
     inherit Node
+    inherit ParentNode
+    inherit GlobalEventHandlers
     /// <summary>Document.implementation.</summary>
     abstract member implementation: DOMImplementation with get
     /// <summary>Document.compatMode.</summary>
@@ -275,6 +249,16 @@ and [<AllowNullLiteral>] Document =
     abstract member createTextNode: data: string -> Text
     /// <summary>Document.createComment.</summary>
     abstract member createComment: data: string -> Comment
+
+    /// <summary>Document.importNode.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.importNode($1, $2)")>]
+    abstract member __ranvier_importNode: node: Node * ?options: obj -> Node
+#else
+    abstract member importNode: node: Node -> Node
+    abstract member importNode: node: Node * options: bool -> Node
+    abstract member importNode: node: Node * options: ImportNodeOptions -> Node
+#endif
     /// <summary>Document.adoptNode.</summary>
     abstract member adoptNode: node: Node -> Node
     /// <summary>Document.createAttribute.</summary>
@@ -337,44 +321,6 @@ and [<AllowNullLiteral>] Document =
     abstract member visibilityState: VisibilityState with get
     /// <summary>Document.getSelection.</summary>
     abstract member getSelection: unit -> DOMSelection
-    /// <summary>Document.children.</summary>
-    abstract member children: HTMLCollection with get
-    /// <summary>Document.firstElementChild.</summary>
-    abstract member firstElementChild: Element with get
-    /// <summary>Document.lastElementChild.</summary>
-    abstract member lastElementChild: Element with get
-    /// <summary>Document.childElementCount.</summary>
-    abstract member childElementCount: uint32 with get
-
-    /// <summary>Document.prepend.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.prepend(...$1)")>]
-    abstract member __ranvier_prepend: nodes: obj array -> unit
-#else
-    abstract member prepend: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>Document.append.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.append(...$1)")>]
-    abstract member __ranvier_append: nodes: obj array -> unit
-#else
-    abstract member append: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>Document.replaceChildren.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.replaceChildren(...$1)")>]
-    abstract member __ranvier_replaceChildren: nodes: obj array -> unit
-#else
-    abstract member replaceChildren: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-    /// <summary>Document.moveBefore.</summary>
-    abstract member moveBefore: node: Node * child: Node -> unit
-    /// <summary>Document.querySelector.</summary>
-    abstract member querySelector: selectors: string -> Element
-    /// <summary>Document.querySelectorAll.</summary>
-    abstract member querySelectorAll: selectors: string -> NodeList
     /// <summary>Document.getElementById.</summary>
     abstract member getElementById: elementId: string -> Element
     /// <summary>Document.activeElement.</summary>
@@ -398,6 +344,11 @@ and [<AllowNullLiteral>] DOMImplementation =
 /// <summary>Element in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] Element =
     inherit Node
+    inherit ARIAMixin
+    inherit ChildNode
+    inherit NonDocumentTypeChildNode
+    inherit ParentNode
+    inherit Slottable
     /// <summary>Element.namespaceURI.</summary>
     abstract member namespaceURI: string with get
     /// <summary>Element.prefix.</summary>
@@ -528,164 +479,6 @@ and [<AllowNullLiteral>] Element =
     abstract member hasPointerCapture: pointerId: int -> bool
     /// <summary>Element.role.</summary>
     abstract member role: string with get, set
-    /// <summary>Element.ariaActiveDescendantElement.</summary>
-    abstract member ariaActiveDescendantElement: Element with get, set
-    /// <summary>Element.ariaAtomic.</summary>
-    abstract member ariaAtomic: string with get, set
-    /// <summary>Element.ariaAutoComplete.</summary>
-    abstract member ariaAutoComplete: string with get, set
-    /// <summary>Element.ariaBrailleLabel.</summary>
-    abstract member ariaBrailleLabel: string with get, set
-    /// <summary>Element.ariaBrailleRoleDescription.</summary>
-    abstract member ariaBrailleRoleDescription: string with get, set
-    /// <summary>Element.ariaBusy.</summary>
-    abstract member ariaBusy: string with get, set
-    /// <summary>Element.ariaChecked.</summary>
-    abstract member ariaChecked: string with get, set
-    /// <summary>Element.ariaColCount.</summary>
-    abstract member ariaColCount: string with get, set
-    /// <summary>Element.ariaColIndex.</summary>
-    abstract member ariaColIndex: string with get, set
-    /// <summary>Element.ariaColIndexText.</summary>
-    abstract member ariaColIndexText: string with get, set
-    /// <summary>Element.ariaColSpan.</summary>
-    abstract member ariaColSpan: string with get, set
-    /// <summary>Element.ariaCurrent.</summary>
-    abstract member ariaCurrent: string with get, set
-    /// <summary>Element.ariaDescription.</summary>
-    abstract member ariaDescription: string with get, set
-    /// <summary>Element.ariaDisabled.</summary>
-    abstract member ariaDisabled: string with get, set
-    /// <summary>Element.ariaExpanded.</summary>
-    abstract member ariaExpanded: string with get, set
-    /// <summary>Element.ariaHasPopup.</summary>
-    abstract member ariaHasPopup: string with get, set
-    /// <summary>Element.ariaHidden.</summary>
-    abstract member ariaHidden: string with get, set
-    /// <summary>Element.ariaInvalid.</summary>
-    abstract member ariaInvalid: string with get, set
-    /// <summary>Element.ariaKeyShortcuts.</summary>
-    abstract member ariaKeyShortcuts: string with get, set
-    /// <summary>Element.ariaLabel.</summary>
-    abstract member ariaLabel: string with get, set
-    /// <summary>Element.ariaLevel.</summary>
-    abstract member ariaLevel: string with get, set
-    /// <summary>Element.ariaLive.</summary>
-    abstract member ariaLive: string with get, set
-    /// <summary>Element.ariaModal.</summary>
-    abstract member ariaModal: string with get, set
-    /// <summary>Element.ariaMultiLine.</summary>
-    abstract member ariaMultiLine: string with get, set
-    /// <summary>Element.ariaMultiSelectable.</summary>
-    abstract member ariaMultiSelectable: string with get, set
-    /// <summary>Element.ariaOrientation.</summary>
-    abstract member ariaOrientation: string with get, set
-    /// <summary>Element.ariaPlaceholder.</summary>
-    abstract member ariaPlaceholder: string with get, set
-    /// <summary>Element.ariaPosInSet.</summary>
-    abstract member ariaPosInSet: string with get, set
-    /// <summary>Element.ariaPressed.</summary>
-    abstract member ariaPressed: string with get, set
-    /// <summary>Element.ariaReadOnly.</summary>
-    abstract member ariaReadOnly: string with get, set
-    /// <summary>Element.ariaRelevant.</summary>
-    abstract member ariaRelevant: string with get, set
-    /// <summary>Element.ariaRequired.</summary>
-    abstract member ariaRequired: string with get, set
-    /// <summary>Element.ariaRoleDescription.</summary>
-    abstract member ariaRoleDescription: string with get, set
-    /// <summary>Element.ariaRowCount.</summary>
-    abstract member ariaRowCount: string with get, set
-    /// <summary>Element.ariaRowIndex.</summary>
-    abstract member ariaRowIndex: string with get, set
-    /// <summary>Element.ariaRowIndexText.</summary>
-    abstract member ariaRowIndexText: string with get, set
-    /// <summary>Element.ariaRowSpan.</summary>
-    abstract member ariaRowSpan: string with get, set
-    /// <summary>Element.ariaSelected.</summary>
-    abstract member ariaSelected: string with get, set
-    /// <summary>Element.ariaSetSize.</summary>
-    abstract member ariaSetSize: string with get, set
-    /// <summary>Element.ariaSort.</summary>
-    abstract member ariaSort: string with get, set
-    /// <summary>Element.ariaValueMax.</summary>
-    abstract member ariaValueMax: string with get, set
-    /// <summary>Element.ariaValueMin.</summary>
-    abstract member ariaValueMin: string with get, set
-    /// <summary>Element.ariaValueNow.</summary>
-    abstract member ariaValueNow: string with get, set
-    /// <summary>Element.ariaValueText.</summary>
-    abstract member ariaValueText: string with get, set
-
-    /// <summary>Element.before.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.before(...$1)")>]
-    abstract member __ranvier_before: nodes: obj array -> unit
-#else
-    abstract member before: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>Element.after.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.after(...$1)")>]
-    abstract member __ranvier_after: nodes: obj array -> unit
-#else
-    abstract member after: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>Element.replaceWith.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.replaceWith(...$1)")>]
-    abstract member __ranvier_replaceWith: nodes: obj array -> unit
-#else
-    abstract member replaceWith: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-    /// <summary>Element.remove.</summary>
-    abstract member remove: unit -> unit
-    /// <summary>Element.previousElementSibling.</summary>
-    abstract member previousElementSibling: Element with get
-    /// <summary>Element.nextElementSibling.</summary>
-    abstract member nextElementSibling: Element with get
-    /// <summary>Element.children.</summary>
-    abstract member children: HTMLCollection with get
-    /// <summary>Element.firstElementChild.</summary>
-    abstract member firstElementChild: Element with get
-    /// <summary>Element.lastElementChild.</summary>
-    abstract member lastElementChild: Element with get
-    /// <summary>Element.childElementCount.</summary>
-    abstract member childElementCount: uint32 with get
-
-    /// <summary>Element.prepend.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.prepend(...$1)")>]
-    abstract member __ranvier_prepend: nodes: obj array -> unit
-#else
-    abstract member prepend: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>Element.append.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.append(...$1)")>]
-    abstract member __ranvier_append: nodes: obj array -> unit
-#else
-    abstract member append: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-
-    /// <summary>Element.replaceChildren.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.replaceChildren(...$1)")>]
-    abstract member __ranvier_replaceChildren: nodes: obj array -> unit
-#else
-    abstract member replaceChildren: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
-#endif
-    /// <summary>Element.moveBefore.</summary>
-    abstract member moveBefore: node: Node * child: Node -> unit
-    /// <summary>Element.querySelector.</summary>
-    abstract member querySelector: selectors: string -> Element
-    /// <summary>Element.querySelectorAll.</summary>
-    abstract member querySelectorAll: selectors: string -> NodeList
-    /// <summary>Element.assignedSlot.</summary>
-    abstract member assignedSlot: HTMLSlotElement with get
     /// <summary>Element.setHTMLUnsafe.</summary>
     abstract member setHTMLUnsafe: html: string -> unit
     /// <summary>Element.getHTML.</summary>
@@ -733,6 +526,10 @@ and [<AllowNullLiteral>] NamedNodeMap =
 /// <summary>HTMLElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLElement =
     inherit Element
+    inherit GlobalEventHandlers
+    inherit ElementContentEditable
+    inherit HTMLOrSVGElement
+    inherit ElementCSSInlineStyle
     /// <summary>HTMLElement.title.</summary>
     abstract member title: string with get, set
     /// <summary>HTMLElement.lang.</summary>
@@ -808,30 +605,11 @@ and [<AllowNullLiteral>] HTMLElement =
     abstract member offsetWidth: int with get
     /// <summary>HTMLElement.offsetHeight.</summary>
     abstract member offsetHeight: int with get
-    /// <summary>HTMLElement.contentEditable.</summary>
-    abstract member contentEditable: string with get, set
-    /// <summary>HTMLElement.enterKeyHint.</summary>
-    abstract member enterKeyHint: string with get, set
-    /// <summary>HTMLElement.isContentEditable.</summary>
-    abstract member isContentEditable: bool with get
-    /// <summary>HTMLElement.inputMode.</summary>
-    abstract member inputMode: string with get, set
-    /// <summary>HTMLElement.dataset.</summary>
-    abstract member dataset: DOMStringMap with get
-    /// <summary>HTMLElement.nonce.</summary>
-    abstract member nonce: string with get, set
-    /// <summary>HTMLElement.autofocus.</summary>
-    abstract member autofocus: bool with get, set
-    /// <summary>HTMLElement.tabIndex.</summary>
-    abstract member tabIndex: int with get, set
-    /// <summary>HTMLElement.focus.</summary>
-    abstract member focus: ?options: FocusOptions -> unit
-    /// <summary>HTMLElement.blur.</summary>
-    abstract member blur: unit -> unit
 
 /// <summary>HTMLAnchorElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLAnchorElement =
     inherit HTMLElement
+    inherit HTMLHyperlinkElementUtils
     /// <summary>HTMLAnchorElement.charset.</summary>
     abstract member charset: string with get, set
     /// <summary>HTMLAnchorElement.coords.</summary>
@@ -876,10 +654,6 @@ and [<AllowNullLiteral>] HTMLAnchorElement =
     abstract member search: string with get, set
     /// <summary>HTMLAnchorElement.hash.</summary>
     abstract member hash: string with get, set
-    /// <summary>HTMLAnchorElement.href.</summary>
-    abstract member href: string with get, set
-    /// <summary>HTMLAnchorElement.target.</summary>
-    abstract member target: string with get, set
 
 /// <summary>HTMLBodyElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLBodyElement =
@@ -900,6 +674,7 @@ and [<AllowNullLiteral>] HTMLBodyElement =
 /// <summary>HTMLButtonElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLButtonElement =
     inherit HTMLElement
+    inherit PopoverTargetAttributes
     /// <summary>HTMLButtonElement.disabled.</summary>
     abstract member disabled: bool with get, set
     /// <summary>HTMLButtonElement.form.</summary>
@@ -938,10 +713,6 @@ and [<AllowNullLiteral>] HTMLButtonElement =
     abstract member setCustomValidity: error: string -> unit
     /// <summary>HTMLButtonElement.labels.</summary>
     abstract member labels: NodeList with get
-    /// <summary>HTMLButtonElement.popoverTargetElement.</summary>
-    abstract member popoverTargetElement: Element with get, set
-    /// <summary>HTMLButtonElement.popoverTargetAction.</summary>
-    abstract member popoverTargetAction: string with get, set
 
 /// <summary>HTMLDetailsElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLDetailsElement =
@@ -1026,6 +797,8 @@ and [<AllowNullLiteral>] HTMLFormElement =
     abstract member rel: string with get, set
     /// <summary>HTMLFormElement.relList.</summary>
     abstract member relList: DOMTokenList with get
+    /// <summary>HTMLFormElement.elements.</summary>
+    abstract member elements: HTMLFormControlsCollection with get
     /// <summary>HTMLFormElement.length.</summary>
     abstract member length: uint32 with get
 
@@ -1118,6 +891,7 @@ and [<AllowNullLiteral>] HTMLImageElement =
 /// <summary>HTMLInputElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLInputElement =
     inherit HTMLElement
+    inherit PopoverTargetAttributes
     /// <summary>HTMLInputElement.accept.</summary>
     abstract member accept: string with get, set
     /// <summary>HTMLInputElement.alpha.</summary>
@@ -1230,10 +1004,6 @@ and [<AllowNullLiteral>] HTMLInputElement =
     abstract member useMap: string with get, set
     /// <summary>HTMLInputElement.capture.</summary>
     abstract member capture: string with get, set
-    /// <summary>HTMLInputElement.popoverTargetElement.</summary>
-    abstract member popoverTargetElement: Element with get, set
-    /// <summary>HTMLInputElement.popoverTargetAction.</summary>
-    abstract member popoverTargetAction: string with get, set
 
 /// <summary>HTMLLabelElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLLabelElement =
@@ -1386,6 +1156,8 @@ and [<AllowNullLiteral>] HTMLSelectElement =
     abstract member size: uint32 with get, set
     /// <summary>HTMLSelectElement.type.</summary>
     abstract member ``type``: string with get
+    /// <summary>HTMLSelectElement.options.</summary>
+    abstract member options: HTMLOptionsCollection with get
     /// <summary>HTMLSelectElement.length.</summary>
     abstract member length: uint32 with get, set
     /// <summary>HTMLSelectElement.item.</summary>
@@ -2024,15 +1796,811 @@ and [<AllowNullLiteral>] CompositionEvent =
     /// <summary>CompositionEvent.data.</summary>
     abstract member data: string with get
 
-/// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
-and [<RequireQualifiedAccess>] NodeOrDOMString =
-    | Node of Node
-    | DOMString of string
+/// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLUnknownElement =
+    inherit HTMLElement
+
+/// <summary>HTMLAreaElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLAreaElement =
+    inherit HTMLElement
+    inherit HTMLHyperlinkElementUtils
+
+/// <summary>HTMLAttachmentElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLAttachmentElement =
+    inherit HTMLElement
+
+/// <summary>HTMLAudioElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLAudioElement =
+    inherit HTMLMediaElement
+
+/// <summary>HTMLBaseElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLBaseElement =
+    inherit HTMLElement
+
+/// <summary>HTMLQuoteElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLQuoteElement =
+    inherit HTMLElement
+
+/// <summary>HTMLBRElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLBRElement =
+    inherit HTMLElement
+
+/// <summary>HTMLCanvasElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLCanvasElement =
+    inherit HTMLElement
+
+/// <summary>HTMLTableCaptionElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableCaptionElement =
+    inherit HTMLElement
+
+/// <summary>HTMLTableColElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableColElement =
+    inherit HTMLElement
+
+/// <summary>HTMLDataElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLDataElement =
+    inherit HTMLElement
+
+/// <summary>HTMLDataListElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLDataListElement =
+    inherit HTMLElement
+
+/// <summary>HTMLModElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLModElement =
+    inherit HTMLElement
+
+/// <summary>HTMLDirectoryElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLDirectoryElement =
+    inherit HTMLElement
+
+/// <summary>HTMLDListElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLDListElement =
+    inherit HTMLElement
+
+/// <summary>HTMLEmbedElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLEmbedElement =
+    inherit HTMLElement
+
+/// <summary>HTMLFontElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLFontElement =
+    inherit HTMLElement
+
+/// <summary>HTMLFrameElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLFrameElement =
+    inherit HTMLElement
+
+/// <summary>HTMLFrameSetElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLFrameSetElement =
+    inherit HTMLElement
+
+/// <summary>HTMLHeadingElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLHeadingElement =
+    inherit HTMLElement
+
+/// <summary>HTMLHRElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLHRElement =
+    inherit HTMLElement
+
+/// <summary>HTMLHtmlElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLHtmlElement =
+    inherit HTMLElement
+
+/// <summary>HTMLIFrameElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLIFrameElement =
+    inherit HTMLElement
+
+/// <summary>HTMLLinkElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLLinkElement =
+    inherit HTMLElement
+    inherit LinkStyle
+
+/// <summary>HTMLPreElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLPreElement =
+    inherit HTMLElement
+
+/// <summary>HTMLMapElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLMapElement =
+    inherit HTMLElement
+
+/// <summary>HTMLMarqueeElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLMarqueeElement =
+    inherit HTMLElement
+
+/// <summary>HTMLMenuElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLMenuElement =
+    inherit HTMLElement
+
+/// <summary>HTMLMetaElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLMetaElement =
+    inherit HTMLElement
+
+/// <summary>HTMLModelElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLModelElement =
+    inherit HTMLElement
+
+/// <summary>HTMLObjectElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLObjectElement =
+    inherit HTMLElement
+
+/// <summary>HTMLParamElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLParamElement =
+    inherit HTMLElement
+
+/// <summary>HTMLPictureElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLPictureElement =
+    inherit HTMLElement
+
+/// <summary>HTMLScriptElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLScriptElement =
+    inherit HTMLElement
+
+/// <summary>HTMLSelectedContentElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLSelectedContentElement =
+    inherit HTMLElement
+
+/// <summary>HTMLSourceElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLSourceElement =
+    inherit HTMLElement
+
+/// <summary>HTMLStyleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLStyleElement =
+    inherit HTMLElement
+    inherit LinkStyle
+
+/// <summary>HTMLTableElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableElement =
+    inherit HTMLElement
+
+/// <summary>HTMLTableSectionElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableSectionElement =
+    inherit HTMLElement
+
+/// <summary>HTMLTableCellElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableCellElement =
+    inherit HTMLElement
+
+/// <summary>HTMLTimeElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTimeElement =
+    inherit HTMLElement
+
+/// <summary>HTMLTitleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTitleElement =
+    inherit HTMLElement
+
+/// <summary>HTMLTableRowElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableRowElement =
+    inherit HTMLElement
+
+/// <summary>HTMLTrackElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTrackElement =
+    inherit HTMLElement
+
+/// <summary>HTMLVideoElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLVideoElement =
+    inherit HTMLMediaElement
+
+/// <summary>SVGAElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGElement =
+    inherit Element
+    inherit GlobalEventHandlers
+    inherit HTMLOrSVGElement
+    inherit ElementCSSInlineStyle
+
+/// <summary>SVGAnimateElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimateElement =
+    inherit SVGAnimationElement
+
+/// <summary>SVGAnimateMotionElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimateMotionElement =
+    inherit SVGAnimationElement
+
+/// <summary>SVGAnimateTransformElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimateTransformElement =
+    inherit SVGAnimationElement
+
+/// <summary>SVGSetElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGSetElement =
+    inherit SVGAnimationElement
+
+/// <summary>SVGCircleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGCircleElement =
+    inherit SVGGeometryElement
+
+/// <summary>SVGClipPathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGClipPathElement =
+    inherit SVGElement
+
+/// <summary>SVGDefsElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGDefsElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGDescElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGDescElement =
+    inherit SVGElement
+
+/// <summary>SVGEllipseElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGEllipseElement =
+    inherit SVGGeometryElement
+
+/// <summary>SVGFEBlendElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEBlendElement =
+    inherit SVGElement
+
+/// <summary>SVGFEColorMatrixElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEColorMatrixElement =
+    inherit SVGElement
+
+/// <summary>SVGFEComponentTransferElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEComponentTransferElement =
+    inherit SVGElement
+
+/// <summary>SVGFECompositeElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFECompositeElement =
+    inherit SVGElement
+
+/// <summary>SVGFEConvolveMatrixElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEConvolveMatrixElement =
+    inherit SVGElement
+
+/// <summary>SVGFEDiffuseLightingElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEDiffuseLightingElement =
+    inherit SVGElement
+
+/// <summary>SVGFEDisplacementMapElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEDisplacementMapElement =
+    inherit SVGElement
+
+/// <summary>SVGFEDistantLightElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEDistantLightElement =
+    inherit SVGElement
+
+/// <summary>SVGFEDropShadowElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEDropShadowElement =
+    inherit SVGElement
+
+/// <summary>SVGFEFloodElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEFloodElement =
+    inherit SVGElement
+
+/// <summary>SVGFEFuncAElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEFuncAElement =
+    inherit SVGComponentTransferFunctionElement
+
+/// <summary>SVGFEFuncBElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEFuncBElement =
+    inherit SVGComponentTransferFunctionElement
+
+/// <summary>SVGFEFuncGElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEFuncGElement =
+    inherit SVGComponentTransferFunctionElement
+
+/// <summary>SVGFEFuncRElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEFuncRElement =
+    inherit SVGComponentTransferFunctionElement
+
+/// <summary>SVGFEGaussianBlurElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEGaussianBlurElement =
+    inherit SVGElement
+
+/// <summary>SVGFEImageElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEImageElement =
+    inherit SVGElement
+
+/// <summary>SVGFEMergeElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEMergeElement =
+    inherit SVGElement
+
+/// <summary>SVGFEMergeNodeElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEMergeNodeElement =
+    inherit SVGElement
+
+/// <summary>SVGFEMorphologyElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEMorphologyElement =
+    inherit SVGElement
+
+/// <summary>SVGFEOffsetElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEOffsetElement =
+    inherit SVGElement
+
+/// <summary>SVGFEPointLightElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEPointLightElement =
+    inherit SVGElement
+
+/// <summary>SVGFESpecularLightingElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFESpecularLightingElement =
+    inherit SVGElement
+
+/// <summary>SVGFESpotLightElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFESpotLightElement =
+    inherit SVGElement
+
+/// <summary>SVGFETileElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFETileElement =
+    inherit SVGElement
+
+/// <summary>SVGFETurbulenceElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFETurbulenceElement =
+    inherit SVGElement
+
+/// <summary>SVGFilterElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFilterElement =
+    inherit SVGElement
+
+/// <summary>SVGForeignObjectElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGForeignObjectElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGGElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGGElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGImageElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGImageElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGLineElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGLineElement =
+    inherit SVGGeometryElement
+
+/// <summary>SVGLinearGradientElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGLinearGradientElement =
+    inherit SVGGradientElement
+
+/// <summary>SVGMarkerElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGMarkerElement =
+    inherit SVGElement
+
+/// <summary>SVGMaskElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGMaskElement =
+    inherit SVGElement
+
+/// <summary>SVGMetadataElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGMetadataElement =
+    inherit SVGElement
+
+/// <summary>SVGMPathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGMPathElement =
+    inherit SVGElement
+
+/// <summary>SVGPathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPathElement =
+    inherit SVGGeometryElement
+
+/// <summary>SVGPatternElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPatternElement =
+    inherit SVGElement
+
+/// <summary>SVGPolygonElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPolygonElement =
+    inherit SVGGeometryElement
+
+/// <summary>SVGPolylineElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPolylineElement =
+    inherit SVGGeometryElement
+
+/// <summary>SVGRadialGradientElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGRadialGradientElement =
+    inherit SVGGradientElement
+
+/// <summary>SVGRectElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGRectElement =
+    inherit SVGGeometryElement
+
+/// <summary>SVGScriptElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGScriptElement =
+    inherit SVGElement
+
+/// <summary>SVGStopElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGStopElement =
+    inherit SVGElement
+
+/// <summary>SVGStyleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGStyleElement =
+    inherit SVGElement
+    inherit LinkStyle
+
+/// <summary>SVGSVGElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGSVGElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGSwitchElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGSwitchElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGSymbolElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGSymbolElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGTextElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTextElement =
+    inherit SVGTextPositioningElement
+
+/// <summary>SVGTextPathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTextPathElement =
+    inherit SVGTextContentElement
+
+/// <summary>SVGTitleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTitleElement =
+    inherit SVGElement
+
+/// <summary>SVGTSpanElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTSpanElement =
+    inherit SVGTextPositioningElement
+
+/// <summary>SVGUseElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGUseElement =
+    inherit SVGGraphicsElement
+
+/// <summary>SVGViewElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGViewElement =
+    inherit SVGElement
+
+/// <summary>AnimationEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] AnimationEvent =
+    inherit Event
+
+/// <summary>TransitionEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TransitionEvent =
+    inherit Event
+
+/// <summary>BeforeUnloadEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] BeforeUnloadEvent =
+    inherit Event
+
+/// <summary>CSSStyleSheet in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSStyleSheet =
+    inherit StyleSheet
+
+/// <summary>CustomElementRegistry in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CustomElementRegistry = interface end
+
+/// <summary>ClipboardEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ClipboardEvent =
+    inherit Event
+
+/// <summary>DragEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DragEvent =
+    inherit MouseEvent
+
+/// <summary>ErrorEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ErrorEvent =
+    inherit Event
+
+/// <summary>FileList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FileList = interface end
+
+/// <summary>FormDataEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FormDataEvent =
+    inherit Event
+
+/// <summary>GamepadEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] GamepadEvent =
+    inherit Event
+
+/// <summary>HTMLFormControlsCollection in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLFormControlsCollection =
+    inherit HTMLCollection
+
+/// <summary>HTMLOptionsCollection in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLOptionsCollection =
+    inherit HTMLCollection
+
+/// <summary>HashChangeEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HashChangeEvent =
+    inherit Event
+
+/// <summary>MediaEncryptedEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MediaEncryptedEvent =
+    inherit Event
+
+/// <summary>MediaError in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MediaError = interface end
+
+/// <summary>MediaKeys in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MediaKeys = interface end
+
+/// <summary>PageRevealEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PageRevealEvent =
+    inherit Event
+
+/// <summary>PageSwapEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PageSwapEvent =
+    inherit Event
+
+/// <summary>PageTransitionEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PageTransitionEvent =
+    inherit Event
+
+/// <summary>PictureInPictureEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PictureInPictureEvent =
+    inherit Event
+
+/// <summary>PopStateEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PopStateEvent =
+    inherit Event
+
+/// <summary>ProgressEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ProgressEvent =
+    inherit Event
+
+/// <summary>PromiseRejectionEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PromiseRejectionEvent =
+    inherit Event
+
+/// <summary>RemotePlayback in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] RemotePlayback =
+    inherit EventTarget
+
+/// <summary>SecurityPolicyViolationEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SecurityPolicyViolationEvent =
+    inherit Event
+
+/// <summary>StorageEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] StorageEvent =
+    inherit Event
+
+/// <summary>StylePropertyMap in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] StylePropertyMap =
+    inherit StylePropertyMapReadOnly
+
+/// <summary>SubmitEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SubmitEvent =
+    inherit Event
+
+/// <summary>TextTrack in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TextTrack =
+    inherit EventTarget
+
+/// <summary>TextTrackList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TextTrackList =
+    inherit EventTarget
+
+/// <summary>TimeRanges in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TimeRanges = interface end
+
+/// <summary>ToggleEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ToggleEvent =
+    inherit Event
+
+/// <summary>TouchEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TouchEvent =
+    inherit UIEvent
+
+/// <summary>ARIAMixin in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ARIAMixin =
+    /// <summary>ARIAMixin.ariaActiveDescendantElement.</summary>
+    abstract member ariaActiveDescendantElement: Element with get, set
+    /// <summary>ARIAMixin.ariaAtomic.</summary>
+    abstract member ariaAtomic: string with get, set
+    /// <summary>ARIAMixin.ariaAutoComplete.</summary>
+    abstract member ariaAutoComplete: string with get, set
+    /// <summary>ARIAMixin.ariaBrailleLabel.</summary>
+    abstract member ariaBrailleLabel: string with get, set
+    /// <summary>ARIAMixin.ariaBrailleRoleDescription.</summary>
+    abstract member ariaBrailleRoleDescription: string with get, set
+    /// <summary>ARIAMixin.ariaBusy.</summary>
+    abstract member ariaBusy: string with get, set
+    /// <summary>ARIAMixin.ariaChecked.</summary>
+    abstract member ariaChecked: string with get, set
+    /// <summary>ARIAMixin.ariaColCount.</summary>
+    abstract member ariaColCount: string with get, set
+    /// <summary>ARIAMixin.ariaColIndex.</summary>
+    abstract member ariaColIndex: string with get, set
+    /// <summary>ARIAMixin.ariaColIndexText.</summary>
+    abstract member ariaColIndexText: string with get, set
+    /// <summary>ARIAMixin.ariaColSpan.</summary>
+    abstract member ariaColSpan: string with get, set
+    /// <summary>ARIAMixin.ariaCurrent.</summary>
+    abstract member ariaCurrent: string with get, set
+    /// <summary>ARIAMixin.ariaDescription.</summary>
+    abstract member ariaDescription: string with get, set
+    /// <summary>ARIAMixin.ariaDisabled.</summary>
+    abstract member ariaDisabled: string with get, set
+    /// <summary>ARIAMixin.ariaExpanded.</summary>
+    abstract member ariaExpanded: string with get, set
+    /// <summary>ARIAMixin.ariaHasPopup.</summary>
+    abstract member ariaHasPopup: string with get, set
+    /// <summary>ARIAMixin.ariaHidden.</summary>
+    abstract member ariaHidden: string with get, set
+    /// <summary>ARIAMixin.ariaInvalid.</summary>
+    abstract member ariaInvalid: string with get, set
+    /// <summary>ARIAMixin.ariaKeyShortcuts.</summary>
+    abstract member ariaKeyShortcuts: string with get, set
+    /// <summary>ARIAMixin.ariaLabel.</summary>
+    abstract member ariaLabel: string with get, set
+    /// <summary>ARIAMixin.ariaLevel.</summary>
+    abstract member ariaLevel: string with get, set
+    /// <summary>ARIAMixin.ariaLive.</summary>
+    abstract member ariaLive: string with get, set
+    /// <summary>ARIAMixin.ariaModal.</summary>
+    abstract member ariaModal: string with get, set
+    /// <summary>ARIAMixin.ariaMultiLine.</summary>
+    abstract member ariaMultiLine: string with get, set
+    /// <summary>ARIAMixin.ariaMultiSelectable.</summary>
+    abstract member ariaMultiSelectable: string with get, set
+    /// <summary>ARIAMixin.ariaOrientation.</summary>
+    abstract member ariaOrientation: string with get, set
+    /// <summary>ARIAMixin.ariaPlaceholder.</summary>
+    abstract member ariaPlaceholder: string with get, set
+    /// <summary>ARIAMixin.ariaPosInSet.</summary>
+    abstract member ariaPosInSet: string with get, set
+    /// <summary>ARIAMixin.ariaPressed.</summary>
+    abstract member ariaPressed: string with get, set
+    /// <summary>ARIAMixin.ariaReadOnly.</summary>
+    abstract member ariaReadOnly: string with get, set
+    /// <summary>ARIAMixin.ariaRelevant.</summary>
+    abstract member ariaRelevant: string with get, set
+    /// <summary>ARIAMixin.ariaRequired.</summary>
+    abstract member ariaRequired: string with get, set
+    /// <summary>ARIAMixin.ariaRoleDescription.</summary>
+    abstract member ariaRoleDescription: string with get, set
+    /// <summary>ARIAMixin.ariaRowCount.</summary>
+    abstract member ariaRowCount: string with get, set
+    /// <summary>ARIAMixin.ariaRowIndex.</summary>
+    abstract member ariaRowIndex: string with get, set
+    /// <summary>ARIAMixin.ariaRowIndexText.</summary>
+    abstract member ariaRowIndexText: string with get, set
+    /// <summary>ARIAMixin.ariaRowSpan.</summary>
+    abstract member ariaRowSpan: string with get, set
+    /// <summary>ARIAMixin.ariaSelected.</summary>
+    abstract member ariaSelected: string with get, set
+    /// <summary>ARIAMixin.ariaSetSize.</summary>
+    abstract member ariaSetSize: string with get, set
+    /// <summary>ARIAMixin.ariaSort.</summary>
+    abstract member ariaSort: string with get, set
+    /// <summary>ARIAMixin.ariaValueMax.</summary>
+    abstract member ariaValueMax: string with get, set
+    /// <summary>ARIAMixin.ariaValueMin.</summary>
+    abstract member ariaValueMin: string with get, set
+    /// <summary>ARIAMixin.ariaValueNow.</summary>
+    abstract member ariaValueNow: string with get, set
+    /// <summary>ARIAMixin.ariaValueText.</summary>
+    abstract member ariaValueText: string with get, set
+
+/// <summary>ChildNode in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ChildNode =
+
+    /// <summary>ChildNode.before.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.before(...$1)")>]
+    abstract member __ranvier_before: nodes: obj array -> unit
+#else
+    abstract member before: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
+#endif
+
+    /// <summary>ChildNode.after.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.after(...$1)")>]
+    abstract member __ranvier_after: nodes: obj array -> unit
+#else
+    abstract member after: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
+#endif
+
+    /// <summary>ChildNode.replaceWith.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.replaceWith(...$1)")>]
+    abstract member __ranvier_replaceWith: nodes: obj array -> unit
+#else
+    abstract member replaceWith: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
+#endif
+    /// <summary>ChildNode.remove.</summary>
+    abstract member remove: unit -> unit
+
+/// <summary>ParentNode in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ParentNode =
+    /// <summary>ParentNode.children.</summary>
+    abstract member children: HTMLCollection with get
+    /// <summary>ParentNode.firstElementChild.</summary>
+    abstract member firstElementChild: Element with get
+    /// <summary>ParentNode.lastElementChild.</summary>
+    abstract member lastElementChild: Element with get
+    /// <summary>ParentNode.childElementCount.</summary>
+    abstract member childElementCount: uint32 with get
+
+    /// <summary>ParentNode.prepend.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.prepend(...$1)")>]
+    abstract member __ranvier_prepend: nodes: obj array -> unit
+#else
+    abstract member prepend: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
+#endif
+
+    /// <summary>ParentNode.append.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.append(...$1)")>]
+    abstract member __ranvier_append: nodes: obj array -> unit
+#else
+    abstract member append: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
+#endif
+
+    /// <summary>ParentNode.replaceChildren.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.replaceChildren(...$1)")>]
+    abstract member __ranvier_replaceChildren: nodes: obj array -> unit
+#else
+    abstract member replaceChildren: [<System.ParamArray>] nodes: NodeOrDOMString array -> unit
+#endif
+    /// <summary>ParentNode.moveBefore.</summary>
+    abstract member moveBefore: node: Node * child: Node -> unit
+    /// <summary>ParentNode.querySelector.</summary>
+    abstract member querySelector: selectors: string -> Element
+    /// <summary>ParentNode.querySelectorAll.</summary>
+    abstract member querySelectorAll: selectors: string -> NodeList
+
+/// <summary>NonDocumentTypeChildNode in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] NonDocumentTypeChildNode =
+    /// <summary>NonDocumentTypeChildNode.previousElementSibling.</summary>
+    abstract member previousElementSibling: Element with get
+    /// <summary>NonDocumentTypeChildNode.nextElementSibling.</summary>
+    abstract member nextElementSibling: Element with get
+
+/// <summary>GlobalEventHandlers in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] GlobalEventHandlers = interface end
+
+/// <summary>ElementCSSInlineStyle in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ElementCSSInlineStyle = interface end
+
+/// <summary>ElementContentEditable in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ElementContentEditable =
+    /// <summary>ElementContentEditable.contentEditable.</summary>
+    abstract member contentEditable: string with get, set
+    /// <summary>ElementContentEditable.enterKeyHint.</summary>
+    abstract member enterKeyHint: string with get, set
+    /// <summary>ElementContentEditable.isContentEditable.</summary>
+    abstract member isContentEditable: bool with get
+    /// <summary>ElementContentEditable.inputMode.</summary>
+    abstract member inputMode: string with get, set
+
+/// <summary>HTMLHyperlinkElementUtils in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLHyperlinkElementUtils =
+    /// <summary>HTMLHyperlinkElementUtils.href.</summary>
+    abstract member href: string with get, set
+    /// <summary>HTMLHyperlinkElementUtils.target.</summary>
+    abstract member target: string with get, set
+
+/// <summary>HTMLOrSVGElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLOrSVGElement =
+    /// <summary>HTMLOrSVGElement.dataset.</summary>
+    abstract member dataset: DOMStringMap with get
+    /// <summary>HTMLOrSVGElement.nonce.</summary>
+    abstract member nonce: string with get, set
+    /// <summary>HTMLOrSVGElement.autofocus.</summary>
+    abstract member autofocus: bool with get, set
+    /// <summary>HTMLOrSVGElement.tabIndex.</summary>
+    abstract member tabIndex: int with get, set
+    /// <summary>HTMLOrSVGElement.focus.</summary>
+    abstract member focus: ?options: FocusOptions -> unit
+    /// <summary>HTMLOrSVGElement.blur.</summary>
+    abstract member blur: unit -> unit
+
+/// <summary>LinkStyle in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] LinkStyle = interface end
+
+/// <summary>PopoverTargetAttributes in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PopoverTargetAttributes =
+    /// <summary>PopoverTargetAttributes.popoverTargetElement.</summary>
+    abstract member popoverTargetElement: Element with get, set
+    /// <summary>PopoverTargetAttributes.popoverTargetAction.</summary>
+    abstract member popoverTargetAction: string with get, set
+
+/// <summary>Slottable in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Slottable =
+    /// <summary>Slottable.assignedSlot.</summary>
+    abstract member assignedSlot: HTMLSlotElement with get
 
 /// <summary>DOMStringOrElementCreationOptions in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] DOMStringOrElementCreationOptions =
     | DOMString of string
     | ElementCreationOptions of ElementCreationOptions
+
+/// <summary>BooleanOrImportNodeOptions in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] BooleanOrImportNodeOptions =
+    | Boolean of bool
+    | ImportNodeOptions of ImportNodeOptions
 
 /// <summary>BooleanOrScrollIntoViewOptions in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] BooleanOrScrollIntoViewOptions =
@@ -2075,6 +2643,11 @@ and [<RequireQualifiedAccess>] ShadowRootOrGetComposedRangesOptions =
     | ShadowRoot of ShadowRoot
     | GetComposedRangesOptions of GetComposedRangesOptions
 
+/// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] NodeOrDOMString =
+    | Node of Node
+    | DOMString of string
+
 /// <summary>GetRootNodeOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetRootNodeOptions() =
     member val composed: bool = false with get, set
@@ -2086,6 +2659,10 @@ and [<AllowNullLiteral; DomDictionary>] GetHTMLOptions() =
 
 /// <summary>ElementCreationOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] ElementCreationOptions() = class end
+
+/// <summary>ImportNodeOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] ImportNodeOptions() =
+    member val selfOnly: bool = false with get, set
 
 /// <summary>AriaNotifyOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] AriaNotifyOptions() =
@@ -2129,11 +2706,6 @@ and [<AllowNullLiteral; DomDictionary>] TogglePopoverOptions() =
     member val source: (HTMLElement) option = None with get, set
     member val force: (bool) option = None with get, set
 
-/// <summary>FocusOptions in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
-    member val preventScroll: bool = false with get, set
-    member val focusVisible: (bool) option = None with get, set
-
 /// <summary>AssignedNodesOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] AssignedNodesOptions() =
     member val flatten: bool = false with get, set
@@ -2141,6 +2713,11 @@ and [<AllowNullLiteral; DomDictionary>] AssignedNodesOptions() =
 /// <summary>GetComposedRangesOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetComposedRangesOptions() =
     member val shadowRoots: (ShadowRoot) array = [||] with get, set
+
+/// <summary>FocusOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
+    member val preventScroll: bool = false with get, set
+    member val focusVisible: (bool) option = None with get, set
 
 /// <summary>EventListener in the scoped DOM interface model.</summary>
 and EventListener = Event -> unit
@@ -2199,24 +2776,24 @@ and [<DomStringEnum; RequireQualifiedAccess>] ScrollLogicalPosition =
 #if FABLE_COMPILER
 [<AutoOpen>]
 module BrowserUnionAdapters =
-    [<Fable.Core.Emit("$0 instanceof globalThis.Element")>]
+    [<Fable.Core.Emit("$0 != null && $0.nodeType === 1")>]
     let private isElement (_: obj) : bool =
         Fable.Core.Util.jsNative
 
-    [<Fable.Core.Emit("$0 instanceof globalThis.RadioNodeList")>]
+    [<Fable.Core.Emit("Object.prototype.toString.call($0) === '[object RadioNodeList]'")>]
     let private isRadioNodeList (_: obj) : bool =
         Fable.Core.Util.jsNative
 
-
-    let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
-        match value with
-        | NodeOrDOMString.Node value -> box value
-        | NodeOrDOMString.DOMString value -> box value
 
     let private boxDOMStringOrElementCreationOptions (value: DOMStringOrElementCreationOptions) : obj =
         match value with
         | DOMStringOrElementCreationOptions.DOMString value -> box value
         | DOMStringOrElementCreationOptions.ElementCreationOptions value -> box value
+
+    let private boxBooleanOrImportNodeOptions (value: BooleanOrImportNodeOptions) : obj =
+        match value with
+        | BooleanOrImportNodeOptions.Boolean value -> box value
+        | BooleanOrImportNodeOptions.ImportNodeOptions value -> box value
 
     let private boxBooleanOrScrollIntoViewOptions (value: BooleanOrScrollIntoViewOptions) : obj =
         match value with
@@ -2272,27 +2849,10 @@ module BrowserUnionAdapters =
         | ShadowRootOrGetComposedRangesOptions.ShadowRoot value -> box value
         | ShadowRootOrGetComposedRangesOptions.GetComposedRangesOptions value -> box value
 
-    type CharacterData with
-        member this.before([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_before (nodes |> Array.map boxNodeOrDOMString)
-
-        member this.after([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_after (nodes |> Array.map boxNodeOrDOMString)
-
-        member this.replaceWith([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_replaceWith (nodes |> Array.map boxNodeOrDOMString)
-
-
-    type DocumentFragment with
-        member this.prepend([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_prepend (nodes |> Array.map boxNodeOrDOMString)
-
-        member this.append([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_append (nodes |> Array.map boxNodeOrDOMString)
-
-        member this.replaceChildren([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_replaceChildren (nodes |> Array.map boxNodeOrDOMString)
-
+    let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
+        match value with
+        | NodeOrDOMString.Node value -> box value
+        | NodeOrDOMString.DOMString value -> box value
 
     type Document with
         member this.createElement(localName: string) : Element =
@@ -2313,14 +2873,14 @@ module BrowserUnionAdapters =
         member this.createElementNS(namespaceURI: string, qualifiedName: string, options: ElementCreationOptions) : Element =
             this.__ranvier_createElementNS (namespaceURI, qualifiedName, ?options = Some (box options))
 
-        member this.prepend([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_prepend (nodes |> Array.map boxNodeOrDOMString)
+        member this.importNode(node: Node) : Node =
+            this.__ranvier_importNode (node, ?options = None)
 
-        member this.append([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_append (nodes |> Array.map boxNodeOrDOMString)
+        member this.importNode(node: Node, options: bool) : Node =
+            this.__ranvier_importNode (node, ?options = Some (box options))
 
-        member this.replaceChildren([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_replaceChildren (nodes |> Array.map boxNodeOrDOMString)
+        member this.importNode(node: Node, options: ImportNodeOptions) : Node =
+            this.__ranvier_importNode (node, ?options = Some (box options))
 
 
     type Element with
@@ -2332,24 +2892,6 @@ module BrowserUnionAdapters =
 
         member this.scrollIntoView(arg: ScrollIntoViewOptions) : unit =
             this.__ranvier_scrollIntoView (?arg = Some (box arg))
-
-        member this.before([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_before (nodes |> Array.map boxNodeOrDOMString)
-
-        member this.after([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_after (nodes |> Array.map boxNodeOrDOMString)
-
-        member this.replaceWith([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_replaceWith (nodes |> Array.map boxNodeOrDOMString)
-
-        member this.prepend([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_prepend (nodes |> Array.map boxNodeOrDOMString)
-
-        member this.append([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_append (nodes |> Array.map boxNodeOrDOMString)
-
-        member this.replaceChildren([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
-            this.__ranvier_replaceChildren (nodes |> Array.map boxNodeOrDOMString)
 
 
     type HTMLElement with
@@ -2422,5 +2964,27 @@ module BrowserUnionAdapters =
 
         member this.getComposedRanges(options: GetComposedRangesOptions, [<System.ParamArray>] shadowRoots: ShadowRoot array) : (StaticRange) array =
             this.__ranvier_getComposedRanges (?options = Some (box options), shadowRoots = shadowRoots)
+
+
+    type ChildNode with
+        member this.before([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
+            this.__ranvier_before (nodes |> Array.map boxNodeOrDOMString)
+
+        member this.after([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
+            this.__ranvier_after (nodes |> Array.map boxNodeOrDOMString)
+
+        member this.replaceWith([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
+            this.__ranvier_replaceWith (nodes |> Array.map boxNodeOrDOMString)
+
+
+    type ParentNode with
+        member this.prepend([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
+            this.__ranvier_prepend (nodes |> Array.map boxNodeOrDOMString)
+
+        member this.append([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
+            this.__ranvier_append (nodes |> Array.map boxNodeOrDOMString)
+
+        member this.replaceChildren([<System.ParamArray>] nodes: NodeOrDOMString array) : unit =
+            this.__ranvier_replaceChildren (nodes |> Array.map boxNodeOrDOMString)
 
 #endif

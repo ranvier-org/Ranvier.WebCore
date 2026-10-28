@@ -80,6 +80,37 @@
     "customGetters": [
         "Node.nodeType"
     ],
+    "contract": {
+        "htmlTags": "html/HTMLTagNames.in",
+        "svgTags": "svg/svgtags.in",
+        "interfaces": [
+            "SVGElement", "SVGSVGElement", "CSSAnimationEvent", "CSSTransitionEvent", "BeforeUnloadEvent",
+            "CSSStyleSheet", "CustomElementRegistry", "ClipboardEvent", "DragEvent", "ErrorEvent", "FileList",
+            "FormDataEvent", "GamepadEvent", "HTMLFormControlsCollection", "HTMLOptionsCollection", "HashChangeEvent",
+            "MediaEncryptedEvent", "MediaError", "MediaKeys", "PageRevealEvent", "PageSwapEvent", "PageTransitionEvent",
+            "PictureInPictureEvent", "PopStateEvent", "ProgressEvent", "PromiseRejectionEvent", "RemotePlayback",
+            "SecurityPolicyViolationEvent", "StorageEvent", "StylePropertyMap", "SubmitEvent", "TextTrack",
+            "TextTrackList", "TimeRanges", "ToggleEvent", "TouchEvent"
+        ],
+        "aliases": {
+            "CSSAnimationEvent": "AnimationEvent",
+            "CSSTransitionEvent": "TransitionEvent"
+        },
+        "mixins": {
+            "AriaAttributes": "ARIAMixin",
+            "ChildNode": "ChildNode",
+            "ParentNode": "ParentNode",
+            "NonDocumentTypeChildNode": "NonDocumentTypeChildNode",
+            "GlobalEventHandlers": "GlobalEventHandlers",
+            "ElementCSSInlineStyle": "ElementCSSInlineStyle",
+            "ElementContentEditable": "ElementContentEditable",
+            "HTMLHyperlinkElementUtils": "HTMLHyperlinkElementUtils",
+            "HTMLOrSVGOrMathMLElement": "HTMLOrSVGElement",
+            "LinkStyle": "LinkStyle",
+            "PopoverInvokerElement": "PopoverTargetAttributes",
+            "Slotable": "Slottable"
+        }
+    },
     "castVia": {
         "RadioNodeList": "LiveNodeList"
     },
@@ -95,6 +126,7 @@
         "DOMRect.width",
         "DOMRect.height",
         "ElementCreationOptions.customElementRegistry",
+        "ImportNodeOptions.customElementRegistry",
         "Document.cookie",
         "Document.domain",
         "Document.referrer",

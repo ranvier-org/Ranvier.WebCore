@@ -51,6 +51,7 @@ WEBCORE_EXPORT void ranvier_dom_sequence_node_or_dom_string_release(RvDomSequenc
 WEBCORE_EXPORT void ranvier_dom_sequence_element_release(RvDomSequenceElement* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value);
 WEBCORE_EXPORT void ranvier_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value);
+WEBCORE_EXPORT void ranvier_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_dom_string_release(RvDomSequenceDOMString* value);
 WEBCORE_EXPORT void ranvier_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value);
 WEBCORE_EXPORT void ranvier_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value);
@@ -176,6 +177,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_document_get_elements_by_class_name(RvNode* t
 WEBCORE_EXPORT int32_t ranvier_dom_document_create_document_fragment(RvNode* target, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_create_text_node(RvNode* target, const char* data, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_create_comment(RvNode* target, const char* data, RvNode** result);
+WEBCORE_EXPORT int32_t ranvier_dom_document_import_node(RvNode* target, RvNode* node, const RvDomUnionBooleanOrImportNodeOptions* options, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_adopt_node(RvNode* target, RvNode* node, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_create_attribute(RvNode* target, const char* local_name, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_create_attribute_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, RvNode** result);
