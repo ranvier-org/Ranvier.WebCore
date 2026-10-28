@@ -136,6 +136,7 @@ def main():
                 ok(remove_listener(listener))
             ok(dispatch(event_child, b'ranvier-passive-test', 1, 1, c.byref(prevented)))
             assert prevented.value == 0 and len(phases) == 1, f'flags {flags}: removed listener still ran'
+        ok(bind('rv_node_remove', [pointer])(event_child))
         print('NATIVE_EVENT_OPTIONS PASS: passive true/false/unspecified, capture phases, removal')
         svg = pointer()
         ok(create_ns(second, b'http://www.w3.org/2000/svg', b'svg:svg', None, c.byref(svg)))
