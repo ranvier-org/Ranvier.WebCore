@@ -23,6 +23,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  package-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: python -I tests/test_package_contract.py
+
   plan:
     # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
     # package, attached by scripts/release.py as the repository owner, that runtime goes to prebuilt instead.
@@ -325,6 +334,41 @@ jobs:
             ${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}/vcpkg-manifest-install.log
             ${{ env.RANVIER_WORK }}/vcpkg/buildtrees/**/*.log
 
+  managed:
+    needs: [native, prebuilt, package-contract]
+    if: >-
+      ${{ !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') &&
+          (needs.native.result == 'success' || needs.native.result == 'skipped') &&
+          (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') &&
+          needs.package-contract.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: package-*-slim
+          merge-multiple: true
+          path: packages
+      - name: Pack the ABI-matched managed interop and native aggregate
+        shell: bash
+        run: |
+          version=$(python -c "import json; print(json.load(open('pins.json'))['package']['version'])")
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then version="${GITHUB_REF_NAME#v}"; fi
+          python -I scripts/package_managed.py --packages packages --version "$version"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-managed
+          path: |
+            packages/Ranvier.WebCore.[0-9]*.nupkg
+            packages/Ranvier.WebCore.Native.[0-9]*.nupkg
+          # The native RID packages are already retained by their platform jobs.
+
   publish:
     # On a version tag, pushes the packages to nuget.org through trusted publishing: the job exchanges
     # GitHub's OIDC token for a one-hour API key under the nuget.org account in the repository variable
@@ -332,7 +376,7 @@ jobs:
     # as workflow artifacts. Each runtime's package stands alone, so the packages that built, or that the
     # release held and prebuilt checked, are pushed even when another runtime failed.
     if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' }}
-    needs: [native, prebuilt]
+    needs: [native, prebuilt, managed]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
