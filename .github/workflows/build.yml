@@ -31,6 +31,7 @@ jobs:
         with:
           python-version: '3.14'
       - run: python -I tests/test_package_contract.py
+      - run: python -I tests/test_release.py
       - run: python -I tests/generator/test_domgen.py
       - uses: actions/setup-dotnet@v4
         with:

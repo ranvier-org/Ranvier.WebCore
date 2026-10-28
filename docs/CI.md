@@ -88,6 +88,35 @@ Creating the release pushes its tag, and the tag's run of this workflow:
 A tag pushed without a release builds every runtime in CI, as before. A package built on a workstation
 records `"builder": "local"` in the `source` field of its `manifest.json`; CI's record `"ci"`.
 
+#### Coordinated Windows GPU package
+
+`release.py --flavor gpu` builds and checks `Ranvier.WebCore.Native.Gpu.<rid>`; `slim`, `gpu` and `lean`
+retain the same clean-source, remote-commit and immutable-version-tag checks. Creating a release always
+starts the default **slim** tag run. That run validates/publishes the five slim runtimes, managed interop
+and native aggregate; it does not select GPU assets. A GPU release therefore needs a subsequent dispatch
+on the **same immutable tag**, after the slim tag run succeeds:
+
+```
+gh workflow run build.yml --repo ranvier-org/Ranvier.WebCore --ref v0.1.0-preview.6 --field flavor=gpu --field rids=win-x64
+```
+
+The dispatch builds or checks the GPU package against that tag's commit, flavor and version and publishes
+`Ranvier.WebCore.Native.Gpu.win-x64` through the existing NuGet OIDC job. The owner's attached-package
+check remains in effect; an asset that does not qualify is rebuilt in CI. Do not overlap the two runs:
+their concurrency group is keyed by the tag, so the later dispatch would cancel a running slim release.
+The managed interop version must remain `0.1.0-preview.6`; choosing the GPU runtime does not change its ABI.
+
+After the GPU version is available from the public v3 feed, run the Views workflow at a ref containing its
+strict GPU lane and the matching backend. This example uses the coordinated preview version:
+
+```
+gh workflow run ci.yml --repo ranvier-org/Ranvier.View --ref <validated-view-ref> --field gpu_runtime_version=0.1.0-preview.6 --field gpu_runtime_source=https://api.nuget.org/v3/index.json --field gpu_runtime_package=Ranvier.WebCore.Native.Gpu.win-x64
+```
+
+The `webcore-gpu` lane verifies the exact package identity, version, flavor and staged hashes, then runs
+the counter with JIT and NativeAOT. Its GPU counts, visible SDL backbuffer and independent OS UIA checks
+must succeed without CPU fallback before the accelerated release is complete.
+
 An incremental rebuild after vcpkg reinstalls packages can fail with clang rejecting a precompiled header:
 the reinstalled headers keep older modification times. Delete `cmake_pch.cxx.obj` under
 `<build>/Source` and build again. A fresh build, as in CI, does not hit this.
