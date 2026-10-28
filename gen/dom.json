@@ -86,7 +86,7 @@
         "dictionaries": ["EventListenerOptions", "AddEventListenerOptions"],
         "interfaces": [
             "SVGElement", "SVGSVGElement", "CSSAnimationEvent", "CSSTransitionEvent", "BeforeUnloadEvent",
-            "CSSStyleSheet", "CustomElementRegistry", "ClipboardEvent", "DragEvent", "ErrorEvent", "FileList",
+            "CSSStyleSheet", "CSSStyleProperties", "CustomElementRegistry", "ClipboardEvent", "DragEvent", "ErrorEvent", "FileList",
             "FormDataEvent", "GamepadEvent", "HTMLFormControlsCollection", "HTMLOptionsCollection", "HashChangeEvent",
             "MediaEncryptedEvent", "MediaError", "MediaKeys", "PageRevealEvent", "PageSwapEvent", "PageTransitionEvent",
             "PictureInPictureEvent", "PopStateEvent", "ProgressEvent", "PromiseRejectionEvent", "RemotePlayback",

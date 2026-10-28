@@ -4,7 +4,7 @@ module FullBrowserContracts
 open Ranvier.Dom
 open Fable.Core
 
-[<Emit("(globalThis.Element = class Element {}, globalThis.RadioNodeList = class RadioNodeList {}, Object.assign(new globalThis.Element(), {nodeType: 1, append(...nodes) {this.received = nodes;}, hidden: false}))")>]
+[<Emit("(globalThis.Element = class Element {}, globalThis.RadioNodeList = class RadioNodeList {}, Object.assign(new globalThis.Element(), {nodeType: 1, append(...nodes) {this.received = nodes;}, hidden: false, style: {cssText: ''}}))")>]
 let private createElement (): obj = jsNative
 
 [<Import("runInNewContext", "node:vm")>]
@@ -39,6 +39,9 @@ let private identical (_: obj) (_: obj): bool = jsNative
 let main _ =
     let raw = createElement ()
     let element = unbox<HTMLElement> raw
+    let inlineStyle = element :> ElementCSSInlineStyle
+    inlineStyle.style.cssText <- "color: red"
+    if element.style.cssText <> "color: red" then failwith "Inline style mixin lost its scoped declaration contract"
     element.append(NodeOrDOMString.Node element, NodeOrDOMString.DOMString "tail")
     if not (receivedOriginalValues raw) then failwith "Full-surface mixed append changed raw browser arguments"
     element.hidden <- Some(BooleanOrUnrestrictedDoubleOrDOMString.DOMString "until-found")

@@ -507,6 +507,8 @@ and [<AllowNullLiteral>] Attr =
     abstract member ownerElement: Element with get
     /// <summary>Attr.specified.</summary>
     abstract member specified: bool with get
+    /// <summary>Attr.style.</summary>
+    abstract member style: CSSStyleProperties with get
 
 /// <summary>NamedNodeMap in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] NamedNodeMap =
@@ -2257,6 +2259,10 @@ and [<AllowNullLiteral>] BeforeUnloadEvent =
 and [<AllowNullLiteral>] CSSStyleSheet =
     inherit StyleSheet
 
+/// <summary>CSSStyleProperties in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSStyleProperties =
+    inherit CSSStyleDeclaration
+
 /// <summary>CustomElementRegistry in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CustomElementRegistry = interface end
 
@@ -2544,7 +2550,9 @@ and [<AllowNullLiteral>] NonDocumentTypeChildNode =
 and [<AllowNullLiteral>] GlobalEventHandlers = interface end
 
 /// <summary>ElementCSSInlineStyle in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ElementCSSInlineStyle = interface end
+and [<AllowNullLiteral>] ElementCSSInlineStyle =
+    /// <summary>ElementCSSInlineStyle.style.</summary>
+    abstract member style: CSSStyleProperties with get
 
 /// <summary>ElementContentEditable in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ElementContentEditable =

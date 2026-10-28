@@ -175,6 +175,33 @@ class GeneratorTests(unittest.TestCase):
         self.assertIn('importNode: node: Node * options: bool -> Node', source)
         self.assertIn('importNode: node: Node * options: ImportNodeOptions -> Node', source)
 
+    def test_inline_style_result_has_a_public_contract(self):
+        config = json.loads((ROOT / 'gen/dom.json').read_text())
+        self.assertIn('CSSStyleProperties', config['contract']['interfaces'])
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleDeclaration { attribute DOMString cssText; };
+interface CSSStyleProperties : CSSStyleDeclaration {};
+interface mixin ElementCSSInlineStyle { readonly attribute CSSStyleProperties style; };
+HTMLElement includes ElementCSSInlineStyle;
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = config['interfaces'] + ['HTMLElement', 'CSSStyleDeclaration']
+        config['contract'] = dict(config['contract'])
+        config['contract']['interfaces'] = config['contract']['interfaces'] + ['CSSStyleProperties']
+        config['contract']['mixins'] = config['contract']['mixins'] | {'ElementCSSInlineStyle': 'ElementCSSInlineStyle'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        source = generator.interfaces()
+        self.assertIn('abstract member style: CSSStyleProperties with get', source)
+        self.assertIn('CSSStyleProperties =\n    inherit CSSStyleDeclaration', source)
+        model = json.loads(generator.api_model())
+        getter = next(f for f in model['functions'] if f['function'] == 'rv_dom_html_element_get_style')
+        self.assertEqual(getter['contractOwner'], 'ElementCSSInlineStyle')
+        self.assertIn('CSSStyleProperties', [i['name'] for i in model['contractInterfaces']])
+
 
 if __name__ == '__main__':
     unittest.main()
