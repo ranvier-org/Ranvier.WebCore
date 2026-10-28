@@ -83,6 +83,7 @@
     "contract": {
         "htmlTags": "html/HTMLTagNames.in",
         "svgTags": "svg/svgtags.in",
+        "dictionaries": ["EventListenerOptions", "AddEventListenerOptions"],
         "interfaces": [
             "SVGElement", "SVGSVGElement", "CSSAnimationEvent", "CSSTransitionEvent", "BeforeUnloadEvent",
             "CSSStyleSheet", "CustomElementRegistry", "ClipboardEvent", "DragEvent", "ErrorEvent", "FileList",
@@ -127,6 +128,8 @@
         "DOMRect.height",
         "ElementCreationOptions.customElementRegistry",
         "ImportNodeOptions.customElementRegistry",
+        "AddEventListenerOptions.signal",
+        "AddEventListenerOptions.webkitTrustedOnly",
         "Document.cookie",
         "Document.domain",
         "Document.referrer",

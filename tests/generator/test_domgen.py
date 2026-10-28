@@ -12,9 +12,13 @@ import domgen
 IDL = '''
 enum Mode { "open", "closed" };
 dictionary ProbeOptions { boolean enabled = true; DOMString label; };
+dictionary EventListenerOptions { boolean capture = false; };
+dictionary AddEventListenerOptions : EventListenerOptions {
+    boolean passive; boolean once = false; Outside signal; boolean webkitTrustedOnly = false;
+};
 interface EventTarget {
-    undefined addEventListener(DOMString type, EventListener? listener, optional boolean capture = false);
-    undefined removeEventListener(DOMString type, EventListener? listener, optional boolean capture = false);
+    undefined addEventListener(DOMString type, EventListener? listener, optional (AddEventListenerOptions or boolean) options = false);
+    undefined removeEventListener(DOMString type, EventListener? listener, optional (EventListenerOptions or boolean) options = false);
     boolean dispatchEvent(Event event);
 };
 callback EventListener = undefined(Event event);
@@ -66,8 +70,9 @@ class GeneratorTests(unittest.TestCase):
         tags.parent.mkdir()
         tags.write_text('audio\nh1 interfaceName=HTMLHeadingElement\narticle interfaceName=HTMLArticleElement, JSInterfaceName=HTMLElement\n')
         config = dict(interfaces=['Node', 'Element', 'Document', 'HTMLDocument', 'DOMImplementation', 'Event', 'DOMStringMap'],
-                      skipDirectories=[], exclude=['ImportNodeOptions.customElementRegistry'], atomArguments=[], customGetters=['Node.nodeType'],
+                      skipDirectories=[], exclude=['ImportNodeOptions.customElementRegistry', 'AddEventListenerOptions.signal', 'AddEventListenerOptions.webkitTrustedOnly'], atomArguments=[], customGetters=['Node.nodeType'],
                       contract=dict(htmlTags='html/HTMLTagNames.in', interfaces=['SVGElement', 'SVGSVGElement'],
+                                    dictionaries=['EventListenerOptions', 'AddEventListenerOptions'],
                                     mixins={'AriaAttributes': 'ARIAMixin', 'ParentNode': 'ParentNode'}))
         self.world = domgen.World(self.source, config)
         self.generator = domgen.Generator(self.world)
@@ -122,6 +127,20 @@ class GeneratorTests(unittest.TestCase):
 
     def test_interface_accessors_match_the_native_accessor_subset(self):
         self.assertIn('abstract member writeOnly: string with set', self.generator.interfaces())
+
+    def test_event_listener_option_contracts_preserve_defaults_and_omit_signal(self):
+        source = self.generator.interfaces()
+        self.assertIn('listener: EventListener * options: AddEventListenerOptions -> unit', source)
+        self.assertIn('listener: EventListenerObject * options: AddEventListenerOptions -> unit', source)
+        self.assertIn('listener: EventListener * options: EventListenerOptions -> unit', source)
+        self.assertIn('listener: EventListenerObject * ?capture: bool -> unit', source)
+        self.assertIn('inherit EventListenerOptions()', source)
+        self.assertIn('member val passive: (bool) option = None', source)
+        self.assertIn('member val once: bool = false', source)
+        self.assertNotIn('member val signal:', source)
+        self.assertNotIn('member val webkitTrustedOnly:', source)
+        self.assertIn('AddEventListenerOptions.signal', self.generator.report())
+        self.assertIn('AddEventListenerOptions', json.loads(self.generator.api_model())['contractDictionaries'])
 
     def test_transport_model_describes_variadic_union_and_dictionary_fields(self):
         model = json.loads(self.generator.api_model())

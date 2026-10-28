@@ -60,9 +60,13 @@ and [<AllowNullLiteral>] EventTarget =
     /// <summary>EventTarget.addEventListener registers or removes an event callback.</summary>
     abstract member addEventListener: eventType: string * listener: EventListener * ?capture: bool -> unit
     abstract member addEventListener: eventType: string * listener: EventListenerObject * ?capture: bool -> unit
+    abstract member addEventListener: eventType: string * listener: EventListener * options: AddEventListenerOptions -> unit
+    abstract member addEventListener: eventType: string * listener: EventListenerObject * options: AddEventListenerOptions -> unit
     /// <summary>EventTarget.removeEventListener registers or removes an event callback.</summary>
     abstract member removeEventListener: eventType: string * listener: EventListener * ?capture: bool -> unit
     abstract member removeEventListener: eventType: string * listener: EventListenerObject * ?capture: bool -> unit
+    abstract member removeEventListener: eventType: string * listener: EventListener * options: EventListenerOptions -> unit
+    abstract member removeEventListener: eventType: string * listener: EventListenerObject * options: EventListenerOptions -> unit
     /// <summary>EventTarget.dispatchEvent.</summary>
     abstract member dispatchEvent: ``event``: Event -> bool
 
@@ -2647,6 +2651,17 @@ and [<RequireQualifiedAccess>] ShadowRootOrGetComposedRangesOptions =
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
     | DOMString of string
+
+/// <summary>EventListenerOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] EventListenerOptions() =
+    member val capture: bool = false with get, set
+
+/// <summary>AddEventListenerOptions in the scoped DOM interface model.</summary>
+/// <remarks>Fields omitted from the shared contract: signal, webkitTrustedOnly.</remarks>
+and [<AllowNullLiteral; DomDictionary>] AddEventListenerOptions() =
+    inherit EventListenerOptions()
+    member val passive: (bool) option = None with get, set
+    member val once: bool = false with get, set
 
 /// <summary>GetRootNodeOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetRootNodeOptions() =

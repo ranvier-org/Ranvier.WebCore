@@ -3701,6 +3701,113 @@
       "implementationInterface": "SVGVKernElement"
     }
   ],
+  "contractDictionaries": {
+    "EventListenerOptions": {
+      "base": null,
+      "contractOnly": true,
+      "omittedFields": [],
+      "fields": [
+        {
+          "name": "capture",
+          "required": false,
+          "default": "false",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ]
+    },
+    "AddEventListenerOptions": {
+      "base": "EventListenerOptions",
+      "contractOnly": true,
+      "omittedFields": [
+        "signal",
+        "webkitTrustedOnly"
+      ],
+      "fields": [
+        {
+          "name": "capture",
+          "required": false,
+          "default": "false",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "passive",
+          "required": false,
+          "default": null,
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "once",
+          "required": false,
+          "default": "false",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ]
+    }
+  },
   "functions": [
     {
       "interface": "Node",

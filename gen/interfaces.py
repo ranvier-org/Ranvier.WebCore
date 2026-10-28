@@ -128,9 +128,18 @@ class InterfaceEmitter:
         special_listener = owner == 'EventTarget' and member.name in ('addEventListener', 'removeEventListener', 'dispatchEvent')
         if special_listener and member.name in ('addEventListener', 'removeEventListener'):
             self.callbacks.add('EventListener')
-            return [f'    /// <summary>{owner}.{member.name} registers or removes an event callback.</summary>',
-                    f'    abstract member {member.name}: eventType: string * listener: EventListener * ?capture: bool -> unit',
-                    f'    abstract member {member.name}: eventType: string * listener: EventListenerObject * ?capture: bool -> unit']
+            lines = [f'    /// <summary>{owner}.{member.name} registers or removes an event callback.</summary>',
+                     f'    abstract member {member.name}: eventType: string * listener: EventListener * ?capture: bool -> unit',
+                     f'    abstract member {member.name}: eventType: string * listener: EventListenerObject * ?capture: bool -> unit']
+            if len(member.arguments) >= 3:
+                options = self.world.resolve(member.arguments[2].type)
+                for choice in options.subtypes if options.name == 'union' else [options]:
+                    if choice.name not in self.world.contract_dictionary_fields:
+                        continue
+                    option_type = self.type(choice)
+                    lines += [f'    abstract member {member.name}: eventType: string * listener: {listener} * options: {option_type} -> unit'
+                              for listener in ['EventListener', 'EventListenerObject']]
+            return lines
         if not special_listener and self.generator.member_reason(owner, member):
             return []
         if not special_listener and not self.supporting_functions(owner, member):
@@ -305,6 +314,8 @@ class InterfaceEmitter:
         return lines + ['#endif']
 
     def emit(self):
+        for name in self.world.contract_dictionary_fields:
+            self.type(idl.Type(name))
         bodies = []
         for name in self.names:
             members = []
@@ -333,7 +344,14 @@ class InterfaceEmitter:
             declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | {label(child)} of {self.type(child)}' for child in children]))
         for name, fields in self.dictionaries.items():
             body = []
+            base = self.world.dictionaries[name].base
+            inherited = set()
+            if name in self.world.contract_dictionary_fields and base in self.dictionaries:
+                body += [f'    inherit {base}()']
+                inherited = {member.name for member, _ in self.world.dictionary_fields(base)}
             for member, ftype in fields:
+                if member.name in inherited:
+                    continue
                 t = self.world.resolve(member.type)
                 default = member.default
                 if not member.required and default is None:
@@ -361,6 +379,11 @@ class InterfaceEmitter:
                 declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | [<CompiledName("{value}")>] {case_name(value)}' for value in values]))
         for index, (name, attrs, body) in enumerate(declarations):
             lines += [f'/// <summary>{name.removesuffix("()")} in the scoped DOM interface model.</summary>']
+            dictionary = name.removesuffix('()')
+            if dictionary in self.world.contract_dictionary_fields:
+                omitted = sorted(field.split('.', 1)[1] for field in self.world.dictionary_exclusions if field.startswith(dictionary + '.'))
+                if omitted:
+                    lines += [f'/// <remarks>Fields omitted from the shared contract: {", ".join(omitted)}.</remarks>']
             prefix = "type" if index == 0 else "and"
             if name in self.world.enums:
                 lines += [f'{prefix} [<DomStringEnum; RequireQualifiedAccess>] {name} =']

@@ -10,7 +10,8 @@ source = output / 'webkit/Source/WebCore/dom'
 source.mkdir(parents=True, exist_ok=True)
 (source / 'Fixture.idl').write_text(IDL)
 config = dict(interfaces=['Node', 'Element', 'Document', 'HTMLDocument', 'DOMImplementation', 'Event', 'DOMStringMap'],
-              skipDirectories=[], exclude=[], atomArguments=[])
+              skipDirectories=[], exclude=['AddEventListenerOptions.signal', 'AddEventListenerOptions.webkitTrustedOnly'], atomArguments=[],
+              contract=dict(dictionaries=['EventListenerOptions', 'AddEventListenerOptions']))
 generator = domgen.Generator(domgen.World(output / 'webkit', config))
 generator.lock = {}
 generator.lock_structs = {}

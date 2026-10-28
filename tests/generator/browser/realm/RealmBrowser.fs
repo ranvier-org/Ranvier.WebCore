@@ -37,6 +37,9 @@ let private hasForeignRadioList (_: HTMLFormElement): bool = jsNative
 [<Emit("$0.group === $1")>]
 let private isOriginalRadioList (_: HTMLFormElement) (_: RadioNodeList): bool = jsNative
 
+[<Emit("new Event($0, {cancelable:true})")>]
+let private createEvent (_: string): Event = jsNative
+
 [<Emit("document.body.dataset.result = 'REAL_BROWSER_REALMS_PASS'")>]
 let private passed (): unit = jsNative
 
@@ -58,5 +61,30 @@ let main _ =
     match form.namedItem "group" with
     | Some(RadioNodeListOrElement.RadioNodeList returned) when isOriginalRadioList form returned -> ()
     | _ -> failwith "A real iframe RadioNodeList was rejected or lost identity"
+    let target = unbox<EventTarget> input
+    let mutable onceCalls = 0
+    let onceListener: EventListener = fun event ->
+        onceCalls <- onceCalls + 1
+        event.preventDefault ()
+    let onceOptions = AddEventListenerOptions()
+    onceOptions.capture <- true
+    onceOptions.once <- true
+    onceOptions.passive <- Some true
+    target.addEventListener("typed-once", onceListener, onceOptions)
+    if not (target.dispatchEvent(createEvent "typed-once")) then failwith "Passive listener unexpectedly cancelled the event"
+    target.dispatchEvent(createEvent "typed-once") |> ignore
+    if onceCalls <> 1 then failwith "Listener options did not preserve once"
+    let mutable removedCalls = 0
+    let objectListener =
+        { new EventListenerObject with
+            member _.handleEvent _ = removedCalls <- removedCalls + 1 }
+    let addOptions = AddEventListenerOptions()
+    addOptions.capture <- true
+    let removeOptions = EventListenerOptions()
+    removeOptions.capture <- true
+    target.addEventListener("typed-remove", objectListener, addOptions)
+    target.removeEventListener("typed-remove", objectListener, removeOptions)
+    target.dispatchEvent(createEvent "typed-remove") |> ignore
+    if removedCalls <> 0 then failwith "Listener-object option removal changed capture semantics"
     passed ()
     0

@@ -224,6 +224,8 @@ class World:
             for ancestor in self.chain(name)[1:]:
                 if ancestor not in self.contract_types:
                     self.contract_types.insert(0, ancestor)
+        self.contract_dictionary_fields = {name: self.dictionary_fields(name)
+                                           for name in self.contract_config.get("dictionaries", [])}
 
     def public_name(self, name):
         return self.contract_aliases.get(name, name)
@@ -1121,6 +1123,14 @@ class Generator(ComplexGeneratorMixin):
                                     "source": self.world.interfaces[name].file}
                                    for name in self.world.contract_types],
             "tagInterfaces": self.world.tag_interfaces,
+            "contractDictionaries": {
+                name: {"base": self.world.dictionaries[name].base, "contractOnly": name not in self.dicts_used,
+                       "omittedFields": sorted(field.split(".", 1)[1] for field in self.world.dictionary_exclusions
+                                               if field.startswith(name + ".")),
+                       "fields": [{"name": member.name, "required": member.required,
+                                   "default": member.default, "idl": describe_idl(member.type),
+                                   "mapping": self.describe_mapping(mapped)} for member, mapped in fields]}
+                for name, fields in self.world.contract_dictionary_fields.items()},
             "functions": functions,
             "enumerations": self.enums_used,
             "containers": [{"mapping": self.describe_mapping(mapped),

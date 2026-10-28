@@ -70,6 +70,8 @@ Stubs, for members of the lock that WebKit's IDL no longer has:
   (none)
 
 Left out:
+  AddEventListenerOptions.signal: excluded dictionary field by gen/dom.json
+  AddEventListenerOptions.webkitTrustedOnly: excluded dictionary field by gen/dom.json
   CSSStyleDeclaration.cssRules: interface CSSRuleList outside gen/dom.json
   CSSStyleDeclaration.getPropertyCSSValue: interface DeprecatedCSSOMValue outside gen/dom.json
   CSSStyleDeclaration.parentRule: interface CSSRule outside gen/dom.json
