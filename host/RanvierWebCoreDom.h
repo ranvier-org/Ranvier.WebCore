@@ -27,6 +27,8 @@
 extern "C" {
 #endif
 
+typedef struct RvDOMImplementation RvDOMImplementation;
+typedef struct RvNamedNodeMap RvNamedNodeMap;
 typedef struct RvCSSStyleDeclaration RvCSSStyleDeclaration;
 typedef struct RvDOMTokenList RvDOMTokenList;
 typedef struct RvDOMStringMap RvDOMStringMap;
@@ -36,6 +38,24 @@ typedef struct RvDOMRectReadOnly RvDOMRectReadOnly;
 typedef struct RvNodeList RvNodeList;
 typedef struct RvHTMLCollection RvHTMLCollection;
 typedef struct RvValidityState RvValidityState;
+typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
+typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
+typedef struct RvDomSequenceElement RvDomSequenceElement;
+typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
+typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
+typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
+typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
+typedef struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable;
+typedef struct RvDomUnionTogglePopoverOptionsOrBoolean RvDomUnionTogglePopoverOptionsOrBoolean;
+typedef struct RvDomUnionRadioNodeListOrElementNullable RvDomUnionRadioNodeListOrElementNullable;
+typedef struct RvDomUnionHTMLOptionElementOrHTMLOptGroupElement RvDomUnionHTMLOptionElementOrHTMLOptGroupElement;
+typedef struct RvDomUnionHTMLElementOrLongNullable RvDomUnionHTMLElementOrLongNullable;
+typedef struct RvDomSequenceNode RvDomSequenceNode;
+typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
+typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
+typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
+typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
+typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 
 /* Constants of the interfaces. */
 enum {
@@ -105,6 +125,14 @@ enum {
     RV_DOM_SCROLL_BEHAVIOR_SMOOTH = 2, /* "smooth" */
 };
 
+/* The values of the IDL enumeration ScrollLogicalPosition. */
+enum {
+    RV_DOM_SCROLL_LOGICAL_POSITION_START = 0, /* "start" */
+    RV_DOM_SCROLL_LOGICAL_POSITION_CENTER = 1, /* "center" */
+    RV_DOM_SCROLL_LOGICAL_POSITION_END = 2, /* "end" */
+    RV_DOM_SCROLL_LOGICAL_POSITION_NEAREST = 3, /* "nearest" */
+};
+
 /* The values of the IDL enumeration ShadowRootMode. */
 enum {
     RV_DOM_SHADOW_ROOT_MODE_USER_AGENT = 0, /* "user-agent" */
@@ -130,6 +158,20 @@ typedef struct RvDomGetRootNodeOptions {
     uint32_t size;
     int32_t composed; /* boolean, default false */
 } RvDomGetRootNodeOptions;
+
+/* The IDL dictionary GetHTMLOptions. size is sizeof(RvDomGetHTMLOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomGetHTMLOptions {
+    uint32_t size;
+    int32_t serializable_shadow_roots; /* boolean, default false */
+    const RvDomSequenceShadowRoot* shadow_roots; /* sequence<ShadowRoot>, default [] */
+} RvDomGetHTMLOptions;
+
+/* The IDL dictionary ElementCreationOptions. size is sizeof(RvDomElementCreationOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomElementCreationOptions {
+    uint32_t size;
+} RvDomElementCreationOptions;
 
 /* The IDL dictionary AriaNotifyOptions. size is sizeof(RvDomAriaNotifyOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -161,6 +203,15 @@ typedef struct RvDomCheckVisibilityOptions {
     int32_t check_visibility_css; /* boolean, default false */
 } RvDomCheckVisibilityOptions;
 
+/* The IDL dictionary ScrollIntoViewOptions. size is sizeof(RvDomScrollIntoViewOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomScrollIntoViewOptions {
+    uint32_t size;
+    int32_t behavior; /* ScrollBehavior, default "auto", RV_DOM_SCROLL_BEHAVIOR_* */
+    const int32_t* block; /* ScrollLogicalPosition, NULL for absent, RV_DOM_SCROLL_LOGICAL_POSITION_* */
+    const int32_t* inline_; /* ScrollLogicalPosition, NULL for absent, RV_DOM_SCROLL_LOGICAL_POSITION_* */
+} RvDomScrollIntoViewOptions;
+
 /* The IDL dictionary ScrollToOptions. size is sizeof(RvDomScrollToOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomScrollToOptions {
@@ -177,6 +228,14 @@ typedef struct RvDomShowPopoverOptions {
     RvNode* source; /* HTMLElement, NULL for absent */
 } RvDomShowPopoverOptions;
 
+/* The IDL dictionary TogglePopoverOptions. size is sizeof(RvDomTogglePopoverOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomTogglePopoverOptions {
+    uint32_t size;
+    RvNode* source; /* HTMLElement, NULL for absent */
+    const int32_t* force; /* boolean, NULL for absent */
+} RvDomTogglePopoverOptions;
+
 /* The IDL dictionary FocusOptions. size is sizeof(RvDomFocusOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomFocusOptions {
@@ -185,6 +244,260 @@ typedef struct RvDomFocusOptions {
     const int32_t* focus_visible; /* boolean, NULL for absent */
 } RvDomFocusOptions;
 
+/* The IDL dictionary AssignedNodesOptions. size is sizeof(RvDomAssignedNodesOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomAssignedNodesOptions {
+    uint32_t size;
+    int32_t flatten; /* boolean, default false */
+} RvDomAssignedNodesOptions;
+
+/* The IDL dictionary GetComposedRangesOptions. size is sizeof(RvDomGetComposedRangesOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomGetComposedRangesOptions {
+    uint32_t size;
+    const RvDomSequenceShadowRoot* shadow_roots; /* sequence<ShadowRoot>, default [] */
+} RvDomGetComposedRangesOptions;
+
+typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
+typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
+typedef struct RvDomSequenceElement RvDomSequenceElement;
+typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
+typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
+typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
+typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
+typedef struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable;
+typedef struct RvDomUnionTogglePopoverOptionsOrBoolean RvDomUnionTogglePopoverOptionsOrBoolean;
+typedef struct RvDomUnionRadioNodeListOrElementNullable RvDomUnionRadioNodeListOrElementNullable;
+typedef struct RvDomUnionHTMLOptionElementOrHTMLOptGroupElement RvDomUnionHTMLOptionElementOrHTMLOptGroupElement;
+typedef struct RvDomUnionHTMLElementOrLongNullable RvDomUnionHTMLElementOrLongNullable;
+typedef struct RvDomSequenceNode RvDomSequenceNode;
+typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
+typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
+typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
+typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
+typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_NODE_OR_DOM_STRING_NODE = 1,
+    RV_DOM_UNION_NODE_OR_DOM_STRING_STRING = 2,
+};
+struct RvDomUnionNodeOrDOMString {
+    int32_t present;
+    int32_t tag;
+    RvNode* arm0;
+    const char* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceNodeOrDOMString {
+    int32_t present;
+    int32_t count;
+    RvDomUnionNodeOrDOMString* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceElement {
+    int32_t present;
+    int32_t count;
+    RvNode** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceShadowRoot {
+    int32_t present;
+    int32_t count;
+    RvNode** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_DOM_STRING_OR_ELEMENT_CREATION_OPTIONS_STRING = 1,
+    RV_DOM_UNION_DOM_STRING_OR_ELEMENT_CREATION_OPTIONS_ELEMENT_CREATION_OPTIONS = 2,
+};
+struct RvDomUnionDOMStringOrElementCreationOptions {
+    int32_t present;
+    int32_t tag;
+    const char* arm0;
+    const RvDomElementCreationOptions* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceDOMString {
+    int32_t present;
+    int32_t count;
+    const char** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_BOOLEAN_OR_SCROLL_INTO_VIEW_OPTIONS_BOOL = 1,
+    RV_DOM_UNION_BOOLEAN_OR_SCROLL_INTO_VIEW_OPTIONS_SCROLL_INTO_VIEW_OPTIONS = 2,
+};
+struct RvDomUnionBooleanOrScrollIntoViewOptions {
+    int32_t present;
+    int32_t tag;
+    int32_t arm0;
+    const RvDomScrollIntoViewOptions* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_BOOLEAN_OR_UNRESTRICTED_DOUBLE_OR_DOM_STRING_NULLABLE_BOOL = 1,
+    RV_DOM_UNION_BOOLEAN_OR_UNRESTRICTED_DOUBLE_OR_DOM_STRING_NULLABLE_NUMBER = 2,
+    RV_DOM_UNION_BOOLEAN_OR_UNRESTRICTED_DOUBLE_OR_DOM_STRING_NULLABLE_STRING = 3,
+};
+struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable {
+    int32_t present;
+    int32_t tag;
+    int32_t arm0;
+    double arm1;
+    const char* arm2;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_TOGGLE_POPOVER_OPTIONS_OR_BOOLEAN_TOGGLE_POPOVER_OPTIONS = 1,
+    RV_DOM_UNION_TOGGLE_POPOVER_OPTIONS_OR_BOOLEAN_BOOL = 2,
+};
+struct RvDomUnionTogglePopoverOptionsOrBoolean {
+    int32_t present;
+    int32_t tag;
+    const RvDomTogglePopoverOptions* arm0;
+    int32_t arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_RADIO_NODE_LIST_OR_ELEMENT_NULLABLE_RADIO_NODE_LIST = 1,
+    RV_DOM_UNION_RADIO_NODE_LIST_OR_ELEMENT_NULLABLE_ELEMENT = 2,
+};
+struct RvDomUnionRadioNodeListOrElementNullable {
+    int32_t present;
+    int32_t tag;
+    RvNodeList* arm0;
+    RvNode* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_HTML_OPTION_ELEMENT_OR_HTML_OPT_GROUP_ELEMENT_HTML_OPTION_ELEMENT = 1,
+    RV_DOM_UNION_HTML_OPTION_ELEMENT_OR_HTML_OPT_GROUP_ELEMENT_HTML_OPT_GROUP_ELEMENT = 2,
+};
+struct RvDomUnionHTMLOptionElementOrHTMLOptGroupElement {
+    int32_t present;
+    int32_t tag;
+    RvNode* arm0;
+    RvNode* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_HTML_ELEMENT_OR_LONG_NULLABLE_HTML_ELEMENT = 1,
+    RV_DOM_UNION_HTML_ELEMENT_OR_LONG_NULLABLE_NUMBER = 2,
+};
+struct RvDomUnionHTMLElementOrLongNullable {
+    int32_t present;
+    int32_t tag;
+    RvNode* arm0;
+    int32_t arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceNode {
+    int32_t present;
+    int32_t count;
+    RvNode** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_ELEMENT_OR_TEXT_ELEMENT = 1,
+    RV_DOM_UNION_ELEMENT_OR_TEXT_TEXT = 2,
+};
+struct RvDomUnionElementOrText {
+    int32_t present;
+    int32_t tag;
+    RvNode* arm0;
+    RvNode* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceElementOrText {
+    int32_t present;
+    int32_t count;
+    RvDomUnionElementOrText* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_SHADOW_ROOT_OR_GET_COMPOSED_RANGES_OPTIONS_SHADOW_ROOT = 1,
+    RV_DOM_UNION_SHADOW_ROOT_OR_GET_COMPOSED_RANGES_OPTIONS_GET_COMPOSED_RANGES_OPTIONS = 2,
+};
+struct RvDomUnionShadowRootOrGetComposedRangesOptions {
+    int32_t present;
+    int32_t tag;
+    RvNode* arm0;
+    const RvDomGetComposedRangesOptions* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceStaticRange {
+    int32_t present;
+    int32_t count;
+    RvAbstractRange** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequencePointerEvent {
+    int32_t present;
+    int32_t count;
+    RvEvent** items;
+};
+RV_EXPORT void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value);
+RV_EXPORT void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value);
+RV_EXPORT void rv_dom_sequence_element_release(RvDomSequenceElement* value);
+RV_EXPORT void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value);
+RV_EXPORT void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value);
+RV_EXPORT void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString* value);
+RV_EXPORT void rv_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value);
+RV_EXPORT void rv_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value);
+RV_EXPORT void rv_dom_union_toggle_popover_options_or_boolean_release(RvDomUnionTogglePopoverOptionsOrBoolean* value);
+RV_EXPORT void rv_dom_union_radio_node_list_or_element_nullable_release(RvDomUnionRadioNodeListOrElementNullable* value);
+RV_EXPORT void rv_dom_union_html_option_element_or_html_opt_group_element_release(RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* value);
+RV_EXPORT void rv_dom_union_html_element_or_long_nullable_release(RvDomUnionHTMLElementOrLongNullable* value);
+RV_EXPORT void rv_dom_sequence_node_release(RvDomSequenceNode* value);
+RV_EXPORT void rv_dom_union_element_or_text_release(RvDomUnionElementOrText* value);
+RV_EXPORT void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value);
+RV_EXPORT void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value);
+RV_EXPORT void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
+RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
+/* Releases a handle to a DOMImplementation. */
+RV_EXPORT void rv_dom_dom_implementation_release(RvDOMImplementation*);
+/* Adds a reference to a DOMImplementation and returns it. */
+RV_EXPORT RvDOMImplementation* rv_dom_dom_implementation_retain(RvDOMImplementation*);
+/* Releases a handle to a NamedNodeMap. */
+RV_EXPORT void rv_dom_named_node_map_release(RvNamedNodeMap*);
+/* Adds a reference to a NamedNodeMap and returns it. */
+RV_EXPORT RvNamedNodeMap* rv_dom_named_node_map_retain(RvNamedNodeMap*);
 /* Releases a handle to a CSSStyleDeclaration. */
 RV_EXPORT void rv_dom_css_style_declaration_release(RvCSSStyleDeclaration*);
 /* Adds a reference to a CSSStyleDeclaration and returns it. */
@@ -224,6 +537,8 @@ RV_EXPORT RvValidityState* rv_dom_validity_state_retain(RvValidityState*);
 
 /* Node */
 
+/* Node.nodeType getter: readonly attribute unsigned short nodeType */
+RV_EXPORT int32_t rv_dom_node_get_node_type(RvNode* target, uint16_t* result);
 /* Node.nodeName getter: readonly attribute DOMString nodeName */
 RV_EXPORT int32_t rv_dom_node_get_node_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Node.baseURI getter: readonly attribute USVString baseURI */
@@ -309,6 +624,12 @@ RV_EXPORT int32_t rv_dom_character_data_insert_data(RvNode* target, uint32_t off
 RV_EXPORT int32_t rv_dom_character_data_delete_data(RvNode* target, uint32_t offset, uint32_t count);
 /* CharacterData.replaceData(unsigned long offset, unsigned long count, DOMString data) -> undefined */
 RV_EXPORT int32_t rv_dom_character_data_replace_data(RvNode* target, uint32_t offset, uint32_t count, const char* data);
+/* CharacterData.before((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_character_data_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* CharacterData.after((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_character_data_after(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* CharacterData.replaceWith((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_character_data_replace_with(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 /* CharacterData.remove() -> undefined */
 RV_EXPORT int32_t rv_dom_character_data_remove(RvNode* target);
 /* Text */
@@ -331,6 +652,12 @@ RV_EXPORT int32_t rv_dom_document_fragment_get_first_element_child(RvNode* targe
 RV_EXPORT int32_t rv_dom_document_fragment_get_last_element_child(RvNode* target, RvNode** result);
 /* DocumentFragment.childElementCount getter: readonly attribute unsigned long childElementCount */
 RV_EXPORT int32_t rv_dom_document_fragment_get_child_element_count(RvNode* target, uint32_t* result);
+/* DocumentFragment.prepend((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_document_fragment_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* DocumentFragment.append((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_document_fragment_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* DocumentFragment.replaceChildren((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_document_fragment_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 /* DocumentFragment.moveBefore(Node node, Node? child) -> undefined; child may be NULL; RV_ERR_UNSUPPORTED while the
  * setting MoveBeforeEnabled is off */
 RV_EXPORT int32_t rv_dom_document_fragment_move_before(RvNode* target, RvNode* node, RvNode* child);
@@ -375,10 +702,18 @@ RV_EXPORT int32_t rv_dom_shadow_root_get_inner_html(RvNode* target, char* buffer
 RV_EXPORT int32_t rv_dom_shadow_root_set_inner_html(RvNode* target, const char* value);
 /* ShadowRoot.elementFromPoint(double x, double y) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_shadow_root_element_from_point(RvNode* target, double x, double y, RvNode** result);
+/* ShadowRoot.elementsFromPoint(double x, double y) -> sequence<Element>; *result owns its contents; release with the
+ * matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_shadow_root_elements_from_point(RvNode* target, double x, double y, RvDomSequenceElement* result);
 /* ShadowRoot.setHTMLUnsafe((TrustedHTML or DOMString) html) -> undefined */
 RV_EXPORT int32_t rv_dom_shadow_root_set_html_unsafe(RvNode* target, const char* html);
+/* ShadowRoot.getHTML(optional GetHTMLOptions options = {}) -> DOMString; options defaults to {} in IDL; options may
+ * be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_shadow_root_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length);
 /* Document */
 
+/* Document.implementation getter: readonly attribute DOMImplementation implementation; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_get_implementation(RvNode* target, RvDOMImplementation** result);
 /* Document.compatMode getter: readonly attribute DOMString compatMode */
 RV_EXPORT int32_t rv_dom_document_get_compat_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Document.characterSet getter: readonly attribute DOMString characterSet */
@@ -434,6 +769,13 @@ RV_EXPORT int32_t rv_dom_document_get_last_element_child(RvNode* target, RvNode*
 RV_EXPORT int32_t rv_dom_document_get_child_element_count(RvNode* target, uint32_t* result);
 /* Document.activeElement getter: readonly attribute Element? activeElement; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_get_active_element(RvNode* target, RvNode** result);
+/* Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) ->
+ * Element; options defaults to {} in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_create_element(RvNode* target, const char* local_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
+/* Document.createElementNS(DOMString? namespaceURI, DOMString qualifiedName, optional (DOMString or
+ * ElementCreationOptions) options = {}) -> Element; namespace_uri may be NULL (null); options defaults to {} in IDL;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_create_element_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
 /* Document.getElementsByTagName(DOMString qualifiedName) -> HTMLCollection; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_get_elements_by_tag_name(RvNode* target, const char* qualified_name, RvHTMLCollection** result);
 /* Document.getElementsByTagNameNS(DOMString? namespaceURI, DOMString localName) -> HTMLCollection; namespace_uri may
@@ -486,6 +828,12 @@ RV_EXPORT int32_t rv_dom_document_query_command_supported(RvNode* target, const 
 RV_EXPORT int32_t rv_dom_document_query_command_value(RvNode* target, const char* command_id, char* buffer, int32_t capacity, int32_t* length);
 /* Document.getSelection() -> DOMSelection?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_get_selection(RvNode* target, RvDOMSelection** result);
+/* Document.prepend((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_document_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* Document.append((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_document_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* Document.replaceChildren((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_document_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 /* Document.moveBefore(Node node, Node? child) -> undefined; child may be NULL; RV_ERR_UNSUPPORTED while the setting
  * MoveBeforeEnabled is off */
 RV_EXPORT int32_t rv_dom_document_move_before(RvNode* target, RvNode* node, RvNode* child);
@@ -497,6 +845,16 @@ RV_EXPORT int32_t rv_dom_document_query_selector_all(RvNode* target, const char*
 RV_EXPORT int32_t rv_dom_document_get_element_by_id(RvNode* target, const char* element_id, RvNode** result);
 /* Document.elementFromPoint(double x, double y) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_element_from_point(RvNode* target, double x, double y, RvNode** result);
+/* Document.elementsFromPoint(double x, double y) -> sequence<Element>; *result owns its contents; release with the
+ * matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_document_elements_from_point(RvNode* target, double x, double y, RvDomSequenceElement* result);
+/* DOMImplementation */
+
+/* DOMImplementation.createHTMLDocument(optional DOMString title) -> HTMLDocument; title may be NULL (absent); *result
+ * is a new reference */
+RV_EXPORT int32_t rv_dom_dom_implementation_create_html_document(RvDOMImplementation* target, const char* title, RvNode** result);
+/* DOMImplementation.hasFeature() -> boolean */
+RV_EXPORT int32_t rv_dom_dom_implementation_has_feature(RvDOMImplementation* target, int32_t* result);
 /* Element */
 
 /* Element.namespaceURI getter: readonly attribute DOMString? namespaceURI */
@@ -523,6 +881,8 @@ RV_EXPORT int32_t rv_dom_element_get_slot(RvNode* target, char* buffer, int32_t 
 RV_EXPORT int32_t rv_dom_element_set_slot(RvNode* target, const char* value);
 /* Element.part getter: readonly attribute DOMTokenList part; *result is a new reference */
 RV_EXPORT int32_t rv_dom_element_get_part(RvNode* target, RvDOMTokenList** result);
+/* Element.attributes getter: readonly attribute NamedNodeMap attributes; *result is a new reference */
+RV_EXPORT int32_t rv_dom_element_get_attributes(RvNode* target, RvNamedNodeMap** result);
 /* Element.scrollTop getter: attribute long scrollTop */
 RV_EXPORT int32_t rv_dom_element_get_scroll_top(RvNode* target, int32_t* result);
 /* Element.scrollTop setter: attribute long scrollTop */
@@ -755,6 +1115,9 @@ RV_EXPORT int32_t rv_dom_element_get_inner_html(RvNode* target, char* buffer, in
 RV_EXPORT int32_t rv_dom_element_set_inner_html(RvNode* target, const char* value);
 /* Element.hasAttributes() -> boolean */
 RV_EXPORT int32_t rv_dom_element_has_attributes(RvNode* target, int32_t* result);
+/* Element.getAttributeNames() -> sequence<DOMString>; *result owns its contents; release with the matching
+ * rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_element_get_attribute_names(RvNode* target, RvDomSequenceDOMString* result);
 /* Element.getAttribute(DOMString qualifiedName) -> DOMString? */
 RV_EXPORT int32_t rv_dom_element_get_attribute(RvNode* target, const char* qualified_name, char* buffer, int32_t capacity, int32_t* length);
 /* Element.getAttributeNS(DOMString? namespaceURI, DOMString localName) -> DOMString?; namespace_uri may be NULL
@@ -815,6 +1178,9 @@ RV_EXPORT int32_t rv_dom_element_get_bounding_client_rect(RvNode* target, RvDOMR
 /* Element.checkVisibility(optional CheckVisibilityOptions options = {}) -> boolean; options defaults to {} in IDL;
  * options may be NULL for the IDL default */
 RV_EXPORT int32_t rv_dom_element_check_visibility(RvNode* target, const RvDomCheckVisibilityOptions* options, int32_t* result);
+/* Element.scrollIntoView(optional (boolean or ScrollIntoViewOptions) arg = {}) -> undefined; arg defaults to {} in
+ * IDL */
+RV_EXPORT int32_t rv_dom_element_scroll_into_view(RvNode* target, const RvDomUnionBooleanOrScrollIntoViewOptions* arg);
 /* Element.scroll(optional ScrollToOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
  * NULL for the IDL default */
 RV_EXPORT int32_t rv_dom_element_scroll_1(RvNode* target, const RvDomScrollToOptions* options);
@@ -841,8 +1207,20 @@ RV_EXPORT int32_t rv_dom_element_set_pointer_capture(RvNode* target, int32_t poi
 RV_EXPORT int32_t rv_dom_element_release_pointer_capture(RvNode* target, int32_t pointer_id);
 /* Element.hasPointerCapture(long pointerId) -> boolean */
 RV_EXPORT int32_t rv_dom_element_has_pointer_capture(RvNode* target, int32_t pointer_id, int32_t* result);
+/* Element.before((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_element_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* Element.after((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_element_after(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* Element.replaceWith((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_element_replace_with(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 /* Element.remove() -> undefined */
 RV_EXPORT int32_t rv_dom_element_remove(RvNode* target);
+/* Element.prepend((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_element_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* Element.append((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_element_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
+/* Element.replaceChildren((Node or DOMString) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_element_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 /* Element.moveBefore(Node node, Node? child) -> undefined; child may be NULL; RV_ERR_UNSUPPORTED while the setting
  * MoveBeforeEnabled is off */
 RV_EXPORT int32_t rv_dom_element_move_before(RvNode* target, RvNode* node, RvNode* child);
@@ -852,6 +1230,9 @@ RV_EXPORT int32_t rv_dom_element_query_selector(RvNode* target, const char* sele
 RV_EXPORT int32_t rv_dom_element_query_selector_all(RvNode* target, const char* selectors, RvNodeList** result);
 /* Element.setHTMLUnsafe((TrustedHTML or DOMString) html) -> undefined */
 RV_EXPORT int32_t rv_dom_element_set_html_unsafe(RvNode* target, const char* html);
+/* Element.getHTML(optional GetHTMLOptions options = {}) -> DOMString; options defaults to {} in IDL; options may be
+ * NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_element_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length);
 /* Attr */
 
 /* Attr.namespaceURI getter: readonly attribute DOMString? namespaceURI */
@@ -872,6 +1253,26 @@ RV_EXPORT int32_t rv_dom_attr_get_owner_element(RvNode* target, RvNode** result)
 RV_EXPORT int32_t rv_dom_attr_get_specified(RvNode* target, int32_t* result);
 /* Attr.style getter: readonly attribute CSSStyleProperties? style; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_attr_get_style(RvNode* target, RvCSSStyleDeclaration** result);
+/* NamedNodeMap */
+
+/* NamedNodeMap.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_named_node_map_get_length(RvNamedNodeMap* target, uint32_t* result);
+/* NamedNodeMap.item(unsigned long index) -> Attr?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_named_node_map_item(RvNamedNodeMap* target, uint32_t index, RvNode** result);
+/* NamedNodeMap.getNamedItem(DOMString qualifiedName) -> Attr?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_named_node_map_get_named_item(RvNamedNodeMap* target, const char* qualified_name, RvNode** result);
+/* NamedNodeMap.getNamedItemNS(DOMString? namespaceURI, DOMString localName) -> Attr?; namespace_uri may be NULL
+ * (null); *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_named_node_map_get_named_item_ns(RvNamedNodeMap* target, const char* namespace_uri, const char* local_name, RvNode** result);
+/* NamedNodeMap.setNamedItem(Attr attr) -> Attr?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_named_node_map_set_named_item(RvNamedNodeMap* target, RvNode* attr, RvNode** result);
+/* NamedNodeMap.setNamedItemNS(Attr attr) -> Attr?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_named_node_map_set_named_item_ns(RvNamedNodeMap* target, RvNode* attr, RvNode** result);
+/* NamedNodeMap.removeNamedItem(DOMString qualifiedName) -> Attr; *result is a new reference */
+RV_EXPORT int32_t rv_dom_named_node_map_remove_named_item(RvNamedNodeMap* target, const char* qualified_name, RvNode** result);
+/* NamedNodeMap.removeNamedItemNS(DOMString? namespaceURI, DOMString localName) -> Attr; namespace_uri may be NULL
+ * (null); *result is a new reference */
+RV_EXPORT int32_t rv_dom_named_node_map_remove_named_item_ns(RvNamedNodeMap* target, const char* namespace_uri, const char* local_name, RvNode** result);
 /* HTMLElement */
 
 /* HTMLElement.title getter: attribute DOMString title */
@@ -898,6 +1299,11 @@ RV_EXPORT int32_t rv_dom_html_element_set_cue(RvNode* target, int32_t value);
 RV_EXPORT int32_t rv_dom_html_element_get_cuebackground(RvNode* target, int32_t* result);
 /* HTMLElement.cuebackground setter: attribute boolean cuebackground */
 RV_EXPORT int32_t rv_dom_html_element_set_cuebackground(RvNode* target, int32_t value);
+/* HTMLElement.hidden getter: attribute (boolean or unrestricted double or DOMString)? hidden; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_html_element_get_hidden(RvNode* target, RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* result);
+/* HTMLElement.hidden setter: attribute (boolean or unrestricted double or DOMString)? hidden */
+RV_EXPORT int32_t rv_dom_html_element_set_hidden(RvNode* target, const RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value);
 /* HTMLElement.accessKey getter: attribute DOMString accessKey */
 RV_EXPORT int32_t rv_dom_html_element_get_access_key(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.accessKey setter: attribute DOMString accessKey */
@@ -1009,6 +1415,9 @@ RV_EXPORT int32_t rv_dom_html_element_click(RvNode* target);
 RV_EXPORT int32_t rv_dom_html_element_show_popover(RvNode* target, const RvDomShowPopoverOptions* options);
 /* HTMLElement.hidePopover() -> undefined; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_hide_popover(RvNode* target);
+/* HTMLElement.togglePopover(optional (TogglePopoverOptions or boolean) options = {}) -> boolean; options defaults to
+ * {} in IDL; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off */
+RV_EXPORT int32_t rv_dom_html_element_toggle_popover(RvNode* target, const RvDomUnionTogglePopoverOptionsOrBoolean* options, int32_t* result);
 /* HTMLElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
  * NULL for the IDL default */
 RV_EXPORT int32_t rv_dom_html_element_focus(RvNode* target, const RvDomFocusOptions* options);
@@ -1334,6 +1743,9 @@ RV_EXPORT int32_t rv_dom_html_form_element_get_elements(RvNode* target, RvHTMLCo
 RV_EXPORT int32_t rv_dom_html_form_element_get_length(RvNode* target, uint32_t* result);
 /* HTMLFormElement.item(unsigned long index) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_form_element_item(RvNode* target, uint32_t index, RvNode** result);
+/* HTMLFormElement.namedItem(DOMString name) -> (RadioNodeList or Element)?; *result owns its contents; release with
+ * the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_html_form_element_named_item(RvNode* target, const char* name, RvDomUnionRadioNodeListOrElementNullable* result);
 /* HTMLFormElement.reset() -> undefined */
 RV_EXPORT int32_t rv_dom_html_form_element_reset(RvNode* target);
 /* HTMLFormElement.checkValidity() -> boolean */
@@ -1895,6 +2307,9 @@ RV_EXPORT int32_t rv_dom_html_select_element_get_labels(RvNode* target, RvNodeLi
 RV_EXPORT int32_t rv_dom_html_select_element_item(RvNode* target, uint32_t index, RvNode** result);
 /* HTMLSelectElement.namedItem(DOMString name) -> HTMLOptionElement?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_select_element_named_item(RvNode* target, const char* name, RvNode** result);
+/* HTMLSelectElement.add((HTMLOptionElement or HTMLOptGroupElement) element, optional (HTMLElement or long)? before =
+ * null) -> undefined; before defaults to null in IDL */
+RV_EXPORT int32_t rv_dom_html_select_element_add(RvNode* target, const RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* element, const RvDomUnionHTMLElementOrLongNullable* before);
 /* HTMLSelectElement.remove() -> undefined */
 RV_EXPORT int32_t rv_dom_html_select_element_remove_0(RvNode* target);
 /* HTMLSelectElement.remove(long index) -> undefined */
@@ -1914,6 +2329,16 @@ RV_EXPORT int32_t rv_dom_html_select_element_set_custom_validity(RvNode* target,
 RV_EXPORT int32_t rv_dom_html_slot_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSlotElement.name setter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_slot_element_set_name(RvNode* target, const char* value);
+/* HTMLSlotElement.assignedNodes(optional AssignedNodesOptions options = {}) -> sequence<Node>; options defaults to {}
+ * in IDL; options may be NULL for the IDL default; *result owns its contents; release with the matching
+ * rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_html_slot_element_assigned_nodes(RvNode* target, const RvDomAssignedNodesOptions* options, RvDomSequenceNode* result);
+/* HTMLSlotElement.assignedElements(optional AssignedNodesOptions options = {}) -> sequence<Element>; options defaults
+ * to {} in IDL; options may be NULL for the IDL default; *result owns its contents; release with the matching
+ * rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_html_slot_element_assigned_elements(RvNode* target, const RvDomAssignedNodesOptions* options, RvDomSequenceElement* result);
+/* HTMLSlotElement.assign((Element or Text) nodes) -> undefined */
+RV_EXPORT int32_t rv_dom_html_slot_element_assign(RvNode* target, const RvDomSequenceElementOrText* nodes);
 /* HTMLTextAreaElement */
 
 /* HTMLTextAreaElement.dirName getter: attribute DOMString dirName */
@@ -2015,6 +2440,42 @@ RV_EXPORT int32_t rv_dom_html_text_area_element_set_range_text_4(RvNode* target,
 /* HTMLTextAreaElement.setSelectionRange(unsigned long start, unsigned long end, optional DOMString direction) ->
  * undefined; direction may be NULL (absent) */
 RV_EXPORT int32_t rv_dom_html_text_area_element_set_selection_range(RvNode* target, uint32_t start, uint32_t end, const char* direction);
+/* HTMLTemplateElement */
+
+/* HTMLTemplateElement.content getter: readonly attribute DocumentFragment content; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_template_element_get_content(RvNode* target, RvNode** result);
+/* HTMLTemplateElement.shadowRootMode getter: attribute DOMString shadowRootMode */
+RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTemplateElement.shadowRootMode setter: attribute DOMString shadowRootMode */
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_mode(RvNode* target, const char* value);
+/* HTMLTemplateElement.shadowRootDelegatesFocus getter: attribute boolean shadowRootDelegatesFocus */
+RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_delegates_focus(RvNode* target, int32_t* result);
+/* HTMLTemplateElement.shadowRootDelegatesFocus setter: attribute boolean shadowRootDelegatesFocus */
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_delegates_focus(RvNode* target, int32_t value);
+/* HTMLTemplateElement.shadowRootSlotAssignment getter: attribute DOMString shadowRootSlotAssignment */
+RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_slot_assignment(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTemplateElement.shadowRootSlotAssignment setter: attribute DOMString shadowRootSlotAssignment */
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_slot_assignment(RvNode* target, const char* value);
+/* HTMLTemplateElement.shadowRootClonable getter: attribute boolean shadowRootClonable */
+RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_clonable(RvNode* target, int32_t* result);
+/* HTMLTemplateElement.shadowRootClonable setter: attribute boolean shadowRootClonable */
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_clonable(RvNode* target, int32_t value);
+/* HTMLTemplateElement.shadowRootSerializable getter: attribute boolean shadowRootSerializable */
+RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_serializable(RvNode* target, int32_t* result);
+/* HTMLTemplateElement.shadowRootSerializable setter: attribute boolean shadowRootSerializable */
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_serializable(RvNode* target, int32_t value);
+/* HTMLTemplateElement.shadowRootCustomElementRegistry getter: attribute DOMString shadowRootCustomElementRegistry;
+ * RV_ERR_UNSUPPORTED while the setting ScopedCustomElementRegistryEnabled is off */
+RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_custom_element_registry(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTemplateElement.shadowRootCustomElementRegistry setter: attribute DOMString shadowRootCustomElementRegistry;
+ * RV_ERR_UNSUPPORTED while the setting ScopedCustomElementRegistryEnabled is off */
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_custom_element_registry(RvNode* target, const char* value);
+/* HTMLTemplateElement.shadowRootReferenceTarget getter: attribute DOMString shadowRootReferenceTarget;
+ * RV_ERR_UNSUPPORTED while the setting ShadowRootReferenceTargetEnabled is off */
+RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_reference_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTemplateElement.shadowRootReferenceTarget setter: attribute DOMString shadowRootReferenceTarget;
+ * RV_ERR_UNSUPPORTED while the setting ShadowRootReferenceTargetEnabled is off */
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_reference_target(RvNode* target, const char* value);
 /* HTMLUListElement */
 
 /* HTMLUListElement.compact getter: attribute boolean compact */
@@ -2056,6 +2517,10 @@ RV_EXPORT int32_t rv_dom_dom_token_list_set_value(RvDOMTokenList* target, const 
 RV_EXPORT int32_t rv_dom_dom_token_list_item(RvDOMTokenList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
 /* DOMTokenList.contains(DOMString token) -> boolean */
 RV_EXPORT int32_t rv_dom_dom_token_list_contains(RvDOMTokenList* target, const char* token, int32_t* result);
+/* DOMTokenList.add(DOMString tokens) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_token_list_add(RvDOMTokenList* target, const RvDomSequenceDOMString* tokens);
+/* DOMTokenList.remove(DOMString tokens) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_token_list_remove(RvDOMTokenList* target, const RvDomSequenceDOMString* tokens);
 /* DOMTokenList.toggle(DOMString token, optional boolean force) -> boolean; force may be NULL (absent) */
 RV_EXPORT int32_t rv_dom_dom_token_list_toggle(RvDOMTokenList* target, const char* token, const int32_t* force, int32_t* result);
 /* DOMTokenList.replace(DOMString token, DOMString newToken) -> boolean */
@@ -2169,6 +2634,10 @@ RV_EXPORT int32_t rv_dom_dom_selection_add_range(RvDOMSelection* target, RvAbstr
 RV_EXPORT int32_t rv_dom_dom_selection_remove_range(RvDOMSelection* target, RvAbstractRange* range);
 /* DOMSelection.removeAllRanges() -> undefined */
 RV_EXPORT int32_t rv_dom_dom_selection_remove_all_ranges(RvDOMSelection* target);
+/* DOMSelection.getComposedRanges(optional (ShadowRoot or GetComposedRangesOptions) options = {}, ShadowRoot
+ * shadowRoots) -> sequence<StaticRange>; options defaults to {} in IDL; *result owns its contents; release with the
+ * matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_dom_selection_get_composed_ranges(RvDOMSelection* target, const RvDomUnionShadowRootOrGetComposedRangesOptions* options, const RvDomSequenceShadowRoot* shadow_roots, RvDomSequenceStaticRange* result);
 /* DOMSelection.empty() -> undefined */
 RV_EXPORT int32_t rv_dom_dom_selection_empty(RvDOMSelection* target);
 /* DOMSelection.collapse(Node? node, optional unsigned long offset = 0) -> undefined; node may be NULL; offset
@@ -2222,6 +2691,12 @@ RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, 
 RV_EXPORT int32_t rv_dom_node_list_get_length(RvNodeList* target, uint32_t* result);
 /* NodeList.item(unsigned long index) -> Node?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_node_list_item(RvNodeList* target, uint32_t index, RvNode** result);
+/* RadioNodeList */
+
+/* RadioNodeList.value getter: attribute DOMString value */
+RV_EXPORT int32_t rv_dom_radio_node_list_get_value(RvNodeList* target, char* buffer, int32_t capacity, int32_t* length);
+/* RadioNodeList.value setter: attribute DOMString value */
+RV_EXPORT int32_t rv_dom_radio_node_list_set_value(RvNodeList* target, const char* value);
 /* HTMLCollection */
 
 /* HTMLCollection.length getter: readonly attribute unsigned long length */
@@ -2377,6 +2852,12 @@ RV_EXPORT int32_t rv_dom_pointer_event_get_azimuth_angle(RvEvent* target, double
 RV_EXPORT int32_t rv_dom_pointer_event_get_pointer_type(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 /* PointerEvent.isPrimary getter: readonly attribute boolean isPrimary */
 RV_EXPORT int32_t rv_dom_pointer_event_get_is_primary(RvEvent* target, int32_t* result);
+/* PointerEvent.getCoalescedEvents() -> sequence<PointerEvent>; *result owns its contents; release with the matching
+ * rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_pointer_event_get_coalesced_events(RvEvent* target, RvDomSequencePointerEvent* result);
+/* PointerEvent.getPredictedEvents() -> sequence<PointerEvent>; *result owns its contents; release with the matching
+ * rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_pointer_event_get_predicted_events(RvEvent* target, RvDomSequencePointerEvent* result);
 /* WheelEvent */
 
 /* WheelEvent.deltaX getter: readonly attribute double deltaX */
@@ -2433,6 +2914,9 @@ RV_EXPORT int32_t rv_dom_input_event_get_input_type(RvEvent* target, char* buffe
 RV_EXPORT int32_t rv_dom_input_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 /* InputEvent.isComposing getter: readonly attribute boolean isComposing */
 RV_EXPORT int32_t rv_dom_input_event_get_is_composing(RvEvent* target, int32_t* result);
+/* InputEvent.getTargetRanges() -> sequence<StaticRange>; *result owns its contents; release with the matching
+ * rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_input_event_get_target_ranges(RvEvent* target, RvDomSequenceStaticRange* result);
 /* CompositionEvent */
 
 /* CompositionEvent.data getter: readonly attribute USVString data */

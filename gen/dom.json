@@ -16,8 +16,11 @@
         "DocumentFragment",
         "ShadowRoot",
         "Document",
+        "HTMLDocument",
+        "DOMImplementation",
         "Element",
         "Attr",
+        "NamedNodeMap",
         "HTMLElement",
         "HTMLAnchorElement",
         "HTMLBodyElement",
@@ -44,15 +47,19 @@
         "HTMLSlotElement",
         "HTMLSpanElement",
         "HTMLTextAreaElement",
+        "HTMLTemplateElement",
         "HTMLUListElement",
         "CSSStyleDeclaration",
         "DOMTokenList",
         "DOMStringMap",
         "AbstractRange",
+        "StaticRange",
         "Range",
         "DOMSelection",
         "DOMRectReadOnly",
+        "DOMRect",
         "NodeList",
+        "RadioNodeList",
         "HTMLCollection",
         "ValidityState",
         "Event",
@@ -70,12 +77,24 @@
         "bindings/scripts/test/",
         "testing/"
     ],
+    "customGetters": [
+        "Node.nodeType"
+    ],
+    "castVia": {
+        "RadioNodeList": "LiveNodeList"
+    },
     "atomArguments": [
+        "HTMLFormElement.namedItem",
         "DocumentFragment.getElementById",
         "HTMLCollection.namedItem",
         "HTMLSelectElement.namedItem"
     ],
     "exclude": [
+        "DOMRect.x",
+        "DOMRect.y",
+        "DOMRect.width",
+        "DOMRect.height",
+        "ElementCreationOptions.customElementRegistry",
         "Document.cookie",
         "Document.domain",
         "Document.referrer",
