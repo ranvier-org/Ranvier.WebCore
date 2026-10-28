@@ -33,8 +33,7 @@ class PackageContract(unittest.TestCase):
                                    (ROOT / 'tests/abi/NativeDom.fs').resolve()})
         references = project.findall('.//PackageReference')
         native = [r for r in references if r.get('Include') == 'Ranvier.WebCore.Native']
-        self.assertEqual(len(native), 1)
-        self.assertEqual(native[0].get('Version'), '[$(Version)]')
+        self.assertEqual(native, [], 'managed interop must allow selecting the GPU native flavor')
         self.assertFalse(any('Fable' in r.get('Include', '') or 'Xantham' in r.get('Include', '')
                              for r in references))
         self.assertEqual(project.findtext('.//IsAotCompatible'), 'true')

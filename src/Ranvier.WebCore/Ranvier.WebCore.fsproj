@@ -12,7 +12,6 @@
   <ItemGroup>
     <Compile Include="../../tests/abi/Native.fs" Link="Native.fs" />
     <Compile Include="../../tests/abi/NativeDom.fs" Link="NativeDom.fs" />
-    <PackageReference Include="Ranvier.WebCore.Native" Version="[$(Version)]" />
     <PackageReference Update="FSharp.Core" Version="10.1.401" />
     <None Include="../../NOTICE.md" Pack="true" PackagePath="" />
     <None Include="../../packaging/README.md" Pack="true" PackagePath="README.md" />

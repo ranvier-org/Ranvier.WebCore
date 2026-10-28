@@ -1,9 +1,11 @@
 # Ranvier.WebCore.Native
 
-`Ranvier.WebCore` provides the managed `RanvierWebCoreAbi.Native` and `NativeDom` modules. It depends on
+`Ranvier.WebCore` provides the managed `RanvierWebCoreAbi.Native` and `NativeDom` modules. Reference it alongside
 the same version of `Ranvier.WebCore.Native`, which brings the five runtime packages into the restore graph:
 Windows x64/ARM64, Linux x64/ARM64 and macOS ARM64. The runtime identifier selects the native assets.
-The managed and aggregate dependencies pin exact versions because their ABI must agree.
+The aggregate pins exact runtime versions because their ABI must agree. Managed interop keeps the native
+flavor selectable: an accelerated Windows app can reference the matching `Ranvier.WebCore.Native.Gpu.win-x64`
+package instead of the aggregate, avoiding duplicate slim and GPU native assets.
 
 The individual runtime packages below can also be referenced directly by native consumers. The aggregate
 and managed packages are built only after all five runtime artifacts have matching ABI, WebKit and source
