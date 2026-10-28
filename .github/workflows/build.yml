@@ -43,6 +43,10 @@ jobs:
       - run: dotnet tool restore
       - name: Compile the full shared contracts on .NET
         run: dotnet build tests/generator/Contracts.fsproj -c Release
+      - name: Compile and execute inherited DOM member implementations
+        run: |
+          python -I tests/generator/write_inherited_fixture.py artifacts/inherited-fixture
+          dotnet run --project artifacts/inherited-fixture/Fixture.fsproj -c Release
       - name: Check the generated F# layout
         run: dotnet fantomas --check gen/Ranvier.Dom.fs
       - name: Compile and execute the browser union adapters

@@ -244,6 +244,11 @@ class World:
         for mixin in self.contract_mixins(interface):
             if any(self.member_key(candidate) == key for candidate in self.members(mixin)):
                 return self.public_name(mixin)
+        if member.kind == "operation":
+            for ancestor in self.chain(interface)[1:]:
+                for candidate in self.members(ancestor):
+                    if self.member_key(candidate) == key:
+                        return self.contract_owner(ancestor, candidate)
         return self.public_name(interface)
 
     def skipped(self, file):

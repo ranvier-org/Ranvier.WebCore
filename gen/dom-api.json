@@ -47000,7 +47000,7 @@
     {
       "interface": "HTMLSelectElement",
       "member": "remove",
-      "contractOwner": "HTMLSelectElement",
+      "contractOwner": "ChildNode",
       "kind": "operation",
       "function": "rv_dom_html_select_element_remove_0",
       "conditional": null,

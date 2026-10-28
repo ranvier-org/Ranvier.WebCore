@@ -1182,8 +1182,6 @@ and [<AllowNullLiteral>] HTMLSelectElement =
     abstract member add: element: HTMLOptGroupElement * before: int -> unit
 #endif
     /// <summary>HTMLSelectElement.remove.</summary>
-    abstract member remove: unit -> unit
-    /// <summary>HTMLSelectElement.remove.</summary>
     abstract member remove: index: int -> unit
 
     /// <summary>HTMLSelectElement.setItem.</summary>
