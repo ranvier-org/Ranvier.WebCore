@@ -10,5 +10,5 @@ references it finds `RanvierWebCoreHost.dll` by name.
 - `include/RanvierWebCoreAbi.h`: the C ABI.
 - `manifest.json`: the build flavor, the WebKit commit, and each DLL's size and SHA-256.
 
-Built by https://github.com/shayanhabibi/Ranvier.WebCore from the WebKit commit in `manifest.json` with the
+Built by https://github.com/ranvier-org/Ranvier.WebCore from the WebKit commit in `manifest.json` with the
 patches and settings documented there.
