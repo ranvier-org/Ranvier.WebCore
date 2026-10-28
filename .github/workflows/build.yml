@@ -336,9 +336,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
-          path: |
-            ${{ env.RANVIER_WORK }}/packages/*.nupkg
-            ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/manifest.json
+          path: ${{ env.RANVIER_WORK }}/packages/*.nupkg
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manifest-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/manifest.json
+          if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:
