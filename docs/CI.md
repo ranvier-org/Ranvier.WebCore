@@ -4,7 +4,7 @@
 uploads the `.nupkg` with `manifest.json`, and the PDBs as a separate artifact. On a `v*` tag it sets the
 package version from the tag and, when the repository variable `NUGET_USER` is set, pushes the packages
 to nuget.org by trusted publishing: no API key is stored. The nuget.org account `NUGET_USER` needs a
-trusted publishing policy for owner `shayanhabibi`, repository `Ranvier.WebCore`, workflow file `build.yml`
+trusted publishing policy for owner `ranvier-org`, repository `Ranvier.WebCore`, workflow file `build.yml`
 and no environment.
 
 ## Runner
