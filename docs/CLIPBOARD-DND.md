@@ -57,13 +57,17 @@ int32_t rv_host_set_drag(RvHost*, int32_t style);
      cursor. A cancelled `dragover` accepts its `dropEffect`; with no listener, text over editable
      content is a copy; anything else is refused.
   5. A drop that no listener cancels inserts the text, or the HTML, at the point.
-- **Dragging out of the page:**
-  1. When the user drags a draggable element, a link, an image or a selection, the host calls `start` with
-     an `RvDrag`: its data types and values, a drag image from `rv_element_snapshot`'s path, the offset of
-     the image from the mouse, and the allowed operations.
-  2. The app runs an OS drag session, or keeps the drag in-process by feeding the same data back through
-     `rv_host_drag`.
-  3. The app ends it with `rv_drag_end(drag, operation)`, which fires `dragend`.
+- **Dragging out of the page**, the App style (ABI 20, `rv_abi_has("drag-out")`):
+  1. The app sets a callback with `rv_host_set_drag_start`. When the user drags a draggable element, a
+     link, an image or a selection, after the page's `dragstart` listeners have set the data, the host calls
+     it with an `RvDrag`, where the press was, and the operations the page allows.
+  2. The app reads the items with `rv_drag_item_count`, `rv_drag_item_type` and `rv_drag_item_value`, and
+     the image with `rv_drag_image`: the dragged element painted as `rv_element_snapshot` does, with where
+     the press was inside it. A selection drag has no image.
+  3. The app runs an OS drag session, or keeps the drag in-process by feeding `rv_drag_data(drag)` back
+     through `rv_host_drag`.
+  4. The app ends it with `rv_drag_end(drag, x, y, operation)`, which fires `dragend` with the operation
+     the target accepted, or none when cancelled.
 - **Native:** the host hands WebCore's platform drag to the OS: OLE `DoDragDrop` on Windows, an
   `NSDraggingSession` on macOS.
 - **DOM:** no drag starts. `draggable` has no effect beyond the attribute, and the page drags with pointer
@@ -74,6 +78,6 @@ int32_t rv_host_set_drag(RvHost*, int32_t style);
 1. **Done:** clipboard in the App, DOM and Native styles (ABI 18). The Native clipboard style calls
    WebCore's own commands.
 2. **Done:** drags into the page in the App and DOM styles (ABI 19).
-3. **Next:** drags out of the page, through a host `DragClient`, with `start` and `rv_drag_end`.
-4. **Then:** the Native drag style. Windows first, where WebCore's code already talks to OLE, then macOS,
+3. **Done:** drags out of the page in the App style, through a host `DragClient` (ABI 20).
+4. **Next:** the Native drag style. Windows first, where WebCore's code already talks to OLE, then macOS,
    which needs a pasteboard strategy that calls NSPasteboard. After that, `dataTransfer.files`.

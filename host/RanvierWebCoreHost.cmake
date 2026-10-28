@@ -3,6 +3,7 @@
 if (ENABLE_WEBCORE)
     set(RanvierWebCoreHost_SOURCES
         RanvierAbi/RanvierWebCoreAbi.cpp
+        RanvierAbi/RanvierWebCoreDom.cpp
     )
     set(RanvierWebCoreHost_LIBRARIES ${TestWebCore_LIBRARIES})
     list(REMOVE_ITEM RanvierWebCoreHost_LIBRARIES WebKit::gtest)

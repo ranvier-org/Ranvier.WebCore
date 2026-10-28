@@ -1,10 +1,11 @@
 # Runs the F# ABI driver (tests/abi) against a staged runtime: the frames and events of every ABI version,
-# then the teardown probes. The driver's P/Invoke declarations are checked against host/RanvierWebCoreAbi.h
-# first. The staged libraries are copied next to the built driver, where .NET finds them on every platform.
+# then the teardown probes. The driver's P/Invoke declarations are checked against host/RanvierWebCoreAbi.h,
+# and the generated DOM functions against the checkout's IDL files (gen/domgen.py), first. The staged libraries
+# are copied next to the built driver, where .NET finds them on every platform.
 #
 #   abi_tests.py --stage DIR --source DIR    a directory build.py package staged, and the WebKit checkout
 #                                            (the resources test serves its Ahem font)
-import argparse, json, os, pathlib, shutil, subprocess, sys, tempfile
+import argparse, glob, json, os, pathlib, shutil, subprocess, sys, tempfile, time
 
 root = pathlib.Path(__file__).resolve().parents[1]
 tests = root / 'tests' / 'abi'
@@ -21,15 +22,74 @@ def run(command, **kw):
     subprocess.run(command, check=True, **kw)
 
 
+def report_crash(started, stage, rid, temp):
+    """After the driver died on a signal on macOS: prints .NET's crash report and the system's crash report for
+    the process, with the crashed thread's frames symbolized from the package's dSYMs by atos."""
+    for report in glob.glob(str(pathlib.Path(temp) / 'dump*.crashreport.json')):
+        print('== .NET crash report', report, flush=True)
+        print(pathlib.Path(report).read_text(errors='replace')[:20000], flush=True)
+    logs = pathlib.Path.home() / 'Library/Logs/DiagnosticReports'
+    # ReportCrash writes the report a moment after the process dies.
+    for _ in range(30):
+        found = [r for r in logs.glob('*.ips') if r.stat().st_mtime >= started] if logs.exists() else []
+        if found:
+            break
+        time.sleep(2)
+    symbols = stage / 'symbols' / rid
+    for report in found:
+        print('== crash report', report.name, flush=True)
+        # ReportCrash may still be writing the report: read it until its body parses.
+        crash = None
+        for _ in range(15):
+            header, _, body = report.read_text(errors='replace').partition(chr(10))
+            try:
+                crash = json.loads(body)
+                break
+            except ValueError:
+                time.sleep(2)
+        if crash is None:
+            print(body[:4000], flush=True)
+            continue
+        print(json.dumps({k: crash.get(k) for k in ('exception', 'termination', 'faultingThread', 'asi')}, indent=1)[:4000], flush=True)
+        images = crash.get('usedImages', [])
+        for index, thread in enumerate(crash.get('threads', [])):
+            if not thread.get('triggered') and index != crash.get('faultingThread'):
+                continue
+            print('-- crashed thread', index, flush=True)
+            for frame in thread.get('frames', [])[:60]:
+                image = images[frame['imageIndex']] if frame.get('imageIndex', -1) < len(images) else {}
+                name = image.get('name') or pathlib.Path(image.get('path', '?')).name
+                address = image.get('base', 0) + frame.get('imageOffset', 0)
+                symbol = frame.get('symbol', '')
+                dwarf = symbols / f'{name}.dSYM' / 'Contents/Resources/DWARF'
+                dsym = next(dwarf.glob('*'), None) if dwarf.exists() else None
+                if dsym:
+                    symbol = subprocess.run(['atos', '-o', str(dsym), '-arch', 'arm64', '-l', hex(image['base']), hex(address)],
+                                            capture_output=True, text=True).stdout.strip() or symbol
+                print(f'  {name} +{frame.get("imageOffset", 0):#x} {symbol}', flush=True)
+
+
 run([sys.executable, '-I', tests / 'generate_native.py', 'check'])
+run([sys.executable, '-I', root / 'gen' / 'domgen.py', 'check', '--source', args.source])
 stage = pathlib.Path(args.stage)
 rid = json.loads((stage / 'manifest.json').read_text())['rid']
 with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     out = pathlib.Path(temp) / 'driver'
     run(['dotnet', 'build', tests / 'RanvierWebCoreAbi.Driver.fsproj', '-c', 'Release', '--nologo', '-v', 'q', '-o', out])
     shutil.copytree(stage / 'runtimes' / rid / 'native', out, dirs_exist_ok=True)
-    env = dict(os.environ, RANVIER_WEBKIT_SOURCE=args.source, RANVIER_WEBCORE_OUT=str(pathlib.Path(temp) / 'run'))
+    env = dict(os.environ, RANVIER_WEBKIT_SOURCE=args.source, RANVIER_WEBCORE_OUT=str(pathlib.Path(temp) / 'run'),
+               RANVIER_TRACE='1')
+    if sys.platform == 'darwin':
+        # A native crash writes .NET's crash report, with the native frames of each thread, next to a minidump.
+        env.update(DOTNET_DbgEnableMiniDump='1', DOTNET_DbgMiniDumpType='1', DOTNET_EnableCrashReport='1',
+                   DOTNET_DbgMiniDumpName=str(pathlib.Path(temp) / 'dump.%d'))
     driver = out / 'RanvierWebCoreAbi.Driver.dll'
-    run(['dotnet', driver], env=env)
+    started = time.time()
+    try:
+        run(['dotnet', driver], env=env)
+    except subprocess.CalledProcessError as error:
+        if sys.platform == 'darwin' and error.returncode < 0:
+            report_crash(started, stage, rid, temp)
+        raise
     run(['dotnet', driver], env=dict(env, RANVIER_WEBCORE_PROBE='teardown'))
 print('abi tests passed', flush=True)

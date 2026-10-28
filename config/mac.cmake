@@ -32,3 +32,7 @@ set(ENABLE_WEBDRIVER OFF CACHE BOOL "")
 set(ENABLE_VIDEO ON CACHE BOOL "")
 set(ENABLE_REMOTE_INSPECTOR ON CACHE BOOL "")
 set(ENABLE_WEBASSEMBLY ON CACHE BOOL "")
+
+# 0013: the package loads WebCore as a plain dylib, outside its framework bundle, where it finds no localized
+# strings; each is then its English key. Every flavor needs it: without it a page with a <details> crashes.
+set(USE_UNBUNDLED_LOCALIZED_STRINGS ON CACHE BOOL "")
