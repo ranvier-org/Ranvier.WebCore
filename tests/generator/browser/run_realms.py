@@ -14,7 +14,7 @@ assert (output / 'RealmBrowser.js').is_file(), 'Compile RealmBrowser.fsproj firs
 page = output / 'realm-fixture.html'
 page.write_text('<!doctype html><html><body><script type="module" src="RealmBrowser.js"></script></body></html>')
 with tempfile.TemporaryDirectory(prefix='ranvier-realm-browser-') as profile:
-    result = subprocess.run(['rtk', 'proxy', str(args.browser.resolve()), '--headless=new', '--disable-gpu',
+    result = subprocess.run([str(args.browser.resolve()), '--headless=new', '--disable-gpu',
                              '--no-first-run', '--no-default-browser-check', '--allow-file-access-from-files',
                              '--user-data-dir=' + profile, '--virtual-time-budget=5000', '--dump-dom', page.as_uri()],
                             capture_output=True, text=True, timeout=45)
