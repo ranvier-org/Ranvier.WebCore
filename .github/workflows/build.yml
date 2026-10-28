@@ -38,6 +38,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      # Portable tools precede RID-specific tools in the manifest to avoid SDK cold-cache command
+      # misattribution (https://github.com/dotnet/sdk/issues/53783).
       - run: dotnet tool restore
       - name: Compile the full shared contracts on .NET
         run: dotnet build tests/generator/Contracts.fsproj -c Release
