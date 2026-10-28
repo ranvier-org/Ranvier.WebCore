@@ -1,0 +1,17 @@
+diff --git a/Source/WebCore/CMakeLists.txt b/Source/WebCore/CMakeLists.txt
+index 09db9d2..bdd1b26 100644
+--- a/Source/WebCore/CMakeLists.txt
++++ b/Source/WebCore/CMakeLists.txt
+@@ -3184,6 +3184,12 @@ list(APPEND WebCore_SOURCES ${WebCore_DERIVED_SOURCES_DIR}/NodeName.cpp)
+ GENERATE_DOM_NAME_ENUM(Namespace)
+ list(APPEND WebCore_SOURCES ${WebCore_DERIVED_SOURCES_DIR}/Namespace.cpp)
+ 
++# Sources an embedder compiles into WebCore, outside the unified build: Ranvier's generated DOM glue, which
++# calls members WebCore does not export and exports plain C functions in their place.
++if (WebCore_EMBEDDER_SOURCES)
++    list(APPEND WebCore_SOURCES ${WebCore_EMBEDDER_SOURCES})
++endif ()
++
+ WEBKIT_COMPUTE_SOURCES(WebCore)
+ 
+ WEBKIT_DEFINE_SUBTARGET_WITH_PREFIX(WebCore WebCoreJSBindings

@@ -38,3 +38,8 @@ set(ENABLE_WEBASSEMBLY_OMGJIT OFF CACHE BOOL "")
 # bmalloc and libpas stay on every port: the system malloc fails to compile on Windows (bmalloc.h calls
 # aligned_alloc, which the CRT lacks), and one allocator keeps the ports alike.
 set(USE_SYSTEM_MALLOC OFF CACHE BOOL "")
+
+# The glue of the generated DOM functions (gen/domgen.py) compiles into WebCore through patch 0012, where it
+# reaches members WebCore does not export. The host re-exports each function under its rv_ name.
+get_filename_component(_ranvier_root "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+set(WebCore_EMBEDDER_SOURCES "${_ranvier_root}/host/dom/RanvierDomGlue.cpp" CACHE STRING "")

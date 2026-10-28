@@ -16,10 +16,10 @@ let html =
 let writePpm (path: string) (rgba: byte[]) =
     use output = File.Create path
     let header = Text.Encoding.ASCII.GetBytes $"P6\n{width} {height}\n255\n"
-    output.Write (header, 0, header.Length)
+    output.Write(header, 0, header.Length)
 
     for i in 0..4 .. rgba.Length - 4 do
-        output.Write (rgba, i, 3)
+        output.Write(rgba, i, 3)
 
 let rgbAt (rgba: byte[]) x y =
     let i = (y * width + x) * 4
@@ -27,10 +27,7 @@ let rgbAt (rgba: byte[]) x y =
 
 let changedPixels (a: byte[]) (b: byte[]) =
     seq { 0..4 .. a.Length - 4 }
-    |> Seq.filter (fun i ->
-        a[i] <> b[i]
-        || a[i + 1] <> b[i + 1]
-        || a[i + 2] <> b[i + 2])
+    |> Seq.filter (fun i -> a[i] <> b[i] || a[i + 1] <> b[i + 1] || a[i + 2] <> b[i + 2])
     |> Seq.length
 
 let opaquePixels (rgba: byte[]) =
@@ -51,21 +48,21 @@ let main _ =
         | dir -> dir
 
     Directory.CreateDirectory outDir |> ignore
-    require (rv_abi_version () = 19) "ABI version 19"
+    require (rv_abi_version () = 20) "ABI version 20"
 
     // RANVIER_WEBCORE_PROBE=teardown runs the teardown probes instead of the frames.
     if Environment.GetEnvironmentVariable "RANVIER_WEBCORE_PROBE" = "teardown" then
         Teardown.run outDir
         exit 0
 
-    use host = new Host (width, height)
+    use host = new Host(width, height)
     host.LoadHtml html
     require (host.ScriptsEnabled = 0) "page scripts disabled after load"
     require (host.VmEntryDisallowed = 1) "JSC VM entry disallowed after load"
 
-    use body = host.Body ()
+    use body = host.Body()
     use panel = host.CreateElement "div"
-    panel.SetAttribute ("id", "panel")
+    panel.SetAttribute("id", "panel")
     use text = host.CreateText "Native WebCore document - before mutation"
     panel.Append text
     use button = host.CreateElement "button"
@@ -73,35 +70,32 @@ let main _ =
     panel.Append button
     body.Append panel
 
-    let frame0 = host.Paint ()
-    writePpm (Path.Combine (outDir, "fsharp-frame0.ppm")) frame0
+    let frame0 = host.Paint()
+    writePpm (Path.Combine(outDir, "fsharp-frame0.ppm")) frame0
 
     text.SetText "Direct native DOM mutation - after"
-    panel.SetAttribute ("style", "background:rgb(160,40,30)")
-    let frame1 = host.Paint ()
-    writePpm (Path.Combine (outDir, "fsharp-frame1.ppm")) frame1
+    panel.SetAttribute("style", "background:rgb(160,40,30)")
+    let frame1 = host.Paint()
+    writePpm (Path.Combine(outDir, "fsharp-frame1.ppm")) frame1
 
     let items =
-        [ 1..3 ]
-        |> List.map (fun n -> n * n)
-        |> List.map string
-        |> String.concat ", "
+        [ 1..3 ] |> List.map (fun n -> n * n) |> List.map string |> String.concat ", "
 
     use appended = host.CreateElement "div"
-    appended.SetAttribute ("style", "margin:0 32px;padding:12px;background:rgb(30,120,60);color:white;width:300px")
+    appended.SetAttribute("style", "margin:0 32px;padding:12px;background:rgb(30,120,60);color:white;width:300px")
     use appendedText = host.CreateText $"Appended from F#: squares {items}"
     appended.Append appendedText
     body.Append appended
-    let frame2 = host.Paint ()
-    writePpm (Path.Combine (outDir, "fsharp-frame2.ppm")) frame2
+    let frame2 = host.Paint()
+    writePpm (Path.Combine(outDir, "fsharp-frame2.ppm")) frame2
 
     let mutable wrongThreadStatus = 0
 
     let worker =
-        Thread (fun () -> wrongThreadStatus <- rv_node_set_text_content (text.Handle, "from another thread"))
+        Thread(fun () -> wrongThreadStatus <- rv_node_set_text_content (text.Handle, "from another thread"))
 
-    worker.Start ()
-    worker.Join ()
+    worker.Start()
+    worker.Join()
 
     // Native WebCore EventListeners calling F# handlers.
     let log = ResizeArray<string>()
@@ -111,49 +105,48 @@ let main _ =
     let record label (event: Event) =
         log.Add $"{label}:{event.Phase}"
 
-        handlerThreads.Add Thread.CurrentThread.ManagedThreadId
-        |> ignore
+        handlerThreads.Add Thread.CurrentThread.ManagedThreadId |> ignore
 
         vmGuardInHandlers.Add host.VmEntryDisallowed
 
     let take () =
         let entries = List.ofSeq log
-        log.Clear ()
+        log.Clear()
         entries
 
     let propagation =
-        use _ = panel.Listen ("probe", true, record "panel-capture")
-        use _ = button.Listen ("probe", false, record "button")
-        use _ = panel.Listen ("probe", false, record "panel-bubble")
-        use _ = body.Listen ("probe", false, record "body-bubble")
-        GC.Collect ()
-        GC.WaitForPendingFinalizers ()
-        GC.Collect ()
-        let prevented = button.Dispatch ("probe", true, true)
+        use _ = panel.Listen("probe", true, record "panel-capture")
+        use _ = button.Listen("probe", false, record "button")
+        use _ = panel.Listen("probe", false, record "panel-bubble")
+        use _ = body.Listen("probe", false, record "body-bubble")
+        GC.Collect()
+        GC.WaitForPendingFinalizers()
+        GC.Collect()
+        let prevented = button.Dispatch("probe", true, true)
 
         {|
             log = take ()
             prevented = prevented
         |}
 
-    button.Dispatch ("probe", true, true) |> ignore
+    button.Dispatch("probe", true, true) |> ignore
     let afterRemoval = take ()
 
     let cancellation =
         use _ =
-            button.Listen (
+            button.Listen(
                 "cancel",
                 false,
                 fun event ->
                     record "button" event
-                    event.PreventDefault ()
+                    event.PreventDefault()
             )
 
         use _ =
-            panel.Listen ("cancel", false, (fun event -> log.Add $"panel-sees-prevented:{event.DefaultPrevented}"))
+            panel.Listen("cancel", false, (fun event -> log.Add $"panel-sees-prevented:{event.DefaultPrevented}"))
 
-        let cancelable = button.Dispatch ("cancel", true, true)
-        let notCancelable = button.Dispatch ("cancel", true, false)
+        let cancelable = button.Dispatch("cancel", true, true)
+        let notCancelable = button.Dispatch("cancel", true, false)
 
         {|
             cancelable = cancelable
@@ -163,49 +156,49 @@ let main _ =
 
     let stopped =
         use _ =
-            button.Listen (
+            button.Listen(
                 "stop",
                 false,
                 fun event ->
                     record "button" event
-                    event.StopPropagation ()
+                    event.StopPropagation()
             )
 
-        use _ = button.Listen ("stop", false, record "button-second")
-        use _ = panel.Listen ("stop", false, record "panel-bubble")
-        button.Dispatch ("stop", true, true) |> ignore
+        use _ = button.Listen("stop", false, record "button-second")
+        use _ = panel.Listen("stop", false, record "panel-bubble")
+        button.Dispatch("stop", true, true) |> ignore
         take ()
 
     use checkbox = host.CreateElement "input"
-    checkbox.SetAttribute ("type", "checkbox")
+    checkbox.SetAttribute("type", "checkbox")
     appended.Append checkbox
 
     let checkboxClicks =
         let initial = checkbox.Checked
 
         let clicked =
-            use _ = checkbox.Listen ("change", false, record "checkbox-change")
-            checkbox.Click ()
+            use _ = checkbox.Listen("change", false, record "checkbox-change")
+            checkbox.Click()
             checkbox.Checked
 
         let clickedLog = take ()
 
         let cancelledClick =
             use _ =
-                checkbox.Listen (
+                checkbox.Listen(
                     "click",
                     false,
                     fun event ->
                         record "checkbox-click" event
-                        event.PreventDefault ()
+                        event.PreventDefault()
                 )
 
-            use _ = checkbox.Listen ("change", false, record "checkbox-change")
-            checkbox.Click ()
+            use _ = checkbox.Listen("change", false, record "checkbox-change")
+            checkbox.Click()
             checkbox.Checked
 
         let cancelledLog = take ()
-        checkbox.Click ()
+        checkbox.Click()
 
         {|
             initial = initial
@@ -218,13 +211,13 @@ let main _ =
 
     let failure =
         use _ =
-            button.Listen ("throw", false, (fun _ -> raise (InvalidOperationException "handler failure from F#")))
+            button.Listen("throw", false, (fun _ -> raise (InvalidOperationException "handler failure from F#")))
 
-        use _ = panel.Listen ("throw", false, record "panel-after-throw")
+        use _ = panel.Listen("throw", false, record "panel-after-throw")
 
         let error =
             try
-                button.Dispatch ("throw", true, true) |> ignore
+                button.Dispatch("throw", true, true) |> ignore
                 None
             with :? AggregateException as error ->
                 Some error
@@ -232,10 +225,7 @@ let main _ =
         {|
             raised =
                 error
-                |> Option.map (fun error ->
-                    error.InnerExceptions
-                    |> Seq.map _.Message
-                    |> List.ofSeq)
+                |> Option.map (fun error -> error.InnerExceptions |> Seq.map _.Message |> List.ofSeq)
             log = take ()
         |}
 
@@ -243,7 +233,7 @@ let main _ =
         let second = ref None
 
         use _ =
-            button.Listen (
+            button.Listen(
                 "remove",
                 false,
                 fun event ->
@@ -253,56 +243,54 @@ let main _ =
                     |> Option.iter (fun (listener: Listener) -> (listener :> IDisposable).Dispose())
             )
 
-        second.Value <- Some (button.Listen ("remove", false, record "second"))
-        button.Dispatch ("remove", true, true) |> ignore
+        second.Value <- Some(button.Listen("remove", false, record "second"))
+        button.Dispatch("remove", true, true) |> ignore
         let first = take ()
-        button.Dispatch ("remove", true, true) |> ignore
+        button.Dispatch("remove", true, true) |> ignore
         {| first = first; second = take () |}
 
-    let beforeReentry = host.Paint ()
+    let beforeReentry = host.Paint()
 
     let reentry =
-        use _ = body.Listen ("inner", false, record "inner-body")
+        use _ = body.Listen("inner", false, record "inner-body")
 
         use _ =
-            panel.Listen (
+            panel.Listen(
                 "outer",
                 false,
                 fun event ->
                     record "outer-start" event
                     text.SetText "Text set inside a native event callback"
-                    body.Dispatch ("inner", false, false) |> ignore
+                    body.Dispatch("inner", false, false) |> ignore
                     log.Add "outer-end"
             )
 
-        button.Dispatch ("outer", true, false) |> ignore
+        button.Dispatch("outer", true, false) |> ignore
         take ()
 
-    let frame3 = host.Paint ()
-    writePpm (Path.Combine (outDir, "fsharp-frame3.ppm")) frame3
+    let frame3 = host.Paint()
+    writePpm (Path.Combine(outDir, "fsharp-frame3.ppm")) frame3
 
     let nestedFailure =
         use _ =
-            body.Listen ("inner-throw", false, (fun _ -> failwith "nested handler failure"))
+            body.Listen("inner-throw", false, (fun _ -> failwith "nested handler failure"))
 
         use _ =
-            panel.Listen (
+            panel.Listen(
                 "outer-catch",
                 false,
                 fun event ->
                     record "outer" event
 
                     try
-                        body.Dispatch ("inner-throw", false, false)
-                        |> ignore
+                        body.Dispatch("inner-throw", false, false) |> ignore
                     with :? AggregateException ->
                         log.Add "caught-nested"
             )
 
         let outerSucceeded =
             try
-                button.Dispatch ("outer-catch", true, false)
-                |> ignore
+                button.Dispatch("outer-catch", true, false) |> ignore
 
                 true
             with _ ->
@@ -313,11 +301,11 @@ let main _ =
             log = take ()
         |}
 
-    use guarded = button.Listen ("guarded", false, record "guarded")
+    use guarded = button.Listen("guarded", false, record "guarded")
     let offThread = ref (0, 0)
 
     let guardWorker =
-        Thread (fun () ->
+        Thread(fun () ->
             let mutable prevented = 0
             let removeStatus = rv_listener_remove guarded.Handle
 
@@ -326,17 +314,14 @@ let main _ =
 
             offThread.Value <- (removeStatus, dispatchStatus))
 
-    guardWorker.Start ()
-    guardWorker.Join ()
-    button.Dispatch ("guarded", true, true) |> ignore
+    guardWorker.Start()
+    guardWorker.Join()
+    button.Dispatch("guarded", true, true) |> ignore
     let guardedLog = take ()
 
     let greenPixels =
         seq { 0..4 .. frame2.Length - 4 }
-        |> Seq.filter (fun i ->
-            frame2[i] = 30uy
-            && frame2[i + 1] = 120uy
-            && frame2[i + 2] = 60uy)
+        |> Seq.filter (fun i -> frame2[i] = 30uy && frame2[i + 1] = 120uy && frame2[i + 2] = 60uy)
         |> Seq.length
 
     let summary =
@@ -398,10 +383,7 @@ let main _ =
     require (greenPixels > 1000) "frame2 contains the appended element's background"
     require (wrongThreadStatus = WrongThread) "off-thread call rejected"
 
-    require
-        (summary.scriptsEnabled = 0
-         && summary.vmEntryDisallowed = 1)
-        "scripts disabled and VM guard held"
+    require (summary.scriptsEnabled = 0 && summary.vmEntryDisallowed = 1) "scripts disabled and VM guard held"
 
     let events = summary.events
 
@@ -424,7 +406,9 @@ let main _ =
             ])
         "later handlers observe the cancellation"
 
-    require (events.stopPropagation = [ "button:2"; "button-second:2" ]) "stopPropagation ends propagation after the target"
+    require
+        (events.stopPropagation = [ "button:2"; "button-second:2" ])
+        "stopPropagation ends propagation after the target"
 
     require
         (not events.checkbox.initial
@@ -446,7 +430,10 @@ let main _ =
          && events.removalDuringDispatch.second = [ "first:2" ])
         "a listener removed during dispatch stays silent"
 
-    require (events.reentry = [ "outer-start:3"; "inner-body:2"; "outer-end" ]) "a handler mutates the DOM and dispatches"
+    require
+        (events.reentry = [ "outer-start:3"; "inner-body:2"; "outer-end" ])
+        "a handler mutates the DOM and dispatches"
+
     require (events.changedByReentry > 100) "a DOM mutation made in a handler repaints"
 
     require
@@ -464,9 +451,9 @@ let main _ =
     require (events.vmGuardInHandlers = [ 1 ]) "JSC VM entry stays disallowed inside handlers"
 
     let json =
-        JsonSerializer.Serialize (summary, JsonSerializerOptions (WriteIndented = true))
+        JsonSerializer.Serialize(summary, JsonSerializerOptions(WriteIndented = true))
 
-    File.WriteAllText (Path.Combine (outDir, "fsharp-summary.json"), json)
+    File.WriteAllText(Path.Combine(outDir, "fsharp-summary.json"), json)
     Resources.run outDir
     Window.run outDir
     Surface.run outDir
@@ -475,5 +462,9 @@ let main _ =
     Popup.run outDir
     Clipboard.run outDir
     Drop.run outDir
+    DragOut.run outDir
+    Accessibility.run outDir
+    AccessibilityText.run outDir
+    Dom.run outDir
     printfn "RANVIER_FSHARP_ABI PASS %s" (JsonSerializer.Serialize summary)
     0

@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 19.
+ * Ranvier native WebCore C ABI, version 20.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -58,6 +58,8 @@ enum {
     RV_ERR_LISTENER_FAILED = -7,
     RV_ERR_NOT_INPUT = -8,
     RV_ERR_UNSUPPORTED = -9,
+    /* A generated function's handle argument is an object of another interface (RanvierWebCoreDom.h). */
+    RV_ERR_WRONG_INTERFACE = -11,
 };
 
 /* String properties of rv_node_get_string and rv_node_set_string. */
@@ -747,6 +749,354 @@ RV_EXPORT void rv_drag_data_release(RvDragData*);
  * when a listener cancelled dragover, else RV_DROP_COPY for text over editable content, else RV_DROP_NONE.
  * A drop that no listener cancels inserts the text, or the HTML, into editable content at the point. */
 RV_EXPORT int32_t rv_host_drag(RvHost*, int32_t action, int32_t x, int32_t y, int32_t allowed, RvDragData* data, int32_t modifiers);
+
+/* v20: "drag-out" for rv_abi_has: drags that start in the page. */
+
+typedef struct RvDrag RvDrag;
+
+/* Called on the host thread when the user drags a draggable element, a link, an image or a selection with
+ * the mouse, in the App drag style, after the page's dragstart listeners have set the data. x and y are where
+ * the press was, in CSS pixels of the viewport; allowed holds the RV_DROP_* operations the page allows. The
+ * app reads the drag's data and image, runs the drag, such as an OS drag session or a drag inside the page
+ * fed back through rv_host_drag, and ends it with rv_drag_end. */
+typedef void (*RvDragStartCallback)(void* context, RvDrag* drag, int32_t x, int32_t y, int32_t allowed);
+
+/* Sets the host's drag start callback, or with a NULL callback removes it. Without one, or in the DOM style,
+ * no drag starts in the page. */
+RV_EXPORT int32_t rv_host_set_drag_start(RvHost*, RvDragStartCallback callback, void* context);
+RV_EXPORT int32_t rv_drag_item_count(RvDrag*);
+/* Copies the type or the value of the drag's item at index. */
+RV_EXPORT int32_t rv_drag_item_type(RvDrag*, int32_t index, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_drag_item_value(RvDrag*, int32_t index, char* buffer, int32_t capacity, int32_t* length);
+/* A copy of the drag's items as drag data, for rv_host_drag; released with rv_drag_data_release. */
+RV_EXPORT RvDragData* rv_drag_data(RvDrag*);
+/* Paints the dragged element as rv_element_snapshot does, and writes where the press was within the image,
+ * in device pixels, to *offsetX and *offsetY. RV_ERR_UNSUPPORTED for a selection drag, which has no element. */
+RV_EXPORT int32_t rv_drag_image(RvDrag*, uint8_t* rgba, int32_t length, int32_t* width, int32_t* height, int32_t* offsetX, int32_t* offsetY);
+/* Ends the drag at x, y CSS pixels of the viewport with the RV_DROP_* operation the drop target accepted, or
+ * RV_DROP_NONE when the drag was cancelled: the page's dragend fires with it. The drag is invalid after the
+ * call. */
+RV_EXPORT int32_t rv_drag_end(RvDrag*, int32_t x, int32_t y, int32_t operation);
+
+/* "accessibility" for rv_abi_has: the page's accessibility tree, which the app exposes through the platform's
+ * accessibility API (UI Automation, NSAccessibility, AT-SPI). docs/ACCESSIBILITY.md describes the model.
+ *
+ * An RvAxNode is a strong reference to one of WebCore's accessibility objects, released with rv_ax_release
+ * before rv_host_destroy; two handles to the same object compare equal. The tree holds the objects a screen
+ * reader sees: elements that are hidden, presentational or purely structural have no node of their own, and
+ * their children are children of the nearest exposed ancestor. When the DOM node behind an object is
+ * removed, the object is detached: its handle stays valid, rv_ax_role returns RV_ERR_DETACHED, and the
+ * other functions return RV_ERR_DETACHED or NULL. Geometry is in CSS pixels of the viewport, as
+ * rv_element_rect. */
+
+typedef struct RvAxNode RvAxNode;
+
+enum {
+    RV_ERR_DETACHED = -10,
+};
+
+/* Roles of rv_ax_role: a small, stable set that maps onto each platform's control types. RV_AX_ROLE_NAME
+ * gives the ARIA role WebCore computed, for an app that maps more finely. */
+enum {
+    RV_ROLE_UNKNOWN = 0,
+    /* The page itself: the root of the tree. */
+    RV_ROLE_DOCUMENT = 1,
+    RV_ROLE_APPLICATION = 2,
+    /* A container with no semantics of its own, such as a <div> with a name or an inline element. */
+    RV_ROLE_GENERIC = 3,
+    RV_ROLE_GROUP = 4,
+    /* A run of text. */
+    RV_ROLE_TEXT = 5,
+    RV_ROLE_PARAGRAPH = 6,
+    RV_ROLE_HEADING = 7,
+    RV_ROLE_LINK = 8,
+    RV_ROLE_BUTTON = 9,
+    RV_ROLE_TOGGLE_BUTTON = 10,
+    RV_ROLE_CHECKBOX = 11,
+    RV_ROLE_RADIO = 12,
+    RV_ROLE_RADIO_GROUP = 13,
+    RV_ROLE_SWITCH = 14,
+    /* A single-line text field, including search, number and date fields. */
+    RV_ROLE_TEXT_FIELD = 15,
+    /* A multi-line text field. */
+    RV_ROLE_TEXT_AREA = 16,
+    /* A combo box, including a single-selection <select>. */
+    RV_ROLE_COMBO_BOX = 17,
+    RV_ROLE_LIST_BOX = 18,
+    RV_ROLE_OPTION = 19,
+    RV_ROLE_MENU = 20,
+    RV_ROLE_MENU_BAR = 21,
+    RV_ROLE_MENU_ITEM = 22,
+    RV_ROLE_MENU_ITEM_CHECKBOX = 23,
+    RV_ROLE_MENU_ITEM_RADIO = 24,
+    RV_ROLE_SLIDER = 25,
+    RV_ROLE_SPIN_BUTTON = 26,
+    RV_ROLE_PROGRESS = 27,
+    RV_ROLE_METER = 28,
+    RV_ROLE_SCROLL_BAR = 29,
+    RV_ROLE_IMAGE = 30,
+    RV_ROLE_LIST = 31,
+    RV_ROLE_LIST_ITEM = 32,
+    /* A term and its definition, as in a description list. */
+    RV_ROLE_TERM = 33,
+    RV_ROLE_DEFINITION = 34,
+    RV_ROLE_TABLE = 35,
+    RV_ROLE_GRID = 36,
+    RV_ROLE_TREE_GRID = 37,
+    RV_ROLE_ROW = 38,
+    RV_ROLE_CELL = 39,
+    RV_ROLE_COLUMN_HEADER = 40,
+    RV_ROLE_ROW_HEADER = 41,
+    RV_ROLE_TREE = 42,
+    RV_ROLE_TREE_ITEM = 43,
+    RV_ROLE_TAB_LIST = 44,
+    RV_ROLE_TAB = 45,
+    RV_ROLE_TAB_PANEL = 46,
+    RV_ROLE_DIALOG = 47,
+    RV_ROLE_ALERT_DIALOG = 48,
+    RV_ROLE_ALERT = 49,
+    RV_ROLE_STATUS = 50,
+    RV_ROLE_LOG = 51,
+    RV_ROLE_MARQUEE = 52,
+    RV_ROLE_TIMER = 53,
+    RV_ROLE_TOOLTIP = 54,
+    RV_ROLE_TOOLBAR = 55,
+    RV_ROLE_SEPARATOR = 56,
+    /* Landmarks. */
+    RV_ROLE_BANNER = 57,
+    RV_ROLE_NAVIGATION = 58,
+    RV_ROLE_MAIN = 59,
+    RV_ROLE_COMPLEMENTARY = 60,
+    RV_ROLE_CONTENT_INFO = 61,
+    RV_ROLE_REGION = 62,
+    RV_ROLE_SEARCH = 63,
+    RV_ROLE_FORM = 64,
+    RV_ROLE_ARTICLE = 65,
+    RV_ROLE_FEED = 66,
+    RV_ROLE_FIGURE = 67,
+    RV_ROLE_NOTE = 68,
+    RV_ROLE_MATH = 69,
+    /* A label, legend or caption that names another element. */
+    RV_ROLE_LABEL = 70,
+};
+
+/* Bits of rv_ax_states. */
+enum {
+    RV_AX_FOCUSABLE = 1 << 0,
+    RV_AX_FOCUSED = 1 << 1,
+    RV_AX_DISABLED = 1 << 2,
+    /* The node has a checked state: a checkbox, radio, switch or checkable menu item. */
+    RV_AX_CHECKABLE = 1 << 3,
+    RV_AX_CHECKED = 1 << 4,
+    /* Neither checked nor unchecked: an indeterminate checkbox, or aria-checked="mixed". */
+    RV_AX_MIXED = 1 << 5,
+    /* A toggle button that is pressed. */
+    RV_AX_PRESSED = 1 << 6,
+    /* The node expands and collapses, and RV_AX_EXPANDED tells which it is. */
+    RV_AX_EXPANDABLE = 1 << 7,
+    RV_AX_EXPANDED = 1 << 8,
+    RV_AX_SELECTABLE = 1 << 9,
+    RV_AX_SELECTED = 1 << 10,
+    RV_AX_MULTISELECTABLE = 1 << 11,
+    /* rv_ax_set_value, or rv_ax_set_number for a range, changes the node's value. */
+    RV_AX_EDITABLE = 1 << 12,
+    RV_AX_REQUIRED = 1 << 13,
+    RV_AX_INVALID = 1 << 14,
+    RV_AX_MULTILINE = 1 << 15,
+    /* A password field: the value is not exposed. */
+    RV_AX_PROTECTED = 1 << 16,
+    RV_AX_VISITED = 1 << 17,
+    RV_AX_BUSY = 1 << 18,
+    RV_AX_MODAL = 1 << 19,
+    RV_AX_HAS_POPUP = 1 << 20,
+    /* The node lies outside the viewport, or is scrolled out of view. */
+    RV_AX_OFFSCREEN = 1 << 21,
+    /* The node is a live region: RV_AX_LIVE is "polite" or "assertive". */
+    RV_AX_LIVE_REGION = 1 << 22,
+};
+
+/* Strings of rv_ax_string. Each is empty when the node has none. */
+enum {
+    /* The accessible name, from the ARIA name computation: aria-labelledby, aria-label, a <label>, alt, the
+     * contents, title. */
+    RV_AX_NAME = 0,
+    /* The accessible description: aria-describedby, aria-description, or a title not used for the name. */
+    RV_AX_DESCRIPTION = 1,
+    /* The value: a text field's text, a combo box's selected option, a range's value as text. Empty for a
+     * password field. */
+    RV_AX_VALUE = 2,
+    /* The ARIA role WebCore computed, such as "button" or "textbox". */
+    RV_AX_ROLE_NAME = 3,
+    /* aria-roledescription. */
+    RV_AX_ROLE_DESCRIPTION = 4,
+    RV_AX_PLACEHOLDER = 5,
+    /* aria-keyshortcuts. */
+    RV_AX_KEY_SHORTCUTS = 6,
+    /* A link's URL. */
+    RV_AX_URL = 7,
+    /* The live region politeness of the node: "polite", "assertive", or empty. */
+    RV_AX_LIVE = 8,
+    /* The text of the node's descendants, such as what a live region says when it changes. */
+    RV_AX_TEXT = 9,
+};
+
+/* Numbers of rv_ax_number. */
+enum {
+    /* A range's value, minimum and maximum: a slider, spin button, progress bar, meter or scroll bar. */
+    RV_AX_NUMBER_VALUE = 0,
+    RV_AX_NUMBER_MIN = 1,
+    RV_AX_NUMBER_MAX = 2,
+    /* A heading's level from 1 to 6, or a tree item's level from 1. */
+    RV_AX_NUMBER_LEVEL = 3,
+};
+
+/* Actions of rv_ax_action. */
+enum {
+    /* The node's default action, as a click: presses a button, follows a link, toggles a checkbox. */
+    RV_AX_PRESS = 0,
+    RV_AX_FOCUS = 1,
+    /* Scrolls the node's scrollable ancestors and the viewport to show it. */
+    RV_AX_SCROLL_INTO_VIEW = 2,
+    /* Steps a range's value, as the arrow keys do. */
+    RV_AX_INCREMENT = 3,
+    RV_AX_DECREMENT = 4,
+    RV_AX_EXPAND = 5,
+    RV_AX_COLLAPSE = 6,
+    /* Selects an option, tab, row or other selectable node. */
+    RV_AX_SELECT = 7,
+};
+
+/* Events of RvAxCallback. */
+enum {
+    /* The node gained keyboard focus, or became the active descendant of the focused node. */
+    RV_AX_EVENT_FOCUS = 0,
+    /* Nodes were added to or removed from the node's children: the app reads them again. */
+    RV_AX_EVENT_CHILDREN = 1,
+    RV_AX_EVENT_VALUE = 2,
+    /* One of the node's rv_ax_states changed. */
+    RV_AX_EVENT_STATE = 3,
+    RV_AX_EVENT_NAME = 4,
+    RV_AX_EVENT_DESCRIPTION = 5,
+    RV_AX_EVENT_ROLE = 6,
+    /* The node was selected or deselected, or the selection among the node's children changed. */
+    RV_AX_EVENT_SELECTION = 7,
+    /* The contents of the live region at node changed; the app announces RV_AX_TEXT with the node's RV_AX_LIVE
+     * politeness. */
+    RV_AX_EVENT_LIVE_REGION = 8,
+    /* The document finished loading. */
+    RV_AX_EVENT_LOAD_COMPLETE = 9,
+    /* Layout or scrolling moved nodes: the app reads bounds again. */
+    RV_AX_EVENT_LAYOUT = 10,
+    RV_AX_EVENT_MENU_OPENED = 11,
+    RV_AX_EVENT_MENU_CLOSED = 12,
+    /* "accessibility-text": text was inserted into or deleted from the editable content at node, which is a text
+     * field or the editable node where the edit happened; the app reads its text again. */
+    RV_AX_EVENT_TEXT = 13,
+    /* "accessibility-text": the selection or caret moved within the text of node, or of the text field node. */
+    RV_AX_EVENT_TEXT_SELECTION = 14,
+};
+
+/* Called on the host thread from rv_run_loop_cycle, once per node and event since the previous call, in the
+ * order WebCore posted them, where rv_abi_has("accessibility-events") is 1: a WebCore built with
+ * USE_AX_EMBEDDER_NOTIFICATIONS (patch 0011), as the slim flavor is. Elsewhere it is never called. WebCore
+ * posts as it updates the tree: in rv_host_update after a DOM change, in its timers, and in the reads below. The node is valid for the callback; rv_ax_retain keeps it. The callback may call
+ * any function of this ABI. */
+typedef void (*RvAxCallback)(void* context, RvAxNode* node, int32_t event);
+
+/* Turns accessibility on or off for the host, and sets the callback for its events, or with a NULL callback
+ * removes it. WebCore keeps one accessibility mode per process: it builds the tree for every page while any
+ * host has accessibility on, and stops when the last host turns it off. A host starts with it off, and the
+ * functions below that start from the host return NULL. Returns RV_ERR_UNSUPPORTED when WebCore made no
+ * accessibility cache for the host's document. */
+RV_EXPORT int32_t rv_host_set_accessibility(RvHost*, int32_t enabled, RvAxCallback callback, void* context);
+/* The root of the host's tree, of role RV_ROLE_DOCUMENT, with layout and the tree updated first; NULL while
+ * accessibility is off. */
+RV_EXPORT RvAxNode* rv_host_ax_root(RvHost*);
+/* The node with keyboard focus, or the root when no element has focus; NULL while accessibility is off. */
+RV_EXPORT RvAxNode* rv_host_ax_focus(RvHost*);
+/* The deepest node at x, y CSS pixels of the viewport, or NULL. */
+RV_EXPORT RvAxNode* rv_host_ax_hit_test(RvHost*, int32_t x, int32_t y);
+/* The node of a DOM node, or NULL when the DOM node has none: it is not exposed, or accessibility is off. */
+RV_EXPORT RvAxNode* rv_node_ax(RvNode*);
+/* The DOM node behind the node, or NULL for a node WebCore made without one, such as a list marker. */
+RV_EXPORT RvNode* rv_ax_dom_node(RvAxNode*);
+/* Adds a reference to the node and returns it, for keeping a node a callback passes. */
+RV_EXPORT RvAxNode* rv_ax_retain(RvAxNode*);
+RV_EXPORT void rv_ax_release(RvAxNode*);
+/* WebCore's identifier of the node's object: positive, unique in the process and never reused, for a
+ * platform's runtime identifiers. A negative status on failure. */
+RV_EXPORT int64_t rv_ax_id(RvAxNode*);
+/* An RV_ROLE_* value, or a negative status. */
+RV_EXPORT int32_t rv_ax_role(RvAxNode*);
+/* The RV_AX_* state bits, or a negative status. */
+RV_EXPORT int32_t rv_ax_states(RvAxNode*);
+RV_EXPORT int32_t rv_ax_string(RvAxNode*, int32_t property, char* buffer, int32_t capacity, int32_t* length);
+/* Writes a number of the node, or returns RV_ERR_UNSUPPORTED when the node has none: a range for the values,
+ * a heading or tree item for the level. */
+RV_EXPORT int32_t rv_ax_number(RvAxNode*, int32_t property, double* value);
+/* Writes the node's bounds in CSS pixels of the viewport, with layout updated first. */
+RV_EXPORT int32_t rv_ax_rect(RvAxNode*, double* x, double* y, double* width, double* height);
+/* The node's parent, or NULL for the root. */
+RV_EXPORT RvAxNode* rv_ax_parent(RvAxNode*);
+/* Writes *count, then a handle to each child in order. When capacity is below *count it returns
+ * RV_ERR_BUFFER_TOO_SMALL and writes no handles, so capacity 0 reads the count. */
+RV_EXPORT int32_t rv_ax_children(RvAxNode*, RvAxNode** nodes, int32_t capacity, int32_t* count);
+/* Performs an action, as an assistive technology asks. Returns 1 when the node performed it, 0 when the action
+ * does not apply to the node, or a negative status. */
+RV_EXPORT int32_t rv_ax_action(RvAxNode*, int32_t action);
+/* Sets the value of an editable text field. An <input> or <textarea> fires input and change, as after a user's
+ * edit; other editable content takes the text as WebCore's platform accessibility sets it. Returns 1 when set,
+ * 0 when the node's value is not editable, or a negative status. */
+RV_EXPORT int32_t rv_ax_set_value(RvAxNode*, const char* value);
+/* Sets the value of a range, such as a slider, clamped to its minimum and maximum; a range <input> fires input
+ * and change. Returns as rv_ax_set_value. */
+RV_EXPORT int32_t rv_ax_set_number(RvAxNode*, double value);
+
+/* "accessibility-text" for rv_abi_has: a node's text, for UI Automation's TextPattern, NSAccessibility's text
+ * attributes and AT-SPI's Text interface. A node's text is its DOM node's rendered text as the page reads it,
+ * with a newline between blocks; a text field's is its value, masked with U+2022 for a password field. Offsets
+ * are UTF-16 code units from 0 to rv_ax_text_length. Each function returns RV_ERR_UNSUPPORTED for a node
+ * without a DOM node, such as a list marker, and for an offset or range outside the text. Layout is updated
+ * first. */
+
+/* Units of rv_ax_text_boundary. */
+enum {
+    /* One character: a UTF-16 code unit, or a surrogate pair. */
+    RV_TEXT_CHARACTER = 0,
+    RV_TEXT_WORD = 1,
+    /* A line as laid out, which wraps with the width of its box. */
+    RV_TEXT_LINE = 2,
+    RV_TEXT_SENTENCE = 3,
+    RV_TEXT_PARAGRAPH = 4,
+};
+
+/* The length of the node's text in UTF-16 code units, or a negative status. */
+RV_EXPORT int32_t rv_ax_text_length(RvAxNode*);
+/* Copies the text from start to end, UTF-16 offsets, as UTF-8. */
+RV_EXPORT int32_t rv_ax_text(RvAxNode*, int32_t start, int32_t end, char* buffer, int32_t capacity, int32_t* length);
+/* Writes the start and end of the unit that contains offset: for a word, the word or the space after it as
+ * WebCore's word breaking finds them; for a line, sentence or paragraph, the unit with the newline that ends it.
+ * At the end of the text, the last unit, or for a character an empty range. A UI Automation text range moves by
+ * calling this at its ends; AT-SPI's GetStringAtOffset and NSAccessibility's ranges for a line read it once. */
+RV_EXPORT int32_t rv_ax_text_boundary(RvAxNode*, int32_t offset, int32_t unit, int32_t* start, int32_t* end);
+/* Writes the part of the page's selection within the node's text and returns 1: a caret as start equal to end,
+ * a selection clipped to the text. Returns 0 and writes -1 when the selection lies outside the text. */
+RV_EXPORT int32_t rv_ax_text_selection(RvAxNode*, int32_t* start, int32_t* end);
+/* The offset of the caret, the selection's moving end, in the node's text, or -1 when it lies outside it. */
+RV_EXPORT int32_t rv_ax_text_caret(RvAxNode*);
+/* Selects the text from start to end, or places the caret when they are equal, as the page's selection. */
+RV_EXPORT int32_t rv_ax_text_set_selection(RvAxNode*, int32_t start, int32_t end);
+/* Writes *count, then x, y, width, height for each rectangle the text from start to end covers, in CSS pixels of
+ * the viewport: one per line box of each text run, or the caret's rectangle when start equals end. rects holds
+ * capacity rectangles, 4 doubles each; when capacity is below *count it returns RV_ERR_BUFFER_TOO_SMALL and
+ * writes none. */
+RV_EXPORT int32_t rv_ax_text_rects(RvAxNode*, int32_t start, int32_t end, double* rects, int32_t capacity, int32_t* count);
+/* The offset in the node's text nearest x, y CSS pixels of the viewport, or -1 when that point's text lies outside
+ * the node. */
+RV_EXPORT int32_t rv_ax_text_offset_at(RvAxNode*, int32_t x, int32_t y);
+
+/* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
+ * IDL member of the interfaces gen/dom.json lists, from the same library. */
 
 #ifdef __cplusplus
 }
