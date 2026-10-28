@@ -228,3 +228,23 @@ with it off costs nothing.
 - **Off the main thread.** UI Automation calls a provider on its own threads; the app marshals each call
   to the host thread, as every call of the ABI requires. WebCore's isolated tree, which answers off the
   main thread on macOS, is not used.
+
+## Platform bridges: help wanted
+
+The ABI above is complete for a first bridge, but no bridge exists yet: nothing turns the tree into UI
+Automation, NSAccessibility or AT-SPI objects, so a page rendered through the host is invisible to screen
+readers today. Each bridge is self-contained work against this document, and a good place to contribute. The
+native path's window layer is SDL3, which gives a bridge the platform window it attaches to
+(`SDL_PROP_WINDOW_WIN32_HWND_POINTER`, `SDL_PROP_WINDOW_COCOA_WINDOW_POINTER`, the X11 or Wayland handles).
+Where the bridges live (one package per platform, or one with three back ends) is open: propose it in an issue.
+
+| Platform | The bridge | Notes |
+|---|---|---|
+| Windows | A UI Automation provider: `IRawElementProviderFragmentRoot` for the window, `IRawElementProviderFragment` per `RvAxNode`, returned from `WM_GETOBJECT` with `UiaReturnRawElementProvider`, and the patterns in the Actions and Text sections | SDL3 owns the window procedure, so `WM_GETOBJECT` is caught with `SDL_SetWindowsMessageHook` or a window subclass. From .NET, `[GeneratedComInterface]` keeps the COM interop AOT-compatible. UI Automation calls arrive on its own threads and are marshalled to the host thread |
+| macOS | An `NSAccessibilityElement` per node, returned from the content view's `accessibilityChildren`, posting the notifications in the Events table | From .NET through the Objective-C runtime (`objc_msgSend`, `class_addMethod`), which stays AOT-compatible without a binding library |
+| Linux | AT-SPI over D-Bus: find the accessibility bus with `org.a11y.Bus.GetAddress`, register the root, and implement `org.a11y.atspi.Accessible`, `Component`, `Action`, `Value` and `Text` | AT-SPI offsets count characters, not UTF-16 code units (see Text). Tmds.DBus is a managed D-Bus client |
+
+Each bridge maps roles with the Roles table, events with the Events table, and actions with the Actions table;
+detached nodes answer as the Lifetime section says. Check a bridge with the platform's inspector and a screen
+reader: Accessibility Insights and Narrator or NVDA on Windows, Accessibility Inspector and VoiceOver on macOS,
+Accerciser and Orca on Linux. `tests/abi/Accessibility.fs` shows the calls in order on a real page.
