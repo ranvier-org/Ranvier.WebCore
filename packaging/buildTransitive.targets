@@ -4,7 +4,7 @@
        or publish with a runtime identifier flattens native assets into the output root, so this puts the
        resources back into WebKit.resources beside them. build.py writes the package's runtime identifier
        for @RID@, and the project packs the result as buildTransitive/<PackageId>.targets. -->
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == '@RID@'">
     <!-- A full path without "..": MSBuild computes %(RecursiveDir) wrongly from an include that has one. -->
     <_RanvierWebKitResources>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../runtimes/@RID@/native/WebKit.resources/'))</_RanvierWebKitResources>
   </PropertyGroup>

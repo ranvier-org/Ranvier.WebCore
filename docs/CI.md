@@ -97,20 +97,20 @@ and native aggregate; it does not select GPU assets. A GPU release therefore nee
 on the **same immutable tag**, after the slim tag run succeeds:
 
 ```
-gh workflow run build.yml --repo ranvier-org/Ranvier.WebCore --ref v0.1.0-preview.6 --field flavor=gpu --field rids=win-x64
+gh workflow run build.yml --repo ranvier-org/Ranvier.WebCore --ref v0.1.0-preview.7 --field flavor=gpu --field rids=win-x64
 ```
 
 The dispatch builds or checks the GPU package against that tag's commit, flavor and version and publishes
 `Ranvier.WebCore.Native.Gpu.win-x64` through the existing NuGet OIDC job. The owner's attached-package
 check remains in effect; an asset that does not qualify is rebuilt in CI. Do not overlap the two runs:
 their concurrency group is keyed by the tag, so the later dispatch would cancel a running slim release.
-The managed interop version must remain `0.1.0-preview.6`; choosing the GPU runtime does not change its ABI.
+The managed interop version must remain `0.1.0-preview.7`; choosing the GPU runtime does not change its ABI.
 
 After the GPU version is available from the public v3 feed, run the Views workflow at a ref containing its
 strict GPU lane and the matching backend. This example uses the coordinated preview version:
 
 ```
-gh workflow run ci.yml --repo ranvier-org/Ranvier.View --ref <validated-view-ref> --field gpu_runtime_version=0.1.0-preview.6 --field gpu_runtime_source=https://api.nuget.org/v3/index.json --field gpu_runtime_package=Ranvier.WebCore.Native.Gpu.win-x64
+gh workflow run ci.yml --repo ranvier-org/Ranvier.View --ref <validated-view-ref> --field gpu_runtime_version=0.1.0-preview.7 --field gpu_runtime_source=https://api.nuget.org/v3/index.json --field gpu_runtime_package=Ranvier.WebCore.Native.Gpu.win-x64
 ```
 
 The `webcore-gpu` lane verifies the exact package identity, version, flavor and staged hashes, then runs
