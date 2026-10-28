@@ -138,6 +138,25 @@ RV_EXPORT void rv_node_release(RvNode*);
 
 /* Lays out and paints the viewport into rgba (width*height*4 bytes, unpremultiplied RGBA8, sRGB). */
 RV_EXPORT int32_t rv_host_paint_rgba(RvHost*, uint8_t* rgba, int32_t length);
+/* Modes of rv_host_set_accelerated_compositing. */
+enum {
+    /* Every frame is painted on the CPU; 3D transforms are drawn flat and backdrop filters are ignored. */
+    RV_COMPOSITING_OFF = 0,
+    /* Every frame is composited. */
+    RV_COMPOSITING_ALWAYS = 1,
+    /* A frame is composited only while some element needs a layer of its own (a 3D transform, a backdrop
+     * filter, will-change, an animated transform or opacity, ...); other frames take the CPU path. */
+    RV_COMPOSITING_WHEN_NEEDED = 2,
+};
+
+/* Sets the accelerated compositing mode. A host is created in RV_COMPOSITING_WHEN_NEEDED when the library has
+ * the GPU code, and in RV_COMPOSITING_OFF otherwise. A composited frame is composited with OpenGL ES (ANGLE on
+ * Windows) into an offscreen framebuffer and read back, so 3D transforms and backdrop filters render; it can
+ * differ from the CPU frame and between GPUs. Returns RV_ERR_UNSUPPORTED, and leaves the mode unchanged, for
+ * an unknown mode, when the library was built without the GPU code, or when RV_COMPOSITING_ALWAYS could not
+ * create a GL context. RV_COMPOSITING_WHEN_NEEDED creates the context on the first composited frame; if that
+ * fails, the host switches to RV_COMPOSITING_OFF and paints that frame on the CPU. */
+RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t mode);
 
 /* Registers a WebCore EventListener on target that calls callback(context, event). Returns NULL on a
  * NULL argument or the wrong thread. */
@@ -298,7 +317,8 @@ RV_EXPORT int32_t rv_resource_load_fail(RvResourceLoad*);
  * an exact rv_abi_version: "resize" (rv_host_resize, rv_host_set_device_scale, rv_host_paint_size), "input"
  * (rv_host_mouse, rv_host_wheel, rv_host_key, rv_host_set_focused), "frame" (rv_host_set_frame_callback,
  * rv_host_update, rv_host_dirty_rect) and "event-details" (rv_event_number, rv_event_string,
- * rv_event_related_target). */
+ * rv_event_related_target). "compositing" is 1 when rv_host_set_accelerated_compositing can composite: the
+ * library was built with the GPU code. */
 RV_EXPORT int32_t rv_abi_has(const char* feature);
 
 /* Sets the viewport to width by height CSS pixels, as rv_host_create does. Input coordinates and dirty

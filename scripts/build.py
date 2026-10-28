@@ -24,7 +24,7 @@ steps = ['fetch', 'prepare', 'configure', 'build', 'package', 'smoke']
 
 parser = argparse.ArgumentParser()
 parser.add_argument('step', choices=steps + ['all'])
-parser.add_argument('--flavor', choices=['slim', 'lean'], default='slim')
+parser.add_argument('--flavor', choices=['slim', 'gpu', 'lean'], default='slim')
 parser.add_argument('--work', default=os.environ.get('RANVIER_WORK'),
                     help='work directory; on Windows keep it short, WebKit paths exceed MAX_PATH under deep roots '
                          '(default C:/rw on Windows, ~/rw elsewhere)')
@@ -240,16 +240,19 @@ def icu_data(env):
 
 
 def build_step(env):
-    if windows and args.flavor == 'slim':
+    # The gpu flavor is the slim flavor with the GPU code kept (config/gpu.cmake).
+    slim = args.flavor in ('slim', 'gpu')
+    if windows and slim:
         # lld-link appends _LINK_ after the command line, so it overrides OptionsMSVC.cmake's /OPT:NOICF.
         # Safe ICF folds only functions whose address is not taken. WebCore links dwrite only through
         # PlatformWin.cmake's MediaFoundation target, which ENABLE_VIDEO=OFF removes.
         env = dict(env, _LINK_='/OPT:SAFEICF dwrite.lib')
         # USE_ANGLE_STUB links EGL and GLES statically; ANGLE DLLs from an earlier lean build would hide a dynamic load.
-        for name in ['libEGL.dll', 'libGLESv2.dll']:
-            (build / 'bin' / name).unlink(missing_ok=True)
+        if args.flavor == 'slim':
+            for name in ['libEGL.dll', 'libGLESv2.dll']:
+                (build / 'bin' / name).unlink(missing_ok=True)
     run(['cmake', '--build', build, '--target', 'RanvierWebCoreHost', '-j', str(args.jobs)], env=env, cwd=build)
-    if windows and args.flavor == 'slim':
+    if windows and slim:
         icu_data(env)
 
 
@@ -362,7 +365,7 @@ def package(env):
     for f in files:
         print(f"{f['name']:50} {f['bytes']:>12,}")
     print(f"{len(files)} files, {manifest['total_bytes'] / 1e6:.2f} MB", flush=True)
-    package_id = pins['package']['id'] + ('' if args.flavor == 'slim' else '.Lean') + '.' + args.rid
+    package_id = pins['package']['id'] + {'slim': '', 'gpu': '.Gpu', 'lean': '.Lean'}[args.flavor] + '.' + args.rid
     run(['dotnet', 'pack', root / 'packaging/Ranvier.WebCore.Native.csproj', '-c', 'Release', '--nologo',
          '-o', work / 'packages', f'-p:PackageId={package_id}', f'-p:PackageVersion={args.version}',
          f'-p:StageDir={out.as_posix()}/', f'-p:RuntimeId={args.rid}', f'-p:WebKitCommit={commit}'], env=env)
