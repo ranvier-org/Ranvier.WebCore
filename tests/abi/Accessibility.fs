@@ -248,6 +248,18 @@ let run (outDir: string) =
     host.Update()
     step "Accessibility: host.CycleRunLoop 50"
     host.CycleRunLoop 50
+    let changed () =
+        events |> Seq.exists (fun (n, e) -> n = list && e = 1)
+        && events |> Seq.exists (fun (n, e) -> n = live && e = 8)
+
+    // Events arrive asynchronously; a loaded runner can take more than one cycle to deliver them.
+    let mutable cycles = 0
+
+    while hasEvents && not (changed ()) && cycles < 40 do
+        host.Update()
+        host.CycleRunLoop 50
+        cycles <- cycles + 1
+
     let changeEvents =
         events |> Seq.map (fun (n, e) -> $"{rv_ax_role n}:{e}") |> List.ofSeq
 
