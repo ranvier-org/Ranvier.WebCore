@@ -1965,6 +1965,15 @@
       "source": "css/CSSStyleSheet.idl"
     },
     {
+      "name": "CSSStyleProperties",
+      "idlName": "CSSStyleProperties",
+      "base": "CSSStyleDeclaration",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": true,
+      "source": "css/CSSStyleProperties.idl"
+    },
+    {
       "name": "CustomElementRegistry",
       "idlName": "CustomElementRegistry",
       "base": null,

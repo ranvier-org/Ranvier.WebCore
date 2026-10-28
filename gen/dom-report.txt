@@ -1394,6 +1394,8 @@ Contract-only interfaces (own members have no native exports):
     CSSStyleSheet.rules: contract-only interface; member omitted
     CSSStyleSheet.addRule: contract-only interface; member omitted
     CSSStyleSheet.removeRule: contract-only interface; member omitted
+  CSSStyleProperties: css/CSSStyleProperties.idl
+    CSSStyleProperties.cssFloat: contract-only interface; member omitted
   CustomElementRegistry: dom/CustomElementRegistry.idl
     CustomElementRegistry.constructor: contract-only interface; member omitted
     CustomElementRegistry.define: contract-only interface; member omitted
