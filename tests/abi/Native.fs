@@ -313,7 +313,7 @@ module Raw =
     extern int rv_host_set_accelerated_compositing(nativeint host, int mode)
 
     [<DllImport(Lib)>]
-    extern int rv_host_acquire_d3d11_frame(nativeint host, nativeint consumerDevice, nativeint[] frame)
+    extern int rv_host_acquire_d3d11_frame(nativeint host, nativeint consumerDevice, nativeint& frame)
 
     [<DllImport(Lib)>]
     extern int rv_gpu_frame_info(nativeint value, nativeint& texture, int& width, int& height, int& format)
@@ -1138,17 +1138,17 @@ let rv_host_set_accelerated_compositing (host: nativeint, mode: int) : int =
     else
         Raw.rv_host_set_accelerated_compositing (host, mode)
 
-let rv_host_acquire_d3d11_frame (host: nativeint, consumerDevice: nativeint, frame: nativeint[]) : int =
+let rv_host_acquire_d3d11_frame (host: nativeint, consumerDevice: nativeint, frame: byref<nativeint>) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_host_acquire_d3d11_frame (host, consumerDevice, frame)
+        let result = Raw.rv_host_acquire_d3d11_frame (host, consumerDevice, &frame)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[18] <- Calls.Counts[18] + 1L
         Calls.Ticks[18] <- Calls.Ticks[18] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_host_acquire_d3d11_frame (host, consumerDevice, frame)
+        Raw.rv_host_acquire_d3d11_frame (host, consumerDevice, &frame)
 
 let rv_gpu_frame_info
     (value: nativeint, texture: byref<nativeint>, width: byref<int>, height: byref<int>, format: byref<int>)

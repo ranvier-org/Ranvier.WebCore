@@ -108,6 +108,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return ("int[]", "") if name == "length" else ("int&", "")
     if ctype == "void**":
         return "nativeint&", ""
+    if ctype == "RvGpuFrame**":
+        return "nativeint&", ""
     if re.fullmatch(r"Rv\w+\*\*", ctype):
         return "nativeint[]", ""
     # An Rv type without a pointer is a function pointer typedef; the header passes every struct by pointer.
