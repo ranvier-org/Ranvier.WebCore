@@ -1,8 +1,15 @@
 # ranvier-webcore
 
 Builds WebKit's WebCore and JavaScriptCore with Ranvier's C ABI host (`RanvierWebCoreHost`) and packs them
-as a NuGet native package, `Ranvier.WebCore.Native.<rid>`. Ranvier's WebCore view loads
-`RanvierWebCoreHost.dll` through P/Invoke.
+as versioned native packages. `Ranvier.WebCore.Native` aggregates the five runtime packages;
+`Ranvier.WebCore` provides the canonical managed interop. Ranvier's WebCore view loads the native host
+through those declarations rather than copying them into its own sources.
+
+The ABI 21 batch adds typed union/sequence/variadic DOM transports, namespace and document factories,
+shared .NET/Fable interface generation and a native Windows UI Automation bridge. The generator emits
+1,070 DOM functions and 228 shared contract declarations; [the generator guide](docs/GENERATOR.md) records
+scope, transport ownership and omitted members. [Accessibility](docs/ACCESSIBILITY.md) lists the Windows
+bridge's supported patterns and limitations.
 
 The shipped build, **slim**, is WebKit's Windows port cut to what presentation needs: no network stack,
 crypto library, GPU code, browser storage, service workers, WebGPU, WebXR or inspector, and JavaScriptCore
@@ -12,7 +19,7 @@ without its JIT tiers. It is
 | | |
 |---|---|
 | WebKit | `b95c91b1c0ee43cc86d25ff7af73038f67a88e04` (`pins.json`) |
-| Runtimes | `win-x64`; other runtimes in `docs/CI.md` |
+| Runtimes | `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-arm64`; build details in `docs/CI.md` |
 | Toolchain | clang-cl 23.1.4, MSVC 14.50, vcpkg at `pins.json`'s commit |
 
 ## Layout

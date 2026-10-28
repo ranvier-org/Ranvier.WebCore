@@ -13,6 +13,7 @@
 #include "CheckVisibilityOptions.h"
 #include "Comment.h"
 #include "CompositionEvent.h"
+#include "DOMImplementation.h"
 #include "DOMRect.h"
 #include "DOMRectReadOnly.h"
 #include "DOMSelection.h"
@@ -23,6 +24,7 @@
 #include "DocumentOrShadowRootFullscreen.h"
 #include "DocumentSettingsValues.h"
 #include "Element.h"
+#include "ElementCreationOptions.h"
 #include "ElementInlines.h"
 #include "Event.h"
 #include "EventTarget.h"
@@ -30,6 +32,8 @@
 #include "ExceptionOr.h"
 #include "FocusEvent.h"
 #include "FocusOptions.h"
+#include "GetComposedRangesOptions.h"
+#include "GetHTMLOptions.h"
 #include "HTMLAnchorElement.h"
 #include "HTMLBodyElement.h"
 #include "HTMLButtonElement.h"
@@ -37,6 +41,7 @@
 #include "HTMLDetailsElement.h"
 #include "HTMLDialogElement.h"
 #include "HTMLDivElement.h"
+#include "HTMLDocument.h"
 #include "HTMLElement.h"
 #include "HTMLFieldSetElement.h"
 #include "HTMLFormControlsCollection.h"
@@ -59,20 +64,27 @@
 #include "HTMLSelectElement.h"
 #include "HTMLSlotElement.h"
 #include "HTMLSpanElement.h"
+#include "HTMLTemplateElement.h"
 #include "HTMLTextAreaElement.h"
 #include "HTMLUListElement.h"
+#include "ImportNodeOptions.h"
 #include "InputEvent.h"
 #include "KeyboardEvent.h"
+#include "LiveNodeList.h"
 #include "MouseEvent.h"
+#include "NamedNodeMap.h"
 #include "Node.h"
 #include "NodeInlines.h"
 #include "NodeList.h"
 #include "PointerEvent.h"
+#include "RadioNodeList.h"
 #include "Range.h"
+#include "ScrollIntoViewOptions.h"
 #include "ScrollToOptions.h"
 #include "Settings.h"
 #include "ShadowRoot.h"
 #include "ShadowRootInit.h"
+#include "StaticRange.h"
 #include "Text.h"
 #include "UIEvent.h"
 #include "ValidityState.h"
@@ -81,14 +93,18 @@
 #include "JSAriaNotifyOptions.h"
 #include "JSDocument.h"
 #include "JSScrollBehavior.h"
+#include "JSScrollLogicalPosition.h"
 #include "JSShadowRootMode.h"
 #include "JSSlotAssignmentMode.h"
 #include "JSVisibilityState.h"
 
 #include <cstddef>
+#include <cstdlib>
 #include <cstring>
 #include <optional>
 #include <type_traits>
+#include <variant>
+#include <wtf/FixedVector.h>
 #include <wtf/MainThread.h>
 
 namespace Ranvier {
@@ -314,9 +330,789 @@ static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
 static constexpr ASCIILiteral enumerationDocumentReadyState[] = { "loading"_s, "interactive"_s, "complete"_s };
 static constexpr ASCIILiteral enumerationScrollBehavior[] = { "auto"_s, "instant"_s, "smooth"_s };
+static constexpr ASCIILiteral enumerationScrollLogicalPosition[] = { "start"_s, "center"_s, "end"_s, "nearest"_s };
 static constexpr ASCIILiteral enumerationShadowRootMode[] = { "user-agent"_s, "closed"_s, "open"_s };
 static constexpr ASCIILiteral enumerationSlotAssignmentMode[] = { "manual"_s, "named"_s };
 static constexpr ASCIILiteral enumerationVisibilityState[] = { "hidden"_s, "visible"_s };
+namespace {
+char* copyOwnedDomString(const String& value)
+{
+    if (value.isNull()) return nullptr;
+    auto utf8 = value.utf8();
+    auto* result = static_cast<char*>(std::malloc(utf8.length() + 1));
+    RELEASE_ASSERT(result);
+    std::memcpy(result, utf8.data(), utf8.length());
+    result[utf8.length()] = 0;
+    return result;
+}
+template<typename T> struct DomSequenceArgument {
+    Vector<T> values;
+    operator Vector<T>() && { return std::move(values); }
+    template<typename U> operator FixedVector<U>() && {
+        Vector<U> converted;
+        converted.reserveInitialCapacity(values.size());
+        for (auto& value : values) {
+            if constexpr (std::is_constructible_v<U, T&&>) converted.append(U { std::move(value) });
+            else converted.append(U { value.get() });
+        }
+        return FixedVector<U> { std::move(converted) };
+    }
+    operator std::optional<Vector<T>>() && { return std::move(values); }
+};
+
+std::optional<Variant<Ref<Node>, String>> decodeRvDomUnionNodeOrDOMString(const RvDomUnionNodeOrDOMString* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<Node> arm0 = reinterpret_cast<Node*>(source->arm0);
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<Node>, String> { Variant<Ref<Node>, String> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<Ref<Node>, String> { Variant<Ref<Node>, String> { WTF::InPlaceIndex<1>, String::fromUTF8(source->arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionNodeOrDOMString(RvDomUnionNodeOrDOMString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<Node*>(value->arm0)->deref();
+        break;
+    case 2:
+        std::free(const_cast<char*>(value->arm1));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionNodeOrDOMString(V&& value, RvDomUnionNodeOrDOMString* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<Node>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = copyOwnedDomString(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionNodeOrDOMString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionNodeOrDOMString(V&& input, RvDomUnionNodeOrDOMString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionNodeOrDOMString(value, result);
+    return RV_OK;
+}
+
+std::optional<Vector<Variant<Ref<Node>, String>>> decodeRvDomSequenceNodeOrDOMString(const RvDomSequenceNodeOrDOMString* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Variant<Ref<Node>, String>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomUnionNodeOrDOMString(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Variant<Ref<Node>, String>> { std::move(result) };
+}
+
+void clearRvDomSequenceNodeOrDOMString(RvDomSequenceNodeOrDOMString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionNodeOrDOMString(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceNodeOrDOMString(V&& input, RvDomSequenceNodeOrDOMString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomUnionNodeOrDOMString*>(std::calloc(value.size(), sizeof(RvDomUnionNodeOrDOMString))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomUnionNodeOrDOMString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+void clearRvDomSequenceElement(RvDomSequenceElement* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<Node*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceElement(V&& input, RvDomSequenceElement* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvNode**>(std::calloc(value.size(), sizeof(RvNode*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<Node>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Vector<Ref<ShadowRoot>>> decodeRvDomSequenceShadowRoot(const RvDomSequenceShadowRoot* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Ref<ShadowRoot>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<ShadowRoot> item = source->items[i] ? dynamicDowncast<ShadowRoot>(*reinterpret_cast<Node*>(source->items[i])) : nullptr;
+        if (source->items[i] && !item) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        result.append(Ref { *item });
+    }
+    return Vector<Ref<ShadowRoot>> { std::move(result) };
+}
+
+void clearRvDomSequenceShadowRoot(RvDomSequenceShadowRoot* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<Node*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceShadowRoot(V&& input, RvDomSequenceShadowRoot* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvNode**>(std::calloc(value.size(), sizeof(RvNode*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<Node>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<String, ElementCreationOptions>> decodeRvDomUnionDOMStringOrElementCreationOptions(const RvDomUnionDOMStringOrElementCreationOptions* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<String, ElementCreationOptions> { Variant<String, ElementCreationOptions> { WTF::InPlaceIndex<0>, String::fromUTF8(source->arm0) } };
+    }
+    case 2: {
+        ElementCreationOptions arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<String, ElementCreationOptions> { Variant<String, ElementCreationOptions> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionDOMStringOrElementCreationOptions(RvDomUnionDOMStringOrElementCreationOptions* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        std::free(const_cast<char*>(value->arm0));
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+std::optional<Variant<bool, ImportNodeOptions>> decodeRvDomUnionBooleanOrImportNodeOptions(const RvDomUnionBooleanOrImportNodeOptions* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<bool, ImportNodeOptions> { Variant<bool, ImportNodeOptions> { WTF::InPlaceIndex<0>, static_cast<bool>(source->arm0) } };
+    }
+    case 2: {
+        ImportNodeOptions arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomImportNodeOptions, self_only) + sizeof(source->arm1->self_only))
+                    assignValue(arm1.selfOnly, !!source->arm1->self_only);
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<bool, ImportNodeOptions> { Variant<bool, ImportNodeOptions> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionBooleanOrImportNodeOptions(RvDomUnionBooleanOrImportNodeOptions* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+std::optional<Vector<String>> decodeRvDomSequenceDOMString(const RvDomSequenceDOMString* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<String> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        result.append(String::fromUTF8(source->items[i]));
+    }
+    return Vector<String> { std::move(result) };
+}
+
+void clearRvDomSequenceDOMString(RvDomSequenceDOMString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        std::free(const_cast<char*>(value->items[i]));
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceDOMString(V&& input, RvDomSequenceDOMString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<const char**>(std::calloc(value.size(), sizeof(const char*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        result->items[i] = copyOwnedDomString(asString(value[i]));
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<bool, ScrollIntoViewOptions>> decodeRvDomUnionBooleanOrScrollIntoViewOptions(const RvDomUnionBooleanOrScrollIntoViewOptions* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<bool, ScrollIntoViewOptions> { Variant<bool, ScrollIntoViewOptions> { WTF::InPlaceIndex<0>, static_cast<bool>(source->arm0) } };
+    }
+    case 2: {
+        ScrollIntoViewOptions arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomScrollIntoViewOptions, behavior) + sizeof(source->arm1->behavior) && !assignEnumeration(arm1.behavior, source->arm1->behavior, enumerationScrollBehavior))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomScrollIntoViewOptions, block) + sizeof(source->arm1->block) && source->arm1->block && !assignEnumeration(arm1.blockPosition, *source->arm1->block, enumerationScrollLogicalPosition))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomScrollIntoViewOptions, inline_) + sizeof(source->arm1->inline_) && source->arm1->inline_ && !assignEnumeration(arm1.inlinePosition, *source->arm1->inline_, enumerationScrollLogicalPosition))
+                    return RV_ERR_UNSUPPORTED;
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<bool, ScrollIntoViewOptions> { Variant<bool, ScrollIntoViewOptions> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionBooleanOrScrollIntoViewOptions(RvDomUnionBooleanOrScrollIntoViewOptions* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+std::optional<std::optional<Variant<bool, double, String>>> decodeRvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable(const RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* source, int32_t& status)
+{
+    if (!source || !source->present) return std::optional<std::optional<Variant<bool, double, String>>> { std::in_place, std::nullopt };
+    switch (source->tag) {
+    case 1: {
+        return std::optional<Variant<bool, double, String>> { Variant<bool, double, String> { WTF::InPlaceIndex<0>, static_cast<bool>(source->arm0) } };
+    }
+    case 2: {
+        return std::optional<Variant<bool, double, String>> { Variant<bool, double, String> { WTF::InPlaceIndex<1>, static_cast<double>(source->arm1) } };
+    }
+    case 3: {
+        if (!source->arm2) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return std::optional<Variant<bool, double, String>> { Variant<bool, double, String> { WTF::InPlaceIndex<2>, String::fromUTF8(source->arm2) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    case 3:
+        std::free(const_cast<char*>(value->arm2));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable(V&& value, RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* result)
+{
+    if constexpr (I < 3) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = static_cast<int32_t>(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = static_cast<double>(std::get<I>(value));
+            }
+            else if constexpr (I == 2) {
+                result->arm2 = copyOwnedDomString(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable(V&& input, RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* result)
+{
+    *result = { };
+    if (!input) return RV_OK;
+    auto&& value = *input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable(value, result);
+    return RV_OK;
+}
+
+std::optional<Variant<HTMLElement::TogglePopoverOptions, bool>> decodeRvDomUnionTogglePopoverOptionsOrBoolean(const RvDomUnionTogglePopoverOptionsOrBoolean* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        HTMLElement::TogglePopoverOptions arm0 { };
+        if (source->arm0) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm0->size >= offsetof(RvDomTogglePopoverOptions, source) + sizeof(source->arm0->source) && source->arm0->source) {
+                    RefPtr value = dynamicDowncast<HTMLElement>(*nodeOf(source->arm0->source));
+                    if (!value)
+                        return RV_ERR_WRONG_INTERFACE;
+                    arm0.source = value.get();
+                }
+                if (source->arm0->size >= offsetof(RvDomTogglePopoverOptions, force) + sizeof(source->arm0->force) && source->arm0->force)
+                    assignValue(arm0.force, !!*source->arm0->force);
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<HTMLElement::TogglePopoverOptions, bool> { Variant<HTMLElement::TogglePopoverOptions, bool> { WTF::InPlaceIndex<0>, std::move(arm0) } };
+    }
+    case 2: {
+        return Variant<HTMLElement::TogglePopoverOptions, bool> { Variant<HTMLElement::TogglePopoverOptions, bool> { WTF::InPlaceIndex<1>, static_cast<bool>(source->arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionTogglePopoverOptionsOrBoolean(RvDomUnionTogglePopoverOptionsOrBoolean* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+void clearRvDomUnionRadioNodeListOrElementNullable(RvDomUnionRadioNodeListOrElementNullable* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<NodeList*>(value->arm0)->deref();
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<Node*>(value->arm1)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionRadioNodeListOrElementNullable(V&& value, RvDomUnionRadioNodeListOrElementNullable* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<NodeList>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                storeHandle<Node>(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionRadioNodeListOrElementNullable<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionRadioNodeListOrElementNullable(V&& input, RvDomUnionRadioNodeListOrElementNullable* result)
+{
+    *result = { };
+    if (!input) return RV_OK;
+    auto&& value = *input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionRadioNodeListOrElementNullable(value, result);
+    return RV_OK;
+}
+
+std::optional<Variant<Ref<HTMLOptionElement>, Ref<HTMLOptGroupElement>>> decodeRvDomUnionHTMLOptionElementOrHTMLOptGroupElement(const RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<HTMLOptionElement> arm0 = source->arm0 ? dynamicDowncast<HTMLOptionElement>(*reinterpret_cast<Node*>(source->arm0)) : nullptr;
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLOptionElement>, Ref<HTMLOptGroupElement>> { Variant<Ref<HTMLOptionElement>, Ref<HTMLOptGroupElement>> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<HTMLOptGroupElement> arm1 = source->arm1 ? dynamicDowncast<HTMLOptGroupElement>(*reinterpret_cast<Node*>(source->arm1)) : nullptr;
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLOptionElement>, Ref<HTMLOptGroupElement>> { Variant<Ref<HTMLOptionElement>, Ref<HTMLOptGroupElement>> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionHTMLOptionElementOrHTMLOptGroupElement(RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<Node*>(value->arm0)->deref();
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<Node*>(value->arm1)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionHTMLOptionElementOrHTMLOptGroupElement(V&& value, RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<Node>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                storeHandle<Node>(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionHTMLOptionElementOrHTMLOptGroupElement<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionHTMLOptionElementOrHTMLOptGroupElement(V&& input, RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionHTMLOptionElementOrHTMLOptGroupElement(value, result);
+    return RV_OK;
+}
+
+std::optional<std::optional<Variant<Ref<HTMLElement>, int32_t>>> decodeRvDomUnionHTMLElementOrLongNullable(const RvDomUnionHTMLElementOrLongNullable* source, int32_t& status)
+{
+    if (!source || !source->present) return std::optional<std::optional<Variant<Ref<HTMLElement>, int32_t>>> { std::in_place, std::nullopt };
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<HTMLElement> arm0 = source->arm0 ? dynamicDowncast<HTMLElement>(*reinterpret_cast<Node*>(source->arm0)) : nullptr;
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return std::optional<Variant<Ref<HTMLElement>, int32_t>> { Variant<Ref<HTMLElement>, int32_t> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        return std::optional<Variant<Ref<HTMLElement>, int32_t>> { Variant<Ref<HTMLElement>, int32_t> { WTF::InPlaceIndex<1>, static_cast<int32_t>(source->arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionHTMLElementOrLongNullable(RvDomUnionHTMLElementOrLongNullable* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<Node*>(value->arm0)->deref();
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionHTMLElementOrLongNullable(V&& value, RvDomUnionHTMLElementOrLongNullable* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<Node>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = static_cast<int32_t>(std::get<I>(value));
+            }
+        } else encodeArmsRvDomUnionHTMLElementOrLongNullable<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionHTMLElementOrLongNullable(V&& input, RvDomUnionHTMLElementOrLongNullable* result)
+{
+    *result = { };
+    if (!input) return RV_OK;
+    auto&& value = *input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionHTMLElementOrLongNullable(value, result);
+    return RV_OK;
+}
+
+void clearRvDomSequenceNode(RvDomSequenceNode* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<Node*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceNode(V&& input, RvDomSequenceNode* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvNode**>(std::calloc(value.size(), sizeof(RvNode*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<Node>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<Ref<Element>, Ref<Text>>> decodeRvDomUnionElementOrText(const RvDomUnionElementOrText* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<Element> arm0 = source->arm0 ? dynamicDowncast<Element>(*reinterpret_cast<Node*>(source->arm0)) : nullptr;
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<Element>, Ref<Text>> { Variant<Ref<Element>, Ref<Text>> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<Text> arm1 = source->arm1 ? dynamicDowncast<Text>(*reinterpret_cast<Node*>(source->arm1)) : nullptr;
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<Element>, Ref<Text>> { Variant<Ref<Element>, Ref<Text>> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionElementOrText(RvDomUnionElementOrText* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<Node*>(value->arm0)->deref();
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<Node*>(value->arm1)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionElementOrText(V&& value, RvDomUnionElementOrText* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<Node>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                storeHandle<Node>(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionElementOrText<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionElementOrText(V&& input, RvDomUnionElementOrText* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionElementOrText(value, result);
+    return RV_OK;
+}
+
+std::optional<Vector<Variant<Ref<Element>, Ref<Text>>>> decodeRvDomSequenceElementOrText(const RvDomSequenceElementOrText* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Variant<Ref<Element>, Ref<Text>>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomUnionElementOrText(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Variant<Ref<Element>, Ref<Text>>> { std::move(result) };
+}
+
+void clearRvDomSequenceElementOrText(RvDomSequenceElementOrText* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionElementOrText(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceElementOrText(V&& input, RvDomSequenceElementOrText* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomUnionElementOrText*>(std::calloc(value.size(), sizeof(RvDomUnionElementOrText))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomUnionElementOrText(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<Ref<ShadowRoot>, GetComposedRangesOptions>> decodeRvDomUnionShadowRootOrGetComposedRangesOptions(const RvDomUnionShadowRootOrGetComposedRangesOptions* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<ShadowRoot> arm0 = source->arm0 ? dynamicDowncast<ShadowRoot>(*reinterpret_cast<Node*>(source->arm0)) : nullptr;
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<ShadowRoot>, GetComposedRangesOptions> { Variant<Ref<ShadowRoot>, GetComposedRangesOptions> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        GetComposedRangesOptions arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomGetComposedRangesOptions, shadow_roots) + sizeof(source->arm1->shadow_roots) && source->arm1->shadow_roots) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomSequenceShadowRoot(source->arm1->shadow_roots, status);
+                    if (status != RV_OK) return status;
+                    arm1.shadowRoots = std::move(*value);
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<Ref<ShadowRoot>, GetComposedRangesOptions> { Variant<Ref<ShadowRoot>, GetComposedRangesOptions> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionShadowRootOrGetComposedRangesOptions(RvDomUnionShadowRootOrGetComposedRangesOptions* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<Node*>(value->arm0)->deref();
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+void clearRvDomSequenceStaticRange(RvDomSequenceStaticRange* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<AbstractRange*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceStaticRange(V&& input, RvDomSequenceStaticRange* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvAbstractRange**>(std::calloc(value.size(), sizeof(RvAbstractRange*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<AbstractRange>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+void clearRvDomSequencePointerEvent(RvDomSequencePointerEvent* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<Event*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequencePointerEvent(V&& input, RvDomSequencePointerEvent* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvEvent**>(std::calloc(value.size(), sizeof(RvEvent*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<Event>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+}
 
 using namespace WebCore;
 
@@ -326,11 +1122,134 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:Element", "dom:Attr", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTextAreaElement", "dom:HTMLUListElement", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:NodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
     return 0;
+}
+
+void ranvier_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value)
+{
+    if (isMainThread()) clearRvDomUnionNodeOrDOMString(value);
+}
+
+void ranvier_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value)
+{
+    if (isMainThread()) clearRvDomSequenceNodeOrDOMString(value);
+}
+
+void ranvier_dom_sequence_element_release(RvDomSequenceElement* value)
+{
+    if (isMainThread()) clearRvDomSequenceElement(value);
+}
+
+void ranvier_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value)
+{
+    if (isMainThread()) clearRvDomSequenceShadowRoot(value);
+}
+
+void ranvier_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value)
+{
+    if (isMainThread()) clearRvDomUnionDOMStringOrElementCreationOptions(value);
+}
+
+void ranvier_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value)
+{
+    if (isMainThread()) clearRvDomUnionBooleanOrImportNodeOptions(value);
+}
+
+void ranvier_dom_sequence_dom_string_release(RvDomSequenceDOMString* value)
+{
+    if (isMainThread()) clearRvDomSequenceDOMString(value);
+}
+
+void ranvier_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value)
+{
+    if (isMainThread()) clearRvDomUnionBooleanOrScrollIntoViewOptions(value);
+}
+
+void ranvier_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value)
+{
+    if (isMainThread()) clearRvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable(value);
+}
+
+void ranvier_dom_union_toggle_popover_options_or_boolean_release(RvDomUnionTogglePopoverOptionsOrBoolean* value)
+{
+    if (isMainThread()) clearRvDomUnionTogglePopoverOptionsOrBoolean(value);
+}
+
+void ranvier_dom_union_radio_node_list_or_element_nullable_release(RvDomUnionRadioNodeListOrElementNullable* value)
+{
+    if (isMainThread()) clearRvDomUnionRadioNodeListOrElementNullable(value);
+}
+
+void ranvier_dom_union_html_option_element_or_html_opt_group_element_release(RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* value)
+{
+    if (isMainThread()) clearRvDomUnionHTMLOptionElementOrHTMLOptGroupElement(value);
+}
+
+void ranvier_dom_union_html_element_or_long_nullable_release(RvDomUnionHTMLElementOrLongNullable* value)
+{
+    if (isMainThread()) clearRvDomUnionHTMLElementOrLongNullable(value);
+}
+
+void ranvier_dom_sequence_node_release(RvDomSequenceNode* value)
+{
+    if (isMainThread()) clearRvDomSequenceNode(value);
+}
+
+void ranvier_dom_union_element_or_text_release(RvDomUnionElementOrText* value)
+{
+    if (isMainThread()) clearRvDomUnionElementOrText(value);
+}
+
+void ranvier_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value)
+{
+    if (isMainThread()) clearRvDomSequenceElementOrText(value);
+}
+
+void ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value)
+{
+    if (isMainThread()) clearRvDomUnionShadowRootOrGetComposedRangesOptions(value);
+}
+
+void ranvier_dom_sequence_static_range_release(RvDomSequenceStaticRange* value)
+{
+    if (isMainThread()) clearRvDomSequenceStaticRange(value);
+}
+
+void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value)
+{
+    if (isMainThread()) clearRvDomSequencePointerEvent(value);
+}
+
+void ranvier_dom_dom_implementation_release(RvDOMImplementation* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<DOMImplementation*>(handle)->deref();
+}
+
+RvDOMImplementation* ranvier_dom_dom_implementation_retain(RvDOMImplementation* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<DOMImplementation*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_named_node_map_release(RvNamedNodeMap* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<NamedNodeMap*>(handle)->deref();
+}
+
+RvNamedNodeMap* ranvier_dom_named_node_map_retain(RvNamedNodeMap* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<NamedNodeMap*>(handle)->ref();
+    return handle;
 }
 
 void ranvier_dom_css_style_declaration_release(RvCSSStyleDeclaration* handle)
@@ -457,6 +1376,17 @@ RvValidityState* ranvier_dom_validity_state_retain(RvValidityState* handle)
         return nullptr;
     reinterpret_cast<ValidityState*>(handle)->ref();
     return handle;
+}
+
+// Node.nodeType getter: readonly attribute unsigned short nodeType
+int32_t ranvier_dom_node_get_node_type(RvNode* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Node> impl = nodeOf(target);
+    return deliver([&]() -> decltype(auto) { return impl->nodeType(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
 }
 
 // Node.nodeName getter: readonly attribute DOMString nodeName
@@ -955,6 +1885,54 @@ int32_t ranvier_dom_character_data_replace_data(RvNode* target, uint32_t offset,
     return invoke([&]() -> decltype(auto) { return impl->replaceData(offset, count, a2.string()); });
 }
 
+// CharacterData.before((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_character_data_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CharacterData>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->before(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// CharacterData.after((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_character_data_after(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CharacterData>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->after(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// CharacterData.replaceWith((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_character_data_replace_with(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CharacterData>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->replaceWith(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
 // CharacterData.remove() -> undefined
 int32_t ranvier_dom_character_data_remove(RvNode* target)
 {
@@ -1057,6 +2035,54 @@ int32_t ranvier_dom_document_fragment_get_child_element_count(RvNode* target, ui
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->childElementCount(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// DocumentFragment.prepend((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_document_fragment_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<DocumentFragment>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->prepend(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// DocumentFragment.append((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_document_fragment_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<DocumentFragment>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->append(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// DocumentFragment.replaceChildren((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_document_fragment_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<DocumentFragment>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->replaceChildren(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
 }
 
 // DocumentFragment.moveBefore(Node node, Node? child) -> undefined; child may be NULL; RV_ERR_UNSUPPORTED while the setting MoveBeforeEnabled is off
@@ -1324,6 +2350,19 @@ int32_t ranvier_dom_shadow_root_element_from_point(RvNode* target, double x, dou
     return deliver([&]() -> decltype(auto) { return impl->elementFromPoint(x, y); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
+// ShadowRoot.elementsFromPoint(double x, double y) -> sequence<Element>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_shadow_root_elements_from_point(RvNode* target, double x, double y, RvDomSequenceElement* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ShadowRoot>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->elementsFromPoint(x, y); }, [&](auto&& value) { return encodeRvDomSequenceElement(value, result); });
+}
+
 // ShadowRoot.setHTMLUnsafe((TrustedHTML or DOMString) html) -> undefined
 int32_t ranvier_dom_shadow_root_set_html_unsafe(RvNode* target, const char* html)
 {
@@ -1336,6 +2375,43 @@ int32_t ranvier_dom_shadow_root_set_html_unsafe(RvNode* target, const char* html
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { html };
     return invoke([&]() -> decltype(auto) { return impl->setHTMLUnsafe(a0.string()); });
+}
+
+// ShadowRoot.getHTML(optional GetHTMLOptions options = {}) -> DOMString; options defaults to {} in IDL; options may be NULL for the IDL default
+int32_t ranvier_dom_shadow_root_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ShadowRoot>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    GetHTMLOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomGetHTMLOptions, serializable_shadow_roots) + sizeof(options->serializable_shadow_roots))
+            assignValue(a0.serializableShadowRoots, !!options->serializable_shadow_roots);
+        if (options->size >= offsetof(RvDomGetHTMLOptions, shadow_roots) + sizeof(options->shadow_roots) && options->shadow_roots) {
+            int32_t status = RV_OK;
+            auto value = decodeRvDomSequenceShadowRoot(options->shadow_roots, status);
+            if (status != RV_OK) return status;
+            a0.shadowRoots = std::move(*value);
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return impl->getHTML(std::move(a0)); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// Document.implementation getter: readonly attribute DOMImplementation implementation; *result is a new reference
+int32_t ranvier_dom_document_get_implementation(RvNode* target, RvDOMImplementation** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->implementation(); }, [&](auto&& value) { return storeHandle<DOMImplementation>(value, result); });
 }
 
 // Document.compatMode getter: readonly attribute DOMString compatMode
@@ -1695,6 +2771,43 @@ int32_t ranvier_dom_document_get_active_element(RvNode* target, RvNode** result)
     return deliver([&]() -> decltype(auto) { return impl->activeElement(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
+// Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) -> Element; options defaults to {} in IDL; *result is a new reference
+int32_t ranvier_dom_document_create_element(RvNode* target, const char* local_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result)
+{
+    if (!target || !local_name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { local_name };
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionDOMStringOrElementCreationOptions(options, status1);
+    if (!options) { a1 = Variant<String, ElementCreationOptions> { WTF::InPlaceIndex<1>, ElementCreationOptions { } }; status1 = RV_OK; }
+    if (status1 != RV_OK) return status1;
+    return deliver([&]() -> decltype(auto) { return impl->createElementForBindings(a0.atom(), std::move(*a1)); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// Document.createElementNS(DOMString? namespaceURI, DOMString qualifiedName, optional (DOMString or ElementCreationOptions) options = {}) -> Element; namespace_uri may be NULL (null); options defaults to {} in IDL; *result is a new reference
+int32_t ranvier_dom_document_create_element_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result)
+{
+    if (!target || !qualified_name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { namespace_uri };
+    StringArg a1 { qualified_name };
+    int32_t status2 = RV_OK;
+    auto a2 = decodeRvDomUnionDOMStringOrElementCreationOptions(options, status2);
+    if (!options) { a2 = Variant<String, ElementCreationOptions> { WTF::InPlaceIndex<1>, ElementCreationOptions { } }; status2 = RV_OK; }
+    if (status2 != RV_OK) return status2;
+    return deliver([&]() -> decltype(auto) { return impl->createElementNS(a0.atom(), a1.atom(), std::move(*a2)); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
 // Document.getElementsByTagName(DOMString qualifiedName) -> HTMLCollection; *result is a new reference
 int32_t ranvier_dom_document_get_elements_by_tag_name(RvNode* target, const char* qualified_name, RvHTMLCollection** result)
 {
@@ -1777,6 +2890,24 @@ int32_t ranvier_dom_document_create_comment(RvNode* target, const char* data, Rv
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { data };
     return deliver([&]() -> decltype(auto) { return impl->createComment(a0.string()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// Document.importNode(Node node, optional (boolean or ImportNodeOptions) options = false) -> Node; options defaults to false in IDL; *result is a new reference
+int32_t ranvier_dom_document_import_node(RvNode* target, RvNode* node, const RvDomUnionBooleanOrImportNodeOptions* options, RvNode** result)
+{
+    if (!target || !node || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<Node> a0 = nodeOf(node);
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionBooleanOrImportNodeOptions(options, status1);
+    if (!options) { a1 = Variant<bool, ImportNodeOptions> { WTF::InPlaceIndex<0>, false }; status1 = RV_OK; }
+    if (status1 != RV_OK) return status1;
+    return deliver([&]() -> decltype(auto) { return impl->importNode(HandleArg<Node> { a0.get() }, std::move(*a1)); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // Document.adoptNode(Node node) -> Node; *result is a new reference
@@ -2028,6 +3159,54 @@ int32_t ranvier_dom_document_get_selection(RvNode* target, RvDOMSelection** resu
     return deliver([&]() -> decltype(auto) { return impl->getSelection(); }, [&](auto&& value) { return storeHandle<DOMSelection>(value, result); });
 }
 
+// Document.prepend((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_document_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->prepend(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// Document.append((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_document_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->append(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// Document.replaceChildren((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_document_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->replaceChildren(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
 // Document.moveBefore(Node node, Node? child) -> undefined; child may be NULL; RV_ERR_UNSUPPORTED while the setting MoveBeforeEnabled is off
 int32_t ranvier_dom_document_move_before(RvNode* target, RvNode* node, RvNode* child)
 {
@@ -2099,6 +3278,42 @@ int32_t ranvier_dom_document_element_from_point(RvNode* target, double x, double
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->elementFromPoint(x, y); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// Document.elementsFromPoint(double x, double y) -> sequence<Element>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_document_elements_from_point(RvNode* target, double x, double y, RvDomSequenceElement* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->elementsFromPoint(x, y); }, [&](auto&& value) { return encodeRvDomSequenceElement(value, result); });
+}
+
+// DOMImplementation.createHTMLDocument(optional DOMString title) -> HTMLDocument; title may be NULL (absent); *result is a new reference
+int32_t ranvier_dom_dom_implementation_create_html_document(RvDOMImplementation* target, const char* title, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMImplementation> impl = reinterpret_cast<DOMImplementation*>(target);
+    StringArg a0 { title };
+    return deliver([&]() -> decltype(auto) { return impl->createHTMLDocument(a0); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// DOMImplementation.hasFeature() -> boolean
+int32_t ranvier_dom_dom_implementation_has_feature(RvDOMImplementation* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMImplementation> impl = reinterpret_cast<DOMImplementation*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->hasFeature(); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
 // Element.namespaceURI getter: readonly attribute DOMString? namespaceURI
@@ -2258,6 +3473,19 @@ int32_t ranvier_dom_element_get_part(RvNode* target, RvDOMTokenList** result)
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->part(); }, [&](auto&& value) { return storeHandle<DOMTokenList>(value, result); });
+}
+
+// Element.attributes getter: readonly attribute NamedNodeMap attributes; *result is a new reference
+int32_t ranvier_dom_element_get_attributes(RvNode* target, RvNamedNodeMap** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributesMap(); }, [&](auto&& value) { return storeHandle<NamedNodeMap>(value, result); });
 }
 
 // Element.scrollTop getter: attribute long scrollTop
@@ -3781,6 +5009,19 @@ int32_t ranvier_dom_element_has_attributes(RvNode* target, int32_t* result)
     return deliver([&]() -> decltype(auto) { return impl->hasAttributes(); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// Element.getAttributeNames() -> sequence<DOMString>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_element_get_attribute_names(RvNode* target, RvDomSequenceDOMString* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getAttributeNames(); }, [&](auto&& value) { return encodeRvDomSequenceDOMString(value, result); });
+}
+
 // Element.getAttribute(DOMString qualifiedName) -> DOMString?
 int32_t ranvier_dom_element_get_attribute(RvNode* target, const char* qualified_name, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -4201,6 +5442,23 @@ int32_t ranvier_dom_element_check_visibility(RvNode* target, const RvDomCheckVis
     return deliver([&]() -> decltype(auto) { return impl->checkVisibility(std::move(a0)); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// Element.scrollIntoView(optional (boolean or ScrollIntoViewOptions) arg = {}) -> undefined; arg defaults to {} in IDL
+int32_t ranvier_dom_element_scroll_into_view(RvNode* target, const RvDomUnionBooleanOrScrollIntoViewOptions* arg)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionBooleanOrScrollIntoViewOptions(arg, status0);
+    if (!arg) { a0 = Variant<bool, ScrollIntoViewOptions> { WTF::InPlaceIndex<1>, ScrollIntoViewOptions { } }; status0 = RV_OK; }
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->scrollIntoView(std::move(*a0)); });
+}
+
 // Element.scroll(optional ScrollToOptions options = {}) -> undefined; options defaults to {} in IDL; options may be NULL for the IDL default
 int32_t ranvier_dom_element_scroll_1(RvNode* target, const RvDomScrollToOptions* options)
 {
@@ -4373,6 +5631,54 @@ int32_t ranvier_dom_element_has_pointer_capture(RvNode* target, int32_t pointer_
     return deliver([&]() -> decltype(auto) { return impl->hasPointerCapture(pointer_id); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// Element.before((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_element_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->before(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// Element.after((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_element_after(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->after(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// Element.replaceWith((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_element_replace_with(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->replaceWith(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
 // Element.remove() -> undefined
 int32_t ranvier_dom_element_remove(RvNode* target)
 {
@@ -4384,6 +5690,54 @@ int32_t ranvier_dom_element_remove(RvNode* target)
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return invoke([&]() -> decltype(auto) { return impl->remove(); });
+}
+
+// Element.prepend((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_element_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->prepend(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// Element.append((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_element_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->append(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
+}
+
+// Element.replaceChildren((Node or DOMString) nodes) -> undefined
+int32_t ranvier_dom_element_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceNodeOrDOMString(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->replaceChildren(DomSequenceArgument<Variant<Ref<Node>, String>> { std::move(*a0) }); });
 }
 
 // Element.moveBefore(Node node, Node? child) -> undefined; child may be NULL; RV_ERR_UNSUPPORTED while the setting MoveBeforeEnabled is off
@@ -4444,6 +5798,30 @@ int32_t ranvier_dom_element_set_html_unsafe(RvNode* target, const char* html)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { html };
     return invoke([&]() -> decltype(auto) { return impl->setHTMLUnsafe(a0.string()); });
+}
+
+// Element.getHTML(optional GetHTMLOptions options = {}) -> DOMString; options defaults to {} in IDL; options may be NULL for the IDL default
+int32_t ranvier_dom_element_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    GetHTMLOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomGetHTMLOptions, serializable_shadow_roots) + sizeof(options->serializable_shadow_roots))
+            assignValue(a0.serializableShadowRoots, !!options->serializable_shadow_roots);
+        if (options->size >= offsetof(RvDomGetHTMLOptions, shadow_roots) + sizeof(options->shadow_roots) && options->shadow_roots) {
+            int32_t status = RV_OK;
+            auto value = decodeRvDomSequenceShadowRoot(options->shadow_roots, status);
+            if (status != RV_OK) return status;
+            a0.shadowRoots = std::move(*value);
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return impl->getHTML(std::move(a0)); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
 }
 
 // Attr.namespaceURI getter: readonly attribute DOMString? namespaceURI
@@ -4562,6 +5940,106 @@ int32_t ranvier_dom_attr_get_style(RvNode* target, RvCSSStyleDeclaration** resul
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->style(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// NamedNodeMap.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_named_node_map_get_length(RvNamedNodeMap* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NamedNodeMap> impl = reinterpret_cast<NamedNodeMap*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// NamedNodeMap.item(unsigned long index) -> Attr?; *result is a new reference, or NULL
+int32_t ranvier_dom_named_node_map_item(RvNamedNodeMap* target, uint32_t index, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NamedNodeMap> impl = reinterpret_cast<NamedNodeMap*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NamedNodeMap.getNamedItem(DOMString qualifiedName) -> Attr?; *result is a new reference, or NULL
+int32_t ranvier_dom_named_node_map_get_named_item(RvNamedNodeMap* target, const char* qualified_name, RvNode** result)
+{
+    if (!target || !qualified_name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NamedNodeMap> impl = reinterpret_cast<NamedNodeMap*>(target);
+    StringArg a0 { qualified_name };
+    return deliver([&]() -> decltype(auto) { return impl->getNamedItem(a0.atom()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NamedNodeMap.getNamedItemNS(DOMString? namespaceURI, DOMString localName) -> Attr?; namespace_uri may be NULL (null); *result is a new reference, or NULL
+int32_t ranvier_dom_named_node_map_get_named_item_ns(RvNamedNodeMap* target, const char* namespace_uri, const char* local_name, RvNode** result)
+{
+    if (!target || !local_name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NamedNodeMap> impl = reinterpret_cast<NamedNodeMap*>(target);
+    StringArg a0 { namespace_uri };
+    StringArg a1 { local_name };
+    return deliver([&]() -> decltype(auto) { return impl->getNamedItemNS(a0.atom(), a1.atom()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NamedNodeMap.setNamedItem(Attr attr) -> Attr?; *result is a new reference, or NULL
+int32_t ranvier_dom_named_node_map_set_named_item(RvNamedNodeMap* target, RvNode* attr, RvNode** result)
+{
+    if (!target || !attr || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NamedNodeMap> impl = reinterpret_cast<NamedNodeMap*>(target);
+    RefPtr<Attr> a0 = attr ? dynamicDowncast<Attr>(*nodeOf(attr)) : nullptr;
+    if (attr && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->setNamedItem(HandleArg<Attr> { a0.get() }); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NamedNodeMap.setNamedItemNS(Attr attr) -> Attr?; *result is a new reference, or NULL
+int32_t ranvier_dom_named_node_map_set_named_item_ns(RvNamedNodeMap* target, RvNode* attr, RvNode** result)
+{
+    if (!target || !attr || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NamedNodeMap> impl = reinterpret_cast<NamedNodeMap*>(target);
+    RefPtr<Attr> a0 = attr ? dynamicDowncast<Attr>(*nodeOf(attr)) : nullptr;
+    if (attr && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->setNamedItem(HandleArg<Attr> { a0.get() }); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NamedNodeMap.removeNamedItem(DOMString qualifiedName) -> Attr; *result is a new reference
+int32_t ranvier_dom_named_node_map_remove_named_item(RvNamedNodeMap* target, const char* qualified_name, RvNode** result)
+{
+    if (!target || !qualified_name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NamedNodeMap> impl = reinterpret_cast<NamedNodeMap*>(target);
+    StringArg a0 { qualified_name };
+    return deliver([&]() -> decltype(auto) { return impl->removeNamedItem(a0.atom()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// NamedNodeMap.removeNamedItemNS(DOMString? namespaceURI, DOMString localName) -> Attr; namespace_uri may be NULL (null); *result is a new reference
+int32_t ranvier_dom_named_node_map_remove_named_item_ns(RvNamedNodeMap* target, const char* namespace_uri, const char* local_name, RvNode** result)
+{
+    if (!target || !local_name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<NamedNodeMap> impl = reinterpret_cast<NamedNodeMap*>(target);
+    StringArg a0 { namespace_uri };
+    StringArg a1 { local_name };
+    return deliver([&]() -> decltype(auto) { return impl->removeNamedItemNS(a0.atom(), a1.atom()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // HTMLElement.title getter: attribute DOMString title
@@ -4721,6 +6199,35 @@ int32_t ranvier_dom_html_element_set_cuebackground(RvNode* target, int32_t value
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::cuebackgroundAttr, !!value); });
+}
+
+// HTMLElement.hidden getter: attribute (boolean or unrestricted double or DOMString)? hidden; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_html_element_get_hidden(RvNode* target, RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hidden(); }, [&](auto&& value) { return encodeRvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable(value, result); });
+}
+
+// HTMLElement.hidden setter: attribute (boolean or unrestricted double or DOMString)? hidden
+int32_t ranvier_dom_html_element_set_hidden(RvNode* target, const RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setHidden(std::move(*a0)); });
 }
 
 // HTMLElement.accessKey getter: attribute DOMString accessKey
@@ -5434,6 +6941,26 @@ int32_t ranvier_dom_html_element_hide_popover(RvNode* target)
     if (!(settings.popoverAttributeEnabled))
         return RV_ERR_UNSUPPORTED;
     return invoke([&]() -> decltype(auto) { return impl->hidePopover(); });
+}
+
+// HTMLElement.togglePopover(optional (TogglePopoverOptions or boolean) options = {}) -> boolean; options defaults to {} in IDL; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off
+int32_t ranvier_dom_html_element_toggle_popover(RvNode* target, const RvDomUnionTogglePopoverOptionsOrBoolean* options, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.popoverAttributeEnabled))
+        return RV_ERR_UNSUPPORTED;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionTogglePopoverOptionsOrBoolean(options, status0);
+    if (!options) { a0 = Variant<HTMLElement::TogglePopoverOptions, bool> { WTF::InPlaceIndex<0>, HTMLElement::TogglePopoverOptions { } }; status0 = RV_OK; }
+    if (status0 != RV_OK) return status0;
+    return deliver([&]() -> decltype(auto) { return impl->togglePopover(std::move(*a0)); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
 // HTMLElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be NULL for the IDL default
@@ -7455,6 +8982,20 @@ int32_t ranvier_dom_html_form_element_item(RvNode* target, uint32_t index, RvNod
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLFormElement.namedItem(DOMString name) -> (RadioNodeList or Element)?; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_html_form_element_named_item(RvNode* target, const char* name, RvDomUnionRadioNodeListOrElementNullable* result)
+{
+    if (!target || !name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { name };
+    return deliver([&]() -> decltype(auto) { return impl->namedItem(a0.atom()); }, [&](auto&& value) { return encodeRvDomUnionRadioNodeListOrElementNullable(value, result); });
 }
 
 // HTMLFormElement.reset() -> undefined
@@ -10921,6 +12462,25 @@ int32_t ranvier_dom_html_select_element_named_item(RvNode* target, const char* n
     return deliver([&]() -> decltype(auto) { return impl->namedItem(a0.atom()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
+// HTMLSelectElement.add((HTMLOptionElement or HTMLOptGroupElement) element, optional (HTMLElement or long)? before = null) -> undefined; before defaults to null in IDL
+int32_t ranvier_dom_html_select_element_add(RvNode* target, const RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* element, const RvDomUnionHTMLElementOrLongNullable* before)
+{
+    if (!target || !element)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSelectElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionHTMLOptionElementOrHTMLOptGroupElement(element, status0);
+    if (status0 != RV_OK) return status0;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionHTMLElementOrLongNullable(before, status1);
+    if (status1 != RV_OK) return status1;
+    return invoke([&]() -> decltype(auto) { return impl->add(std::move(*a0), std::move(*a1)); });
+}
+
 // HTMLSelectElement.remove() -> undefined
 int32_t ranvier_dom_html_select_element_remove_0(RvNode* target)
 {
@@ -11031,6 +12591,58 @@ int32_t ranvier_dom_html_slot_element_set_name(RvNode* target, const char* value
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { value };
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::nameAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSlotElement.assignedNodes(optional AssignedNodesOptions options = {}) -> sequence<Node>; options defaults to {} in IDL; options may be NULL for the IDL default; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_html_slot_element_assigned_nodes(RvNode* target, const RvDomAssignedNodesOptions* options, RvDomSequenceNode* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSlotElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    HTMLSlotElement::AssignedNodesOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomAssignedNodesOptions, flatten) + sizeof(options->flatten))
+            assignValue(a0.flatten, !!options->flatten);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->assignedNodes(std::move(a0)); }, [&](auto&& value) { return encodeRvDomSequenceNode(value, result); });
+}
+
+// HTMLSlotElement.assignedElements(optional AssignedNodesOptions options = {}) -> sequence<Element>; options defaults to {} in IDL; options may be NULL for the IDL default; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_html_slot_element_assigned_elements(RvNode* target, const RvDomAssignedNodesOptions* options, RvDomSequenceElement* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSlotElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    HTMLSlotElement::AssignedNodesOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomAssignedNodesOptions, flatten) + sizeof(options->flatten))
+            assignValue(a0.flatten, !!options->flatten);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->assignedElements(std::move(a0)); }, [&](auto&& value) { return encodeRvDomSequenceElement(value, result); });
+}
+
+// HTMLSlotElement.assign((Element or Text) nodes) -> undefined
+int32_t ranvier_dom_html_slot_element_assign(RvNode* target, const RvDomSequenceElementOrText* nodes)
+{
+    if (!target || !nodes)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSlotElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceElementOrText(nodes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->assign(DomSequenceArgument<Variant<Ref<Element>, Ref<Text>>> { std::move(*a0) }); });
 }
 
 // HTMLTextAreaElement.dirName getter: attribute DOMString dirName
@@ -11673,6 +13285,217 @@ int32_t ranvier_dom_html_text_area_element_set_selection_range(RvNode* target, u
     return invoke([&]() -> decltype(auto) { return impl->setSelectionRangeForBindings(start, end, a2); });
 }
 
+// HTMLTemplateElement.content getter: readonly attribute DocumentFragment content; *result is a new reference
+int32_t ranvier_dom_html_template_element_get_content(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->content(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTemplateElement.shadowRootMode getter: attribute DOMString shadowRootMode
+int32_t ranvier_dom_html_template_element_get_shadow_root_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->shadowRootMode(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTemplateElement.shadowRootMode setter: attribute DOMString shadowRootMode
+int32_t ranvier_dom_html_template_element_set_shadow_root_mode(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::shadowrootmodeAttr, AtomString { a0.atom() }); });
+}
+
+// HTMLTemplateElement.shadowRootDelegatesFocus getter: attribute boolean shadowRootDelegatesFocus
+int32_t ranvier_dom_html_template_element_get_shadow_root_delegates_focus(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::shadowrootdelegatesfocusAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLTemplateElement.shadowRootDelegatesFocus setter: attribute boolean shadowRootDelegatesFocus
+int32_t ranvier_dom_html_template_element_set_shadow_root_delegates_focus(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::shadowrootdelegatesfocusAttr, !!value); });
+}
+
+// HTMLTemplateElement.shadowRootSlotAssignment getter: attribute DOMString shadowRootSlotAssignment
+int32_t ranvier_dom_html_template_element_get_shadow_root_slot_assignment(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->shadowRootSlotAssignment(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTemplateElement.shadowRootSlotAssignment setter: attribute DOMString shadowRootSlotAssignment
+int32_t ranvier_dom_html_template_element_set_shadow_root_slot_assignment(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::shadowrootslotassignmentAttr, AtomString { a0.atom() }); });
+}
+
+// HTMLTemplateElement.shadowRootClonable getter: attribute boolean shadowRootClonable
+int32_t ranvier_dom_html_template_element_get_shadow_root_clonable(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::shadowrootclonableAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLTemplateElement.shadowRootClonable setter: attribute boolean shadowRootClonable
+int32_t ranvier_dom_html_template_element_set_shadow_root_clonable(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::shadowrootclonableAttr, !!value); });
+}
+
+// HTMLTemplateElement.shadowRootSerializable getter: attribute boolean shadowRootSerializable
+int32_t ranvier_dom_html_template_element_get_shadow_root_serializable(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::shadowrootserializableAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLTemplateElement.shadowRootSerializable setter: attribute boolean shadowRootSerializable
+int32_t ranvier_dom_html_template_element_set_shadow_root_serializable(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::shadowrootserializableAttr, !!value); });
+}
+
+// HTMLTemplateElement.shadowRootCustomElementRegistry getter: attribute DOMString shadowRootCustomElementRegistry; RV_ERR_UNSUPPORTED while the setting ScopedCustomElementRegistryEnabled is off
+int32_t ranvier_dom_html_template_element_get_shadow_root_custom_element_registry(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.scopedCustomElementRegistryEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shadowrootcustomelementregistryAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTemplateElement.shadowRootCustomElementRegistry setter: attribute DOMString shadowRootCustomElementRegistry; RV_ERR_UNSUPPORTED while the setting ScopedCustomElementRegistryEnabled is off
+int32_t ranvier_dom_html_template_element_set_shadow_root_custom_element_registry(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.scopedCustomElementRegistryEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::shadowrootcustomelementregistryAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTemplateElement.shadowRootReferenceTarget getter: attribute DOMString shadowRootReferenceTarget; RV_ERR_UNSUPPORTED while the setting ShadowRootReferenceTargetEnabled is off
+int32_t ranvier_dom_html_template_element_get_shadow_root_reference_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.shadowRootReferenceTargetEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shadowrootreferencetargetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTemplateElement.shadowRootReferenceTarget setter: attribute DOMString shadowRootReferenceTarget; RV_ERR_UNSUPPORTED while the setting ShadowRootReferenceTargetEnabled is off
+int32_t ranvier_dom_html_template_element_set_shadow_root_reference_target(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.shadowRootReferenceTargetEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::shadowrootreferencetargetAttr, AtomString { a0.string() }); });
+}
+
 // HTMLUListElement.compact getter: attribute boolean compact
 int32_t ranvier_dom_htmlu_list_element_get_compact(RvNode* target, int32_t* result)
 {
@@ -11876,6 +13699,34 @@ int32_t ranvier_dom_dom_token_list_contains(RvDOMTokenList* target, const char* 
     RefPtr<DOMTokenList> impl = reinterpret_cast<DOMTokenList*>(target);
     StringArg a0 { token };
     return deliver([&]() -> decltype(auto) { return impl->contains(a0.atom()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// DOMTokenList.add(DOMString tokens) -> undefined
+int32_t ranvier_dom_dom_token_list_add(RvDOMTokenList* target, const RvDomSequenceDOMString* tokens)
+{
+    if (!target || !tokens)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMTokenList> impl = reinterpret_cast<DOMTokenList*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceDOMString(tokens, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->add(DomSequenceArgument<String> { std::move(*a0) }); });
+}
+
+// DOMTokenList.remove(DOMString tokens) -> undefined
+int32_t ranvier_dom_dom_token_list_remove(RvDOMTokenList* target, const RvDomSequenceDOMString* tokens)
+{
+    if (!target || !tokens)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMTokenList> impl = reinterpret_cast<DOMTokenList*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceDOMString(tokens, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->remove(DomSequenceArgument<String> { std::move(*a0) }); });
 }
 
 // DOMTokenList.toggle(DOMString token, optional boolean force) -> boolean; force may be NULL (absent)
@@ -12533,6 +14384,24 @@ int32_t ranvier_dom_dom_selection_remove_all_ranges(RvDOMSelection* target)
     return invoke([&]() -> decltype(auto) { return impl->removeAllRanges(); });
 }
 
+// DOMSelection.getComposedRanges(optional (ShadowRoot or GetComposedRangesOptions) options = {}, ShadowRoot shadowRoots) -> sequence<StaticRange>; options defaults to {} in IDL; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_dom_selection_get_composed_ranges(RvDOMSelection* target, const RvDomUnionShadowRootOrGetComposedRangesOptions* options, const RvDomSequenceShadowRoot* shadow_roots, RvDomSequenceStaticRange* result)
+{
+    if (!target || !shadow_roots || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMSelection> impl = reinterpret_cast<DOMSelection*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionShadowRootOrGetComposedRangesOptions(options, status0);
+    if (!options) { a0 = Variant<Ref<ShadowRoot>, GetComposedRangesOptions> { WTF::InPlaceIndex<1>, GetComposedRangesOptions { } }; status0 = RV_OK; }
+    if (status0 != RV_OK) return status0;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomSequenceShadowRoot(shadow_roots, status1);
+    if (status1 != RV_OK) return status1;
+    return deliver([&]() -> decltype(auto) { return impl->getComposedRanges(std::move(*a0), DomSequenceArgument<Ref<ShadowRoot>> { std::move(*a1) }); }, [&](auto&& value) { return encodeRvDomSequenceStaticRange(value, result); });
+}
+
 // DOMSelection.empty() -> undefined
 int32_t ranvier_dom_dom_selection_empty(RvDOMSelection* target)
 {
@@ -12783,6 +14652,33 @@ int32_t ranvier_dom_node_list_item(RvNodeList* target, uint32_t index, RvNode** 
         return RV_ERR_WRONG_THREAD;
     RefPtr<NodeList> impl = reinterpret_cast<NodeList*>(target);
     return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// RadioNodeList.value getter: attribute DOMString value
+int32_t ranvier_dom_radio_node_list_get_value(RvNodeList* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> RadioNodeList* { auto* base = dynamicDowncast<LiveNodeList>(*reinterpret_cast<NodeList*>(target)); return base ? dynamicDowncast<RadioNodeList>(*base) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// RadioNodeList.value setter: attribute DOMString value
+int32_t ranvier_dom_radio_node_list_set_value(RvNodeList* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> RadioNodeList* { auto* base = dynamicDowncast<LiveNodeList>(*reinterpret_cast<NodeList*>(target)); return base ? dynamicDowncast<RadioNodeList>(*base) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setValue(a0.string()); });
 }
 
 // HTMLCollection.length getter: readonly attribute unsigned long length
@@ -13646,6 +15542,32 @@ int32_t ranvier_dom_pointer_event_get_is_primary(RvEvent* target, int32_t* resul
     return deliver([&]() -> decltype(auto) { return impl->isPrimary(); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// PointerEvent.getCoalescedEvents() -> sequence<PointerEvent>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_pointer_event_get_coalesced_events(RvEvent* target, RvDomSequencePointerEvent* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<PointerEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getCoalescedEvents(); }, [&](auto&& value) { return encodeRvDomSequencePointerEvent(value, result); });
+}
+
+// PointerEvent.getPredictedEvents() -> sequence<PointerEvent>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_pointer_event_get_predicted_events(RvEvent* target, RvDomSequencePointerEvent* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<PointerEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getPredictedEvents(); }, [&](auto&& value) { return encodeRvDomSequencePointerEvent(value, result); });
+}
+
 // WheelEvent.deltaX getter: readonly attribute double deltaX
 int32_t ranvier_dom_wheel_event_get_delta_x(RvEvent* target, double* result)
 {
@@ -13957,6 +15879,19 @@ int32_t ranvier_dom_input_event_get_is_composing(RvEvent* target, int32_t* resul
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->isInputMethodComposing(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// InputEvent.getTargetRanges() -> sequence<StaticRange>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_input_event_get_target_ranges(RvEvent* target, RvDomSequenceStaticRange* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<InputEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getTargetRanges(); }, [&](auto&& value) { return encodeRvDomSequenceStaticRange(value, result); });
 }
 
 // CompositionEvent.data getter: readonly attribute USVString data

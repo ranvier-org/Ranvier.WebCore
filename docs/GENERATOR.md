@@ -19,7 +19,23 @@ python -I gen/domgen.py check --source <webkit>   # build.py prepare and abi_tes
 ```
 
 The outputs are committed: the header is the record of the ABI, and a diff of it shows what a change does to
-it.
+it. `gen/Ranvier.Dom.fs` additionally defines the shared browser/native interfaces in `Ranvier.Dom`.
+Core owns that interface assembly; the native managed package owns only the low-level interop modules.
+`gen/dom-api.json` is the schema-versioned transport model for wrapper generation: each function includes
+its declaring interface/member, IDL arguments and defaults, C parameters, recursive mapped types and result.
+It also records interface bases and dictionary fields in their locked C layout order.
+
+Unions use a sequential C struct with `present`, a one-based IDL-order tag and separate arm fields.
+Sequences use `present`, `count` and `items`; variadics use the same sequence transport, including mixed
+node/string arrays. Input containers are borrowed for the duration of the call. Returned containers own
+their allocated strings, retained handles and nested containers; call their generated release function
+exactly once. An empty returned sequence has a null buffer. A DOMImplementation handle retains its owning
+document; a created HTMLDocument has its own reference and outlives that implementation handle.
+
+The shared F# source exposes typed DUs, array sequences and variadics, nullable interface references and
+optional nullable scalar/union results. Fable-only adapters unwrap input DUs and rewrap union results while
+preserving browser object identity. Ordinary members are shared directly. EventTarget exposes supported
+function and listener-object callbacks. Dictionary classes carry IDL defaults in both targets.
 
 ## Where the glue compiles
 
@@ -125,8 +141,8 @@ every default.
   `RvNode*` for a node. The header comment of each field gives its IDL default. A `required` field outside
   `size` returns `RV_ERR_NULL_ARGUMENT`.
 - A dictionary declared in an interface's IDL file is that interface's C++ member (`Node::GetRootNodeOptions`).
-- Dictionaries with members of other types (sequences, unions, other dictionaries, object handles) are not
-  mapped, and the members that take them are left out.
+- Dictionaries can contain supported union and sequence transports. Unsupported field types still exclude
+  the dictionary and its consumers; explicit exclusions are recorded in the report.
 
 ## Statuses, exceptions and threads
 
@@ -176,23 +192,23 @@ The C++ the IDL does not determine is listed in `gen/dom.json`: `atomArguments` 
 
 ## Scope
 
-`gen/dom.json` lists 55 interfaces: `Node`, `CharacterData`, `Text`, `Comment`, `DocumentFragment`, `ShadowRoot`,
+`gen/dom.json` lists 62 interfaces: `Node`, `CharacterData`, `Text`, `Comment`, `DocumentFragment`, `ShadowRoot`,
 `Document`, `Element`, `Attr`, `HTMLElement` and 27 HTML elements (form controls, `a`, `img`, `label`, `slot`,
 lists, `details`, `dialog`, ...), `CSSStyleDeclaration`, `DOMTokenList`, `DOMStringMap`, `AbstractRange`,
 `Range`, `DOMSelection` (`Selection`), `DOMRectReadOnly`, `NodeList`, `HTMLCollection`, `ValidityState`, and
 `Event`, `UIEvent`, `MouseEvent`, `PointerEvent`, `WheelEvent`, `KeyboardEvent`, `FocusEvent`, `InputEvent` and
-`CompositionEvent`.
+`CompositionEvent`, plus `HTMLDocument`, `DOMImplementation`, `NamedNodeMap`, `HTMLTemplateElement`,
+`StaticRange`, `DOMRect` and `RadioNodeList`.
 
-They give 1,002 functions (525 getters, 270 setters, 207 operations), 9 object handle types with their release
-and retain functions, 37 constants, 7 enumerations and 7 dictionary structs. `gen/dom-report.txt` lists the
-466 members left out, by reason:
+They give 1,069 functions (539 getters, 279 setters, 251 operations), 11 object handle types with their release
+and retain functions, 37 constants, 8 enumerations and 13 dictionary structs. `gen/dom-report.txt` lists the
+445 members left out, by reason:
 
 - **By rule:** event handler attributes (`onclick`; listeners go through `rv_node_add_event_listener`),
   constructors and static members, WebKit-prefixed members (`webkit*`), members not exposed to `Window`,
   `[Custom]` bindings and `[EnabledForWorld]` extensions.
-- **Not mapped yet:** unions other than strings with Trusted Types, sequences and frozen arrays, variadic
-  arguments (`append(...nodes)`), dictionary results and dictionaries with unmapped members, `any`, `object`,
-  `Date`, callbacks, enumeration arguments of operations, and interfaces outside the scope (`NamedNodeMap`,
+- **Not mapped yet:** dictionary results and dictionaries with unmapped members, `any`, `object`,
+  `Date`, callbacks, enumeration arguments of operations, and interfaces outside the scope (
   `DOMRectList`, `StyleSheetList`, ...).
 - **By `gen/dom.json`'s `exclude`:** browser features the patches cut or a UI does not use: cookies,
   navigation, `document.write`, fullscreen, pointer lock, form submission, legacy colours.
@@ -237,7 +253,6 @@ for an interface it needs.
 
 - `[CEReactions]`: the glue does not open a custom element reaction scope. The host runs no page script, so no
   custom element has script reactions; a page that defines them would see them run late.
-- Enumeration arguments of operations, unions other than strings, dictionary results, sequences and variadic
-  arguments are not mapped.
+- Enumeration arguments of operations and dictionary results are not mapped.
 - A dictionary that loses a locked field upstream is left unmapped, and the members that take it become stubs;
   `gen/dom-report.txt` names the lost fields. Keeping such a struct needs a decision on the retired field.

@@ -166,6 +166,9 @@
 #include <WebCore/PlatformDisplay.h>
 #include <WebCore/TextureMapper.h>
 #include <WebCore/TextureMapperLayer.h>
+#if defined(_WIN32)
+#include "RanvierWebCoreD3D11.h"
+#endif
 #endif
 
 using namespace WebCore;
@@ -606,6 +609,9 @@ struct RvHost {
     int32_t compositingMode { RV_COMPOSITING_OFF };
     // Created on the first frame that composites, so a page that never needs a layer never creates a GL context.
     std::unique_ptr<RvCompositor> compositor;
+#if defined(_WIN32)
+    std::shared_ptr<RvD3D11Surface> presentationSurface;
+#endif
 #endif
     float deviceScale { 1 };
     // The viewport area invalidated since the last paint.
@@ -1078,7 +1084,7 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 20; }
+int32_t rv_abi_version(void) { return 21; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1092,6 +1098,10 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+#if defined(_WIN32)
+    if (!std::strcmp(feature, "accessibility-uia"))
+        return 1;
+#endif
     for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text" }) {
         if (!std::strcmp(feature, name))
             return 1;
@@ -1099,6 +1109,10 @@ int32_t rv_abi_has(const char* feature)
 #if RANVIER_COMPOSITING
     if (!std::strcmp(feature, "compositing"))
         return 1;
+#if defined(_WIN32)
+    if (!std::strcmp(feature, "presentation-d3d11"))
+        return 1;
+#endif
 #endif
     // "dom-generated" and "dom:<Interface>": the generated functions of RanvierWebCoreDom.h.
     if (ranvier_dom_has(feature))
@@ -1195,6 +1209,7 @@ void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread())
         return;
+    rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
     rv_host_set_accessibility(host, 0, nullptr, nullptr);
@@ -1321,7 +1336,7 @@ void rv_node_release(RvNode* target)
 }
 
 #if RANVIER_COMPOSITING
-static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t* rgba)
+static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t* rgba, GLuint targetFramebuffer = 0)
 {
     if (!compositor.context->makeContextCurrent())
         return RV_ERR_PAINT_FAILED;
@@ -1347,7 +1362,7 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
     compositor.view = nullptr;
 
     auto size = compositor.size;
-    glBindFramebuffer(GL_FRAMEBUFFER, compositor.framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, targetFramebuffer ? targetFramebuffer : compositor.framebuffer);
     glViewport(0, 0, size.width(), size.height());
     glClearColor(0, 0, 0, 0);
     glClearStencil(0);
@@ -1356,6 +1371,10 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
     compositor.textureMapper->beginPainting(TextureMapper::FlipY::Yes);
     rootLayer.layer().paint(*compositor.textureMapper);
     compositor.textureMapper->endPainting();
+    if (!rgba) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        return glGetError() == GL_NO_ERROR ? RV_OK : RV_ERR_PAINT_FAILED;
+    }
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glReadPixels(0, 0, size.width(), size.height(), GL_RGBA, GL_UNSIGNED_BYTE, rgba);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1374,6 +1393,105 @@ static int32_t composite(RvCompositor& compositor, LocalFrameView& view, uint8_t
     return RV_OK;
 }
 #endif
+
+struct RvGpuFrame {
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    std::shared_ptr<RvD3D11Surface> surface;
+#endif
+};
+
+int32_t rv_host_acquire_d3d11_frame(RvHost* host, void* consumerDevice, RvGpuFrame** frame)
+{
+    if (!frame)
+        return RV_ERR_NULL_ARGUMENT;
+    *frame = nullptr;
+    if (!host || !consumerDevice)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    if (host->deviceScale != 1 || host->compositingMode == RV_COMPOSITING_OFF || host->inFrame)
+        return RV_ERR_UNSUPPORTED;
+    if (host->presentationSurface && host->presentationSurface->matches(consumerDevice, host->size.width(), host->size.height())
+        && !host->presentationSurface->available())
+        return RV_ERR_UNSUPPORTED;
+    auto result = [&]() -> int32_t {
+        SetForScope inFrame(host->inFrame, true);
+        host->frameRequested = false;
+        host->document().updateLayoutIgnorePendingStylesheets();
+        RefPtr view = host->frame().view();
+        if (!view)
+            return RV_ERR_PAINT_FAILED;
+        view->updateLayoutAndStyleIfNeededRecursive();
+        if (!view->clipLayer())
+            return RV_ERR_UNSUPPORTED;
+        if (host->compositor && host->compositor->size != host->size)
+            host->compositor = nullptr;
+        if (!host->compositor)
+            host->compositor = RvCompositor::create(host->size);
+        if (!host->compositor)
+            return RV_ERR_UNSUPPORTED;
+        if (!host->presentationSurface || !host->presentationSurface->matches(consumerDevice, host->size.width(), host->size.height())) {
+            host->presentationSurface = RvD3D11Surface::create(consumerDevice, host->size.width(), host->size.height(), [] {
+                auto* context = compositingContext();
+                return context && context->makeContextCurrent();
+            });
+        }
+        auto surface = host->presentationSurface;
+        if (!surface || !surface->beginProducer()) {
+            host->presentationSurface = nullptr;
+            return RV_ERR_UNSUPPORTED;
+        }
+        auto paintResult = composite(*host->compositor, *view, nullptr, surface->framebuffer());
+        bool transferred = paintResult == RV_OK && surface->finishProducer();
+        if (!transferred) {
+            surface->cancelProducer();
+            host->presentationSurface = nullptr;
+        } else {
+            host->dirty = { };
+            *frame = new RvGpuFrame { WTF::move(surface) };
+        }
+        return transferred ? RV_OK : RV_ERR_PAINT_FAILED;
+    }();
+    if (host->updateWanted)
+        host->requestFrame();
+    return result;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_gpu_frame_info(RvGpuFrame* frame, void** texture, int32_t* width, int32_t* height, int32_t* format)
+{
+    if (!frame || !texture || !width || !height || !format)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    *texture = frame->surface->texture();
+    *width = frame->surface->width();
+    *height = frame->surface->height();
+    *format = RV_GPU_RGBA8_PREMULTIPLIED;
+    return RV_OK;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_gpu_frame_release(RvGpuFrame* frame)
+{
+    if (!frame)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+#if defined(_WIN32) && RANVIER_COMPOSITING
+    bool released = frame->surface->releaseConsumer();
+    delete frame;
+    return released ? RV_OK : RV_ERR_PAINT_FAILED;
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
 
 // Paints area, in CSS pixels of the viewport, into its place in rgba, an image of paintSize.
 static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect area)
@@ -1421,7 +1539,10 @@ static int32_t paintArea(RvHost& host, uint8_t* rgba, int32_t length, IntRect ar
             RenderingPurpose::Unspecified, host.deviceScale, DestinationColorSpace::SRGB(), PixelFormat::BGRA8);
         if (buffer) {
             buffer->context().translate(-area.x(), -area.y());
+            auto behavior = view->paintBehavior();
+            view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
             view->paint(buffer->context(), area);
+            view->setPaintBehavior(behavior);
         }
     }
     // A paint of part of the viewport leaves invalidations outside it for a later paint.
@@ -1479,9 +1600,11 @@ RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t
     if (!target || !type || !callback || !onOwningThread())
         return nullptr;
     auto* listener = new RvListener { RvEventListener::create(callback, context), *node(target),
-        AtomString::fromUTF8(type), !!capture };
+        AtomString::fromUTF8(type), !!(capture & RV_LISTENER_CAPTURE) };
     AddEventListenerOptions options;
     options.capture = listener->capture;
+    if (capture & RV_LISTENER_PASSIVE_SPECIFIED)
+        options.passive = !!(capture & RV_LISTENER_PASSIVE);
     listener->target->addEventListener(listener->type, listener->listener.copyRef(), options);
     return listener;
 }
@@ -4538,6 +4661,23 @@ static int32_t textStatus(RvAxNode* handle, std::optional<SimpleRange>& scope)
         return status;
     scope = textScope(*axObject(handle));
     return scope ? RV_OK : RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_ax_text_child_range(RvAxNode* ancestor, RvAxNode* child, int32_t* start, int32_t* end)
+{
+    if (!start || !end)
+        return RV_ERR_NULL_ARGUMENT;
+    std::optional<SimpleRange> parentScope, childScope;
+    if (auto result = textStatus(ancestor, parentScope))
+        return result;
+    if (auto result = textStatus(child, childScope))
+        return result;
+    std::optional<BoundaryPoint> first { childScope->start }, last { childScope->end };
+    if (!inScope(*parentScope, first) || !inScope(*parentScope, last))
+        return RV_ERR_UNSUPPORTED;
+    *start = textOffset(*parentScope, first);
+    *end = textOffset(*parentScope, last);
+    return RV_OK;
 }
 
 // The text of the scope, with a password field's characters masked.

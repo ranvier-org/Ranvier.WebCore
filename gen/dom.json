@@ -16,8 +16,11 @@
         "DocumentFragment",
         "ShadowRoot",
         "Document",
+        "HTMLDocument",
+        "DOMImplementation",
         "Element",
         "Attr",
+        "NamedNodeMap",
         "HTMLElement",
         "HTMLAnchorElement",
         "HTMLBodyElement",
@@ -44,15 +47,19 @@
         "HTMLSlotElement",
         "HTMLSpanElement",
         "HTMLTextAreaElement",
+        "HTMLTemplateElement",
         "HTMLUListElement",
         "CSSStyleDeclaration",
         "DOMTokenList",
         "DOMStringMap",
         "AbstractRange",
+        "StaticRange",
         "Range",
         "DOMSelection",
         "DOMRectReadOnly",
+        "DOMRect",
         "NodeList",
+        "RadioNodeList",
         "HTMLCollection",
         "ValidityState",
         "Event",
@@ -70,12 +77,59 @@
         "bindings/scripts/test/",
         "testing/"
     ],
+    "customGetters": [
+        "Node.nodeType"
+    ],
+    "contract": {
+        "htmlTags": "html/HTMLTagNames.in",
+        "svgTags": "svg/svgtags.in",
+        "dictionaries": ["EventListenerOptions", "AddEventListenerOptions"],
+        "interfaces": [
+            "SVGElement", "SVGSVGElement", "CSSAnimationEvent", "CSSTransitionEvent", "BeforeUnloadEvent",
+            "CSSStyleSheet", "CustomElementRegistry", "ClipboardEvent", "DragEvent", "ErrorEvent", "FileList",
+            "FormDataEvent", "GamepadEvent", "HTMLFormControlsCollection", "HTMLOptionsCollection", "HashChangeEvent",
+            "MediaEncryptedEvent", "MediaError", "MediaKeys", "PageRevealEvent", "PageSwapEvent", "PageTransitionEvent",
+            "PictureInPictureEvent", "PopStateEvent", "ProgressEvent", "PromiseRejectionEvent", "RemotePlayback",
+            "SecurityPolicyViolationEvent", "StorageEvent", "StylePropertyMap", "SubmitEvent", "TextTrack",
+            "TextTrackList", "TimeRanges", "ToggleEvent", "TouchEvent"
+        ],
+        "aliases": {
+            "CSSAnimationEvent": "AnimationEvent",
+            "CSSTransitionEvent": "TransitionEvent"
+        },
+        "mixins": {
+            "AriaAttributes": "ARIAMixin",
+            "ChildNode": "ChildNode",
+            "ParentNode": "ParentNode",
+            "NonDocumentTypeChildNode": "NonDocumentTypeChildNode",
+            "GlobalEventHandlers": "GlobalEventHandlers",
+            "ElementCSSInlineStyle": "ElementCSSInlineStyle",
+            "ElementContentEditable": "ElementContentEditable",
+            "HTMLHyperlinkElementUtils": "HTMLHyperlinkElementUtils",
+            "HTMLOrSVGOrMathMLElement": "HTMLOrSVGElement",
+            "LinkStyle": "LinkStyle",
+            "PopoverInvokerElement": "PopoverTargetAttributes",
+            "Slotable": "Slottable"
+        }
+    },
+    "castVia": {
+        "RadioNodeList": "LiveNodeList"
+    },
     "atomArguments": [
+        "HTMLFormElement.namedItem",
         "DocumentFragment.getElementById",
         "HTMLCollection.namedItem",
         "HTMLSelectElement.namedItem"
     ],
     "exclude": [
+        "DOMRect.x",
+        "DOMRect.y",
+        "DOMRect.width",
+        "DOMRect.height",
+        "ElementCreationOptions.customElementRegistry",
+        "ImportNodeOptions.customElementRegistry",
+        "AddEventListenerOptions.signal",
+        "AddEventListenerOptions.webkitTrustedOnly",
         "Document.cookie",
         "Document.domain",
         "Document.referrer",

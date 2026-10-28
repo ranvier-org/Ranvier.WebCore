@@ -27,10 +27,12 @@
 
 #include <stdint.h>
 
+#ifndef RV_EXPORT
 #if defined(_WIN32)
 #define RV_EXPORT __declspec(dllexport)
 #else
 #define RV_EXPORT __attribute__((visibility("default")))
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -42,6 +44,7 @@ typedef struct RvNode RvNode;
 typedef struct RvListener RvListener;
 typedef struct RvEvent RvEvent;
 typedef struct RvWatch RvWatch;
+typedef struct RvGpuFrame RvGpuFrame;
 
 /* Returns 0 on success. Any other value marks the listener as failed: the dispatch continues with the
  * remaining listeners, and the dispatching call returns RV_ERR_LISTENER_FAILED. */
@@ -158,8 +161,39 @@ enum {
  * fails, the host switches to RV_COMPOSITING_OFF and paints that frame on the CPU. */
 RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t mode);
 
-/* Registers a WebCore EventListener on target that calls callback(context, event). Returns NULL on a
- * NULL argument or the wrong thread. */
+enum { RV_GPU_RGBA8_PREMULTIPLIED = 1 };
+/* Acquires a Windows D3D11 frame without CPU pixel readback. Call rv_host_update before acquire, as before
+ * CPU paint, to advance animations and update compositing layers. consumerDevice is a live ID3D11Device*
+ * (for SDL, SDL_PROP_RENDERER_D3D11_DEVICE_POINTER). Requires compositing enabled, scale 1 and a GPU build;
+ * otherwise returns RV_ERR_UNSUPPORTED so the caller can paint with rv_host_paint_rgba. An outstanding
+ * frame on the same surface also returns RV_ERR_UNSUPPORTED immediately. Other GPU waits are bounded.
+ * Writes NULL to *frame on failure. The frame owns its resources independently of host/renderer/window;
+ * it remains valid over resize or rv_host_destroy and must be released on the owner thread. */
+RV_EXPORT int32_t rv_host_acquire_d3d11_frame(RvHost*, void* consumerDevice, RvGpuFrame** frame);
+/* Returns a borrowed ID3D11Texture2D*, physical dimensions and RV_GPU_RGBA8_PREMULTIPLIED. Row 0 is the
+ * top of the page; channels are sRGB bytes with premultiplied alpha. SDL imports this pointer with
+ * SDL_PROP_TEXTURE_CREATE_D3D11_TEXTURE_POINTER and uses SDL_BLENDMODE_BLEND_PREMULTIPLIED (or NONE for
+ * an opaque final image). The texture is consumer-locked until release. Do not update or retain it for
+ * GPU use after frame release. SDL may retain its COM reference, but must destroy its wrapper before
+ * presenting a different resource. All arguments are required and calls use the host owner thread. */
+RV_EXPORT int32_t rv_gpu_frame_info(RvGpuFrame*, void** texture, int32_t* width, int32_t* height, int32_t* format);
+/* Before release, flush the SDL draw batch (SDL_FlushRenderer) or SDL_RenderPresent. Release flushes
+ * the consumer immediate context, returns the keyed mutex to the producer and frees this frame handle.
+ * The SDL wrapper and all frame handles must be disposed before unloading their native DLLs. */
+RV_EXPORT int32_t rv_gpu_frame_release(RvGpuFrame*);
+
+/* Bits of the capture parameter of rv_node_add_event_listener. Values 0 and 1 retain their original
+ * bubbling/capturing behavior. PASSIVE has an effect only together with PASSIVE_SPECIFIED; omitting
+ * PASSIVE_SPECIFIED preserves WebCore's event-specific passive default. */
+enum {
+    RV_LISTENER_CAPTURE = 1,
+    RV_LISTENER_PASSIVE = 2,
+    RV_LISTENER_PASSIVE_SPECIFIED = 4,
+};
+
+/* Registers a WebCore EventListener on target that calls callback(context, event). capture contains
+ * RV_LISTENER_* bits. Explicit passive true ignores preventDefault; explicit false permits it for
+ * cancelable events. Returns NULL on a NULL argument or the wrong thread. */
 RV_EXPORT RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t capture,
     RvEventCallback callback, void* context);
 /* Unregisters the listener and frees the handle. The callback will not run after this returns, also
@@ -318,7 +352,8 @@ RV_EXPORT int32_t rv_resource_load_fail(RvResourceLoad*);
  * (rv_host_mouse, rv_host_wheel, rv_host_key, rv_host_set_focused), "frame" (rv_host_set_frame_callback,
  * rv_host_update, rv_host_dirty_rect) and "event-details" (rv_event_number, rv_event_string,
  * rv_event_related_target). "compositing" is 1 when rv_host_set_accelerated_compositing can composite: the
- * library was built with the GPU code. */
+ * library was built with the GPU code. "presentation-d3d11" is 1 for the Windows shared-texture frame
+ * API; successful acquisition additionally depends on the actual GPU, consumer device and scale. */
 RV_EXPORT int32_t rv_abi_has(const char* feature);
 
 /* Sets the viewport to width by height CSS pixels, as rv_host_create does. Input coordinates and dirty
@@ -1029,6 +1064,15 @@ typedef void (*RvAxCallback)(void* context, RvAxNode* node, int32_t event);
  * functions below that start from the host return NULL. Returns RV_ERR_UNSUPPORTED when WebCore made no
  * accessibility cache for the host's document. */
 RV_EXPORT int32_t rv_host_set_accessibility(RvHost*, int32_t enabled, RvAxCallback callback, void* context);
+
+/* Windows UI Automation bridge ("accessibility-uia"). Attach on the host/window owner thread after the
+ * HWND is fully initialized. The bridge owns the accessibility callback until detached, so do not replace
+ * it with rv_host_set_accessibility while attached. One attachment per host and HWND. The window's message
+ * loop must keep pumping while UI Automation clients query it. No managed COM interop is required.
+ * Detach on the same thread, before destroying either the host or HWND; it is idempotent. Outstanding UIA
+ * references become unavailable. rv_host_destroy also detaches. Non-Windows builds return UNSUPPORTED. */
+RV_EXPORT int32_t rv_host_attach_uia(RvHost*, void* hwnd);
+RV_EXPORT int32_t rv_host_detach_uia(RvHost*);
 /* The root of the host's tree, of role RV_ROLE_DOCUMENT, with layout and the tree updated first; NULL while
  * accessibility is off. */
 RV_EXPORT RvAxNode* rv_host_ax_root(RvHost*);
@@ -1114,6 +1158,11 @@ RV_EXPORT int32_t rv_ax_text_rects(RvAxNode*, int32_t start, int32_t end, double
 /* The offset in the node's text nearest x, y CSS pixels of the viewport, or -1 when that point's text lies outside
  * the node. */
 RV_EXPORT int32_t rv_ax_text_offset_at(RvAxNode*, int32_t x, int32_t y);
+
+/* The descendant's text range in ancestor's UTF-16 text coordinates, for UIA RangeFromChild. Returns
+ * UNSUPPORTED when child is outside ancestor's text scope. A text field's inner-editor value does not
+ * appear in its ancestor's plain text: its position there can therefore be an empty range. */
+RV_EXPORT int32_t rv_ax_text_child_range(RvAxNode* ancestor, RvAxNode* child, int32_t* start, int32_t* end);
 
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */

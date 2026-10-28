@@ -6,6 +6,51 @@ NSAccessibility on macOS, AT-SPI on Linux. The app owns the platform objects; th
 mirror, the events that say when to read it again, and the actions an assistive technology performs.
 `rv_abi_has("accessibility")` reports the group.
 
+## Windows UI Automation bridge
+
+On Windows, `rv_abi_has("accessibility-uia")` reports the native UI Automation bridge. Attach it to an
+initialized window on the same thread as the host:
+
+```c
+rv_host_attach_uia(host, hwnd);
+/* Keep pumping the window messages and cycling/updating the WebCore host. */
+rv_host_detach_uia(host);
+/* Destroy the host and window after detaching. */
+```
+
+`rv_host_attach_uia` returns `RV_OK` on success. It owns the host's accessibility callback while attached;
+do not replace that callback with `rv_host_set_accessibility`. Each host and HWND has at most one bridge.
+Detach is idempotent and `rv_host_destroy` also detaches. Non-Windows builds return `RV_ERR_UNSUPPORTED`.
+
+The bridge subclasses the HWND and answers `WM_GETOBJECT` with native COM fragment providers. It exposes
+the WebCore tree, names, roles, states and screen geometry, with Invoke, Value, Toggle, RangeValue,
+ExpandCollapse, SelectionItem and ScrollItem actions where the corresponding ABI capability applies.
+Document and text-field providers expose UTF-16 text ranges, selection, character/word/line/paragraph
+movement, text search and geometry. `RangeFromChild` uses `rv_ax_text_child_range`, so the offsets come
+from WebCore's DOM text scopes rather than a guess based on matching strings or rectangles.
+
+UIA may call on arbitrary threads. The bridge dispatches ABI work to the HWND owner thread and releases
+all native node references there before host destruction. Providers retained by clients after removal or
+teardown return `UIA_E_ELEMENTNOTAVAILABLE`. COM disconnection is deferred when teardown happens inside a
+synchronous window message, where Windows forbids it. The COM implementation is native and adds no
+managed COM dependency to a NativeAOT application.
+
+Detached nodes are evicted on reads and event delivery; periodic sweeps also bound retained detached nodes
+when a flavor has no accessibility events. Native handles are released on the host thread, while COM
+retirement is deferred if a synchronous message is in progress. Text-range geometry excludes caret-only
+degenerate ranges and clips text rectangles to the viewport and CSS overflow-clipping ancestors.
+
+The bridge does not add information absent from the ABI: text attributes, table metadata and relations
+remain unavailable. Selection removal and additive text selection are not supported. A text range can
+scroll its whole enclosing object into view; scrolling a subrange returns `UIA_E_NOTSUPPORTED` rather
+than claiming the object-level action moved that subrange. Visible ranges are computed from laid-out
+lines clipped against the viewport and overflow-clipping ancestors; partially visible lines remain whole.
+
+`tests/uia` verifies the exported attachment API and uses an independent OS UI Automation client process
+to query and act on a real WebCore host. Its README describes the staged-runtime/build inputs and the
+four teardown modes. An SDL presenter attaches using its native Windows handle; the bridge has no SDL
+dependency.
+
 ## What WebCore provides on each port
 
 WebCore builds its accessibility tree on every port: `AXObjectCache`, `AccessibilityObject` and its

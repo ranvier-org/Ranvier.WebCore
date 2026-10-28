@@ -1,7 +1,8 @@
 # Releases packages built on this machine. Each --rid is built by build.py from a clean commit that is on the
 # remote, the packed package is checked and loaded by smoke.py, and the GitHub release v<version> is created
 # with the packages attached. Creating the release pushes its tag; the tag's CI run builds the runtimes not
-# attached, checks the attached ones again on its own runners, and pushes every package to nuget.org.
+# attached, checks the attached ones again on its own runners, and pushes every slim package to nuget.org.
+# Non-slim flavors use a subsequent same-tag dispatch after the default slim run completes (docs/CI.md).
 #
 #   release.py --rid win-x64 [--rid ...] [--flavor slim] [--work DIR] [--dry-run] [build.py options]
 #
@@ -15,7 +16,7 @@ pins = json.loads((root / 'pins.json').read_text())
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--rid', action='append', required=True)
-parser.add_argument('--flavor', choices=['slim', 'lean'], default='slim')
+parser.add_argument('--flavor', choices=['slim', 'gpu', 'lean'], default='slim')
 parser.add_argument('--work', default=os.environ.get('RANVIER_WORK'))
 parser.add_argument('--dry-run', action='store_true', help='build and check, but create no release')
 args, build_args = parser.parse_known_args()
@@ -49,7 +50,7 @@ for rid in args.rid:
     common = ['--rid', rid, '--flavor', args.flavor, '--work', work, '--version', version, *build_args]
     for step in ['fetch', 'prepare', 'configure', 'build', 'package']:
         run(sys.executable, '-I', root / 'scripts/build.py', step, *common, *(['--strict'] if step == 'prepare' else []))
-    package_id = pins['package']['id'] + ('' if args.flavor == 'slim' else '.Lean') + '.' + rid
+    package_id = pins['package']['id'] + {'slim': '', 'gpu': '.Gpu', 'lean': '.Lean'}[args.flavor] + '.' + rid
     package = work / 'packages' / f'{package_id}.{version}.nupkg'
     # The packed files, not the staged ones: what nuget.org would serve.
     run(sys.executable, '-I', root / 'scripts/smoke.py', '--package', package, '--expect-commit', head,
@@ -63,4 +64,9 @@ notes = (f'Built from {head}. The packages of {", ".join(args.rid)} were built l
          'CI builds the other runtimes.')
 run('gh', 'release', 'create', tag, '--target', head, '--title', tag, '--notes', notes,
     *(['--prerelease'] if '-' in version else []), *packages)
-print(f'{tag} created: its CI run checks these packages and publishes them with the rest', flush=True)
+if args.flavor == 'slim':
+    print(f'{tag} created: its CI run checks these packages and publishes them with the rest', flush=True)
+else:
+    print(f'{tag} created: wait for its default slim CI run to succeed, then dispatch this flavor on the same tag:', flush=True)
+    print(subprocess.list2cmdline(['gh', 'workflow', 'run', 'build.yml', '--ref', tag,
+                                  '--field', f'flavor={args.flavor}', '--field', f'rids={",".join(args.rid)}']), flush=True)

@@ -4,6 +4,10 @@
 #include "RanvierWebCoreDom.h"
 #include "dom/RanvierDomGlue.h"
 
+void rv_dom_dom_implementation_release(RvDOMImplementation* handle) { ranvier_dom_dom_implementation_release(handle); }
+RvDOMImplementation* rv_dom_dom_implementation_retain(RvDOMImplementation* handle) { return ranvier_dom_dom_implementation_retain(handle); }
+void rv_dom_named_node_map_release(RvNamedNodeMap* handle) { ranvier_dom_named_node_map_release(handle); }
+RvNamedNodeMap* rv_dom_named_node_map_retain(RvNamedNodeMap* handle) { return ranvier_dom_named_node_map_retain(handle); }
 void rv_dom_css_style_declaration_release(RvCSSStyleDeclaration* handle) { ranvier_dom_css_style_declaration_release(handle); }
 RvCSSStyleDeclaration* rv_dom_css_style_declaration_retain(RvCSSStyleDeclaration* handle) { return ranvier_dom_css_style_declaration_retain(handle); }
 void rv_dom_dom_token_list_release(RvDOMTokenList* handle) { ranvier_dom_dom_token_list_release(handle); }
@@ -22,6 +26,26 @@ void rv_dom_html_collection_release(RvHTMLCollection* handle) { ranvier_dom_html
 RvHTMLCollection* rv_dom_html_collection_retain(RvHTMLCollection* handle) { return ranvier_dom_html_collection_retain(handle); }
 void rv_dom_validity_state_release(RvValidityState* handle) { ranvier_dom_validity_state_release(handle); }
 RvValidityState* rv_dom_validity_state_retain(RvValidityState* handle) { return ranvier_dom_validity_state_retain(handle); }
+void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value) { ranvier_dom_union_node_or_dom_string_release(value); }
+void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value) { ranvier_dom_sequence_node_or_dom_string_release(value); }
+void rv_dom_sequence_element_release(RvDomSequenceElement* value) { ranvier_dom_sequence_element_release(value); }
+void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value) { ranvier_dom_sequence_shadow_root_release(value); }
+void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value) { ranvier_dom_union_dom_string_or_element_creation_options_release(value); }
+void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value) { ranvier_dom_union_boolean_or_import_node_options_release(value); }
+void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString* value) { ranvier_dom_sequence_dom_string_release(value); }
+void rv_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value) { ranvier_dom_union_boolean_or_scroll_into_view_options_release(value); }
+void rv_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value) { ranvier_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(value); }
+void rv_dom_union_toggle_popover_options_or_boolean_release(RvDomUnionTogglePopoverOptionsOrBoolean* value) { ranvier_dom_union_toggle_popover_options_or_boolean_release(value); }
+void rv_dom_union_radio_node_list_or_element_nullable_release(RvDomUnionRadioNodeListOrElementNullable* value) { ranvier_dom_union_radio_node_list_or_element_nullable_release(value); }
+void rv_dom_union_html_option_element_or_html_opt_group_element_release(RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* value) { ranvier_dom_union_html_option_element_or_html_opt_group_element_release(value); }
+void rv_dom_union_html_element_or_long_nullable_release(RvDomUnionHTMLElementOrLongNullable* value) { ranvier_dom_union_html_element_or_long_nullable_release(value); }
+void rv_dom_sequence_node_release(RvDomSequenceNode* value) { ranvier_dom_sequence_node_release(value); }
+void rv_dom_union_element_or_text_release(RvDomUnionElementOrText* value) { ranvier_dom_union_element_or_text_release(value); }
+void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value) { ranvier_dom_sequence_element_or_text_release(value); }
+void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value) { ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(value); }
+void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value) { ranvier_dom_sequence_static_range_release(value); }
+void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value) { ranvier_dom_sequence_pointer_event_release(value); }
+int32_t rv_dom_node_get_node_type(RvNode* target, uint16_t* result) { return ranvier_dom_node_get_node_type(target, result); }
 int32_t rv_dom_node_get_node_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_node_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_base_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_base_uri(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_is_connected(RvNode* target, int32_t* result) { return ranvier_dom_node_get_is_connected(target, result); }
@@ -62,6 +86,9 @@ int32_t rv_dom_character_data_append_data(RvNode* target, const char* data) { re
 int32_t rv_dom_character_data_insert_data(RvNode* target, uint32_t offset, const char* data) { return ranvier_dom_character_data_insert_data(target, offset, data); }
 int32_t rv_dom_character_data_delete_data(RvNode* target, uint32_t offset, uint32_t count) { return ranvier_dom_character_data_delete_data(target, offset, count); }
 int32_t rv_dom_character_data_replace_data(RvNode* target, uint32_t offset, uint32_t count, const char* data) { return ranvier_dom_character_data_replace_data(target, offset, count, data); }
+int32_t rv_dom_character_data_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_character_data_before(target, nodes); }
+int32_t rv_dom_character_data_after(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_character_data_after(target, nodes); }
+int32_t rv_dom_character_data_replace_with(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_character_data_replace_with(target, nodes); }
 int32_t rv_dom_character_data_remove(RvNode* target) { return ranvier_dom_character_data_remove(target); }
 int32_t rv_dom_text_get_whole_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_text_get_whole_text(target, buffer, capacity, length); }
 int32_t rv_dom_text_get_assigned_slot(RvNode* target, RvNode** result) { return ranvier_dom_text_get_assigned_slot(target, result); }
@@ -70,6 +97,9 @@ int32_t rv_dom_document_fragment_get_children(RvNode* target, RvHTMLCollection**
 int32_t rv_dom_document_fragment_get_first_element_child(RvNode* target, RvNode** result) { return ranvier_dom_document_fragment_get_first_element_child(target, result); }
 int32_t rv_dom_document_fragment_get_last_element_child(RvNode* target, RvNode** result) { return ranvier_dom_document_fragment_get_last_element_child(target, result); }
 int32_t rv_dom_document_fragment_get_child_element_count(RvNode* target, uint32_t* result) { return ranvier_dom_document_fragment_get_child_element_count(target, result); }
+int32_t rv_dom_document_fragment_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_document_fragment_prepend(target, nodes); }
+int32_t rv_dom_document_fragment_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_document_fragment_append(target, nodes); }
+int32_t rv_dom_document_fragment_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_document_fragment_replace_children(target, nodes); }
 int32_t rv_dom_document_fragment_move_before(RvNode* target, RvNode* node, RvNode* child) { return ranvier_dom_document_fragment_move_before(target, node, child); }
 int32_t rv_dom_document_fragment_query_selector(RvNode* target, const char* selectors, RvNode** result) { return ranvier_dom_document_fragment_query_selector(target, selectors, result); }
 int32_t rv_dom_document_fragment_query_selector_all(RvNode* target, const char* selectors, RvNodeList** result) { return ranvier_dom_document_fragment_query_selector_all(target, selectors, result); }
@@ -88,7 +118,10 @@ int32_t rv_dom_shadow_root_get_pointer_lock_element(RvNode* target, RvNode** res
 int32_t rv_dom_shadow_root_get_inner_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_shadow_root_get_inner_html(target, buffer, capacity, length); }
 int32_t rv_dom_shadow_root_set_inner_html(RvNode* target, const char* value) { return ranvier_dom_shadow_root_set_inner_html(target, value); }
 int32_t rv_dom_shadow_root_element_from_point(RvNode* target, double x, double y, RvNode** result) { return ranvier_dom_shadow_root_element_from_point(target, x, y, result); }
+int32_t rv_dom_shadow_root_elements_from_point(RvNode* target, double x, double y, RvDomSequenceElement* result) { return ranvier_dom_shadow_root_elements_from_point(target, x, y, result); }
 int32_t rv_dom_shadow_root_set_html_unsafe(RvNode* target, const char* html) { return ranvier_dom_shadow_root_set_html_unsafe(target, html); }
+int32_t rv_dom_shadow_root_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_shadow_root_get_html(target, options, buffer, capacity, length); }
+int32_t rv_dom_document_get_implementation(RvNode* target, RvDOMImplementation** result) { return ranvier_dom_document_get_implementation(target, result); }
 int32_t rv_dom_document_get_compat_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_document_get_compat_mode(target, buffer, capacity, length); }
 int32_t rv_dom_document_get_character_set(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_document_get_character_set(target, buffer, capacity, length); }
 int32_t rv_dom_document_get_content_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_document_get_content_type(target, buffer, capacity, length); }
@@ -116,12 +149,15 @@ int32_t rv_dom_document_get_first_element_child(RvNode* target, RvNode** result)
 int32_t rv_dom_document_get_last_element_child(RvNode* target, RvNode** result) { return ranvier_dom_document_get_last_element_child(target, result); }
 int32_t rv_dom_document_get_child_element_count(RvNode* target, uint32_t* result) { return ranvier_dom_document_get_child_element_count(target, result); }
 int32_t rv_dom_document_get_active_element(RvNode* target, RvNode** result) { return ranvier_dom_document_get_active_element(target, result); }
+int32_t rv_dom_document_create_element(RvNode* target, const char* local_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result) { return ranvier_dom_document_create_element(target, local_name, options, result); }
+int32_t rv_dom_document_create_element_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result) { return ranvier_dom_document_create_element_ns(target, namespace_uri, qualified_name, options, result); }
 int32_t rv_dom_document_get_elements_by_tag_name(RvNode* target, const char* qualified_name, RvHTMLCollection** result) { return ranvier_dom_document_get_elements_by_tag_name(target, qualified_name, result); }
 int32_t rv_dom_document_get_elements_by_tag_name_ns(RvNode* target, const char* namespace_uri, const char* local_name, RvHTMLCollection** result) { return ranvier_dom_document_get_elements_by_tag_name_ns(target, namespace_uri, local_name, result); }
 int32_t rv_dom_document_get_elements_by_class_name(RvNode* target, const char* class_names, RvHTMLCollection** result) { return ranvier_dom_document_get_elements_by_class_name(target, class_names, result); }
 int32_t rv_dom_document_create_document_fragment(RvNode* target, RvNode** result) { return ranvier_dom_document_create_document_fragment(target, result); }
 int32_t rv_dom_document_create_text_node(RvNode* target, const char* data, RvNode** result) { return ranvier_dom_document_create_text_node(target, data, result); }
 int32_t rv_dom_document_create_comment(RvNode* target, const char* data, RvNode** result) { return ranvier_dom_document_create_comment(target, data, result); }
+int32_t rv_dom_document_import_node(RvNode* target, RvNode* node, const RvDomUnionBooleanOrImportNodeOptions* options, RvNode** result) { return ranvier_dom_document_import_node(target, node, options, result); }
 int32_t rv_dom_document_adopt_node(RvNode* target, RvNode* node, RvNode** result) { return ranvier_dom_document_adopt_node(target, node, result); }
 int32_t rv_dom_document_create_attribute(RvNode* target, const char* local_name, RvNode** result) { return ranvier_dom_document_create_attribute(target, local_name, result); }
 int32_t rv_dom_document_create_attribute_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, RvNode** result) { return ranvier_dom_document_create_attribute_ns(target, namespace_uri, qualified_name, result); }
@@ -139,11 +175,17 @@ int32_t rv_dom_document_query_command_state(RvNode* target, const char* command_
 int32_t rv_dom_document_query_command_supported(RvNode* target, const char* command_id, int32_t* result) { return ranvier_dom_document_query_command_supported(target, command_id, result); }
 int32_t rv_dom_document_query_command_value(RvNode* target, const char* command_id, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_document_query_command_value(target, command_id, buffer, capacity, length); }
 int32_t rv_dom_document_get_selection(RvNode* target, RvDOMSelection** result) { return ranvier_dom_document_get_selection(target, result); }
+int32_t rv_dom_document_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_document_prepend(target, nodes); }
+int32_t rv_dom_document_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_document_append(target, nodes); }
+int32_t rv_dom_document_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_document_replace_children(target, nodes); }
 int32_t rv_dom_document_move_before(RvNode* target, RvNode* node, RvNode* child) { return ranvier_dom_document_move_before(target, node, child); }
 int32_t rv_dom_document_query_selector(RvNode* target, const char* selectors, RvNode** result) { return ranvier_dom_document_query_selector(target, selectors, result); }
 int32_t rv_dom_document_query_selector_all(RvNode* target, const char* selectors, RvNodeList** result) { return ranvier_dom_document_query_selector_all(target, selectors, result); }
 int32_t rv_dom_document_get_element_by_id(RvNode* target, const char* element_id, RvNode** result) { return ranvier_dom_document_get_element_by_id(target, element_id, result); }
 int32_t rv_dom_document_element_from_point(RvNode* target, double x, double y, RvNode** result) { return ranvier_dom_document_element_from_point(target, x, y, result); }
+int32_t rv_dom_document_elements_from_point(RvNode* target, double x, double y, RvDomSequenceElement* result) { return ranvier_dom_document_elements_from_point(target, x, y, result); }
+int32_t rv_dom_dom_implementation_create_html_document(RvDOMImplementation* target, const char* title, RvNode** result) { return ranvier_dom_dom_implementation_create_html_document(target, title, result); }
+int32_t rv_dom_dom_implementation_has_feature(RvDOMImplementation* target, int32_t* result) { return ranvier_dom_dom_implementation_has_feature(target, result); }
 int32_t rv_dom_element_get_namespace_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_namespace_uri(target, buffer, capacity, length); }
 int32_t rv_dom_element_get_prefix(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_prefix(target, buffer, capacity, length); }
 int32_t rv_dom_element_get_local_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_local_name(target, buffer, capacity, length); }
@@ -156,6 +198,7 @@ int32_t rv_dom_element_get_class_list(RvNode* target, RvDOMTokenList** result) {
 int32_t rv_dom_element_get_slot(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_slot(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_slot(RvNode* target, const char* value) { return ranvier_dom_element_set_slot(target, value); }
 int32_t rv_dom_element_get_part(RvNode* target, RvDOMTokenList** result) { return ranvier_dom_element_get_part(target, result); }
+int32_t rv_dom_element_get_attributes(RvNode* target, RvNamedNodeMap** result) { return ranvier_dom_element_get_attributes(target, result); }
 int32_t rv_dom_element_get_scroll_top(RvNode* target, int32_t* result) { return ranvier_dom_element_get_scroll_top(target, result); }
 int32_t rv_dom_element_set_scroll_top(RvNode* target, int32_t value) { return ranvier_dom_element_set_scroll_top(target, value); }
 int32_t rv_dom_element_get_scroll_left(RvNode* target, int32_t* result) { return ranvier_dom_element_get_scroll_left(target, result); }
@@ -269,6 +312,7 @@ int32_t rv_dom_element_get_assigned_slot(RvNode* target, RvNode** result) { retu
 int32_t rv_dom_element_get_inner_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_inner_html(target, buffer, capacity, length); }
 int32_t rv_dom_element_set_inner_html(RvNode* target, const char* value) { return ranvier_dom_element_set_inner_html(target, value); }
 int32_t rv_dom_element_has_attributes(RvNode* target, int32_t* result) { return ranvier_dom_element_has_attributes(target, result); }
+int32_t rv_dom_element_get_attribute_names(RvNode* target, RvDomSequenceDOMString* result) { return ranvier_dom_element_get_attribute_names(target, result); }
 int32_t rv_dom_element_get_attribute(RvNode* target, const char* qualified_name, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_attribute(target, qualified_name, buffer, capacity, length); }
 int32_t rv_dom_element_get_attribute_ns(RvNode* target, const char* namespace_uri, const char* local_name, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_attribute_ns(target, namespace_uri, local_name, buffer, capacity, length); }
 int32_t rv_dom_element_set_attribute(RvNode* target, const char* qualified_name, const char* value) { return ranvier_dom_element_set_attribute(target, qualified_name, value); }
@@ -295,6 +339,7 @@ int32_t rv_dom_element_aria_notify(RvNode* target, const char* announcement) { r
 int32_t rv_dom_element_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options) { return ranvier_dom_element_aria_notify_2(target, announcement, options); }
 int32_t rv_dom_element_get_bounding_client_rect(RvNode* target, RvDOMRectReadOnly** result) { return ranvier_dom_element_get_bounding_client_rect(target, result); }
 int32_t rv_dom_element_check_visibility(RvNode* target, const RvDomCheckVisibilityOptions* options, int32_t* result) { return ranvier_dom_element_check_visibility(target, options, result); }
+int32_t rv_dom_element_scroll_into_view(RvNode* target, const RvDomUnionBooleanOrScrollIntoViewOptions* arg) { return ranvier_dom_element_scroll_into_view(target, arg); }
 int32_t rv_dom_element_scroll_1(RvNode* target, const RvDomScrollToOptions* options) { return ranvier_dom_element_scroll_1(target, options); }
 int32_t rv_dom_element_scroll(RvNode* target, double x, double y) { return ranvier_dom_element_scroll(target, x, y); }
 int32_t rv_dom_element_scroll_to_1(RvNode* target, const RvDomScrollToOptions* options) { return ranvier_dom_element_scroll_to_1(target, options); }
@@ -306,11 +351,18 @@ int32_t rv_dom_element_insert_adjacent_html(RvNode* target, const char* position
 int32_t rv_dom_element_set_pointer_capture(RvNode* target, int32_t pointer_id) { return ranvier_dom_element_set_pointer_capture(target, pointer_id); }
 int32_t rv_dom_element_release_pointer_capture(RvNode* target, int32_t pointer_id) { return ranvier_dom_element_release_pointer_capture(target, pointer_id); }
 int32_t rv_dom_element_has_pointer_capture(RvNode* target, int32_t pointer_id, int32_t* result) { return ranvier_dom_element_has_pointer_capture(target, pointer_id, result); }
+int32_t rv_dom_element_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_element_before(target, nodes); }
+int32_t rv_dom_element_after(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_element_after(target, nodes); }
+int32_t rv_dom_element_replace_with(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_element_replace_with(target, nodes); }
 int32_t rv_dom_element_remove(RvNode* target) { return ranvier_dom_element_remove(target); }
+int32_t rv_dom_element_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_element_prepend(target, nodes); }
+int32_t rv_dom_element_append(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_element_append(target, nodes); }
+int32_t rv_dom_element_replace_children(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes) { return ranvier_dom_element_replace_children(target, nodes); }
 int32_t rv_dom_element_move_before(RvNode* target, RvNode* node, RvNode* child) { return ranvier_dom_element_move_before(target, node, child); }
 int32_t rv_dom_element_query_selector(RvNode* target, const char* selectors, RvNode** result) { return ranvier_dom_element_query_selector(target, selectors, result); }
 int32_t rv_dom_element_query_selector_all(RvNode* target, const char* selectors, RvNodeList** result) { return ranvier_dom_element_query_selector_all(target, selectors, result); }
 int32_t rv_dom_element_set_html_unsafe(RvNode* target, const char* html) { return ranvier_dom_element_set_html_unsafe(target, html); }
+int32_t rv_dom_element_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_element_get_html(target, options, buffer, capacity, length); }
 int32_t rv_dom_attr_get_namespace_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_attr_get_namespace_uri(target, buffer, capacity, length); }
 int32_t rv_dom_attr_get_prefix(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_attr_get_prefix(target, buffer, capacity, length); }
 int32_t rv_dom_attr_get_local_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_attr_get_local_name(target, buffer, capacity, length); }
@@ -320,6 +372,14 @@ int32_t rv_dom_attr_set_value(RvNode* target, const char* value) { return ranvie
 int32_t rv_dom_attr_get_owner_element(RvNode* target, RvNode** result) { return ranvier_dom_attr_get_owner_element(target, result); }
 int32_t rv_dom_attr_get_specified(RvNode* target, int32_t* result) { return ranvier_dom_attr_get_specified(target, result); }
 int32_t rv_dom_attr_get_style(RvNode* target, RvCSSStyleDeclaration** result) { return ranvier_dom_attr_get_style(target, result); }
+int32_t rv_dom_named_node_map_get_length(RvNamedNodeMap* target, uint32_t* result) { return ranvier_dom_named_node_map_get_length(target, result); }
+int32_t rv_dom_named_node_map_item(RvNamedNodeMap* target, uint32_t index, RvNode** result) { return ranvier_dom_named_node_map_item(target, index, result); }
+int32_t rv_dom_named_node_map_get_named_item(RvNamedNodeMap* target, const char* qualified_name, RvNode** result) { return ranvier_dom_named_node_map_get_named_item(target, qualified_name, result); }
+int32_t rv_dom_named_node_map_get_named_item_ns(RvNamedNodeMap* target, const char* namespace_uri, const char* local_name, RvNode** result) { return ranvier_dom_named_node_map_get_named_item_ns(target, namespace_uri, local_name, result); }
+int32_t rv_dom_named_node_map_set_named_item(RvNamedNodeMap* target, RvNode* attr, RvNode** result) { return ranvier_dom_named_node_map_set_named_item(target, attr, result); }
+int32_t rv_dom_named_node_map_set_named_item_ns(RvNamedNodeMap* target, RvNode* attr, RvNode** result) { return ranvier_dom_named_node_map_set_named_item_ns(target, attr, result); }
+int32_t rv_dom_named_node_map_remove_named_item(RvNamedNodeMap* target, const char* qualified_name, RvNode** result) { return ranvier_dom_named_node_map_remove_named_item(target, qualified_name, result); }
+int32_t rv_dom_named_node_map_remove_named_item_ns(RvNamedNodeMap* target, const char* namespace_uri, const char* local_name, RvNode** result) { return ranvier_dom_named_node_map_remove_named_item_ns(target, namespace_uri, local_name, result); }
 int32_t rv_dom_html_element_get_title(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_element_get_title(target, buffer, capacity, length); }
 int32_t rv_dom_html_element_set_title(RvNode* target, const char* value) { return ranvier_dom_html_element_set_title(target, value); }
 int32_t rv_dom_html_element_get_lang(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_element_get_lang(target, buffer, capacity, length); }
@@ -332,6 +392,8 @@ int32_t rv_dom_html_element_get_cue(RvNode* target, int32_t* result) { return ra
 int32_t rv_dom_html_element_set_cue(RvNode* target, int32_t value) { return ranvier_dom_html_element_set_cue(target, value); }
 int32_t rv_dom_html_element_get_cuebackground(RvNode* target, int32_t* result) { return ranvier_dom_html_element_get_cuebackground(target, result); }
 int32_t rv_dom_html_element_set_cuebackground(RvNode* target, int32_t value) { return ranvier_dom_html_element_set_cuebackground(target, value); }
+int32_t rv_dom_html_element_get_hidden(RvNode* target, RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* result) { return ranvier_dom_html_element_get_hidden(target, result); }
+int32_t rv_dom_html_element_set_hidden(RvNode* target, const RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value) { return ranvier_dom_html_element_set_hidden(target, value); }
 int32_t rv_dom_html_element_get_access_key(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_element_get_access_key(target, buffer, capacity, length); }
 int32_t rv_dom_html_element_set_access_key(RvNode* target, const char* value) { return ranvier_dom_html_element_set_access_key(target, value); }
 int32_t rv_dom_html_element_get_access_key_label(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_element_get_access_key_label(target, buffer, capacity, length); }
@@ -380,6 +442,7 @@ int32_t rv_dom_html_element_get_style(RvNode* target, RvCSSStyleDeclaration** re
 int32_t rv_dom_html_element_click(RvNode* target) { return ranvier_dom_html_element_click(target); }
 int32_t rv_dom_html_element_show_popover(RvNode* target, const RvDomShowPopoverOptions* options) { return ranvier_dom_html_element_show_popover(target, options); }
 int32_t rv_dom_html_element_hide_popover(RvNode* target) { return ranvier_dom_html_element_hide_popover(target); }
+int32_t rv_dom_html_element_toggle_popover(RvNode* target, const RvDomUnionTogglePopoverOptionsOrBoolean* options, int32_t* result) { return ranvier_dom_html_element_toggle_popover(target, options, result); }
 int32_t rv_dom_html_element_focus(RvNode* target, const RvDomFocusOptions* options) { return ranvier_dom_html_element_focus(target, options); }
 int32_t rv_dom_html_element_blur(RvNode* target) { return ranvier_dom_html_element_blur(target); }
 int32_t rv_dom_html_anchor_element_get_charset(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_anchor_element_get_charset(target, buffer, capacity, length); }
@@ -527,6 +590,7 @@ int32_t rv_dom_html_form_element_get_rel_list(RvNode* target, RvDOMTokenList** r
 int32_t rv_dom_html_form_element_get_elements(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_html_form_element_get_elements(target, result); }
 int32_t rv_dom_html_form_element_get_length(RvNode* target, uint32_t* result) { return ranvier_dom_html_form_element_get_length(target, result); }
 int32_t rv_dom_html_form_element_item(RvNode* target, uint32_t index, RvNode** result) { return ranvier_dom_html_form_element_item(target, index, result); }
+int32_t rv_dom_html_form_element_named_item(RvNode* target, const char* name, RvDomUnionRadioNodeListOrElementNullable* result) { return ranvier_dom_html_form_element_named_item(target, name, result); }
 int32_t rv_dom_html_form_element_reset(RvNode* target) { return ranvier_dom_html_form_element_reset(target); }
 int32_t rv_dom_html_form_element_check_validity(RvNode* target, int32_t* result) { return ranvier_dom_html_form_element_check_validity(target, result); }
 int32_t rv_dom_html_form_element_report_validity(RvNode* target, int32_t* result) { return ranvier_dom_html_form_element_report_validity(target, result); }
@@ -782,6 +846,7 @@ int32_t rv_dom_html_select_element_get_validation_message(RvNode* target, char* 
 int32_t rv_dom_html_select_element_get_labels(RvNode* target, RvNodeList** result) { return ranvier_dom_html_select_element_get_labels(target, result); }
 int32_t rv_dom_html_select_element_item(RvNode* target, uint32_t index, RvNode** result) { return ranvier_dom_html_select_element_item(target, index, result); }
 int32_t rv_dom_html_select_element_named_item(RvNode* target, const char* name, RvNode** result) { return ranvier_dom_html_select_element_named_item(target, name, result); }
+int32_t rv_dom_html_select_element_add(RvNode* target, const RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* element, const RvDomUnionHTMLElementOrLongNullable* before) { return ranvier_dom_html_select_element_add(target, element, before); }
 int32_t rv_dom_html_select_element_remove_0(RvNode* target) { return ranvier_dom_html_select_element_remove_0(target); }
 int32_t rv_dom_html_select_element_remove_1(RvNode* target, int32_t index) { return ranvier_dom_html_select_element_remove_1(target, index); }
 int32_t rv_dom_html_select_element_set_item(RvNode* target, uint32_t index, RvNode* option) { return ranvier_dom_html_select_element_set_item(target, index, option); }
@@ -790,6 +855,9 @@ int32_t rv_dom_html_select_element_report_validity(RvNode* target, int32_t* resu
 int32_t rv_dom_html_select_element_set_custom_validity(RvNode* target, const char* error) { return ranvier_dom_html_select_element_set_custom_validity(target, error); }
 int32_t rv_dom_html_slot_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_slot_element_get_name(target, buffer, capacity, length); }
 int32_t rv_dom_html_slot_element_set_name(RvNode* target, const char* value) { return ranvier_dom_html_slot_element_set_name(target, value); }
+int32_t rv_dom_html_slot_element_assigned_nodes(RvNode* target, const RvDomAssignedNodesOptions* options, RvDomSequenceNode* result) { return ranvier_dom_html_slot_element_assigned_nodes(target, options, result); }
+int32_t rv_dom_html_slot_element_assigned_elements(RvNode* target, const RvDomAssignedNodesOptions* options, RvDomSequenceElement* result) { return ranvier_dom_html_slot_element_assigned_elements(target, options, result); }
+int32_t rv_dom_html_slot_element_assign(RvNode* target, const RvDomSequenceElementOrText* nodes) { return ranvier_dom_html_slot_element_assign(target, nodes); }
 int32_t rv_dom_html_text_area_element_get_dir_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_text_area_element_get_dir_name(target, buffer, capacity, length); }
 int32_t rv_dom_html_text_area_element_set_dir_name(RvNode* target, const char* value) { return ranvier_dom_html_text_area_element_set_dir_name(target, value); }
 int32_t rv_dom_html_text_area_element_get_disabled(RvNode* target, int32_t* result) { return ranvier_dom_html_text_area_element_get_disabled(target, result); }
@@ -838,6 +906,21 @@ int32_t rv_dom_html_text_area_element_select(RvNode* target) { return ranvier_do
 int32_t rv_dom_html_text_area_element_set_range_text_1(RvNode* target, const char* replacement) { return ranvier_dom_html_text_area_element_set_range_text_1(target, replacement); }
 int32_t rv_dom_html_text_area_element_set_range_text_4(RvNode* target, const char* replacement, uint32_t start, uint32_t end, const char* selection_mode) { return ranvier_dom_html_text_area_element_set_range_text_4(target, replacement, start, end, selection_mode); }
 int32_t rv_dom_html_text_area_element_set_selection_range(RvNode* target, uint32_t start, uint32_t end, const char* direction) { return ranvier_dom_html_text_area_element_set_selection_range(target, start, end, direction); }
+int32_t rv_dom_html_template_element_get_content(RvNode* target, RvNode** result) { return ranvier_dom_html_template_element_get_content(target, result); }
+int32_t rv_dom_html_template_element_get_shadow_root_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_template_element_get_shadow_root_mode(target, buffer, capacity, length); }
+int32_t rv_dom_html_template_element_set_shadow_root_mode(RvNode* target, const char* value) { return ranvier_dom_html_template_element_set_shadow_root_mode(target, value); }
+int32_t rv_dom_html_template_element_get_shadow_root_delegates_focus(RvNode* target, int32_t* result) { return ranvier_dom_html_template_element_get_shadow_root_delegates_focus(target, result); }
+int32_t rv_dom_html_template_element_set_shadow_root_delegates_focus(RvNode* target, int32_t value) { return ranvier_dom_html_template_element_set_shadow_root_delegates_focus(target, value); }
+int32_t rv_dom_html_template_element_get_shadow_root_slot_assignment(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_template_element_get_shadow_root_slot_assignment(target, buffer, capacity, length); }
+int32_t rv_dom_html_template_element_set_shadow_root_slot_assignment(RvNode* target, const char* value) { return ranvier_dom_html_template_element_set_shadow_root_slot_assignment(target, value); }
+int32_t rv_dom_html_template_element_get_shadow_root_clonable(RvNode* target, int32_t* result) { return ranvier_dom_html_template_element_get_shadow_root_clonable(target, result); }
+int32_t rv_dom_html_template_element_set_shadow_root_clonable(RvNode* target, int32_t value) { return ranvier_dom_html_template_element_set_shadow_root_clonable(target, value); }
+int32_t rv_dom_html_template_element_get_shadow_root_serializable(RvNode* target, int32_t* result) { return ranvier_dom_html_template_element_get_shadow_root_serializable(target, result); }
+int32_t rv_dom_html_template_element_set_shadow_root_serializable(RvNode* target, int32_t value) { return ranvier_dom_html_template_element_set_shadow_root_serializable(target, value); }
+int32_t rv_dom_html_template_element_get_shadow_root_custom_element_registry(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_template_element_get_shadow_root_custom_element_registry(target, buffer, capacity, length); }
+int32_t rv_dom_html_template_element_set_shadow_root_custom_element_registry(RvNode* target, const char* value) { return ranvier_dom_html_template_element_set_shadow_root_custom_element_registry(target, value); }
+int32_t rv_dom_html_template_element_get_shadow_root_reference_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_template_element_get_shadow_root_reference_target(target, buffer, capacity, length); }
+int32_t rv_dom_html_template_element_set_shadow_root_reference_target(RvNode* target, const char* value) { return ranvier_dom_html_template_element_set_shadow_root_reference_target(target, value); }
 int32_t rv_dom_htmlu_list_element_get_compact(RvNode* target, int32_t* result) { return ranvier_dom_htmlu_list_element_get_compact(target, result); }
 int32_t rv_dom_htmlu_list_element_set_compact(RvNode* target, int32_t value) { return ranvier_dom_htmlu_list_element_set_compact(target, value); }
 int32_t rv_dom_htmlu_list_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_htmlu_list_element_get_type(target, buffer, capacity, length); }
@@ -855,6 +938,8 @@ int32_t rv_dom_dom_token_list_get_value(RvDOMTokenList* target, char* buffer, in
 int32_t rv_dom_dom_token_list_set_value(RvDOMTokenList* target, const char* value) { return ranvier_dom_dom_token_list_set_value(target, value); }
 int32_t rv_dom_dom_token_list_item(RvDOMTokenList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_token_list_item(target, index, buffer, capacity, length); }
 int32_t rv_dom_dom_token_list_contains(RvDOMTokenList* target, const char* token, int32_t* result) { return ranvier_dom_dom_token_list_contains(target, token, result); }
+int32_t rv_dom_dom_token_list_add(RvDOMTokenList* target, const RvDomSequenceDOMString* tokens) { return ranvier_dom_dom_token_list_add(target, tokens); }
+int32_t rv_dom_dom_token_list_remove(RvDOMTokenList* target, const RvDomSequenceDOMString* tokens) { return ranvier_dom_dom_token_list_remove(target, tokens); }
 int32_t rv_dom_dom_token_list_toggle(RvDOMTokenList* target, const char* token, const int32_t* force, int32_t* result) { return ranvier_dom_dom_token_list_toggle(target, token, force, result); }
 int32_t rv_dom_dom_token_list_replace(RvDOMTokenList* target, const char* token, const char* new_token, int32_t* result) { return ranvier_dom_dom_token_list_replace(target, token, new_token, result); }
 int32_t rv_dom_dom_token_list_supports(RvDOMTokenList* target, const char* token, int32_t* result) { return ranvier_dom_dom_token_list_supports(target, token, result); }
@@ -907,6 +992,7 @@ int32_t rv_dom_dom_selection_get_range_at(RvDOMSelection* target, uint32_t index
 int32_t rv_dom_dom_selection_add_range(RvDOMSelection* target, RvAbstractRange* range) { return ranvier_dom_dom_selection_add_range(target, range); }
 int32_t rv_dom_dom_selection_remove_range(RvDOMSelection* target, RvAbstractRange* range) { return ranvier_dom_dom_selection_remove_range(target, range); }
 int32_t rv_dom_dom_selection_remove_all_ranges(RvDOMSelection* target) { return ranvier_dom_dom_selection_remove_all_ranges(target); }
+int32_t rv_dom_dom_selection_get_composed_ranges(RvDOMSelection* target, const RvDomUnionShadowRootOrGetComposedRangesOptions* options, const RvDomSequenceShadowRoot* shadow_roots, RvDomSequenceStaticRange* result) { return ranvier_dom_dom_selection_get_composed_ranges(target, options, shadow_roots, result); }
 int32_t rv_dom_dom_selection_empty(RvDOMSelection* target) { return ranvier_dom_dom_selection_empty(target); }
 int32_t rv_dom_dom_selection_collapse(RvDOMSelection* target, RvNode* node, uint32_t offset) { return ranvier_dom_dom_selection_collapse(target, node, offset); }
 int32_t rv_dom_dom_selection_set_position(RvDOMSelection* target, RvNode* node, uint32_t offset) { return ranvier_dom_dom_selection_set_position(target, node, offset); }
@@ -929,6 +1015,8 @@ int32_t rv_dom_dom_rect_read_only_get_bottom(RvDOMRectReadOnly* target, double* 
 int32_t rv_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_read_only_get_left(target, result); }
 int32_t rv_dom_node_list_get_length(RvNodeList* target, uint32_t* result) { return ranvier_dom_node_list_get_length(target, result); }
 int32_t rv_dom_node_list_item(RvNodeList* target, uint32_t index, RvNode** result) { return ranvier_dom_node_list_item(target, index, result); }
+int32_t rv_dom_radio_node_list_get_value(RvNodeList* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_radio_node_list_get_value(target, buffer, capacity, length); }
+int32_t rv_dom_radio_node_list_set_value(RvNodeList* target, const char* value) { return ranvier_dom_radio_node_list_set_value(target, value); }
 int32_t rv_dom_html_collection_get_length(RvHTMLCollection* target, uint32_t* result) { return ranvier_dom_html_collection_get_length(target, result); }
 int32_t rv_dom_html_collection_item(RvHTMLCollection* target, uint32_t index, RvNode** result) { return ranvier_dom_html_collection_item(target, index, result); }
 int32_t rv_dom_html_collection_named_item(RvHTMLCollection* target, const char* name, RvNode** result) { return ranvier_dom_html_collection_named_item(target, name, result); }
@@ -999,6 +1087,8 @@ int32_t rv_dom_pointer_event_get_altitude_angle(RvEvent* target, double* result)
 int32_t rv_dom_pointer_event_get_azimuth_angle(RvEvent* target, double* result) { return ranvier_dom_pointer_event_get_azimuth_angle(target, result); }
 int32_t rv_dom_pointer_event_get_pointer_type(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_pointer_event_get_pointer_type(target, buffer, capacity, length); }
 int32_t rv_dom_pointer_event_get_is_primary(RvEvent* target, int32_t* result) { return ranvier_dom_pointer_event_get_is_primary(target, result); }
+int32_t rv_dom_pointer_event_get_coalesced_events(RvEvent* target, RvDomSequencePointerEvent* result) { return ranvier_dom_pointer_event_get_coalesced_events(target, result); }
+int32_t rv_dom_pointer_event_get_predicted_events(RvEvent* target, RvDomSequencePointerEvent* result) { return ranvier_dom_pointer_event_get_predicted_events(target, result); }
 int32_t rv_dom_wheel_event_get_delta_x(RvEvent* target, double* result) { return ranvier_dom_wheel_event_get_delta_x(target, result); }
 int32_t rv_dom_wheel_event_get_delta_y(RvEvent* target, double* result) { return ranvier_dom_wheel_event_get_delta_y(target, result); }
 int32_t rv_dom_wheel_event_get_delta_z(RvEvent* target, double* result) { return ranvier_dom_wheel_event_get_delta_z(target, result); }
@@ -1023,4 +1113,5 @@ int32_t rv_dom_focus_event_get_related_target(RvEvent* target, RvNode** result) 
 int32_t rv_dom_input_event_get_input_type(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_input_event_get_input_type(target, buffer, capacity, length); }
 int32_t rv_dom_input_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_input_event_get_data(target, buffer, capacity, length); }
 int32_t rv_dom_input_event_get_is_composing(RvEvent* target, int32_t* result) { return ranvier_dom_input_event_get_is_composing(target, result); }
+int32_t rv_dom_input_event_get_target_ranges(RvEvent* target, RvDomSequenceStaticRange* result) { return ranvier_dom_input_event_get_target_ranges(target, result); }
 int32_t rv_dom_composition_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_composition_event_get_data(target, buffer, capacity, length); }

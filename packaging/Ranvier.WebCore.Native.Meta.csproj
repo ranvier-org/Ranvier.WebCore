@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackageId>Ranvier.WebCore.Native</PackageId>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <Authors>Ranvier</Authors>
+    <Description>Native WebCore host for Windows x64/ARM64, Linux x64/ARM64 and macOS ARM64. Restore selects the native assets for the application's runtime.</Description>
+    <PackageTags>webkit;webcore;native;ranvier</PackageTags>
+    <PackageLicenseFile>NOTICE.md</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Ranvier.WebCore.Native.win-x64" Version="[$(Version)]" />
+    <PackageReference Include="Ranvier.WebCore.Native.win-arm64" Version="[$(Version)]" />
+    <PackageReference Include="Ranvier.WebCore.Native.linux-x64" Version="[$(Version)]" />
+    <PackageReference Include="Ranvier.WebCore.Native.linux-arm64" Version="[$(Version)]" />
+    <PackageReference Include="Ranvier.WebCore.Native.osx-arm64" Version="[$(Version)]" />
+    <None Include="../NOTICE.md" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+</Project>

@@ -22,6 +22,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import idl  # noqa: E402
+from domtypes import ComplexGeneratorMixin, token as transport_token
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "gen" / "dom.json"
@@ -71,7 +72,7 @@ FSHARP_KEYWORDS = set(
 C_KEYWORDS = {"default", "char", "int", "float", "double", "long", "short", "unsigned", "signed", "register", "switch",
               "case", "const", "volatile", "struct", "union", "enum", "auto", "extern", "static", "goto", "return",
               "sizeof", "typedef", "void", "while", "for", "do", "if", "else", "break", "continue", "bool", "new",
-              "delete", "class", "template", "this", "namespace", "operator", "private", "public", "protected"}
+              "delete", "class", "template", "this", "namespace", "operator", "private", "public", "protected", "inline"}
 # The names generated functions give their own parameters, which an IDL argument does not take.
 RESERVED = {"target", "buffer", "capacity", "length", "result", "present"}
 # Extended attributes of a member that the generator does not map.
@@ -117,7 +118,8 @@ def attr_list(value):
 class Mapped:
     """A C mapping of an IDL type."""
 
-    def __init__(self, kind, nullable=False, ctype=None, interface=None, root=None, cls=None, enum=None, atom=False):
+    def __init__(self, kind, nullable=False, ctype=None, interface=None, root=None, cls=None, enum=None, atom=False,
+                 subtypes=(), label=None):
         self.kind = kind  # string, bool, number, enum, node, event, object, dict, void
         self.atom = atom  # a string union whose DOMString is [AtomString]
         self.nullable = nullable
@@ -126,6 +128,8 @@ class Mapped:
         self.root = root  # the handle struct's interface for object handles
         self.cls = cls  # the C++ class
         self.enum = enum
+        self.subtypes = subtypes
+        self.label = label
 
     @property
     def handle(self):
@@ -136,6 +140,14 @@ class Mapped:
 
 class Unsupported(Exception):
     pass
+
+
+def type_label(t):
+    if t.name == "union":
+        return "Or".join(type_label(child) for child in t.subtypes)
+    if t.subtypes:
+        return "".join(word[:1].upper() + word[1:] for word in t.name.split()) + "Of" + "And".join(type_label(child) for child in t.subtypes)
+    return "".join(word[:1].upper() + word[1:] for word in t.name.split())
 
 
 class World:
@@ -151,6 +163,7 @@ class World:
         self.dictionaries = {}  # name -> idl.Dictionary, with its partials' members
         self.callbacks = set()
         self.dictionary_partials = {}
+        self.dictionary_exclusions = set()
         for path in sorted(self.webcore.rglob("*.idl")):
             relative = path.relative_to(self.webcore).as_posix()
             if relative.startswith("bindings/scripts/test/"):
@@ -177,6 +190,66 @@ class World:
         missing = [name for name in self.scope if name not in self.interfaces]
         if missing:
             raise SystemExit(f"gen/dom.json names interfaces the IDL files do not define: {missing}")
+        self.contract_config = config.get("contract", {})
+        self.contract_aliases = self.contract_config.get("aliases", {}) | self.contract_config.get("mixins", {})
+        self.contract_types = list(self.scope)
+        self.tag_interfaces = []
+        for key, namespace, namespace_uri in [("htmlTags", "HTML", "http://www.w3.org/1999/xhtml"),
+                                              ("svgTags", "SVG", "http://www.w3.org/2000/svg")]:
+            catalogue = self.contract_config.get(key)
+            if not catalogue:
+                continue
+            for raw in (self.webcore / catalogue).read_text(encoding="utf-8").splitlines():
+                raw = raw.split("#", 1)[0].strip()
+                if not raw or "=" in raw.split()[0]:
+                    continue
+                tag, _, options = raw.partition(" ")
+                properties = dict(re.findall(r"(\w+)\s*=\s*([^,\s]+)", options))
+                # Match make_names.pl's SVG FE capitalization before its ucfirst conversion.
+                capitalized = "FE" + tag[2:3].upper() + tag[3:] if namespace == "SVG" and tag.startswith("fe") else tag[:1].upper() + tag[1:]
+                implementation = properties.get("interfaceName", namespace + capitalized + "Element")
+                public = properties.get("JSInterfaceName", implementation)
+                if public not in self.interfaces:
+                    raise SystemExit(f"{catalogue}: {tag} names missing IDL interface {public}")
+                self.tag_interfaces.append({"tag": tag, "namespaceURI": namespace_uri,
+                                            "interface": public, "implementationInterface": implementation})
+                if public not in self.contract_types:
+                    self.contract_types.append(public)
+        for name in self.contract_config.get("interfaces", []) + list(self.contract_aliases):
+            if name not in self.interfaces:
+                raise SystemExit(f"contract interface {name} has no WebKit IDL definition")
+            if name not in self.contract_types:
+                self.contract_types.append(name)
+        for name in list(self.contract_types):
+            for ancestor in self.chain(name)[1:]:
+                if ancestor not in self.contract_types:
+                    self.contract_types.insert(0, ancestor)
+        self.contract_dictionary_fields = {name: self.dictionary_fields(name)
+                                           for name in self.contract_config.get("dictionaries", [])}
+
+    def public_name(self, name):
+        return self.contract_aliases.get(name, name)
+
+    def contract_mixins(self, name):
+        return [mixin for mixin, _, file in self.includes.get(name, [])
+                if mixin in self.contract_config.get("mixins", {}) and not self.skipped(file)]
+
+    @staticmethod
+    def member_key(member):
+        return (member.kind, member.name, str(member.type), member.special,
+                tuple((str(arg.type), arg.optional, arg.variadic) for arg in member.arguments))
+
+    def contract_owner(self, interface, member):
+        key = self.member_key(member)
+        for mixin in self.contract_mixins(interface):
+            if any(self.member_key(candidate) == key for candidate in self.members(mixin)):
+                return self.public_name(mixin)
+        if member.kind == "operation":
+            for ancestor in self.chain(interface)[1:]:
+                for candidate in self.members(ancestor):
+                    if self.member_key(candidate) == key:
+                        return self.contract_owner(ancestor, candidate)
+        return self.public_name(interface)
 
     def skipped(self, file):
         return any(file.startswith(prefix) for prefix in self.skip)
@@ -263,6 +336,9 @@ class World:
         for partial in self.dictionary_partials.get(name, []):
             members += partial.members
         for member in members:
+            if f"{name}.{member.name}" in self.config["exclude"]:
+                self.dictionary_exclusions.add(f"{name}.{member.name}")
+                continue
             if "Conditional" in member.attrs or "EnabledBySetting" in member.attrs:
                 continue
             try:
@@ -308,10 +384,18 @@ class World:
             return Mapped("object", t.nullable, interface=t.name, root=root, cls=self.cpp_class(t.name))
         if t.name == "union":
             strings = self.string_union(t)
-            if strings is None:
-                raise Unsupported(f"union {t}")
-            return Mapped("string", t.nullable, atom=strings)
-        if t.name in ("sequence", "FrozenArray", "record", "Promise", "ObservableArray"):
+            if strings is not None:
+                return Mapped("string", t.nullable, atom=strings)
+            children = [self.map(child) for child in t.subtypes]
+            label = "Or".join(type_label(self.resolve(child)) for child in t.subtypes)
+            return Mapped("union", t.nullable, "RvDomUnion" + label + ("Nullable" if t.nullable else ""),
+                          subtypes=children, label=label)
+        if t.name in ("sequence", "FrozenArray"):
+            child = self.map(t.subtypes[0])
+            label = type_label(self.resolve(t.subtypes[0]))
+            return Mapped("sequence", t.nullable, "RvDomSequence" + label + ("Nullable" if t.nullable else ""),
+                          subtypes=[child], label=label + " sequence")
+        if t.name in ("record", "Promise", "ObservableArray"):
             raise Unsupported(f"{t.name} type {t}")
         if t.name in self.dictionaries:
             self.dictionary_fields(t.name)
@@ -341,7 +425,8 @@ def c_name(name):
     return name + "_" if name in RESERVED or name in C_KEYWORDS else name
 
 
-class Generator:
+class Generator(ComplexGeneratorMixin):
+    unsupported_type = Unsupported
     def __init__(self, world: World):
         self.world = world
         self.functions = []
@@ -356,6 +441,8 @@ class Generator:
         self.lock, self.lock_structs = read_lock(OUT_HEADER)
         self.stubs = []
         self.changed = []  # names whose C signature differs from the lock
+        self.complex_used = {}
+        self.complex_inputs = set()
 
     def run(self):
         for name in self.world.scope:
@@ -407,7 +494,7 @@ class Generator:
                     self.skip(name, member, reason)
                     continue
                 try:
-                    supported.append((member, [self.world.map(a.type) for a in member.arguments],
+                    supported.append((member, [self.world.map(idl.Type("sequence", subtypes=[a.type]) if a.variadic else a.type) for a in member.arguments],
                                       self.world.map(member.type)))
                 except Unsupported as error:
                     self.skip(name, member, str(error))
@@ -502,8 +589,6 @@ class Generator:
         for key in UNMAPPED:
             if key in member.attrs:
                 return f"[{key}]"
-        if any(a.variadic for a in member.arguments):
-            return "variadic arguments"
         return None
 
     def call_with(self, values):
@@ -535,6 +620,14 @@ class Generator:
         if "Event" in chain:
             return "RvEvent*"
         return f"Rv{chain[-1]}*"
+
+    def cast_expression(self, cls, root, value):
+        via = self.world.config.get("castVia", {}).get(cls)
+        if via:
+            self.headers.add(f"{via}.h")
+            return (f"([&]() -> {cls}* {{ auto* base = dynamicDowncast<{via}>({value}); "
+                    f"return base ? dynamicDowncast<{cls}>(*base) : nullptr; }}())")
+        return f"dynamicDowncast<{cls}>({value})"
 
     # Attributes.
 
@@ -629,6 +722,8 @@ class Generator:
         for member, mapped in ordered:
             if mapped.kind == "enum":
                 self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
+            elif mapped.kind in ("union", "sequence"):
+                self.use_complex(mapped)
         self.dicts_used[name] = ordered
         return ordered
 
@@ -640,6 +735,8 @@ class Generator:
             return "const char*"
         if mapped.kind == "node":
             return "RvNode*"
+        if mapped.kind in ("union", "sequence"):
+            return f"const {mapped.ctype}*"
         ctype = mapped.ctype
         return f"const {ctype}*" if absent else ctype
 
@@ -667,6 +764,11 @@ class Generator:
                 lines.append("        return RV_ERR_WRONG_INTERFACE;")
                 lines.append(f"    {target}.{cpp_field} = value.get();")
             lines.append("}")
+        elif mapped.kind in ("union", "sequence"):
+            lines += [f"if ({covered} && {pointer}->{field}) {{", "    int32_t status = RV_OK;",
+                      f"    auto value = decode{mapped.ctype}({pointer}->{field}, status);",
+                      "    if (status != RV_OK) return status;",
+                      f"    {target}.{cpp_field} = std::move(*value);", "}"]
         else:
             pointer_field = ctype.endswith("*")
             value = f"*{pointer}->{field}" if pointer_field else f"{pointer}->{field}"
@@ -718,7 +820,7 @@ class Generator:
         base = f"{snake(interface)}_{{}}_{snake(member.name)}"
         idl_text = f"{'readonly ' if member.readonly else ''}attribute {member.type} {member.name}"
         # Getter.
-        if "CustomGetter" in member.attrs:
+        if "CustomGetter" in member.attrs and f"{interface}.{member.name}" not in self.world.config.get("customGetters", []):
             self.skip(interface, member, "[CustomGetter]")
         else:
             try:
@@ -834,6 +936,21 @@ class Generator:
                     prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped)]
                 prepare.append("}")
                 passed.append(f"std::move(a{index})")
+            elif mapped.kind in ("union", "sequence"):
+                self.use_complex(mapped)
+                params.append((f"const {mapped.ctype}*", name))
+                if not maybe_null and not argument.optional:
+                    checks.append(name)
+                prepare += [f"int32_t status{index} = RV_OK;",
+                            f"auto a{index} = decode{mapped.ctype}({name}, status{index});"]
+                if argument.optional and argument.default is not None and not mapped.nullable:
+                    default = self.complex_default(mapped, argument.default)
+                    prepare += [f"if (!{name}) {{ a{index} = {default}; status{index} = RV_OK; }}"]
+                prepare += [f"if (status{index} != RV_OK) return status{index};"]
+                if mapped.kind == "sequence" and not mapped.nullable:
+                    passed.append(f"DomSequenceArgument<{self.transport_cpp(mapped.subtypes[0])}> {{ std::move(*a{index}) }}")
+                else:
+                    passed.append(f"std::move(*a{index})")
             elif mapped.kind in ("node", "event", "object"):
                 if mapped.interface == "EventTarget":
                     raise Unsupported(f"{mapped.interface} argument")
@@ -896,6 +1013,14 @@ class Generator:
             else:
                 sink = f"storeHandle<{root}>(value, result)"
             notes.append("*result is a new reference" + (", or NULL" if returns.nullable or returns.interface == "EventTarget" else ""))
+        elif returns.kind in ("union", "sequence"):
+            if not self.transport_can_return(returns):
+                raise Unsupported("dictionary result in a union or sequence")
+            self.use_complex(returns, input=False)
+            params.append((f"{returns.ctype}*", "result"))
+            checks.append("result")
+            sink = f"encode{returns.ctype}(value, result)"
+            notes.append("*result owns its contents; release with the matching rv_dom_*_release")
         # The body.
         cls = self.world.cpp_class(interface)
         chain = self.world.chain(interface)
@@ -916,7 +1041,7 @@ class Generator:
             if root_cls == cls:
                 body.append(f"RefPtr<{cls}> impl = reinterpret_cast<{cls}*>(target);")
             else:
-                body += [f"RefPtr impl = dynamicDowncast<{cls}>(*reinterpret_cast<{root_cls}*>(target));", "if (!impl)",
+                body += [f"RefPtr impl = {self.cast_expression(cls, root_cls, f'*reinterpret_cast<{root_cls}*>(target)')};", "if (!impl)",
                          "    return RV_ERR_WRONG_INTERFACE;"]
         setting = member.attrs.get("EnabledBySetting")
         if setting:
@@ -945,6 +1070,8 @@ class Generator:
             body.append(f"return deliver([&]() -> decltype(auto) {{ return {expression}; }}, [&](auto&& value) {{ return {sink}; }});")
         function.params = params
         function.body = body
+        function.arguments = list(zip(arguments, mapped_args))
+        function.returns = returns
         function.conditional = self.conditional(member)
         if function.conditional:
             notes.append(f"RV_ERR_UNSUPPORTED where WebKit builds without {member.attrs['Conditional']}")
@@ -952,6 +1079,75 @@ class Generator:
         self.functions.append(function)
 
     # Output.
+
+    @staticmethod
+    def describe_mapping(mapped):
+        return {
+            "kind": mapped.kind, "ctype": mapped.ctype, "interface": mapped.interface,
+            "root": mapped.root, "class": mapped.cls, "enum": mapped.enum,
+            "label": mapped.label, "nullable": mapped.nullable, "atom": mapped.atom,
+            "subtypes": [Generator.describe_mapping(child) for child in mapped.subtypes],
+        }
+
+    def api_model(self):
+        def describe_idl(value):
+            value = self.world.resolve(value)
+            return {"name": value.name, "nullable": value.nullable,
+                    "subtypes": [describe_idl(child) for child in value.subtypes]}
+
+        def argument(member, mapped):
+            return {
+                "name": member.name, "idlType": str(member.type), "idl": describe_idl(member.type),
+                "optional": member.optional, "default": member.default,
+                "variadic": member.variadic, "mapping": self.describe_mapping(mapped),
+            }
+
+        functions = []
+        for function in self.functions:
+            if function.unused:
+                continue
+            functions.append({
+                "interface": function.interface, "member": function.member.name,
+                "contractOwner": self.world.contract_owner(function.interface, function.member),
+                "kind": function.kind, "function": "rv_dom_" + function.name,
+                "conditional": function.conditional,
+                "parameters": [{"ctype": ctype, "name": name} for ctype, name in function.params],
+                "arguments": [argument(member, mapped) for member, mapped in function.arguments],
+                "returnIdl": describe_idl(idl.Type("undefined") if function.kind == "setter" else function.member.type),
+                "returns": self.describe_mapping(function.returns),
+            })
+        model = {
+            "schemaVersion": 1,
+            "interfaces": [{"name": name, "base": self.world.interfaces[name].base}
+                           for name in self.world.scope],
+            "contractInterfaces": [{"name": self.world.public_name(name), "idlName": name,
+                                    "base": self.world.public_name(self.world.interfaces[name].base),
+                                    "mixins": [self.world.public_name(mixin) for mixin in self.world.contract_mixins(name)],
+                                    "mixin": self.world.interfaces[name].mixin,
+                                    "contractOnly": name not in self.world.scope,
+                                    "source": self.world.interfaces[name].file}
+                                   for name in self.world.contract_types],
+            "tagInterfaces": self.world.tag_interfaces,
+            "contractDictionaries": {
+                name: {"base": self.world.dictionaries[name].base, "contractOnly": name not in self.dicts_used,
+                       "omittedFields": sorted(field.split(".", 1)[1] for field in self.world.dictionary_exclusions
+                                               if field.startswith(name + ".")),
+                       "fields": [{"name": member.name, "required": member.required,
+                                   "default": member.default, "idl": describe_idl(member.type),
+                                   "mapping": self.describe_mapping(mapped)} for member, mapped in fields]}
+                for name, fields in self.world.contract_dictionary_fields.items()},
+            "functions": functions,
+            "enumerations": self.enums_used,
+            "containers": [{"mapping": self.describe_mapping(mapped),
+                            "releaseFunction": "rv_dom_" + transport_token(name) + "_release"}
+                           for name, mapped in self.complex_used.items()],
+            "dictionaries": {name: [{"name": member.name, "field": c_name(member.name),
+                                     "ctype": self.field_ctype(member, mapped), "required": member.required,
+                                     "default": member.default, "mapping": self.describe_mapping(mapped)}
+                                    for member, mapped in fields]
+                             for name, fields in self.dicts_used.items()},
+        }
+        return json.dumps(model, indent=2, ensure_ascii=False) + "\n"
 
     def header(self):
         lines = [
@@ -987,6 +1183,7 @@ class Generator:
         ]
         for name in self.handles:
             lines.append(f"typedef struct Rv{name} Rv{name};")
+        lines += [f"typedef struct {name} {name};" for name in self.complex_used]
         lines.append("")
         if self.constants:
             lines.append("/* Constants of the interfaces. */")
@@ -1022,6 +1219,8 @@ class Generator:
                 lines.append(f"    {ctype} {c_name(member.name)}; /* {note} */")
             lines.append(f"}} {struct};")
             lines.append("")
+        lines += self.transport_structs()
+        lines += self.complex_release_declarations("rv_dom_", "RV_EXPORT")
         for name in self.handles:
             lines.append(f"/* Releases a handle to a {name}. */")
             lines.append(f"RV_EXPORT void rv_dom_{snake(name)}_release(Rv{name}*);")
@@ -1070,6 +1269,7 @@ class Generator:
         for name in self.handles:
             lines.append(f"WEBCORE_EXPORT void ranvier_dom_{snake(name)}_release(Rv{name}*);")
             lines.append(f"WEBCORE_EXPORT Rv{name}* ranvier_dom_{snake(name)}_retain(Rv{name}*);")
+        lines += self.complex_release_declarations("ranvier_dom_", "WEBCORE_EXPORT")
         for function in self.functions:
             lines.append(f"WEBCORE_EXPORT int32_t ranvier_dom_{function.name}({params_text(function.params)});")
         lines += ["", "}", ""]
@@ -1087,6 +1287,8 @@ class Generator:
         for name in self.handles:
             lines.append(f"void rv_dom_{snake(name)}_release(Rv{name}* handle) {{ ranvier_dom_{snake(name)}_release(handle); }}")
             lines.append(f"Rv{name}* rv_dom_{snake(name)}_retain(Rv{name}* handle) {{ return ranvier_dom_{snake(name)}_retain(handle); }}")
+        for name in self.complex_used:
+            lines.append(f"void rv_dom_{transport_token(name)}_release({name}* value) {{ ranvier_dom_{transport_token(name)}_release(value); }}")
         for function in self.functions:
             args = ", ".join(n for _, n in function.params)
             lines.append(f"int32_t rv_dom_{function.name}({params_text(function.params)}) {{ return ranvier_dom_{function.name}({args}); }}")
@@ -1108,6 +1310,7 @@ class Generator:
         for enum, (values, _, _) in sorted(self.enums_used.items()):
             quoted = ", ".join(f'"{v}"_s' for v in values)
             lines.append(f"static constexpr ASCIILiteral {enum_table(enum)}[] = {{ {quoted} }};")
+        lines += self.complex_runtime()
         lines += ["", "using namespace WebCore;", "", 'extern "C" {', ""]
         lines.append("int32_t ranvier_dom_has(const char* feature)")
         lines.append("{")
@@ -1121,6 +1324,9 @@ class Generator:
         lines.append("    return 0;")
         lines.append("}")
         lines.append("")
+        for name in self.complex_used:
+            lines += [f"void ranvier_dom_{transport_token(name)}_release({name}* value)", "{",
+                      f"    if (isMainThread()) clear{name}(value);", "}", ""]
         for name in self.handles:
             cls = self.world.cpp_class(name)
             lines += [
@@ -1158,6 +1364,10 @@ class Generator:
         lines += ["} // extern \"C\"", ""]
         return "\n".join(lines)
 
+    def interfaces(self):
+        from interfaces import emit_interfaces
+        return emit_interfaces(self)
+
     def fsharp(self):
         lines = [
             "/// P/Invoke declarations of host/RanvierWebCoreDom.h, the generated DOM functions. Generated by gen/domgen.py;",
@@ -1193,6 +1403,7 @@ class Generator:
                     lines.append(f"    val mutable {field}: nativeint")
                 else:
                     lines.append(f"    val mutable {field}: {FSHARP_NUMBERS[ctype]}")
+        lines += self.complex_fsharp()
         for name in self.handles:
             lines += ["", "[<DllImport(Lib)>]", f"extern void rv_dom_{snake(name)}_release(nativeint handle)"]
             lines += ["", "[<DllImport(Lib)>]", f"extern nativeint rv_dom_{snake(name)}_retain(nativeint handle)"]
@@ -1221,16 +1432,39 @@ class Generator:
         lines += ["", "Stubs, for members of the lock that WebKit's IDL no longer has:"]
         lines += [f"  rv_dom_{f.name}" for f in self.stubs] or ["  (none)"]
         lines += ["", "Left out:"]
-        for label, reason in sorted(self.excluded):
+        for label, reason in sorted(self.excluded + [(name, "excluded dictionary field by gen/dom.json") for name in self.world.dictionary_exclusions]):
             lines.append(f"  {label}: {reason}")
+        lines += ["", "Contract-only interfaces (own members have no native exports):"]
+        for name in self.world.contract_types:
+            if name in self.world.scope or self.world.interfaces[name].mixin or name == "EventTarget":
+                continue
+            lines.append(f"  {self.world.public_name(name)}: {self.world.interfaces[name].file}")
+            for member in self.world.interfaces[name].members:
+                label = member.name or member.special or member.kind
+                lines.append(f"    {name}.{label}: contract-only interface; member omitted")
+        lines += ["", "Contract mixins (only members mapped by scoped concrete interfaces are declared):"]
+        for name in self.world.contract_types:
+            if not self.world.interfaces[name].mixin:
+                continue
+            public = self.world.public_name(name)
+            mapped = {self.world.member_key(function.member) for function in self.functions
+                      if function.member and self.world.contract_owner(function.interface, function.member) == public}
+            lines.append(f"  {public}: {self.world.interfaces[name].file}")
+            for member in self.world.members(name):
+                if self.world.member_key(member) not in mapped:
+                    label = member.name or member.special or member.kind
+                    lines.append(f"    {public}.{label}: no scoped concrete native export; member omitted")
         del interfaces
         return "\n".join(lines) + "\n"
 
 
 RUNTIME = r"""#include <cstddef>
+#include <cstdlib>
 #include <cstring>
 #include <optional>
 #include <type_traits>
+#include <variant>
+#include <wtf/FixedVector.h>
 #include <wtf/MainThread.h>
 
 namespace Ranvier {
@@ -1522,6 +1756,8 @@ def fsharp_param(ctype, name):
     if ctype.endswith("**"):
         return f"nativeint& {fname}"
     if ctype.startswith("Rv") and ctype.endswith("*"):
+        if ctype.startswith(("RvDomUnion", "RvDomSequence")):
+            return f"{ctype[:-1]}& {fname}"
         return f"nativeint {fname}"
     if ctype.endswith("*"):
         return f"{FSHARP_NUMBERS[ctype[:-1]]}& {fname}"
@@ -1536,6 +1772,8 @@ def outputs(generator):
         OUT_GLUE: generator.glue(),
         OUT_FSHARP: generator.fsharp(),
         OUT_REPORT: generator.report(),
+        ROOT / "gen" / "Ranvier.Dom.fs": generator.interfaces(),
+        ROOT / "gen" / "dom-api.json": generator.api_model(),
     }
 
 

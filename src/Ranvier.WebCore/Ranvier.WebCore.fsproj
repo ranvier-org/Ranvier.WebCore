@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackageId>Ranvier.WebCore</PackageId>
+    <Authors>Ranvier</Authors>
+    <Description>Managed interop for the versioned Ranvier WebCore C ABI.</Description>
+    <PackageTags>webkit;webcore;native;fsharp;ranvier</PackageTags>
+    <IsAotCompatible>true</IsAotCompatible>
+    <PackageLicenseFile>NOTICE.md</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../tests/abi/Native.fs" Link="Native.fs" />
+    <Compile Include="../../tests/abi/NativeDom.fs" Link="NativeDom.fs" />
+    <PackageReference Update="FSharp.Core" Version="10.1.401" />
+    <None Include="../../NOTICE.md" Pack="true" PackagePath="" />
+    <None Include="../../packaging/README.md" Pack="true" PackagePath="README.md" />
+    <None Include="../../host/RanvierWebCoreAbi.h" Pack="true" PackagePath="include/" />
+    <None Include="../../host/RanvierWebCoreDom.h" Pack="true" PackagePath="include/" />
+    <None Include="../../gen/dom-api.json" Pack="true" PackagePath="model/" />
+  </ItemGroup>
+</Project>

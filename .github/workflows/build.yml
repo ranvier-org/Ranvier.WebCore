@@ -23,6 +23,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  package-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: python -I tests/test_package_contract.py
+      - run: python -I tests/test_release.py
+      - run: python -I tests/generator/test_domgen.py
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Portable tools precede RID-specific tools in the manifest to avoid SDK cold-cache command
+      # misattribution (https://github.com/dotnet/sdk/issues/53783).
+      - run: dotnet tool restore
+      - name: Compile the full shared contracts on .NET
+        run: dotnet build tests/generator/Contracts.fsproj -c Release
+      - name: Compile and execute inherited DOM member implementations
+        run: |
+          python -I tests/generator/write_inherited_fixture.py artifacts/inherited-fixture
+          dotnet run --project artifacts/inherited-fixture/Fixture.fsproj -c Release
+      - name: Check the generated F# layout
+        run: dotnet fantomas --check gen/Ranvier.Dom.fs
+      - name: Compile and execute the browser union adapters
+        run: |
+          python -I tests/generator/write_fable_fixture.py artifacts/dom-fixture
+          dotnet fickl artifacts/dom-fixture/Fixture.fsproj --outDir artifacts/dom-fixture/js
+          node artifacts/dom-fixture/js/Program.js
+      - name: Compile and execute the full generated browser contracts
+        run: |
+          dotnet fickl tests/generator/browser/FullBrowser.fsproj --outDir artifacts/full-browser/js --noCache --extension .js
+          node artifacts/full-browser/js/FullBrowser.js
+
   plan:
     # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
     # package, attached by scripts/release.py as the repository owner, that runtime goes to prebuilt instead.
@@ -75,7 +112,7 @@ jobs:
               # Only the owner's: anyone who can push a tag could otherwise attach a package to be published.
               assets = {a['name'] for a in release['assets'] if a['uploader']['login'] == owner} \
                   if release and release['author']['login'] == owner else set()
-              package = json.load(open('pins.json'))['package']['id'] + ('' if os.environ['FLAVOR'] == 'slim' else '.Lean')
+              package = json.load(open('pins.json'))['package']['id'] + {'slim': '', 'gpu': '.Gpu', 'lean': '.Lean'}[os.environ['FLAVOR']]
               for runtime in include:
                   name = f"{package}.{runtime['rid']}.{tag[1:]}.nupkg"
                   if name in assets:
@@ -300,9 +337,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
-          path: |
-            ${{ env.RANVIER_WORK }}/packages/*.nupkg
-            ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/manifest.json
+          path: ${{ env.RANVIER_WORK }}/packages/*.nupkg
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manifest-${{ matrix.rid }}-${{ env.FLAVOR }}
+          path: ${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/manifest.json
+          if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:
@@ -313,6 +355,35 @@ jobs:
         # scripts/smoke.py, as a local build.py all runs it: the host loads from the staged package, and on macOS
         # no staged library names the build tree. On Linux, loading is untested and the step checks the manifest.
         run: python scripts/build.py smoke --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: Exercise typed DOM transport against the packaged native host
+        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
+        run: python -I tests/generator/native_types.py --native-dir "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Build Windows UI Automation OS clients
+        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
+        run: >-
+          python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}"
+          --build-dir "${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}" --build-only
+
+      - name: Exercise Windows UI Automation and teardown
+        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
+        shell: pwsh
+        run: |
+          python -I tests/uia/check_exports.py "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          foreach ($mode in @('explicit', 'host', 'window', 'sync', 'overflow')) {
+            python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}" --run-only --teardown $mode
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Build and exercise the accessibility cache lifetime probe
+        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
+        shell: pwsh
+        run: |
+          python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}" --build-dir "${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}" --cache-probe --build-only
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}" --cache-probe --run-only --teardown cache
 
       - name: Upload the CMake logs on failure
         if: failure()
@@ -325,6 +396,41 @@ jobs:
             ${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}/vcpkg-manifest-install.log
             ${{ env.RANVIER_WORK }}/vcpkg/buildtrees/**/*.log
 
+  managed:
+    needs: [native, prebuilt, package-contract]
+    if: >-
+      ${{ !cancelled() && inputs.rids == '' && (inputs.flavor == '' || inputs.flavor == 'slim') &&
+          (needs.native.result == 'success' || needs.native.result == 'skipped') &&
+          (needs.prebuilt.result == 'success' || needs.prebuilt.result == 'skipped') &&
+          needs.package-contract.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: package-*-slim
+          merge-multiple: true
+          path: packages
+      - name: Pack the ABI-matched managed interop and native aggregate
+        shell: bash
+        run: |
+          version=$(python -c "import json; print(json.load(open('pins.json'))['package']['version'])")
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then version="${GITHUB_REF_NAME#v}"; fi
+          python -I scripts/package_managed.py --packages packages --version "$version"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-managed
+          path: |
+            packages/Ranvier.WebCore.[0-9]*.nupkg
+            packages/Ranvier.WebCore.Native.[0-9]*.nupkg
+          # The native RID packages are already retained by their platform jobs.
+
   publish:
     # On a version tag, pushes the packages to nuget.org through trusted publishing: the job exchanges
     # GitHub's OIDC token for a one-hour API key under the nuget.org account in the repository variable
@@ -332,7 +438,7 @@ jobs:
     # as workflow artifacts. Each runtime's package stands alone, so the packages that built, or that the
     # release held and prebuilt checked, are pushed even when another runtime failed.
     if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && vars.NUGET_USER != '' }}
-    needs: [native, prebuilt]
+    needs: [native, prebuilt, managed]
     runs-on: ubuntu-latest
     permissions:
       id-token: write

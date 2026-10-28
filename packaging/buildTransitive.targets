@@ -8,7 +8,7 @@
     <!-- A full path without "..": MSBuild computes %(RecursiveDir) wrongly from an include that has one. -->
     <_RanvierWebKitResources>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../runtimes/@RID@/native/WebKit.resources/'))</_RanvierWebKitResources>
   </PropertyGroup>
-  <ItemGroup Condition="'$(RuntimeIdentifier)' != ''">
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == '@RID@'">
     <None Include="$(_RanvierWebKitResources)**/*"
           Link="WebKit.resources/%(RecursiveDir)%(Filename)%(Extension)"
           CopyToOutputDirectory="PreserveNewest"
