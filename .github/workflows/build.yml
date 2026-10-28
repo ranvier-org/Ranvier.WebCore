@@ -48,6 +48,10 @@ jobs:
           python -I tests/generator/write_fable_fixture.py artifacts/dom-fixture
           dotnet fickl artifacts/dom-fixture/Fixture.fsproj --outDir artifacts/dom-fixture/js
           node artifacts/dom-fixture/js/Program.js
+      - name: Compile and execute the full generated browser contracts
+        run: |
+          dotnet fickl tests/generator/browser/FullBrowser.fsproj --outDir artifacts/full-browser/js --noCache --extension .js
+          node artifacts/full-browser/js/FullBrowser.js
 
   plan:
     # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
@@ -339,6 +343,35 @@ jobs:
         # scripts/smoke.py, as a local build.py all runs it: the host loads from the staged package, and on macOS
         # no staged library names the build tree. On Linux, loading is untested and the step checks the manifest.
         run: python scripts/build.py smoke --flavor ${{ env.FLAVOR }} --rid ${{ matrix.rid }}
+
+      - name: Exercise typed DOM transport against the packaged native host
+        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
+        run: python -I tests/generator/native_types.py --native-dir "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Build Windows UI Automation OS clients
+        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
+        run: >-
+          python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}"
+          --build-dir "${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}" --build-only
+
+      - name: Exercise Windows UI Automation and teardown
+        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
+        shell: pwsh
+        run: |
+          python -I tests/uia/check_exports.py "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          foreach ($mode in @('explicit', 'host', 'window', 'sync', 'overflow')) {
+            python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}" --run-only --teardown $mode
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Build and exercise the accessibility cache lifetime probe
+        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
+        shell: pwsh
+        run: |
+          python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}" --build-dir "${{ env.RANVIER_WORK }}/build-${{ env.FLAVOR }}" --cache-probe --build-only
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -I tests/uia/run.py --stage "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}" --cache-probe --run-only --teardown cache
 
       - name: Upload the CMake logs on failure
         if: failure()

@@ -15,5 +15,8 @@
     <PackageReference Update="FSharp.Core" Version="10.1.401" />
     <None Include="../../NOTICE.md" Pack="true" PackagePath="" />
     <None Include="../../packaging/README.md" Pack="true" PackagePath="README.md" />
+    <None Include="../../host/RanvierWebCoreAbi.h" Pack="true" PackagePath="include/" />
+    <None Include="../../host/RanvierWebCoreDom.h" Pack="true" PackagePath="include/" />
+    <None Include="../../gen/dom-api.json" Pack="true" PackagePath="model/" />
   </ItemGroup>
 </Project>

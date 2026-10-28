@@ -3,6 +3,7 @@
 import argparse
 import json
 import pathlib
+import re
 import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
@@ -13,7 +14,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 RIDS = ('win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-arm64')
 
 
-def validate_runtimes(packages, version):
+def validate_runtimes(packages, version, expected_identity):
     manifests = []
     for rid in RIDS:
         path = packages / f'Ranvier.WebCore.Native.{rid}.{version}.nupkg'
@@ -25,13 +26,24 @@ def validate_runtimes(packages, version):
     identities = {(m['abi'], m['webkit'], m['source']['commit']) for m in manifests}
     if len(identities) != 1:
         raise ValueError('native artifacts must come from one ABI, WebKit pin and source commit')
+    if identities != {expected_identity}:
+        raise ValueError('native artifacts do not match the managed checkout identity')
     if any(m['source']['dirty'] for m in manifests):
         raise ValueError('native artifacts must come from clean source trees')
     return manifests[0]['abi']
 
 
+def checkout_identity():
+    subprocess.run(['git', 'diff', '--quiet', 'HEAD'], cwd=ROOT, check=True)
+    pins = json.loads((ROOT / 'pins.json').read_text())
+    source = (ROOT / 'host/RanvierWebCoreAbi.cpp').read_text()
+    abi = int(re.search(r'rv_abi_version\(void\)\s*\{\s*return (\d+);', source).group(1))
+    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    return abi, pins['webkit']['commit'], revision
+
+
 def build(packages, version):
-    abi = validate_runtimes(packages, version)
+    abi = validate_runtimes(packages, version, checkout_identity())
     packages = packages.resolve()
     with tempfile.TemporaryDirectory(prefix='ranvier-pack-') as temporary:
         config = pathlib.Path(temporary) / 'NuGet.Config'

@@ -2,7 +2,7 @@ packaging/bin/
 packaging/obj/
 src/**/bin/
 src/**/obj/
-tests/generator/bin/
-tests/generator/obj/
+tests/generator/**/bin/
+tests/generator/**/obj/
 artifacts/
 __pycache__/

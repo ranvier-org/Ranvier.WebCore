@@ -4,8 +4,12 @@ if (ENABLE_WEBCORE)
     set(RanvierWebCoreHost_SOURCES
         RanvierAbi/RanvierWebCoreAbi.cpp
         RanvierAbi/RanvierWebCoreDom.cpp
+        RanvierAbi/RanvierWebCoreUia.cpp
     )
     set(RanvierWebCoreHost_LIBRARIES ${TestWebCore_LIBRARIES})
+    if (WIN32)
+        list(APPEND RanvierWebCoreHost_LIBRARIES Uiautomationcore Ole32 OleAut32 Comctl32)
+    endif ()
     list(REMOVE_ITEM RanvierWebCoreHost_LIBRARIES WebKit::gtest)
     list(REMOVE_ITEM RanvierWebCoreHost_LIBRARIES WebKit::WebCoreTestSupport)
     set(RanvierWebCoreHost_FRAMEWORKS ${TestWebCore_FRAMEWORKS})

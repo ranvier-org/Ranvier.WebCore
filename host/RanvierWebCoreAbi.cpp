@@ -1078,7 +1078,7 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 20; }
+int32_t rv_abi_version(void) { return 21; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1092,6 +1092,10 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+#if defined(_WIN32)
+    if (!std::strcmp(feature, "accessibility-uia"))
+        return 1;
+#endif
     for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text" }) {
         if (!std::strcmp(feature, name))
             return 1;
@@ -1195,6 +1199,7 @@ void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread())
         return;
+    rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
     rv_host_set_accessibility(host, 0, nullptr, nullptr);
@@ -4538,6 +4543,23 @@ static int32_t textStatus(RvAxNode* handle, std::optional<SimpleRange>& scope)
         return status;
     scope = textScope(*axObject(handle));
     return scope ? RV_OK : RV_ERR_UNSUPPORTED;
+}
+
+int32_t rv_ax_text_child_range(RvAxNode* ancestor, RvAxNode* child, int32_t* start, int32_t* end)
+{
+    if (!start || !end)
+        return RV_ERR_NULL_ARGUMENT;
+    std::optional<SimpleRange> parentScope, childScope;
+    if (auto result = textStatus(ancestor, parentScope))
+        return result;
+    if (auto result = textStatus(child, childScope))
+        return result;
+    std::optional<BoundaryPoint> first { childScope->start }, last { childScope->end };
+    if (!inScope(*parentScope, first) || !inScope(*parentScope, last))
+        return RV_ERR_UNSUPPORTED;
+    *start = textOffset(*parentScope, first);
+    *end = textOffset(*parentScope, last);
+    return RV_OK;
 }
 
 // The text of the scope, with a password field's characters masked.

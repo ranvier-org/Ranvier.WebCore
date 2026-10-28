@@ -48,19 +48,23 @@ class PackageContract(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             packages = pathlib.Path(temporary)
             with self.assertRaises(FileNotFoundError):
-                PACKAGING.validate_runtimes(packages, '0.1.0-preview.6')
+                PACKAGING.validate_runtimes(packages, '0.1.0-preview.6', (21, 'pinned', 'same'))
             for rid in RIDS:
                 path = packages / f'Ranvier.WebCore.Native.{rid}.0.1.0-preview.6.nupkg'
                 manifest = dict(rid=rid, version='0.1.0-preview.6', flavor='slim', abi=21,
                                 webkit='pinned', source=dict(commit='same', dirty=False))
                 with zipfile.ZipFile(path, 'w') as archive:
                     archive.writestr('manifest.json', json.dumps(manifest))
-            self.assertEqual(PACKAGING.validate_runtimes(packages, '0.1.0-preview.6'), 21)
+            self.assertEqual(PACKAGING.validate_runtimes(packages, '0.1.0-preview.6', (21, 'pinned', 'same')), 21)
+            with self.assertRaisesRegex(ValueError, 'checkout identity'):
+                PACKAGING.validate_runtimes(packages, '0.1.0-preview.6', (22, 'pinned', 'same'))
+            with self.assertRaisesRegex(ValueError, 'checkout identity'):
+                PACKAGING.validate_runtimes(packages, '0.1.0-preview.6', (21, 'pinned', 'new-checkout'))
             manifest['source']['commit'] = 'different'
             with zipfile.ZipFile(path, 'w') as archive:
                 archive.writestr('manifest.json', json.dumps(manifest))
             with self.assertRaisesRegex(ValueError, 'one ABI'):
-                PACKAGING.validate_runtimes(packages, '0.1.0-preview.6')
+                PACKAGING.validate_runtimes(packages, '0.1.0-preview.6', (21, 'pinned', 'same'))
 
 
 if __name__ == '__main__':

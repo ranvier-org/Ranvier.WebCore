@@ -27,10 +27,12 @@
 
 #include <stdint.h>
 
+#ifndef RV_EXPORT
 #if defined(_WIN32)
 #define RV_EXPORT __declspec(dllexport)
 #else
 #define RV_EXPORT __attribute__((visibility("default")))
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -1029,6 +1031,15 @@ typedef void (*RvAxCallback)(void* context, RvAxNode* node, int32_t event);
  * functions below that start from the host return NULL. Returns RV_ERR_UNSUPPORTED when WebCore made no
  * accessibility cache for the host's document. */
 RV_EXPORT int32_t rv_host_set_accessibility(RvHost*, int32_t enabled, RvAxCallback callback, void* context);
+
+/* Windows UI Automation bridge ("accessibility-uia"). Attach on the host/window owner thread after the
+ * HWND is fully initialized. The bridge owns the accessibility callback until detached, so do not replace
+ * it with rv_host_set_accessibility while attached. One attachment per host and HWND. The window's message
+ * loop must keep pumping while UI Automation clients query it. No managed COM interop is required.
+ * Detach on the same thread, before destroying either the host or HWND; it is idempotent. Outstanding UIA
+ * references become unavailable. rv_host_destroy also detaches. Non-Windows builds return UNSUPPORTED. */
+RV_EXPORT int32_t rv_host_attach_uia(RvHost*, void* hwnd);
+RV_EXPORT int32_t rv_host_detach_uia(RvHost*);
 /* The root of the host's tree, of role RV_ROLE_DOCUMENT, with layout and the tree updated first; NULL while
  * accessibility is off. */
 RV_EXPORT RvAxNode* rv_host_ax_root(RvHost*);
@@ -1114,6 +1125,11 @@ RV_EXPORT int32_t rv_ax_text_rects(RvAxNode*, int32_t start, int32_t end, double
 /* The offset in the node's text nearest x, y CSS pixels of the viewport, or -1 when that point's text lies outside
  * the node. */
 RV_EXPORT int32_t rv_ax_text_offset_at(RvAxNode*, int32_t x, int32_t y);
+
+/* The descendant's text range in ancestor's UTF-16 text coordinates, for UIA RangeFromChild. Returns
+ * UNSUPPORTED when child is outside ancestor's text scope. A text field's inner-editor value does not
+ * appear in its ancestor's plain text: its position there can therefore be an empty range. */
+RV_EXPORT int32_t rv_ax_text_child_range(RvAxNode* ancestor, RvAxNode* child, int32_t* start, int32_t* end);
 
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
