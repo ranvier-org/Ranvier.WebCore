@@ -5,6 +5,7 @@ if (ENABLE_WEBCORE)
         RanvierAbi/RanvierWebCoreAbi.cpp
         RanvierAbi/RanvierWebCoreDom.cpp
         RanvierAbi/RanvierWebCoreUia.cpp
+        RanvierAbi/RanvierWebCoreD3D11.cpp
     )
     set(RanvierWebCoreHost_LIBRARIES ${TestWebCore_LIBRARIES})
     if (WIN32)
@@ -24,6 +25,9 @@ if (ENABLE_WEBCORE)
     if (USE_GRAPHICS_LAYER_TEXTURE_MAPPER AND NOT USE_GPU_STUB)
         list(APPEND RanvierWebCoreHost_DEFINITIONS RANVIER_COMPOSITING=1)
         list(APPEND RanvierWebCoreHost_LIBRARIES ANGLE::GLES)
+        if (WIN32)
+            list(APPEND RanvierWebCoreHost_LIBRARIES ANGLE::EGL d3d11 dxgi)
+        endif ()
     endif ()
 
     add_library(RanvierWebCoreHost SHARED "${CMAKE_BINARY_DIR}/cmakeconfig.h")

@@ -44,6 +44,7 @@ typedef struct RvNode RvNode;
 typedef struct RvListener RvListener;
 typedef struct RvEvent RvEvent;
 typedef struct RvWatch RvWatch;
+typedef struct RvGpuFrame RvGpuFrame;
 
 /* Returns 0 on success. Any other value marks the listener as failed: the dispatch continues with the
  * remaining listeners, and the dispatching call returns RV_ERR_LISTENER_FAILED. */
@@ -159,6 +160,27 @@ enum {
  * create a GL context. RV_COMPOSITING_WHEN_NEEDED creates the context on the first composited frame; if that
  * fails, the host switches to RV_COMPOSITING_OFF and paints that frame on the CPU. */
 RV_EXPORT int32_t rv_host_set_accelerated_compositing(RvHost*, int32_t mode);
+
+enum { RV_GPU_RGBA8_PREMULTIPLIED = 1 };
+/* Acquires a Windows D3D11 frame without CPU pixel readback. Call rv_host_update before acquire, as before
+ * CPU paint, to advance animations and update compositing layers. consumerDevice is a live ID3D11Device*
+ * (for SDL, SDL_PROP_RENDERER_D3D11_DEVICE_POINTER). Requires compositing enabled, scale 1 and a GPU build;
+ * otherwise returns RV_ERR_UNSUPPORTED so the caller can paint with rv_host_paint_rgba. An outstanding
+ * frame on the same surface also returns RV_ERR_UNSUPPORTED immediately. Other GPU waits are bounded.
+ * Writes NULL to *frame on failure. The frame owns its resources independently of host/renderer/window;
+ * it remains valid over resize or rv_host_destroy and must be released on the owner thread. */
+RV_EXPORT int32_t rv_host_acquire_d3d11_frame(RvHost*, void* consumerDevice, RvGpuFrame** frame);
+/* Returns a borrowed ID3D11Texture2D*, physical dimensions and RV_GPU_RGBA8_PREMULTIPLIED. Row 0 is the
+ * top of the page; channels are sRGB bytes with premultiplied alpha. SDL imports this pointer with
+ * SDL_PROP_TEXTURE_CREATE_D3D11_TEXTURE_POINTER and uses SDL_BLENDMODE_BLEND_PREMULTIPLIED (or NONE for
+ * an opaque final image). The texture is consumer-locked until release. Do not update or retain it for
+ * GPU use after frame release. SDL may retain its COM reference, but must destroy its wrapper before
+ * presenting a different resource. All arguments are required and calls use the host owner thread. */
+RV_EXPORT int32_t rv_gpu_frame_info(RvGpuFrame*, void** texture, int32_t* width, int32_t* height, int32_t* format);
+/* Before release, flush the SDL draw batch (SDL_FlushRenderer) or SDL_RenderPresent. Release flushes
+ * the consumer immediate context, returns the keyed mutex to the producer and frees this frame handle.
+ * The SDL wrapper and all frame handles must be disposed before unloading their native DLLs. */
+RV_EXPORT int32_t rv_gpu_frame_release(RvGpuFrame*);
 
 /* Registers a WebCore EventListener on target that calls callback(context, event). Returns NULL on a
  * NULL argument or the wrong thread. */
@@ -320,7 +342,8 @@ RV_EXPORT int32_t rv_resource_load_fail(RvResourceLoad*);
  * (rv_host_mouse, rv_host_wheel, rv_host_key, rv_host_set_focused), "frame" (rv_host_set_frame_callback,
  * rv_host_update, rv_host_dirty_rect) and "event-details" (rv_event_number, rv_event_string,
  * rv_event_related_target). "compositing" is 1 when rv_host_set_accelerated_compositing can composite: the
- * library was built with the GPU code. */
+ * library was built with the GPU code. "presentation-d3d11" is 1 for the Windows shared-texture frame
+ * API; successful acquisition additionally depends on the actual GPU, consumer device and scale. */
 RV_EXPORT int32_t rv_abi_has(const char* feature);
 
 /* Sets the viewport to width by height CSS pixels, as rv_host_create does. Input coordinates and dirty
