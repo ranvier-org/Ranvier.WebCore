@@ -490,6 +490,9 @@ static Ref<Page> createPage(IntSize viewportSize)
     page->settings().setAcceleratedCompositingEnabled(false);
     page->settings().setLoadsImagesAutomatically(true);
     page->settings().setDataListElementEnabled(true);
+    page->settings().setDownloadAttributeEnabled(true);
+    page->settings().setCSSFontFaceMetricOverrideDescriptorsEnabled(true);
+    page->settings().setCSSAnchorPositioningEnabled(true);
 #if ENABLE(VIDEO)
     page->settings().setMediaEnabled(false);
 #endif

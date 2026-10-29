@@ -74,6 +74,10 @@ Linux both halves link into the same library. A call costs one extra direct call
 `rv_dom_html_input_element_set_selection_range`. Attributes take `get_` and `set_`; operations take their own
 name.
 
+Dashed CSS descriptor aliases append `_css` to their native attribute name, so `fontFamily` and
+`font-family` have distinct exports. Both call WebCore's camel-case descriptor accessor. The shared
+F# contract quotes names such as ``font-family`` with double backticks.
+
 - The `dom` prefix keeps the generated names apart from the hand-written ones, such as
   `rv_element_get_attribute`.
 - A member comes from the interface that declares it, including its partial interfaces and included mixins:
@@ -215,6 +219,21 @@ SVGElement and MathMLElement expose their shared inline styles, dataset, nonce, 
 focus operations through their actual engine types. Interface-level build and setting guards apply to
 their own members and included mixins; unavailable operations keep their ABI and return `RV_ERR_UNSUPPORTED`.
 
+Area elements expose semantic reflection, URL components and live relation tokens. The host enables
+download-attribute reflection; this does not provide a navigation or download handler. Area `ping` is
+excluded like the anchor equivalent.
+
+Stylesheet discovery and rule editing include style/link elements, sheets, rule lists, media lists,
+conditional/grouping rules, layers, scopes, imports, namespaces, nested declarations, keyframes, font
+descriptors, counter styles, position fallbacks, starting styles and view-transition rule metadata.
+Rule and descriptor setting guards use their owning stylesheet's document, or its constructor document
+for constructed sheets; a detached object without either returns `RV_ERR_UNSUPPORTED` for gated members.
+The host enables the existing anchor-positioning and font-metric descriptor settings. CSS generator
+fixtures under `css/scripts/test/` are excluded from runtime partial interfaces.
+
+Sheet constructors, asynchronous replacement and adopted-sheet lists still need their native bridges;
+these exports do not claim those operations, layout parity or cross-platform conformance is complete.
+
 `gen/dom-report.txt` records the generated interface/function counts, handle types, constants, enumerations,
 dictionary structs and every member left out, by reason:
 
@@ -223,7 +242,7 @@ dictionary structs and every member left out, by reason:
   `[Custom]` bindings and `[EnabledForWorld]` extensions.
 - **Not mapped yet:** dictionary results and dictionaries with unmapped members, `any`, `object`,
   `Date`, callbacks, enumeration arguments of operations, and interfaces outside the scope (
-  `DOMRectList`, `StyleSheetList`, ...).
+  `DOMRectList`, ...).
 - **By `gen/dom.json`'s `exclude`:** browser features the patches cut or a UI does not use: cookies,
   navigation, `document.write`, fullscreen, pointer lock, form submission, legacy colours.
 

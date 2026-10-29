@@ -20,9 +20,6 @@ type internal DomDictionaryAttribute() =
 [<AllowNullLiteral>]
 type StylePropertyMapReadOnly = interface end
 
-/// <summary>StyleSheet in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] StyleSheet = interface end
-
 /// <summary>SVGTextContentElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGTextContentElement =
     inherit SVGGraphicsElement
@@ -195,6 +192,8 @@ and [<AllowNullLiteral>] ShadowRoot =
     abstract member elementFromPoint: x: float * y: float -> Element
     /// <summary>ShadowRoot.elementsFromPoint.</summary>
     abstract member elementsFromPoint: x: float * y: float -> (Element) array
+    /// <summary>ShadowRoot.styleSheets.</summary>
+    abstract member styleSheets: StyleSheetList with get
     /// <summary>ShadowRoot.fullscreenElement.</summary>
     abstract member fullscreenElement: Element with get
     /// <summary>ShadowRoot.pointerLockElement.</summary>
@@ -333,6 +332,8 @@ and [<AllowNullLiteral>] Document =
     abstract member elementFromPoint: x: float * y: float -> Element
     /// <summary>Document.elementsFromPoint.</summary>
     abstract member elementsFromPoint: x: float * y: float -> (Element) array
+    /// <summary>Document.styleSheets.</summary>
+    abstract member styleSheets: StyleSheetList with get
 
 /// <summary>HTMLDocument in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLDocument =
@@ -659,6 +660,47 @@ and [<AllowNullLiteral>] HTMLAnchorElement =
     /// <summary>HTMLAnchorElement.search.</summary>
     abstract member search: string with get, set
     /// <summary>HTMLAnchorElement.hash.</summary>
+    abstract member hash: string with get, set
+
+/// <summary>HTMLAreaElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLAreaElement =
+    inherit HTMLElement
+    inherit HTMLHyperlinkElementUtils
+    /// <summary>HTMLAreaElement.alt.</summary>
+    abstract member alt: string with get, set
+    /// <summary>HTMLAreaElement.coords.</summary>
+    abstract member coords: string with get, set
+    /// <summary>HTMLAreaElement.noHref.</summary>
+    abstract member noHref: bool with get, set
+    /// <summary>HTMLAreaElement.rel.</summary>
+    abstract member rel: string with get, set
+    /// <summary>HTMLAreaElement.shape.</summary>
+    abstract member shape: string with get, set
+    /// <summary>HTMLAreaElement.download.</summary>
+    abstract member download: string with get, set
+    /// <summary>HTMLAreaElement.referrerPolicy.</summary>
+    abstract member referrerPolicy: string with get, set
+    /// <summary>HTMLAreaElement.relList.</summary>
+    abstract member relList: DOMTokenList with get
+    /// <summary>HTMLAreaElement.origin.</summary>
+    abstract member origin: string with get
+    /// <summary>HTMLAreaElement.protocol.</summary>
+    abstract member protocol: string with get, set
+    /// <summary>HTMLAreaElement.username.</summary>
+    abstract member username: string with get, set
+    /// <summary>HTMLAreaElement.password.</summary>
+    abstract member password: string with get, set
+    /// <summary>HTMLAreaElement.host.</summary>
+    abstract member host: string with get, set
+    /// <summary>HTMLAreaElement.hostname.</summary>
+    abstract member hostname: string with get, set
+    /// <summary>HTMLAreaElement.port.</summary>
+    abstract member port: string with get, set
+    /// <summary>HTMLAreaElement.pathname.</summary>
+    abstract member pathname: string with get, set
+    /// <summary>HTMLAreaElement.search.</summary>
+    abstract member search: string with get, set
+    /// <summary>HTMLAreaElement.hash.</summary>
     abstract member hash: string with get, set
 
 /// <summary>HTMLBodyElement in the scoped DOM interface model.</summary>
@@ -1697,10 +1739,551 @@ and [<AllowNullLiteral>] MathMLElement =
     inherit HTMLOrSVGElement
     inherit ElementCSSInlineStyle
 
+/// <summary>HTMLStyleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLStyleElement =
+    inherit HTMLElement
+    inherit LinkStyle
+    /// <summary>HTMLStyleElement.disabled.</summary>
+    abstract member disabled: bool with get, set
+    /// <summary>HTMLStyleElement.media.</summary>
+    abstract member media: string with get, set
+    /// <summary>HTMLStyleElement.type.</summary>
+    abstract member ``type``: string with get, set
+    /// <summary>HTMLStyleElement.blocking.</summary>
+    abstract member blocking: DOMTokenList with get
+
+/// <summary>HTMLLinkElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLLinkElement =
+    inherit HTMLElement
+    inherit LinkStyle
+    /// <summary>HTMLLinkElement.href.</summary>
+    abstract member href: string with get, set
+    /// <summary>HTMLLinkElement.crossOrigin.</summary>
+    abstract member crossOrigin: string with get, set
+    /// <summary>HTMLLinkElement.rel.</summary>
+    abstract member rel: string with get, set
+    /// <summary>HTMLLinkElement.as.</summary>
+    abstract member ``as``: string with get, set
+    /// <summary>HTMLLinkElement.relList.</summary>
+    abstract member relList: DOMTokenList with get
+    /// <summary>HTMLLinkElement.media.</summary>
+    abstract member media: string with get, set
+    /// <summary>HTMLLinkElement.integrity.</summary>
+    abstract member integrity: string with get, set
+    /// <summary>HTMLLinkElement.hreflang.</summary>
+    abstract member hreflang: string with get, set
+    /// <summary>HTMLLinkElement.type.</summary>
+    abstract member ``type``: string with get, set
+    /// <summary>HTMLLinkElement.sizes.</summary>
+    abstract member sizes: DOMTokenList with get
+    /// <summary>HTMLLinkElement.imageSrcset.</summary>
+    abstract member imageSrcset: string with get, set
+    /// <summary>HTMLLinkElement.imageSizes.</summary>
+    abstract member imageSizes: string with get, set
+    /// <summary>HTMLLinkElement.referrerPolicy.</summary>
+    abstract member referrerPolicy: string with get, set
+    /// <summary>HTMLLinkElement.blocking.</summary>
+    abstract member blocking: DOMTokenList with get
+    /// <summary>HTMLLinkElement.disabled.</summary>
+    abstract member disabled: bool with get, set
+    /// <summary>HTMLLinkElement.fetchPriority.</summary>
+    abstract member fetchPriority: string with get, set
+    /// <summary>HTMLLinkElement.charset.</summary>
+    abstract member charset: string with get, set
+    /// <summary>HTMLLinkElement.rev.</summary>
+    abstract member rev: string with get, set
+    /// <summary>HTMLLinkElement.target.</summary>
+    abstract member target: string with get, set
+
+/// <summary>StyleSheet in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] StyleSheet =
+    /// <summary>StyleSheet.type.</summary>
+    abstract member ``type``: string with get
+    /// <summary>StyleSheet.href.</summary>
+    abstract member href: string with get
+    /// <summary>StyleSheet.ownerNode.</summary>
+    abstract member ownerNode: Node with get
+    /// <summary>StyleSheet.parentStyleSheet.</summary>
+    abstract member parentStyleSheet: StyleSheet with get
+    /// <summary>StyleSheet.title.</summary>
+    abstract member title: string with get
+    /// <summary>StyleSheet.media.</summary>
+    abstract member media: MediaList with get
+    /// <summary>StyleSheet.disabled.</summary>
+    abstract member disabled: bool with get, set
+
+/// <summary>StyleSheetList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] StyleSheetList =
+    /// <summary>StyleSheetList.item.</summary>
+    abstract member item: index: uint32 -> StyleSheet
+    /// <summary>StyleSheetList.length.</summary>
+    abstract member length: uint32 with get
+
+    /// <summary>StyleSheetList.namedItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1]")>]
+#endif
+    abstract member namedItem: name: string -> CSSStyleSheet
+
+
+/// <summary>CSSStyleSheet in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSStyleSheet =
+    inherit StyleSheet
+    /// <summary>CSSStyleSheet.ownerRule.</summary>
+    abstract member ownerRule: CSSRule with get
+    /// <summary>CSSStyleSheet.cssRules.</summary>
+    abstract member cssRules: CSSRuleList with get
+    /// <summary>CSSStyleSheet.insertRule.</summary>
+    abstract member insertRule: rule: string * ?index: uint32 -> uint32
+    /// <summary>CSSStyleSheet.deleteRule.</summary>
+    abstract member deleteRule: index: uint32 -> unit
+    /// <summary>CSSStyleSheet.replaceSync.</summary>
+    abstract member replaceSync: text: string -> unit
+    /// <summary>CSSStyleSheet.rules.</summary>
+    abstract member rules: CSSRuleList with get
+    /// <summary>CSSStyleSheet.addRule.</summary>
+    abstract member addRule: ?selector: string * ?style: string * ?index: uint32 -> int
+    /// <summary>CSSStyleSheet.removeRule.</summary>
+    abstract member removeRule: ?index: uint32 -> unit
+
+/// <summary>MediaList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MediaList =
+    /// <summary>MediaList.mediaText.</summary>
+    abstract member mediaText: string with get, set
+    /// <summary>MediaList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>MediaList.item.</summary>
+    abstract member item: index: uint32 -> string
+    /// <summary>MediaList.deleteMedium.</summary>
+    abstract member deleteMedium: oldMedium: string -> unit
+    /// <summary>MediaList.appendMedium.</summary>
+    abstract member appendMedium: newMedium: string -> unit
+
+/// <summary>CSSRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSRule =
+    /// <summary>CSSRule.cssText.</summary>
+    abstract member cssText: string with get, set
+    /// <summary>CSSRule.parentRule.</summary>
+    abstract member parentRule: CSSRule with get
+    /// <summary>CSSRule.parentStyleSheet.</summary>
+    abstract member parentStyleSheet: CSSStyleSheet with get
+    /// <summary>CSSRule.type.</summary>
+    abstract member ``type``: uint16 with get
+
+/// <summary>CSSRuleList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSRuleList =
+    /// <summary>CSSRuleList.item.</summary>
+    abstract member item: index: uint32 -> CSSRule
+    /// <summary>CSSRuleList.length.</summary>
+    abstract member length: uint32 with get
+
+/// <summary>CSSStyleRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSStyleRule =
+    inherit CSSRule
+    /// <summary>CSSStyleRule.selectorText.</summary>
+    abstract member selectorText: string with get, set
+    /// <summary>CSSStyleRule.style.</summary>
+    abstract member style: CSSStyleProperties with get
+    /// <summary>CSSStyleRule.cssRules.</summary>
+    abstract member cssRules: CSSRuleList with get
+    /// <summary>CSSStyleRule.insertRule.</summary>
+    abstract member insertRule: rule: string * ?index: uint32 -> uint32
+    /// <summary>CSSStyleRule.deleteRule.</summary>
+    abstract member deleteRule: index: uint32 -> unit
+
+/// <summary>CSSStyleProperties in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSStyleProperties =
+    inherit CSSStyleDeclaration
+    /// <summary>CSSStyleProperties.cssFloat.</summary>
+    abstract member cssFloat: string with get, set
+
+/// <summary>CSSGroupingRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSGroupingRule =
+    inherit CSSRule
+    /// <summary>CSSGroupingRule.cssRules.</summary>
+    abstract member cssRules: CSSRuleList with get
+    /// <summary>CSSGroupingRule.insertRule.</summary>
+    abstract member insertRule: rule: string * ?index: uint32 -> uint32
+    /// <summary>CSSGroupingRule.deleteRule.</summary>
+    abstract member deleteRule: index: uint32 -> unit
+
+/// <summary>CSSConditionRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSConditionRule =
+    inherit CSSGroupingRule
+    /// <summary>CSSConditionRule.conditionText.</summary>
+    abstract member conditionText: string with get
+
+/// <summary>CSSMediaRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSMediaRule =
+    inherit CSSConditionRule
+    /// <summary>CSSMediaRule.media.</summary>
+    abstract member media: MediaList with get
+
+/// <summary>CSSSupportsRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSSupportsRule =
+    inherit CSSConditionRule
+
+/// <summary>CSSContainerRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSContainerRule =
+    inherit CSSConditionRule
+    /// <summary>CSSContainerRule.containerName.</summary>
+    abstract member containerName: string with get
+    /// <summary>CSSContainerRule.containerQuery.</summary>
+    abstract member containerQuery: string with get
+
+/// <summary>CSSLayerBlockRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSLayerBlockRule =
+    inherit CSSGroupingRule
+    /// <summary>CSSLayerBlockRule.name.</summary>
+    abstract member name: string with get
+
+/// <summary>CSSLayerStatementRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSLayerStatementRule =
+    inherit CSSRule
+    /// <summary>CSSLayerStatementRule.nameList.</summary>
+    abstract member nameList: (string) array with get
+
+/// <summary>CSSScopeRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSScopeRule =
+    inherit CSSGroupingRule
+    /// <summary>CSSScopeRule.start.</summary>
+    abstract member start: string with get
+    /// <summary>CSSScopeRule.end.</summary>
+    abstract member ``end``: string with get
+
+/// <summary>CSSNestedDeclarations in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSNestedDeclarations =
+    inherit CSSRule
+    /// <summary>CSSNestedDeclarations.style.</summary>
+    abstract member style: CSSStyleProperties with get
+
+/// <summary>CSSImportRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSImportRule =
+    inherit CSSRule
+    /// <summary>CSSImportRule.href.</summary>
+    abstract member href: string with get
+    /// <summary>CSSImportRule.media.</summary>
+    abstract member media: MediaList with get
+    /// <summary>CSSImportRule.styleSheet.</summary>
+    abstract member styleSheet: CSSStyleSheet with get
+    /// <summary>CSSImportRule.layerName.</summary>
+    abstract member layerName: string with get
+    /// <summary>CSSImportRule.supportsText.</summary>
+    abstract member supportsText: string with get
+
+/// <summary>CSSNamespaceRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSNamespaceRule =
+    inherit CSSRule
+    /// <summary>CSSNamespaceRule.namespaceURI.</summary>
+    abstract member namespaceURI: string with get
+    /// <summary>CSSNamespaceRule.prefix.</summary>
+    abstract member prefix: string with get
+
+/// <summary>CSSKeyframesRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSKeyframesRule =
+    inherit CSSRule
+    /// <summary>CSSKeyframesRule.name.</summary>
+    abstract member name: string with get, set
+    /// <summary>CSSKeyframesRule.cssRules.</summary>
+    abstract member cssRules: CSSRuleList with get
+    /// <summary>CSSKeyframesRule.length.</summary>
+    abstract member length: uint32 with get
+
+    /// <summary>CSSKeyframesRule.item.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1]")>]
+#endif
+    abstract member item: index: uint32 -> CSSKeyframeRule
+
+    /// <summary>CSSKeyframesRule.appendRule.</summary>
+    abstract member appendRule: rule: string -> unit
+    /// <summary>CSSKeyframesRule.deleteRule.</summary>
+    abstract member deleteRule: key: string -> unit
+    /// <summary>CSSKeyframesRule.findRule.</summary>
+    abstract member findRule: key: string -> CSSKeyframeRule
+
+/// <summary>CSSKeyframeRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSKeyframeRule =
+    inherit CSSRule
+    /// <summary>CSSKeyframeRule.keyText.</summary>
+    abstract member keyText: string with get, set
+    /// <summary>CSSKeyframeRule.style.</summary>
+    abstract member style: CSSStyleProperties with get
+
+/// <summary>CSSFontFaceRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSFontFaceRule =
+    inherit CSSRule
+    /// <summary>CSSFontFaceRule.style.</summary>
+    abstract member style: CSSFontFaceDescriptors with get
+
+/// <summary>CSSFontFaceDescriptors in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSFontFaceDescriptors =
+    inherit CSSStyleDeclaration
+    /// <summary>CSSFontFaceDescriptors.src.</summary>
+    abstract member src: string with get, set
+    /// <summary>CSSFontFaceDescriptors.fontFamily.</summary>
+    abstract member fontFamily: string with get, set
+    /// <summary>CSSFontFaceDescriptors.font-family.</summary>
+    abstract member ``font-family``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.fontStyle.</summary>
+    abstract member fontStyle: string with get, set
+    /// <summary>CSSFontFaceDescriptors.font-style.</summary>
+    abstract member ``font-style``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.fontWeight.</summary>
+    abstract member fontWeight: string with get, set
+    /// <summary>CSSFontFaceDescriptors.font-weight.</summary>
+    abstract member ``font-weight``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.fontStretch.</summary>
+    abstract member fontStretch: string with get, set
+    /// <summary>CSSFontFaceDescriptors.font-stretch.</summary>
+    abstract member ``font-stretch``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.fontWidth.</summary>
+    abstract member fontWidth: string with get, set
+    /// <summary>CSSFontFaceDescriptors.font-width.</summary>
+    abstract member ``font-width``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.sizeAdjust.</summary>
+    abstract member sizeAdjust: string with get, set
+    /// <summary>CSSFontFaceDescriptors.size-adjust.</summary>
+    abstract member ``size-adjust``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.unicodeRange.</summary>
+    abstract member unicodeRange: string with get, set
+    /// <summary>CSSFontFaceDescriptors.unicode-range.</summary>
+    abstract member ``unicode-range``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.fontFeatureSettings.</summary>
+    abstract member fontFeatureSettings: string with get, set
+    /// <summary>CSSFontFaceDescriptors.font-feature-settings.</summary>
+    abstract member ``font-feature-settings``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.fontDisplay.</summary>
+    abstract member fontDisplay: string with get, set
+    /// <summary>CSSFontFaceDescriptors.font-display.</summary>
+    abstract member ``font-display``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.ascentOverride.</summary>
+    abstract member ascentOverride: string with get, set
+    /// <summary>CSSFontFaceDescriptors.ascent-override.</summary>
+    abstract member ``ascent-override``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.descentOverride.</summary>
+    abstract member descentOverride: string with get, set
+    /// <summary>CSSFontFaceDescriptors.descent-override.</summary>
+    abstract member ``descent-override``: string with get, set
+    /// <summary>CSSFontFaceDescriptors.lineGapOverride.</summary>
+    abstract member lineGapOverride: string with get, set
+    /// <summary>CSSFontFaceDescriptors.line-gap-override.</summary>
+    abstract member ``line-gap-override``: string with get, set
+
+/// <summary>CSSFontFeatureValuesRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSFontFeatureValuesRule =
+    inherit CSSRule
+    /// <summary>CSSFontFeatureValuesRule.fontFamily.</summary>
+    abstract member fontFamily: string with get, set
+
+/// <summary>CSSFontPaletteValuesRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSFontPaletteValuesRule =
+    inherit CSSRule
+    /// <summary>CSSFontPaletteValuesRule.name.</summary>
+    abstract member name: string with get
+    /// <summary>CSSFontPaletteValuesRule.fontFamily.</summary>
+    abstract member fontFamily: string with get
+    /// <summary>CSSFontPaletteValuesRule.basePalette.</summary>
+    abstract member basePalette: string with get
+    /// <summary>CSSFontPaletteValuesRule.overrideColors.</summary>
+    abstract member overrideColors: string with get
+
+/// <summary>CSSCounterStyleRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSCounterStyleRule =
+    inherit CSSRule
+    /// <summary>CSSCounterStyleRule.name.</summary>
+    abstract member name: string with get, set
+    /// <summary>CSSCounterStyleRule.system.</summary>
+    abstract member system: string with get, set
+    /// <summary>CSSCounterStyleRule.symbols.</summary>
+    abstract member symbols: string with get, set
+    /// <summary>CSSCounterStyleRule.additiveSymbols.</summary>
+    abstract member additiveSymbols: string with get, set
+    /// <summary>CSSCounterStyleRule.negative.</summary>
+    abstract member negative: string with get, set
+    /// <summary>CSSCounterStyleRule.prefix.</summary>
+    abstract member prefix: string with get, set
+    /// <summary>CSSCounterStyleRule.suffix.</summary>
+    abstract member suffix: string with get, set
+    /// <summary>CSSCounterStyleRule.range.</summary>
+    abstract member range: string with get, set
+    /// <summary>CSSCounterStyleRule.pad.</summary>
+    abstract member pad: string with get, set
+    /// <summary>CSSCounterStyleRule.speakAs.</summary>
+    abstract member speakAs: string with get, set
+    /// <summary>CSSCounterStyleRule.fallback.</summary>
+    abstract member fallback: string with get, set
+
+/// <summary>CSSPositionTryRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSPositionTryRule =
+    inherit CSSRule
+    /// <summary>CSSPositionTryRule.name.</summary>
+    abstract member name: string with get
+    /// <summary>CSSPositionTryRule.style.</summary>
+    abstract member style: CSSPositionTryDescriptors with get
+
+/// <summary>CSSPositionTryDescriptors in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSPositionTryDescriptors =
+    inherit CSSStyleDeclaration
+    /// <summary>CSSPositionTryDescriptors.margin.</summary>
+    abstract member margin: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginTop.</summary>
+    abstract member marginTop: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginRight.</summary>
+    abstract member marginRight: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginBottom.</summary>
+    abstract member marginBottom: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginLeft.</summary>
+    abstract member marginLeft: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginBlock.</summary>
+    abstract member marginBlock: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginBlockStart.</summary>
+    abstract member marginBlockStart: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginBlockEnd.</summary>
+    abstract member marginBlockEnd: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginInline.</summary>
+    abstract member marginInline: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginInlineStart.</summary>
+    abstract member marginInlineStart: string with get, set
+    /// <summary>CSSPositionTryDescriptors.marginInlineEnd.</summary>
+    abstract member marginInlineEnd: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-top.</summary>
+    abstract member ``margin-top``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-right.</summary>
+    abstract member ``margin-right``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-bottom.</summary>
+    abstract member ``margin-bottom``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-left.</summary>
+    abstract member ``margin-left``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-block.</summary>
+    abstract member ``margin-block``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-block-start.</summary>
+    abstract member ``margin-block-start``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-block-end.</summary>
+    abstract member ``margin-block-end``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-inline.</summary>
+    abstract member ``margin-inline``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-inline-start.</summary>
+    abstract member ``margin-inline-start``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.margin-inline-end.</summary>
+    abstract member ``margin-inline-end``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.inset.</summary>
+    abstract member inset: string with get, set
+    /// <summary>CSSPositionTryDescriptors.insetBlock.</summary>
+    abstract member insetBlock: string with get, set
+    /// <summary>CSSPositionTryDescriptors.insetBlockStart.</summary>
+    abstract member insetBlockStart: string with get, set
+    /// <summary>CSSPositionTryDescriptors.insetBlockEnd.</summary>
+    abstract member insetBlockEnd: string with get, set
+    /// <summary>CSSPositionTryDescriptors.insetInline.</summary>
+    abstract member insetInline: string with get, set
+    /// <summary>CSSPositionTryDescriptors.insetInlineStart.</summary>
+    abstract member insetInlineStart: string with get, set
+    /// <summary>CSSPositionTryDescriptors.insetInlineEnd.</summary>
+    abstract member insetInlineEnd: string with get, set
+    /// <summary>CSSPositionTryDescriptors.top.</summary>
+    abstract member top: string with get, set
+    /// <summary>CSSPositionTryDescriptors.left.</summary>
+    abstract member left: string with get, set
+    /// <summary>CSSPositionTryDescriptors.right.</summary>
+    abstract member right: string with get, set
+    /// <summary>CSSPositionTryDescriptors.bottom.</summary>
+    abstract member bottom: string with get, set
+    /// <summary>CSSPositionTryDescriptors.inset-block.</summary>
+    abstract member ``inset-block``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.inset-block-start.</summary>
+    abstract member ``inset-block-start``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.inset-block-end.</summary>
+    abstract member ``inset-block-end``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.inset-inline.</summary>
+    abstract member ``inset-inline``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.inset-inline-start.</summary>
+    abstract member ``inset-inline-start``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.inset-inline-end.</summary>
+    abstract member ``inset-inline-end``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.width.</summary>
+    abstract member width: string with get, set
+    /// <summary>CSSPositionTryDescriptors.minWidth.</summary>
+    abstract member minWidth: string with get, set
+    /// <summary>CSSPositionTryDescriptors.maxWidth.</summary>
+    abstract member maxWidth: string with get, set
+    /// <summary>CSSPositionTryDescriptors.height.</summary>
+    abstract member height: string with get, set
+    /// <summary>CSSPositionTryDescriptors.minHeight.</summary>
+    abstract member minHeight: string with get, set
+    /// <summary>CSSPositionTryDescriptors.maxHeight.</summary>
+    abstract member maxHeight: string with get, set
+    /// <summary>CSSPositionTryDescriptors.blockSize.</summary>
+    abstract member blockSize: string with get, set
+    /// <summary>CSSPositionTryDescriptors.minBlockSize.</summary>
+    abstract member minBlockSize: string with get, set
+    /// <summary>CSSPositionTryDescriptors.maxBlockSize.</summary>
+    abstract member maxBlockSize: string with get, set
+    /// <summary>CSSPositionTryDescriptors.inlineSize.</summary>
+    abstract member inlineSize: string with get, set
+    /// <summary>CSSPositionTryDescriptors.minInlineSize.</summary>
+    abstract member minInlineSize: string with get, set
+    /// <summary>CSSPositionTryDescriptors.maxInlineSize.</summary>
+    abstract member maxInlineSize: string with get, set
+    /// <summary>CSSPositionTryDescriptors.min-width.</summary>
+    abstract member ``min-width``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.max-width.</summary>
+    abstract member ``max-width``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.min-height.</summary>
+    abstract member ``min-height``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.max-height.</summary>
+    abstract member ``max-height``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.block-size.</summary>
+    abstract member ``block-size``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.min-block-size.</summary>
+    abstract member ``min-block-size``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.max-block-size.</summary>
+    abstract member ``max-block-size``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.inline-size.</summary>
+    abstract member ``inline-size``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.min-inline-size.</summary>
+    abstract member ``min-inline-size``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.max-inline-size.</summary>
+    abstract member ``max-inline-size``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.placeSelf.</summary>
+    abstract member placeSelf: string with get, set
+    /// <summary>CSSPositionTryDescriptors.alignSelf.</summary>
+    abstract member alignSelf: string with get, set
+    /// <summary>CSSPositionTryDescriptors.justifySelf.</summary>
+    abstract member justifySelf: string with get, set
+    /// <summary>CSSPositionTryDescriptors.place-self.</summary>
+    abstract member ``place-self``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.align-self.</summary>
+    abstract member ``align-self``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.justify-self.</summary>
+    abstract member ``justify-self``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.positionAnchor.</summary>
+    abstract member positionAnchor: string with get, set
+    /// <summary>CSSPositionTryDescriptors.position-anchor.</summary>
+    abstract member ``position-anchor``: string with get, set
+    /// <summary>CSSPositionTryDescriptors.positionArea.</summary>
+    abstract member positionArea: string with get, set
+    /// <summary>CSSPositionTryDescriptors.position-area.</summary>
+    abstract member ``position-area``: string with get, set
+
+/// <summary>CSSStartingStyleRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSStartingStyleRule =
+    inherit CSSGroupingRule
+
+/// <summary>CSSViewTransitionRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSViewTransitionRule =
+    inherit CSSRule
+    /// <summary>CSSViewTransitionRule.navigation.</summary>
+    abstract member navigation: string with get
+    /// <summary>CSSViewTransitionRule.types.</summary>
+    abstract member types: (string) array with get
+
 /// <summary>CSSStyleDeclaration in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CSSStyleDeclaration =
     /// <summary>CSSStyleDeclaration.cssText.</summary>
     abstract member cssText: string with get, set
+    /// <summary>CSSStyleDeclaration.cssRules.</summary>
+    abstract member cssRules: CSSRuleList with get
     /// <summary>CSSStyleDeclaration.length.</summary>
     abstract member length: uint32 with get
     /// <summary>CSSStyleDeclaration.item.</summary>
@@ -1713,6 +2296,8 @@ and [<AllowNullLiteral>] CSSStyleDeclaration =
     abstract member setProperty: property: string * value: string * ?priority: string -> unit
     /// <summary>CSSStyleDeclaration.removeProperty.</summary>
     abstract member removeProperty: property: string -> string
+    /// <summary>CSSStyleDeclaration.parentRule.</summary>
+    abstract member parentRule: CSSRule with get
 
 /// <summary>DOMTokenList in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DOMTokenList =
@@ -2172,11 +2757,6 @@ and [<AllowNullLiteral>] CompositionEvent =
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
 
-/// <summary>HTMLAreaElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLAreaElement =
-    inherit HTMLElement
-    inherit HTMLHyperlinkElementUtils
-
 /// <summary>HTMLAttachmentElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLAttachmentElement =
     inherit HTMLElement
@@ -2205,11 +2785,6 @@ and [<AllowNullLiteral>] HTMLFrameSetElement =
 and [<AllowNullLiteral>] HTMLIFrameElement =
     inherit HTMLElement
 
-/// <summary>HTMLLinkElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLLinkElement =
-    inherit HTMLElement
-    inherit LinkStyle
-
 /// <summary>HTMLModelElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLModelElement =
     inherit HTMLElement
@@ -2221,11 +2796,6 @@ and [<AllowNullLiteral>] HTMLObjectElement =
 /// <summary>HTMLScriptElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLScriptElement =
     inherit HTMLElement
-
-/// <summary>HTMLStyleElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLStyleElement =
-    inherit HTMLElement
-    inherit LinkStyle
 
 /// <summary>HTMLTrackElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLTrackElement =
@@ -2499,14 +3069,6 @@ and [<AllowNullLiteral>] TransitionEvent =
 /// <summary>BeforeUnloadEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] BeforeUnloadEvent =
     inherit Event
-
-/// <summary>CSSStyleSheet in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] CSSStyleSheet =
-    inherit StyleSheet
-
-/// <summary>CSSStyleProperties in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] CSSStyleProperties =
-    inherit CSSStyleDeclaration
 
 /// <summary>CustomElementRegistry in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CustomElementRegistry = interface end
@@ -2833,7 +3395,9 @@ and [<AllowNullLiteral>] HTMLOrSVGElement =
     abstract member blur: unit -> unit
 
 /// <summary>LinkStyle in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] LinkStyle = interface end
+and [<AllowNullLiteral>] LinkStyle =
+    /// <summary>LinkStyle.sheet.</summary>
+    abstract member sheet: CSSStyleSheet with get
 
 /// <summary>PopoverTargetAttributes in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] PopoverTargetAttributes =

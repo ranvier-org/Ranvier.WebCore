@@ -29,6 +29,11 @@ extern "C" {
 
 typedef struct RvDOMImplementation RvDOMImplementation;
 typedef struct RvNamedNodeMap RvNamedNodeMap;
+typedef struct RvStyleSheet RvStyleSheet;
+typedef struct RvStyleSheetList RvStyleSheetList;
+typedef struct RvMediaList RvMediaList;
+typedef struct RvCSSRule RvCSSRule;
+typedef struct RvCSSRuleList RvCSSRuleList;
 typedef struct RvCSSStyleDeclaration RvCSSStyleDeclaration;
 typedef struct RvDOMTokenList RvDOMTokenList;
 typedef struct RvDOMStringMap RvDOMStringMap;
@@ -54,6 +59,7 @@ typedef struct RvDomUnionHTMLElementOrLongNullable RvDomUnionHTMLElementOrLongNu
 typedef struct RvDomSequenceNode RvDomSequenceNode;
 typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
 typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
+typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
@@ -78,6 +84,19 @@ enum {
     RV_DOM_NODE_DOCUMENT_POSITION_CONTAINS = 0x08, /* Node.DOCUMENT_POSITION_CONTAINS */
     RV_DOM_NODE_DOCUMENT_POSITION_CONTAINED_BY = 0x10, /* Node.DOCUMENT_POSITION_CONTAINED_BY */
     RV_DOM_NODE_DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 0x20, /* Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC */
+    RV_DOM_CSS_RULE_STYLE_RULE = 1, /* CSSRule.STYLE_RULE */
+    RV_DOM_CSS_RULE_CHARSET_RULE = 2, /* CSSRule.CHARSET_RULE */
+    RV_DOM_CSS_RULE_IMPORT_RULE = 3, /* CSSRule.IMPORT_RULE */
+    RV_DOM_CSS_RULE_MEDIA_RULE = 4, /* CSSRule.MEDIA_RULE */
+    RV_DOM_CSS_RULE_FONT_FACE_RULE = 5, /* CSSRule.FONT_FACE_RULE */
+    RV_DOM_CSS_RULE_PAGE_RULE = 6, /* CSSRule.PAGE_RULE */
+    RV_DOM_CSS_RULE_KEYFRAMES_RULE = 7, /* CSSRule.KEYFRAMES_RULE */
+    RV_DOM_CSS_RULE_KEYFRAME_RULE = 8, /* CSSRule.KEYFRAME_RULE */
+    RV_DOM_CSS_RULE_MARGIN_RULE = 9, /* CSSRule.MARGIN_RULE */
+    RV_DOM_CSS_RULE_NAMESPACE_RULE = 10, /* CSSRule.NAMESPACE_RULE */
+    RV_DOM_CSS_RULE_COUNTER_STYLE_RULE = 11, /* CSSRule.COUNTER_STYLE_RULE */
+    RV_DOM_CSS_RULE_SUPPORTS_RULE = 12, /* CSSRule.SUPPORTS_RULE */
+    RV_DOM_CSS_RULE_FONT_FEATURE_VALUES_RULE = 14, /* CSSRule.FONT_FEATURE_VALUES_RULE */
     RV_DOM_RANGE_START_TO_START = 0, /* Range.START_TO_START */
     RV_DOM_RANGE_START_TO_END = 1, /* Range.START_TO_END */
     RV_DOM_RANGE_END_TO_END = 2, /* Range.END_TO_END */
@@ -282,6 +301,7 @@ typedef struct RvDomUnionHTMLElementOrLongNullable RvDomUnionHTMLElementOrLongNu
 typedef struct RvDomSequenceNode RvDomSequenceNode;
 typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
 typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
+typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
@@ -468,6 +488,14 @@ struct RvDomSequenceElementOrText {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceUSVString {
+    int32_t present;
+    int32_t count;
+    const char** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 enum {
     RV_DOM_UNION_SHADOW_ROOT_OR_GET_COMPOSED_RANGES_OPTIONS_SHADOW_ROOT = 1,
     RV_DOM_UNION_SHADOW_ROOT_OR_GET_COMPOSED_RANGES_OPTIONS_GET_COMPOSED_RANGES_OPTIONS = 2,
@@ -510,6 +538,7 @@ RV_EXPORT void rv_dom_union_html_element_or_long_nullable_release(RvDomUnionHTML
 RV_EXPORT void rv_dom_sequence_node_release(RvDomSequenceNode* value);
 RV_EXPORT void rv_dom_union_element_or_text_release(RvDomUnionElementOrText* value);
 RV_EXPORT void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value);
+RV_EXPORT void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString* value);
 RV_EXPORT void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value);
 RV_EXPORT void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
@@ -521,6 +550,26 @@ RV_EXPORT RvDOMImplementation* rv_dom_dom_implementation_retain(RvDOMImplementat
 RV_EXPORT void rv_dom_named_node_map_release(RvNamedNodeMap*);
 /* Adds a reference to a NamedNodeMap and returns it. */
 RV_EXPORT RvNamedNodeMap* rv_dom_named_node_map_retain(RvNamedNodeMap*);
+/* Releases a handle to a StyleSheet. */
+RV_EXPORT void rv_dom_style_sheet_release(RvStyleSheet*);
+/* Adds a reference to a StyleSheet and returns it. */
+RV_EXPORT RvStyleSheet* rv_dom_style_sheet_retain(RvStyleSheet*);
+/* Releases a handle to a StyleSheetList. */
+RV_EXPORT void rv_dom_style_sheet_list_release(RvStyleSheetList*);
+/* Adds a reference to a StyleSheetList and returns it. */
+RV_EXPORT RvStyleSheetList* rv_dom_style_sheet_list_retain(RvStyleSheetList*);
+/* Releases a handle to a MediaList. */
+RV_EXPORT void rv_dom_media_list_release(RvMediaList*);
+/* Adds a reference to a MediaList and returns it. */
+RV_EXPORT RvMediaList* rv_dom_media_list_retain(RvMediaList*);
+/* Releases a handle to a CSSRule. */
+RV_EXPORT void rv_dom_css_rule_release(RvCSSRule*);
+/* Adds a reference to a CSSRule and returns it. */
+RV_EXPORT RvCSSRule* rv_dom_css_rule_retain(RvCSSRule*);
+/* Releases a handle to a CSSRuleList. */
+RV_EXPORT void rv_dom_css_rule_list_release(RvCSSRuleList*);
+/* Adds a reference to a CSSRuleList and returns it. */
+RV_EXPORT RvCSSRuleList* rv_dom_css_rule_list_retain(RvCSSRuleList*);
 /* Releases a handle to a CSSStyleDeclaration. */
 RV_EXPORT void rv_dom_css_style_declaration_release(RvCSSStyleDeclaration*);
 /* Adds a reference to a CSSStyleDeclaration and returns it. */
@@ -712,6 +761,8 @@ RV_EXPORT int32_t rv_dom_shadow_root_get_reference_target(RvNode* target, char* 
 RV_EXPORT int32_t rv_dom_shadow_root_set_reference_target(RvNode* target, const char* value);
 /* ShadowRoot.activeElement getter: readonly attribute Element? activeElement; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_shadow_root_get_active_element(RvNode* target, RvNode** result);
+/* ShadowRoot.styleSheets getter: readonly attribute StyleSheetList styleSheets; *result is a new reference */
+RV_EXPORT int32_t rv_dom_shadow_root_get_style_sheets(RvNode* target, RvStyleSheetList** result);
 /* ShadowRoot.fullscreenElement getter: readonly attribute Element? fullscreenElement; *result is a new reference, or
  * NULL; RV_ERR_UNSUPPORTED where WebKit builds without FULLSCREEN_API */
 RV_EXPORT int32_t rv_dom_shadow_root_get_fullscreen_element(RvNode* target, RvNode** result);
@@ -792,6 +843,8 @@ RV_EXPORT int32_t rv_dom_document_get_last_element_child(RvNode* target, RvNode*
 RV_EXPORT int32_t rv_dom_document_get_child_element_count(RvNode* target, uint32_t* result);
 /* Document.activeElement getter: readonly attribute Element? activeElement; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_get_active_element(RvNode* target, RvNode** result);
+/* Document.styleSheets getter: readonly attribute StyleSheetList styleSheets; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_get_style_sheets(RvNode* target, RvStyleSheetList** result);
 /* Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) ->
  * Element; options defaults to {} in IDL; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_create_element(RvNode* target, const char* local_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
@@ -1545,6 +1598,86 @@ RV_EXPORT int32_t rv_dom_html_anchor_element_set_href(RvNode* target, const char
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.target setter: attribute DOMString target */
 RV_EXPORT int32_t rv_dom_html_anchor_element_set_target(RvNode* target, const char* value);
+/* HTMLAreaElement */
+
+/* HTMLAreaElement.alt getter: attribute DOMString alt */
+RV_EXPORT int32_t rv_dom_html_area_element_get_alt(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.alt setter: attribute DOMString alt */
+RV_EXPORT int32_t rv_dom_html_area_element_set_alt(RvNode* target, const char* value);
+/* HTMLAreaElement.coords getter: attribute DOMString coords */
+RV_EXPORT int32_t rv_dom_html_area_element_get_coords(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.coords setter: attribute DOMString coords */
+RV_EXPORT int32_t rv_dom_html_area_element_set_coords(RvNode* target, const char* value);
+/* HTMLAreaElement.noHref getter: attribute boolean noHref */
+RV_EXPORT int32_t rv_dom_html_area_element_get_no_href(RvNode* target, int32_t* result);
+/* HTMLAreaElement.noHref setter: attribute boolean noHref */
+RV_EXPORT int32_t rv_dom_html_area_element_set_no_href(RvNode* target, int32_t value);
+/* HTMLAreaElement.rel getter: attribute DOMString rel */
+RV_EXPORT int32_t rv_dom_html_area_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.rel setter: attribute DOMString rel */
+RV_EXPORT int32_t rv_dom_html_area_element_set_rel(RvNode* target, const char* value);
+/* HTMLAreaElement.shape getter: attribute DOMString shape */
+RV_EXPORT int32_t rv_dom_html_area_element_get_shape(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.shape setter: attribute DOMString shape */
+RV_EXPORT int32_t rv_dom_html_area_element_set_shape(RvNode* target, const char* value);
+/* HTMLAreaElement.download getter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting
+ * DownloadAttributeEnabled is off */
+RV_EXPORT int32_t rv_dom_html_area_element_get_download(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.download setter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting
+ * DownloadAttributeEnabled is off */
+RV_EXPORT int32_t rv_dom_html_area_element_set_download(RvNode* target, const char* value);
+/* HTMLAreaElement.referrerPolicy getter: attribute DOMString referrerPolicy */
+RV_EXPORT int32_t rv_dom_html_area_element_get_referrer_policy(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.referrerPolicy setter: attribute DOMString referrerPolicy */
+RV_EXPORT int32_t rv_dom_html_area_element_set_referrer_policy(RvNode* target, const char* value);
+/* HTMLAreaElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_area_element_get_rel_list(RvNode* target, RvDOMTokenList** result);
+/* HTMLAreaElement.origin getter: readonly attribute USVString origin */
+RV_EXPORT int32_t rv_dom_html_area_element_get_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.protocol getter: attribute USVString protocol */
+RV_EXPORT int32_t rv_dom_html_area_element_get_protocol(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.protocol setter: attribute USVString protocol */
+RV_EXPORT int32_t rv_dom_html_area_element_set_protocol(RvNode* target, const char* value);
+/* HTMLAreaElement.username getter: attribute USVString username */
+RV_EXPORT int32_t rv_dom_html_area_element_get_username(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.username setter: attribute USVString username */
+RV_EXPORT int32_t rv_dom_html_area_element_set_username(RvNode* target, const char* value);
+/* HTMLAreaElement.password getter: attribute USVString password */
+RV_EXPORT int32_t rv_dom_html_area_element_get_password(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.password setter: attribute USVString password */
+RV_EXPORT int32_t rv_dom_html_area_element_set_password(RvNode* target, const char* value);
+/* HTMLAreaElement.host getter: attribute USVString host */
+RV_EXPORT int32_t rv_dom_html_area_element_get_host(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.host setter: attribute USVString host */
+RV_EXPORT int32_t rv_dom_html_area_element_set_host(RvNode* target, const char* value);
+/* HTMLAreaElement.hostname getter: attribute USVString hostname */
+RV_EXPORT int32_t rv_dom_html_area_element_get_hostname(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.hostname setter: attribute USVString hostname */
+RV_EXPORT int32_t rv_dom_html_area_element_set_hostname(RvNode* target, const char* value);
+/* HTMLAreaElement.port getter: attribute USVString port */
+RV_EXPORT int32_t rv_dom_html_area_element_get_port(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.port setter: attribute USVString port */
+RV_EXPORT int32_t rv_dom_html_area_element_set_port(RvNode* target, const char* value);
+/* HTMLAreaElement.pathname getter: attribute USVString pathname */
+RV_EXPORT int32_t rv_dom_html_area_element_get_pathname(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.pathname setter: attribute USVString pathname */
+RV_EXPORT int32_t rv_dom_html_area_element_set_pathname(RvNode* target, const char* value);
+/* HTMLAreaElement.search getter: attribute USVString search */
+RV_EXPORT int32_t rv_dom_html_area_element_get_search(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.search setter: attribute USVString search */
+RV_EXPORT int32_t rv_dom_html_area_element_set_search(RvNode* target, const char* value);
+/* HTMLAreaElement.hash getter: attribute USVString hash */
+RV_EXPORT int32_t rv_dom_html_area_element_get_hash(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.hash setter: attribute USVString hash */
+RV_EXPORT int32_t rv_dom_html_area_element_set_hash(RvNode* target, const char* value);
+/* HTMLAreaElement.href getter: attribute USVString href */
+RV_EXPORT int32_t rv_dom_html_area_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.href setter: attribute USVString href */
+RV_EXPORT int32_t rv_dom_html_area_element_set_href(RvNode* target, const char* value);
+/* HTMLAreaElement.target getter: attribute DOMString target */
+RV_EXPORT int32_t rv_dom_html_area_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLAreaElement.target setter: attribute DOMString target */
+RV_EXPORT int32_t rv_dom_html_area_element_set_target(RvNode* target, const char* value);
 /* HTMLBodyElement */
 
 /* HTMLBodyElement.aLink getter: attribute DOMString aLink */
@@ -3052,14 +3185,915 @@ RV_EXPORT int32_t rv_dom_math_ml_element_focus(RvNode* target, const RvDomFocusO
 /* MathMLElement.blur() -> undefined; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED
  * where WebKit builds without MATHML */
 RV_EXPORT int32_t rv_dom_math_ml_element_blur(RvNode* target);
+/* HTMLStyleElement */
+
+/* HTMLStyleElement.disabled getter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_html_style_element_get_disabled(RvNode* target, int32_t* result);
+/* HTMLStyleElement.disabled setter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_html_style_element_set_disabled(RvNode* target, int32_t value);
+/* HTMLStyleElement.media getter: attribute DOMString media */
+RV_EXPORT int32_t rv_dom_html_style_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLStyleElement.media setter: attribute DOMString media */
+RV_EXPORT int32_t rv_dom_html_style_element_set_media(RvNode* target, const char* value);
+/* HTMLStyleElement.type getter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_html_style_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLStyleElement.type setter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_html_style_element_set_type(RvNode* target, const char* value);
+/* HTMLStyleElement.blocking getter: readonly attribute DOMTokenList blocking; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_style_element_get_blocking(RvNode* target, RvDOMTokenList** result);
+/* HTMLStyleElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_style_element_get_sheet(RvNode* target, RvStyleSheet** result);
+/* HTMLLinkElement */
+
+/* HTMLLinkElement.href getter: attribute USVString href */
+RV_EXPORT int32_t rv_dom_html_link_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.href setter: attribute USVString href */
+RV_EXPORT int32_t rv_dom_html_link_element_set_href(RvNode* target, const char* value);
+/* HTMLLinkElement.crossOrigin getter: attribute DOMString? crossOrigin */
+RV_EXPORT int32_t rv_dom_html_link_element_get_cross_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.crossOrigin setter: attribute DOMString? crossOrigin; value may be NULL (null) */
+RV_EXPORT int32_t rv_dom_html_link_element_set_cross_origin(RvNode* target, const char* value);
+/* HTMLLinkElement.rel getter: attribute DOMString rel */
+RV_EXPORT int32_t rv_dom_html_link_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.rel setter: attribute DOMString rel */
+RV_EXPORT int32_t rv_dom_html_link_element_set_rel(RvNode* target, const char* value);
+/* HTMLLinkElement.as getter: attribute DOMString as */
+RV_EXPORT int32_t rv_dom_html_link_element_get_as(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.as setter: attribute DOMString as */
+RV_EXPORT int32_t rv_dom_html_link_element_set_as(RvNode* target, const char* value);
+/* HTMLLinkElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_link_element_get_rel_list(RvNode* target, RvDOMTokenList** result);
+/* HTMLLinkElement.media getter: attribute DOMString media */
+RV_EXPORT int32_t rv_dom_html_link_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.media setter: attribute DOMString media */
+RV_EXPORT int32_t rv_dom_html_link_element_set_media(RvNode* target, const char* value);
+/* HTMLLinkElement.integrity getter: attribute DOMString integrity */
+RV_EXPORT int32_t rv_dom_html_link_element_get_integrity(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.integrity setter: attribute DOMString integrity */
+RV_EXPORT int32_t rv_dom_html_link_element_set_integrity(RvNode* target, const char* value);
+/* HTMLLinkElement.hreflang getter: attribute DOMString hreflang */
+RV_EXPORT int32_t rv_dom_html_link_element_get_hreflang(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.hreflang setter: attribute DOMString hreflang */
+RV_EXPORT int32_t rv_dom_html_link_element_set_hreflang(RvNode* target, const char* value);
+/* HTMLLinkElement.type getter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_html_link_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.type setter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_html_link_element_set_type(RvNode* target, const char* value);
+/* HTMLLinkElement.sizes getter: readonly attribute DOMTokenList sizes; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_link_element_get_sizes(RvNode* target, RvDOMTokenList** result);
+/* HTMLLinkElement.imageSrcset getter: attribute DOMString imageSrcset */
+RV_EXPORT int32_t rv_dom_html_link_element_get_image_srcset(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.imageSrcset setter: attribute DOMString imageSrcset */
+RV_EXPORT int32_t rv_dom_html_link_element_set_image_srcset(RvNode* target, const char* value);
+/* HTMLLinkElement.imageSizes getter: attribute DOMString imageSizes */
+RV_EXPORT int32_t rv_dom_html_link_element_get_image_sizes(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.imageSizes setter: attribute DOMString imageSizes */
+RV_EXPORT int32_t rv_dom_html_link_element_set_image_sizes(RvNode* target, const char* value);
+/* HTMLLinkElement.referrerPolicy getter: attribute DOMString referrerPolicy */
+RV_EXPORT int32_t rv_dom_html_link_element_get_referrer_policy(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.referrerPolicy setter: attribute DOMString referrerPolicy */
+RV_EXPORT int32_t rv_dom_html_link_element_set_referrer_policy(RvNode* target, const char* value);
+/* HTMLLinkElement.blocking getter: readonly attribute DOMTokenList blocking; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_link_element_get_blocking(RvNode* target, RvDOMTokenList** result);
+/* HTMLLinkElement.disabled getter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_html_link_element_get_disabled(RvNode* target, int32_t* result);
+/* HTMLLinkElement.disabled setter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_html_link_element_set_disabled(RvNode* target, int32_t value);
+/* HTMLLinkElement.fetchPriority getter: attribute DOMString fetchPriority */
+RV_EXPORT int32_t rv_dom_html_link_element_get_fetch_priority(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.fetchPriority setter: attribute DOMString fetchPriority */
+RV_EXPORT int32_t rv_dom_html_link_element_set_fetch_priority(RvNode* target, const char* value);
+/* HTMLLinkElement.charset getter: attribute DOMString charset */
+RV_EXPORT int32_t rv_dom_html_link_element_get_charset(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.charset setter: attribute DOMString charset */
+RV_EXPORT int32_t rv_dom_html_link_element_set_charset(RvNode* target, const char* value);
+/* HTMLLinkElement.rev getter: attribute DOMString rev */
+RV_EXPORT int32_t rv_dom_html_link_element_get_rev(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.rev setter: attribute DOMString rev */
+RV_EXPORT int32_t rv_dom_html_link_element_set_rev(RvNode* target, const char* value);
+/* HTMLLinkElement.target getter: attribute DOMString target */
+RV_EXPORT int32_t rv_dom_html_link_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLLinkElement.target setter: attribute DOMString target */
+RV_EXPORT int32_t rv_dom_html_link_element_set_target(RvNode* target, const char* value);
+/* HTMLLinkElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_link_element_get_sheet(RvNode* target, RvStyleSheet** result);
+/* StyleSheet */
+
+/* StyleSheet.type getter: readonly attribute DOMString? type */
+RV_EXPORT int32_t rv_dom_style_sheet_get_type(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length);
+/* StyleSheet.href getter: readonly attribute USVString? href */
+RV_EXPORT int32_t rv_dom_style_sheet_get_href(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length);
+/* StyleSheet.ownerNode getter: readonly attribute Node? ownerNode; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_style_sheet_get_owner_node(RvStyleSheet* target, RvNode** result);
+/* StyleSheet.parentStyleSheet getter: readonly attribute StyleSheet? parentStyleSheet; *result is a new reference, or
+ * NULL */
+RV_EXPORT int32_t rv_dom_style_sheet_get_parent_style_sheet(RvStyleSheet* target, RvStyleSheet** result);
+/* StyleSheet.title getter: readonly attribute DOMString? title */
+RV_EXPORT int32_t rv_dom_style_sheet_get_title(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length);
+/* StyleSheet.media getter: readonly attribute MediaList? media; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_style_sheet_get_media(RvStyleSheet* target, RvMediaList** result);
+/* StyleSheet.disabled getter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_style_sheet_get_disabled(RvStyleSheet* target, int32_t* result);
+/* StyleSheet.disabled setter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_style_sheet_set_disabled(RvStyleSheet* target, int32_t value);
+/* StyleSheetList */
+
+/* StyleSheetList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_style_sheet_list_get_length(RvStyleSheetList* target, uint32_t* result);
+/* StyleSheetList.item(unsigned long index) -> StyleSheet?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_style_sheet_list_item(RvStyleSheetList* target, uint32_t index, RvStyleSheet** result);
+/* StyleSheetList.namedItem(DOMString name) -> CSSStyleSheet; *result is a new reference */
+RV_EXPORT int32_t rv_dom_style_sheet_list_named_item(RvStyleSheetList* target, const char* name, RvStyleSheet** result);
+/* CSSStyleSheet */
+
+/* CSSStyleSheet.ownerRule getter: readonly attribute CSSRule? ownerRule; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_css_style_sheet_get_owner_rule(RvStyleSheet* target, RvCSSRule** result);
+/* CSSStyleSheet.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_style_sheet_get_css_rules(RvStyleSheet* target, RvCSSRuleList** result);
+/* CSSStyleSheet.rules getter: readonly attribute CSSRuleList rules; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_style_sheet_get_rules(RvStyleSheet* target, RvCSSRuleList** result);
+/* CSSStyleSheet.insertRule(DOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to 0 in
+ * IDL */
+RV_EXPORT int32_t rv_dom_css_style_sheet_insert_rule(RvStyleSheet* target, const char* rule, uint32_t index, uint32_t* result);
+/* CSSStyleSheet.deleteRule(unsigned long index) -> undefined */
+RV_EXPORT int32_t rv_dom_css_style_sheet_delete_rule(RvStyleSheet* target, uint32_t index);
+/* CSSStyleSheet.replaceSync(USVString text) -> undefined */
+RV_EXPORT int32_t rv_dom_css_style_sheet_replace_sync(RvStyleSheet* target, const char* text);
+/* CSSStyleSheet.addRule(optional DOMString selector = "undefined", optional DOMString style = "undefined", optional
+ * unsigned long index) -> long; selector defaults to "undefined" in IDL; style defaults to "undefined" in IDL; index
+ * may be NULL (absent) */
+RV_EXPORT int32_t rv_dom_css_style_sheet_add_rule(RvStyleSheet* target, const char* selector, const char* style, const uint32_t* index, int32_t* result);
+/* CSSStyleSheet.removeRule(optional unsigned long index = 0) -> undefined; index defaults to 0 in IDL */
+RV_EXPORT int32_t rv_dom_css_style_sheet_remove_rule(RvStyleSheet* target, uint32_t index);
+/* MediaList */
+
+/* MediaList.mediaText getter: attribute DOMString mediaText */
+RV_EXPORT int32_t rv_dom_media_list_get_media_text(RvMediaList* target, char* buffer, int32_t capacity, int32_t* length);
+/* MediaList.mediaText setter: attribute DOMString mediaText */
+RV_EXPORT int32_t rv_dom_media_list_set_media_text(RvMediaList* target, const char* value);
+/* MediaList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_media_list_get_length(RvMediaList* target, uint32_t* result);
+/* MediaList.item(unsigned long index) -> DOMString? */
+RV_EXPORT int32_t rv_dom_media_list_item(RvMediaList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
+/* MediaList.deleteMedium(DOMString oldMedium) -> undefined */
+RV_EXPORT int32_t rv_dom_media_list_delete_medium(RvMediaList* target, const char* old_medium);
+/* MediaList.appendMedium(DOMString newMedium) -> undefined */
+RV_EXPORT int32_t rv_dom_media_list_append_medium(RvMediaList* target, const char* new_medium);
+/* CSSRule */
+
+/* CSSRule.cssText getter: attribute DOMString cssText */
+RV_EXPORT int32_t rv_dom_css_rule_get_css_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSRule.cssText setter: attribute DOMString cssText */
+RV_EXPORT int32_t rv_dom_css_rule_set_css_text(RvCSSRule* target, const char* value);
+/* CSSRule.parentRule getter: readonly attribute CSSRule? parentRule; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_css_rule_get_parent_rule(RvCSSRule* target, RvCSSRule** result);
+/* CSSRule.parentStyleSheet getter: readonly attribute CSSStyleSheet? parentStyleSheet; *result is a new reference, or
+ * NULL */
+RV_EXPORT int32_t rv_dom_css_rule_get_parent_style_sheet(RvCSSRule* target, RvStyleSheet** result);
+/* CSSRule.type getter: readonly attribute unsigned short type */
+RV_EXPORT int32_t rv_dom_css_rule_get_type(RvCSSRule* target, uint16_t* result);
+/* CSSRuleList */
+
+/* CSSRuleList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_css_rule_list_get_length(RvCSSRuleList* target, uint32_t* result);
+/* CSSRuleList.item(unsigned long index) -> CSSRule?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_css_rule_list_item(RvCSSRuleList* target, uint32_t index, RvCSSRule** result);
+/* CSSStyleRule */
+
+/* CSSStyleRule.selectorText getter: attribute DOMString selectorText */
+RV_EXPORT int32_t rv_dom_css_style_rule_get_selector_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSStyleRule.selectorText setter: attribute DOMString selectorText */
+RV_EXPORT int32_t rv_dom_css_style_rule_set_selector_text(RvCSSRule* target, const char* value);
+/* CSSStyleRule.style getter: readonly attribute CSSStyleProperties style; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_style_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
+/* CSSStyleRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_style_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result);
+/* CSSStyleRule.insertRule(CSSOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to 0
+ * in IDL */
+RV_EXPORT int32_t rv_dom_css_style_rule_insert_rule(RvCSSRule* target, const char* rule, uint32_t index, uint32_t* result);
+/* CSSStyleRule.deleteRule(unsigned long index) -> undefined */
+RV_EXPORT int32_t rv_dom_css_style_rule_delete_rule(RvCSSRule* target, uint32_t index);
+/* CSSStyleProperties */
+
+/* CSSStyleProperties.cssFloat getter: attribute CSSOMString cssFloat */
+RV_EXPORT int32_t rv_dom_css_style_properties_get_css_float(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSStyleProperties.cssFloat setter: attribute CSSOMString cssFloat */
+RV_EXPORT int32_t rv_dom_css_style_properties_set_css_float(RvCSSStyleDeclaration* target, const char* value);
+/* CSSGroupingRule */
+
+/* CSSGroupingRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_grouping_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result);
+/* CSSGroupingRule.insertRule(CSSOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to
+ * 0 in IDL */
+RV_EXPORT int32_t rv_dom_css_grouping_rule_insert_rule(RvCSSRule* target, const char* rule, uint32_t index, uint32_t* result);
+/* CSSGroupingRule.deleteRule(unsigned long index) -> undefined */
+RV_EXPORT int32_t rv_dom_css_grouping_rule_delete_rule(RvCSSRule* target, uint32_t index);
+/* CSSConditionRule */
+
+/* CSSConditionRule.conditionText getter: readonly attribute CSSOMString conditionText */
+RV_EXPORT int32_t rv_dom_css_condition_rule_get_condition_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSMediaRule */
+
+/* CSSMediaRule.media getter: readonly attribute MediaList media; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_media_rule_get_media(RvCSSRule* target, RvMediaList** result);
+/* CSSContainerRule */
+
+/* CSSContainerRule.containerName getter: readonly attribute CSSOMString containerName */
+RV_EXPORT int32_t rv_dom_css_container_rule_get_container_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSContainerRule.containerQuery getter: readonly attribute CSSOMString containerQuery */
+RV_EXPORT int32_t rv_dom_css_container_rule_get_container_query(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSLayerBlockRule */
+
+/* CSSLayerBlockRule.name getter: readonly attribute CSSOMString name */
+RV_EXPORT int32_t rv_dom_css_layer_block_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSLayerStatementRule */
+
+/* CSSLayerStatementRule.nameList getter: readonly attribute FrozenArray<CSSOMString> nameList; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_layer_statement_rule_get_name_list(RvCSSRule* target, RvDomSequenceUSVString* result);
+/* CSSScopeRule */
+
+/* CSSScopeRule.start getter: readonly attribute CSSOMString? start */
+RV_EXPORT int32_t rv_dom_css_scope_rule_get_start(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSScopeRule.end getter: readonly attribute CSSOMString? end */
+RV_EXPORT int32_t rv_dom_css_scope_rule_get_end(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSNestedDeclarations */
+
+/* CSSNestedDeclarations.style getter: readonly attribute CSSStyleProperties style; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_nested_declarations_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
+/* CSSImportRule */
+
+/* CSSImportRule.href getter: readonly attribute USVString href */
+RV_EXPORT int32_t rv_dom_css_import_rule_get_href(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSImportRule.media getter: readonly attribute MediaList media; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_import_rule_get_media(RvCSSRule* target, RvMediaList** result);
+/* CSSImportRule.styleSheet getter: readonly attribute CSSStyleSheet? styleSheet; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_css_import_rule_get_style_sheet(RvCSSRule* target, RvStyleSheet** result);
+/* CSSImportRule.layerName getter: readonly attribute CSSOMString? layerName */
+RV_EXPORT int32_t rv_dom_css_import_rule_get_layer_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSImportRule.supportsText getter: readonly attribute CSSOMString? supportsText */
+RV_EXPORT int32_t rv_dom_css_import_rule_get_supports_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSNamespaceRule */
+
+/* CSSNamespaceRule.namespaceURI getter: readonly attribute CSSOMString namespaceURI */
+RV_EXPORT int32_t rv_dom_css_namespace_rule_get_namespace_uri(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSNamespaceRule.prefix getter: readonly attribute CSSOMString prefix */
+RV_EXPORT int32_t rv_dom_css_namespace_rule_get_prefix(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSKeyframesRule */
+
+/* CSSKeyframesRule.name getter: attribute CSSOMString name */
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSKeyframesRule.name setter: attribute CSSOMString name */
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_set_name(RvCSSRule* target, const char* value);
+/* CSSKeyframesRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result);
+/* CSSKeyframesRule.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_get_length(RvCSSRule* target, uint32_t* result);
+/* CSSKeyframesRule.item(unsigned long index) -> CSSKeyframeRule; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_item(RvCSSRule* target, uint32_t index, RvCSSRule** result);
+/* CSSKeyframesRule.appendRule(CSSOMString rule) -> undefined */
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_append_rule(RvCSSRule* target, const char* rule);
+/* CSSKeyframesRule.deleteRule(CSSOMString key) -> undefined */
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_delete_rule(RvCSSRule* target, const char* key);
+/* CSSKeyframesRule.findRule(CSSOMString key) -> CSSKeyframeRule?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_find_rule(RvCSSRule* target, const char* key, RvCSSRule** result);
+/* CSSKeyframeRule */
+
+/* CSSKeyframeRule.keyText getter: attribute CSSOMString keyText */
+RV_EXPORT int32_t rv_dom_css_keyframe_rule_get_key_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSKeyframeRule.keyText setter: attribute CSSOMString keyText */
+RV_EXPORT int32_t rv_dom_css_keyframe_rule_set_key_text(RvCSSRule* target, const char* value);
+/* CSSKeyframeRule.style getter: readonly attribute CSSStyleProperties style; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_keyframe_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
+/* CSSFontFaceRule */
+
+/* CSSFontFaceRule.style getter: readonly attribute CSSFontFaceDescriptors style; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_font_face_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
+/* CSSFontFaceDescriptors */
+
+/* CSSFontFaceDescriptors.src getter: attribute CSSOMString src */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_src(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.src setter: attribute CSSOMString src */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_src(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.fontFamily getter: attribute CSSOMString fontFamily */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_family(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.fontFamily setter: attribute CSSOMString fontFamily */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_family(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.font-family getter: attribute CSSOMString font-family */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_family_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.font-family setter: attribute CSSOMString font-family */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_family_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.fontStyle getter: attribute CSSOMString fontStyle */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_style(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.fontStyle setter: attribute CSSOMString fontStyle */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_style(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.font-style getter: attribute CSSOMString font-style */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_style_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.font-style setter: attribute CSSOMString font-style */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_style_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.fontWeight getter: attribute CSSOMString fontWeight */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_weight(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.fontWeight setter: attribute CSSOMString fontWeight */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_weight(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.font-weight getter: attribute CSSOMString font-weight */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_weight_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.font-weight setter: attribute CSSOMString font-weight */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_weight_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.fontStretch getter: attribute CSSOMString fontStretch */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_stretch(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.fontStretch setter: attribute CSSOMString fontStretch */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_stretch(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.font-stretch getter: attribute CSSOMString font-stretch */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_stretch_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.font-stretch setter: attribute CSSOMString font-stretch */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_stretch_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.fontWidth getter: attribute CSSOMString fontWidth */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.fontWidth setter: attribute CSSOMString fontWidth */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_width(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.font-width getter: attribute CSSOMString font-width */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_width_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.font-width setter: attribute CSSOMString font-width */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_width_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.sizeAdjust getter: attribute CSSOMString sizeAdjust */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_size_adjust(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.sizeAdjust setter: attribute CSSOMString sizeAdjust */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_size_adjust(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.size-adjust getter: attribute CSSOMString size-adjust */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_size_adjust_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.size-adjust setter: attribute CSSOMString size-adjust */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_size_adjust_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.unicodeRange getter: attribute CSSOMString unicodeRange */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_unicode_range(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.unicodeRange setter: attribute CSSOMString unicodeRange */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_unicode_range(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.unicode-range getter: attribute CSSOMString unicode-range */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_unicode_range_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.unicode-range setter: attribute CSSOMString unicode-range */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_unicode_range_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.fontFeatureSettings getter: attribute CSSOMString fontFeatureSettings */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_feature_settings(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.fontFeatureSettings setter: attribute CSSOMString fontFeatureSettings */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_feature_settings(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.font-feature-settings getter: attribute CSSOMString font-feature-settings */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_feature_settings_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.font-feature-settings setter: attribute CSSOMString font-feature-settings */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_feature_settings_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.fontDisplay getter: attribute CSSOMString fontDisplay */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_display(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.fontDisplay setter: attribute CSSOMString fontDisplay */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_display(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.font-display getter: attribute CSSOMString font-display */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_display_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.font-display setter: attribute CSSOMString font-display */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_display_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.ascentOverride getter: attribute CSSOMString ascentOverride; RV_ERR_UNSUPPORTED while the
+ * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_ascent_override(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.ascentOverride setter: attribute CSSOMString ascentOverride; RV_ERR_UNSUPPORTED while the
+ * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_ascent_override(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.ascent-override getter: attribute CSSOMString ascent-override; RV_ERR_UNSUPPORTED while the
+ * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_ascent_override_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.ascent-override setter: attribute CSSOMString ascent-override; RV_ERR_UNSUPPORTED while the
+ * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_ascent_override_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.descentOverride getter: attribute CSSOMString descentOverride; RV_ERR_UNSUPPORTED while the
+ * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_descent_override(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.descentOverride setter: attribute CSSOMString descentOverride; RV_ERR_UNSUPPORTED while the
+ * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_descent_override(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.descent-override getter: attribute CSSOMString descent-override; RV_ERR_UNSUPPORTED while
+ * the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_descent_override_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.descent-override setter: attribute CSSOMString descent-override; RV_ERR_UNSUPPORTED while
+ * the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_descent_override_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.lineGapOverride getter: attribute CSSOMString lineGapOverride; RV_ERR_UNSUPPORTED while the
+ * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_line_gap_override(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.lineGapOverride setter: attribute CSSOMString lineGapOverride; RV_ERR_UNSUPPORTED while the
+ * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_line_gap_override(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFaceDescriptors.line-gap-override getter: attribute CSSOMString line-gap-override; RV_ERR_UNSUPPORTED while
+ * the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_line_gap_override_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFaceDescriptors.line-gap-override setter: attribute CSSOMString line-gap-override; RV_ERR_UNSUPPORTED while
+ * the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_line_gap_override_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSFontFeatureValuesRule */
+
+/* CSSFontFeatureValuesRule.fontFamily getter: attribute CSSOMString fontFamily */
+RV_EXPORT int32_t rv_dom_css_font_feature_values_rule_get_font_family(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontFeatureValuesRule.fontFamily setter: attribute CSSOMString fontFamily */
+RV_EXPORT int32_t rv_dom_css_font_feature_values_rule_set_font_family(RvCSSRule* target, const char* value);
+/* CSSFontPaletteValuesRule */
+
+/* CSSFontPaletteValuesRule.name getter: readonly attribute CSSOMString name */
+RV_EXPORT int32_t rv_dom_css_font_palette_values_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontPaletteValuesRule.fontFamily getter: readonly attribute CSSOMString fontFamily */
+RV_EXPORT int32_t rv_dom_css_font_palette_values_rule_get_font_family(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontPaletteValuesRule.basePalette getter: readonly attribute CSSOMString basePalette */
+RV_EXPORT int32_t rv_dom_css_font_palette_values_rule_get_base_palette(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSFontPaletteValuesRule.overrideColors getter: readonly attribute CSSOMString overrideColors */
+RV_EXPORT int32_t rv_dom_css_font_palette_values_rule_get_override_colors(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule */
+
+/* CSSCounterStyleRule.name getter: attribute DOMString name */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.name setter: attribute DOMString name */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_name(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.system getter: attribute DOMString system */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_system(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.system setter: attribute DOMString system */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_system(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.symbols getter: attribute DOMString symbols */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_symbols(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.symbols setter: attribute DOMString symbols */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_symbols(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.additiveSymbols getter: attribute DOMString additiveSymbols */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_additive_symbols(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.additiveSymbols setter: attribute DOMString additiveSymbols */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_additive_symbols(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.negative getter: attribute DOMString negative */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_negative(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.negative setter: attribute DOMString negative */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_negative(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.prefix getter: attribute DOMString prefix */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_prefix(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.prefix setter: attribute DOMString prefix */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_prefix(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.suffix getter: attribute DOMString suffix */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_suffix(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.suffix setter: attribute DOMString suffix */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_suffix(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.range getter: attribute DOMString range */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_range(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.range setter: attribute DOMString range */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_range(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.pad getter: attribute DOMString pad */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_pad(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.pad setter: attribute DOMString pad */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_pad(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.speakAs getter: attribute DOMString speakAs */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_speak_as(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.speakAs setter: attribute DOMString speakAs */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_speak_as(RvCSSRule* target, const char* value);
+/* CSSCounterStyleRule.fallback getter: attribute DOMString fallback */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_fallback(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSCounterStyleRule.fallback setter: attribute DOMString fallback */
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_fallback(RvCSSRule* target, const char* value);
+/* CSSPositionTryRule */
+
+/* CSSPositionTryRule.name getter: readonly attribute CSSOMString name; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryRule.style getter: readonly attribute CSSPositionTryDescriptors style; *result is a new reference;
+ * RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
+/* CSSPositionTryDescriptors */
+
+/* CSSPositionTryDescriptors.margin getter: attribute CSSOMString margin; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin setter: attribute CSSOMString margin; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginTop getter: attribute CSSOMString marginTop; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_top(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginTop setter: attribute CSSOMString marginTop; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_top(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginRight getter: attribute CSSOMString marginRight; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_right(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginRight setter: attribute CSSOMString marginRight; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_right(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginBottom getter: attribute CSSOMString marginBottom; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_bottom(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginBottom setter: attribute CSSOMString marginBottom; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_bottom(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginLeft getter: attribute CSSOMString marginLeft; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_left(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginLeft setter: attribute CSSOMString marginLeft; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_left(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginBlock getter: attribute CSSOMString marginBlock; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginBlock setter: attribute CSSOMString marginBlock; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginBlockStart getter: attribute CSSOMString marginBlockStart; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginBlockStart setter: attribute CSSOMString marginBlockStart; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_start(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginBlockEnd getter: attribute CSSOMString marginBlockEnd; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginBlockEnd setter: attribute CSSOMString marginBlockEnd; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_end(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginInline getter: attribute CSSOMString marginInline; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginInline setter: attribute CSSOMString marginInline; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginInlineStart getter: attribute CSSOMString marginInlineStart; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginInlineStart setter: attribute CSSOMString marginInlineStart; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_start(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.marginInlineEnd getter: attribute CSSOMString marginInlineEnd; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.marginInlineEnd setter: attribute CSSOMString marginInlineEnd; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_end(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-top getter: attribute CSSOMString margin-top; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_top_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-top setter: attribute CSSOMString margin-top; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_top_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-right getter: attribute CSSOMString margin-right; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_right_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-right setter: attribute CSSOMString margin-right; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_right_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-bottom getter: attribute CSSOMString margin-bottom; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_bottom_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-bottom setter: attribute CSSOMString margin-bottom; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_bottom_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-left getter: attribute CSSOMString margin-left; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_left_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-left setter: attribute CSSOMString margin-left; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_left_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-block getter: attribute CSSOMString margin-block; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-block setter: attribute CSSOMString margin-block; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-block-start getter: attribute CSSOMString margin-block-start; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-block-start setter: attribute CSSOMString margin-block-start; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_start_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-block-end getter: attribute CSSOMString margin-block-end; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-block-end setter: attribute CSSOMString margin-block-end; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_end_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-inline getter: attribute CSSOMString margin-inline; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-inline setter: attribute CSSOMString margin-inline; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-inline-start getter: attribute CSSOMString margin-inline-start; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-inline-start setter: attribute CSSOMString margin-inline-start; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_start_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.margin-inline-end getter: attribute CSSOMString margin-inline-end; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.margin-inline-end setter: attribute CSSOMString margin-inline-end; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_end_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.inset getter: attribute CSSOMString inset; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.inset setter: attribute CSSOMString inset; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.insetBlock getter: attribute CSSOMString insetBlock; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.insetBlock setter: attribute CSSOMString insetBlock; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.insetBlockStart getter: attribute CSSOMString insetBlockStart; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.insetBlockStart setter: attribute CSSOMString insetBlockStart; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_start(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.insetBlockEnd getter: attribute CSSOMString insetBlockEnd; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.insetBlockEnd setter: attribute CSSOMString insetBlockEnd; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_end(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.insetInline getter: attribute CSSOMString insetInline; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.insetInline setter: attribute CSSOMString insetInline; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.insetInlineStart getter: attribute CSSOMString insetInlineStart; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.insetInlineStart setter: attribute CSSOMString insetInlineStart; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_start(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.insetInlineEnd getter: attribute CSSOMString insetInlineEnd; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.insetInlineEnd setter: attribute CSSOMString insetInlineEnd; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_end(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.top getter: attribute CSSOMString top; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_top(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.top setter: attribute CSSOMString top; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_top(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.left getter: attribute CSSOMString left; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_left(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.left setter: attribute CSSOMString left; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_left(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.right getter: attribute CSSOMString right; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_right(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.right setter: attribute CSSOMString right; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_right(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.bottom getter: attribute CSSOMString bottom; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_bottom(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.bottom setter: attribute CSSOMString bottom; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_bottom(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.inset-block getter: attribute CSSOMString inset-block; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.inset-block setter: attribute CSSOMString inset-block; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.inset-block-start getter: attribute CSSOMString inset-block-start; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.inset-block-start setter: attribute CSSOMString inset-block-start; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_start_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.inset-block-end getter: attribute CSSOMString inset-block-end; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.inset-block-end setter: attribute CSSOMString inset-block-end; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_end_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.inset-inline getter: attribute CSSOMString inset-inline; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.inset-inline setter: attribute CSSOMString inset-inline; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.inset-inline-start getter: attribute CSSOMString inset-inline-start; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.inset-inline-start setter: attribute CSSOMString inset-inline-start; RV_ERR_UNSUPPORTED
+ * while the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_start_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.inset-inline-end getter: attribute CSSOMString inset-inline-end; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.inset-inline-end setter: attribute CSSOMString inset-inline-end; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_end_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.width getter: attribute CSSOMString width; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.width setter: attribute CSSOMString width; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_width(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.minWidth getter: attribute CSSOMString minWidth; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.minWidth setter: attribute CSSOMString minWidth; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_width(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.maxWidth getter: attribute CSSOMString maxWidth; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.maxWidth setter: attribute CSSOMString maxWidth; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_width(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.height getter: attribute CSSOMString height; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_height(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.height setter: attribute CSSOMString height; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_height(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.minHeight getter: attribute CSSOMString minHeight; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_height(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.minHeight setter: attribute CSSOMString minHeight; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_height(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.maxHeight getter: attribute CSSOMString maxHeight; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_height(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.maxHeight setter: attribute CSSOMString maxHeight; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_height(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.blockSize getter: attribute CSSOMString blockSize; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_block_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.blockSize setter: attribute CSSOMString blockSize; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_block_size(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.minBlockSize getter: attribute CSSOMString minBlockSize; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_block_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.minBlockSize setter: attribute CSSOMString minBlockSize; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_block_size(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.maxBlockSize getter: attribute CSSOMString maxBlockSize; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_block_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.maxBlockSize setter: attribute CSSOMString maxBlockSize; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_block_size(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.inlineSize getter: attribute CSSOMString inlineSize; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inline_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.inlineSize setter: attribute CSSOMString inlineSize; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inline_size(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.minInlineSize getter: attribute CSSOMString minInlineSize; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_inline_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.minInlineSize setter: attribute CSSOMString minInlineSize; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_inline_size(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.maxInlineSize getter: attribute CSSOMString maxInlineSize; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_inline_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.maxInlineSize setter: attribute CSSOMString maxInlineSize; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_inline_size(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.min-width getter: attribute CSSOMString min-width; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_width_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.min-width setter: attribute CSSOMString min-width; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_width_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.max-width getter: attribute CSSOMString max-width; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_width_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.max-width setter: attribute CSSOMString max-width; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_width_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.min-height getter: attribute CSSOMString min-height; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_height_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.min-height setter: attribute CSSOMString min-height; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_height_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.max-height getter: attribute CSSOMString max-height; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_height_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.max-height setter: attribute CSSOMString max-height; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_height_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.block-size getter: attribute CSSOMString block-size; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_block_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.block-size setter: attribute CSSOMString block-size; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_block_size_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.min-block-size getter: attribute CSSOMString min-block-size; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_block_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.min-block-size setter: attribute CSSOMString min-block-size; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_block_size_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.max-block-size getter: attribute CSSOMString max-block-size; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_block_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.max-block-size setter: attribute CSSOMString max-block-size; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_block_size_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.inline-size getter: attribute CSSOMString inline-size; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inline_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.inline-size setter: attribute CSSOMString inline-size; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inline_size_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.min-inline-size getter: attribute CSSOMString min-inline-size; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_inline_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.min-inline-size setter: attribute CSSOMString min-inline-size; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_inline_size_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.max-inline-size getter: attribute CSSOMString max-inline-size; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_inline_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.max-inline-size setter: attribute CSSOMString max-inline-size; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_inline_size_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.placeSelf getter: attribute CSSOMString placeSelf; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_place_self(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.placeSelf setter: attribute CSSOMString placeSelf; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_place_self(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.alignSelf getter: attribute CSSOMString alignSelf; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_align_self(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.alignSelf setter: attribute CSSOMString alignSelf; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_align_self(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.justifySelf getter: attribute CSSOMString justifySelf; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_justify_self(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.justifySelf setter: attribute CSSOMString justifySelf; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_justify_self(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.place-self getter: attribute CSSOMString place-self; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_place_self_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.place-self setter: attribute CSSOMString place-self; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_place_self_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.align-self getter: attribute CSSOMString align-self; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_align_self_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.align-self setter: attribute CSSOMString align-self; RV_ERR_UNSUPPORTED while the setting
+ * CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_align_self_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.justify-self getter: attribute CSSOMString justify-self; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_justify_self_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.justify-self setter: attribute CSSOMString justify-self; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_justify_self_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.positionAnchor getter: attribute CSSOMString positionAnchor; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_position_anchor(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.positionAnchor setter: attribute CSSOMString positionAnchor; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_anchor(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.position-anchor getter: attribute CSSOMString position-anchor; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_position_anchor_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.position-anchor setter: attribute CSSOMString position-anchor; RV_ERR_UNSUPPORTED while
+ * the setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_anchor_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.positionArea getter: attribute CSSOMString positionArea; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_position_area(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.positionArea setter: attribute CSSOMString positionArea; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_area(RvCSSStyleDeclaration* target, const char* value);
+/* CSSPositionTryDescriptors.position-area getter: attribute CSSOMString position-area; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_position_area_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPositionTryDescriptors.position-area setter: attribute CSSOMString position-area; RV_ERR_UNSUPPORTED while the
+ * setting CSSAnchorPositioningEnabled is off */
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_area_css(RvCSSStyleDeclaration* target, const char* value);
+/* CSSViewTransitionRule */
+
+/* CSSViewTransitionRule.navigation getter: readonly attribute CSSOMString navigation */
+RV_EXPORT int32_t rv_dom_css_view_transition_rule_get_navigation(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSViewTransitionRule.types getter: readonly attribute FrozenArray<CSSOMString> types; *result owns its contents;
+ * release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_view_transition_rule_get_types(RvCSSRule* target, RvDomSequenceUSVString* result);
 /* CSSStyleDeclaration */
 
 /* CSSStyleDeclaration.cssText getter: attribute CSSOMString cssText */
 RV_EXPORT int32_t rv_dom_css_style_declaration_get_css_text(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSStyleDeclaration.cssText setter: attribute CSSOMString cssText */
 RV_EXPORT int32_t rv_dom_css_style_declaration_set_css_text(RvCSSStyleDeclaration* target, const char* value);
+/* CSSStyleDeclaration.cssRules getter: readonly attribute CSSRuleList? cssRules; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_css_style_declaration_get_css_rules(RvCSSStyleDeclaration* target, RvCSSRuleList** result);
 /* CSSStyleDeclaration.length getter: readonly attribute unsigned long length */
 RV_EXPORT int32_t rv_dom_css_style_declaration_get_length(RvCSSStyleDeclaration* target, uint32_t* result);
+/* CSSStyleDeclaration.parentRule getter: readonly attribute CSSRule? parentRule; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_css_style_declaration_get_parent_rule(RvCSSStyleDeclaration* target, RvCSSRule** result);
 /* CSSStyleDeclaration.item(unsigned long index) -> CSSOMString */
 RV_EXPORT int32_t rv_dom_css_style_declaration_item(RvCSSStyleDeclaration* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
 /* CSSStyleDeclaration.getPropertyValue(CSSOMString property) -> CSSOMString */

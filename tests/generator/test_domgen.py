@@ -59,6 +59,74 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_css_rule_and_descriptor_settings_use_owner_or_constructor_document(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSRule {};
+[EnabledBySetting=CSSAnchorPositioningEnabled] interface CSSPositionTryRule : CSSRule {
+    readonly attribute DOMString name;
+};
+interface CSSStyleDeclaration {};
+interface CSSFontFaceDescriptors : CSSStyleDeclaration {
+    [EnabledBySetting=CSSFontFaceMetricOverrideDescriptorsEnabled] attribute DOMString ascentOverride;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['CSSRule', 'CSSPositionTryRule', 'CSSStyleDeclaration', 'CSSFontFaceDescriptors']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertEqual(len(generator.functions), 3)
+        glue = generator.glue()
+        self.assertIn('settingsSheet->ownerDocument()', glue)
+        self.assertIn('settingsSheet->constructorDocument()', glue)
+        self.assertIn('settings.cssAnchorPositioningEnabled', glue)
+        self.assertIn('settings.cssFontFaceMetricOverrideDescriptorsEnabled', glue)
+
+    def test_css_descriptor_aliases_have_distinct_exports_and_valid_fsharp_names(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleDeclaration {};
+interface CSSFontFaceDescriptors : CSSStyleDeclaration {
+    attribute DOMString fontFamily;
+    attribute DOMString font-family;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['CSSStyleDeclaration', 'CSSFontFaceDescriptors']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertEqual(len(generator.functions), 4)
+        self.assertEqual(len({function.name for function in generator.functions}), 4)
+        self.assertIn('abstract member ``font-family``:', generator.interfaces())
+        glue = generator.glue()
+        self.assertIn('impl->fontFamily()', glue)
+        self.assertNotIn('impl->font-family(', glue)
+
+    def test_css_generator_test_partials_are_not_exposed_as_runtime_properties(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '\ninterface CSSStyleProperties : HTMLElement {};')
+        partial = self.source / 'Source/WebCore/css/scripts/test/Results/Probe.idl'
+        partial.parent.mkdir(parents=True)
+        partial.write_text('partial interface CSSStyleProperties { attribute DOMString fakeTestProperty; };')
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'HTMLElement', 'CSSStyleProperties']
+        config['skipDirectories'] = json.loads((ROOT / 'gen/dom.json').read_text())['skipDirectories']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertNotIn('fake_test_property', generator.header())
+        self.assertNotIn('fakeTestProperty', generator.interfaces())
+
+    def test_area_reflection_and_url_components_are_in_native_scope(self):
+        config = json.loads((ROOT / 'gen/dom.json').read_text())
+        self.assertIn('HTMLAreaElement', config['interfaces'])
+        self.assertIn('HTMLAreaElement.ping', config['exclude'])
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
