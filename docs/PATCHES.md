@@ -1,12 +1,12 @@
 # The patch series
 
-`patches/series` lists seventeen patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012, 0014, 0015 and 0016, changes nothing unless
+`patches/series` lists eighteen patches, applied in order over the WebKit commit in `pins.json` by
+`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012, 0014, 0015, 0016 and 0017, changes nothing unless
 its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
 WebKit's feature implementations. 0010 changes which symbols WebCore exports and which members the host may override,
 and no behavior. 0012 adds the sources an embedder names to WebCore. 0013's option is set for macOS in every
 flavor, because the package always loads WebCore outside its framework bundle (`config/mac.cmake`).
-0014, 0015 and 0016 correct stylesheet mutation behavior in every flavor.
+0014, 0015, 0016 and 0017 correct stylesheet mutation and retained-object behavior in every flavor.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in these places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
@@ -16,7 +16,9 @@ and also changes `PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjec
 `FrameSelection.cpp`, `ChromeClient.h` and `OptionsCommon.cmake`. 0012 adds a CMake hook to `Source/WebCore/CMakeLists.txt`. 0013 changes `LocalizedStrings.cpp` and
 `OptionsMac.cmake`. 0014 changes `CSSStyleSheet.cpp`; 0015 changes `CSSKeyframeRule.h`, `CSSKeyframeRule.cpp`,
 `CSSKeyframesRule.cpp` and `CSSStyleSheet.cpp`. 0016 changes `CSSCounterStyleRule.cpp` and
-`CSSCounterStyleRule.h`. The patches touch 81 files in all.
+`CSSCounterStyleRule.h`. 0017 changes `CSSRule.h`, `CSSRule.cpp`, `CSSFontFaceRule.h`,
+`PropertySetCSSDescriptors.h`, `PropertySetCSSDescriptors.cpp` and `CSSPositionTryDescriptors.cpp`.
+The patches touch 87 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -39,6 +41,8 @@ The sizes are the reduction each patch measured when it was added, on Windows x6
 | 0013-unbundled-strings | `USE_UNBUNDLED_LOCALIZED_STRINGS` (macOS) | | none |
 | 0014-constructed-sheet-replacement | none, always applies | | correctness repair |
 | 0015-keyframe-offset-invalidation | none, always applies | | correctness repair |
+| 0016-counter-style-name | none, always applies | | correctness repair |
+| 0017-detached-cssom-context | none, always applies | | correctness repair |
 
 ## Conventions
 
