@@ -7,8 +7,34 @@
 #include "AbstractRange.h"
 #include "AriaNotifyOptions.h"
 #include "Attr.h"
+#include "CSSConditionRule.h"
+#include "CSSContainerRule.h"
+#include "CSSCounterStyleRule.h"
+#include "CSSFontFaceDescriptors.h"
+#include "CSSFontFaceRule.h"
+#include "CSSFontFeatureValuesRule.h"
+#include "CSSFontPaletteValuesRule.h"
+#include "CSSGroupingRule.h"
+#include "CSSImportRule.h"
+#include "CSSKeyframeRule.h"
+#include "CSSKeyframesRule.h"
+#include "CSSLayerBlockRule.h"
+#include "CSSLayerStatementRule.h"
+#include "CSSMediaRule.h"
+#include "CSSNamespaceRule.h"
+#include "CSSNestedDeclarations.h"
+#include "CSSPositionTryDescriptors.h"
+#include "CSSPositionTryRule.h"
+#include "CSSRule.h"
+#include "CSSRuleList.h"
+#include "CSSScopeRule.h"
+#include "CSSStartingStyleRule.h"
 #include "CSSStyleDeclaration.h"
 #include "CSSStyleProperties.h"
+#include "CSSStyleRule.h"
+#include "CSSStyleSheet.h"
+#include "CSSSupportsRule.h"
+#include "CSSViewTransitionRule.h"
 #include "CharacterData.h"
 #include "CheckVisibilityOptions.h"
 #include "Comment.h"
@@ -35,24 +61,41 @@
 #include "GetComposedRangesOptions.h"
 #include "GetHTMLOptions.h"
 #include "HTMLAnchorElement.h"
+#include "HTMLAreaElement.h"
+#include "HTMLBRElement.h"
+#include "HTMLBaseElement.h"
 #include "HTMLBodyElement.h"
 #include "HTMLButtonElement.h"
 #include "HTMLCollection.h"
+#include "HTMLDListElement.h"
+#include "HTMLDataElement.h"
+#include "HTMLDataListElement.h"
 #include "HTMLDetailsElement.h"
 #include "HTMLDialogElement.h"
+#include "HTMLDirectoryElement.h"
 #include "HTMLDivElement.h"
 #include "HTMLDocument.h"
 #include "HTMLElement.h"
 #include "HTMLFieldSetElement.h"
+#include "HTMLFontElement.h"
 #include "HTMLFormControlsCollection.h"
 #include "HTMLFormElement.h"
+#include "HTMLHRElement.h"
 #include "HTMLHeadElement.h"
+#include "HTMLHeadingElement.h"
+#include "HTMLHtmlElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLLIElement.h"
 #include "HTMLLabelElement.h"
 #include "HTMLLegendElement.h"
+#include "HTMLLinkElement.h"
+#include "HTMLMapElement.h"
+#include "HTMLMarqueeElement.h"
+#include "HTMLMenuElement.h"
+#include "HTMLMetaElement.h"
 #include "HTMLMeterElement.h"
+#include "HTMLModElement.h"
 #include "HTMLNames.h"
 #include "HTMLOListElement.h"
 #include "HTMLOptGroupElement.h"
@@ -60,10 +103,17 @@
 #include "HTMLOptionsCollection.h"
 #include "HTMLOutputElement.h"
 #include "HTMLParagraphElement.h"
+#include "HTMLParamElement.h"
+#include "HTMLPictureElement.h"
+#include "HTMLPreElement.h"
 #include "HTMLProgressElement.h"
+#include "HTMLQuoteElement.h"
 #include "HTMLSelectElement.h"
+#include "HTMLSelectedContentElement.h"
 #include "HTMLSlotElement.h"
+#include "HTMLSourceElement.h"
 #include "HTMLSpanElement.h"
+#include "HTMLStyleElement.h"
 #include "HTMLTableCaptionElement.h"
 #include "HTMLTableCellElement.h"
 #include "HTMLTableColElement.h"
@@ -72,11 +122,15 @@
 #include "HTMLTableSectionElement.h"
 #include "HTMLTemplateElement.h"
 #include "HTMLTextAreaElement.h"
+#include "HTMLTimeElement.h"
+#include "HTMLTitleElement.h"
 #include "HTMLUListElement.h"
 #include "ImportNodeOptions.h"
 #include "InputEvent.h"
 #include "KeyboardEvent.h"
 #include "LiveNodeList.h"
+#include "MathMLElement.h"
+#include "MediaList.h"
 #include "MouseEvent.h"
 #include "NamedNodeMap.h"
 #include "Node.h"
@@ -85,12 +139,15 @@
 #include "PointerEvent.h"
 #include "RadioNodeList.h"
 #include "Range.h"
+#include "SVGElement.h"
 #include "ScrollIntoViewOptions.h"
 #include "ScrollToOptions.h"
 #include "Settings.h"
 #include "ShadowRoot.h"
 #include "ShadowRootInit.h"
 #include "StaticRange.h"
+#include "StyleSheet.h"
+#include "StyleSheetList.h"
 #include "Text.h"
 #include "UIEvent.h"
 #include "ValidityState.h"
@@ -1029,6 +1086,29 @@ template<typename V> int32_t encodeRvDomSequenceElementOrText(V&& input, RvDomSe
     return RV_OK;
 }
 
+void clearRvDomSequenceUSVString(RvDomSequenceUSVString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        std::free(const_cast<char*>(value->items[i]));
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceUSVString(V&& input, RvDomSequenceUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<const char**>(std::calloc(value.size(), sizeof(const char*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        result->items[i] = copyOwnedDomString(asString(value[i]));
+    }
+    return RV_OK;
+}
+
 std::optional<Variant<Ref<ShadowRoot>, GetComposedRangesOptions>> decodeRvDomUnionShadowRootOrGetComposedRangesOptions(const RvDomUnionShadowRootOrGetComposedRangesOptions* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -1128,7 +1208,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1215,6 +1295,11 @@ void ranvier_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* va
     if (isMainThread()) clearRvDomSequenceElementOrText(value);
 }
 
+void ranvier_dom_sequence_usv_string_release(RvDomSequenceUSVString* value)
+{
+    if (isMainThread()) clearRvDomSequenceUSVString(value);
+}
+
 void ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value)
 {
     if (isMainThread()) clearRvDomUnionShadowRootOrGetComposedRangesOptions(value);
@@ -1255,6 +1340,76 @@ RvNamedNodeMap* ranvier_dom_named_node_map_retain(RvNamedNodeMap* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<NamedNodeMap*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_style_sheet_release(RvStyleSheet* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<StyleSheet*>(handle)->deref();
+}
+
+RvStyleSheet* ranvier_dom_style_sheet_retain(RvStyleSheet* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<StyleSheet*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_style_sheet_list_release(RvStyleSheetList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<StyleSheetList*>(handle)->deref();
+}
+
+RvStyleSheetList* ranvier_dom_style_sheet_list_retain(RvStyleSheetList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<StyleSheetList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_media_list_release(RvMediaList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<MediaList*>(handle)->deref();
+}
+
+RvMediaList* ranvier_dom_media_list_retain(RvMediaList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<MediaList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_css_rule_release(RvCSSRule* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<CSSRule*>(handle)->deref();
+}
+
+RvCSSRule* ranvier_dom_css_rule_retain(RvCSSRule* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<CSSRule*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_css_rule_list_release(RvCSSRuleList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<CSSRuleList*>(handle)->deref();
+}
+
+RvCSSRuleList* ranvier_dom_css_rule_list_retain(RvCSSRuleList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<CSSRuleList*>(handle)->ref();
     return handle;
 }
 
@@ -2275,6 +2430,19 @@ int32_t ranvier_dom_shadow_root_get_active_element(RvNode* target, RvNode** resu
     return deliver([&]() -> decltype(auto) { return impl->activeElement(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
+// ShadowRoot.styleSheets getter: readonly attribute StyleSheetList styleSheets; *result is a new reference
+int32_t ranvier_dom_shadow_root_get_style_sheets(RvNode* target, RvStyleSheetList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ShadowRoot>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->styleSheets(); }, [&](auto&& value) { return storeHandle<StyleSheetList>(value, result); });
+}
+
 // ShadowRoot.fullscreenElement getter: readonly attribute Element? fullscreenElement; *result is a new reference, or NULL; RV_ERR_UNSUPPORTED where WebKit builds without FULLSCREEN_API
 int32_t ranvier_dom_shadow_root_get_fullscreen_element(RvNode* target, RvNode** result)
 {
@@ -2775,6 +2943,19 @@ int32_t ranvier_dom_document_get_active_element(RvNode* target, RvNode** result)
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->activeElement(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// Document.styleSheets getter: readonly attribute StyleSheetList styleSheets; *result is a new reference
+int32_t ranvier_dom_document_get_style_sheets(RvNode* target, RvStyleSheetList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->styleSheets(); }, [&](auto&& value) { return storeHandle<StyleSheetList>(value, result); });
 }
 
 // Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) -> Element; options defaults to {} in IDL; *result is a new reference
@@ -7622,6 +7803,523 @@ int32_t ranvier_dom_html_anchor_element_set_target(RvNode* target, const char* v
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::targetAttr, AtomString { a0.string() }); });
+}
+
+// HTMLAreaElement.alt getter: attribute DOMString alt
+int32_t ranvier_dom_html_area_element_get_alt(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::altAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.alt setter: attribute DOMString alt
+int32_t ranvier_dom_html_area_element_set_alt(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::altAttr, AtomString { a0.string() }); });
+}
+
+// HTMLAreaElement.coords getter: attribute DOMString coords
+int32_t ranvier_dom_html_area_element_get_coords(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::coordsAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.coords setter: attribute DOMString coords
+int32_t ranvier_dom_html_area_element_set_coords(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::coordsAttr, AtomString { a0.string() }); });
+}
+
+// HTMLAreaElement.noHref getter: attribute boolean noHref
+int32_t ranvier_dom_html_area_element_get_no_href(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::nohrefAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLAreaElement.noHref setter: attribute boolean noHref
+int32_t ranvier_dom_html_area_element_set_no_href(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::nohrefAttr, !!value); });
+}
+
+// HTMLAreaElement.rel getter: attribute DOMString rel
+int32_t ranvier_dom_html_area_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.rel setter: attribute DOMString rel
+int32_t ranvier_dom_html_area_element_set_rel(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::relAttr, AtomString { a0.string() }); });
+}
+
+// HTMLAreaElement.shape getter: attribute DOMString shape
+int32_t ranvier_dom_html_area_element_get_shape(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shapeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.shape setter: attribute DOMString shape
+int32_t ranvier_dom_html_area_element_set_shape(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::shapeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLAreaElement.download getter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting DownloadAttributeEnabled is off
+int32_t ranvier_dom_html_area_element_get_download(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.downloadAttributeEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::downloadAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.download setter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting DownloadAttributeEnabled is off
+int32_t ranvier_dom_html_area_element_set_download(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.downloadAttributeEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::downloadAttr, AtomString { a0.string() }); });
+}
+
+// HTMLAreaElement.referrerPolicy getter: attribute DOMString referrerPolicy
+int32_t ranvier_dom_html_area_element_get_referrer_policy(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.referrerPolicy setter: attribute DOMString referrerPolicy
+int32_t ranvier_dom_html_area_element_set_referrer_policy(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::referrerpolicyAttr, AtomString { a0.atom() }); });
+}
+
+// HTMLAreaElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference
+int32_t ranvier_dom_html_area_element_get_rel_list(RvNode* target, RvDOMTokenList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->relList(); }, [&](auto&& value) { return storeHandle<DOMTokenList>(value, result); });
+}
+
+// HTMLAreaElement.origin getter: readonly attribute USVString origin
+int32_t ranvier_dom_html_area_element_get_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->origin(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.protocol getter: attribute USVString protocol
+int32_t ranvier_dom_html_area_element_get_protocol(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->protocol(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.protocol setter: attribute USVString protocol
+int32_t ranvier_dom_html_area_element_set_protocol(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setProtocol(a0.string()); });
+}
+
+// HTMLAreaElement.username getter: attribute USVString username
+int32_t ranvier_dom_html_area_element_get_username(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->username(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.username setter: attribute USVString username
+int32_t ranvier_dom_html_area_element_set_username(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setUsername(a0.string()); });
+}
+
+// HTMLAreaElement.password getter: attribute USVString password
+int32_t ranvier_dom_html_area_element_get_password(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->password(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.password setter: attribute USVString password
+int32_t ranvier_dom_html_area_element_set_password(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPassword(a0.string()); });
+}
+
+// HTMLAreaElement.host getter: attribute USVString host
+int32_t ranvier_dom_html_area_element_get_host(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->host(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.host setter: attribute USVString host
+int32_t ranvier_dom_html_area_element_set_host(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setHost(a0.string()); });
+}
+
+// HTMLAreaElement.hostname getter: attribute USVString hostname
+int32_t ranvier_dom_html_area_element_get_hostname(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hostname(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.hostname setter: attribute USVString hostname
+int32_t ranvier_dom_html_area_element_set_hostname(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setHostname(a0.string()); });
+}
+
+// HTMLAreaElement.port getter: attribute USVString port
+int32_t ranvier_dom_html_area_element_get_port(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->port(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.port setter: attribute USVString port
+int32_t ranvier_dom_html_area_element_set_port(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPort(a0.string()); });
+}
+
+// HTMLAreaElement.pathname getter: attribute USVString pathname
+int32_t ranvier_dom_html_area_element_get_pathname(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->pathname(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.pathname setter: attribute USVString pathname
+int32_t ranvier_dom_html_area_element_set_pathname(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPathname(a0.string()); });
+}
+
+// HTMLAreaElement.search getter: attribute USVString search
+int32_t ranvier_dom_html_area_element_get_search(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->search(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.search setter: attribute USVString search
+int32_t ranvier_dom_html_area_element_set_search(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setSearch(a0.string()); });
+}
+
+// HTMLAreaElement.hash getter: attribute USVString hash
+int32_t ranvier_dom_html_area_element_get_hash(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hash(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.hash setter: attribute USVString hash
+int32_t ranvier_dom_html_area_element_set_hash(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setHash(a0.string()); });
+}
+
+// HTMLAreaElement.href getter: attribute USVString href
+int32_t ranvier_dom_html_area_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::hrefAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.href setter: attribute USVString href
+int32_t ranvier_dom_html_area_element_set_href(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::hrefAttr, AtomString { a0.string() }); });
+}
+
+// HTMLAreaElement.target getter: attribute DOMString target
+int32_t ranvier_dom_html_area_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLAreaElement.target setter: attribute DOMString target
+int32_t ranvier_dom_html_area_element_set_target(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { value };
@@ -14951,6 +15649,7687 @@ int32_t ranvier_dom_htmlu_list_element_set_type(RvNode* target, const char* valu
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
 }
 
+// HTMLBaseElement.href getter: attribute USVString href
+int32_t ranvier_dom_html_base_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->href(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLBaseElement.href setter: attribute USVString href
+int32_t ranvier_dom_html_base_element_set_href(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::hrefAttr, AtomString { a0.atom() }); });
+}
+
+// HTMLBaseElement.target getter: attribute DOMString target
+int32_t ranvier_dom_html_base_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLBaseElement.target setter: attribute DOMString target
+int32_t ranvier_dom_html_base_element_set_target(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::targetAttr, AtomString { a0.string() }); });
+}
+
+// HTMLBRElement.clear getter: attribute DOMString clear
+int32_t ranvier_dom_htmlbr_element_get_clear(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::clearAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLBRElement.clear setter: attribute DOMString clear
+int32_t ranvier_dom_htmlbr_element_set_clear(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::clearAttr, AtomString { a0.string() }); });
+}
+
+// HTMLDataElement.value getter: attribute DOMString value
+int32_t ranvier_dom_html_data_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDataElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLDataElement.value setter: attribute DOMString value
+int32_t ranvier_dom_html_data_element_set_value(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDataElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valueAttr, AtomString { a0.string() }); });
+}
+
+// HTMLDataListElement.options getter: readonly attribute HTMLCollection options; *result is a new reference; RV_ERR_UNSUPPORTED while the setting DataListElementEnabled is off
+int32_t ranvier_dom_html_data_list_element_get_options(RvNode* target, RvHTMLCollection** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDataListElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.dataListElementEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->options(); }, [&](auto&& value) { return storeHandle<HTMLCollection>(value, result); });
+}
+
+// HTMLDirectoryElement.compact getter: attribute boolean compact
+int32_t ranvier_dom_html_directory_element_get_compact(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDirectoryElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::compactAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLDirectoryElement.compact setter: attribute boolean compact
+int32_t ranvier_dom_html_directory_element_set_compact(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDirectoryElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::compactAttr, !!value); });
+}
+
+// HTMLDListElement.compact getter: attribute boolean compact
+int32_t ranvier_dom_htmld_list_element_get_compact(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDListElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::compactAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLDListElement.compact setter: attribute boolean compact
+int32_t ranvier_dom_htmld_list_element_set_compact(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDListElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::compactAttr, !!value); });
+}
+
+// HTMLFontElement.color getter: attribute DOMString color
+int32_t ranvier_dom_html_font_element_get_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::colorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLFontElement.color setter: attribute DOMString color
+int32_t ranvier_dom_html_font_element_set_color(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::colorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLFontElement.face getter: attribute DOMString face
+int32_t ranvier_dom_html_font_element_get_face(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::faceAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLFontElement.face setter: attribute DOMString face
+int32_t ranvier_dom_html_font_element_set_face(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::faceAttr, AtomString { a0.string() }); });
+}
+
+// HTMLFontElement.size getter: attribute DOMString size
+int32_t ranvier_dom_html_font_element_get_size(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLFontElement.size setter: attribute DOMString size
+int32_t ranvier_dom_html_font_element_set_size(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::sizeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHeadingElement.align getter: attribute DOMString align
+int32_t ranvier_dom_html_heading_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHeadingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHeadingElement.align setter: attribute DOMString align
+int32_t ranvier_dom_html_heading_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHeadingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHRElement.align getter: attribute DOMString align
+int32_t ranvier_dom_htmlhr_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHRElement.align setter: attribute DOMString align
+int32_t ranvier_dom_htmlhr_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHRElement.color getter: attribute DOMString color
+int32_t ranvier_dom_htmlhr_element_get_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::colorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHRElement.color setter: attribute DOMString color
+int32_t ranvier_dom_htmlhr_element_set_color(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::colorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHRElement.noShade getter: attribute boolean noShade
+int32_t ranvier_dom_htmlhr_element_get_no_shade(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::noshadeAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLHRElement.noShade setter: attribute boolean noShade
+int32_t ranvier_dom_htmlhr_element_set_no_shade(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::noshadeAttr, !!value); });
+}
+
+// HTMLHRElement.size getter: attribute DOMString size
+int32_t ranvier_dom_htmlhr_element_get_size(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHRElement.size setter: attribute DOMString size
+int32_t ranvier_dom_htmlhr_element_set_size(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::sizeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHRElement.width getter: attribute DOMString width
+int32_t ranvier_dom_htmlhr_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHRElement.width setter: attribute DOMString width
+int32_t ranvier_dom_htmlhr_element_set_width(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::widthAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHtmlElement.version getter: attribute DOMString version
+int32_t ranvier_dom_html_html_element_get_version(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHtmlElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::versionAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHtmlElement.version setter: attribute DOMString version
+int32_t ranvier_dom_html_html_element_set_version(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHtmlElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::versionAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMapElement.areas getter: readonly attribute HTMLCollection areas; *result is a new reference
+int32_t ranvier_dom_html_map_element_get_areas(RvNode* target, RvHTMLCollection** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->areas(); }, [&](auto&& value) { return storeHandle<HTMLCollection>(value, result); });
+}
+
+// HTMLMapElement.name getter: attribute DOMString name
+int32_t ranvier_dom_html_map_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMapElement.name setter: attribute DOMString name
+int32_t ranvier_dom_html_map_element_set_name(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::nameAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.behavior getter: attribute DOMString behavior
+int32_t ranvier_dom_html_marquee_element_get_behavior(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::behaviorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.behavior setter: attribute DOMString behavior
+int32_t ranvier_dom_html_marquee_element_set_behavior(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::behaviorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.bgColor getter: attribute DOMString bgColor
+int32_t ranvier_dom_html_marquee_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.bgColor setter: attribute DOMString bgColor
+int32_t ranvier_dom_html_marquee_element_set_bg_color(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::bgcolorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.direction getter: attribute DOMString direction
+int32_t ranvier_dom_html_marquee_element_get_direction(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::directionAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.direction setter: attribute DOMString direction
+int32_t ranvier_dom_html_marquee_element_set_direction(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::directionAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.height getter: attribute DOMString height
+int32_t ranvier_dom_html_marquee_element_get_height(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::heightAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.height setter: attribute DOMString height
+int32_t ranvier_dom_html_marquee_element_set_height(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::heightAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.hspace getter: attribute unsigned long hspace
+int32_t ranvier_dom_html_marquee_element_get_hspace(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unsignedIntegralAttribute(HTMLNames::hspaceAttr); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.hspace setter: attribute unsigned long hspace
+int32_t ranvier_dom_html_marquee_element_set_hspace(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setUnsignedIntegralAttribute(HTMLNames::hspaceAttr, value); });
+}
+
+// HTMLMarqueeElement.loop getter: attribute long loop
+int32_t ranvier_dom_html_marquee_element_get_loop(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->loop(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.loop setter: attribute long loop
+int32_t ranvier_dom_html_marquee_element_set_loop(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setLoop(value); });
+}
+
+// HTMLMarqueeElement.scrollAmount getter: attribute unsigned long scrollAmount
+int32_t ranvier_dom_html_marquee_element_get_scroll_amount(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->scrollAmount(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.scrollAmount setter: attribute unsigned long scrollAmount
+int32_t ranvier_dom_html_marquee_element_set_scroll_amount(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setScrollAmount(value); });
+}
+
+// HTMLMarqueeElement.scrollDelay getter: attribute unsigned long scrollDelay
+int32_t ranvier_dom_html_marquee_element_get_scroll_delay(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->scrollDelay(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.scrollDelay setter: attribute unsigned long scrollDelay
+int32_t ranvier_dom_html_marquee_element_set_scroll_delay(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setScrollDelay(value); });
+}
+
+// HTMLMarqueeElement.trueSpeed getter: attribute boolean trueSpeed
+int32_t ranvier_dom_html_marquee_element_get_true_speed(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::truespeedAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.trueSpeed setter: attribute boolean trueSpeed
+int32_t ranvier_dom_html_marquee_element_set_true_speed(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::truespeedAttr, !!value); });
+}
+
+// HTMLMarqueeElement.vspace getter: attribute unsigned long vspace
+int32_t ranvier_dom_html_marquee_element_get_vspace(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unsignedIntegralAttribute(HTMLNames::vspaceAttr); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.vspace setter: attribute unsigned long vspace
+int32_t ranvier_dom_html_marquee_element_set_vspace(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setUnsignedIntegralAttribute(HTMLNames::vspaceAttr, value); });
+}
+
+// HTMLMarqueeElement.width getter: attribute DOMString width
+int32_t ranvier_dom_html_marquee_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.width setter: attribute DOMString width
+int32_t ranvier_dom_html_marquee_element_set_width(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::widthAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.start() -> undefined
+int32_t ranvier_dom_html_marquee_element_start(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->start(); });
+}
+
+// HTMLMarqueeElement.stop() -> undefined
+int32_t ranvier_dom_html_marquee_element_stop(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->stop(); });
+}
+
+// HTMLMenuElement.compact getter: attribute boolean compact
+int32_t ranvier_dom_html_menu_element_get_compact(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMenuElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::compactAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLMenuElement.compact setter: attribute boolean compact
+int32_t ranvier_dom_html_menu_element_set_compact(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMenuElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::compactAttr, !!value); });
+}
+
+// HTMLMetaElement.content getter: attribute DOMString content
+int32_t ranvier_dom_html_meta_element_get_content(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::contentAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.content setter: attribute DOMString content
+int32_t ranvier_dom_html_meta_element_set_content(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::contentAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMetaElement.httpEquiv getter: attribute DOMString httpEquiv
+int32_t ranvier_dom_html_meta_element_get_http_equiv(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::http_equivAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.httpEquiv setter: attribute DOMString httpEquiv
+int32_t ranvier_dom_html_meta_element_set_http_equiv(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::http_equivAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMetaElement.media getter: attribute DOMString media
+int32_t ranvier_dom_html_meta_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.media setter: attribute DOMString media
+int32_t ranvier_dom_html_meta_element_set_media(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::mediaAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMetaElement.name getter: attribute DOMString name
+int32_t ranvier_dom_html_meta_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.name setter: attribute DOMString name
+int32_t ranvier_dom_html_meta_element_set_name(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::nameAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMetaElement.scheme getter: attribute DOMString scheme
+int32_t ranvier_dom_html_meta_element_get_scheme(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::schemeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.scheme setter: attribute DOMString scheme
+int32_t ranvier_dom_html_meta_element_set_scheme(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::schemeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLModElement.cite getter: attribute USVString cite
+int32_t ranvier_dom_html_mod_element_get_cite(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::citeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLModElement.cite setter: attribute USVString cite
+int32_t ranvier_dom_html_mod_element_set_cite(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::citeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLModElement.dateTime getter: attribute DOMString dateTime
+int32_t ranvier_dom_html_mod_element_get_date_time(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::datetimeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLModElement.dateTime setter: attribute DOMString dateTime
+int32_t ranvier_dom_html_mod_element_set_date_time(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::datetimeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLParamElement.name getter: attribute DOMString name
+int32_t ranvier_dom_html_param_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLParamElement.name setter: attribute DOMString name
+int32_t ranvier_dom_html_param_element_set_name(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::nameAttr, AtomString { a0.string() }); });
+}
+
+// HTMLParamElement.type getter: attribute DOMString type
+int32_t ranvier_dom_html_param_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLParamElement.type setter: attribute DOMString type
+int32_t ranvier_dom_html_param_element_set_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLParamElement.value getter: attribute DOMString value
+int32_t ranvier_dom_html_param_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLParamElement.value setter: attribute DOMString value
+int32_t ranvier_dom_html_param_element_set_value(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valueAttr, AtomString { a0.string() }); });
+}
+
+// HTMLParamElement.valueType getter: attribute DOMString valueType
+int32_t ranvier_dom_html_param_element_get_value_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valuetypeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLParamElement.valueType setter: attribute DOMString valueType
+int32_t ranvier_dom_html_param_element_set_value_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valuetypeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLPreElement.width getter: attribute long width
+int32_t ranvier_dom_html_pre_element_get_width(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLPreElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::preTag) || element->hasTagName(HTMLNames::listingTag) || element->hasTagName(HTMLNames::xmpTag)) ? static_cast<HTMLPreElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->integralAttribute(HTMLNames::widthAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLPreElement.width setter: attribute long width
+int32_t ranvier_dom_html_pre_element_set_width(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLPreElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::preTag) || element->hasTagName(HTMLNames::listingTag) || element->hasTagName(HTMLNames::xmpTag)) ? static_cast<HTMLPreElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setIntegralAttribute(HTMLNames::widthAttr, value); });
+}
+
+// HTMLQuoteElement.cite getter: attribute USVString cite
+int32_t ranvier_dom_html_quote_element_get_cite(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLQuoteElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::blockquoteTag) || element->hasTagName(HTMLNames::qTag)) ? static_cast<HTMLQuoteElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::citeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLQuoteElement.cite setter: attribute USVString cite
+int32_t ranvier_dom_html_quote_element_set_cite(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLQuoteElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::blockquoteTag) || element->hasTagName(HTMLNames::qTag)) ? static_cast<HTMLQuoteElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::citeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.src getter: attribute USVString src
+int32_t ranvier_dom_html_source_element_get_src(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::srcAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.src setter: attribute USVString src
+int32_t ranvier_dom_html_source_element_set_src(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::srcAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.type getter: attribute DOMString type
+int32_t ranvier_dom_html_source_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.type setter: attribute DOMString type
+int32_t ranvier_dom_html_source_element_set_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.srcset getter: attribute USVString srcset
+int32_t ranvier_dom_html_source_element_get_srcset(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::srcsetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.srcset setter: attribute USVString srcset
+int32_t ranvier_dom_html_source_element_set_srcset(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::srcsetAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.sizes getter: attribute DOMString sizes
+int32_t ranvier_dom_html_source_element_get_sizes(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizesAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.sizes setter: attribute DOMString sizes
+int32_t ranvier_dom_html_source_element_set_sizes(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::sizesAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.media getter: attribute DOMString media
+int32_t ranvier_dom_html_source_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.media setter: attribute DOMString media
+int32_t ranvier_dom_html_source_element_set_media(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::mediaAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.width getter: attribute unsigned long width
+int32_t ranvier_dom_html_source_element_get_width(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unsignedIntegralAttribute(HTMLNames::widthAttr); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLSourceElement.width setter: attribute unsigned long width
+int32_t ranvier_dom_html_source_element_set_width(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setUnsignedIntegralAttribute(HTMLNames::widthAttr, value); });
+}
+
+// HTMLSourceElement.height getter: attribute unsigned long height
+int32_t ranvier_dom_html_source_element_get_height(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unsignedIntegralAttribute(HTMLNames::heightAttr); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLSourceElement.height setter: attribute unsigned long height
+int32_t ranvier_dom_html_source_element_set_height(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setUnsignedIntegralAttribute(HTMLNames::heightAttr, value); });
+}
+
+// HTMLSourceElement.attachmentIdentifier getter: readonly attribute DOMString attachmentIdentifier; RV_ERR_UNSUPPORTED where WebKit builds without ATTACHMENT_ELEMENT
+int32_t ranvier_dom_html_source_element_get_attachment_identifier(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+#if ENABLE(ATTACHMENT_ELEMENT)
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attachmentIdentifier(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(buffer);
+    UNUSED_PARAM(capacity);
+    UNUSED_PARAM(length);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// HTMLTimeElement.dateTime getter: attribute DOMString dateTime
+int32_t ranvier_dom_html_time_element_get_date_time(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTimeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::datetimeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTimeElement.dateTime setter: attribute DOMString dateTime
+int32_t ranvier_dom_html_time_element_set_date_time(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTimeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::datetimeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTitleElement.text getter: attribute DOMString text
+int32_t ranvier_dom_html_title_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTitleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->text(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTitleElement.text setter: attribute DOMString text
+int32_t ranvier_dom_html_title_element_set_text(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTitleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setText(a0.string()); });
+}
+
+// SVGElement.viewportElement getter: readonly attribute SVGElement? viewportElement; *result is a new reference, or NULL
+int32_t ranvier_dom_svg_element_get_viewport_element(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->viewportElement(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// SVGElement.dataset getter: readonly attribute DOMStringMap dataset; *result is a new reference
+int32_t ranvier_dom_svg_element_get_dataset(RvNode* target, RvDOMStringMap** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dataset(); }, [&](auto&& value) { return storeHandle<DOMStringMap>(value, result); });
+}
+
+// SVGElement.nonce getter: attribute DOMString nonce
+int32_t ranvier_dom_svg_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// SVGElement.nonce setter: attribute DOMString nonce
+int32_t ranvier_dom_svg_element_set_nonce(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setNonce(a0.atom()); });
+}
+
+// SVGElement.autofocus getter: attribute boolean autofocus
+int32_t ranvier_dom_svg_element_get_autofocus(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::autofocusAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGElement.autofocus setter: attribute boolean autofocus
+int32_t ranvier_dom_svg_element_set_autofocus(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::autofocusAttr, !!value); });
+}
+
+// SVGElement.tabIndex getter: attribute long tabIndex
+int32_t ranvier_dom_svg_element_get_tab_index(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->tabIndexForBindings(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGElement.tabIndex setter: attribute long tabIndex
+int32_t ranvier_dom_svg_element_set_tab_index(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setTabIndexForBindings(value); });
+}
+
+// SVGElement.style getter: readonly attribute CSSStyleProperties style; *result is a new reference
+int32_t ranvier_dom_svg_element_get_style(RvNode* target, RvCSSStyleDeclaration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cssomStyle(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// SVGElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be NULL for the IDL default
+int32_t ranvier_dom_svg_element_focus(RvNode* target, const RvDomFocusOptions* options)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    FocusOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomFocusOptions, prevent_scroll) + sizeof(options->prevent_scroll))
+            assignValue(a0.preventScroll, !!options->prevent_scroll);
+        if (options->size >= offsetof(RvDomFocusOptions, focus_visible) + sizeof(options->focus_visible) && options->focus_visible)
+            assignValue(a0.focusVisible, !!*options->focus_visible);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->focusForBindings(std::move(a0)); });
+}
+
+// SVGElement.blur() -> undefined
+int32_t ranvier_dom_svg_element_blur(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->blur(); });
+}
+
+// MathMLElement.dataset getter: readonly attribute DOMStringMap dataset; *result is a new reference; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_dataset(RvNode* target, RvDOMStringMap** result)
+{
+#if ENABLE(MATHML)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->dataset(); }, [&](auto&& value) { return storeHandle<DOMStringMap>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.nonce getter: attribute DOMString nonce; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+#if ENABLE(MATHML)
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(buffer);
+    UNUSED_PARAM(capacity);
+    UNUSED_PARAM(length);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.nonce setter: attribute DOMString nonce; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_set_nonce(RvNode* target, const char* value)
+{
+#if ENABLE(MATHML)
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setNonce(a0.atom()); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(value);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.autofocus getter: attribute boolean autofocus; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_autofocus(RvNode* target, int32_t* result)
+{
+#if ENABLE(MATHML)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::autofocusAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.autofocus setter: attribute boolean autofocus; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_set_autofocus(RvNode* target, int32_t value)
+{
+#if ENABLE(MATHML)
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::autofocusAttr, !!value); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(value);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.tabIndex getter: attribute long tabIndex; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_tab_index(RvNode* target, int32_t* result)
+{
+#if ENABLE(MATHML)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->tabIndexForBindings(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.tabIndex setter: attribute long tabIndex; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_set_tab_index(RvNode* target, int32_t value)
+{
+#if ENABLE(MATHML)
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setTabIndexForBindings(value); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(value);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.style getter: readonly attribute CSSStyleProperties style; *result is a new reference; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_style(RvNode* target, RvCSSStyleDeclaration** result)
+{
+#if ENABLE(MATHML)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->cssomStyle(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be NULL for the IDL default; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_focus(RvNode* target, const RvDomFocusOptions* options)
+{
+#if ENABLE(MATHML)
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    FocusOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomFocusOptions, prevent_scroll) + sizeof(options->prevent_scroll))
+            assignValue(a0.preventScroll, !!options->prevent_scroll);
+        if (options->size >= offsetof(RvDomFocusOptions, focus_visible) + sizeof(options->focus_visible) && options->focus_visible)
+            assignValue(a0.focusVisible, !!*options->focus_visible);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->focusForBindings(std::move(a0)); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(options);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.blur() -> undefined; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_blur(RvNode* target)
+{
+#if ENABLE(MATHML)
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->blur(); });
+#else
+    UNUSED_PARAM(target);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// HTMLStyleElement.disabled getter: attribute boolean disabled
+int32_t ranvier_dom_html_style_element_get_disabled(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->disabled(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLStyleElement.disabled setter: attribute boolean disabled
+int32_t ranvier_dom_html_style_element_set_disabled(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setDisabled(!!value); });
+}
+
+// HTMLStyleElement.media getter: attribute DOMString media
+int32_t ranvier_dom_html_style_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLStyleElement.media setter: attribute DOMString media
+int32_t ranvier_dom_html_style_element_set_media(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::mediaAttr, AtomString { a0.string() }); });
+}
+
+// HTMLStyleElement.type getter: attribute DOMString type
+int32_t ranvier_dom_html_style_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLStyleElement.type setter: attribute DOMString type
+int32_t ranvier_dom_html_style_element_set_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLStyleElement.blocking getter: readonly attribute DOMTokenList blocking; *result is a new reference
+int32_t ranvier_dom_html_style_element_get_blocking(RvNode* target, RvDOMTokenList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->blocking(); }, [&](auto&& value) { return storeHandle<DOMTokenList>(value, result); });
+}
+
+// HTMLStyleElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL
+int32_t ranvier_dom_html_style_element_get_sheet(RvNode* target, RvStyleSheet** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->sheet(); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
+}
+
+// HTMLLinkElement.href getter: attribute USVString href
+int32_t ranvier_dom_html_link_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::hrefAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.href setter: attribute USVString href
+int32_t ranvier_dom_html_link_element_set_href(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::hrefAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.crossOrigin getter: attribute DOMString? crossOrigin
+int32_t ranvier_dom_html_link_element_get_cross_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->crossOrigin(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.crossOrigin setter: attribute DOMString? crossOrigin; value may be NULL (null)
+int32_t ranvier_dom_html_link_element_set_cross_origin(RvNode* target, const char* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::crossoriginAttr, AtomString { a0.atom() }); });
+}
+
+// HTMLLinkElement.rel getter: attribute DOMString rel
+int32_t ranvier_dom_html_link_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.rel setter: attribute DOMString rel
+int32_t ranvier_dom_html_link_element_set_rel(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::relAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.as getter: attribute DOMString as
+int32_t ranvier_dom_html_link_element_get_as(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->as(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.as setter: attribute DOMString as
+int32_t ranvier_dom_html_link_element_set_as(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::asAttr, AtomString { a0.atom() }); });
+}
+
+// HTMLLinkElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference
+int32_t ranvier_dom_html_link_element_get_rel_list(RvNode* target, RvDOMTokenList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->relList(); }, [&](auto&& value) { return storeHandle<DOMTokenList>(value, result); });
+}
+
+// HTMLLinkElement.media getter: attribute DOMString media
+int32_t ranvier_dom_html_link_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.media setter: attribute DOMString media
+int32_t ranvier_dom_html_link_element_set_media(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::mediaAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.integrity getter: attribute DOMString integrity
+int32_t ranvier_dom_html_link_element_get_integrity(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::integrityAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.integrity setter: attribute DOMString integrity
+int32_t ranvier_dom_html_link_element_set_integrity(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::integrityAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.hreflang getter: attribute DOMString hreflang
+int32_t ranvier_dom_html_link_element_get_hreflang(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::hreflangAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.hreflang setter: attribute DOMString hreflang
+int32_t ranvier_dom_html_link_element_set_hreflang(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::hreflangAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.type getter: attribute DOMString type
+int32_t ranvier_dom_html_link_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.type setter: attribute DOMString type
+int32_t ranvier_dom_html_link_element_set_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.sizes getter: readonly attribute DOMTokenList sizes; *result is a new reference
+int32_t ranvier_dom_html_link_element_get_sizes(RvNode* target, RvDOMTokenList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->sizes(); }, [&](auto&& value) { return storeHandle<DOMTokenList>(value, result); });
+}
+
+// HTMLLinkElement.imageSrcset getter: attribute DOMString imageSrcset
+int32_t ranvier_dom_html_link_element_get_image_srcset(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::imagesrcsetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.imageSrcset setter: attribute DOMString imageSrcset
+int32_t ranvier_dom_html_link_element_set_image_srcset(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::imagesrcsetAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.imageSizes getter: attribute DOMString imageSizes
+int32_t ranvier_dom_html_link_element_get_image_sizes(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::imagesizesAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.imageSizes setter: attribute DOMString imageSizes
+int32_t ranvier_dom_html_link_element_set_image_sizes(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::imagesizesAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.referrerPolicy getter: attribute DOMString referrerPolicy
+int32_t ranvier_dom_html_link_element_get_referrer_policy(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.referrerPolicy setter: attribute DOMString referrerPolicy
+int32_t ranvier_dom_html_link_element_set_referrer_policy(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::referrerpolicyAttr, AtomString { a0.atom() }); });
+}
+
+// HTMLLinkElement.blocking getter: readonly attribute DOMTokenList blocking; *result is a new reference
+int32_t ranvier_dom_html_link_element_get_blocking(RvNode* target, RvDOMTokenList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->blocking(); }, [&](auto&& value) { return storeHandle<DOMTokenList>(value, result); });
+}
+
+// HTMLLinkElement.disabled getter: attribute boolean disabled
+int32_t ranvier_dom_html_link_element_get_disabled(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::disabledAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLLinkElement.disabled setter: attribute boolean disabled
+int32_t ranvier_dom_html_link_element_set_disabled(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::disabledAttr, !!value); });
+}
+
+// HTMLLinkElement.fetchPriority getter: attribute DOMString fetchPriority
+int32_t ranvier_dom_html_link_element_get_fetch_priority(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fetchPriorityForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.fetchPriority setter: attribute DOMString fetchPriority
+int32_t ranvier_dom_html_link_element_set_fetch_priority(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::fetchpriorityAttr, AtomString { a0.atom() }); });
+}
+
+// HTMLLinkElement.charset getter: attribute DOMString charset
+int32_t ranvier_dom_html_link_element_get_charset(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charsetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.charset setter: attribute DOMString charset
+int32_t ranvier_dom_html_link_element_set_charset(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::charsetAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.rev getter: attribute DOMString rev
+int32_t ranvier_dom_html_link_element_get_rev(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::revAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.rev setter: attribute DOMString rev
+int32_t ranvier_dom_html_link_element_set_rev(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::revAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.target getter: attribute DOMString target
+int32_t ranvier_dom_html_link_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLLinkElement.target setter: attribute DOMString target
+int32_t ranvier_dom_html_link_element_set_target(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::targetAttr, AtomString { a0.string() }); });
+}
+
+// HTMLLinkElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL
+int32_t ranvier_dom_html_link_element_get_sheet(RvNode* target, RvStyleSheet** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->sheet(); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
+}
+
+// StyleSheet.type getter: readonly attribute DOMString? type
+int32_t ranvier_dom_style_sheet_get_type(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheet> impl = reinterpret_cast<StyleSheet*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// StyleSheet.href getter: readonly attribute USVString? href
+int32_t ranvier_dom_style_sheet_get_href(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheet> impl = reinterpret_cast<StyleSheet*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->href(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// StyleSheet.ownerNode getter: readonly attribute Node? ownerNode; *result is a new reference, or NULL
+int32_t ranvier_dom_style_sheet_get_owner_node(RvStyleSheet* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheet> impl = reinterpret_cast<StyleSheet*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->ownerNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// StyleSheet.parentStyleSheet getter: readonly attribute StyleSheet? parentStyleSheet; *result is a new reference, or NULL
+int32_t ranvier_dom_style_sheet_get_parent_style_sheet(RvStyleSheet* target, RvStyleSheet** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheet> impl = reinterpret_cast<StyleSheet*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->parentStyleSheet(); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
+}
+
+// StyleSheet.title getter: readonly attribute DOMString? title
+int32_t ranvier_dom_style_sheet_get_title(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheet> impl = reinterpret_cast<StyleSheet*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->title(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// StyleSheet.media getter: readonly attribute MediaList? media; *result is a new reference, or NULL
+int32_t ranvier_dom_style_sheet_get_media(RvStyleSheet* target, RvMediaList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheet> impl = reinterpret_cast<StyleSheet*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->media(); }, [&](auto&& value) { return storeHandle<MediaList>(value, result); });
+}
+
+// StyleSheet.disabled getter: attribute boolean disabled
+int32_t ranvier_dom_style_sheet_get_disabled(RvStyleSheet* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheet> impl = reinterpret_cast<StyleSheet*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->disabled(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// StyleSheet.disabled setter: attribute boolean disabled
+int32_t ranvier_dom_style_sheet_set_disabled(RvStyleSheet* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheet> impl = reinterpret_cast<StyleSheet*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setDisabled(!!value); });
+}
+
+// StyleSheetList.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_style_sheet_list_get_length(RvStyleSheetList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheetList> impl = reinterpret_cast<StyleSheetList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// StyleSheetList.item(unsigned long index) -> StyleSheet?; *result is a new reference, or NULL
+int32_t ranvier_dom_style_sheet_list_item(RvStyleSheetList* target, uint32_t index, RvStyleSheet** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheetList> impl = reinterpret_cast<StyleSheetList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
+}
+
+// StyleSheetList.namedItem(DOMString name) -> CSSStyleSheet; *result is a new reference
+int32_t ranvier_dom_style_sheet_list_named_item(RvStyleSheetList* target, const char* name, RvStyleSheet** result)
+{
+    if (!target || !name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StyleSheetList> impl = reinterpret_cast<StyleSheetList*>(target);
+    StringArg a0 { name };
+    return deliver([&]() -> decltype(auto) { return impl->namedItem(a0.atom()); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
+}
+
+// CSSStyleSheet.ownerRule getter: readonly attribute CSSRule? ownerRule; *result is a new reference, or NULL
+int32_t ranvier_dom_css_style_sheet_get_owner_rule(RvStyleSheet* target, RvCSSRule** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleSheet>(*reinterpret_cast<StyleSheet*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->ownerRule(); }, [&](auto&& value) { return storeHandle<CSSRule>(value, result); });
+}
+
+// CSSStyleSheet.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference
+int32_t ranvier_dom_css_style_sheet_get_css_rules(RvStyleSheet* target, RvCSSRuleList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleSheet>(*reinterpret_cast<StyleSheet*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cssRulesForBindings(); }, [&](auto&& value) { return storeHandle<CSSRuleList>(value, result); });
+}
+
+// CSSStyleSheet.rules getter: readonly attribute CSSRuleList rules; *result is a new reference
+int32_t ranvier_dom_css_style_sheet_get_rules(RvStyleSheet* target, RvCSSRuleList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleSheet>(*reinterpret_cast<StyleSheet*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rules(); }, [&](auto&& value) { return storeHandle<CSSRuleList>(value, result); });
+}
+
+// CSSStyleSheet.insertRule(DOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to 0 in IDL
+int32_t ranvier_dom_css_style_sheet_insert_rule(RvStyleSheet* target, const char* rule, uint32_t index, uint32_t* result)
+{
+    if (!target || !rule || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleSheet>(*reinterpret_cast<StyleSheet*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { rule };
+    return deliver([&]() -> decltype(auto) { return impl->insertRule(a0.string(), index); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// CSSStyleSheet.deleteRule(unsigned long index) -> undefined
+int32_t ranvier_dom_css_style_sheet_delete_rule(RvStyleSheet* target, uint32_t index)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleSheet>(*reinterpret_cast<StyleSheet*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deleteRule(index); });
+}
+
+// CSSStyleSheet.replaceSync(USVString text) -> undefined
+int32_t ranvier_dom_css_style_sheet_replace_sync(RvStyleSheet* target, const char* text)
+{
+    if (!target || !text)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleSheet>(*reinterpret_cast<StyleSheet*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { text };
+    return invoke([&]() -> decltype(auto) { return impl->replaceSync(a0.string()); });
+}
+
+// CSSStyleSheet.addRule(optional DOMString selector = "undefined", optional DOMString style = "undefined", optional unsigned long index) -> long; selector defaults to "undefined" in IDL; style defaults to "undefined" in IDL; index may be NULL (absent)
+int32_t ranvier_dom_css_style_sheet_add_rule(RvStyleSheet* target, const char* selector, const char* style, const uint32_t* index, int32_t* result)
+{
+    if (!target || !selector || !style || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleSheet>(*reinterpret_cast<StyleSheet*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { selector };
+    StringArg a1 { style };
+    return deliver([&]() -> decltype(auto) { return impl->addRule(a0.string(), a1.string(), OptionalArg<uint32_t> { index }); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CSSStyleSheet.removeRule(optional unsigned long index = 0) -> undefined; index defaults to 0 in IDL
+int32_t ranvier_dom_css_style_sheet_remove_rule(RvStyleSheet* target, uint32_t index)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleSheet>(*reinterpret_cast<StyleSheet*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->removeRule(index); });
+}
+
+// MediaList.mediaText getter: attribute DOMString mediaText
+int32_t ranvier_dom_media_list_get_media_text(RvMediaList* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<MediaList> impl = reinterpret_cast<MediaList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->mediaText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// MediaList.mediaText setter: attribute DOMString mediaText
+int32_t ranvier_dom_media_list_set_media_text(RvMediaList* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<MediaList> impl = reinterpret_cast<MediaList*>(target);
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMediaText(a0.string()); });
+}
+
+// MediaList.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_media_list_get_length(RvMediaList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<MediaList> impl = reinterpret_cast<MediaList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// MediaList.item(unsigned long index) -> DOMString?
+int32_t ranvier_dom_media_list_item(RvMediaList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<MediaList> impl = reinterpret_cast<MediaList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// MediaList.deleteMedium(DOMString oldMedium) -> undefined
+int32_t ranvier_dom_media_list_delete_medium(RvMediaList* target, const char* old_medium)
+{
+    if (!target || !old_medium)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<MediaList> impl = reinterpret_cast<MediaList*>(target);
+    StringArg a0 { old_medium };
+    return invoke([&]() -> decltype(auto) { return impl->deleteMedium(a0.string()); });
+}
+
+// MediaList.appendMedium(DOMString newMedium) -> undefined
+int32_t ranvier_dom_media_list_append_medium(RvMediaList* target, const char* new_medium)
+{
+    if (!target || !new_medium)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<MediaList> impl = reinterpret_cast<MediaList*>(target);
+    StringArg a0 { new_medium };
+    return invoke([&]() -> decltype(auto) { return impl->appendMedium(a0.string()); });
+}
+
+// CSSRule.cssText getter: attribute DOMString cssText
+int32_t ranvier_dom_css_rule_get_css_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSRule> impl = reinterpret_cast<CSSRule*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->cssText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSRule.cssText setter: attribute DOMString cssText
+int32_t ranvier_dom_css_rule_set_css_text(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSRule> impl = reinterpret_cast<CSSRule*>(target);
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setCssText(a0.string()); });
+}
+
+// CSSRule.parentRule getter: readonly attribute CSSRule? parentRule; *result is a new reference, or NULL
+int32_t ranvier_dom_css_rule_get_parent_rule(RvCSSRule* target, RvCSSRule** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSRule> impl = reinterpret_cast<CSSRule*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->parentRule(); }, [&](auto&& value) { return storeHandle<CSSRule>(value, result); });
+}
+
+// CSSRule.parentStyleSheet getter: readonly attribute CSSStyleSheet? parentStyleSheet; *result is a new reference, or NULL
+int32_t ranvier_dom_css_rule_get_parent_style_sheet(RvCSSRule* target, RvStyleSheet** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSRule> impl = reinterpret_cast<CSSRule*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->parentStyleSheet(); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
+}
+
+// CSSRule.type getter: readonly attribute unsigned short type
+int32_t ranvier_dom_css_rule_get_type(RvCSSRule* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSRule> impl = reinterpret_cast<CSSRule*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->typeForCSSOM(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// CSSRuleList.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_css_rule_list_get_length(RvCSSRuleList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSRuleList> impl = reinterpret_cast<CSSRuleList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// CSSRuleList.item(unsigned long index) -> CSSRule?; *result is a new reference, or NULL
+int32_t ranvier_dom_css_rule_list_item(RvCSSRuleList* target, uint32_t index, RvCSSRule** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSRuleList> impl = reinterpret_cast<CSSRuleList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<CSSRule>(value, result); });
+}
+
+// CSSStyleRule.selectorText getter: attribute DOMString selectorText
+int32_t ranvier_dom_css_style_rule_get_selector_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->selectorText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSStyleRule.selectorText setter: attribute DOMString selectorText
+int32_t ranvier_dom_css_style_rule_set_selector_text(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setSelectorText(a0.string()); });
+}
+
+// CSSStyleRule.style getter: readonly attribute CSSStyleProperties style; *result is a new reference
+int32_t ranvier_dom_css_style_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->style(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// CSSStyleRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference
+int32_t ranvier_dom_css_style_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cssRules(); }, [&](auto&& value) { return storeHandle<CSSRuleList>(value, result); });
+}
+
+// CSSStyleRule.insertRule(CSSOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to 0 in IDL
+int32_t ranvier_dom_css_style_rule_insert_rule(RvCSSRule* target, const char* rule, uint32_t index, uint32_t* result)
+{
+    if (!target || !rule || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { rule };
+    return deliver([&]() -> decltype(auto) { return impl->insertRule(a0.string(), index); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// CSSStyleRule.deleteRule(unsigned long index) -> undefined
+int32_t ranvier_dom_css_style_rule_delete_rule(RvCSSRule* target, uint32_t index)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deleteRule(index); });
+}
+
+// CSSStyleProperties.cssFloat getter: attribute CSSOMString cssFloat
+int32_t ranvier_dom_css_style_properties_get_css_float(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleProperties>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cssFloat(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSStyleProperties.cssFloat setter: attribute CSSOMString cssFloat
+int32_t ranvier_dom_css_style_properties_set_css_float(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleProperties>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setCssFloat(a0.string()); });
+}
+
+// CSSGroupingRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference
+int32_t ranvier_dom_css_grouping_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSGroupingRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cssRules(); }, [&](auto&& value) { return storeHandle<CSSRuleList>(value, result); });
+}
+
+// CSSGroupingRule.insertRule(CSSOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to 0 in IDL
+int32_t ranvier_dom_css_grouping_rule_insert_rule(RvCSSRule* target, const char* rule, uint32_t index, uint32_t* result)
+{
+    if (!target || !rule || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSGroupingRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { rule };
+    return deliver([&]() -> decltype(auto) { return impl->insertRule(a0.string(), index); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// CSSGroupingRule.deleteRule(unsigned long index) -> undefined
+int32_t ranvier_dom_css_grouping_rule_delete_rule(RvCSSRule* target, uint32_t index)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSGroupingRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deleteRule(index); });
+}
+
+// CSSConditionRule.conditionText getter: readonly attribute CSSOMString conditionText
+int32_t ranvier_dom_css_condition_rule_get_condition_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> CSSConditionRule* { auto* base = dynamicDowncast<CSSGroupingRule>(*reinterpret_cast<CSSRule*>(target)); return base ? dynamicDowncast<CSSConditionRule>(*base) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->conditionText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSMediaRule.media getter: readonly attribute MediaList media; *result is a new reference
+int32_t ranvier_dom_css_media_rule_get_media(RvCSSRule* target, RvMediaList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSMediaRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->media(); }, [&](auto&& value) { return storeHandle<MediaList>(value, result); });
+}
+
+// CSSContainerRule.containerName getter: readonly attribute CSSOMString containerName
+int32_t ranvier_dom_css_container_rule_get_container_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSContainerRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->containerName(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSContainerRule.containerQuery getter: readonly attribute CSSOMString containerQuery
+int32_t ranvier_dom_css_container_rule_get_container_query(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSContainerRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->containerQuery(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSLayerBlockRule.name getter: readonly attribute CSSOMString name
+int32_t ranvier_dom_css_layer_block_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSLayerBlockRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSLayerStatementRule.nameList getter: readonly attribute FrozenArray<CSSOMString> nameList; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_layer_statement_rule_get_name_list(RvCSSRule* target, RvDomSequenceUSVString* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSLayerStatementRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->nameList(); }, [&](auto&& value) { return encodeRvDomSequenceUSVString(value, result); });
+}
+
+// CSSScopeRule.start getter: readonly attribute CSSOMString? start
+int32_t ranvier_dom_css_scope_rule_get_start(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSScopeRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->start(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSScopeRule.end getter: readonly attribute CSSOMString? end
+int32_t ranvier_dom_css_scope_rule_get_end(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSScopeRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->end(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSNestedDeclarations.style getter: readonly attribute CSSStyleProperties style; *result is a new reference
+int32_t ranvier_dom_css_nested_declarations_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSNestedDeclarations>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->style(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// CSSImportRule.href getter: readonly attribute USVString href
+int32_t ranvier_dom_css_import_rule_get_href(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSImportRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->href(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSImportRule.media getter: readonly attribute MediaList media; *result is a new reference
+int32_t ranvier_dom_css_import_rule_get_media(RvCSSRule* target, RvMediaList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSImportRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->media(); }, [&](auto&& value) { return storeHandle<MediaList>(value, result); });
+}
+
+// CSSImportRule.styleSheet getter: readonly attribute CSSStyleSheet? styleSheet; *result is a new reference, or NULL
+int32_t ranvier_dom_css_import_rule_get_style_sheet(RvCSSRule* target, RvStyleSheet** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSImportRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->styleSheet(); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
+}
+
+// CSSImportRule.layerName getter: readonly attribute CSSOMString? layerName
+int32_t ranvier_dom_css_import_rule_get_layer_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSImportRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->layerName(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSImportRule.supportsText getter: readonly attribute CSSOMString? supportsText
+int32_t ranvier_dom_css_import_rule_get_supports_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSImportRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->supportsText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSNamespaceRule.namespaceURI getter: readonly attribute CSSOMString namespaceURI
+int32_t ranvier_dom_css_namespace_rule_get_namespace_uri(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSNamespaceRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->namespaceURI(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSNamespaceRule.prefix getter: readonly attribute CSSOMString prefix
+int32_t ranvier_dom_css_namespace_rule_get_prefix(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSNamespaceRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->prefix(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSKeyframesRule.name getter: attribute CSSOMString name
+int32_t ranvier_dom_css_keyframes_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSKeyframesRule.name setter: attribute CSSOMString name
+int32_t ranvier_dom_css_keyframes_rule_set_name(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setName(a0.atom()); });
+}
+
+// CSSKeyframesRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference
+int32_t ranvier_dom_css_keyframes_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cssRules(); }, [&](auto&& value) { return storeHandle<CSSRuleList>(value, result); });
+}
+
+// CSSKeyframesRule.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_css_keyframes_rule_get_length(RvCSSRule* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// CSSKeyframesRule.item(unsigned long index) -> CSSKeyframeRule; *result is a new reference
+int32_t ranvier_dom_css_keyframes_rule_item(RvCSSRule* target, uint32_t index, RvCSSRule** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<CSSRule>(value, result); });
+}
+
+// CSSKeyframesRule.appendRule(CSSOMString rule) -> undefined
+int32_t ranvier_dom_css_keyframes_rule_append_rule(RvCSSRule* target, const char* rule)
+{
+    if (!target || !rule)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { rule };
+    return invoke([&]() -> decltype(auto) { return impl->appendRule(a0.string()); });
+}
+
+// CSSKeyframesRule.deleteRule(CSSOMString key) -> undefined
+int32_t ranvier_dom_css_keyframes_rule_delete_rule(RvCSSRule* target, const char* key)
+{
+    if (!target || !key)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { key };
+    return invoke([&]() -> decltype(auto) { return impl->deleteRule(a0.string()); });
+}
+
+// CSSKeyframesRule.findRule(CSSOMString key) -> CSSKeyframeRule?; *result is a new reference, or NULL
+int32_t ranvier_dom_css_keyframes_rule_find_rule(RvCSSRule* target, const char* key, RvCSSRule** result)
+{
+    if (!target || !key || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { key };
+    return deliver([&]() -> decltype(auto) { return impl->findRule(a0.string()); }, [&](auto&& value) { return storeHandle<CSSRule>(value, result); });
+}
+
+// CSSKeyframeRule.keyText getter: attribute CSSOMString keyText
+int32_t ranvier_dom_css_keyframe_rule_get_key_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframeRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->keyText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSKeyframeRule.keyText setter: attribute CSSOMString keyText
+int32_t ranvier_dom_css_keyframe_rule_set_key_text(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframeRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setKeyText(a0.string()); });
+}
+
+// CSSKeyframeRule.style getter: readonly attribute CSSStyleProperties style; *result is a new reference
+int32_t ranvier_dom_css_keyframe_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSKeyframeRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->style(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// CSSFontFaceRule.style getter: readonly attribute CSSFontFaceDescriptors style; *result is a new reference
+int32_t ranvier_dom_css_font_face_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->style(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// CSSFontFaceDescriptors.src getter: attribute CSSOMString src
+int32_t ranvier_dom_css_font_face_descriptors_get_src(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->src(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.src setter: attribute CSSOMString src
+int32_t ranvier_dom_css_font_face_descriptors_set_src(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setSrc(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.fontFamily getter: attribute CSSOMString fontFamily
+int32_t ranvier_dom_css_font_face_descriptors_get_font_family(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.fontFamily setter: attribute CSSOMString fontFamily
+int32_t ranvier_dom_css_font_face_descriptors_set_font_family(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontFamily(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.font-family getter: attribute CSSOMString font-family
+int32_t ranvier_dom_css_font_face_descriptors_get_font_family_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.font-family setter: attribute CSSOMString font-family
+int32_t ranvier_dom_css_font_face_descriptors_set_font_family_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontFamily(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.fontStyle getter: attribute CSSOMString fontStyle
+int32_t ranvier_dom_css_font_face_descriptors_get_font_style(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontStyle(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.fontStyle setter: attribute CSSOMString fontStyle
+int32_t ranvier_dom_css_font_face_descriptors_set_font_style(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontStyle(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.font-style getter: attribute CSSOMString font-style
+int32_t ranvier_dom_css_font_face_descriptors_get_font_style_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontStyle(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.font-style setter: attribute CSSOMString font-style
+int32_t ranvier_dom_css_font_face_descriptors_set_font_style_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontStyle(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.fontWeight getter: attribute CSSOMString fontWeight
+int32_t ranvier_dom_css_font_face_descriptors_get_font_weight(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontWeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.fontWeight setter: attribute CSSOMString fontWeight
+int32_t ranvier_dom_css_font_face_descriptors_set_font_weight(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontWeight(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.font-weight getter: attribute CSSOMString font-weight
+int32_t ranvier_dom_css_font_face_descriptors_get_font_weight_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontWeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.font-weight setter: attribute CSSOMString font-weight
+int32_t ranvier_dom_css_font_face_descriptors_set_font_weight_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontWeight(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.fontStretch getter: attribute CSSOMString fontStretch
+int32_t ranvier_dom_css_font_face_descriptors_get_font_stretch(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontStretch(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.fontStretch setter: attribute CSSOMString fontStretch
+int32_t ranvier_dom_css_font_face_descriptors_set_font_stretch(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontStretch(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.font-stretch getter: attribute CSSOMString font-stretch
+int32_t ranvier_dom_css_font_face_descriptors_get_font_stretch_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontStretch(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.font-stretch setter: attribute CSSOMString font-stretch
+int32_t ranvier_dom_css_font_face_descriptors_set_font_stretch_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontStretch(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.fontWidth getter: attribute CSSOMString fontWidth
+int32_t ranvier_dom_css_font_face_descriptors_get_font_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.fontWidth setter: attribute CSSOMString fontWidth
+int32_t ranvier_dom_css_font_face_descriptors_set_font_width(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontWidth(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.font-width getter: attribute CSSOMString font-width
+int32_t ranvier_dom_css_font_face_descriptors_get_font_width_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.font-width setter: attribute CSSOMString font-width
+int32_t ranvier_dom_css_font_face_descriptors_set_font_width_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontWidth(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.sizeAdjust getter: attribute CSSOMString sizeAdjust
+int32_t ranvier_dom_css_font_face_descriptors_get_size_adjust(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->sizeAdjust(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.sizeAdjust setter: attribute CSSOMString sizeAdjust
+int32_t ranvier_dom_css_font_face_descriptors_set_size_adjust(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setSizeAdjust(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.size-adjust getter: attribute CSSOMString size-adjust
+int32_t ranvier_dom_css_font_face_descriptors_get_size_adjust_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->sizeAdjust(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.size-adjust setter: attribute CSSOMString size-adjust
+int32_t ranvier_dom_css_font_face_descriptors_set_size_adjust_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setSizeAdjust(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.unicodeRange getter: attribute CSSOMString unicodeRange
+int32_t ranvier_dom_css_font_face_descriptors_get_unicode_range(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unicodeRange(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.unicodeRange setter: attribute CSSOMString unicodeRange
+int32_t ranvier_dom_css_font_face_descriptors_set_unicode_range(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setUnicodeRange(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.unicode-range getter: attribute CSSOMString unicode-range
+int32_t ranvier_dom_css_font_face_descriptors_get_unicode_range_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unicodeRange(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.unicode-range setter: attribute CSSOMString unicode-range
+int32_t ranvier_dom_css_font_face_descriptors_set_unicode_range_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setUnicodeRange(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.fontFeatureSettings getter: attribute CSSOMString fontFeatureSettings
+int32_t ranvier_dom_css_font_face_descriptors_get_font_feature_settings(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontFeatureSettings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.fontFeatureSettings setter: attribute CSSOMString fontFeatureSettings
+int32_t ranvier_dom_css_font_face_descriptors_set_font_feature_settings(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontFeatureSettings(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.font-feature-settings getter: attribute CSSOMString font-feature-settings
+int32_t ranvier_dom_css_font_face_descriptors_get_font_feature_settings_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontFeatureSettings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.font-feature-settings setter: attribute CSSOMString font-feature-settings
+int32_t ranvier_dom_css_font_face_descriptors_set_font_feature_settings_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontFeatureSettings(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.fontDisplay getter: attribute CSSOMString fontDisplay
+int32_t ranvier_dom_css_font_face_descriptors_get_font_display(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontDisplay(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.fontDisplay setter: attribute CSSOMString fontDisplay
+int32_t ranvier_dom_css_font_face_descriptors_set_font_display(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontDisplay(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.font-display getter: attribute CSSOMString font-display
+int32_t ranvier_dom_css_font_face_descriptors_get_font_display_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontDisplay(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.font-display setter: attribute CSSOMString font-display
+int32_t ranvier_dom_css_font_face_descriptors_set_font_display_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontDisplay(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.ascentOverride getter: attribute CSSOMString ascentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_get_ascent_override(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->ascentOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.ascentOverride setter: attribute CSSOMString ascentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_set_ascent_override(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAscentOverride(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.ascent-override getter: attribute CSSOMString ascent-override; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_get_ascent_override_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->ascentOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.ascent-override setter: attribute CSSOMString ascent-override; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_set_ascent_override_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAscentOverride(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.descentOverride getter: attribute CSSOMString descentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_get_descent_override(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->descentOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.descentOverride setter: attribute CSSOMString descentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_set_descent_override(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setDescentOverride(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.descent-override getter: attribute CSSOMString descent-override; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_get_descent_override_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->descentOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.descent-override setter: attribute CSSOMString descent-override; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_set_descent_override_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setDescentOverride(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.lineGapOverride getter: attribute CSSOMString lineGapOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_get_line_gap_override(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->lineGapOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.lineGapOverride setter: attribute CSSOMString lineGapOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_set_line_gap_override(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setLineGapOverride(a0.string()); });
+}
+
+// CSSFontFaceDescriptors.line-gap-override getter: attribute CSSOMString line-gap-override; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_get_line_gap_override_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->lineGapOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFaceDescriptors.line-gap-override setter: attribute CSSOMString line-gap-override; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_css_font_face_descriptors_set_line_gap_override_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setLineGapOverride(a0.string()); });
+}
+
+// CSSFontFeatureValuesRule.fontFamily getter: attribute CSSOMString fontFamily
+int32_t ranvier_dom_css_font_feature_values_rule_get_font_family(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFeatureValuesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontFeatureValuesRule.fontFamily setter: attribute CSSOMString fontFamily
+int32_t ranvier_dom_css_font_feature_values_rule_set_font_family(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontFeatureValuesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFontFamily(a0.string()); });
+}
+
+// CSSFontPaletteValuesRule.name getter: readonly attribute CSSOMString name
+int32_t ranvier_dom_css_font_palette_values_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontPaletteValuesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontPaletteValuesRule.fontFamily getter: readonly attribute CSSOMString fontFamily
+int32_t ranvier_dom_css_font_palette_values_rule_get_font_family(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontPaletteValuesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontPaletteValuesRule.basePalette getter: readonly attribute CSSOMString basePalette
+int32_t ranvier_dom_css_font_palette_values_rule_get_base_palette(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontPaletteValuesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->basePalette(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSFontPaletteValuesRule.overrideColors getter: readonly attribute CSSOMString overrideColors
+int32_t ranvier_dom_css_font_palette_values_rule_get_override_colors(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSFontPaletteValuesRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->overrideColors(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.name getter: attribute DOMString name
+int32_t ranvier_dom_css_counter_style_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.name setter: attribute DOMString name
+int32_t ranvier_dom_css_counter_style_rule_set_name(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setName(a0.string()); });
+}
+
+// CSSCounterStyleRule.system getter: attribute DOMString system
+int32_t ranvier_dom_css_counter_style_rule_get_system(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->system(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.system setter: attribute DOMString system
+int32_t ranvier_dom_css_counter_style_rule_set_system(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setSystem(a0.string()); });
+}
+
+// CSSCounterStyleRule.symbols getter: attribute DOMString symbols
+int32_t ranvier_dom_css_counter_style_rule_get_symbols(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->symbols(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.symbols setter: attribute DOMString symbols
+int32_t ranvier_dom_css_counter_style_rule_set_symbols(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setSymbols(a0.string()); });
+}
+
+// CSSCounterStyleRule.additiveSymbols getter: attribute DOMString additiveSymbols
+int32_t ranvier_dom_css_counter_style_rule_get_additive_symbols(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->additiveSymbols(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.additiveSymbols setter: attribute DOMString additiveSymbols
+int32_t ranvier_dom_css_counter_style_rule_set_additive_symbols(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAdditiveSymbols(a0.string()); });
+}
+
+// CSSCounterStyleRule.negative getter: attribute DOMString negative
+int32_t ranvier_dom_css_counter_style_rule_get_negative(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->negative(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.negative setter: attribute DOMString negative
+int32_t ranvier_dom_css_counter_style_rule_set_negative(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setNegative(a0.string()); });
+}
+
+// CSSCounterStyleRule.prefix getter: attribute DOMString prefix
+int32_t ranvier_dom_css_counter_style_rule_get_prefix(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->prefix(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.prefix setter: attribute DOMString prefix
+int32_t ranvier_dom_css_counter_style_rule_set_prefix(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPrefix(a0.string()); });
+}
+
+// CSSCounterStyleRule.suffix getter: attribute DOMString suffix
+int32_t ranvier_dom_css_counter_style_rule_get_suffix(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->suffix(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.suffix setter: attribute DOMString suffix
+int32_t ranvier_dom_css_counter_style_rule_set_suffix(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setSuffix(a0.string()); });
+}
+
+// CSSCounterStyleRule.range getter: attribute DOMString range
+int32_t ranvier_dom_css_counter_style_rule_get_range(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->range(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.range setter: attribute DOMString range
+int32_t ranvier_dom_css_counter_style_rule_set_range(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setRange(a0.string()); });
+}
+
+// CSSCounterStyleRule.pad getter: attribute DOMString pad
+int32_t ranvier_dom_css_counter_style_rule_get_pad(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->pad(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.pad setter: attribute DOMString pad
+int32_t ranvier_dom_css_counter_style_rule_set_pad(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPad(a0.string()); });
+}
+
+// CSSCounterStyleRule.speakAs getter: attribute DOMString speakAs
+int32_t ranvier_dom_css_counter_style_rule_get_speak_as(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->speakAs(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.speakAs setter: attribute DOMString speakAs
+int32_t ranvier_dom_css_counter_style_rule_set_speak_as(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setSpeakAs(a0.string()); });
+}
+
+// CSSCounterStyleRule.fallback getter: attribute DOMString fallback
+int32_t ranvier_dom_css_counter_style_rule_get_fallback(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fallback(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSCounterStyleRule.fallback setter: attribute DOMString fallback
+int32_t ranvier_dom_css_counter_style_rule_set_fallback(RvCSSRule* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setFallback(a0.string()); });
+}
+
+// CSSPositionTryRule.name getter: readonly attribute CSSOMString name; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSRule&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryRule.style getter: readonly attribute CSSPositionTryDescriptors style; *result is a new reference; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSRule&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->style(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// CSSPositionTryDescriptors.margin getter: attribute CSSOMString margin; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->margin(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin setter: attribute CSSOMString margin; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMargin(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginTop getter: attribute CSSOMString marginTop; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_top(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginTop(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginTop setter: attribute CSSOMString marginTop; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_top(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginTop(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginRight getter: attribute CSSOMString marginRight; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_right(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginRight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginRight setter: attribute CSSOMString marginRight; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_right(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginRight(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginBottom getter: attribute CSSOMString marginBottom; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_bottom(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginBottom(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginBottom setter: attribute CSSOMString marginBottom; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_bottom(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginBottom(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginLeft getter: attribute CSSOMString marginLeft; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_left(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginLeft(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginLeft setter: attribute CSSOMString marginLeft; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_left(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginLeft(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginBlock getter: attribute CSSOMString marginBlock; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_block(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginBlock(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginBlock setter: attribute CSSOMString marginBlock; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_block(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginBlock(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginBlockStart getter: attribute CSSOMString marginBlockStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginBlockStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginBlockStart setter: attribute CSSOMString marginBlockStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_start(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginBlockStart(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginBlockEnd getter: attribute CSSOMString marginBlockEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginBlockEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginBlockEnd setter: attribute CSSOMString marginBlockEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_end(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginBlockEnd(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginInline getter: attribute CSSOMString marginInline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginInline(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginInline setter: attribute CSSOMString marginInline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginInline(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginInlineStart getter: attribute CSSOMString marginInlineStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginInlineStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginInlineStart setter: attribute CSSOMString marginInlineStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_start(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginInlineStart(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.marginInlineEnd getter: attribute CSSOMString marginInlineEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginInlineEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.marginInlineEnd setter: attribute CSSOMString marginInlineEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_end(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginInlineEnd(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-top getter: attribute CSSOMString margin-top; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_top_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginTop(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-top setter: attribute CSSOMString margin-top; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_top_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginTop(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-right getter: attribute CSSOMString margin-right; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_right_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginRight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-right setter: attribute CSSOMString margin-right; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_right_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginRight(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-bottom getter: attribute CSSOMString margin-bottom; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_bottom_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginBottom(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-bottom setter: attribute CSSOMString margin-bottom; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_bottom_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginBottom(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-left getter: attribute CSSOMString margin-left; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_left_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginLeft(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-left setter: attribute CSSOMString margin-left; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_left_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginLeft(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-block getter: attribute CSSOMString margin-block; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginBlock(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-block setter: attribute CSSOMString margin-block; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginBlock(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-block-start getter: attribute CSSOMString margin-block-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginBlockStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-block-start setter: attribute CSSOMString margin-block-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_start_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginBlockStart(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-block-end getter: attribute CSSOMString margin-block-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginBlockEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-block-end setter: attribute CSSOMString margin-block-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_end_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginBlockEnd(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-inline getter: attribute CSSOMString margin-inline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginInline(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-inline setter: attribute CSSOMString margin-inline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginInline(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-inline-start getter: attribute CSSOMString margin-inline-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginInlineStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-inline-start setter: attribute CSSOMString margin-inline-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_start_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginInlineStart(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.margin-inline-end getter: attribute CSSOMString margin-inline-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->marginInlineEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.margin-inline-end setter: attribute CSSOMString margin-inline-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_end_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMarginInlineEnd(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.inset getter: attribute CSSOMString inset; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->inset(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.inset setter: attribute CSSOMString inset; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInset(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.insetBlock getter: attribute CSSOMString insetBlock; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_block(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetBlock(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.insetBlock setter: attribute CSSOMString insetBlock; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_block(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetBlock(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.insetBlockStart getter: attribute CSSOMString insetBlockStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetBlockStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.insetBlockStart setter: attribute CSSOMString insetBlockStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_start(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetBlockStart(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.insetBlockEnd getter: attribute CSSOMString insetBlockEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetBlockEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.insetBlockEnd setter: attribute CSSOMString insetBlockEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_end(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetBlockEnd(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.insetInline getter: attribute CSSOMString insetInline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetInline(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.insetInline setter: attribute CSSOMString insetInline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetInline(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.insetInlineStart getter: attribute CSSOMString insetInlineStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetInlineStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.insetInlineStart setter: attribute CSSOMString insetInlineStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_start(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetInlineStart(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.insetInlineEnd getter: attribute CSSOMString insetInlineEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetInlineEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.insetInlineEnd setter: attribute CSSOMString insetInlineEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_end(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetInlineEnd(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.top getter: attribute CSSOMString top; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_top(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->top(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.top setter: attribute CSSOMString top; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_top(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setTop(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.left getter: attribute CSSOMString left; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_left(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->left(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.left setter: attribute CSSOMString left; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_left(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setLeft(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.right getter: attribute CSSOMString right; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_right(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->right(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.right setter: attribute CSSOMString right; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_right(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setRight(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.bottom getter: attribute CSSOMString bottom; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_bottom(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->bottom(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.bottom setter: attribute CSSOMString bottom; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_bottom(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setBottom(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.inset-block getter: attribute CSSOMString inset-block; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetBlock(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.inset-block setter: attribute CSSOMString inset-block; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetBlock(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.inset-block-start getter: attribute CSSOMString inset-block-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetBlockStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.inset-block-start setter: attribute CSSOMString inset-block-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_start_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetBlockStart(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.inset-block-end getter: attribute CSSOMString inset-block-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetBlockEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.inset-block-end setter: attribute CSSOMString inset-block-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_end_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetBlockEnd(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.inset-inline getter: attribute CSSOMString inset-inline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetInline(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.inset-inline setter: attribute CSSOMString inset-inline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetInline(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.inset-inline-start getter: attribute CSSOMString inset-inline-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetInlineStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.inset-inline-start setter: attribute CSSOMString inset-inline-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_start_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetInlineStart(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.inset-inline-end getter: attribute CSSOMString inset-inline-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->insetInlineEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.inset-inline-end setter: attribute CSSOMString inset-inline-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_end_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInsetInlineEnd(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.width getter: attribute CSSOMString width; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.width setter: attribute CSSOMString width; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_width(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setWidth(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.minWidth getter: attribute CSSOMString minWidth; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_min_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->minWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.minWidth setter: attribute CSSOMString minWidth; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_min_width(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMinWidth(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.maxWidth getter: attribute CSSOMString maxWidth; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_max_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->maxWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.maxWidth setter: attribute CSSOMString maxWidth; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_max_width(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMaxWidth(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.height getter: attribute CSSOMString height; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_height(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->height(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.height setter: attribute CSSOMString height; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_height(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setHeight(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.minHeight getter: attribute CSSOMString minHeight; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_min_height(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->minHeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.minHeight setter: attribute CSSOMString minHeight; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_min_height(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMinHeight(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.maxHeight getter: attribute CSSOMString maxHeight; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_max_height(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->maxHeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.maxHeight setter: attribute CSSOMString maxHeight; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_max_height(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMaxHeight(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.blockSize getter: attribute CSSOMString blockSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_block_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->blockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.blockSize setter: attribute CSSOMString blockSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_block_size(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setBlockSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.minBlockSize getter: attribute CSSOMString minBlockSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_min_block_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->minBlockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.minBlockSize setter: attribute CSSOMString minBlockSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_min_block_size(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMinBlockSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.maxBlockSize getter: attribute CSSOMString maxBlockSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_max_block_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->maxBlockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.maxBlockSize setter: attribute CSSOMString maxBlockSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_max_block_size(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMaxBlockSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.inlineSize getter: attribute CSSOMString inlineSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inline_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->inlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.inlineSize setter: attribute CSSOMString inlineSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inline_size(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInlineSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.minInlineSize getter: attribute CSSOMString minInlineSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_min_inline_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->minInlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.minInlineSize setter: attribute CSSOMString minInlineSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_min_inline_size(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMinInlineSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.maxInlineSize getter: attribute CSSOMString maxInlineSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_max_inline_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->maxInlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.maxInlineSize setter: attribute CSSOMString maxInlineSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_max_inline_size(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMaxInlineSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.min-width getter: attribute CSSOMString min-width; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_min_width_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->minWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.min-width setter: attribute CSSOMString min-width; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_min_width_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMinWidth(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.max-width getter: attribute CSSOMString max-width; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_max_width_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->maxWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.max-width setter: attribute CSSOMString max-width; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_max_width_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMaxWidth(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.min-height getter: attribute CSSOMString min-height; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_min_height_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->minHeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.min-height setter: attribute CSSOMString min-height; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_min_height_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMinHeight(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.max-height getter: attribute CSSOMString max-height; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_max_height_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->maxHeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.max-height setter: attribute CSSOMString max-height; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_max_height_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMaxHeight(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.block-size getter: attribute CSSOMString block-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_block_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->blockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.block-size setter: attribute CSSOMString block-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_block_size_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setBlockSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.min-block-size getter: attribute CSSOMString min-block-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_min_block_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->minBlockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.min-block-size setter: attribute CSSOMString min-block-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_min_block_size_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMinBlockSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.max-block-size getter: attribute CSSOMString max-block-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_max_block_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->maxBlockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.max-block-size setter: attribute CSSOMString max-block-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_max_block_size_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMaxBlockSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.inline-size getter: attribute CSSOMString inline-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_inline_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->inlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.inline-size setter: attribute CSSOMString inline-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_inline_size_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setInlineSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.min-inline-size getter: attribute CSSOMString min-inline-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_min_inline_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->minInlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.min-inline-size setter: attribute CSSOMString min-inline-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_min_inline_size_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMinInlineSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.max-inline-size getter: attribute CSSOMString max-inline-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_max_inline_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->maxInlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.max-inline-size setter: attribute CSSOMString max-inline-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_max_inline_size_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setMaxInlineSize(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.placeSelf getter: attribute CSSOMString placeSelf; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_place_self(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->placeSelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.placeSelf setter: attribute CSSOMString placeSelf; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_place_self(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPlaceSelf(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.alignSelf getter: attribute CSSOMString alignSelf; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_align_self(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->alignSelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.alignSelf setter: attribute CSSOMString alignSelf; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_align_self(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAlignSelf(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.justifySelf getter: attribute CSSOMString justifySelf; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_justify_self(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->justifySelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.justifySelf setter: attribute CSSOMString justifySelf; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_justify_self(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setJustifySelf(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.place-self getter: attribute CSSOMString place-self; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_place_self_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->placeSelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.place-self setter: attribute CSSOMString place-self; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_place_self_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPlaceSelf(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.align-self getter: attribute CSSOMString align-self; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_align_self_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->alignSelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.align-self setter: attribute CSSOMString align-self; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_align_self_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAlignSelf(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.justify-self getter: attribute CSSOMString justify-self; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_justify_self_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->justifySelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.justify-self setter: attribute CSSOMString justify-self; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_justify_self_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setJustifySelf(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.positionAnchor getter: attribute CSSOMString positionAnchor; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_position_anchor(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->positionAnchor(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.positionAnchor setter: attribute CSSOMString positionAnchor; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_position_anchor(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPositionAnchor(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.position-anchor getter: attribute CSSOMString position-anchor; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_position_anchor_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->positionAnchor(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.position-anchor setter: attribute CSSOMString position-anchor; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_position_anchor_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPositionAnchor(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.positionArea getter: attribute CSSOMString positionArea; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_position_area(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->positionArea(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.positionArea setter: attribute CSSOMString positionArea; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_position_area(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPositionArea(a0.string()); });
+}
+
+// CSSPositionTryDescriptors.position-area getter: attribute CSSOMString position-area; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_get_position_area_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->positionArea(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPositionTryDescriptors.position-area setter: attribute CSSOMString position-area; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
+int32_t ranvier_dom_css_position_try_descriptors_set_position_area_css(RvCSSStyleDeclaration* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
+    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
+    if (!settingsDocument && settingsSheet)
+        settingsDocument = settingsSheet->constructorDocument();
+    if (!settingsDocument)
+        return RV_ERR_UNSUPPORTED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssAnchorPositioningEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setPositionArea(a0.string()); });
+}
+
+// CSSViewTransitionRule.navigation getter: readonly attribute CSSOMString navigation
+int32_t ranvier_dom_css_view_transition_rule_get_navigation(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSViewTransitionRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->navigation(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSViewTransitionRule.types getter: readonly attribute FrozenArray<CSSOMString> types; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_view_transition_rule_get_types(RvCSSRule* target, RvDomSequenceUSVString* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSViewTransitionRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->types(); }, [&](auto&& value) { return encodeRvDomSequenceUSVString(value, result); });
+}
+
 // CSSStyleDeclaration.cssText getter: attribute CSSOMString cssText
 int32_t ranvier_dom_css_style_declaration_get_css_text(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -14974,6 +23353,17 @@ int32_t ranvier_dom_css_style_declaration_set_css_text(RvCSSStyleDeclaration* ta
     return invoke([&]() -> decltype(auto) { return impl->setCssText(a0.string()); });
 }
 
+// CSSStyleDeclaration.cssRules getter: readonly attribute CSSRuleList? cssRules; *result is a new reference, or NULL
+int32_t ranvier_dom_css_style_declaration_get_css_rules(RvCSSStyleDeclaration* target, RvCSSRuleList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSStyleDeclaration> impl = reinterpret_cast<CSSStyleDeclaration*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->cssRules(); }, [&](auto&& value) { return storeHandle<CSSRuleList>(value, result); });
+}
+
 // CSSStyleDeclaration.length getter: readonly attribute unsigned long length
 int32_t ranvier_dom_css_style_declaration_get_length(RvCSSStyleDeclaration* target, uint32_t* result)
 {
@@ -14983,6 +23373,17 @@ int32_t ranvier_dom_css_style_declaration_get_length(RvCSSStyleDeclaration* targ
         return RV_ERR_WRONG_THREAD;
     RefPtr<CSSStyleDeclaration> impl = reinterpret_cast<CSSStyleDeclaration*>(target);
     return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// CSSStyleDeclaration.parentRule getter: readonly attribute CSSRule? parentRule; *result is a new reference, or NULL
+int32_t ranvier_dom_css_style_declaration_get_parent_rule(RvCSSStyleDeclaration* target, RvCSSRule** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSStyleDeclaration> impl = reinterpret_cast<CSSStyleDeclaration*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->parentRule(); }, [&](auto&& value) { return storeHandle<CSSRule>(value, result); });
 }
 
 // CSSStyleDeclaration.item(unsigned long index) -> CSSOMString

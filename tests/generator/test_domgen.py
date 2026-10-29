@@ -59,6 +59,74 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_css_rule_and_descriptor_settings_use_owner_or_constructor_document(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSRule {};
+[EnabledBySetting=CSSAnchorPositioningEnabled] interface CSSPositionTryRule : CSSRule {
+    readonly attribute DOMString name;
+};
+interface CSSStyleDeclaration {};
+interface CSSFontFaceDescriptors : CSSStyleDeclaration {
+    [EnabledBySetting=CSSFontFaceMetricOverrideDescriptorsEnabled] attribute DOMString ascentOverride;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['CSSRule', 'CSSPositionTryRule', 'CSSStyleDeclaration', 'CSSFontFaceDescriptors']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertEqual(len(generator.functions), 3)
+        glue = generator.glue()
+        self.assertIn('settingsSheet->ownerDocument()', glue)
+        self.assertIn('settingsSheet->constructorDocument()', glue)
+        self.assertIn('settings.cssAnchorPositioningEnabled', glue)
+        self.assertIn('settings.cssFontFaceMetricOverrideDescriptorsEnabled', glue)
+
+    def test_css_descriptor_aliases_have_distinct_exports_and_valid_fsharp_names(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleDeclaration {};
+interface CSSFontFaceDescriptors : CSSStyleDeclaration {
+    attribute DOMString fontFamily;
+    attribute DOMString font-family;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['CSSStyleDeclaration', 'CSSFontFaceDescriptors']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertEqual(len(generator.functions), 4)
+        self.assertEqual(len({function.name for function in generator.functions}), 4)
+        self.assertIn('abstract member ``font-family``:', generator.interfaces())
+        glue = generator.glue()
+        self.assertIn('impl->fontFamily()', glue)
+        self.assertNotIn('impl->font-family(', glue)
+
+    def test_css_generator_test_partials_are_not_exposed_as_runtime_properties(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '\ninterface CSSStyleProperties : HTMLElement {};')
+        partial = self.source / 'Source/WebCore/css/scripts/test/Results/Probe.idl'
+        partial.parent.mkdir(parents=True)
+        partial.write_text('partial interface CSSStyleProperties { attribute DOMString fakeTestProperty; };')
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'HTMLElement', 'CSSStyleProperties']
+        config['skipDirectories'] = json.loads((ROOT / 'gen/dom.json').read_text())['skipDirectories']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertNotIn('fake_test_property', generator.header())
+        self.assertNotIn('fakeTestProperty', generator.interfaces())
+
+    def test_area_reflection_and_url_components_are_in_native_scope(self):
+        config = json.loads((ROOT / 'gen/dom.json').read_text())
+        self.assertIn('HTMLAreaElement', config['interfaces'])
+        self.assertIn('HTMLAreaElement.ping', config['exclude'])
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -251,6 +319,95 @@ interface HTMLTableElement : HTMLElement {
         insert = functions['rv_dom_html_table_element_insert_row']
         self.assertEqual(insert['arguments'][0]['default'], '-1')
         self.assertIn('abstract member insertCell:', generator.interfaces())
+
+
+    def test_interface_build_and_setting_gates_apply_to_own_and_mixin_members(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[Conditional=INTERFACE, EnabledBySetting=GatedEnabled]
+interface GatedElement : Element { [Conditional=OWN] attribute DOMString own; };
+interface mixin GatedMixin { attribute DOMString mixed; };
+GatedElement includes GatedMixin;
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'GatedElement']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = [f for f in generator.functions if f.interface == 'GatedElement']
+        self.assertEqual(len(functions), 4)
+        for function in functions:
+            self.assertIn('ENABLE(INTERFACE)', function.conditional or '')
+        self.assertIn('ENABLE(OWN)', functions[0].conditional)
+        self.assertTrue('settings.gatedEnabled' in generator.glue())
+
+    def test_configured_svg_mathml_shared_style_and_focus_members(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface MathMLElement : Element {};
+interface CSSStyleDeclaration { attribute DOMString cssText; };
+interface mixin ElementCSSInlineStyle { readonly attribute CSSStyleDeclaration style; };
+interface mixin HTMLOrSVGOrMathMLElement {
+    readonly attribute DOMStringMap dataset;
+    attribute DOMString nonce;
+    attribute boolean autofocus;
+    attribute long tabIndex;
+    undefined focus();
+    undefined blur();
+};
+SVGElement includes ElementCSSInlineStyle;
+SVGElement includes HTMLOrSVGOrMathMLElement;
+MathMLElement includes ElementCSSInlineStyle;
+MathMLElement includes HTMLOrSVGOrMathMLElement;
+''')
+        configured = json.loads((ROOT / 'gen/dom.json').read_text())['interfaces']
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'DOMStringMap', 'CSSStyleDeclaration'] + [
+            name for name in configured if name in ['SVGElement', 'MathMLElement']
+        ]
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {function['function'] for function in json.loads(generator.api_model())['functions']}
+        for prefix in ['svg_element', 'math_ml_element']:
+            for member in ['get_style', 'get_dataset', 'get_nonce', 'set_nonce', 'get_autofocus', 'set_autofocus',
+                           'get_tab_index', 'set_tab_index', 'focus', 'blur']:
+                self.assertIn('rv_dom_' + prefix + '_' + member, functions)
+
+    def test_node_cast_by_tag_checks_namespace_and_tag_before_static_cast(self):
+        self.world.config['nodeCastTags'] = {'HTMLModElement': ['del', 'ins']}
+        generator = domgen.Generator(self.world)
+        expression = generator.cast_expression('HTMLModElement', 'Node', '*nodeOf(target)')
+        self.assertIn('dynamicDowncast<HTMLElement>(*nodeOf(target))', expression)
+        self.assertIn('element->hasTagName(HTMLNames::delTag)', expression)
+        self.assertIn('element->hasTagName(HTMLNames::insTag)', expression)
+        self.assertIn('static_cast<HTMLModElement*>(element)', expression)
+        self.assertIn(': nullptr', expression)
+        self.assertIn('HTMLNames.h', generator.headers)
+
+    def test_configured_html_reflection_scope_includes_selected_semantic_types(self):
+        names = ["HTMLBaseElement","HTMLBRElement","HTMLDataElement","HTMLDataListElement","HTMLDirectoryElement","HTMLDListElement","HTMLFontElement","HTMLHeadingElement","HTMLHRElement","HTMLHtmlElement","HTMLMapElement","HTMLMarqueeElement","HTMLMenuElement","HTMLMetaElement","HTMLModElement","HTMLParamElement","HTMLPictureElement","HTMLPreElement","HTMLQuoteElement","HTMLSelectedContentElement","HTMLSourceElement","HTMLTimeElement","HTMLTitleElement"]
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '\n' + '\n'.join(
+            'interface ' + name + ' : HTMLElement { attribute DOMString reflection; };'
+            for name in names
+        ))
+        configured = json.loads((ROOT / 'gen/dom.json').read_text())['interfaces']
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'HTMLElement'] + [name for name in configured if name in names]
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        reflected = {function['interface'] for function in model['functions'] if function['member'] == 'reflection'}
+        self.assertEqual(reflected, set(names))
+        for name in names:
+            kinds = {function['kind'] for function in model['functions']
+                     if function['interface'] == name and function['member'] == 'reflection'}
+            self.assertEqual(kinds, {'getter', 'setter'}, name)
 
 
 if __name__ == '__main__':

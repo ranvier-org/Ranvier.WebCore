@@ -269,7 +269,7 @@ class World:
 
     def members(self, name):
         """The members of an interface with those of its partials and included mixins, with the extended
-        attributes of the partial, mixin and includes statement merged into each, as CodeGenerator.pm does."""
+        attributes of the interface, partial, mixin and includes statement merged into each, as CodeGenerator.pm does."""
         interface = self.interfaces[name]
         found = [self.copy(member, {}) for member in interface.members]
         for partial in self.partials.get(name, []):
@@ -289,7 +289,9 @@ class World:
                 attrs = dict(partial.attrs)
                 attrs.update(include_attrs)
                 found += [self.copy(member, attrs) for member in partial.members]
-        return found
+        gates = {key: interface.attrs[key] for key in ("Conditional", "EnabledBySetting", "EnabledForWorld")
+                 if key in interface.attrs}
+        return [self.copy(member, gates) for member in found]
 
     @staticmethod
     def copy(member, merged):
@@ -622,6 +624,12 @@ class Generator(ComplexGeneratorMixin):
         return f"Rv{chain[-1]}*"
 
     def cast_expression(self, cls, root, value):
+        tags = self.world.config.get("nodeCastTags", {}).get(cls) if root == "Node" else None
+        if tags:
+            self.headers.update({"HTMLElement.h", "HTMLNames.h"})
+            matches = " || ".join(f"element->hasTagName(HTMLNames::{tag}Tag)" for tag in tags)
+            return (f"([&]() -> {cls}* {{ auto* element = dynamicDowncast<HTMLElement>({value}); "
+                    f"return element && ({matches}) ? static_cast<{cls}*>(element) : nullptr; }}())")
         via = self.world.config.get("castVia", {}).get(cls)
         if via:
             self.headers.add(f"{via}.h")
@@ -645,6 +653,8 @@ class Generator(ComplexGeneratorMixin):
     def getter_call(self, interface, member, mapped):
         attribute = self.reflect(member, False)
         name = member.attrs.get("ImplementedAs", member.name)
+        if "CSSStyleDeclaration" in self.world.chain(interface) and "-" in name:
+            name = name.split("-")[0] + "".join(part[:1].upper() + part[1:] for part in name.split("-")[1:])
         if not attribute:
             implemented_by = member.attrs.get("ImplementedBy")
             if implemented_by:
@@ -683,6 +693,15 @@ class Generator(ComplexGeneratorMixin):
             lines = ["RefPtr settingsNode = dynamicDowncast<Node>(impl->target());", "if (!settingsNode)",
                      "    return RV_ERR_UNSUPPORTED;"]
             document = "settingsNode->document()"
+        elif chain[-1] in ("CSSRule", "CSSStyleDeclaration"):
+            root = chain[-1]
+            self.headers.add("CSSStyleSheet.h")
+            lines = [f"RefPtr settingsSheet = static_cast<{root}&>(*impl).parentStyleSheet();",
+                     "RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;",
+                     "if (!settingsDocument && settingsSheet)",
+                     "    settingsDocument = settingsSheet->constructorDocument();",
+                     "if (!settingsDocument)", "    return RV_ERR_UNSUPPORTED;"]
+            document = "(*settingsDocument)"
         elif chain[-1] in SETTINGS_DOCUMENT:
             document = SETTINGS_DOCUMENT[chain[-1]]
         else:
@@ -786,7 +805,10 @@ class Generator(ComplexGeneratorMixin):
     def setter_call(self, interface, member, mapped, value):
         attribute = self.reflect(member, True)
         if not attribute:
-            name = "set" + wk_ucfirst(member.attrs.get("ImplementedAs", member.name))
+            name = member.attrs.get("ImplementedAs", member.name)
+            if "CSSStyleDeclaration" in self.world.chain(interface) and "-" in name:
+                name = name.split("-")[0] + "".join(part[:1].upper() + part[1:] for part in name.split("-")[1:])
+            name = "set" + wk_ucfirst(name)
             implemented_by = member.attrs.get("ImplementedBy")
             if implemented_by:
                 self.headers.add(f"{implemented_by}.h")
@@ -817,7 +839,8 @@ class Generator(ComplexGeneratorMixin):
         except Unsupported as error:
             self.skip(interface, member, str(error))
             return
-        base = f"{snake(interface)}_{{}}_{snake(member.name)}"
+        suffix = "_css" if "-" in member.name else ""
+        base = f"{snake(interface)}_{{}}_{snake(member.name)}{suffix}"
         idl_text = f"{'readonly ' if member.readonly else ''}attribute {member.type} {member.name}"
         # Getter.
         if "CustomGetter" in member.attrs and f"{interface}.{member.name}" not in self.world.config.get("customGetters", []):
@@ -1030,7 +1053,7 @@ class Generator(ComplexGeneratorMixin):
             if cls == "Node":
                 body.append("RefPtr<Node> impl = nodeOf(target);")
             else:
-                body += [f"RefPtr impl = dynamicDowncast<{cls}>(*nodeOf(target));", "if (!impl)", "    return RV_ERR_WRONG_INTERFACE;"]
+                body += [f"RefPtr impl = {self.cast_expression(cls, 'Node', '*nodeOf(target)')};", "if (!impl)", "    return RV_ERR_WRONG_INTERFACE;"]
         elif "Event" in chain:
             if cls == "Event":
                 body.append("RefPtr<Event> impl = eventOf(target);")

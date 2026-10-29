@@ -13,7 +13,7 @@ STRINGS = {'DOMString', 'USVString', 'ByteString'}
 
 
 def identifier(name):
-    return f'``{name}``' if name in KEYWORDS else name
+    return f'``{name}``' if name in KEYWORDS or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', name) else name
 
 
 def label(t):
