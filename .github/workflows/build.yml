@@ -409,6 +409,14 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/typed_style_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify typed style maps
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/style_property_maps.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify declared typed map mutation isolation
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/declared_style_maps.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Build Windows UI Automation OS clients
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
         run: >-

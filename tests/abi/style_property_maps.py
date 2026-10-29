@@ -149,6 +149,31 @@ def verify(native_directory):
         expect(values.present == 0 and values.count == 0 and not values.items, 'getAll release resets ownership')
         expect(get_all(inline, document, *data('width'), ctypes.byref(values)) == 0 and values.count == 0, 'missing getAll is empty')
         release_values(ctypes.byref(values))
+
+        def read_all(map_value, property_name):
+            result = Values()
+            expect(get_all(map_value, document, *data(property_name), ctypes.byref(result)) == 0, 'getAll ' + property_name)
+            try:
+                expect(result.present == 1, 'getAll present ' + property_name)
+                return [serialized(result.items[index]) if result.items[index] else None for index in range(result.count)]
+            finally:
+                release_values(ctypes.byref(result))
+                expect(result.present == 0 and result.count == 0 and not result.items, 'getAll cleanup ' + property_name)
+
+        for property_name, layers in [
+            ('background-clip', ['border-box', 'content-box']),
+            ('background-origin', ['padding-box', 'border-box']),
+            ('background-size', ['10px 20px', '30px 40px']),
+        ]:
+            write(inline, property_name, layers[:1])
+            write(inline, property_name, layers[1:], append)
+            expect(read_all(inline, property_name) == layers, 'outer commas preserve inner layer spaces: ' + property_name)
+        write(inline, 'animation-name', ['first', 'second'])
+        write(inline, 'animation-name', ['third'], append)
+        expect(read_all(inline, 'animation-name') == ['first', 'second', 'third'], 'existing comma-list control')
+        write(inline, 'grid-auto-columns', ['10px', '20px'])
+        expect(read_all(inline, 'grid-auto-columns') == ['10px', '20px'], 'legitimate space-list control')
+
         sequence = input_values(['1px'])
         expect(set_value(computed, document, *data('height'), ctypes.byref(sequence)) == -11, 'readonly map rejects mutator')
         expect(get(inline, None, *data('height'), ctypes.byref(MaybeValue())) == -1, 'null explicit context rejected')
@@ -194,6 +219,8 @@ def verify(native_directory):
         bind('rv_host_destroy', None, [pointer])(host)
         if search:
             search.close()
+    if assertions != 189:
+        raise AssertionError(f'Incomplete typed style map regression: {assertions} assertions, expected 189')
     print(f'PASS typed style maps: {assertions} assertions; retained handles released', flush=True)
 
 

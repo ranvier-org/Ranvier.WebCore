@@ -1,0 +1,26 @@
+Subject: [PATCH] Replace custom declarations through explicit typed style setters
+
+diff --git a/Source/WebCore/css/typedom/DeclaredStylePropertyMap.cpp b/Source/WebCore/css/typedom/DeclaredStylePropertyMap.cpp
+--- a/Source/WebCore/css/typedom/DeclaredStylePropertyMap.cpp
++++ b/Source/WebCore/css/typedom/DeclaredStylePropertyMap.cpp
+@@ -133,7 +133,7 @@
+         return false;
+ 
+     Ref customPropertyValue = CSSCustomPropertyValue::createUnresolved(property, WTF::move(value));
+-    protect(styleRule->mutableProperties())->addParsedProperty(CSSProperty(CSSPropertyCustom, WTF::move(customPropertyValue)));
++    protect(styleRule->mutableProperties())->setProperty(CSSProperty(CSSPropertyCustom, WTF::move(customPropertyValue)));
+     return true;
+ }
+ 
+diff --git a/Source/WebCore/dom/StyledElement.cpp b/Source/WebCore/dom/StyledElement.cpp
+--- a/Source/WebCore/dom/StyledElement.cpp
++++ b/Source/WebCore/dom/StyledElement.cpp
+@@ -257,7 +257,7 @@
+ 
+ bool StyledElement::setInlineStyleCustomProperty(Ref<CSSValue>&& customPropertyValue, IsImportant important)
+ {
+-    bool changes = ensureMutableInlineStyle()->addParsedProperty(CSSProperty(CSSPropertyCustom, WTF::move(customPropertyValue), important));
++    bool changes = ensureMutableInlineStyle()->setProperty(CSSProperty(CSSPropertyCustom, WTF::move(customPropertyValue), important));
+     if (changes)
+         inlineStyleChanged();
+     return changes;
