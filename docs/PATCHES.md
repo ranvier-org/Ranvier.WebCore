@@ -1,12 +1,12 @@
 # The patch series
 
-`patches/series` lists sixteen patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012, 0014 and 0015, changes nothing unless
+`patches/series` lists eighteen patches, applied in order over the WebKit commit in `pins.json` by
+`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012, 0014, 0015, 0016 and 0017, changes nothing unless
 its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
 WebKit's feature implementations. 0010 changes which symbols WebCore exports and which members the host may override,
 and no behavior. 0012 adds the sources an embedder names to WebCore. 0013's option is set for macOS in every
 flavor, because the package always loads WebCore outside its framework bundle (`config/mac.cmake`).
-0014 and 0015 correct stylesheet mutation behavior in every flavor.
+0014, 0015, 0016 and 0017 correct stylesheet mutation and retained-object behavior in every flavor.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in these places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
@@ -15,7 +15,10 @@ They edit upstream C++ in these places: 0003 changes `CryptoDigestWin.cpp`, `Cry
 and also changes `PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjectCache.cpp`, `FrameSelection.h`,
 `FrameSelection.cpp`, `ChromeClient.h` and `OptionsCommon.cmake`. 0012 adds a CMake hook to `Source/WebCore/CMakeLists.txt`. 0013 changes `LocalizedStrings.cpp` and
 `OptionsMac.cmake`. 0014 changes `CSSStyleSheet.cpp`; 0015 changes `CSSKeyframeRule.h`, `CSSKeyframeRule.cpp`,
-`CSSKeyframesRule.cpp` and `CSSStyleSheet.cpp`. The patches touch 79 files in all.
+`CSSKeyframesRule.cpp` and `CSSStyleSheet.cpp`. 0016 changes `CSSCounterStyleRule.cpp` and
+`CSSCounterStyleRule.h`. 0017 changes `CSSRule.h`, `CSSRule.cpp`, `CSSFontFaceRule.h`,
+`PropertySetCSSDescriptors.h`, `PropertySetCSSDescriptors.cpp` and `CSSPositionTryDescriptors.cpp`.
+The patches touch 87 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -38,6 +41,8 @@ The sizes are the reduction each patch measured when it was added, on Windows x6
 | 0013-unbundled-strings | `USE_UNBUNDLED_LOCALIZED_STRINGS` (macOS) | | none |
 | 0014-constructed-sheet-replacement | none, always applies | | correctness repair |
 | 0015-keyframe-offset-invalidation | none, always applies | | correctness repair |
+| 0016-counter-style-name | none, always applies | | correctness repair |
+| 0017-detached-cssom-context | none, always applies | | correctness repair |
 
 ## Conventions
 
@@ -278,6 +283,20 @@ CSSKeyframeRule offset edits enter the parent CSSKeyframesRule mutation scope so
 StyleRuleKeyframes copies its child offsets and declarations independently when stylesheet contents detach for mutation. Existing CSSKeyframeRule and style wrappers reattach to the copied children. Editing a retained keyframe after deletion also works when its parent is null.
 
 `tests/abi/keyframe_rules.py` holds a CSS animation paused at 25% progress using a negative delay. It verifies computed effects, shared stylesheet isolation, retained wrappers, invalid/no-op input and checked ABI errors; CI runs it against each slim runtime and package audits run it against extracted payloads.
+
+## 0016-counter-style-name
+
+CSSCounterStyleRule name edits update both the style rule's public name and its counter-style descriptors under the existing mutation scope. Getters/serialization and the renderer's counter registry resolve the same name after copy-on-write.
+
+`tests/abi/counter_style_rules.py` retains rules from two identical stylesheets, removes the second from the active cascade and renames the first. It checks public metadata, complete copy isolation, rendered old/new-name marker effects against literal and decimal controls, invalid/checked errors and detached-rule edits. Slim CI and extracted-package audits run the regression.
+
+## 0017-detached-cssom-context
+
+Retained CSSOM rules keep a weak original settings document and snapshot parser context before losing their parent. The binding helpers prefer live parent/stylesheet scope context while attached. Descriptor objects retain their own weak context so they survive their rule. Disabled or expired document contexts remain unsupported; no global raw-pointer registry or strong document reference is added.
+
+Detached position-try/font-face descriptor edits copy shared backing rules/property sets before mutation and preserve existing descriptor identity. Attached mutations retain stylesheet notification and copy-on-write pairing. The CSSRule size assertion explicitly accounts for one context pointer; the parsed source rule layout is unchanged.
+
+`tests/abi/detached_cssom_context.py` covers retained and late-acquired rules/descriptors, grouping-rule context, ownerless sheets, shared-sheet isolation with actual anchored layout, checked errors and weak owner expiry. Slim CI and extracted-package audits run it. A live settings-toggle scenario is not currently exercised by the public ABI test.
 
 ## Working on the series
 

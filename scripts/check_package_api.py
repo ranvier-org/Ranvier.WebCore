@@ -31,7 +31,7 @@ def verify(package):
                 files += 1
             if files == 0:
                 raise ValueError('Package has no native payload for ' + rid)
-        for name in ['css_supports', 'computed_style', 'fragment_rectangles', 'keyframe_rules']:
+        for name in ['css_supports', 'computed_style', 'fragment_rectangles', 'keyframe_rules', 'counter_style_rules', 'detached_cssom_context']:
             subprocess.run([sys.executable, '-I', str(root / 'tests/abi' / (name + '.py')),
                             '--native-directory', str(destination)], check=True)
         print(f'PASS packaged API probes: {rid}, {files} native/resource files')

@@ -1,0 +1,30 @@
+diff --git a/Source/WebCore/css/CSSCounterStyleRule.cpp b/Source/WebCore/css/CSSCounterStyleRule.cpp
+index b88bcf7..0eca514 100644
+--- a/Source/WebCore/css/CSSCounterStyleRule.cpp
++++ b/Source/WebCore/css/CSSCounterStyleRule.cpp
+@@ -201,7 +201,7 @@ void CSSCounterStyleRule::setName(const String& text)
+     if (!name)
+         return;
+     CSSStyleSheet::RuleMutationScope mutationScope(this);
+-    mutableDescriptors().setName(WTF::move(name));
++    m_counterStyleRule->setName(name);
+ }
+ 
+ void CSSCounterStyleRule::setSystem(const String& text)
+diff --git a/Source/WebCore/css/CSSCounterStyleRule.h b/Source/WebCore/css/CSSCounterStyleRule.h
+index 39973fe..e44232d 100644
+--- a/Source/WebCore/css/CSSCounterStyleRule.h
++++ b/Source/WebCore/css/CSSCounterStyleRule.h
+@@ -55,7 +55,11 @@ public:
+     String speakAs() const { return { }; }
+     bool newValueInvalidOrEqual(CSSPropertyID, const RefPtr<CSSValue> newValue) const;
+ 
+-    void setName(const AtomString& name) { m_name = name; }
++    void setName(const AtomString& name)
++    {
++        m_name = name;
++        m_descriptors.setName(name);
++    }
+ 
+ private:
+     explicit StyleRuleCounterStyle(const AtomString&, CSSCounterStyleDescriptors&&);

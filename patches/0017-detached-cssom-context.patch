@@ -1,0 +1,364 @@
+diff --git a/Source/WebCore/css/CSSFontFaceRule.h b/Source/WebCore/css/CSSFontFaceRule.h
+index 42668450ad..fc45499ba3 100644
+--- a/Source/WebCore/css/CSSFontFaceRule.h
++++ b/Source/WebCore/css/CSSFontFaceRule.h
+@@ -37,6 +37,7 @@ public:
+     WEBCORE_EXPORT CSSFontFaceDescriptors& style();
+ 
+ private:
++    friend class CSSRule;
+     CSSFontFaceRule(StyleRuleFontFace&, CSSStyleSheet* parent);
+ 
+     StyleRuleType styleRuleType() const final { return StyleRuleType::FontFace; }
+diff --git a/Source/WebCore/css/CSSPositionTryDescriptors.cpp b/Source/WebCore/css/CSSPositionTryDescriptors.cpp
+index 4c9700a52f..02ec649100 100644
+--- a/Source/WebCore/css/CSSPositionTryDescriptors.cpp
++++ b/Source/WebCore/css/CSSPositionTryDescriptors.cpp
+@@ -484,12 +484,10 @@ ExceptionOr<void> CSSPositionTryDescriptors::setPropertyInternal(CSSPropertyID p
+ 
+     auto invalidateAllRememberedLastSuccessfulPositionOptions = [&] () {
+         RefPtr strongParentRule = m_parentRule.get();
+-        ASSERT(strongParentRule);
+         if (!strongParentRule)
+             return;
+ 
+         RefPtr parentStyleSheet = strongParentRule->parentStyleSheet();
+-        ASSERT(parentStyleSheet);
+         if (!parentStyleSheet)
+             return;
+ 
+diff --git a/Source/WebCore/css/CSSRule.cpp b/Source/WebCore/css/CSSRule.cpp
+index 4160e8a2a4..418b7f4212 100644
+--- a/Source/WebCore/css/CSSRule.cpp
++++ b/Source/WebCore/css/CSSRule.cpp
+@@ -22,23 +22,125 @@
+ #include "config.h"
+ #include "CSSRule.h"
+ 
++#include "CSSParserContext.h"
++#include "CSSFontFaceRule.h"
++#include "CSSPositionTryRule.h"
+ #include "CSSScopeRule.h"
+ #include "CSSStyleRule.h"
+ #include "CSSStyleSheet.h"
++#include "Document.h"
++#include "NodeDocument.h"
+ #include "StyleRule.h"
+ #include "StyleSheetContents.h"
++#include "StyleScope.h"
+ #include "css/parser/CSSParserEnum.h"
+ 
+ namespace WebCore {
+ 
++struct CSSRule::BindingsContext {
++    WTF_DEPRECATED_MAKE_STRUCT_FAST_ALLOCATED(BindingsContext);
++    WeakPtr<Document, WeakPtrImplWithEventTargetData> document;
++    std::unique_ptr<CSSParserContext> parserContext;
++};
++
+ struct SameSizeAsCSSRule : public RefCountedAndCanMakeWeakPtr<SameSizeAsCSSRule> {
+     virtual ~SameSizeAsCSSRule();
+     unsigned char bitfields;
+     void* pointerUnion;
++    void* bindingsContext;
+ };
+ 
+ static_assert(sizeof(CSSRule) == sizeof(SameSizeAsCSSRule), "CSSRule should stay small");
+ 
++CSSRule::CSSRule(CSSStyleSheet* parent)
++    : m_hasCachedSelectorText(false)
++    , m_parentIsRule(false)
++    , m_parentStyleSheet(parent)
++{
++    rememberBindingsContext(false);
++}
++
++CSSRule::~CSSRule() = default;
++
++Document* CSSRule::documentForBindings() const
++{
++    if (auto* rule = parentRule())
++        return rule->documentForBindings();
++    if (auto* sheet = parentStyleSheet()) {
++        auto& root = sheet->rootStyleSheet();
++        if (auto* node = root.ownerNode())
++            return &node->document();
++        if (auto* document = root.constructorDocument())
++            return document;
++        if (auto* scope = root.styleScope())
++            return &scope->document();
++    }
++    return m_bindingsContext ? m_bindingsContext->document.get() : nullptr;
++}
++
++void CSSRule::rememberBindingsContext(bool preserveParserContext)
++{
++    if (preserveParserContext) {
++        if (!m_bindingsContext)
++            m_bindingsContext = makeUnique<BindingsContext>();
++        m_bindingsContext->parserContext = makeUnique<CSSParserContext>(parserContext());
++        return;
++    }
++    auto* document = documentForBindings();
++    if (!document)
++        return;
++    if (!m_bindingsContext)
++        m_bindingsContext = makeUnique<BindingsContext>();
++    m_bindingsContext->document = document;
++}
++
++bool CSSRule::prepareForDetachedDescriptorMutation()
++{
++    if (auto* rule = dynamicDowncast<CSSPositionTryRule>(*this)) {
++        if (!rule->positionTryRule().hasOneRef()) {
++            Ref copy = rule->positionTryRule().copy();
++            reattach(copy.get());
++        }
++        return true;
++    }
++    if (auto* rule = dynamicDowncast<CSSFontFaceRule>(*this)) {
++        if (!rule->m_fontFaceRule->hasOneRef()) {
++            Ref copy = rule->m_fontFaceRule->copy();
++            reattach(copy.get());
++        }
++        return true;
++    }
++    return false;
++}
++
++void CSSRule::setParentStyleSheet(CSSStyleSheet* styleSheet)
++{
++    rememberBindingsContext(true);
++    m_parentIsRule = false;
++    m_parentStyleSheet = styleSheet;
++    if (styleSheet) {
++        if (m_bindingsContext) {
++            m_bindingsContext->document = nullptr;
++            m_bindingsContext->parserContext = nullptr;
++        }
++        rememberBindingsContext(false);
++    }
++}
++
++void CSSRule::setParentRule(CSSRule* rule)
++{
++    rememberBindingsContext(true);
++    m_parentIsRule = true;
++    m_parentRule = rule;
++    if (rule) {
++        if (m_bindingsContext) {
++            m_bindingsContext->document = nullptr;
++            m_bindingsContext->parserContext = nullptr;
++        }
++        rememberBindingsContext(false);
++    }
++}
++
+ unsigned short CSSRule::typeForCSSOM() const
+ {
+     // "This enumeration is thus frozen in its current state, and no new new values will be
+@@ -57,8 +159,13 @@ ExceptionOr<void> CSSRule::setCssText(const String&)
+ 
+ const CSSParserContext& CSSRule::parserContext() const
+ {
+-    RefPtr styleSheet = parentStyleSheet();
+-    return styleSheet ? styleSheet->contents().parserContext() : strictCSSParserContext();
++    if (auto* styleSheet = parentStyleSheet())
++        return styleSheet->contents().parserContext();
++    if (auto* rule = parentRule())
++        return rule->parserContext();
++    if (m_bindingsContext && m_bindingsContext->parserContext)
++        return *m_bindingsContext->parserContext;
++    return strictCSSParserContext();
+ }
+ 
+ bool CSSRule::hasStyleRuleAncestor() const
+diff --git a/Source/WebCore/css/CSSRule.h b/Source/WebCore/css/CSSRule.h
+index e7ef73130c..95f552098b 100644
+--- a/Source/WebCore/css/CSSRule.h
++++ b/Source/WebCore/css/CSSRule.h
+@@ -24,6 +24,7 @@
+ 
+ #include <WebCore/CSSParserEnum.h>
+ #include <WebCore/StyleRuleType.h>
++#include <memory>
+ #include <wtf/RefCountedAndCanMakeWeakPtr.h>
+ #include <wtf/TypeCasts.h>
+ #include <wtf/text/WTFString.h>
+@@ -31,6 +32,8 @@
+ namespace WebCore {
+ 
+ class CSSStyleSheet;
++class Document;
++class PropertySetCSSDescriptors;
+ class StyleRuleBase;
+ class StyleRule;
+ class StyleRuleWithNesting;
+@@ -45,7 +48,7 @@ struct SerializationContext;
+ 
+ class CSSRule : public RefCountedAndCanMakeWeakPtr<CSSRule> {
+ public:
+-    virtual ~CSSRule() = default;
++    virtual ~CSSRule();
+ 
+     WEBCORE_EXPORT unsigned short typeForCSSOM() const;
+ 
+@@ -58,6 +61,8 @@ public:
+     void setParentStyleSheet(CSSStyleSheet*);
+     void setParentRule(CSSRule*);
+     CSSStyleSheet* parentStyleSheet() const;
++    Document* documentForBindings() const;
++    bool prepareForDetachedDescriptorMutation();
+     CSSRule* parentRule() const { return m_parentIsRule ? m_parentRule : nullptr; }
+     bool hasStyleRuleAncestor() const;
+     CSSParserEnum::NestedContext nestedContext() const;
+@@ -75,33 +80,19 @@ protected:
+     const CSSParserContext& parserContext() const;
+ 
+ private:
++    friend class PropertySetCSSDescriptors;
++    struct BindingsContext;
++    void rememberBindingsContext(bool preserveParserContext);
++
+     mutable unsigned char m_hasCachedSelectorText : 1;
+     unsigned char m_parentIsRule : 1;
+     union {
+         CSSRule* m_parentRule;
+         CSSStyleSheet* m_parentStyleSheet;
+     };
++    std::unique_ptr<BindingsContext> m_bindingsContext;
+ };
+ 
+-inline CSSRule::CSSRule(CSSStyleSheet* parent)
+-    : m_hasCachedSelectorText(false)
+-    , m_parentIsRule(false)
+-    , m_parentStyleSheet(parent)
+-{
+-}
+-
+-inline void CSSRule::setParentStyleSheet(CSSStyleSheet* styleSheet)
+-{
+-    m_parentIsRule = false;
+-    m_parentStyleSheet = styleSheet;
+-}
+-
+-inline void CSSRule::setParentRule(CSSRule* rule)
+-{
+-    m_parentIsRule = true;
+-    m_parentRule = rule;
+-}
+-
+ inline CSSStyleSheet* CSSRule::parentStyleSheet() const
+ {
+     if (m_parentIsRule)
+diff --git a/Source/WebCore/css/PropertySetCSSDescriptors.cpp b/Source/WebCore/css/PropertySetCSSDescriptors.cpp
+index b1f6449922..6c147da11a 100644
+--- a/Source/WebCore/css/PropertySetCSSDescriptors.cpp
++++ b/Source/WebCore/css/PropertySetCSSDescriptors.cpp
+@@ -46,12 +46,21 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(PropertySetCSSDescriptors);
+ 
+ PropertySetCSSDescriptors::PropertySetCSSDescriptors(MutableStyleProperties& propertySet, CSSRule& parentRule)
+     : m_parentRule(&parentRule)
++    , m_originalDocument(parentRule.documentForBindings())
++    , m_originalParserContext(parentRule.parserContext())
+     , m_propertySet(propertySet)
+ {
+ }
+ 
+ PropertySetCSSDescriptors::~PropertySetCSSDescriptors() = default;
+ 
++Document* PropertySetCSSDescriptors::documentForBindings() const
++{
++    if (auto* rule = m_parentRule.get())
++        return rule->documentForBindings();
++    return m_originalDocument.get();
++}
++
+ unsigned PropertySetCSSDescriptors::length() const
+ {
+     Ref propertySet = m_propertySet;
+@@ -250,14 +259,17 @@ bool PropertySetCSSDescriptors::willMutate()
+     }
+ 
+     RefPtr strongParentRule = m_parentRule.get();
+-    ASSERT(strongParentRule);
+-    if (!strongParentRule)
+-        return false;
++    if (!strongParentRule) {
++        if (ruleType() != StyleRuleType::FontFace && ruleType() != StyleRuleType::PositionTry)
++            return false;
++        if (!m_propertySet->hasOneRef())
++            m_propertySet = m_propertySet->mutableCopy();
++        return true;
++    }
+ 
+     RefPtr strongParentStyleSheet = strongParentRule->parentStyleSheet();
+-    ASSERT(strongParentStyleSheet);
+     if (!strongParentStyleSheet)
+-        return false;
++        return strongParentRule->prepareForDetachedDescriptorMutation();
+ 
+     strongParentStyleSheet->willMutateRules();
+     return true;
+@@ -269,12 +281,10 @@ void PropertySetCSSDescriptors::didMutate(MutationType type)
+         m_cssomValueWrappers.clear();
+ 
+     RefPtr strongParentRule = m_parentRule.get();
+-    ASSERT(strongParentRule);
+     if (!strongParentRule)
+         return;
+ 
+     RefPtr strongParentStyleSheet = strongParentRule->parentStyleSheet();
+-    ASSERT(strongParentStyleSheet);
+     if (!strongParentStyleSheet)
+         return;
+ 
+@@ -297,8 +307,8 @@ CSSRule* PropertySetCSSDescriptors::parentRule() const
+ 
+ CSSParserContext PropertySetCSSDescriptors::cssParserContext() const
+ {
+-    RefPtr cssStyleSheet = parentStyleSheet();
+-    auto context = cssStyleSheet ? cssStyleSheet->contents().parserContext() : CSSParserContext(propertySet().cssParserMode());
++    auto* rule = m_parentRule.get();
++    auto context = rule ? rule->parserContext() : m_originalParserContext;
+ 
+     context.enclosingRuleType = ruleType();
+ 
+diff --git a/Source/WebCore/css/PropertySetCSSDescriptors.h b/Source/WebCore/css/PropertySetCSSDescriptors.h
+index 0b81e53b7d..2c8f3e4617 100644
+--- a/Source/WebCore/css/PropertySetCSSDescriptors.h
++++ b/Source/WebCore/css/PropertySetCSSDescriptors.h
+@@ -25,6 +25,7 @@
+ #pragma once
+ 
+ #include <WebCore/CSSProperty.h>
++#include <WebCore/CSSParserContext.h>
+ #include <WebCore/CSSPropertyNames.h>
+ #include <WebCore/CSSStyleDeclaration.h>
+ #include <wtf/HashMap.h>
+@@ -35,6 +36,8 @@
+ namespace WebCore {
+ 
+ struct CSSParserContext;
++class Document;
++class WeakPtrImplWithEventTargetData;
+ enum class StyleRuleType : uint8_t;
+ 
+ class PropertySetCSSDescriptors : public CSSStyleDeclaration, public RefCounted<PropertySetCSSDescriptors> {
+@@ -47,6 +50,7 @@ public:
+ 
+     void clearParentRule() { m_parentRule = nullptr; }
+     void reattach(MutableStyleProperties&);
++    Document* documentForBindings() const;
+ 
+     virtual StyleRuleType ruleType() const = 0;
+ 
+@@ -84,6 +88,8 @@ protected:
+     MutableStyleProperties& propertySet() const { return m_propertySet; }
+ 
+     WeakPtr<CSSRule> m_parentRule;
++    WeakPtr<Document, WeakPtrImplWithEventTargetData> m_originalDocument;
++    CSSParserContext m_originalParserContext;
+     HashMap<CSSValue*, WeakPtr<DeprecatedCSSOMValue>> m_cssomValueWrappers;
+ 
+     // FIXME: Replaced this with a more descriptor specific property map that doesn't have all the complexity of the Style one.

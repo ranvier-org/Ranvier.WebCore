@@ -354,7 +354,7 @@ interface CSSGroupingRule : CSSRule {};
         self.assertLess(glue.index('dynamicDowncast<CSSStartingStyleRule>'), glue.index('dynamicDowncast<CSSGroupingRule>'))
         self.assertIn('return copyString("CSSRule"_s, buffer, capacity, length)', glue)
 
-    def test_css_rule_and_descriptor_settings_use_owner_or_constructor_document(self):
+    def test_css_rule_and_descriptor_settings_use_retained_binding_document(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
 interface CSSRule {};
@@ -374,8 +374,9 @@ interface CSSFontFaceDescriptors : CSSStyleDeclaration {
         generator.run()
         self.assertEqual(len(generator.functions), 3)
         glue = generator.glue()
-        self.assertIn('settingsSheet->ownerDocument()', glue)
-        self.assertIn('settingsSheet->constructorDocument()', glue)
+        self.assertEqual(glue.count('RefPtr<Document> settingsDocument = impl->documentForBindings();'), 3)
+        self.assertNotIn('settingsSheet->ownerDocument()', glue)
+        self.assertIn('if (!settingsDocument)\n        return RV_ERR_UNSUPPORTED;', glue)
         self.assertIn('settings.cssAnchorPositioningEnabled', glue)
         self.assertIn('settings.cssFontFaceMetricOverrideDescriptorsEnabled', glue)
 
