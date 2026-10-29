@@ -97,5 +97,7 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', tests / 'area_surface.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'cssom_surface.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'keyframe_rules.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'counter_style_rules.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'detached_cssom_context.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'svg_mathml_surface.py', '--native-directory', out])
 print('abi tests passed', flush=True)

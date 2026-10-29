@@ -415,7 +415,7 @@ interface CSSGroupingRule : CSSRule {};
         self.assertLess(glue.index('dynamicDowncast<CSSStartingStyleRule>'), glue.index('dynamicDowncast<CSSGroupingRule>'))
         self.assertIn('return copyString("CSSRule"_s, buffer, capacity, length)', glue)
 
-    def test_css_rule_and_descriptor_settings_use_owner_or_constructor_document(self):
+    def test_css_rule_and_descriptor_settings_use_retained_binding_document(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
 interface CSSRule {};
@@ -435,8 +435,9 @@ interface CSSFontFaceDescriptors : CSSStyleDeclaration {
         generator.run()
         self.assertEqual(len(generator.functions), 3)
         glue = generator.glue()
-        self.assertIn('settingsSheet->ownerDocument()', glue)
-        self.assertIn('settingsSheet->constructorDocument()', glue)
+        self.assertEqual(glue.count('RefPtr<Document> settingsDocument = impl->documentForBindings();'), 3)
+        self.assertNotIn('settingsSheet->ownerDocument()', glue)
+        self.assertIn('if (!settingsDocument)\n        return RV_ERR_UNSUPPORTED;', glue)
         self.assertIn('settings.cssAnchorPositioningEnabled', glue)
         self.assertIn('settings.cssFontFaceMetricOverrideDescriptorsEnabled', glue)
 
@@ -545,6 +546,42 @@ interface CSSFontFaceDescriptors : CSSStyleDeclaration {
         source = self.generator.interfaces()
         self.assertIn('abstract member namedItem:', source)
         self.assertIn('$0[$1]', source)
+
+    def test_dataset_named_lookup_uses_own_keys_and_missing_string(self):
+        source = self.generator.interfaces()
+        start = source.index('and [<AllowNullLiteral>] DOMStringMap =')
+        section = source[start:].split('\n/// <summary>', 1)[0]
+        self.assertIn('Object.prototype.hasOwnProperty.call', section)
+        self.assertIn("?$0[$1]:''", section)
+
+    def test_stylesheet_named_lookup_uses_document_id_semantics(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface StyleSheet {};
+interface CSSStyleSheet : StyleSheet {};
+interface StyleSheetList {
+    readonly attribute unsigned long length;
+    getter CSSStyleSheet? item(unsigned long index);
+    getter CSSStyleSheet? (DOMString name);
+};
+partial interface Document { readonly attribute StyleSheetList styleSheets; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Document', 'DOMImplementation', 'StyleSheet', 'CSSStyleSheet', 'StyleSheetList']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        source = generator.interfaces()
+        start = source.index('and [<AllowNullLiteral>] StyleSheetList =')
+        section = source[start:]
+        section = section.split('\n/// <summary>', 1)[0]
+        self.assertIn('getElementById', section)
+        self.assertIn('styleSheets', section)
+        self.assertNotIn('Emit("$0[$1]")', section)
+        self.assertIn('new WeakMap()', source)
+        self.assertIn('new WeakRef(r)', source)
+        self.assertIn('Reflect.defineProperty(s,k,{value:v})', source)
 
     def test_explicit_custom_getter_override_maps_node_type_only(self):
         self.assertIn('node_get_node_type', {function.name for function in self.generator.functions})

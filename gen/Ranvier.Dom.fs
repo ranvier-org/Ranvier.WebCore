@@ -192,8 +192,13 @@ and [<AllowNullLiteral>] ShadowRoot =
     abstract member elementFromPoint: x: float * y: float -> Element
     /// <summary>ShadowRoot.elementsFromPoint.</summary>
     abstract member elementsFromPoint: x: float * y: float -> (Element) array
+
     /// <summary>ShadowRoot.styleSheets.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((r)=>{const s=r.styleSheets;if(r.nodeType===9){const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');const m=globalThis[k]||(globalThis[k]=new WeakMap());let v=m.get(s);if(!v){v=new WeakRef(r);m.set(s,v);}if(!Object.getOwnPropertyDescriptor(s,k))Reflect.defineProperty(s,k,{value:v});}return s;})($0)")>]
+#endif
     abstract member styleSheets: StyleSheetList with get
+
     /// <summary>ShadowRoot.fullscreenElement.</summary>
     abstract member fullscreenElement: Element with get
     /// <summary>ShadowRoot.pointerLockElement.</summary>
@@ -332,8 +337,13 @@ and [<AllowNullLiteral>] Document =
     abstract member elementFromPoint: x: float * y: float -> Element
     /// <summary>Document.elementsFromPoint.</summary>
     abstract member elementsFromPoint: x: float * y: float -> (Element) array
+
     /// <summary>Document.styleSheets.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((r)=>{const s=r.styleSheets;if(r.nodeType===9){const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');const m=globalThis[k]||(globalThis[k]=new WeakMap());let v=m.get(s);if(!v){v=new WeakRef(r);m.set(s,v);}if(!Object.getOwnPropertyDescriptor(s,k))Reflect.defineProperty(s,k,{value:v});}return s;})($0)")>]
+#endif
     abstract member styleSheets: StyleSheetList with get
+
 
 /// <summary>HTMLDocument in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLDocument =
@@ -1836,7 +1846,7 @@ and [<AllowNullLiteral>] StyleSheetList =
 
     /// <summary>StyleSheetList.namedItem.</summary>
 #if FABLE_COMPILER
-    [<Fable.Core.Emit("$0[$1]")>]
+    [<Fable.Core.Emit("((s,n)=>{const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');const m=globalThis[k];let d;try{d=WeakRef.prototype.deref.call(Object.getOwnPropertyDescriptor(s,k)?.value);}catch{}d=d||m?.get(s)?.deref()||(s.length?s.item(0)?.ownerNode?.ownerDocument:null);if(!d||d.styleSheets!==s)return null;const e=d.getElementById(n??'');return e&&e.namespaceURI==='http://www.w3.org/1999/xhtml'&&e.localName==='style'?e.sheet:null;})($0,$1)")>]
 #endif
     abstract member namedItem: name: string -> CSSStyleSheet
 
@@ -2340,7 +2350,7 @@ and [<AllowNullLiteral>] DOMStringMap =
 
     /// <summary>DOMStringMap.namedItem.</summary>
 #if FABLE_COMPILER
-    [<Fable.Core.Emit("$0[$1]")>]
+    [<Fable.Core.Emit("(Object.prototype.hasOwnProperty.call($0,$1)?$0[$1]:'')")>]
 #endif
     abstract member namedItem: name: string -> string
 

@@ -61,6 +61,16 @@ jobs:
         run: |
           dotnet fickl tests/generator/browser/FullBrowser.fsproj --outDir artifacts/full-browser/js --noCache --extension .js
           node artifacts/full-browser/js/FullBrowser.js
+      - name: Verify named getters against actual Chromium DOM objects
+        run: |
+          dotnet fickl tests/generator/browser/NamedLookupBrowser.fsproj --outDir artifacts/named-lookup/js --noCache --extension .js
+          python -I tests/generator/browser/run_named_lookup.py --browser "$(command -v google-chrome)" --output artifacts/named-lookup/js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: named-lookup-browser-proof
+          path: artifacts/named-lookup/js/named-lookup-*.html
+          if-no-files-found: ignore
 
   plan:
     # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
@@ -382,6 +392,14 @@ jobs:
       - name: Verify paused animation effects after keyframe edits
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/keyframe_rules.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify counter style name and rendered marker edits
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/counter_style_rules.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify retained CSSOM settings context and isolated descriptor edits
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/detached_cssom_context.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
       - name: Build Windows UI Automation OS clients
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
