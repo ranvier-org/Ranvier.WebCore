@@ -59,6 +59,43 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_adopted_stylesheet_native_bridges_preserve_js_wrapper_contract(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface StyleSheet {};
+interface CSSStyleSheet : StyleSheet {};
+interface ShadowRoot : Node {};
+interface mixin DocumentOrShadowRoot {
+    [CallWith=CurrentGlobalObject, ImplementedAs=adoptedStyleSheetWrapper, CachedAttribute, CustomSetter]
+    attribute any adoptedStyleSheets;
+};
+Document includes DocumentOrShadowRoot;
+ShadowRoot includes DocumentOrShadowRoot;
+''')
+        config = dict(self.world.config)
+        selected = json.loads((ROOT / 'gen/dom.json').read_text())
+        config['interfaces'] = ['Node', 'Document', 'ShadowRoot', 'StyleSheet', 'CSSStyleSheet']
+        config['attributeBridges'] = selected.get('attributeBridges', {})
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {function['function']: function for function in json.loads(generator.api_model())['functions']}
+        for scope in ['document', 'shadow_root']:
+            get = functions[f'rv_dom_{scope}_get_adopted_style_sheets']
+            put = functions[f'rv_dom_{scope}_set_adopted_style_sheets']
+            self.assertEqual(get['returns']['kind'], 'sequence')
+            self.assertEqual(get['returns']['subtypes'][0]['interface'], 'CSSStyleSheet')
+            self.assertEqual(put['arguments'][0]['mapping']['kind'], 'sequence')
+            self.assertEqual(get['binding'], 'facade')
+            self.assertEqual(get['feature'], 'dom-adopted-style-sheets')
+        glue = generator.glue()
+        self.assertIn('impl->adoptedStyleSheets()', glue)
+        self.assertIn('impl->setAdoptedStyleSheets(', glue)
+        self.assertIn('"dom-adopted-style-sheets"', glue)
+        self.assertNotIn('adoptedStyleSheetWrapper(', glue)
+        self.assertNotIn('abstract member adoptedStyleSheets:', generator.interfaces())
+
     def test_configured_stylesheet_constructor_uses_document_receiver_and_cpp_init(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

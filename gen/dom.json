@@ -8,6 +8,20 @@
         "Members whose types or extended attributes the generator does not map are left out on their own and listed",
         "in gen/dom-report.txt."
     ],
+    "attributeBridges": {
+        "Document.adoptedStyleSheets": {
+            "sequenceElement": "CSSStyleSheet",
+            "getter": "impl->adoptedStyleSheets()",
+            "setter": "impl->setAdoptedStyleSheets({value})",
+            "feature": "dom-adopted-style-sheets"
+        },
+        "ShadowRoot.adoptedStyleSheets": {
+            "sequenceElement": "CSSStyleSheet",
+            "getter": "impl->adoptedStyleSheets()",
+            "setter": "impl->setAdoptedStyleSheets({value})",
+            "feature": "dom-adopted-style-sheets"
+        }
+    },
     "constructors": {
         "CSSStyleSheet": {
             "receiver": "Document",

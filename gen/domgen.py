@@ -672,6 +672,9 @@ class Generator(ComplexGeneratorMixin):
         return f"HTMLNames::{value}Attr"
 
     def getter_call(self, interface, member, mapped):
+        bridge = self.world.config.get("attributeBridges", {}).get(f"{interface}.{member.name}")
+        if bridge:
+            return bridge["getter"]
         attribute = self.reflect(member, False)
         name = member.attrs.get("ImplementedAs", member.name)
         if "CSSStyleDeclaration" in self.world.chain(interface) and "-" in name:
@@ -827,6 +830,9 @@ class Generator(ComplexGeneratorMixin):
         return lines
 
     def setter_call(self, interface, member, mapped, value):
+        bridge = self.world.config.get("attributeBridges", {}).get(f"{interface}.{member.name}")
+        if bridge:
+            return bridge["setter"].replace("{value}", value)
         attribute = self.reflect(member, True)
         if not attribute:
             name = member.attrs.get("ImplementedAs", member.name)
@@ -854,6 +860,12 @@ class Generator(ComplexGeneratorMixin):
         return f"impl->setAttributeWithoutSynchronization({attribute}, AtomString {{ {value} }})"
 
     def attribute(self, interface, member):
+        bridge = self.world.config.get("attributeBridges", {}).get(f"{interface}.{member.name}")
+        if bridge:
+            member = idl.Member(**member.__dict__)
+            member.type = idl.Type("sequence", subtypes=[idl.Type(bridge["sequenceElement"])])
+            member.attrs = {key: value for key, value in member.attrs.items()
+                            if key not in {"CallWith", "ImplementedAs", "CachedAttribute", "CustomSetter"}}
         reason = self.member_reason(interface, member)
         if reason:
             self.skip(interface, member, reason)
@@ -1183,6 +1195,10 @@ class Generator(ComplexGeneratorMixin):
             if function.kind == "constructor":
                 functions[-1]["receiver"] = self.world.config["constructors"][function.interface]["receiver"]
                 functions[-1]["feature"] = f"dom-constructor:{function.interface}"
+            bridge = self.world.config.get("attributeBridges", {}).get(f"{function.interface}.{function.member.name}")
+            if bridge:
+                functions[-1]["binding"] = "facade"
+                functions[-1]["feature"] = bridge["feature"]
         model = {
             "schemaVersion": 1,
             "runtimeTypeQueries": self.runtime_queries,
@@ -1399,6 +1415,11 @@ class Generator(ComplexGeneratorMixin):
         lines.append("        return 0;")
         groups = ["dom-generated"] + [f"dom:{name}" for name in self.world.scope] + [query['feature'] for query in self.runtime_queries]
         groups += [f"dom-constructor:{function.interface}" for function in self.functions if function.kind == "constructor"]
+        for label, bridge in self.world.config.get("attributeBridges", {}).items():
+            kinds = {function.kind for function in self.functions
+                     if f"{function.interface}.{function.member.name if function.member else ''}" == label}
+            if {"getter", "setter"}.issubset(kinds):
+                groups.append(bridge["feature"])
         lines.append("    for (auto* name : { " + ", ".join(f'"{g}"' for g in groups) + " }) {")
         lines.append("        if (!std::strcmp(feature, name))")
         lines.append("            return 1;")

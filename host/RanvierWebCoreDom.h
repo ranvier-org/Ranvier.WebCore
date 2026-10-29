@@ -45,6 +45,7 @@ typedef struct RvHTMLCollection RvHTMLCollection;
 typedef struct RvValidityState RvValidityState;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
+typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
 typedef struct RvDomSequenceElement RvDomSequenceElement;
 typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
@@ -297,6 +298,7 @@ typedef struct RvDomGetComposedRangesOptions {
 
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
+typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
 typedef struct RvDomSequenceElement RvDomSequenceElement;
 typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
@@ -336,6 +338,14 @@ struct RvDomSequenceNodeOrDOMString {
     int32_t present;
     int32_t count;
     RvDomUnionNodeOrDOMString* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceCSSStyleSheet {
+    int32_t present;
+    int32_t count;
+    RvStyleSheet** items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -548,6 +558,7 @@ struct RvDomSequencePointerEvent {
 };
 RV_EXPORT void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value);
+RV_EXPORT void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value);
 RV_EXPORT void rv_dom_sequence_element_release(RvDomSequenceElement* value);
 RV_EXPORT void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value);
 RV_EXPORT void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value);
@@ -794,6 +805,11 @@ RV_EXPORT int32_t rv_dom_shadow_root_set_reference_target(RvNode* target, const 
 RV_EXPORT int32_t rv_dom_shadow_root_get_active_element(RvNode* target, RvNode** result);
 /* ShadowRoot.styleSheets getter: readonly attribute StyleSheetList styleSheets; *result is a new reference */
 RV_EXPORT int32_t rv_dom_shadow_root_get_style_sheets(RvNode* target, RvStyleSheetList** result);
+/* ShadowRoot.adoptedStyleSheets getter: attribute sequence<CSSStyleSheet> adoptedStyleSheets; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_shadow_root_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result);
+/* ShadowRoot.adoptedStyleSheets setter: attribute sequence<CSSStyleSheet> adoptedStyleSheets */
+RV_EXPORT int32_t rv_dom_shadow_root_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value);
 /* ShadowRoot.fullscreenElement getter: readonly attribute Element? fullscreenElement; *result is a new reference, or
  * NULL; RV_ERR_UNSUPPORTED where WebKit builds without FULLSCREEN_API */
 RV_EXPORT int32_t rv_dom_shadow_root_get_fullscreen_element(RvNode* target, RvNode** result);
@@ -876,6 +892,11 @@ RV_EXPORT int32_t rv_dom_document_get_child_element_count(RvNode* target, uint32
 RV_EXPORT int32_t rv_dom_document_get_active_element(RvNode* target, RvNode** result);
 /* Document.styleSheets getter: readonly attribute StyleSheetList styleSheets; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_get_style_sheets(RvNode* target, RvStyleSheetList** result);
+/* Document.adoptedStyleSheets getter: attribute sequence<CSSStyleSheet> adoptedStyleSheets; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_document_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result);
+/* Document.adoptedStyleSheets setter: attribute sequence<CSSStyleSheet> adoptedStyleSheets */
+RV_EXPORT int32_t rv_dom_document_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value);
 /* Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) ->
  * Element; options defaults to {} in IDL; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_create_element(RvNode* target, const char* local_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);

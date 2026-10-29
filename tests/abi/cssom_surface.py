@@ -306,6 +306,77 @@ def verify(native_directory):
         replace_sync = bind('rv_dom_css_style_sheet_replace_sync', integer, [pointer, string])
         expect(replace_sync(sheet, b'.forbidden {}') != 0, 'replaceSync rejects non-constructed sheet')
         expect(text('rv_dom_css_style_rule_get_selector_text', [pointer], rule) == '.changed', 'failed replace preserves existing sheet')
+
+        class SheetSequence(ctypes.Structure):
+            _fields_ = [('present', integer), ('count', integer), ('items', ctypes.POINTER(pointer))]
+
+        def adopt(scope, prefix, values, succeeds=True):
+            items = (pointer * len(values))(*values)
+            sequence = SheetSequence(1, len(values), items)
+            status = bind('rv_dom_' + prefix + '_set_adopted_style_sheets', integer,
+                          [pointer, ctypes.POINTER(SheetSequence)])(scope, ctypes.byref(sequence))
+            expect((status == 0) == succeeds, prefix + ' adoption status ' + str(status))
+
+        def adopted(scope, prefix):
+            sequence = SheetSequence()
+            call('rv_dom_' + prefix + '_get_adopted_style_sheets', [pointer, ctypes.POINTER(SheetSequence)],
+                 scope, ctypes.byref(sequence))
+            try:
+                expect(sequence.present == 1, prefix + ' adopted snapshot is present')
+                return list(sequence.items[:sequence.count])
+            finally:
+                bind('rv_dom_sequence_css_style_sheet_release', None, [ctypes.POINTER(SheetSequence)])(ctypes.byref(sequence))
+
+        expect(has(b'dom-adopted-style-sheets') == 1, 'adoption capability')
+        expect(adopted(document, 'document') == [], 'document adoption starts empty')
+        adopt(document, 'document', [constructed, defaulted])
+        expect(adopted(document, 'document') == [constructed, defaulted], 'document adoption order')
+        adopt(document, 'document', [constructed, constructed])
+        expect(adopted(document, 'document') == [constructed, constructed], 'adoption preserves duplicates')
+        adopt(document, 'document', [constructed, sheet], succeeds=False)
+        expect(adopted(document, 'document') == [constructed, constructed], 'non-constructed adoption error is atomic')
+        implementation = handle('rv_dom_document_get_implementation', [pointer], document, release='rv_dom_dom_implementation_release')
+        foreign_document = handle('rv_dom_dom_implementation_create_html_document', [pointer, string], implementation, None,
+                                  release='rv_node_release')
+        foreign_sheet = handle('rv_dom_css_style_sheet_create', [pointer, pointer], foreign_document, None,
+                               release='rv_dom_style_sheet_release')
+        adopt(document, 'document', [foreign_sheet], succeeds=False)
+        expect(adopted(document, 'document') == [constructed, constructed], 'foreign document adoption error is atomic')
+
+        probe = handle('rv_dom_document_create_element', [pointer, string, pointer], document, b'div', None, release='rv_node_release')
+        call('rv_dom_element_set_attribute', [pointer, string, string], probe, b'class', b'adopt-probe')
+        call('rv_dom_element_set_attribute', [pointer, string, string], probe, b'style', b'width: 17px')
+        call('rv_node_append_child', [pointer, pointer], body, probe)
+        call('rv_dom_css_style_sheet_replace_sync', [pointer, string], constructed, b'.adopt-probe { width: 31px !important; }')
+        width = integer()
+        call('rv_dom_element_get_client_width', [pointer, numbers], probe, ctypes.byref(width))
+        expect(width.value == 31, 'adopted stylesheet affects document layout')
+        adopt(document, 'document', [])
+        expect(adopted(document, 'document') == [], 'document adoption clears')
+        call('rv_dom_element_get_client_width', [pointer, numbers], probe, ctypes.byref(width))
+        expect(width.value == 17, 'clearing adoption removes layout effect')
+
+        shadow_host = handle('rv_dom_document_create_element', [pointer, string, pointer], document, b'div', None, release='rv_node_release')
+        call('rv_node_append_child', [pointer, pointer], body, shadow_host)
+
+        class ShadowOptions(ctypes.Structure):
+            _fields_ = [('size', unsigned), ('mode', integer)]
+
+        shadow_options = ShadowOptions(ctypes.sizeof(ShadowOptions), 2)
+        shadow = handle('rv_dom_element_attach_shadow', [pointer, ctypes.POINTER(ShadowOptions)], shadow_host,
+                        ctypes.byref(shadow_options), release='rv_node_release')
+        call('rv_node_append_child', [pointer, pointer], shadow, probe)
+        expect(adopted(shadow, 'shadow_root') == [], 'shadow adoption starts empty')
+        adopt(shadow, 'shadow_root', [constructed])
+        expect(adopted(shadow, 'shadow_root') == [constructed], 'shadow adoption snapshot')
+        call('rv_dom_element_get_client_width', [pointer, numbers], probe, ctypes.byref(width))
+        expect(width.value == 31, 'adopted stylesheet affects shadow layout')
+        adopt(shadow, 'shadow_root', [foreign_sheet], succeeds=False)
+        expect(adopted(shadow, 'shadow_root') == [constructed], 'shadow foreign adoption is atomic')
+        adopt(shadow, 'shadow_root', [])
+        call('rv_dom_element_get_client_width', [pointer, numbers], probe, ctypes.byref(width))
+        expect(width.value == 17, 'clearing shadow adoption removes layout effect')
+        call('rv_node_remove_child', [pointer, pointer], body, shadow_host)
     finally:
         for release, value in reversed(retained):
             bind(release, None, [pointer])(value)
