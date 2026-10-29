@@ -40,6 +40,7 @@ typedef struct RvDOMStringMap RvDOMStringMap;
 typedef struct RvAbstractRange RvAbstractRange;
 typedef struct RvDOMSelection RvDOMSelection;
 typedef struct RvDOMRectReadOnly RvDOMRectReadOnly;
+typedef struct RvDOMRectList RvDOMRectList;
 typedef struct RvNodeList RvNodeList;
 typedef struct RvHTMLCollection RvHTMLCollection;
 typedef struct RvValidityState RvValidityState;
@@ -630,6 +631,10 @@ RV_EXPORT RvDOMSelection* rv_dom_dom_selection_retain(RvDOMSelection*);
 RV_EXPORT void rv_dom_dom_rect_read_only_release(RvDOMRectReadOnly*);
 /* Adds a reference to a DOMRectReadOnly and returns it. */
 RV_EXPORT RvDOMRectReadOnly* rv_dom_dom_rect_read_only_retain(RvDOMRectReadOnly*);
+/* Releases a handle to a DOMRectList. */
+RV_EXPORT void rv_dom_dom_rect_list_release(RvDOMRectList*);
+/* Adds a reference to a DOMRectList and returns it. */
+RV_EXPORT RvDOMRectList* rv_dom_dom_rect_list_retain(RvDOMRectList*);
 /* Releases a handle to a NodeList. */
 RV_EXPORT void rv_dom_node_list_release(RvNodeList*);
 /* Adds a reference to a NodeList and returns it. */
@@ -1304,6 +1309,8 @@ RV_EXPORT int32_t rv_dom_element_aria_notify(RvNode* target, const char* announc
 /* Element.ariaNotify(DOMString announcement, AriaNotifyOptions options) -> undefined; RV_ERR_UNSUPPORTED while the
  * setting IsARIANotifyEnabled is off */
 RV_EXPORT int32_t rv_dom_element_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options);
+/* Element.getClientRects() -> DOMRectList; *result is a new reference */
+RV_EXPORT int32_t rv_dom_element_get_client_rects(RvNode* target, RvDOMRectList** result);
 /* Element.getBoundingClientRect() -> DOMRect; *result is a new reference */
 RV_EXPORT int32_t rv_dom_element_get_bounding_client_rect(RvNode* target, RvDOMRectReadOnly** result);
 /* Element.checkVisibility(optional CheckVisibilityOptions options = {}) -> boolean; options defaults to {} in IDL;
@@ -4271,6 +4278,8 @@ RV_EXPORT int32_t rv_dom_range_intersects_node(RvAbstractRange* target, RvNode* 
 RV_EXPORT int32_t rv_dom_range_expand(RvAbstractRange* target, const char* unit);
 /* Range.compareNode(Node node) -> short */
 RV_EXPORT int32_t rv_dom_range_compare_node(RvAbstractRange* target, RvNode* node, int16_t* result);
+/* Range.getClientRects() -> DOMRectList; *result is a new reference */
+RV_EXPORT int32_t rv_dom_range_get_client_rects(RvAbstractRange* target, RvDOMRectList** result);
 /* Range.getBoundingClientRect() -> DOMRect; *result is a new reference */
 RV_EXPORT int32_t rv_dom_range_get_bounding_client_rect(RvAbstractRange* target, RvDOMRectReadOnly** result);
 /* Range.createContextualFragment((TrustedHTML or DOMString) fragment) -> DocumentFragment; *result is a new reference */
@@ -4360,6 +4369,12 @@ RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_right(RvDOMRectReadOnly* target,
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_bottom(RvDOMRectReadOnly* target, double* result);
 /* DOMRectReadOnly.left getter: readonly attribute unrestricted double left */
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, double* result);
+/* DOMRectList */
+
+/* DOMRectList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_dom_rect_list_get_length(RvDOMRectList* target, uint32_t* result);
+/* DOMRectList.item(unsigned long index) -> DOMRect?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_dom_rect_list_item(RvDOMRectList* target, uint32_t index, RvDOMRectReadOnly** result);
 /* NodeList */
 
 /* NodeList.length getter: readonly attribute unsigned long length */

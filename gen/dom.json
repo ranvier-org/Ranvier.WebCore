@@ -146,6 +146,7 @@
         "DOMSelection",
         "DOMRectReadOnly",
         "DOMRect",
+        "DOMRectList",
         "NodeList",
         "RadioNodeList",
         "HTMLCollection",

@@ -426,6 +426,8 @@ and [<AllowNullLiteral>] Element =
     abstract member ariaNotify: announcement: string -> unit
     /// <summary>Element.ariaNotify.</summary>
     abstract member ariaNotify: announcement: string * options: AriaNotifyOptions -> unit
+    /// <summary>Element.getClientRects.</summary>
+    abstract member getClientRects: unit -> DOMRectList
     /// <summary>Element.getBoundingClientRect.</summary>
     abstract member getBoundingClientRect: unit -> DOMRect
     /// <summary>Element.checkVisibility.</summary>
@@ -2423,6 +2425,8 @@ and [<AllowNullLiteral>] Range =
     abstract member expand: ?unit: string -> unit
     /// <summary>Range.compareNode.</summary>
     abstract member compareNode: node: Node -> int16
+    /// <summary>Range.getClientRects.</summary>
+    abstract member getClientRects: unit -> DOMRectList
     /// <summary>Range.getBoundingClientRect.</summary>
     abstract member getBoundingClientRect: unit -> DOMRect
     /// <summary>Range.createContextualFragment.</summary>
@@ -2519,6 +2523,13 @@ and [<AllowNullLiteral>] DOMRectReadOnly =
 /// <summary>DOMRect in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DOMRect =
     inherit DOMRectReadOnly
+
+/// <summary>DOMRectList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DOMRectList =
+    /// <summary>DOMRectList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>DOMRectList.item.</summary>
+    abstract member item: index: uint32 -> DOMRect
 
 /// <summary>NodeList in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] NodeList =

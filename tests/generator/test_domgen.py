@@ -59,6 +59,36 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_fragment_rectangle_lists_select_real_element_and_range_geometry(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface DOMRectReadOnly { readonly attribute unrestricted double x; };
+interface DOMRect : DOMRectReadOnly {};
+interface DOMRectList {
+    readonly attribute unsigned long length;
+    getter DOMRect? item(unsigned long index);
+};
+partial interface Element { DOMRectList getClientRects(); };
+interface Range { DOMRectList getClientRects(); };
+''')
+        configured = json.loads((ROOT / 'gen/dom.json').read_text())['interfaces']
+        self.assertIn('DOMRectList', configured)
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'Range', 'DOMRectReadOnly', 'DOMRect', 'DOMRectList']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {f['function']: f for f in json.loads(generator.api_model())['functions']}
+        for name in ['rv_dom_element_get_client_rects', 'rv_dom_range_get_client_rects',
+                     'rv_dom_dom_rect_list_get_length', 'rv_dom_dom_rect_list_item']:
+            self.assertIn(name, functions)
+        item = functions['rv_dom_dom_rect_list_item']
+        self.assertTrue(item['returns']['nullable'])
+        self.assertEqual(item['returns']['interface'], 'DOMRect')
+        self.assertEqual(functions['rv_dom_element_get_client_rects']['returns']['interface'], 'DOMRectList')
+        self.assertIn('abstract member getClientRects:', generator.interfaces())
+
     def test_required_dom_strings_normalize_null_engine_values_but_nullable_strings_preserve_null(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

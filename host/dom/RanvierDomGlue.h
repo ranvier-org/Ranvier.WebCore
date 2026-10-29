@@ -50,6 +50,8 @@ WEBCORE_EXPORT void ranvier_dom_dom_selection_release(RvDOMSelection*);
 WEBCORE_EXPORT RvDOMSelection* ranvier_dom_dom_selection_retain(RvDOMSelection*);
 WEBCORE_EXPORT void ranvier_dom_dom_rect_read_only_release(RvDOMRectReadOnly*);
 WEBCORE_EXPORT RvDOMRectReadOnly* ranvier_dom_dom_rect_read_only_retain(RvDOMRectReadOnly*);
+WEBCORE_EXPORT void ranvier_dom_dom_rect_list_release(RvDOMRectList*);
+WEBCORE_EXPORT RvDOMRectList* ranvier_dom_dom_rect_list_retain(RvDOMRectList*);
 WEBCORE_EXPORT void ranvier_dom_node_list_release(RvNodeList*);
 WEBCORE_EXPORT RvNodeList* ranvier_dom_node_list_retain(RvNodeList*);
 WEBCORE_EXPORT void ranvier_dom_html_collection_release(RvHTMLCollection*);
@@ -379,6 +381,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_element_insert_adjacent_element(RvNode* targe
 WEBCORE_EXPORT int32_t ranvier_dom_element_insert_adjacent_text(RvNode* target, const char* where, const char* data);
 WEBCORE_EXPORT int32_t ranvier_dom_element_aria_notify(RvNode* target, const char* announcement);
 WEBCORE_EXPORT int32_t ranvier_dom_element_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options);
+WEBCORE_EXPORT int32_t ranvier_dom_element_get_client_rects(RvNode* target, RvDOMRectList** result);
 WEBCORE_EXPORT int32_t ranvier_dom_element_get_bounding_client_rect(RvNode* target, RvDOMRectReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_element_check_visibility(RvNode* target, const RvDomCheckVisibilityOptions* options, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_element_scroll_into_view(RvNode* target, const RvDomUnionBooleanOrScrollIntoViewOptions* arg);
@@ -1635,6 +1638,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_range_compare_point(RvAbstractRange* target, 
 WEBCORE_EXPORT int32_t ranvier_dom_range_intersects_node(RvAbstractRange* target, RvNode* node, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_range_expand(RvAbstractRange* target, const char* unit);
 WEBCORE_EXPORT int32_t ranvier_dom_range_compare_node(RvAbstractRange* target, RvNode* node, int16_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_range_get_client_rects(RvAbstractRange* target, RvDOMRectList** result);
 WEBCORE_EXPORT int32_t ranvier_dom_range_get_bounding_client_rect(RvAbstractRange* target, RvDOMRectReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_range_create_contextual_fragment(RvAbstractRange* target, const char* fragment, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_selection_get_anchor_node(RvDOMSelection* target, RvNode** result);
@@ -1674,6 +1678,8 @@ WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_get_top(RvDOMRectReadOnly*
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_get_right(RvDOMRectReadOnly* target, double* result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_get_bottom(RvDOMRectReadOnly* target, double* result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, double* result);
+WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_list_get_length(RvDOMRectList* target, uint32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_list_item(RvDOMRectList* target, uint32_t index, RvDOMRectReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_node_list_get_length(RvNodeList* target, uint32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_node_list_item(RvNodeList* target, uint32_t index, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_radio_node_list_get_value(RvNodeList* target, char* buffer, int32_t capacity, int32_t* length);

@@ -140,7 +140,7 @@ the member belongs to; the IDL arguments follow in order; the result comes last,
 | other interface in scope | `Rv<Root>*`, the handle of the root of its inheritance | `Rv<Root>**`, a new reference |
 
 The object handles are `RvCSSStyleDeclaration`, `RvDOMTokenList`, `RvDOMStringMap`, `RvAbstractRange` (for
-`Range`), `RvDOMSelection` (the `Selection` interface), `RvDOMRectReadOnly`, `RvNodeList`, `RvHTMLCollection`
+`Range`), `RvDOMSelection` (the `Selection` interface), `RvDOMRectReadOnly`, `RvDOMRectList`, `RvNodeList`, `RvHTMLCollection`
 and `RvValidityState`.
 
 - **Nullable and optional.** A nullable argument, or an optional one without a default, is a pointer, and
@@ -153,6 +153,8 @@ and `RvValidityState`.
   function of a derived interface (`Range` on `RvAbstractRange`) checks the object's interface and returns
   `RV_ERR_WRONG_INTERFACE` for another one, such as a `StaticRange`. A handle is the address of its WebCore
   object, as for nodes, so two handles to one object compare equal.
+  Pass handles to functions accepting their declared root type; cross-root pointer casts are outside the ABI contract.
+  `DOMRectList` retains a snapshot of its rectangles; each non-null `item` result adds a separately owned rectangle reference.
 - **[ReturnValue].** `Node.appendChild` and its kin write the argument's handle, as the JavaScript binding
   returns the argument.
 

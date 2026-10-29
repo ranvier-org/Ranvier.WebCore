@@ -55,6 +55,8 @@ for rid in args.rid:
     # The packed files, not the staged ones: what nuget.org would serve.
     run(sys.executable, '-I', root / 'scripts/smoke.py', '--package', package, '--expect-commit', head,
         '--expect-version', version, '--expect-flavor', args.flavor, *(['--no-load'] if rid.startswith('linux') else []))
+    if args.flavor == 'slim':
+        run(sys.executable, '-I', root / 'scripts/check_package_api.py', '--package', package)
     packages.append(package)
 
 if args.dry_run:

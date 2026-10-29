@@ -157,6 +157,11 @@ jobs:
           --expect-version "${GITHUB_REF_NAME#v}" --expect-flavor "$FLAVOR"
           ${{ startsWith(matrix.rid, 'linux') && '--no-load' || '' }}
 
+      - name: Verify packaged CSS queries, computed styles and fragment rectangles
+        if: env.FLAVOR == 'slim'
+        shell: bash
+        run: python -I scripts/check_package_api.py --package 'packages/${{ matrix.asset }}'
+
       - uses: actions/upload-artifact@v4
         with:
           name: package-${{ matrix.rid }}-${{ env.FLAVOR }}
@@ -369,6 +374,10 @@ jobs:
       - name: Verify live computed styles and pseudo-elements
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/computed_style.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify fragment rectangle lists and retained snapshots
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/fragment_rectangles.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
       - name: Build Windows UI Automation OS clients
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
