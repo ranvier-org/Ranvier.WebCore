@@ -82,7 +82,7 @@ NULL with a nonzero length and invalid UTF-8 return `RV_ERR_NULL_ARGUMENT`. Embe
 Existing null-terminated string signatures retain their transport. Failed calls preserve the result.
 
 Run `python -I tests/abi/css_supports.py --native-directory <staged-native-directory>` for real parser,
-complete-input and receiver/thread validation. The packaged Windows slim CI lane runs this probe.
+complete-input and receiver/thread validation. Every packaged slim CI target runs this probe.
 
 `rv_dom_<interface>_<member>`, in snake case: `Element.className` gives `rv_dom_element_get_class_name` and
 `rv_dom_element_set_class_name`; `HTMLInputElement.setSelectionRange` gives
