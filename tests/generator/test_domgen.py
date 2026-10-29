@@ -59,6 +59,268 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_selected_reference_segment_overload_rejects_null_and_checks_the_engine_brand(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef (USVString or CSSOMVariableReferenceValue) CSSUnparsedSegment;
+interface CSSStyleValue {};
+[InterfaceName=CSSVariableReferenceValue] interface CSSOMVariableReferenceValue { attribute USVString variable; };
+interface CSSUnparsedValue : CSSStyleValue { setter undefined (unsigned long index, CSSUnparsedSegment reference); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMVariableReferenceValue', 'CSSUnparsedValue']
+        config['complexStringSpans'] = ['USVStringOrCSSOMVariableReferenceValue']
+        config['contract'] = {'aliases': {'CSSOMVariableReferenceValue': 'CSSVariableReferenceValue'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        interfaces = generator.interfaces()
+        self.assertTrue('if isNull (box reference) then\n                nullArg "reference"' in interfaces)
+        self.assertTrue('if not (isCSSOMVariableReferenceValue (box reference)) then' in interfaces)
+        self.assertTrue("getOwnPropertyDescriptor(globalThis.CSSVariableReferenceValue.prototype,'variable').get.call(v)" in interfaces)
+        self.assertTrue('box (normalizeUSVString reference)' in interfaces)
+        self.assertTrue("if(i===4294967295)throw new RangeError('Index out of range.');v[i]=s;" in interfaces)
+
+    def test_selected_unit_value_rejects_nonfinite_double_inputs_but_keeps_unrestricted_inputs(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface CSSNumericValue : CSSStyleValue {};
+interface CSSUnitValue : CSSNumericValue {
+    constructor(double value, USVString unit);
+    attribute double value;
+    attribute unrestricted double unrestricted;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSNumericValue', 'CSSUnitValue']
+        config['finiteNumberInputs'] = ['CSSUnitValue']
+        config['constructors'] = {'CSSUnitValue': {
+            'receiver': 'Document', 'factory': 'CSSUnitValue::create', 'passReceiver': False,
+            'stringInputs': 'utf8-lengths',
+        }}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        for name in ['css_unit_value_create', 'css_unit_value_set_value']:
+            function = next(item for item in generator.functions if item.name == name)
+            self.assertTrue('!std::isfinite(value)' in '\n'.join(function.body))
+            self.assertTrue('ExceptionCode::TypeError' in '\n'.join(function.body))
+        unrestricted = next(item for item in generator.functions if item.name == 'css_unit_value_set_unrestricted')
+        self.assertNotIn('isfinite', '\n'.join(unrestricted.body))
+        self.assertTrue('#include <cmath>' in generator.glue())
+
+    def test_selected_usv_property_setter_normalizes_once_in_the_browser(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface CSSOMKeywordValue : CSSStyleValue { attribute USVString value; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMKeywordValue']
+        config['interfaceStringInputs'] = {'CSSOMKeywordValue': 'utf8-lengths'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertTrue("$0.value{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}" in generator.interfaces())
+
+    def test_selected_usv_segment_setter_normalizes_its_string_overload(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef (USVString or CSSOMVariableReferenceValue) CSSUnparsedSegment;
+interface CSSStyleValue {};
+interface CSSOMVariableReferenceValue { readonly attribute USVString variable; };
+interface CSSUnparsedValue : CSSStyleValue { setter undefined (unsigned long index, CSSUnparsedSegment value); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMVariableReferenceValue', 'CSSUnparsedValue']
+        config['complexStringSpans'] = ['USVStringOrCSSOMVariableReferenceValue']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        interfaces = generator.interfaces()
+        self.assertTrue('box (normalizeUSVString value)' in interfaces)
+        self.assertTrue('let private normalizeUSVString' in interfaces)
+
+    def test_aliased_segment_interfaces_keep_the_browser_tag_and_typed_union_arm(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef (USVString or CSSOMVariableReferenceValue) CSSUnparsedSegment;
+interface CSSStyleValue {};
+[InterfaceName=CSSVariableReferenceValue] interface CSSOMVariableReferenceValue { readonly attribute USVString variable; };
+interface CSSUnparsedValue : CSSStyleValue { getter CSSUnparsedSegment? (unsigned long index); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMVariableReferenceValue', 'CSSUnparsedValue']
+        config['contract'] = {'aliases': {'CSSOMVariableReferenceValue': 'CSSVariableReferenceValue'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        interfaces = generator.interfaces()
+        self.assertTrue('CSSOMVariableReferenceValue of CSSVariableReferenceValue' in interfaces)
+        self.assertTrue('[object CSSVariableReferenceValue]' in interfaces)
+        self.assertTrue('let private isCSSOMVariableReferenceValue' in interfaces)
+
+    def test_selected_value_setters_use_string_spans_while_old_setters_keep_their_signatures(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface CSSOMKeywordValue : CSSStyleValue { attribute USVString value; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMKeywordValue']
+        config['interfaceStringInputs'] = {'CSSOMKeywordValue': 'utf8-lengths'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        setter = functions['rv_dom_cssom_keyword_value_set_value']
+        self.assertEqual(setter['parameters'][1:], [
+            {'ctype': 'const uint8_t*', 'name': 'value'},
+            {'ctype': 'int32_t', 'name': 'value_length'},
+        ])
+        self.assertEqual(setter['stringInputs'], 'utf8-lengths')
+        self.assertEqual(functions['rv_dom_element_set_id']['parameters'][1], {'ctype': 'const char*', 'name': 'value'})
+
+    def test_selected_unparsed_segment_transport_preserves_string_lengths_without_changing_old_unions(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef (USVString or CSSOMVariableReferenceValue) CSSUnparsedSegment;
+interface CSSStyleValue {};
+interface CSSOMVariableReferenceValue { readonly attribute USVString variable; };
+interface CSSUnparsedValue : CSSStyleValue {
+    constructor(sequence<CSSUnparsedSegment> members);
+    readonly attribute unsigned long length;
+    getter CSSUnparsedSegment? (unsigned long index);
+    setter undefined (unsigned long index, CSSUnparsedSegment val);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMVariableReferenceValue', 'CSSUnparsedValue']
+        config['complexStringSpans'] = ['USVStringOrCSSOMVariableReferenceValue']
+        config['constructors'] = {'CSSUnparsedValue': {
+            'receiver': 'Document', 'factory': 'CSSUnparsedValue::create', 'passReceiver': False,
+        }}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        header = generator.header()
+        self.assertTrue('RvDomUtf8StringSpan arm0;' in header)
+        self.assertTrue('const char* arm1;' in header)
+        model = json.loads(generator.api_model())
+        functions = {item['function']: item for item in model['functions']}
+        item = functions['rv_dom_css_unparsed_value_item']
+        self.assertTrue(item['returns']['nullable'])
+        self.assertEqual(item['returns']['subtypes'][0]['stringTransport'], 'utf8-lengths')
+        old = functions['rv_dom_node_get_state']['returns']['subtypes'][1]
+        self.assertNotIn('stringTransport', old)
+        glue = generator.glue()
+        self.assertTrue('source->arm0.length < 0' in glue)
+        self.assertTrue('source->arm0.length > 0 && !source->arm0.data' in glue)
+        self.assertTrue('source->present != 0 && source->present != 1' in glue)
+        self.assertTrue('result->arm0 = copyOwnedDomStringSpan' in glue)
+        self.assertTrue('std::free(const_cast<uint8_t*>(value->arm0.data))' in glue)
+        self.assertTrue('impl->setItem(' in glue)
+        self.assertTrue('type RvDomUtf8StringSpan =' in generator.fsharp())
+
+    def test_value_factory_constructor_can_validate_document_without_passing_it_to_cpp(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface CSSOMKeywordValue : CSSStyleValue { constructor(USVString value); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSOMKeywordValue']
+        config['constructors'] = {'CSSOMKeywordValue': {
+            'receiver': 'Document', 'factory': 'CSSOMKeywordValue::create',
+            'passReceiver': False, 'stringInputs': 'utf8-lengths',
+        }}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        constructor = functions['rv_dom_cssom_keyword_value_create']
+        self.assertEqual(constructor['parameters'][:3], [
+            {'ctype': 'RvNode*', 'name': 'target'},
+            {'ctype': 'const uint8_t*', 'name': 'value'},
+            {'ctype': 'int32_t', 'name': 'value_length'},
+        ])
+        self.assertEqual(constructor['stringInputs'], 'utf8-lengths')
+        self.assertEqual(constructor['receiver'], 'Document')
+        glue = generator.glue()
+        self.assertTrue('CSSOMKeywordValue::create(a0.string())' in glue)
+        self.assertTrue('dynamicDowncast<Document>(*nodeOf(target))' in glue)
+
+    def test_configured_bare_stringifier_exports_engine_serialization_only_for_selected_types(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue { stringifier; };
+interface OtherValue { stringifier; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'OtherValue']
+        config['stringifiers'] = ['CSSStyleValue']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertIn('rv_dom_css_style_value_to_string', functions.keys())
+        self.assertNotIn('rv_dom_other_value_to_string', functions.keys())
+        self.assertTrue('impl->toString()' in generator.glue())
+        self.assertTrue('abstract member toString: unit -> string' in generator.interfaces())
+
+    def test_configured_static_value_parsers_use_document_and_length_delimited_inputs(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {
+    [Exposed=Window, CallWith=CurrentDocument] static CSSStyleValue parse([AtomString] USVString property, USVString cssText);
+    [Exposed=Window, CallWith=CurrentDocument] static sequence<CSSStyleValue> parseAll([AtomString] USVString property, USVString cssText);
+    static boolean unrelated();
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue']
+        config['staticBindings'] = {'CSSStyleValue': {
+            'receiver': 'Document', 'members': ['parse', 'parseAll'],
+            'feature': 'dom-css-style-values', 'stringInputs': 'utf8-lengths',
+        }}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertIn('rv_dom_css_style_value_parse', functions.keys())
+        self.assertIn('rv_dom_css_style_value_parse_all', functions.keys())
+        self.assertNotIn('rv_dom_css_style_value_unrelated', functions)
+        single = functions['rv_dom_css_style_value_parse']
+        self.assertEqual(single['kind'], 'static_operation')
+        self.assertEqual(single['receiver'], 'Document')
+        self.assertEqual(single['binding'], 'facade')
+        self.assertEqual(single['feature'], 'dom-css-style-values')
+        self.assertEqual(single['parameters'][:5], [
+            {'ctype': 'RvNode*', 'name': 'target'},
+            {'ctype': 'const uint8_t*', 'name': 'property'},
+            {'ctype': 'int32_t', 'name': 'property_length'},
+            {'ctype': 'const uint8_t*', 'name': 'css_text'},
+            {'ctype': 'int32_t', 'name': 'css_text_length'},
+        ])
+        self.assertEqual(single['returns']['interface'], 'CSSStyleValue')
+        self.assertEqual(functions['rv_dom_css_style_value_parse_all']['returns']['kind'], 'sequence')
+        glue = generator.glue()
+        self.assertTrue('CSSStyleValue::parse(document.get(), a0.atom(), a1.string())' in glue)
+        self.assertTrue('CSSStyleValue::parseAll(document.get(), a0.atom(), a1.string())' in glue)
+        self.assertIn('dynamicDowncast<Document>(*nodeOf(target))', glue)
+        self.assertIn('property_length >= 0', glue)
+
     def test_registration_dictionary_has_lossless_spans_and_independent_capability(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

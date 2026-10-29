@@ -6,7 +6,8 @@
  * - Each function returns RV_OK or a negative status and writes its result through the last parameters.
  * - target is the object the member belongs to. A node handle of another interface returns
  *   RV_ERR_WRONG_INTERFACE, as does a node argument of another interface.
- * - Strings in are NUL-terminated UTF-8. Strings out copy into buffer as RanvierWebCoreAbi.h describes.
+ * - String inputs use UTF-8, with explicit byte lengths where the signature supplies them; otherwise
+ *   inputs are NUL-terminated. String outputs copy into buffer as RanvierWebCoreAbi.h describes.
  * - Booleans are int32_t 0 or 1. An argument that is nullable or optional without a default is a pointer,
  *   NULL for null or absent.
  * - Handles out are new references: rv_node_release, rv_event_release, or the rv_dom_*_release of the type.
@@ -34,6 +35,8 @@ typedef struct RvStyleSheetList RvStyleSheetList;
 typedef struct RvMediaList RvMediaList;
 typedef struct RvCSSRule RvCSSRule;
 typedef struct RvCSSRuleList RvCSSRuleList;
+typedef struct RvCSSStyleValue RvCSSStyleValue;
+typedef struct RvCSSOMVariableReferenceValue RvCSSOMVariableReferenceValue;
 typedef struct RvCSSStyleDeclaration RvCSSStyleDeclaration;
 typedef struct RvDOMTokenList RvDOMTokenList;
 typedef struct RvDOMStringMap RvDOMStringMap;
@@ -63,9 +66,13 @@ typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
 typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
 typedef struct RvDomUnionMediaListOrDOMString RvDomUnionMediaListOrDOMString;
 typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
+typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValue RvDomUnionUSVStringOrCSSOMVariableReferenceValue;
+typedef struct RvDomSequenceUSVStringOrCSSOMVariableReferenceValue RvDomSequenceUSVStringOrCSSOMVariableReferenceValue;
+typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
+typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 
 /* Constants of the interfaces. */
 enum {
@@ -314,6 +321,12 @@ typedef struct RvDomDOMCSSCustomPropertyDescriptor {
     RvDomUtf8StringInput initial_value; /* DOMString */
 } RvDomDOMCSSCustomPropertyDescriptor;
 
+/* UTF-8 byte length; -1 is null where permitted. Compound results own data until release. */
+typedef struct RvDomUtf8StringSpan {
+    const uint8_t* data;
+    int32_t length;
+} RvDomUtf8StringSpan;
+
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -333,9 +346,13 @@ typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
 typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
 typedef struct RvDomUnionMediaListOrDOMString RvDomUnionMediaListOrDOMString;
 typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
+typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValue RvDomUnionUSVStringOrCSSOMVariableReferenceValue;
+typedef struct RvDomSequenceUSVStringOrCSSOMVariableReferenceValue RvDomSequenceUSVStringOrCSSOMVariableReferenceValue;
+typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
+typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
@@ -549,6 +566,40 @@ struct RvDomSequenceUSVString {
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 enum {
+    RV_DOM_UNION_USV_STRING_OR_CSSOM_VARIABLE_REFERENCE_VALUE_STRING = 1,
+    RV_DOM_UNION_USV_STRING_OR_CSSOM_VARIABLE_REFERENCE_VALUE_CSSOM_VARIABLE_REFERENCE_VALUE = 2,
+};
+struct RvDomUnionUSVStringOrCSSOMVariableReferenceValue {
+    int32_t present;
+    int32_t tag;
+    RvDomUtf8StringSpan arm0;
+    RvCSSOMVariableReferenceValue* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceUSVStringOrCSSOMVariableReferenceValue {
+    int32_t present;
+    int32_t count;
+    RvDomUnionUSVStringOrCSSOMVariableReferenceValue* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_USV_STRING_OR_CSSOM_VARIABLE_REFERENCE_VALUE_NULLABLE_STRING = 1,
+    RV_DOM_UNION_USV_STRING_OR_CSSOM_VARIABLE_REFERENCE_VALUE_NULLABLE_CSSOM_VARIABLE_REFERENCE_VALUE = 2,
+};
+struct RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable {
+    int32_t present;
+    int32_t tag;
+    RvDomUtf8StringSpan arm0;
+    RvCSSOMVariableReferenceValue* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
     RV_DOM_UNION_SHADOW_ROOT_OR_GET_COMPOSED_RANGES_OPTIONS_SHADOW_ROOT = 1,
     RV_DOM_UNION_SHADOW_ROOT_OR_GET_COMPOSED_RANGES_OPTIONS_GET_COMPOSED_RANGES_OPTIONS = 2,
 };
@@ -574,6 +625,14 @@ struct RvDomSequencePointerEvent {
     int32_t count;
     RvEvent** items;
 };
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceCSSStyleValue {
+    int32_t present;
+    int32_t count;
+    RvCSSStyleValue** items;
+};
 RV_EXPORT void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value);
@@ -593,9 +652,13 @@ RV_EXPORT void rv_dom_union_element_or_text_release(RvDomUnionElementOrText* val
 RV_EXPORT void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value);
 RV_EXPORT void rv_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString* value);
+RV_EXPORT void rv_dom_union_usv_string_or_cssom_variable_reference_value_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValue* value);
+RV_EXPORT void rv_dom_sequence_usv_string_or_cssom_variable_reference_value_release(RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* value);
+RV_EXPORT void rv_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* value);
 RV_EXPORT void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value);
 RV_EXPORT void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
+RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 /* Releases a handle to a DOMImplementation. */
 RV_EXPORT void rv_dom_dom_implementation_release(RvDOMImplementation*);
 /* Adds a reference to a DOMImplementation and returns it. */
@@ -624,6 +687,14 @@ RV_EXPORT RvCSSRule* rv_dom_css_rule_retain(RvCSSRule*);
 RV_EXPORT void rv_dom_css_rule_list_release(RvCSSRuleList*);
 /* Adds a reference to a CSSRuleList and returns it. */
 RV_EXPORT RvCSSRuleList* rv_dom_css_rule_list_retain(RvCSSRuleList*);
+/* Releases a handle to a CSSStyleValue. */
+RV_EXPORT void rv_dom_css_style_value_release(RvCSSStyleValue*);
+/* Adds a reference to a CSSStyleValue and returns it. */
+RV_EXPORT RvCSSStyleValue* rv_dom_css_style_value_retain(RvCSSStyleValue*);
+/* Releases a handle to a CSSOMVariableReferenceValue. */
+RV_EXPORT void rv_dom_cssom_variable_reference_value_release(RvCSSOMVariableReferenceValue*);
+/* Adds a reference to a CSSOMVariableReferenceValue and returns it. */
+RV_EXPORT RvCSSOMVariableReferenceValue* rv_dom_cssom_variable_reference_value_retain(RvCSSOMVariableReferenceValue*);
 /* Releases a handle to a CSSStyleDeclaration. */
 RV_EXPORT void rv_dom_css_style_declaration_release(RvCSSStyleDeclaration*);
 /* Adds a reference to a CSSStyleDeclaration and returns it. */
@@ -670,6 +741,8 @@ RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* bu
 RV_EXPORT int32_t rv_dom_style_sheet_get_interface_name(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a CSSStyleDeclaration handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
+/* Concrete scoped interface name of a CSSStyleValue handle; borrows target. */
+RV_EXPORT int32_t rv_dom_css_style_value_get_interface_name(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length);
 
 /* Node */
 
@@ -3754,6 +3827,51 @@ RV_EXPORT int32_t rv_dom_css_property_rule_get_syntax(RvCSSRule* target, char* b
 RV_EXPORT int32_t rv_dom_css_property_rule_get_inherits(RvCSSRule* target, int32_t* result);
 /* CSSPropertyRule.initialValue getter: readonly attribute CSSOMString? initialValue */
 RV_EXPORT int32_t rv_dom_css_property_rule_get_initial_value(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSStyleValue */
+
+/* CSSStyleValue.toString() -> DOMString */
+RV_EXPORT int32_t rv_dom_css_style_value_to_string(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSUnitValue */
+
+/* CSSUnitValue.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_unit_value_create(RvNode* target, double value, const uint8_t* unit, int32_t unit_length, RvCSSStyleValue** result);
+/* CSSUnitValue.value getter: attribute double value */
+RV_EXPORT int32_t rv_dom_css_unit_value_get_value(RvCSSStyleValue* target, double* result);
+/* CSSUnitValue.value setter: attribute double value */
+RV_EXPORT int32_t rv_dom_css_unit_value_set_value(RvCSSStyleValue* target, double value);
+/* CSSUnitValue.unit getter: readonly attribute USVString unit */
+RV_EXPORT int32_t rv_dom_css_unit_value_get_unit(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSOMKeywordValue */
+
+/* CSSOMKeywordValue.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_cssom_keyword_value_create(RvNode* target, const uint8_t* value, int32_t value_length, RvCSSStyleValue** result);
+/* CSSOMKeywordValue.value getter: attribute USVString value */
+RV_EXPORT int32_t rv_dom_cssom_keyword_value_get_value(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSOMKeywordValue.value setter: attribute USVString value */
+RV_EXPORT int32_t rv_dom_cssom_keyword_value_set_value(RvCSSStyleValue* target, const uint8_t* value, int32_t value_length);
+/* CSSUnparsedValue */
+
+/* CSSUnparsedValue.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_unparsed_value_create(RvNode* target, const RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* members, RvCSSStyleValue** result);
+/* CSSUnparsedValue.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_css_unparsed_value_get_length(RvCSSStyleValue* target, uint32_t* result);
+/* CSSUnparsedValue.item(unsigned long index) -> CSSUnparsedSegment?; *result owns its contents; release with the
+ * matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_unparsed_value_item(RvCSSStyleValue* target, uint32_t index, RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* result);
+/* CSSUnparsedValue.setItem(unsigned long index, CSSUnparsedSegment val) -> undefined */
+RV_EXPORT int32_t rv_dom_css_unparsed_value_set_item(RvCSSStyleValue* target, uint32_t index, const RvDomUnionUSVStringOrCSSOMVariableReferenceValue* val);
+/* CSSOMVariableReferenceValue */
+
+/* CSSOMVariableReferenceValue.constructor: target is the Document of the constructed object; fallback defaults to
+ * null in IDL; fallback may be NULL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_cssom_variable_reference_value_create(RvNode* target, const uint8_t* variable, int32_t variable_length, RvCSSStyleValue* fallback, RvCSSOMVariableReferenceValue** result);
+/* CSSOMVariableReferenceValue.variable getter: attribute USVString variable */
+RV_EXPORT int32_t rv_dom_cssom_variable_reference_value_get_variable(RvCSSOMVariableReferenceValue* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSOMVariableReferenceValue.variable setter: attribute USVString variable */
+RV_EXPORT int32_t rv_dom_cssom_variable_reference_value_set_variable(RvCSSOMVariableReferenceValue* target, const uint8_t* value, int32_t value_length);
+/* CSSOMVariableReferenceValue.fallback getter: readonly attribute CSSUnparsedValue? fallback; *result is a new
+ * reference, or NULL */
+RV_EXPORT int32_t rv_dom_cssom_variable_reference_value_get_fallback(RvCSSOMVariableReferenceValue* target, RvCSSStyleValue** result);
 /* CSSPositionTryRule */
 
 /* CSSPositionTryRule.name getter: readonly attribute CSSOMString name; RV_ERR_UNSUPPORTED while the setting
@@ -4651,6 +4769,14 @@ RV_EXPORT int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSS
 /* Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element
  * defaults to null in IDL; pseudo_element may be NULL (null); *result is a new reference */
 RV_EXPORT int32_t rv_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
+/* CSSStyleValue */
+
+/* CSSStyleValue.parse: static operation with checked Document context and UTF-8 byte lengths; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_css_style_value_parse(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvCSSStyleValue** result);
+/* CSSStyleValue.parseAll: static operation with checked Document context and UTF-8 byte lengths; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result);
 
 #ifdef __cplusplus
 }

@@ -119,7 +119,7 @@ class Mapped:
     """A C mapping of an IDL type."""
 
     def __init__(self, kind, nullable=False, ctype=None, interface=None, root=None, cls=None, enum=None, atom=False,
-                 subtypes=(), label=None):
+                 subtypes=(), label=None, string_spans=False):
         self.kind = kind  # string, bool, number, enum, node, event, object, dict, void
         self.atom = atom  # a string union whose DOMString is [AtomString]
         self.nullable = nullable
@@ -130,6 +130,7 @@ class Mapped:
         self.enum = enum
         self.subtypes = subtypes
         self.label = label
+        self.string_spans = string_spans
 
     @property
     def handle(self):
@@ -398,6 +399,10 @@ class World:
                 return Mapped("string", t.nullable, atom=strings)
             children = [self.map(child) for child in t.subtypes]
             label = "Or".join(type_label(self.resolve(child)) for child in t.subtypes)
+            if label in self.config.get('complexStringSpans', []):
+                for child in children:
+                    if child.kind == 'string':
+                        child.string_spans = True
             return Mapped("union", t.nullable, "RvDomUnion" + label + ("Nullable" if t.nullable else ""),
                           subtypes=children, label=label)
         if t.name in ("sequence", "FrozenArray"):
@@ -471,6 +476,8 @@ class Generator(ComplexGeneratorMixin):
             self.namespace(name, binding)
         for name, binding in self.world.config.get("windowBindings", {}).items():
             self.window_context(name, binding)
+        for name, binding in self.world.config.get("staticBindings", {}).items():
+            self.static_context(name, binding)
         self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
@@ -542,6 +549,50 @@ class Generator(ComplexGeneratorMixin):
                     placeholders = ', '.join(f'{{arg{i}}}' for i in range(len(args)))
                     call = f'impl->window()->{member.attrs.get("ImplementedAs", member.name)}({placeholders})'
                     self.finish(function, 'Document', member, member.arguments, args, result, call, [])
+                except Unsupported as error:
+                    raise SystemExit(f'{name}.{member.name}: {error}') from error
+                generated.append(function)
+        self.namespace_features.append((binding['feature'], [function.conditional for function in generated if function.conditional]))
+
+    def static_context(self, name, binding):
+        if name not in self.world.scope:
+            raise SystemExit(f'{name}: static binding requires a scoped interface')
+        receiver = binding['receiver']
+        if receiver not in self.world.scope or 'Node' not in self.world.chain(receiver):
+            raise SystemExit(f'{name}: static receiver must be a scoped node interface')
+        if binding.get('stringInputs') != 'utf8-lengths':
+            raise SystemExit(f'{name}: static string inputs require explicit UTF-8 lengths')
+        selected = set(binding['members'])
+        operations = {}
+        for member in self.world.members(name):
+            if member.name not in selected:
+                continue
+            checked = idl.Member(**member.__dict__)
+            checked.static = False
+            reason = self.member_reason(name, checked)
+            if reason or member.kind != 'operation' or not member.static:
+                raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not a static operation"}')
+            operations.setdefault(member.name, []).append(member)
+        if selected != set(operations):
+            raise SystemExit(f'{name}: missing configured static operations {sorted(selected - set(operations))}')
+        generated = []
+        for operation, overloads in operations.items():
+            for member in overloads:
+                suffix = '' if len(overloads) == 1 else f'_{len(member.arguments)}'
+                function = Function(name, member, 'static_operation', f'{snake(name)}_{snake(operation)}{suffix}', [],
+                                    f'{name}.{operation}: static operation with checked {receiver} context and UTF-8 byte lengths')
+                function.receiver = receiver
+                function.feature = binding['feature']
+                function.string_spans = True
+                try:
+                    args = [self.world.map(argument.type) for argument in member.arguments]
+                    result = self.world.map(member.type)
+                    call_with = self.call_with(attr_list(member.attrs.get('CallWith')))
+                    cpp = member.attrs.get('ImplementedBy', self.world.cpp_class(name))
+                    self.headers.add(f'{cpp}.h')
+                    placeholders = ', '.join(f'{{arg{i}}}' for i in range(len(args)))
+                    call = f'{cpp}::{member.attrs.get("ImplementedAs", member.name)}({{call_with_lead}}{placeholders})'
+                    self.finish(function, receiver, member, member.arguments, args, result, call, call_with)
                 except Unsupported as error:
                     raise SystemExit(f'{name}.{member.name}: {error}') from error
                 generated.append(function)
@@ -632,6 +683,8 @@ class Generator(ComplexGeneratorMixin):
                     self.skip(name, member, "constructor")
                 continue
             if member.kind == "operation":
+                if member.static and member.name in self.world.config.get('staticBindings', {}).get(name, {}).get('members', []):
+                    continue
                 if not member.name and member.special in ("getter", "setter", "deleter") and member.arguments:
                     member = self.special_name(member)
                 operations.setdefault(member.name, []).append(member)
@@ -726,6 +779,8 @@ class Generator(ComplexGeneratorMixin):
         label = f"{interface}.{member.name}"
         if label in self.exclude or member.name in self.exclude:
             return "excluded by gen/dom.json"
+        if member.kind == 'operation' and member.special == 'stringifier' and interface not in self.world.config.get('stringifiers', []):
+            return 'stringifier outside configured binding'
         if not member.name:
             return "unnamed special operation"
         if member.static:
@@ -1070,9 +1125,12 @@ class Generator(ComplexGeneratorMixin):
             args = [self.world.map(argument.type) for argument in member.arguments]
             returns = self.world.map(idl.Type(interface))
             arguments = ", ".join(f"{{arg{i}}}" for i in range(len(args)))
-            call = f"{configured['factory']}(*impl{', ' if arguments else ''}{arguments})"
+            if configured.get('passReceiver', True):
+                arguments = f"*impl{', ' if arguments else ''}{arguments}"
+            call = f"{configured['factory']}({arguments})"
             function = Function(interface, member, "constructor", f"{snake(interface)}_create", [],
                                 f"{interface}.constructor: target is the {receiver} of the constructed object")
+            function.string_spans = configured.get('stringInputs') == 'utf8-lengths'
             self.finish(function, receiver, member, member.arguments, args, returns, call, [])
         except Unsupported as error:
             self.skip(interface, member, f"constructor: {error}")
@@ -1104,6 +1162,8 @@ class Generator(ComplexGeneratorMixin):
 
     def finish(self, function, interface, member, arguments, mapped_args, returns, call, call_with):
         """Fills in the function's C parameters and glue body, then records it."""
+        if self.world.config.get('interfaceStringInputs', {}).get(function.interface) == 'utf8-lengths':
+            function.string_spans = True
         self_type = self.self_param(interface)
         params = [(self_type, "target")]
         checks = ["target"]
@@ -1144,6 +1204,11 @@ class Generator(ComplexGeneratorMixin):
                     notes.append(f"{name} may be NULL" + (" (absent)" if optional_no_default else " (null)"))
             elif mapped.kind in ("bool", "number"):
                 ctype = mapped.ctype
+                if (mapped.kind == 'number' and function.interface in self.world.config.get('finiteNumberInputs', [])
+                        and self.world.resolve(argument.type).name in ('double', 'float')):
+                    condition = f'{name} && !std::isfinite(*{name})' if maybe_null else f'!std::isfinite({name})'
+                    prepare += [f'if ({condition})',
+                                '    return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });']
                 if maybe_null:
                     params.append((f"const {ctype}*", name))
                     passed.append(f"OptionalArg<{ctype}> {{ {name} }}")
@@ -1325,12 +1390,15 @@ class Generator(ComplexGeneratorMixin):
 
     @staticmethod
     def describe_mapping(mapped):
-        return {
+        result = {
             "kind": mapped.kind, "ctype": mapped.ctype, "interface": mapped.interface,
             "root": mapped.root, "class": mapped.cls, "enum": mapped.enum,
             "label": mapped.label, "nullable": mapped.nullable, "atom": mapped.atom,
             "subtypes": [Generator.describe_mapping(child) for child in mapped.subtypes],
         }
+        if mapped.kind == 'string' and mapped.string_spans:
+            result['stringTransport'] = 'utf8-lengths'
+        return result
 
     def api_model(self):
         def describe_idl(value):
@@ -1365,12 +1433,19 @@ class Generator(ComplexGeneratorMixin):
             if function.kind == "constructor":
                 functions[-1]["receiver"] = self.world.config["constructors"][function.interface]["receiver"]
                 functions[-1]["feature"] = f"dom-constructor:{function.interface}"
+                if getattr(function, 'string_spans', False):
+                    functions[-1]['stringInputs'] = 'utf8-lengths'
             if function.kind == "namespace_operation":
                 functions[-1].update(receiver=function.receiver, namespace=function.namespace, feature=function.feature,
                                      binding="facade", stringInputs="utf8-lengths")
             if function.kind == 'context_operation':
                 functions[-1].update(receiver=function.receiver, context='Window', feature=function.feature,
                                      binding='facade', stringInputs='utf8-lengths-nullable')
+            if function.kind == 'static_operation':
+                functions[-1].update(receiver=function.receiver, feature=function.feature,
+                                     binding='facade', stringInputs='utf8-lengths')
+            if function.kind in ('operation', 'setter') and getattr(function, 'string_spans', False):
+                functions[-1]['stringInputs'] = 'utf8-lengths'
             bridge = self.world.config.get("attributeBridges", {}).get(f"{function.interface}.{function.member.name}")
             if bridge:
                 functions[-1]["binding"] = "facade"
@@ -1419,7 +1494,8 @@ class Generator(ComplexGeneratorMixin):
             " * - Each function returns RV_OK or a negative status and writes its result through the last parameters.",
             " * - target is the object the member belongs to. A node handle of another interface returns",
             " *   RV_ERR_WRONG_INTERFACE, as does a node argument of another interface.",
-            " * - Strings in are NUL-terminated UTF-8. Strings out copy into buffer as RanvierWebCoreAbi.h describes.",
+            " * - String inputs use UTF-8, with explicit byte lengths where the signature supplies them; otherwise",
+            " *   inputs are NUL-terminated. String outputs copy into buffer as RanvierWebCoreAbi.h describes.",
             " * - Booleans are int32_t 0 or 1. An argument that is nullable or optional without a default is a pointer,",
             " *   NULL for null or absent.",
             " * - Handles out are new references: rv_node_release, rv_event_release, or the rv_dom_*_release of the type.",
@@ -1739,6 +1815,7 @@ class Generator(ComplexGeneratorMixin):
             f"operations {sum(f.kind == 'operation' for f in self.functions)}, "
             f"constructors {sum(f.kind == 'constructor' for f in self.functions)}, "
             f"namespace operations {sum(f.kind == 'namespace_operation' for f in self.functions)}, "
+            f"static operations {sum(f.kind == 'static_operation' for f in self.functions)}, "
             f"context operations {sum(f.kind == 'context_operation' for f in self.functions)}), handle types {len(self.handles)}, "
             f"constants {len(self.constants)}, enumerations {len(self.enums_used)}, dictionaries {len(self.dicts_used)}, "
             f"stubs {len(self.stubs)}, left out {len(self.excluded)}",
@@ -1779,7 +1856,8 @@ class Generator(ComplexGeneratorMixin):
         return "\n".join(lines) + "\n"
 
 
-RUNTIME = r"""#include <cstddef>
+RUNTIME = r"""#include <cmath>
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <optional>

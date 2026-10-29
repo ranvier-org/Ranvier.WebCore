@@ -305,7 +305,8 @@ class Parser:
             return None
         if special == "stringifier" and self.peek() == ";":
             self.take(";")
-            return None
+            return Member("operation", "toString", Type("DOMString"), special=special,
+                          attrs=attrs, file=self.file, owner=owner)
         if self.accept("attribute"):
             attribute_type = self.type()
             name = self.take()
