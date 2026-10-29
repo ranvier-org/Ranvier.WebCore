@@ -59,6 +59,67 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_registration_dictionary_has_lossless_spans_and_independent_capability(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary DOMCSSCustomPropertyDescriptor {
+    required [AtomString] DOMString name;
+    DOMString syntax = "*";
+    required boolean inherits;
+    DOMString initialValue;
+};
+[InterfaceName=CSS] namespace DOMCSSNamespace {
+    [CallWith=CurrentDocument] boolean supports(DOMString condition);
+};
+[ImplementedBy=DOMCSSRegisterCustomProperty, Conditional=REGISTRATION]
+partial namespace DOMCSSNamespace {
+    [CallWith=CurrentDocument] undefined registerProperty(DOMCSSCustomPropertyDescriptor descriptor);
+};
+interface CSSRule {};
+interface CSSPropertyRule : CSSRule {
+    readonly attribute DOMString name;
+    readonly attribute DOMString syntax;
+    readonly attribute boolean inherits;
+    readonly attribute DOMString? initialValue;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSRule', 'CSSPropertyRule']
+        config['dictionaryStringInputs'] = {'DOMCSSCustomPropertyDescriptor': 'utf8-lengths-presence'}
+        config['namespaceBindings'] = {'DOMCSSNamespace': {
+            'receiver': 'Document', 'members': ['supports', 'registerProperty'],
+            'feature': 'dom-css-supports', 'memberFeatures': {'registerProperty': 'dom-css-register-property'},
+            'stringInputs': 'utf8-lengths',
+        }}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        functions = {item['function']: item for item in model['functions']}
+        self.assertEqual(functions['rv_dom_css_register_property']['feature'], 'dom-css-register-property')
+        self.assertEqual(functions['rv_dom_css_supports']['feature'], 'dom-css-supports')
+        self.assertTrue(functions['rv_dom_css_property_rule_get_initial_value']['returns']['nullable'])
+        fields = model['dictionaries']['DOMCSSCustomPropertyDescriptor']
+        self.assertEqual([field['ctype'] for field in fields],
+                         ['RvDomUtf8StringInput', 'RvDomUtf8StringInput', 'int32_t', 'RvDomUtf8StringInput'])
+        header = generator.header()
+        self.assertIn('int32_t present;', header)
+        self.assertIn('const uint8_t* data;', header)
+        self.assertIn('int32_t length;', header)
+        self.assertIn('const char* label;', header)
+        glue = generator.glue()
+        self.assertIn('DOMCSSRegisterCustomProperty::registerProperty(document.get(), std::move(a0))', glue)
+        self.assertIn('descriptor->name.present != 1', glue)
+        self.assertIn('descriptor->initial_value.length < 0', glue)
+        self.assertIn('descriptor->initial_value.length > 0 && !descriptor->initial_value.data', glue)
+        self.assertIn('assignString(a0.initialValue, descriptor->initial_value.data, descriptor->initial_value.length)', glue)
+        self.assertIn('length ? String::fromUTF8(std::span<const uint8_t>', glue)
+        self.assertIn('val mutable initial_value: RvDomUtf8StringInput', generator.fsharp())
+        features = dict(generator.namespace_features)
+        self.assertEqual(features['dom-css-supports'], [])
+        self.assertEqual(features['dom-css-register-property'], ['ENABLE(REGISTRATION)'])
+
     def test_fragment_rectangle_lists_select_real_element_and_range_geometry(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

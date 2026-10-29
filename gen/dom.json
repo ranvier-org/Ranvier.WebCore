@@ -31,6 +31,9 @@
     "dictionaryCppTypes": {
         "CSSStyleSheetInit": "CSSStyleSheet::Init"
     },
+    "dictionaryStringInputs": {
+        "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence"
+    },
     "interfaces": [
         "Node",
         "CharacterData",
@@ -133,6 +136,7 @@
         "CSSFontFeatureValuesRule",
         "CSSFontPaletteValuesRule",
         "CSSCounterStyleRule",
+        "CSSPropertyRule",
         "CSSPositionTryRule",
         "CSSPositionTryDescriptors",
         "CSSStartingStyleRule",
@@ -337,9 +341,13 @@
         "DOMCSSNamespace": {
             "receiver": "Document",
             "members": [
-                "supports"
+                "supports",
+                "registerProperty"
             ],
             "feature": "dom-css-supports",
+            "memberFeatures": {
+                "registerProperty": "dom-css-register-property"
+            },
             "stringInputs": "utf8-lengths"
         }
     },

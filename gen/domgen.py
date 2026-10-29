@@ -596,7 +596,7 @@ class Generator(ComplexGeneratorMixin):
                                     f"{public}.{operation}: namespace operation with {receiver} context and explicit UTF-8 byte lengths")
                 function.namespace = public
                 function.receiver = receiver
-                function.feature = binding["feature"]
+                function.feature = binding.get("memberFeatures", {}).get(operation, binding["feature"])
                 function.string_spans = True
                 try:
                     args = [self.world.map(argument.type) for argument in member.arguments]
@@ -610,7 +610,9 @@ class Generator(ComplexGeneratorMixin):
                 except Unsupported as error:
                     raise SystemExit(f"{name}.{member.name}: {error}") from error
                 generated.append(function)
-        self.namespace_features.append((binding["feature"], [function.conditional for function in generated if function.conditional]))
+        for feature in dict.fromkeys(function.feature for function in generated):
+            self.namespace_features.append((feature, [function.conditional for function in generated
+                                                       if function.feature == feature and function.conditional]))
 
     def interface(self, name):
         members = self.world.members(name)
@@ -879,6 +881,10 @@ class Generator(ComplexGeneratorMixin):
             return f"{self.world.cpp_class(stem)}::{name}"
         return name
 
+    def uses_dictionary_string_spans(self):
+        return any(self.field_ctype(member, mapped, name) == "RvDomUtf8StringInput"
+                   for name, fields in self.dicts_used.items() for member, mapped in fields)
+
     def use_dictionary(self, name):
         """The dictionary's fields in struct order: the lock's fields first, in its order, then new ones."""
         if name in self.dicts_used:
@@ -901,11 +907,12 @@ class Generator(ComplexGeneratorMixin):
         self.dicts_used[name] = ordered
         return ordered
 
-    @staticmethod
-    def field_ctype(member, mapped):
+    def field_ctype(self, member, mapped, dictionary=None):
         """The C type of a dictionary field: a pointer for an optional scalar without a default, NULL for absent."""
         absent = mapped.nullable or (not member.required and member.default is None)
         if mapped.kind == "string":
+            if self.world.config.get("dictionaryStringInputs", {}).get(dictionary) == "utf8-lengths-presence":
+                return "RvDomUtf8StringInput"
             return "const char*"
         if mapped.kind == "node":
             return "RvNode*"
@@ -914,19 +921,33 @@ class Generator(ComplexGeneratorMixin):
         ctype = mapped.ctype
         return f"const {ctype}*" if absent else ctype
 
-    def dictionary_field(self, pointer, struct, target, member, mapped):
+    def dictionary_field(self, pointer, struct, target, member, mapped, dictionary=None):
         """The glue that copies one field of a C dictionary into the C++ one, when the struct's size covers it."""
         field = c_name(member.name)
         cpp_field = member.attrs.get("ImplementedAs", member.name)
         covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
-        ctype = self.field_ctype(member, mapped)
+        ctype = self.field_ctype(member, mapped, dictionary)
         lines = []
         if member.required:
             lines += [f"if (!({covered}))", "    return RV_ERR_NULL_ARGUMENT;"]
             covered = "true"
         if mapped.kind == "string":
-            lines.append(f"if ({covered} && {pointer}->{field})")
-            lines.append(f"    assignString({target}.{cpp_field}, {pointer}->{field});")
+            if ctype == "RvDomUtf8StringInput":
+                span = f"{pointer}->{field}"
+                if member.required:
+                    lines += [f"if ({span}.present != 1)", "    return RV_ERR_NULL_ARGUMENT;"]
+                lines += [f"if ({covered}) {{",
+                          f"    if ({span}.present != 0 && {span}.present != 1)",
+                          "        return RV_ERR_NULL_ARGUMENT;",
+                          f"    if ({span}.present) {{",
+                          f"        if ({span}.length < 0 || ({span}.length > 0 && !{span}.data))",
+                          "            return RV_ERR_NULL_ARGUMENT;",
+                          f"        if (!assignString({target}.{cpp_field}, {span}.data, {span}.length))",
+                          "            return RV_ERR_NULL_ARGUMENT;",
+                          "    }", "}"]
+            else:
+                lines.append(f"if ({covered} && {pointer}->{field})")
+                lines.append(f"    assignString({target}.{cpp_field}, {pointer}->{field});")
         elif mapped.kind == "node":
             self.headers.add(f"{mapped.cls}.h")
             lines.append(f"if ({covered} && {pointer}->{field}) {{")
@@ -1148,7 +1169,7 @@ class Generator(ComplexGeneratorMixin):
                 prepare.append(f"{cpp} a{index} {{ }};")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
-                    prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped)]
+                    prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped, mapped.interface)]
                 prepare.append("}")
                 passed.append(f"std::move(a{index})")
             elif mapped.kind in ("union", "sequence"):
@@ -1376,7 +1397,7 @@ class Generator(ComplexGeneratorMixin):
                             "releaseFunction": "rv_dom_" + transport_token(name) + "_release"}
                            for name, mapped in self.complex_used.items()],
             "dictionaries": {name: [{"name": member.name, "field": c_name(member.name),
-                                     "ctype": self.field_ctype(member, mapped), "required": member.required,
+                                     "ctype": self.field_ctype(member, mapped, name), "required": member.required,
                                      "default": member.default, "mapping": self.describe_mapping(mapped)}
                                     for member, mapped in fields]
                              for name, fields in self.dicts_used.items()},
@@ -1433,6 +1454,10 @@ class Generator(ComplexGeneratorMixin):
                 lines.append(f"    RV_DOM_{snake(enum).upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', value).upper() or 'EMPTY'} = {index}, /* \"{value}\" */")
             lines.append("};")
             lines.append("")
+        if self.uses_dictionary_string_spans():
+            lines += ["/* A present UTF-8 dictionary string; length is a byte count and may include NUL. */",
+                      "typedef struct RvDomUtf8StringInput {", "    int32_t present;",
+                      "    const uint8_t* data;", "    int32_t length;", "} RvDomUtf8StringInput;", ""]
         for name, fields in self.dicts_used.items():
             struct = f"RvDom{name}"
             lines.append(f"/* The IDL dictionary {name}. size is sizeof({struct}) as the caller compiles it; a field past")
@@ -1440,7 +1465,7 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"typedef struct {struct} {{")
             lines.append("    uint32_t size;")
             for member, mapped in fields:
-                ctype = self.field_ctype(member, mapped)
+                ctype = self.field_ctype(member, mapped, name)
                 note = f"{member.type}"
                 if member.required:
                     note += ", required"
@@ -1665,11 +1690,15 @@ class Generator(ComplexGeneratorMixin):
             for index, value in enumerate(values):
                 macro = f"RV_DOM_{snake(enum).upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', value).upper() or 'EMPTY'}"
                 lines += ["", "[<Literal>]", f"let {macro} = {index}"]
+        if self.uses_dictionary_string_spans():
+            lines += ["", "/// <summary>A present UTF-8 dictionary string with an explicit byte count.</summary>",
+                      "[<Struct; StructLayout(LayoutKind.Sequential)>]", "type RvDomUtf8StringInput =",
+                      "    val mutable present: int32", "    val mutable data: nativeint", "    val mutable length: int32"]
         for name, fields in self.dicts_used.items():
             lines += ["", f"/// <summary>The IDL dictionary {name}; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>",
                       "[<Struct; StructLayout(LayoutKind.Sequential)>]", f"type RvDom{name} =", "    val mutable size: uint32"]
             for member, mapped in fields:
-                ctype = self.field_ctype(member, mapped)
+                ctype = self.field_ctype(member, mapped, name)
                 field = c_name(member.name)
                 field = f"``{field}``" if field in FSHARP_KEYWORDS else field
                 if ctype == "const char*":
@@ -1677,6 +1706,8 @@ class Generator(ComplexGeneratorMixin):
                     lines.append(f"    val mutable {field}: string")
                 elif ctype.endswith("*"):
                     lines.append(f"    val mutable {field}: nativeint")
+                elif ctype == "RvDomUtf8StringInput":
+                    lines.append(f"    val mutable {field}: RvDomUtf8StringInput")
                 else:
                     lines.append(f"    val mutable {field}: {FSHARP_NUMBERS[ctype]}")
         lines += self.complex_fsharp()
@@ -1901,6 +1932,19 @@ template<typename T> void assignString(T& field, const char* text)
         field = AtomString::fromUTF8(text);
     else
         field = Type { String::fromUTF8(text) };
+}
+
+template<typename T> bool assignString(T& field, const uint8_t* text, int32_t length)
+{
+    String value = length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString();
+    if (value.isNull())
+        return false;
+    using Type = typename Unwrapped<T>::Type;
+    if constexpr (std::is_same_v<Type, AtomString>)
+        field = AtomString { value };
+    else
+        field = Type { value };
+    return true;
 }
 
 template<typename T, size_t N> bool assignEnumeration(T& field, int32_t index, const ASCIILiteral (&names)[N])
