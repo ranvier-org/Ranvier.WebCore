@@ -162,6 +162,8 @@ class World:
         self.enums = {}  # name -> (values, attrs, file)
         self.dictionaries = {}  # name -> idl.Dictionary, with its partials' members
         self.callbacks = set()
+        self.namespaces = {}
+        self.namespace_partials = {}
         self.dictionary_partials = {}
         self.dictionary_exclusions = set()
         for path in sorted(self.webcore.rglob("*.idl")):
@@ -169,6 +171,12 @@ class World:
             if relative.startswith("bindings/scripts/test/"):
                 continue
             document = idl.parse(path.read_text(encoding="utf-8"), relative)
+            for namespace in document.namespaces:
+                if namespace.partial:
+                    if not self.skipped(relative):
+                        self.namespace_partials.setdefault(namespace.name, []).append(namespace)
+                elif namespace.name not in self.namespaces or not self.skipped(relative):
+                    self.namespaces[namespace.name] = namespace
             for interface in document.interfaces:
                 if interface.partial:
                     self.partials.setdefault(interface.name, []).append(interface)
@@ -445,6 +453,7 @@ class Generator(ComplexGeneratorMixin):
         self.changed = []  # names whose C signature differs from the lock
         self.complex_used = {}
         self.complex_inputs = set()
+        self.namespace_features = []
 
     def run(self):
         for name in self.world.scope:
@@ -458,6 +467,8 @@ class Generator(ComplexGeneratorMixin):
                 if root == name:
                     self.handles.append(name)
             self.interface(name)
+        for name, binding in self.world.config.get("namespaceBindings", {}).items():
+            self.namespace(name, binding)
         self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
@@ -483,6 +494,70 @@ class Generator(ComplexGeneratorMixin):
     def skip(self, interface, member, reason):
         label = member.name or member.special or member.kind
         self.excluded.append((f"{interface}.{label}", reason))
+
+    def namespace(self, name, binding):
+        definition = self.world.namespaces.get(name)
+        if not definition:
+            raise SystemExit(f"{name}: configured IDL namespace was not found")
+        receiver = binding["receiver"]
+        if receiver not in self.world.scope or "Node" not in self.world.chain(receiver):
+            raise SystemExit(f"{name}: namespace receiver must be a scoped node interface")
+        if binding.get("stringInputs") != "utf8-lengths":
+            raise SystemExit(f"{name}: namespace string inputs require explicit UTF-8 lengths")
+        public = definition.attrs.get("InterfaceName", name)
+        cpp = definition.attrs.get("ImplementedAs", name)
+        self.headers.add(f"{cpp}.h")
+        def scoped_member(member, *scopes):
+            gates = [attrs['Conditional'] for attrs in (member.attrs, *scopes) if attrs.get('Conditional')]
+            result = member
+            for attrs in scopes:
+                result = self.world.copy(result, attrs)
+            if gates:
+                terms = ['']
+                for gate in gates:
+                    text = '&'.join(gate) if isinstance(gate, list) else gate
+                    terms = [f'{left}&{right}' if left else right for left in terms for right in text.split('|')]
+                result.attrs['Conditional'] = '|'.join(terms)
+            return result
+
+        members = [scoped_member(member, definition.attrs) for member in definition.members]
+        for partial in self.world.namespace_partials.get(name, []):
+            members += [scoped_member(member, partial.attrs, definition.attrs) for member in partial.members]
+        selected = set(binding["members"])
+        operations = {}
+        for member in members:
+            if member.name not in selected:
+                self.skip(name, member, "namespace member outside configured binding")
+                continue
+            reason = self.member_reason(name, member)
+            if reason or member.kind != "operation":
+                raise SystemExit(f"{name}.{member.name}: {reason or 'namespace attributes are not configured operations'}")
+            operations.setdefault(member.name, []).append(member)
+        if selected != set(operations):
+            raise SystemExit(f"{name}: missing configured namespace operations {sorted(selected - set(operations))}")
+        generated = []
+        for operation, overloads in operations.items():
+            for member in overloads:
+                suffix = "" if len(overloads) == 1 else f"_{len(member.arguments)}"
+                function = Function(name, member, "namespace_operation", f"{snake(public)}_{snake(operation)}{suffix}", [],
+                                    f"{public}.{operation}: namespace operation with {receiver} context and explicit UTF-8 byte lengths")
+                function.namespace = public
+                function.receiver = receiver
+                function.feature = binding["feature"]
+                function.string_spans = True
+                try:
+                    args = [self.world.map(argument.type) for argument in member.arguments]
+                    result = self.world.map(member.type)
+                    call_with = self.call_with(attr_list(member.attrs.get("CallWith")))
+                    placeholders = ", ".join(f"{{arg{i}}}" for i in range(len(args)))
+                    implemented_by = member.attrs.get("ImplementedBy", cpp)
+                    self.headers.add(f"{implemented_by}.h")
+                    call = f"{implemented_by}::{member.attrs.get('ImplementedAs', member.name)}({{call_with_lead}}{placeholders})"
+                    self.finish(function, receiver, member, member.arguments, args, result, call, call_with)
+                except Unsupported as error:
+                    raise SystemExit(f"{name}.{member.name}: {error}") from error
+                generated.append(function)
+        self.namespace_features.append((binding["feature"], [function.conditional for function in generated if function.conditional]))
 
     def interface(self, name):
         members = self.world.members(name)
@@ -964,10 +1039,18 @@ class Generator(ComplexGeneratorMixin):
             if argument.optional and argument.default is not None:
                 notes.append(f"{name} defaults to {argument.default} in IDL")
             if mapped.kind == "string":
-                params.append(("const char*", name))
-                if not maybe_null:
-                    checks.append(name)
-                prepare.append(f"StringArg a{index} {{ {name} }};")
+                if getattr(function, "string_spans", False):
+                    if argument.optional or mapped.nullable:
+                        raise Unsupported("optional or nullable namespace strings need an explicit presence representation")
+                    params += [("const uint8_t*", name), ("int32_t", name + "_length")]
+                    checks.append(f"({name}_length >= 0 && (!{name}_length || {name}))")
+                    prepare += [f"StringArg a{index} {{ {name}, {name}_length }};",
+                                f"if (a{index}.string().isNull()) return RV_ERR_NULL_ARGUMENT;"]
+                else:
+                    params.append(("const char*", name))
+                    if not maybe_null:
+                        checks.append(name)
+                    prepare.append(f"StringArg a{index} {{ {name} }};")
                 atom = ("AtomString" in argument.attrs or "AtomString" in argument.type.attrs or mapped.atom
                         or f"{interface}.{member.name}" in self.world.config["atomArguments"])
                 if optional_no_default:
@@ -1183,7 +1266,7 @@ class Generator(ComplexGeneratorMixin):
                 continue
             functions.append({
                 "interface": function.interface, "member": function.member.name,
-                "contractOwner": self.world.contract_owner(function.interface, function.member),
+                "contractOwner": function.namespace if function.kind == "namespace_operation" else self.world.contract_owner(function.interface, function.member),
                 "kind": function.kind, "function": "rv_dom_" + function.name,
                 "conditional": function.conditional,
                 "parameters": [{"ctype": ctype, "name": name} for ctype, name in function.params],
@@ -1195,6 +1278,9 @@ class Generator(ComplexGeneratorMixin):
             if function.kind == "constructor":
                 functions[-1]["receiver"] = self.world.config["constructors"][function.interface]["receiver"]
                 functions[-1]["feature"] = f"dom-constructor:{function.interface}"
+            if function.kind == "namespace_operation":
+                functions[-1].update(receiver=function.receiver, namespace=function.namespace, feature=function.feature,
+                                     binding="facade", stringInputs="utf8-lengths")
             bridge = self.world.config.get("attributeBridges", {}).get(f"{function.interface}.{function.member.name}")
             if bridge:
                 functions[-1]["binding"] = "facade"
@@ -1424,6 +1510,12 @@ class Generator(ComplexGeneratorMixin):
         lines.append("        if (!std::strcmp(feature, name))")
         lines.append("            return 1;")
         lines.append("    }")
+        for feature, conditions in self.namespace_features:
+            if conditions:
+                lines.append("#if " + " && ".join(f"({condition})" for condition in sorted(set(conditions))))
+            lines += [f'    if (!std::strcmp(feature, "{feature}"))', "        return 1;"]
+            if conditions:
+                lines.append("#endif")
         lines.append("    return 0;")
         lines.append("}")
         lines.append("")
@@ -1544,7 +1636,9 @@ class Generator(ComplexGeneratorMixin):
             "",
             f"interfaces {len(self.world.scope)}, functions {len(self.functions)} "
             f"(getters {sum(f.kind == 'getter' for f in self.functions)}, setters {sum(f.kind == 'setter' for f in self.functions)}, "
-            f"operations {sum(f.kind == 'operation' for f in self.functions)}), handle types {len(self.handles)}, "
+            f"operations {sum(f.kind == 'operation' for f in self.functions)}, "
+            f"constructors {sum(f.kind == 'constructor' for f in self.functions)}, "
+            f"namespace operations {sum(f.kind == 'namespace_operation' for f in self.functions)}), handle types {len(self.handles)}, "
             f"constants {len(self.constants)}, enumerations {len(self.enums_used)}, dictionaries {len(self.dicts_used)}, "
             f"stubs {len(self.stubs)}, left out {len(self.excluded)}",
             f"Runtime type queries: {len(self.runtime_queries)} (separate from the IDL member count)",
@@ -1553,6 +1647,8 @@ class Generator(ComplexGeneratorMixin):
         ]
         for name in self.world.scope:
             lines.append(f"  {name}: {sum(f.interface == name for f in self.functions)}")
+        for name in self.world.config.get("namespaceBindings", {}):
+            lines.append(f"  namespace {name}: {sum(f.interface == name for f in self.functions)}")
         lines += ["", "Stubs, for members of the lock that WebKit's IDL no longer has:"]
         lines += [f"  rv_dom_{f.name}" for f in self.stubs] or ["  (none)"]
         lines += ["", "Left out:"]
@@ -1782,6 +1878,10 @@ int32_t storeNode(Node* pointer, RvNode** result)
 struct StringArg {
     explicit StringArg(const char* text)
         : value(text ? String::fromUTF8(text) : String { })
+    {
+    }
+    StringArg(const uint8_t* text, int32_t length)
+        : value(length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString())
     {
     }
     operator String() const { return value; }

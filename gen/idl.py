@@ -1,7 +1,6 @@
 """A lean Web IDL parser for WebKit's IDL files: the definitions gen/domgen.py reads (interfaces, interface mixins,
 partial interfaces, includes statements, typedefs, enums, dictionaries and callbacks), their members, types and
-extended attributes. It follows WebKit's IDLParser.pm closely enough for those, and skips what it does not model
-(namespaces, iterable and the other declarations) by balancing braces.
+extended attributes, namespaces and partial namespaces. It skips iterable and other unmodeled members by balancing braces.
 
 WebKit's IDL files hold a few `#if` blocks (Document.idl, DeviceOrientationEvent.idl); the parser keeps the
 `#else` branch of each and drops the `#if` branch, which matches a build with every such macro undefined.
@@ -87,6 +86,15 @@ class DictionaryMember:
 
 
 @dataclass
+class Namespace:
+    name: str
+    partial: bool = False
+    attrs: dict = field(default_factory=dict)
+    members: list = field(default_factory=list)
+    file: str = ""
+
+
+@dataclass
 class Dictionary:
     name: str
     base: str | None = None
@@ -105,6 +113,7 @@ class Document:
     enums: dict = field(default_factory=dict)  # name -> (values, attrs)
     dictionaries: dict = field(default_factory=dict)  # name -> Dictionary
     callbacks: set = field(default_factory=set)
+    namespaces: list = field(default_factory=list)
 
 
 def preprocess(text: str) -> str:
@@ -394,7 +403,16 @@ class Parser:
                 document.typedefs[name] = typedef_type
                 continue
             if word == "namespace":
-                self.skip_to_semicolon()
+                self.take()
+                name = self.take()
+                namespace = Namespace(name, partial=partial, attrs=attrs, file=self.file)
+                self.take("{")
+                while not self.accept("}"):
+                    member = self.member(name)
+                    if member:
+                        namespace.members.append(member)
+                self.take(";")
+                document.namespaces.append(namespace)
                 continue
             # `A includes B;`
             if self.peek(1) == "includes":

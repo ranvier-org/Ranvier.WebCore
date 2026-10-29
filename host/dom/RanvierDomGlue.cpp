@@ -39,6 +39,7 @@
 #include "CheckVisibilityOptions.h"
 #include "Comment.h"
 #include "CompositionEvent.h"
+#include "DOMCSSNamespace.h"
 #include "DOMImplementation.h"
 #include "DOMRect.h"
 #include "DOMRectReadOnly.h"
@@ -363,6 +364,10 @@ int32_t storeNode(Node* pointer, RvNode** result)
 struct StringArg {
     explicit StringArg(const char* text)
         : value(text ? String::fromUTF8(text) : String { })
+    {
+    }
+    StringArg(const uint8_t* text, int32_t length)
+        : value(length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString())
     {
     }
     operator String() const { return value; }
@@ -1306,6 +1311,8 @@ int32_t ranvier_dom_has(const char* feature)
         if (!std::strcmp(feature, name))
             return 1;
     }
+    if (!std::strcmp(feature, "dom-css-supports"))
+        return 1;
     return 0;
 }
 
@@ -26016,6 +26023,40 @@ int32_t ranvier_dom_composition_event_get_data(RvEvent* target, char* buffer, in
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->data(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
+int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result)
+{
+    if (!target || !(property_length >= 0 && (!property_length || property)) || !(value_length >= 0 && (!value_length || value)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    StringArg a0 { property, property_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { value, value_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return DOMCSSNamespace::supports(document.get(), a0.string(), a1.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
+int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result)
+{
+    if (!target || !(condition_text_length >= 0 && (!condition_text_length || condition_text)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    StringArg a0 { condition_text, condition_text_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return DOMCSSNamespace::supports(document.get(), a0.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
 int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)

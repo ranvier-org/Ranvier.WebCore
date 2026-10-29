@@ -69,6 +69,21 @@ Linux both halves link into the same library. A call costs one extra direct call
 
 ## Naming
 
+### Selected IDL namespaces
+
+`namespaceBindings` selects real IDL namespace operations with a checked node context. CSS support
+queries borrow a Document and call `DOMCSSNamespace::supports` with its parser settings. Their
+`dom-css-supports` capability requires every selected overload to be compiled; namespace, partial
+namespace and member feature gates all apply. Unselected namespace members stay excluded.
+
+`rv_dom_css_supports_2` tests a property/value pair and `rv_dom_css_supports_1` tests a condition.
+Each string is a `const uint8_t*` plus signed byte length. Empty spans may use NULL; negative lengths,
+NULL with a nonzero length and invalid UTF-8 return `RV_ERR_NULL_ARGUMENT`. Embedded NUL is preserved.
+Existing null-terminated string signatures retain their transport. Failed calls preserve the result.
+
+Run `python -I tests/abi/css_supports.py --native-directory <staged-native-directory>` for real parser,
+complete-input and receiver/thread validation. The packaged Windows slim CI lane runs this probe.
+
 `rv_dom_<interface>_<member>`, in snake case: `Element.className` gives `rv_dom_element_get_class_name` and
 `rv_dom_element_set_class_name`; `HTMLInputElement.setSelectionRange` gives
 `rv_dom_html_input_element_set_selection_range`. Attributes take `get_` and `set_`; operations take their own

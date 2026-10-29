@@ -362,6 +362,10 @@ jobs:
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
         run: python -I tests/generator/native_types.py --native-dir "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify document-scoped CSS support queries
+        if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
+        run: python -I tests/abi/css_supports.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Build Windows UI Automation OS clients
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
         run: >-
