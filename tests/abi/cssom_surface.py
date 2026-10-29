@@ -71,7 +71,7 @@ def verify(native_directory):
         def length_is(name, target, expected):
             length = unsigned()
             call(name, [pointer, ctypes.POINTER(unsigned)], target, ctypes.byref(length))
-            expect(length.value == expected, name + ': length ' + str(expected))
+            expect(length.value == expected, name + ': expected length ' + str(expected) + ', got ' + str(length.value))
 
         length_is('rv_dom_style_sheet_list_get_length', sheets, 1)
         length_is('rv_dom_css_rule_list_get_length', rules, 1)
@@ -240,6 +240,72 @@ def verify(native_directory):
                'SVG style wrong namespace rejected')
         call('rv_node_remove_child', [pointer, pointer], body, svg)
         length_is('rv_dom_style_sheet_list_get_length', sheets, 0)
+
+        class MediaOption(ctypes.Structure):
+            _fields_ = [('present', integer), ('tag', integer), ('media', pointer), ('text', string)]
+
+        class SheetOptions(ctypes.Structure):
+            _fields_ = [('size', unsigned), ('base_url', string), ('media', ctypes.POINTER(MediaOption)), ('disabled', integer)]
+
+        create_sheet = bind('rv_dom_css_style_sheet_create', integer, [pointer, ctypes.POINTER(SheetOptions), pointers])
+        expect(has(b'dom-constructor:CSSStyleSheet') == 1, 'stylesheet constructor capability')
+        constructed = handle('rv_dom_css_style_sheet_create', [pointer, pointer], document, None, release='rv_dom_style_sheet_release')
+        owner = pointer()
+        call('rv_dom_style_sheet_get_owner_node', [pointer, pointers], constructed, ctypes.byref(owner))
+        expect(not owner.value, 'constructed stylesheet has no owner node')
+        call('rv_dom_css_style_sheet_replace_sync', [pointer, string], constructed, b'.constructed { width: 23px; }')
+        constructed_rules = handle('rv_dom_css_style_sheet_get_css_rules', [pointer], constructed, release='rv_dom_css_rule_list_release')
+        length_is('rv_dom_css_rule_list_get_length', constructed_rules, 1)
+        cached_peer = handle('rv_dom_css_style_sheet_create', [pointer, pointer], document, None, release='rv_dom_style_sheet_release')
+        call('rv_dom_css_style_sheet_replace_sync', [pointer, string], cached_peer, b'.constructed { width: 23px; }')
+        peer_rules = handle('rv_dom_css_style_sheet_get_css_rules', [pointer], cached_peer, release='rv_dom_css_rule_list_release')
+        call('rv_dom_css_style_sheet_replace_sync', [pointer, string], constructed, b'@import url("missing.css"); .second { color: blue; }')
+        length_is('rv_dom_css_rule_list_get_length', constructed_rules, 1)
+        length_is('rv_dom_css_rule_list_get_length', peer_rules, 1)
+        peer_rule = handle('rv_dom_css_rule_list_item', [pointer, unsigned], peer_rules, 0, release='rv_dom_css_rule_release')
+        expect(text('rv_dom_css_style_rule_get_selector_text', [pointer], peer_rule) == '.constructed', 'replacement preserves cached peer')
+        import_only = b'@import url("empty-cached-fixture.css");'
+        empty_peers = []
+        for _ in range(2):
+            empty_peer = handle('rv_dom_css_style_sheet_create', [pointer, pointer], document, None, release='rv_dom_style_sheet_release')
+            call('rv_dom_css_style_sheet_replace_sync', [pointer, string], empty_peer, import_only)
+            empty_rules = handle('rv_dom_css_style_sheet_get_css_rules', [pointer], empty_peer, release='rv_dom_css_rule_list_release')
+            length_is('rv_dom_css_rule_list_get_length', empty_rules, 0)
+            empty_peers.append((empty_peer, empty_rules))
+        call('rv_dom_css_style_sheet_replace_sync', [pointer, string], empty_peers[0][0], b'.exclusive { color: green; }')
+        length_is('rv_dom_css_rule_list_get_length', empty_peers[0][1], 1)
+        length_is('rv_dom_css_rule_list_get_length', empty_peers[1][1], 0)
+        constructed_rule = handle('rv_dom_css_rule_list_item', [pointer, unsigned], constructed_rules, 0, release='rv_dom_css_rule_release')
+        expect(text('rv_dom_css_style_rule_get_selector_text', [pointer], constructed_rule) == '.second', 'constructed sheet ignores imports')
+
+        media_option = MediaOption(1, 2, None, b'print')
+        options = SheetOptions(ctypes.sizeof(SheetOptions), b'https://example.test/css/', ctypes.pointer(media_option), 1)
+        configured = handle('rv_dom_css_style_sheet_create', [pointer, ctypes.POINTER(SheetOptions)], document, ctypes.byref(options),
+                            release='rv_dom_style_sheet_release')
+        configured_media = handle('rv_dom_style_sheet_get_media', [pointer], configured, release='rv_dom_media_list_release')
+        expect(text('rv_dom_media_list_get_media_text', [pointer], configured_media) == 'print', 'constructor media string')
+        call('rv_dom_style_sheet_get_disabled', [pointer, numbers], configured, ctypes.byref(disabled))
+        expect(disabled.value == 1, 'constructor disabled option')
+        media_option.tag, media_option.media, media_option.text = 1, configured_media, None
+        second_configured = handle('rv_dom_css_style_sheet_create', [pointer, ctypes.POINTER(SheetOptions)], document, ctypes.byref(options),
+                                   release='rv_dom_style_sheet_release')
+        second_media = handle('rv_dom_style_sheet_get_media', [pointer], second_configured, release='rv_dom_media_list_release')
+        expect(text('rv_dom_media_list_get_media_text', [pointer], second_media) == 'print', 'constructor MediaList option')
+
+        truncated = SheetOptions(4, b'http://[', ctypes.pointer(media_option), 1)
+        defaulted = handle('rv_dom_css_style_sheet_create', [pointer, ctypes.POINTER(SheetOptions)], document, ctypes.byref(truncated),
+                           release='rv_dom_style_sheet_release')
+        call('rv_dom_style_sheet_get_disabled', [pointer, numbers], defaulted, ctypes.byref(disabled))
+        expect(disabled.value == 0, 'short options struct uses defaults')
+        options.base_url = b'http://['
+        invalid_sheet = pointer()
+        expect(create_sheet(document, ctypes.byref(options), ctypes.byref(invalid_sheet)) != 0, 'invalid base URL fails')
+        expect(not invalid_sheet.value, 'invalid constructor leaves result null')
+        expect(create_sheet(style, None, ctypes.byref(invalid_sheet)) == -11, 'constructor rejects element receiver')
+        expect(create_sheet(None, None, ctypes.byref(invalid_sheet)) == -1, 'constructor rejects null document')
+        replace_sync = bind('rv_dom_css_style_sheet_replace_sync', integer, [pointer, string])
+        expect(replace_sync(sheet, b'.forbidden {}') != 0, 'replaceSync rejects non-constructed sheet')
+        expect(text('rv_dom_css_style_rule_get_selector_text', [pointer], rule) == '.changed', 'failed replace preserves existing sheet')
     finally:
         for release, value in reversed(retained):
             bind(release, None, [pointer])(value)

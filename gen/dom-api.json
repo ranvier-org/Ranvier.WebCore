@@ -68544,6 +68544,73 @@
     },
     {
       "interface": "CSSStyleSheet",
+      "member": "constructor",
+      "contractOwner": "CSSStyleSheet",
+      "kind": "constructor",
+      "function": "rv_dom_css_style_sheet_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomCSSStyleSheetInit*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvStyleSheet**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "options",
+          "idlType": "CSSStyleSheetInit",
+          "idl": {
+            "name": "CSSStyleSheetInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "CSSStyleSheetInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSStyleSheet",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSStyleSheet",
+        "root": "StyleSheet",
+        "class": "CSSStyleSheet",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSStyleSheet"
+    },
+    {
+      "interface": "CSSStyleSheet",
       "member": "ownerRule",
       "contractOwner": "CSSStyleSheet",
       "kind": "getter",
@@ -93189,6 +93256,46 @@
     },
     {
       "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionMediaListOrDOMString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "MediaListOrDOMString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "MediaList",
+            "root": "MediaList",
+            "class": "MediaList",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_media_list_or_dom_string_release"
+    },
+    {
+      "mapping": {
         "kind": "sequence",
         "ctype": "RvDomSequenceUSVString",
         "interface": null,
@@ -93866,6 +93973,90 @@
       {
         "name": "flatten",
         "field": "flatten",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "CSSStyleSheetInit": [
+      {
+        "name": "baseURL",
+        "field": "base_url",
+        "ctype": "const char*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "media",
+        "field": "media",
+        "ctype": "const RvDomUnionMediaListOrDOMString*",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "union",
+          "ctype": "RvDomUnionMediaListOrDOMString",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "MediaListOrDOMString",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "MediaList",
+              "root": "MediaList",
+              "class": "MediaList",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "string",
+              "ctype": null,
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            }
+          ]
+        }
+      },
+      {
+        "name": "disabled",
+        "field": "disabled",
         "ctype": "int32_t",
         "required": false,
         "default": "false",

@@ -8,6 +8,15 @@
         "Members whose types or extended attributes the generator does not map are left out on their own and listed",
         "in gen/dom-report.txt."
     ],
+    "constructors": {
+        "CSSStyleSheet": {
+            "receiver": "Document",
+            "factory": "CSSStyleSheet::create"
+        }
+    },
+    "dictionaryCppTypes": {
+        "CSSStyleSheetInit": "CSSStyleSheet::Init"
+    },
     "interfaces": [
         "Node",
         "CharacterData",

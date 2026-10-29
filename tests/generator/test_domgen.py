@@ -59,6 +59,36 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_configured_stylesheet_constructor_uses_document_receiver_and_cpp_init(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface StyleSheet {};
+interface CSSStyleSheet : StyleSheet {
+    [CallWith=CurrentDocument] constructor(optional CSSStyleSheetInit options = {});
+};
+dictionary CSSStyleSheetInit { DOMString baseURL = null; boolean disabled = false; };
+''')
+        config = dict(self.world.config)
+        selected = json.loads((ROOT / 'gen/dom.json').read_text())
+        config['interfaces'] = ['Node', 'Document', 'StyleSheet', 'CSSStyleSheet']
+        config['constructors'] = selected.get('constructors', {})
+        config['dictionaryCppTypes'] = selected.get('dictionaryCppTypes', {})
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {function['function']: function for function in json.loads(generator.api_model())['functions']}
+        factory = functions['rv_dom_css_style_sheet_create']
+        self.assertEqual(factory['parameters'][0], {'ctype': 'RvNode*', 'name': 'target'})
+        self.assertEqual(factory['returns']['interface'], 'CSSStyleSheet')
+        self.assertEqual(factory['kind'], 'constructor')
+        self.assertEqual(factory['feature'], 'dom-constructor:CSSStyleSheet')
+        glue = generator.glue()
+        self.assertIn('dynamicDowncast<Document>(*nodeOf(target))', glue)
+        self.assertIn('CSSStyleSheet::Init a0', glue)
+        self.assertIn('CSSStyleSheet::create(*impl, std::move(a0))', glue)
+        self.assertIn('"dom-constructor:CSSStyleSheet"', glue)
+
     def test_runtime_type_queries_classify_derived_interfaces_without_changing_dom_members(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

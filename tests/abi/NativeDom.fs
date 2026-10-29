@@ -320,6 +320,15 @@ type RvDomAssignedNodesOptions =
     val mutable size: uint32
     val mutable flatten: int
 
+/// <summary>The IDL dictionary CSSStyleSheetInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomCSSStyleSheetInit =
+    val mutable size: uint32
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable base_url: string
+    val mutable media: nativeint
+    val mutable disabled: int
+
 /// <summary>The IDL dictionary GetComposedRangesOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomGetComposedRangesOptions =
@@ -512,6 +521,20 @@ type RvDomSequenceElementOrText =
     val mutable count: int
     val mutable items: nativeint
 
+[<Literal>]
+let RV_DOM_UNION_MEDIA_LIST_OR_DOM_STRING_MEDIA_LIST = 1
+
+[<Literal>]
+let RV_DOM_UNION_MEDIA_LIST_OR_DOM_STRING_STRING = 2
+
+/// <summary>ABI transport for MediaListOrDOMString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionMediaListOrDOMString =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: nativeint
+    val mutable arm1: nativeint
+
 /// <summary>ABI transport for USVString sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceUSVString =
@@ -594,6 +617,9 @@ extern void rv_dom_union_element_or_text_release(RvDomUnionElementOrText& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrDOMString& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString& value)
@@ -4359,6 +4385,9 @@ extern int rv_dom_style_sheet_list_item(nativeint target, uint32 index, nativein
 
 [<DllImport(Lib)>]
 extern int rv_dom_style_sheet_list_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_style_sheet_create(nativeint target, [<In>] RvDomCSSStyleSheetInit[] options, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_sheet_get_owner_rule(nativeint target, nativeint& result)

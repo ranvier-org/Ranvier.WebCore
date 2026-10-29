@@ -496,7 +496,10 @@ class Generator(ComplexGeneratorMixin):
                 self.constant(name, member)
                 continue
             if member.kind == "constructor":
-                self.skip(name, member, "constructor")
+                if name in self.world.config.get("constructors", {}):
+                    self.constructor(name, member)
+                else:
+                    self.skip(name, member, "constructor")
                 continue
             if member.kind == "operation":
                 if not member.name and member.special in ("getter", "setter", "deleter") and member.arguments:
@@ -732,6 +735,9 @@ class Generator(ComplexGeneratorMixin):
         return lines + [f"auto& settings = {document}.settingsValues();", f"if (!({' && '.join(terms)}))", "    return RV_ERR_UNSUPPORTED;"]
 
     def dictionary_cpp(self, name):
+        configured = self.world.config.get("dictionaryCppTypes", {}).get(name)
+        if configured:
+            return configured
         dictionary = self.world.dictionaries[name]
         value = dictionary.attrs.get("ImplementedAs")
         if isinstance(value, str):
@@ -888,6 +894,22 @@ class Generator(ComplexGeneratorMixin):
             self.skip(interface, member, f"setter: {error}")
 
     # Operations.
+
+    def constructor(self, interface, member):
+        configured = self.world.config["constructors"][interface]
+        receiver = configured["receiver"]
+        if receiver not in self.world.scope:
+            raise SystemExit(f"{interface}: constructor receiver {receiver} is outside scope")
+        try:
+            args = [self.world.map(argument.type) for argument in member.arguments]
+            returns = self.world.map(idl.Type(interface))
+            arguments = ", ".join(f"{{arg{i}}}" for i in range(len(args)))
+            call = f"{configured['factory']}(*impl{', ' if arguments else ''}{arguments})"
+            function = Function(interface, member, "constructor", f"{snake(interface)}_create", [],
+                                f"{interface}.constructor: target is the {receiver} of the constructed object")
+            self.finish(function, receiver, member, member.arguments, args, returns, call, [])
+        except Unsupported as error:
+            self.skip(interface, member, f"constructor: {error}")
 
     def operation(self, interface, member, args, returns, suffix):
         try:
@@ -1154,9 +1176,13 @@ class Generator(ComplexGeneratorMixin):
                 "conditional": function.conditional,
                 "parameters": [{"ctype": ctype, "name": name} for ctype, name in function.params],
                 "arguments": [argument(member, mapped) for member, mapped in function.arguments],
-                "returnIdl": describe_idl(idl.Type("undefined") if function.kind == "setter" else function.member.type),
+                "returnIdl": describe_idl(idl.Type("undefined") if function.kind == "setter" else
+                                          idl.Type(function.interface) if function.kind == "constructor" else function.member.type),
                 "returns": self.describe_mapping(function.returns),
             })
+            if function.kind == "constructor":
+                functions[-1]["receiver"] = self.world.config["constructors"][function.interface]["receiver"]
+                functions[-1]["feature"] = f"dom-constructor:{function.interface}"
         model = {
             "schemaVersion": 1,
             "runtimeTypeQueries": self.runtime_queries,
@@ -1372,6 +1398,7 @@ class Generator(ComplexGeneratorMixin):
         lines.append("    if (!feature)")
         lines.append("        return 0;")
         groups = ["dom-generated"] + [f"dom:{name}" for name in self.world.scope] + [query['feature'] for query in self.runtime_queries]
+        groups += [f"dom-constructor:{function.interface}" for function in self.functions if function.kind == "constructor"]
         lines.append("    for (auto* name : { " + ", ".join(f'"{g}"' for g in groups) + " }) {")
         lines.append("        if (!std::strcmp(feature, name))")
         lines.append("            return 1;")

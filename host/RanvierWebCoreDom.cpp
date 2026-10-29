@@ -52,6 +52,7 @@ void rv_dom_union_html_element_or_long_nullable_release(RvDomUnionHTMLElementOrL
 void rv_dom_sequence_node_release(RvDomSequenceNode* value) { ranvier_dom_sequence_node_release(value); }
 void rv_dom_union_element_or_text_release(RvDomUnionElementOrText* value) { ranvier_dom_union_element_or_text_release(value); }
 void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value) { ranvier_dom_sequence_element_or_text_release(value); }
+void rv_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrDOMString* value) { ranvier_dom_union_media_list_or_dom_string_release(value); }
 void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString* value) { ranvier_dom_sequence_usv_string_release(value); }
 void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value) { ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(value); }
 void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value) { ranvier_dom_sequence_static_range_release(value); }
@@ -1275,6 +1276,7 @@ int32_t rv_dom_style_sheet_set_disabled(RvStyleSheet* target, int32_t value) { r
 int32_t rv_dom_style_sheet_list_get_length(RvStyleSheetList* target, uint32_t* result) { return ranvier_dom_style_sheet_list_get_length(target, result); }
 int32_t rv_dom_style_sheet_list_item(RvStyleSheetList* target, uint32_t index, RvStyleSheet** result) { return ranvier_dom_style_sheet_list_item(target, index, result); }
 int32_t rv_dom_style_sheet_list_named_item(RvStyleSheetList* target, const char* name, RvStyleSheet** result) { return ranvier_dom_style_sheet_list_named_item(target, name, result); }
+int32_t rv_dom_css_style_sheet_create(RvNode* target, const RvDomCSSStyleSheetInit* options, RvStyleSheet** result) { return ranvier_dom_css_style_sheet_create(target, options, result); }
 int32_t rv_dom_css_style_sheet_get_owner_rule(RvStyleSheet* target, RvCSSRule** result) { return ranvier_dom_css_style_sheet_get_owner_rule(target, result); }
 int32_t rv_dom_css_style_sheet_get_css_rules(RvStyleSheet* target, RvCSSRuleList** result) { return ranvier_dom_css_style_sheet_get_css_rules(target, result); }
 int32_t rv_dom_css_style_sheet_get_rules(RvStyleSheet* target, RvCSSRuleList** result) { return ranvier_dom_css_style_sheet_get_rules(target, result); }
