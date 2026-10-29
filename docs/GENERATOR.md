@@ -192,17 +192,18 @@ The C++ the IDL does not determine is listed in `gen/dom.json`: `atomArguments` 
 
 ## Scope
 
-`gen/dom.json` lists 62 interfaces: `Node`, `CharacterData`, `Text`, `Comment`, `DocumentFragment`, `ShadowRoot`,
+`gen/dom.json` lists the scoped interfaces: `Node`, `CharacterData`, `Text`, `Comment`, `DocumentFragment`, `ShadowRoot`,
 `Document`, `Element`, `Attr`, `HTMLElement` and 27 HTML elements (form controls, `a`, `img`, `label`, `slot`,
 lists, `details`, `dialog`, ...), `CSSStyleDeclaration`, `DOMTokenList`, `DOMStringMap`, `AbstractRange`,
 `Range`, `DOMSelection` (`Selection`), `DOMRectReadOnly`, `NodeList`, `HTMLCollection`, `ValidityState`, and
 `Event`, `UIEvent`, `MouseEvent`, `PointerEvent`, `WheelEvent`, `KeyboardEvent`, `FocusEvent`, `InputEvent` and
 `CompositionEvent`, plus `HTMLDocument`, `DOMImplementation`, `NamedNodeMap`, `HTMLTemplateElement`,
-`StaticRange`, `DOMRect` and `RadioNodeList`.
+`StaticRange`, `DOMRect` and `RadioNodeList`. The table editor surface additionally includes `HTMLTableElement`,
+`HTMLTableCaptionElement`, `HTMLTableColElement`, `HTMLTableSectionElement`, `HTMLTableRowElement` and
+`HTMLTableCellElement`: live row/cell collections, insertion/deletion and reflected table properties.
 
-They give 1,069 functions (539 getters, 279 setters, 251 operations), 11 object handle types with their release
-and retain functions, 37 constants, 8 enumerations and 13 dictionary structs. `gen/dom-report.txt` lists the
-445 members left out, by reason:
+`gen/dom-report.txt` records the generated interface/function counts, handle types, constants, enumerations,
+dictionary structs and every member left out, by reason:
 
 - **By rule:** event handler attributes (`onclick`; listeners go through `rv_node_add_event_listener`),
   constructors and static members, WebKit-prefixed members (`webkit*`), members not exposed to `Window`,

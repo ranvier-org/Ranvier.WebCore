@@ -3064,6 +3064,318 @@ extern int rv_dom_html_slot_element_assigned_elements(nativeint target, [<In>] R
 extern int rv_dom_html_slot_element_assign(nativeint target, [<In>] RvDomSequenceElementOrText[] nodes)
 
 [<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_caption(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_caption(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_t_head(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_t_head(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_t_foot(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_t_foot(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_t_bodies(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_rows(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_border(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_border(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_frame(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_frame(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_rules(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_rules(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_summary(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_summary(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_bg_color(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_bg_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_cell_padding(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_cell_padding(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_get_cell_spacing(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_set_cell_spacing(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_create_caption(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_delete_caption(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_create_t_head(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_delete_t_head(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_create_t_foot(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_delete_t_foot(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_create_t_body(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_insert_row(nativeint target, int index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_element_delete_row(nativeint target, int index)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_caption_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_caption_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_get_ch(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_set_ch(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_get_ch_off(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_set_ch_off(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_get_span(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_set_span(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_get_v_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_set_v_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_col_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_get_rows(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_get_ch(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_set_ch(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_get_ch_off(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_set_ch_off(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_get_v_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_set_v_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_insert_row(nativeint target, int index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_section_element_delete_row(nativeint target, int index)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_get_row_index(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_get_section_row_index(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_get_cells(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_get_bg_color(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_set_bg_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_get_ch(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_set_ch(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_get_ch_off(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_set_ch_off(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_get_v_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_set_v_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_insert_cell(nativeint target, int index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_row_element_delete_cell(nativeint target, int index)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_cell_index(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_axis(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_axis(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_bg_color(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_bg_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_ch(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_ch(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_ch_off(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_ch_off(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_col_span(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_col_span(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_row_span(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_row_span(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_headers(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_headers(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_height(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_height(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_no_wrap(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_no_wrap(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_v_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_v_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_abbr(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_abbr(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_get_scope(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_table_cell_element_set_scope(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_dir_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]

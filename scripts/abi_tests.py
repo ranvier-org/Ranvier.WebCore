@@ -92,4 +92,5 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
             report_crash(started, stage, rid, temp)
         raise
     run(['dotnet', driver], env=dict(env, RANVIER_WEBCORE_PROBE='teardown'))
+    run([sys.executable, '-I', tests / 'table_surface.py', '--native-directory', out])
 print('abi tests passed', flush=True)
