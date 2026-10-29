@@ -59,6 +59,7 @@ typedef struct RvDomUnionHTMLElementOrLongNullable RvDomUnionHTMLElementOrLongNu
 typedef struct RvDomSequenceNode RvDomSequenceNode;
 typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
 typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
+typedef struct RvDomUnionMediaListOrDOMString RvDomUnionMediaListOrDOMString;
 typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
@@ -278,6 +279,15 @@ typedef struct RvDomAssignedNodesOptions {
     int32_t flatten; /* boolean, default false */
 } RvDomAssignedNodesOptions;
 
+/* The IDL dictionary CSSStyleSheetInit. size is sizeof(RvDomCSSStyleSheetInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomCSSStyleSheetInit {
+    uint32_t size;
+    const char* base_url; /* DOMString, default null */
+    const RvDomUnionMediaListOrDOMString* media; /* (MediaList or DOMString), default "" */
+    int32_t disabled; /* boolean, default false */
+} RvDomCSSStyleSheetInit;
+
 /* The IDL dictionary GetComposedRangesOptions. size is sizeof(RvDomGetComposedRangesOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomGetComposedRangesOptions {
@@ -301,6 +311,7 @@ typedef struct RvDomUnionHTMLElementOrLongNullable RvDomUnionHTMLElementOrLongNu
 typedef struct RvDomSequenceNode RvDomSequenceNode;
 typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
 typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
+typedef struct RvDomUnionMediaListOrDOMString RvDomUnionMediaListOrDOMString;
 typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
@@ -488,6 +499,19 @@ struct RvDomSequenceElementOrText {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_MEDIA_LIST_OR_DOM_STRING_MEDIA_LIST = 1,
+    RV_DOM_UNION_MEDIA_LIST_OR_DOM_STRING_STRING = 2,
+};
+struct RvDomUnionMediaListOrDOMString {
+    int32_t present;
+    int32_t tag;
+    RvMediaList* arm0;
+    const char* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceUSVString {
     int32_t present;
     int32_t count;
@@ -538,6 +562,7 @@ RV_EXPORT void rv_dom_union_html_element_or_long_nullable_release(RvDomUnionHTML
 RV_EXPORT void rv_dom_sequence_node_release(RvDomSequenceNode* value);
 RV_EXPORT void rv_dom_union_element_or_text_release(RvDomUnionElementOrText* value);
 RV_EXPORT void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value);
+RV_EXPORT void rv_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString* value);
 RV_EXPORT void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value);
 RV_EXPORT void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
@@ -3209,6 +3234,26 @@ RV_EXPORT int32_t rv_dom_html_style_element_set_type(RvNode* target, const char*
 RV_EXPORT int32_t rv_dom_html_style_element_get_blocking(RvNode* target, RvDOMTokenList** result);
 /* HTMLStyleElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_style_element_get_sheet(RvNode* target, RvStyleSheet** result);
+/* SVGStyleElement */
+
+/* SVGStyleElement.disabled getter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_disabled(RvNode* target, int32_t* result);
+/* SVGStyleElement.disabled setter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_svg_style_element_set_disabled(RvNode* target, int32_t value);
+/* SVGStyleElement.type getter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStyleElement.type setter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_svg_style_element_set_type(RvNode* target, const char* value);
+/* SVGStyleElement.media getter: attribute DOMString media */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStyleElement.media setter: attribute DOMString media */
+RV_EXPORT int32_t rv_dom_svg_style_element_set_media(RvNode* target, const char* value);
+/* SVGStyleElement.title getter: attribute DOMString title */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_title(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStyleElement.title setter: attribute DOMString title */
+RV_EXPORT int32_t rv_dom_svg_style_element_set_title(RvNode* target, const char* value);
+/* SVGStyleElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_sheet(RvNode* target, RvStyleSheet** result);
 /* HTMLLinkElement */
 
 /* HTMLLinkElement.href getter: attribute USVString href */
@@ -3312,6 +3357,9 @@ RV_EXPORT int32_t rv_dom_style_sheet_list_item(RvStyleSheetList* target, uint32_
 RV_EXPORT int32_t rv_dom_style_sheet_list_named_item(RvStyleSheetList* target, const char* name, RvStyleSheet** result);
 /* CSSStyleSheet */
 
+/* CSSStyleSheet.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options
+ * may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_style_sheet_create(RvNode* target, const RvDomCSSStyleSheetInit* options, RvStyleSheet** result);
 /* CSSStyleSheet.ownerRule getter: readonly attribute CSSRule? ownerRule; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_css_style_sheet_get_owner_rule(RvStyleSheet* target, RvCSSRule** result);
 /* CSSStyleSheet.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference */

@@ -140,6 +140,8 @@
 #include "RadioNodeList.h"
 #include "Range.h"
 #include "SVGElement.h"
+#include "SVGElementTypeHelpers.h"
+#include "SVGStyleElement.h"
 #include "ScrollIntoViewOptions.h"
 #include "ScrollToOptions.h"
 #include "Settings.h"
@@ -1086,6 +1088,60 @@ template<typename V> int32_t encodeRvDomSequenceElementOrText(V&& input, RvDomSe
     return RV_OK;
 }
 
+std::optional<Variant<Ref<MediaList>, String>> decodeRvDomUnionMediaListOrDOMString(const RvDomUnionMediaListOrDOMString* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<MediaList> arm0 = reinterpret_cast<MediaList*>(source->arm0);
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<MediaList>, String> { Variant<Ref<MediaList>, String> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<Ref<MediaList>, String> { Variant<Ref<MediaList>, String> { WTF::InPlaceIndex<1>, String::fromUTF8(source->arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionMediaListOrDOMString(RvDomUnionMediaListOrDOMString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<MediaList*>(value->arm0)->deref();
+        break;
+    case 2:
+        std::free(const_cast<char*>(value->arm1));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionMediaListOrDOMString(V&& value, RvDomUnionMediaListOrDOMString* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<MediaList>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = copyOwnedDomString(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionMediaListOrDOMString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionMediaListOrDOMString(V&& input, RvDomUnionMediaListOrDOMString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionMediaListOrDOMString(value, result);
+    return RV_OK;
+}
+
 void clearRvDomSequenceUSVString(RvDomSequenceUSVString* value)
 {
     if (!value) return;
@@ -1208,7 +1264,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-constructor:CSSStyleSheet" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1293,6 +1349,11 @@ void ranvier_dom_union_element_or_text_release(RvDomUnionElementOrText* value)
 void ranvier_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value)
 {
     if (isMainThread()) clearRvDomSequenceElementOrText(value);
+}
+
+void ranvier_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrDOMString* value)
+{
+    if (isMainThread()) clearRvDomUnionMediaListOrDOMString(value);
 }
 
 void ranvier_dom_sequence_usv_string_release(RvDomSequenceUSVString* value)
@@ -17575,6 +17636,126 @@ int32_t ranvier_dom_html_style_element_get_sheet(RvNode* target, RvStyleSheet** 
     return deliver([&]() -> decltype(auto) { return impl->sheet(); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
 }
 
+// SVGStyleElement.disabled getter: attribute boolean disabled
+int32_t ranvier_dom_svg_style_element_get_disabled(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->disabled(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGStyleElement.disabled setter: attribute boolean disabled
+int32_t ranvier_dom_svg_style_element_set_disabled(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setDisabled(!!value); });
+}
+
+// SVGStyleElement.type getter: attribute DOMString type
+int32_t ranvier_dom_svg_style_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// SVGStyleElement.type setter: attribute DOMString type
+int32_t ranvier_dom_svg_style_element_set_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// SVGStyleElement.media getter: attribute DOMString media
+int32_t ranvier_dom_svg_style_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// SVGStyleElement.media setter: attribute DOMString media
+int32_t ranvier_dom_svg_style_element_set_media(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::mediaAttr, AtomString { a0.string() }); });
+}
+
+// SVGStyleElement.title getter: attribute DOMString title
+int32_t ranvier_dom_svg_style_element_get_title(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::titleAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// SVGStyleElement.title setter: attribute DOMString title
+int32_t ranvier_dom_svg_style_element_set_title(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::titleAttr, AtomString { a0.string() }); });
+}
+
+// SVGStyleElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL
+int32_t ranvier_dom_svg_style_element_get_sheet(RvNode* target, RvStyleSheet** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->sheet(); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
+}
+
 // HTMLLinkElement.href getter: attribute USVString href
 int32_t ranvier_dom_html_link_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -18178,6 +18359,32 @@ int32_t ranvier_dom_style_sheet_list_named_item(RvStyleSheetList* target, const 
     RefPtr<StyleSheetList> impl = reinterpret_cast<StyleSheetList*>(target);
     StringArg a0 { name };
     return deliver([&]() -> decltype(auto) { return impl->namedItem(a0.atom()); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
+}
+
+// CSSStyleSheet.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_css_style_sheet_create(RvNode* target, const RvDomCSSStyleSheetInit* options, RvStyleSheet** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    CSSStyleSheet::Init a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomCSSStyleSheetInit, base_url) + sizeof(options->base_url) && options->base_url)
+            assignString(a0.baseURL, options->base_url);
+        if (options->size >= offsetof(RvDomCSSStyleSheetInit, media) + sizeof(options->media) && options->media) {
+            int32_t status = RV_OK;
+            auto value = decodeRvDomUnionMediaListOrDOMString(options->media, status);
+            if (status != RV_OK) return status;
+            a0.media = std::move(*value);
+        }
+        if (options->size >= offsetof(RvDomCSSStyleSheetInit, disabled) + sizeof(options->disabled))
+            assignValue(a0.disabled, !!options->disabled);
+    }
+    return deliver([&]() -> decltype(auto) { return CSSStyleSheet::create(*impl, std::move(a0)); }, [&](auto&& value) { return storeHandle<StyleSheet>(value, result); });
 }
 
 // CSSStyleSheet.ownerRule getter: readonly attribute CSSRule? ownerRule; *result is a new reference, or NULL
