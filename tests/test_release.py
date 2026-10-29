@@ -66,6 +66,18 @@ class ReleaseTests(unittest.TestCase):
                 self.assertEqual(Path(smoke[smoke.index('--package') + 1]).name,
                                  f'Ranvier.WebCore.Native{suffix}.win-x64.{version}.nupkg')
 
+    def test_slim_release_checks_the_packaged_api_surface_after_smoke(self):
+        code, calls = self.invoke('slim')
+        self.assertIsNone(code)
+        smoke_index = next(index for index, command in enumerate(calls) if any(value.endswith('smoke.py') for value in command))
+        probe_index = next(index for index, command in enumerate(calls) if any(value.endswith('check_package_api.py') for value in command))
+        self.assertGreater(probe_index, smoke_index)
+        smoke, probe = calls[smoke_index], calls[probe_index]
+        self.assertEqual(probe[probe.index('--package') + 1], smoke[smoke.index('--package') + 1])
+        for flavor in ['gpu', 'lean']:
+            _, calls = self.invoke(flavor)
+            self.assertFalse(any(any(value.endswith('check_package_api.py') for value in command) for command in calls))
+
     def test_gpu_release_still_rejects_dirty_source(self):
         code, calls = self.invoke('gpu', dirty=True)
         self.assertIsInstance(code, str)

@@ -563,6 +563,10 @@
       "base": "DOMRectReadOnly"
     },
     {
+      "name": "DOMRectList",
+      "base": null
+    },
+    {
       "name": "NodeList",
       "base": null
     },
@@ -1774,6 +1778,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "dom/DOMRect.idl"
+    },
+    {
+      "name": "DOMRectList",
+      "idlName": "DOMRectList",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/DOMRectList.idl"
     },
     {
       "name": "NodeList",
@@ -21612,6 +21625,42 @@
         "interface": null,
         "root": null,
         "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Element",
+      "member": "getClientRects",
+      "contractOwner": "Element",
+      "kind": "operation",
+      "function": "rv_dom_element_get_client_rects",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMRectList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMRectList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMRectList",
+        "root": "DOMRectList",
+        "class": "DOMRectList",
         "enum": null,
         "label": null,
         "nullable": false,
@@ -86657,6 +86706,42 @@
     },
     {
       "interface": "Range",
+      "member": "getClientRects",
+      "contractOwner": "Range",
+      "kind": "operation",
+      "function": "rv_dom_range_get_client_rects",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAbstractRange*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMRectList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMRectList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMRectList",
+        "root": "DOMRectList",
+        "class": "DOMRectList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Range",
       "member": "getBoundingClientRect",
       "contractOwner": "Range",
       "kind": "operation",
@@ -88734,6 +88819,107 @@
         "enum": null,
         "label": null,
         "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMRectList",
+      "member": "length",
+      "contractOwner": "DOMRectList",
+      "kind": "getter",
+      "function": "rv_dom_dom_rect_list_get_length",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMRectList",
+      "member": "item",
+      "contractOwner": "DOMRectList",
+      "kind": "operation",
+      "function": "rv_dom_dom_rect_list_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvDOMRectReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMRect",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMRect",
+        "root": "DOMRectReadOnly",
+        "class": "DOMRect",
+        "enum": null,
+        "label": null,
+        "nullable": true,
         "atom": false,
         "subtypes": []
       }

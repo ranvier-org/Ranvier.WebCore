@@ -722,6 +722,12 @@ extern void rv_dom_dom_rect_read_only_release(nativeint handle)
 extern nativeint rv_dom_dom_rect_read_only_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_dom_rect_list_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_dom_rect_list_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern void rv_dom_node_list_release(nativeint handle)
 
 [<DllImport(Lib)>]
@@ -1641,6 +1647,9 @@ extern int rv_dom_element_aria_notify(nativeint target, [<MarshalAs(UnmanagedTyp
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_aria_notify_2(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement, [<In>] RvDomAriaNotifyOptions[] options)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_get_client_rects(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_bounding_client_rect(nativeint target, nativeint& result)
@@ -5411,6 +5420,9 @@ extern int rv_dom_range_expand(nativeint target, [<MarshalAs(UnmanagedType.LPUTF
 extern int rv_dom_range_compare_node(nativeint target, nativeint node, int16& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_range_get_client_rects(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_range_get_bounding_client_rect(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -5526,6 +5538,12 @@ extern int rv_dom_dom_rect_read_only_get_bottom(nativeint target, float& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_rect_read_only_get_left(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_list_get_length(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_list_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_list_get_length(nativeint target, uint32& result)
