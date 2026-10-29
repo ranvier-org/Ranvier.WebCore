@@ -341,5 +341,15 @@
             "feature": "dom-css-supports",
             "stringInputs": "utf8-lengths"
         }
+    },
+    "windowBindings": {
+        "DOMWindow": {
+            "receiver": "Document",
+            "members": [
+                "getComputedStyle"
+            ],
+            "feature": "dom-computed-style",
+            "stringInputs": "utf8-lengths"
+        }
     }
 }

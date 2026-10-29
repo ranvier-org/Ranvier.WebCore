@@ -93007,6 +93007,108 @@
       "feature": "dom-css-supports",
       "binding": "facade",
       "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMWindow",
+      "member": "getComputedStyle",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_get_computed_style",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "element"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "pseudo_element"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "pseudo_element_length"
+        },
+        {
+          "ctype": "RvCSSStyleDeclaration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "element",
+          "idlType": "Element",
+          "idl": {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "pseudoElement",
+          "idlType": "CSSOMString?",
+          "idl": {
+            "name": "USVString",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "null",
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSStyleDeclaration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSStyleDeclaration",
+        "root": "CSSStyleDeclaration",
+        "class": "CSSStyleDeclaration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-computed-style",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
     }
   ],
   "enumerations": {

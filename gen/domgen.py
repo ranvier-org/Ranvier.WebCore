@@ -469,6 +469,8 @@ class Generator(ComplexGeneratorMixin):
             self.interface(name)
         for name, binding in self.world.config.get("namespaceBindings", {}).items():
             self.namespace(name, binding)
+        for name, binding in self.world.config.get("windowBindings", {}).items():
+            self.window_context(name, binding)
         self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
@@ -495,6 +497,70 @@ class Generator(ComplexGeneratorMixin):
         label = member.name or member.special or member.kind
         self.excluded.append((f"{interface}.{label}", reason))
 
+    def window_context(self, name, binding):
+        if name != 'DOMWindow' or binding.get('receiver') != 'Document':
+            raise SystemExit('Window bindings require DOMWindow with a Document receiver')
+        if name not in self.world.interfaces:
+            raise SystemExit(f'{name}: configured Window interface was not found')
+        if 'Document' not in self.world.scope:
+            raise SystemExit(f'{name}: Window context receiver must be a scoped Document')
+        if binding.get('stringInputs') != 'utf8-lengths':
+            raise SystemExit(f'{name}: Window string inputs require explicit UTF-8 lengths')
+        self.headers.add('LocalDOMWindow.h')
+        selected = set(binding['members'])
+        operations = {}
+        definition = self.world.interfaces[name]
+        members = [self.scoped_member(member, definition.attrs) for member in definition.members]
+        for partial in self.world.partials.get(name, []):
+            if not self.world.skipped(partial.file):
+                members += [self.scoped_member(member, partial.attrs, definition.attrs) for member in partial.members]
+        for member in members:
+            if member.name not in selected:
+                continue
+            reason = self.member_reason(name, member)
+            if reason or member.kind != 'operation':
+                raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not an operation"}')
+            if member.attrs.get('CallWith') or member.attrs.get('ImplementedBy'):
+                raise SystemExit(f'{name}.{member.name}: Window context bindings require a direct instance operation')
+            operations.setdefault(member.name, []).append(member)
+        if selected != set(operations):
+            raise SystemExit(f'{name}: missing configured Window operations {sorted(selected - set(operations))}')
+        generated = []
+        for operation, overloads in operations.items():
+            for member in overloads:
+                suffix = '' if len(overloads) == 1 else f'_{len(member.arguments)}'
+                function = Function(name, member, 'context_operation', f'window_{snake(operation)}{suffix}', [],
+                                    f'Window.{operation}: checked Document context; nullable string byte length -1 means null')
+                function.receiver = 'Document'
+                function.feature = binding['feature']
+                function.string_spans = True
+                function.nullable_spans = True
+                function.context_checks = ['if (!impl->window())', '    return RV_ERR_UNSUPPORTED;']
+                try:
+                    args = [self.world.map(argument.type) for argument in member.arguments]
+                    result = self.world.map(member.type)
+                    placeholders = ', '.join(f'{{arg{i}}}' for i in range(len(args)))
+                    call = f'impl->window()->{member.attrs.get("ImplementedAs", member.name)}({placeholders})'
+                    self.finish(function, 'Document', member, member.arguments, args, result, call, [])
+                except Unsupported as error:
+                    raise SystemExit(f'{name}.{member.name}: {error}') from error
+                generated.append(function)
+        self.namespace_features.append((binding['feature'], [function.conditional for function in generated if function.conditional]))
+
+    def scoped_member(self, member, *scopes):
+        result = member
+        for attrs in scopes:
+            result = self.world.copy(result, attrs)
+        for key in ('Conditional', 'EnabledBySetting', 'EnabledForWorld'):
+            gates = [attrs[key] for attrs in (member.attrs, *scopes) if attrs.get(key)]
+            if gates:
+                terms = ['']
+                for gate in gates:
+                    text = '&'.join(gate) if isinstance(gate, list) else gate
+                    terms = [f'{left}&{right}' if left else right for left in terms for right in text.split('|')]
+                result.attrs[key] = '|'.join(terms)
+        return result
+
     def namespace(self, name, binding):
         definition = self.world.namespaces.get(name)
         if not definition:
@@ -507,22 +573,9 @@ class Generator(ComplexGeneratorMixin):
         public = definition.attrs.get("InterfaceName", name)
         cpp = definition.attrs.get("ImplementedAs", name)
         self.headers.add(f"{cpp}.h")
-        def scoped_member(member, *scopes):
-            gates = [attrs['Conditional'] for attrs in (member.attrs, *scopes) if attrs.get('Conditional')]
-            result = member
-            for attrs in scopes:
-                result = self.world.copy(result, attrs)
-            if gates:
-                terms = ['']
-                for gate in gates:
-                    text = '&'.join(gate) if isinstance(gate, list) else gate
-                    terms = [f'{left}&{right}' if left else right for left in terms for right in text.split('|')]
-                result.attrs['Conditional'] = '|'.join(terms)
-            return result
-
-        members = [scoped_member(member, definition.attrs) for member in definition.members]
+        members = [self.scoped_member(member, definition.attrs) for member in definition.members]
         for partial in self.world.namespace_partials.get(name, []):
-            members += [scoped_member(member, partial.attrs, definition.attrs) for member in partial.members]
+            members += [self.scoped_member(member, partial.attrs, definition.attrs) for member in partial.members]
         selected = set(binding["members"])
         operations = {}
         for member in members:
@@ -1040,12 +1093,16 @@ class Generator(ComplexGeneratorMixin):
                 notes.append(f"{name} defaults to {argument.default} in IDL")
             if mapped.kind == "string":
                 if getattr(function, "string_spans", False):
-                    if argument.optional or mapped.nullable:
+                    nullable_span = (getattr(function, 'nullable_spans', False) and mapped.nullable
+                                     and not optional_no_default and argument.default in (None, 'null'))
+                    if (argument.optional or mapped.nullable) and not nullable_span:
                         raise Unsupported("optional or nullable namespace strings need an explicit presence representation")
                     params += [("const uint8_t*", name), ("int32_t", name + "_length")]
-                    checks.append(f"({name}_length >= 0 && (!{name}_length || {name}))")
+                    minimum = -1 if nullable_span else 0
+                    checks.append(f"({name}_length >= {minimum} && ({name}_length <= 0 || {name}))")
+                    null_guard = f'{name}_length >= 0 && ' if nullable_span else ''
                     prepare += [f"StringArg a{index} {{ {name}, {name}_length }};",
-                                f"if (a{index}.string().isNull()) return RV_ERR_NULL_ARGUMENT;"]
+                                f"if ({null_guard}a{index}.string().isNull()) return RV_ERR_NULL_ARGUMENT;"]
                 else:
                     params.append(("const char*", name))
                     if not maybe_null:
@@ -1145,7 +1202,8 @@ class Generator(ComplexGeneratorMixin):
         elif returns.kind == "string":
             params += [("char*", "buffer"), ("int32_t", "capacity"), ("int32_t*", "length")]
             checks.append("length")
-            sink = "copyString(asString(value), buffer, capacity, length)"
+            copier = 'copyString' if returns.nullable else 'copyRequiredString'
+            sink = f"{copier}(asString(value), buffer, capacity, length)"
         elif returns.kind in ("bool", "number"):
             params.append((f"{returns.ctype}*", "result"))
             checks.append("result")
@@ -1209,6 +1267,7 @@ class Generator(ComplexGeneratorMixin):
             if "Node" not in chain:
                 raise Unsupported("[CallWith] on an interface other than a node")
             body.append("Ref document = impl->document();")
+        body += getattr(function, 'context_checks', [])
         body += prepare
         expression = call
         expression = expression.replace("{call_with}", "".join(", document.get()" for _ in call_with))
@@ -1266,7 +1325,9 @@ class Generator(ComplexGeneratorMixin):
                 continue
             functions.append({
                 "interface": function.interface, "member": function.member.name,
-                "contractOwner": function.namespace if function.kind == "namespace_operation" else self.world.contract_owner(function.interface, function.member),
+                "contractOwner": (function.namespace if function.kind == "namespace_operation" else
+                                  'Window' if function.kind == 'context_operation' else
+                                  self.world.contract_owner(function.interface, function.member)),
                 "kind": function.kind, "function": "rv_dom_" + function.name,
                 "conditional": function.conditional,
                 "parameters": [{"ctype": ctype, "name": name} for ctype, name in function.params],
@@ -1281,6 +1342,9 @@ class Generator(ComplexGeneratorMixin):
             if function.kind == "namespace_operation":
                 functions[-1].update(receiver=function.receiver, namespace=function.namespace, feature=function.feature,
                                      binding="facade", stringInputs="utf8-lengths")
+            if function.kind == 'context_operation':
+                functions[-1].update(receiver=function.receiver, context='Window', feature=function.feature,
+                                     binding='facade', stringInputs='utf8-lengths-nullable')
             bridge = self.world.config.get("attributeBridges", {}).get(f"{function.interface}.{function.member.name}")
             if bridge:
                 functions[-1]["binding"] = "facade"
@@ -1638,7 +1702,8 @@ class Generator(ComplexGeneratorMixin):
             f"(getters {sum(f.kind == 'getter' for f in self.functions)}, setters {sum(f.kind == 'setter' for f in self.functions)}, "
             f"operations {sum(f.kind == 'operation' for f in self.functions)}, "
             f"constructors {sum(f.kind == 'constructor' for f in self.functions)}, "
-            f"namespace operations {sum(f.kind == 'namespace_operation' for f in self.functions)}), handle types {len(self.handles)}, "
+            f"namespace operations {sum(f.kind == 'namespace_operation' for f in self.functions)}, "
+            f"context operations {sum(f.kind == 'context_operation' for f in self.functions)}), handle types {len(self.handles)}, "
             f"constants {len(self.constants)}, enumerations {len(self.enums_used)}, dictionaries {len(self.dicts_used)}, "
             f"stubs {len(self.stubs)}, left out {len(self.excluded)}",
             f"Runtime type queries: {len(self.runtime_queries)} (separate from the IDL member count)",
@@ -1765,6 +1830,11 @@ int32_t copyString(const String& value, char* buffer, int32_t capacity, int32_t*
     return RV_OK;
 }
 
+int32_t copyRequiredString(const String& value, char* buffer, int32_t capacity, int32_t* length)
+{
+    return copyString(value.isNull() ? emptyString() : value, buffer, capacity, length);
+}
+
 template<typename V> String asString(const V& value)
 {
     if constexpr (IsOptional<V>::value)
@@ -1881,7 +1951,7 @@ struct StringArg {
     {
     }
     StringArg(const uint8_t* text, int32_t length)
-        : value(length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString())
+        : value(length < 0 ? String() : length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString())
     {
     }
     operator String() const { return value; }

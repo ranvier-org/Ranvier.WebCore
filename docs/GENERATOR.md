@@ -84,6 +84,17 @@ Existing null-terminated string signatures retain their transport. Failed calls 
 Run `python -I tests/abi/css_supports.py --native-directory <staged-native-directory>` for real parser,
 complete-input and receiver/thread validation. Every packaged slim CI target runs this probe.
 
+`windowBindings` selects direct Window instance operations using a checked Document receiver.
+`rv_dom_window_get_computed_style` returns a retained, live, read-only CSSStyleDeclaration for the
+element or pseudo-element. A windowless context returns unsupported. Nullable input spans use
+length -1 for null, zero for empty and positive lengths for complete UTF-8; invalid spans preserve
+the result. Namespace and Window operations remain facade metadata rather than invented interface members.
+
+Non-nullable IDL string results convert null internal engine strings to empty strings, matching
+browser DOM conversion. Nullable string results preserve null. This includes empty computed
+declarations for invalid/unresolved pseudo selectors. The computed-style ABI fixture verifies
+cascade, pseudo values, live updates, read-only rejection, nullable strings and context/input errors.
+
 `rv_dom_<interface>_<member>`, in snake case: `Element.className` gives `rv_dom_element_get_class_name` and
 `rv_dom_element_set_class_name`; `HTMLInputElement.setSelectionRange` gives
 `rv_dom_html_input_element_set_selection_range`. Attributes take `get_` and `set_`; operations take their own

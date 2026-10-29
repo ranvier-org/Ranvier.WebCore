@@ -130,6 +130,7 @@
 #include "InputEvent.h"
 #include "KeyboardEvent.h"
 #include "LiveNodeList.h"
+#include "LocalDOMWindow.h"
 #include "MathMLElement.h"
 #include "MediaList.h"
 #include "MouseEvent.h"
@@ -251,6 +252,11 @@ int32_t copyString(const String& value, char* buffer, int32_t capacity, int32_t*
     return RV_OK;
 }
 
+int32_t copyRequiredString(const String& value, char* buffer, int32_t capacity, int32_t* length)
+{
+    return copyString(value.isNull() ? emptyString() : value, buffer, capacity, length);
+}
+
 template<typename V> String asString(const V& value)
 {
     if constexpr (IsOptional<V>::value)
@@ -367,7 +373,7 @@ struct StringArg {
     {
     }
     StringArg(const uint8_t* text, int32_t length)
-        : value(length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString())
+        : value(length < 0 ? String() : length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString())
     {
     }
     operator String() const { return value; }
@@ -1313,6 +1319,8 @@ int32_t ranvier_dom_has(const char* feature)
     }
     if (!std::strcmp(feature, "dom-css-supports"))
         return 1;
+    if (!std::strcmp(feature, "dom-computed-style"))
+        return 1;
     return 0;
 }
 
@@ -1669,7 +1677,7 @@ int32_t ranvier_dom_node_get_node_name(RvNode* target, char* buffer, int32_t cap
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<Node> impl = nodeOf(target);
-    return deliver([&]() -> decltype(auto) { return impl->nodeName(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->nodeName(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Node.baseURI getter: readonly attribute USVString baseURI
@@ -1680,7 +1688,7 @@ int32_t ranvier_dom_node_get_base_uri(RvNode* target, char* buffer, int32_t capa
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<Node> impl = nodeOf(target);
-    return deliver([&]() -> decltype(auto) { return impl->baseURI(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->baseURI(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Node.isConnected getter: readonly attribute boolean isConnected
@@ -2033,7 +2041,7 @@ int32_t ranvier_dom_character_data_get_data(RvNode* target, char* buffer, int32_
     RefPtr impl = dynamicDowncast<CharacterData>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->data(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->data(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CharacterData.data setter: attribute DOMString data
@@ -2099,7 +2107,7 @@ int32_t ranvier_dom_character_data_substring_data(RvNode* target, uint32_t offse
     RefPtr impl = dynamicDowncast<CharacterData>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->substringData(offset, count); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->substringData(offset, count); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CharacterData.appendData(DOMString data) -> undefined
@@ -2228,7 +2236,7 @@ int32_t ranvier_dom_text_get_whole_text(RvNode* target, char* buffer, int32_t ca
     RefPtr impl = dynamicDowncast<Text>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->wholeText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->wholeText(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Text.assignedSlot getter: readonly attribute HTMLSlotElement? assignedSlot; *result is a new reference, or NULL
@@ -2508,7 +2516,7 @@ int32_t ranvier_dom_shadow_root_get_reference_target(RvNode* target, char* buffe
     auto& settings = impl->document().settingsValues();
     if (!(settings.shadowRootReferenceTargetEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->referenceTarget(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->referenceTarget(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // ShadowRoot.referenceTarget setter: attribute DOMString referenceTarget; RV_ERR_UNSUPPORTED while the setting ShadowRootReferenceTargetEnabled is off
@@ -2634,7 +2642,7 @@ int32_t ranvier_dom_shadow_root_get_inner_html(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<ShadowRoot>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->innerHTML(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->innerHTML(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // ShadowRoot.innerHTML setter: attribute (TrustedHTML or DOMString) innerHTML
@@ -2712,7 +2720,7 @@ int32_t ranvier_dom_shadow_root_get_html(RvNode* target, const RvDomGetHTMLOptio
             a0.shadowRoots = std::move(*value);
         }
     }
-    return deliver([&]() -> decltype(auto) { return impl->getHTML(std::move(a0)); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getHTML(std::move(a0)); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Document.implementation getter: readonly attribute DOMImplementation implementation; *result is a new reference
@@ -2738,7 +2746,7 @@ int32_t ranvier_dom_document_get_compat_mode(RvNode* target, char* buffer, int32
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->compatMode(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->compatMode(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Document.characterSet getter: readonly attribute DOMString characterSet
@@ -2751,7 +2759,7 @@ int32_t ranvier_dom_document_get_character_set(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->characterSetWithUTF8Fallback(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->characterSetWithUTF8Fallback(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Document.contentType getter: readonly attribute DOMString contentType
@@ -2764,7 +2772,7 @@ int32_t ranvier_dom_document_get_content_type(RvNode* target, char* buffer, int3
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->contentType(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->contentType(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Document.documentElement getter: readonly attribute Element? documentElement; *result is a new reference, or NULL
@@ -2816,7 +2824,7 @@ int32_t ranvier_dom_document_get_title(RvNode* target, char* buffer, int32_t cap
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->title(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->title(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Document.title setter: attribute DOMString title
@@ -2843,7 +2851,7 @@ int32_t ranvier_dom_document_get_dir(RvNode* target, char* buffer, int32_t capac
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->dir(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->dir(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Document.dir setter: attribute DOMString dir
@@ -2964,7 +2972,7 @@ int32_t ranvier_dom_document_get_design_mode(RvNode* target, char* buffer, int32
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->designMode(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->designMode(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Document.designMode setter: attribute DOMString designMode
@@ -3499,7 +3507,7 @@ int32_t ranvier_dom_document_query_command_value(RvNode* target, const char* com
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { command_id };
-    return deliver([&]() -> decltype(auto) { return impl->queryCommandValue(a0.string()); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->queryCommandValue(a0.string()); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Document.getSelection() -> DOMSelection?; *result is a new reference, or NULL
@@ -3708,7 +3716,7 @@ int32_t ranvier_dom_element_get_local_name(RvNode* target, char* buffer, int32_t
     RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->localName(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->localName(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Element.tagName getter: readonly attribute DOMString tagName
@@ -3721,7 +3729,7 @@ int32_t ranvier_dom_element_get_tag_name(RvNode* target, char* buffer, int32_t c
     RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->tagName(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->tagName(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Element.id getter: attribute DOMString id
@@ -3734,7 +3742,7 @@ int32_t ranvier_dom_element_get_id(RvNode* target, char* buffer, int32_t capacit
     RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getIdAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getIdAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Element.id setter: attribute DOMString id
@@ -3761,7 +3769,7 @@ int32_t ranvier_dom_element_get_class_name(RvNode* target, char* buffer, int32_t
     RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::classAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::classAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Element.className setter: attribute DOMString className
@@ -3801,7 +3809,7 @@ int32_t ranvier_dom_element_get_slot(RvNode* target, char* buffer, int32_t capac
     RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::slotAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::slotAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Element.slot setter: attribute DOMString slot
@@ -4000,7 +4008,7 @@ int32_t ranvier_dom_element_get_outer_html(RvNode* target, char* buffer, int32_t
     RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->outerHTML(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->outerHTML(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Element.outerHTML setter: attribute (TrustedHTML or DOMString) outerHTML
@@ -5335,7 +5343,7 @@ int32_t ranvier_dom_element_get_inner_html(RvNode* target, char* buffer, int32_t
     RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->innerHTML(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->innerHTML(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Element.innerHTML setter: attribute (TrustedHTML or DOMString) innerHTML
@@ -6177,7 +6185,7 @@ int32_t ranvier_dom_element_get_html(RvNode* target, const RvDomGetHTMLOptions* 
             a0.shadowRoots = std::move(*value);
         }
     }
-    return deliver([&]() -> decltype(auto) { return impl->getHTML(std::move(a0)); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getHTML(std::move(a0)); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Attr.namespaceURI getter: readonly attribute DOMString? namespaceURI
@@ -6216,7 +6224,7 @@ int32_t ranvier_dom_attr_get_local_name(RvNode* target, char* buffer, int32_t ca
     RefPtr impl = dynamicDowncast<Attr>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->localName(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->localName(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Attr.name getter: readonly attribute DOMString name
@@ -6229,7 +6237,7 @@ int32_t ranvier_dom_attr_get_name(RvNode* target, char* buffer, int32_t capacity
     RefPtr impl = dynamicDowncast<Attr>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Attr.value getter: attribute DOMString value
@@ -6242,7 +6250,7 @@ int32_t ranvier_dom_attr_get_value(RvNode* target, char* buffer, int32_t capacit
     RefPtr impl = dynamicDowncast<Attr>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Attr.value setter: attribute DOMString value
@@ -6408,7 +6416,7 @@ int32_t ranvier_dom_html_element_get_title(RvNode* target, char* buffer, int32_t
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::titleAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::titleAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.title setter: attribute DOMString title
@@ -6435,7 +6443,7 @@ int32_t ranvier_dom_html_element_get_lang(RvNode* target, char* buffer, int32_t 
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::langAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::langAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.lang setter: attribute DOMString lang
@@ -6488,7 +6496,7 @@ int32_t ranvier_dom_html_element_get_dir(RvNode* target, char* buffer, int32_t c
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->dir(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->dir(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.dir setter: attribute DOMString dir
@@ -6596,7 +6604,7 @@ int32_t ranvier_dom_html_element_get_access_key(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::accesskeyAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::accesskeyAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.accessKey setter: attribute DOMString accessKey
@@ -6623,7 +6631,7 @@ int32_t ranvier_dom_html_element_get_access_key_label(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->accessKeyLabel(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->accessKeyLabel(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.draggable getter: attribute boolean draggable
@@ -6689,7 +6697,7 @@ int32_t ranvier_dom_html_element_get_autocapitalize(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->autocapitalize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->autocapitalize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 #else
     UNUSED_PARAM(target);
     UNUSED_PARAM(buffer);
@@ -6729,7 +6737,7 @@ int32_t ranvier_dom_html_element_get_inner_text(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->innerText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->innerText(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.innerText setter: attribute DOMString innerText
@@ -6879,7 +6887,7 @@ int32_t ranvier_dom_html_element_get_outer_text(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->outerText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->outerText(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.outerText setter: attribute DOMString outerText
@@ -6945,7 +6953,7 @@ int32_t ranvier_dom_html_element_get_writing_suggestions(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->writingSuggestions(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->writingSuggestions(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 #else
     UNUSED_PARAM(target);
     UNUSED_PARAM(buffer);
@@ -7050,7 +7058,7 @@ int32_t ranvier_dom_html_element_get_content_editable(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->contentEditable(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->contentEditable(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.contentEditable setter: attribute DOMString contentEditable
@@ -7080,7 +7088,7 @@ int32_t ranvier_dom_html_element_get_enter_key_hint(RvNode* target, char* buffer
     auto& settings = impl->document().settingsValues();
     if (!(settings.enterKeyHintEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->enterKeyHint(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->enterKeyHint(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.enterKeyHint setter: attribute DOMString enterKeyHint; RV_ERR_UNSUPPORTED while the setting EnterKeyHintEnabled is off
@@ -7123,7 +7131,7 @@ int32_t ranvier_dom_html_element_get_input_mode(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->inputMode(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->inputMode(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.inputMode setter: attribute DOMString inputMode
@@ -7163,7 +7171,7 @@ int32_t ranvier_dom_html_element_get_nonce(RvNode* target, char* buffer, int32_t
     RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLElement.nonce setter: attribute DOMString nonce
@@ -7362,7 +7370,7 @@ int32_t ranvier_dom_html_anchor_element_get_charset(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charsetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charsetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.charset setter: attribute DOMString charset
@@ -7389,7 +7397,7 @@ int32_t ranvier_dom_html_anchor_element_get_coords(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::coordsAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::coordsAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.coords setter: attribute DOMString coords
@@ -7419,7 +7427,7 @@ int32_t ranvier_dom_html_anchor_element_get_download(RvNode* target, char* buffe
     auto& settings = impl->document().settingsValues();
     if (!(settings.downloadAttributeEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::downloadAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::downloadAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.download setter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting DownloadAttributeEnabled is off
@@ -7449,7 +7457,7 @@ int32_t ranvier_dom_html_anchor_element_get_hreflang(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::hreflangAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::hreflangAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.hreflang setter: attribute DOMString hreflang
@@ -7476,7 +7484,7 @@ int32_t ranvier_dom_html_anchor_element_get_name(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.name setter: attribute DOMString name
@@ -7503,7 +7511,7 @@ int32_t ranvier_dom_html_anchor_element_get_rel(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.rel setter: attribute DOMString rel
@@ -7530,7 +7538,7 @@ int32_t ranvier_dom_html_anchor_element_get_rev(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::revAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::revAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.rev setter: attribute DOMString rev
@@ -7557,7 +7565,7 @@ int32_t ranvier_dom_html_anchor_element_get_shape(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shapeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shapeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.shape setter: attribute DOMString shape
@@ -7584,7 +7592,7 @@ int32_t ranvier_dom_html_anchor_element_get_type(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.type setter: attribute DOMString type
@@ -7611,7 +7619,7 @@ int32_t ranvier_dom_html_anchor_element_get_text(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->text(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->text(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.text setter: attribute DOMString text
@@ -7651,7 +7659,7 @@ int32_t ranvier_dom_html_anchor_element_get_referrer_policy(RvNode* target, char
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.referrerPolicy setter: attribute DOMString referrerPolicy
@@ -7678,7 +7686,7 @@ int32_t ranvier_dom_html_anchor_element_get_origin(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->origin(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->origin(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.protocol getter: attribute USVString protocol
@@ -7691,7 +7699,7 @@ int32_t ranvier_dom_html_anchor_element_get_protocol(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->protocol(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->protocol(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.protocol setter: attribute USVString protocol
@@ -7718,7 +7726,7 @@ int32_t ranvier_dom_html_anchor_element_get_username(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->username(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->username(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.username setter: attribute USVString username
@@ -7745,7 +7753,7 @@ int32_t ranvier_dom_html_anchor_element_get_password(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->password(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->password(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.password setter: attribute USVString password
@@ -7772,7 +7780,7 @@ int32_t ranvier_dom_html_anchor_element_get_host(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->host(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->host(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.host setter: attribute USVString host
@@ -7799,7 +7807,7 @@ int32_t ranvier_dom_html_anchor_element_get_hostname(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->hostname(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->hostname(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.hostname setter: attribute USVString hostname
@@ -7826,7 +7834,7 @@ int32_t ranvier_dom_html_anchor_element_get_port(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->port(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->port(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.port setter: attribute USVString port
@@ -7853,7 +7861,7 @@ int32_t ranvier_dom_html_anchor_element_get_pathname(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->pathname(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->pathname(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.pathname setter: attribute USVString pathname
@@ -7880,7 +7888,7 @@ int32_t ranvier_dom_html_anchor_element_get_search(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->search(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->search(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.search setter: attribute USVString search
@@ -7907,7 +7915,7 @@ int32_t ranvier_dom_html_anchor_element_get_hash(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->hash(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->hash(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.hash setter: attribute USVString hash
@@ -7934,7 +7942,7 @@ int32_t ranvier_dom_html_anchor_element_get_href(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::hrefAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::hrefAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.href setter: attribute USVString href
@@ -7961,7 +7969,7 @@ int32_t ranvier_dom_html_anchor_element_get_target(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLAnchorElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAnchorElement.target setter: attribute DOMString target
@@ -7988,7 +7996,7 @@ int32_t ranvier_dom_html_area_element_get_alt(RvNode* target, char* buffer, int3
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::altAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::altAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.alt setter: attribute DOMString alt
@@ -8015,7 +8023,7 @@ int32_t ranvier_dom_html_area_element_get_coords(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::coordsAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::coordsAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.coords setter: attribute DOMString coords
@@ -8068,7 +8076,7 @@ int32_t ranvier_dom_html_area_element_get_rel(RvNode* target, char* buffer, int3
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.rel setter: attribute DOMString rel
@@ -8095,7 +8103,7 @@ int32_t ranvier_dom_html_area_element_get_shape(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shapeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shapeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.shape setter: attribute DOMString shape
@@ -8125,7 +8133,7 @@ int32_t ranvier_dom_html_area_element_get_download(RvNode* target, char* buffer,
     auto& settings = impl->document().settingsValues();
     if (!(settings.downloadAttributeEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::downloadAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::downloadAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.download setter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting DownloadAttributeEnabled is off
@@ -8155,7 +8163,7 @@ int32_t ranvier_dom_html_area_element_get_referrer_policy(RvNode* target, char* 
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.referrerPolicy setter: attribute DOMString referrerPolicy
@@ -8195,7 +8203,7 @@ int32_t ranvier_dom_html_area_element_get_origin(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->origin(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->origin(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.protocol getter: attribute USVString protocol
@@ -8208,7 +8216,7 @@ int32_t ranvier_dom_html_area_element_get_protocol(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->protocol(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->protocol(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.protocol setter: attribute USVString protocol
@@ -8235,7 +8243,7 @@ int32_t ranvier_dom_html_area_element_get_username(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->username(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->username(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.username setter: attribute USVString username
@@ -8262,7 +8270,7 @@ int32_t ranvier_dom_html_area_element_get_password(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->password(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->password(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.password setter: attribute USVString password
@@ -8289,7 +8297,7 @@ int32_t ranvier_dom_html_area_element_get_host(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->host(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->host(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.host setter: attribute USVString host
@@ -8316,7 +8324,7 @@ int32_t ranvier_dom_html_area_element_get_hostname(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->hostname(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->hostname(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.hostname setter: attribute USVString hostname
@@ -8343,7 +8351,7 @@ int32_t ranvier_dom_html_area_element_get_port(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->port(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->port(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.port setter: attribute USVString port
@@ -8370,7 +8378,7 @@ int32_t ranvier_dom_html_area_element_get_pathname(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->pathname(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->pathname(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.pathname setter: attribute USVString pathname
@@ -8397,7 +8405,7 @@ int32_t ranvier_dom_html_area_element_get_search(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->search(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->search(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.search setter: attribute USVString search
@@ -8424,7 +8432,7 @@ int32_t ranvier_dom_html_area_element_get_hash(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->hash(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->hash(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.hash setter: attribute USVString hash
@@ -8451,7 +8459,7 @@ int32_t ranvier_dom_html_area_element_get_href(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::hrefAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::hrefAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.href setter: attribute USVString href
@@ -8478,7 +8486,7 @@ int32_t ranvier_dom_html_area_element_get_target(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLAreaElement.target setter: attribute DOMString target
@@ -8505,7 +8513,7 @@ int32_t ranvier_dom_html_body_element_get_a_link(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLBodyElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alinkAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alinkAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLBodyElement.aLink setter: attribute DOMString aLink
@@ -8532,7 +8540,7 @@ int32_t ranvier_dom_html_body_element_get_background(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLBodyElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::backgroundAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::backgroundAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLBodyElement.background setter: attribute DOMString background
@@ -8559,7 +8567,7 @@ int32_t ranvier_dom_html_body_element_get_bg_color(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLBodyElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLBodyElement.bgColor setter: attribute DOMString bgColor
@@ -8586,7 +8594,7 @@ int32_t ranvier_dom_html_body_element_get_link(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLBodyElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::linkAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::linkAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLBodyElement.link setter: attribute DOMString link
@@ -8613,7 +8621,7 @@ int32_t ranvier_dom_html_body_element_get_text(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLBodyElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::textAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::textAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLBodyElement.text setter: attribute DOMString text
@@ -8640,7 +8648,7 @@ int32_t ranvier_dom_html_body_element_get_v_link(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLBodyElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::vlinkAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::vlinkAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLBodyElement.vLink setter: attribute DOMString vLink
@@ -8706,7 +8714,7 @@ int32_t ranvier_dom_html_button_element_get_form_action(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLButtonElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->formAction(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->formAction(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.formAction setter: attribute USVString formAction
@@ -8733,7 +8741,7 @@ int32_t ranvier_dom_html_button_element_get_form_enctype(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLButtonElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->formEnctype(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->formEnctype(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.formEnctype setter: attribute DOMString formEnctype
@@ -8760,7 +8768,7 @@ int32_t ranvier_dom_html_button_element_get_form_method(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLButtonElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->formMethod(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->formMethod(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.formMethod setter: attribute DOMString formMethod
@@ -8787,7 +8795,7 @@ int32_t ranvier_dom_html_button_element_get_type(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLButtonElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.type setter: attribute DOMString type
@@ -8840,7 +8848,7 @@ int32_t ranvier_dom_html_button_element_get_form_target(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLButtonElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::formtargetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::formtargetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.formTarget setter: attribute DOMString formTarget
@@ -8867,7 +8875,7 @@ int32_t ranvier_dom_html_button_element_get_name(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLButtonElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.name setter: attribute DOMString name
@@ -8894,7 +8902,7 @@ int32_t ranvier_dom_html_button_element_get_value(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLButtonElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.value setter: attribute DOMString value
@@ -8959,7 +8967,7 @@ int32_t ranvier_dom_html_button_element_get_command(RvNode* target, char* buffer
     auto& settings = impl->document().settingsValues();
     if (!(settings.commandAttributesEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->command(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->command(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.command setter: attribute DOMString command; RV_ERR_UNSUPPORTED while the setting CommandAttributesEnabled is off
@@ -9015,7 +9023,7 @@ int32_t ranvier_dom_html_button_element_get_validation_message(RvNode* target, c
     RefPtr impl = dynamicDowncast<HTMLButtonElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.labels getter: readonly attribute NodeList? labels; *result is a new reference, or NULL
@@ -9079,7 +9087,7 @@ int32_t ranvier_dom_html_button_element_get_popover_target_action(RvNode* target
     auto& settings = impl->document().settingsValues();
     if (!(settings.popoverAttributeEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->popoverTargetAction(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->popoverTargetAction(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLButtonElement.popoverTargetAction setter: attribute DOMString popoverTargetAction; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off
@@ -9152,7 +9160,7 @@ int32_t ranvier_dom_html_details_element_get_name(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLDetailsElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLDetailsElement.name setter: attribute DOMString name
@@ -9231,7 +9239,7 @@ int32_t ranvier_dom_html_dialog_element_get_return_value(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLDialogElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->returnValue(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->returnValue(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLDialogElement.returnValue setter: attribute DOMString returnValue
@@ -9261,7 +9269,7 @@ int32_t ranvier_dom_html_dialog_element_get_closed_by(RvNode* target, char* buff
     auto& settings = impl->document().settingsValues();
     if (!(settings.closeWatcherEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->closedBy(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->closedBy(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLDialogElement.closedBy setter: attribute DOMString closedBy; RV_ERR_UNSUPPORTED while the setting CloseWatcherEnabled is off
@@ -9345,7 +9353,7 @@ int32_t ranvier_dom_html_div_element_get_align(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLDivElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLDivElement.align setter: attribute DOMString align
@@ -9411,7 +9419,7 @@ int32_t ranvier_dom_html_field_set_element_get_name(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLFieldSetElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFieldSetElement.name setter: attribute DOMString name
@@ -9438,7 +9446,7 @@ int32_t ranvier_dom_html_field_set_element_get_type(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLFieldSetElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFieldSetElement.elements getter: readonly attribute HTMLCollection elements; *result is a new reference
@@ -9490,7 +9498,7 @@ int32_t ranvier_dom_html_field_set_element_get_validation_message(RvNode* target
     RefPtr impl = dynamicDowncast<HTMLFieldSetElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFieldSetElement.checkValidity() -> boolean
@@ -9546,7 +9554,7 @@ int32_t ranvier_dom_html_form_element_get_accept_charset(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::accept_charsetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::accept_charsetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFormElement.acceptCharset setter: attribute DOMString acceptCharset
@@ -9573,7 +9581,7 @@ int32_t ranvier_dom_html_form_element_get_action(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->action(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->action(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFormElement.action setter: attribute USVString action
@@ -9600,7 +9608,7 @@ int32_t ranvier_dom_html_form_element_get_autocomplete(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->autocomplete(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->autocomplete(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFormElement.autocomplete setter: attribute DOMString autocomplete
@@ -9627,7 +9635,7 @@ int32_t ranvier_dom_html_form_element_get_enctype(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->enctype(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->enctype(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFormElement.enctype setter: attribute DOMString enctype
@@ -9654,7 +9662,7 @@ int32_t ranvier_dom_html_form_element_get_encoding(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->enctype(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->enctype(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFormElement.encoding setter: attribute DOMString encoding
@@ -9681,7 +9689,7 @@ int32_t ranvier_dom_html_form_element_get_method(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->method(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->method(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFormElement.method setter: attribute DOMString method
@@ -9708,7 +9716,7 @@ int32_t ranvier_dom_html_form_element_get_name(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFormElement.name setter: attribute DOMString name
@@ -9761,7 +9769,7 @@ int32_t ranvier_dom_html_form_element_get_target(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFormElement.target setter: attribute DOMString target
@@ -9788,7 +9796,7 @@ int32_t ranvier_dom_html_form_element_get_rel(RvNode* target, char* buffer, int3
     RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFormElement.rel setter: attribute DOMString rel
@@ -9923,7 +9931,7 @@ int32_t ranvier_dom_html_image_element_get_alt(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::altAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::altAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.alt setter: attribute DOMString alt
@@ -9950,7 +9958,7 @@ int32_t ranvier_dom_html_image_element_get_src(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::srcAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::srcAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.src setter: attribute USVString src
@@ -9977,7 +9985,7 @@ int32_t ranvier_dom_html_image_element_get_srcset(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->srcsetForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->srcsetForBindings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.srcset setter: attribute USVString srcset
@@ -10004,7 +10012,7 @@ int32_t ranvier_dom_html_image_element_get_sizes(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizesAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizesAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.sizes setter: attribute DOMString sizes
@@ -10058,7 +10066,7 @@ int32_t ranvier_dom_html_image_element_get_use_map(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::usemapAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::usemapAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.useMap setter: attribute DOMString useMap
@@ -10246,7 +10254,7 @@ int32_t ranvier_dom_html_image_element_get_current_src(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->currentSrc(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->currentSrc(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.referrerPolicy getter: attribute DOMString referrerPolicy
@@ -10259,7 +10267,7 @@ int32_t ranvier_dom_html_image_element_get_referrer_policy(RvNode* target, char*
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.referrerPolicy setter: attribute DOMString referrerPolicy
@@ -10286,7 +10294,7 @@ int32_t ranvier_dom_html_image_element_get_decoding(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->decoding(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->decoding(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.decoding setter: attribute DOMString decoding
@@ -10316,7 +10324,7 @@ int32_t ranvier_dom_html_image_element_get_loading(RvNode* target, char* buffer,
     auto& settings = impl->document().settingsValues();
     if (!(settings.lazyImageLoadingEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::loadingAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::loadingAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.loading setter: attribute DOMString loading; RV_ERR_UNSUPPORTED while the setting LazyImageLoadingEnabled is off
@@ -10346,7 +10354,7 @@ int32_t ranvier_dom_html_image_element_get_name(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.name setter: attribute DOMString name
@@ -10373,7 +10381,7 @@ int32_t ranvier_dom_html_image_element_get_lowsrc(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::lowsrcAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::lowsrcAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.lowsrc setter: attribute USVString lowsrc
@@ -10400,7 +10408,7 @@ int32_t ranvier_dom_html_image_element_get_align(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.align setter: attribute DOMString align
@@ -10479,7 +10487,7 @@ int32_t ranvier_dom_html_image_element_get_long_desc(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::longdescAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::longdescAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.longDesc setter: attribute USVString longDesc
@@ -10506,7 +10514,7 @@ int32_t ranvier_dom_html_image_element_get_border(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::borderAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::borderAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.border setter: attribute DOMString border
@@ -10533,7 +10541,7 @@ int32_t ranvier_dom_html_image_element_get_fetch_priority(RvNode* target, char* 
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fetchPriorityForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fetchPriorityForBindings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLImageElement.fetchPriority setter: attribute DOMString fetchPriority
@@ -10561,7 +10569,7 @@ int32_t ranvier_dom_html_image_element_get_attachment_identifier(RvNode* target,
     RefPtr impl = dynamicDowncast<HTMLImageElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attachmentIdentifier(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attachmentIdentifier(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 #else
     UNUSED_PARAM(target);
     UNUSED_PARAM(buffer);
@@ -10607,7 +10615,7 @@ int32_t ranvier_dom_html_input_element_get_accept(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::acceptAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::acceptAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.accept setter: attribute DOMString accept
@@ -10666,7 +10674,7 @@ int32_t ranvier_dom_html_input_element_get_alt(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::altAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::altAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.alt setter: attribute DOMString alt
@@ -10693,7 +10701,7 @@ int32_t ranvier_dom_html_input_element_get_autocomplete(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->autocomplete(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->autocomplete(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.autocomplete setter: attribute DOMString autocomplete
@@ -10775,7 +10783,7 @@ int32_t ranvier_dom_html_input_element_get_color_space(RvNode* target, char* buf
     auto& settings = impl->document().settingsValues();
     if (!(settings.inputTypeColorEnhancementsEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->colorSpace(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->colorSpace(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.colorSpace setter: attribute DOMString colorSpace; RV_ERR_UNSUPPORTED while the setting InputTypeColorEnhancementsEnabled is off
@@ -10805,7 +10813,7 @@ int32_t ranvier_dom_html_input_element_get_dir_name(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::dirnameAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::dirnameAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.dirName setter: attribute DOMString dirName
@@ -10871,7 +10879,7 @@ int32_t ranvier_dom_html_input_element_get_form_action(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->formAction(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->formAction(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.formAction setter: attribute USVString formAction
@@ -10898,7 +10906,7 @@ int32_t ranvier_dom_html_input_element_get_form_enctype(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->formEnctype(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->formEnctype(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.formEnctype setter: attribute DOMString formEnctype
@@ -10925,7 +10933,7 @@ int32_t ranvier_dom_html_input_element_get_form_method(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->formMethod(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->formMethod(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.formMethod setter: attribute DOMString formMethod
@@ -10978,7 +10986,7 @@ int32_t ranvier_dom_html_input_element_get_form_target(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::formtargetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::formtargetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.formTarget setter: attribute DOMString formTarget
@@ -11070,7 +11078,7 @@ int32_t ranvier_dom_html_input_element_get_max(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::maxAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::maxAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.max setter: attribute DOMString max
@@ -11149,7 +11157,7 @@ int32_t ranvier_dom_html_input_element_get_min(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::minAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::minAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.min setter: attribute DOMString min
@@ -11202,7 +11210,7 @@ int32_t ranvier_dom_html_input_element_get_name(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.name setter: attribute DOMString name
@@ -11229,7 +11237,7 @@ int32_t ranvier_dom_html_input_element_get_pattern(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::patternAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::patternAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.pattern setter: attribute DOMString pattern
@@ -11256,7 +11264,7 @@ int32_t ranvier_dom_html_input_element_get_placeholder(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::placeholderAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::placeholderAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.placeholder setter: attribute DOMString placeholder
@@ -11361,7 +11369,7 @@ int32_t ranvier_dom_html_input_element_get_src(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::srcAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::srcAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.src setter: attribute USVString src
@@ -11388,7 +11396,7 @@ int32_t ranvier_dom_html_input_element_get_step(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::stepAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::stepAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.step setter: attribute DOMString step
@@ -11447,7 +11455,7 @@ int32_t ranvier_dom_html_input_element_get_type(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.type setter: attribute DOMString type
@@ -11474,7 +11482,7 @@ int32_t ranvier_dom_html_input_element_get_default_value(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.defaultValue setter: attribute DOMString defaultValue
@@ -11501,7 +11509,7 @@ int32_t ranvier_dom_html_input_element_get_value(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.value setter: attribute DOMString value
@@ -11606,7 +11614,7 @@ int32_t ranvier_dom_html_input_element_get_validation_message(RvNode* target, ch
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.labels getter: readonly attribute NodeList? labels; *result is a new reference, or NULL
@@ -11711,7 +11719,7 @@ int32_t ranvier_dom_html_input_element_get_align(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.align setter: attribute DOMString align
@@ -11738,7 +11746,7 @@ int32_t ranvier_dom_html_input_element_get_use_map(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::usemapAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::usemapAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.useMap setter: attribute DOMString useMap
@@ -11766,7 +11774,7 @@ int32_t ranvier_dom_html_input_element_get_capture(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLInputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::captureAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::captureAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 #else
     UNUSED_PARAM(target);
     UNUSED_PARAM(buffer);
@@ -11844,7 +11852,7 @@ int32_t ranvier_dom_html_input_element_get_popover_target_action(RvNode* target,
     auto& settings = impl->document().settingsValues();
     if (!(settings.popoverAttributeEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->popoverTargetAction(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->popoverTargetAction(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLInputElement.popoverTargetAction setter: attribute DOMString popoverTargetAction; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off
@@ -12012,7 +12020,7 @@ int32_t ranvier_dom_html_label_element_get_html_for(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLLabelElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::forAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::forAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLabelElement.htmlFor setter: attribute DOMString htmlFor
@@ -12065,7 +12073,7 @@ int32_t ranvier_dom_html_legend_element_get_align(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLLegendElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLegendElement.align setter: attribute DOMString align
@@ -12092,7 +12100,7 @@ int32_t ranvier_dom_htmlli_element_get_type(RvNode* target, char* buffer, int32_
     RefPtr impl = dynamicDowncast<HTMLLIElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLIElement.type setter: attribute DOMString type
@@ -12392,7 +12400,7 @@ int32_t ranvier_dom_htmlo_list_element_get_type(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLOListElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOListElement.type setter: attribute DOMString type
@@ -12445,7 +12453,7 @@ int32_t ranvier_dom_html_opt_group_element_get_label(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLOptGroupElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::labelAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::labelAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOptGroupElement.label setter: attribute DOMString label
@@ -12511,7 +12519,7 @@ int32_t ranvier_dom_html_option_element_get_label(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLOptionElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->label(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->label(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOptionElement.label setter: attribute DOMString label
@@ -12590,7 +12598,7 @@ int32_t ranvier_dom_html_option_element_get_value(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLOptionElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOptionElement.value setter: attribute DOMString value
@@ -12617,7 +12625,7 @@ int32_t ranvier_dom_html_option_element_get_text(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLOptionElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->text(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->text(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOptionElement.text setter: attribute DOMString text
@@ -12683,7 +12691,7 @@ int32_t ranvier_dom_html_output_element_get_name(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLOutputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOutputElement.name setter: attribute DOMString name
@@ -12710,7 +12718,7 @@ int32_t ranvier_dom_html_output_element_get_type(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLOutputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOutputElement.defaultValue getter: attribute DOMString defaultValue
@@ -12723,7 +12731,7 @@ int32_t ranvier_dom_html_output_element_get_default_value(RvNode* target, char* 
     RefPtr impl = dynamicDowncast<HTMLOutputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->defaultValue(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->defaultValue(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOutputElement.defaultValue setter: attribute DOMString defaultValue
@@ -12750,7 +12758,7 @@ int32_t ranvier_dom_html_output_element_get_value(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLOutputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOutputElement.value setter: attribute DOMString value
@@ -12803,7 +12811,7 @@ int32_t ranvier_dom_html_output_element_get_validation_message(RvNode* target, c
     RefPtr impl = dynamicDowncast<HTMLOutputElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLOutputElement.labels getter: readonly attribute NodeList? labels; *result is a new reference, or NULL
@@ -12872,7 +12880,7 @@ int32_t ranvier_dom_html_paragraph_element_get_align(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLParagraphElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLParagraphElement.align setter: attribute DOMString align
@@ -12977,7 +12985,7 @@ int32_t ranvier_dom_html_select_element_get_autocomplete(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLSelectElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->autocomplete(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->autocomplete(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSelectElement.autocomplete setter: attribute DOMString autocomplete
@@ -13069,7 +13077,7 @@ int32_t ranvier_dom_html_select_element_get_name(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLSelectElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSelectElement.name setter: attribute DOMString name
@@ -13148,7 +13156,7 @@ int32_t ranvier_dom_html_select_element_get_type(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLSelectElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSelectElement.options getter: readonly attribute HTMLOptionsCollection options; *result is a new reference
@@ -13239,7 +13247,7 @@ int32_t ranvier_dom_html_select_element_get_value(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLSelectElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSelectElement.value setter: attribute DOMString value
@@ -13292,7 +13300,7 @@ int32_t ranvier_dom_html_select_element_get_validation_message(RvNode* target, c
     RefPtr impl = dynamicDowncast<HTMLSelectElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSelectElement.labels getter: readonly attribute NodeList? labels; *result is a new reference, or NULL
@@ -13449,7 +13457,7 @@ int32_t ranvier_dom_html_slot_element_get_name(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLSlotElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSlotElement.name setter: attribute DOMString name
@@ -13641,7 +13649,7 @@ int32_t ranvier_dom_html_table_element_get_align(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableElement.align setter: attribute DOMString align
@@ -13668,7 +13676,7 @@ int32_t ranvier_dom_html_table_element_get_border(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::borderAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::borderAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableElement.border setter: attribute DOMString border
@@ -13695,7 +13703,7 @@ int32_t ranvier_dom_html_table_element_get_frame(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::frameAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::frameAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableElement.frame setter: attribute DOMString frame
@@ -13722,7 +13730,7 @@ int32_t ranvier_dom_html_table_element_get_rules(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::rulesAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::rulesAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableElement.rules setter: attribute DOMString rules
@@ -13749,7 +13757,7 @@ int32_t ranvier_dom_html_table_element_get_summary(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::summaryAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::summaryAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableElement.summary setter: attribute DOMString summary
@@ -13776,7 +13784,7 @@ int32_t ranvier_dom_html_table_element_get_width(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableElement.width setter: attribute DOMString width
@@ -13803,7 +13811,7 @@ int32_t ranvier_dom_html_table_element_get_bg_color(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableElement.bgColor setter: attribute DOMString bgColor
@@ -13830,7 +13838,7 @@ int32_t ranvier_dom_html_table_element_get_cell_padding(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::cellpaddingAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::cellpaddingAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableElement.cellPadding setter: attribute DOMString cellPadding
@@ -13857,7 +13865,7 @@ int32_t ranvier_dom_html_table_element_get_cell_spacing(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::cellspacingAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::cellspacingAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableElement.cellSpacing setter: attribute DOMString cellSpacing
@@ -14001,7 +14009,7 @@ int32_t ranvier_dom_html_table_caption_element_get_align(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLTableCaptionElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCaptionElement.align setter: attribute DOMString align
@@ -14028,7 +14036,7 @@ int32_t ranvier_dom_html_table_col_element_get_align(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableColElement.align setter: attribute DOMString align
@@ -14055,7 +14063,7 @@ int32_t ranvier_dom_html_table_col_element_get_ch(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableColElement.ch setter: attribute DOMString ch
@@ -14082,7 +14090,7 @@ int32_t ranvier_dom_html_table_col_element_get_ch_off(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableColElement.chOff setter: attribute DOMString chOff
@@ -14135,7 +14143,7 @@ int32_t ranvier_dom_html_table_col_element_get_v_align(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableColElement.vAlign setter: attribute DOMString vAlign
@@ -14162,7 +14170,7 @@ int32_t ranvier_dom_html_table_col_element_get_width(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableColElement.width setter: attribute DOMString width
@@ -14202,7 +14210,7 @@ int32_t ranvier_dom_html_table_section_element_get_align(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableSectionElement.align setter: attribute DOMString align
@@ -14229,7 +14237,7 @@ int32_t ranvier_dom_html_table_section_element_get_ch(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableSectionElement.ch setter: attribute DOMString ch
@@ -14256,7 +14264,7 @@ int32_t ranvier_dom_html_table_section_element_get_ch_off(RvNode* target, char* 
     RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableSectionElement.chOff setter: attribute DOMString chOff
@@ -14283,7 +14291,7 @@ int32_t ranvier_dom_html_table_section_element_get_v_align(RvNode* target, char*
     RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableSectionElement.vAlign setter: attribute DOMString vAlign
@@ -14375,7 +14383,7 @@ int32_t ranvier_dom_html_table_row_element_get_align(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableRowElement.align setter: attribute DOMString align
@@ -14402,7 +14410,7 @@ int32_t ranvier_dom_html_table_row_element_get_bg_color(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableRowElement.bgColor setter: attribute DOMString bgColor
@@ -14429,7 +14437,7 @@ int32_t ranvier_dom_html_table_row_element_get_ch(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableRowElement.ch setter: attribute DOMString ch
@@ -14456,7 +14464,7 @@ int32_t ranvier_dom_html_table_row_element_get_ch_off(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableRowElement.chOff setter: attribute DOMString chOff
@@ -14483,7 +14491,7 @@ int32_t ranvier_dom_html_table_row_element_get_v_align(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableRowElement.vAlign setter: attribute DOMString vAlign
@@ -14549,7 +14557,7 @@ int32_t ranvier_dom_html_table_cell_element_get_align(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.align setter: attribute DOMString align
@@ -14576,7 +14584,7 @@ int32_t ranvier_dom_html_table_cell_element_get_axis(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::axisAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::axisAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.axis setter: attribute DOMString axis
@@ -14603,7 +14611,7 @@ int32_t ranvier_dom_html_table_cell_element_get_bg_color(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.bgColor setter: attribute DOMString bgColor
@@ -14630,7 +14638,7 @@ int32_t ranvier_dom_html_table_cell_element_get_ch(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.ch setter: attribute DOMString ch
@@ -14657,7 +14665,7 @@ int32_t ranvier_dom_html_table_cell_element_get_ch_off(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.chOff setter: attribute DOMString chOff
@@ -14736,7 +14744,7 @@ int32_t ranvier_dom_html_table_cell_element_get_headers(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::headersAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::headersAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.headers setter: attribute DOMString headers
@@ -14763,7 +14771,7 @@ int32_t ranvier_dom_html_table_cell_element_get_height(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::heightAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::heightAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.height setter: attribute DOMString height
@@ -14816,7 +14824,7 @@ int32_t ranvier_dom_html_table_cell_element_get_v_align(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.vAlign setter: attribute DOMString vAlign
@@ -14843,7 +14851,7 @@ int32_t ranvier_dom_html_table_cell_element_get_width(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.width setter: attribute DOMString width
@@ -14870,7 +14878,7 @@ int32_t ranvier_dom_html_table_cell_element_get_abbr(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::abbrAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::abbrAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.abbr setter: attribute DOMString abbr
@@ -14897,7 +14905,7 @@ int32_t ranvier_dom_html_table_cell_element_get_scope(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->scope(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->scope(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTableCellElement.scope setter: attribute DOMString scope
@@ -14924,7 +14932,7 @@ int32_t ranvier_dom_html_text_area_element_get_dir_name(RvNode* target, char* bu
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::dirnameAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::dirnameAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.dirName setter: attribute DOMString dirName
@@ -15042,7 +15050,7 @@ int32_t ranvier_dom_html_text_area_element_get_name(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.name setter: attribute DOMString name
@@ -15069,7 +15077,7 @@ int32_t ranvier_dom_html_text_area_element_get_placeholder(RvNode* target, char*
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::placeholderAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::placeholderAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.placeholder setter: attribute DOMString placeholder
@@ -15200,7 +15208,7 @@ int32_t ranvier_dom_html_text_area_element_get_wrap(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::wrapAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::wrapAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.wrap setter: attribute DOMString wrap
@@ -15227,7 +15235,7 @@ int32_t ranvier_dom_html_text_area_element_get_type(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.defaultValue getter: attribute DOMString defaultValue
@@ -15240,7 +15248,7 @@ int32_t ranvier_dom_html_text_area_element_get_default_value(RvNode* target, cha
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->defaultValue(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->defaultValue(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.defaultValue setter: attribute DOMString defaultValue
@@ -15267,7 +15275,7 @@ int32_t ranvier_dom_html_text_area_element_get_value(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.value setter: attribute DOMString value
@@ -15333,7 +15341,7 @@ int32_t ranvier_dom_html_text_area_element_get_validation_message(RvNode* target
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->validationMessage(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.labels getter: readonly attribute NodeList? labels; *result is a new reference, or NULL
@@ -15411,7 +15419,7 @@ int32_t ranvier_dom_html_text_area_element_get_selection_direction(RvNode* targe
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->selectionDirection(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->selectionDirection(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.selectionDirection setter: attribute DOMString selectionDirection
@@ -15438,7 +15446,7 @@ int32_t ranvier_dom_html_text_area_element_get_autocomplete(RvNode* target, char
     RefPtr impl = dynamicDowncast<HTMLTextAreaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->autocomplete(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->autocomplete(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTextAreaElement.autocomplete setter: attribute DOMString autocomplete
@@ -15577,7 +15585,7 @@ int32_t ranvier_dom_html_template_element_get_shadow_root_mode(RvNode* target, c
     RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->shadowRootMode(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->shadowRootMode(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTemplateElement.shadowRootMode setter: attribute DOMString shadowRootMode
@@ -15630,7 +15638,7 @@ int32_t ranvier_dom_html_template_element_get_shadow_root_slot_assignment(RvNode
     RefPtr impl = dynamicDowncast<HTMLTemplateElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->shadowRootSlotAssignment(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->shadowRootSlotAssignment(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTemplateElement.shadowRootSlotAssignment setter: attribute DOMString shadowRootSlotAssignment
@@ -15712,7 +15720,7 @@ int32_t ranvier_dom_html_template_element_get_shadow_root_custom_element_registr
     auto& settings = impl->document().settingsValues();
     if (!(settings.scopedCustomElementRegistryEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shadowrootcustomelementregistryAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shadowrootcustomelementregistryAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTemplateElement.shadowRootCustomElementRegistry setter: attribute DOMString shadowRootCustomElementRegistry; RV_ERR_UNSUPPORTED while the setting ScopedCustomElementRegistryEnabled is off
@@ -15745,7 +15753,7 @@ int32_t ranvier_dom_html_template_element_get_shadow_root_reference_target(RvNod
     auto& settings = impl->document().settingsValues();
     if (!(settings.shadowRootReferenceTargetEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shadowrootreferencetargetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::shadowrootreferencetargetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTemplateElement.shadowRootReferenceTarget setter: attribute DOMString shadowRootReferenceTarget; RV_ERR_UNSUPPORTED while the setting ShadowRootReferenceTargetEnabled is off
@@ -15801,7 +15809,7 @@ int32_t ranvier_dom_htmlu_list_element_get_type(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLUListElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLUListElement.type setter: attribute DOMString type
@@ -15828,7 +15836,7 @@ int32_t ranvier_dom_html_base_element_get_href(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->href(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->href(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLBaseElement.href setter: attribute USVString href
@@ -15855,7 +15863,7 @@ int32_t ranvier_dom_html_base_element_get_target(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLBaseElement.target setter: attribute DOMString target
@@ -15882,7 +15890,7 @@ int32_t ranvier_dom_htmlbr_element_get_clear(RvNode* target, char* buffer, int32
     RefPtr impl = dynamicDowncast<HTMLBRElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::clearAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::clearAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLBRElement.clear setter: attribute DOMString clear
@@ -15909,7 +15917,7 @@ int32_t ranvier_dom_html_data_element_get_value(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLDataElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLDataElement.value setter: attribute DOMString value
@@ -16004,7 +16012,7 @@ int32_t ranvier_dom_html_font_element_get_color(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::colorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::colorAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFontElement.color setter: attribute DOMString color
@@ -16031,7 +16039,7 @@ int32_t ranvier_dom_html_font_element_get_face(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::faceAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::faceAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFontElement.face setter: attribute DOMString face
@@ -16058,7 +16066,7 @@ int32_t ranvier_dom_html_font_element_get_size(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLFontElement.size setter: attribute DOMString size
@@ -16085,7 +16093,7 @@ int32_t ranvier_dom_html_heading_element_get_align(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLHeadingElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLHeadingElement.align setter: attribute DOMString align
@@ -16112,7 +16120,7 @@ int32_t ranvier_dom_htmlhr_element_get_align(RvNode* target, char* buffer, int32
     RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLHRElement.align setter: attribute DOMString align
@@ -16139,7 +16147,7 @@ int32_t ranvier_dom_htmlhr_element_get_color(RvNode* target, char* buffer, int32
     RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::colorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::colorAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLHRElement.color setter: attribute DOMString color
@@ -16192,7 +16200,7 @@ int32_t ranvier_dom_htmlhr_element_get_size(RvNode* target, char* buffer, int32_
     RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLHRElement.size setter: attribute DOMString size
@@ -16219,7 +16227,7 @@ int32_t ranvier_dom_htmlhr_element_get_width(RvNode* target, char* buffer, int32
     RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLHRElement.width setter: attribute DOMString width
@@ -16246,7 +16254,7 @@ int32_t ranvier_dom_html_html_element_get_version(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLHtmlElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::versionAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::versionAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLHtmlElement.version setter: attribute DOMString version
@@ -16286,7 +16294,7 @@ int32_t ranvier_dom_html_map_element_get_name(RvNode* target, char* buffer, int3
     RefPtr impl = dynamicDowncast<HTMLMapElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMapElement.name setter: attribute DOMString name
@@ -16313,7 +16321,7 @@ int32_t ranvier_dom_html_marquee_element_get_behavior(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::behaviorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::behaviorAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMarqueeElement.behavior setter: attribute DOMString behavior
@@ -16340,7 +16348,7 @@ int32_t ranvier_dom_html_marquee_element_get_bg_color(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMarqueeElement.bgColor setter: attribute DOMString bgColor
@@ -16367,7 +16375,7 @@ int32_t ranvier_dom_html_marquee_element_get_direction(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::directionAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::directionAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMarqueeElement.direction setter: attribute DOMString direction
@@ -16394,7 +16402,7 @@ int32_t ranvier_dom_html_marquee_element_get_height(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::heightAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::heightAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMarqueeElement.height setter: attribute DOMString height
@@ -16577,7 +16585,7 @@ int32_t ranvier_dom_html_marquee_element_get_width(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMarqueeElement.width setter: attribute DOMString width
@@ -16656,7 +16664,7 @@ int32_t ranvier_dom_html_meta_element_get_content(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::contentAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::contentAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMetaElement.content setter: attribute DOMString content
@@ -16683,7 +16691,7 @@ int32_t ranvier_dom_html_meta_element_get_http_equiv(RvNode* target, char* buffe
     RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::http_equivAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::http_equivAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMetaElement.httpEquiv setter: attribute DOMString httpEquiv
@@ -16710,7 +16718,7 @@ int32_t ranvier_dom_html_meta_element_get_media(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMetaElement.media setter: attribute DOMString media
@@ -16737,7 +16745,7 @@ int32_t ranvier_dom_html_meta_element_get_name(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMetaElement.name setter: attribute DOMString name
@@ -16764,7 +16772,7 @@ int32_t ranvier_dom_html_meta_element_get_scheme(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::schemeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::schemeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLMetaElement.scheme setter: attribute DOMString scheme
@@ -16791,7 +16799,7 @@ int32_t ranvier_dom_html_mod_element_get_cite(RvNode* target, char* buffer, int3
     RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::citeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::citeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLModElement.cite setter: attribute USVString cite
@@ -16818,7 +16826,7 @@ int32_t ranvier_dom_html_mod_element_get_date_time(RvNode* target, char* buffer,
     RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::datetimeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::datetimeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLModElement.dateTime setter: attribute DOMString dateTime
@@ -16845,7 +16853,7 @@ int32_t ranvier_dom_html_param_element_get_name(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLParamElement.name setter: attribute DOMString name
@@ -16872,7 +16880,7 @@ int32_t ranvier_dom_html_param_element_get_type(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLParamElement.type setter: attribute DOMString type
@@ -16899,7 +16907,7 @@ int32_t ranvier_dom_html_param_element_get_value(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLParamElement.value setter: attribute DOMString value
@@ -16926,7 +16934,7 @@ int32_t ranvier_dom_html_param_element_get_value_type(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valuetypeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valuetypeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLParamElement.valueType setter: attribute DOMString valueType
@@ -16979,7 +16987,7 @@ int32_t ranvier_dom_html_quote_element_get_cite(RvNode* target, char* buffer, in
     RefPtr impl = ([&]() -> HTMLQuoteElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::blockquoteTag) || element->hasTagName(HTMLNames::qTag)) ? static_cast<HTMLQuoteElement*>(element) : nullptr; }());
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::citeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::citeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLQuoteElement.cite setter: attribute USVString cite
@@ -17006,7 +17014,7 @@ int32_t ranvier_dom_html_source_element_get_src(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::srcAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::srcAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSourceElement.src setter: attribute USVString src
@@ -17033,7 +17041,7 @@ int32_t ranvier_dom_html_source_element_get_type(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSourceElement.type setter: attribute DOMString type
@@ -17060,7 +17068,7 @@ int32_t ranvier_dom_html_source_element_get_srcset(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::srcsetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::srcsetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSourceElement.srcset setter: attribute USVString srcset
@@ -17087,7 +17095,7 @@ int32_t ranvier_dom_html_source_element_get_sizes(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizesAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizesAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSourceElement.sizes setter: attribute DOMString sizes
@@ -17114,7 +17122,7 @@ int32_t ranvier_dom_html_source_element_get_media(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLSourceElement.media setter: attribute DOMString media
@@ -17194,7 +17202,7 @@ int32_t ranvier_dom_html_source_element_get_attachment_identifier(RvNode* target
     RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attachmentIdentifier(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attachmentIdentifier(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 #else
     UNUSED_PARAM(target);
     UNUSED_PARAM(buffer);
@@ -17214,7 +17222,7 @@ int32_t ranvier_dom_html_time_element_get_date_time(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLTimeElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::datetimeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::datetimeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTimeElement.dateTime setter: attribute DOMString dateTime
@@ -17241,7 +17249,7 @@ int32_t ranvier_dom_html_title_element_get_text(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLTitleElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->text(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->text(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLTitleElement.text setter: attribute DOMString text
@@ -17294,7 +17302,7 @@ int32_t ranvier_dom_svg_element_get_nonce(RvNode* target, char* buffer, int32_t 
     RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // SVGElement.nonce setter: attribute DOMString nonce
@@ -17445,7 +17453,7 @@ int32_t ranvier_dom_math_ml_element_get_nonce(RvNode* target, char* buffer, int3
     auto& settings = impl->document().settingsValues();
     if (!(settings.mathMLEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 #else
     UNUSED_PARAM(target);
     UNUSED_PARAM(buffer);
@@ -17674,7 +17682,7 @@ int32_t ranvier_dom_html_style_element_get_media(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLStyleElement.media setter: attribute DOMString media
@@ -17701,7 +17709,7 @@ int32_t ranvier_dom_html_style_element_get_type(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLStyleElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLStyleElement.type setter: attribute DOMString type
@@ -17780,7 +17788,7 @@ int32_t ranvier_dom_svg_style_element_get_type(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // SVGStyleElement.type setter: attribute DOMString type
@@ -17807,7 +17815,7 @@ int32_t ranvier_dom_svg_style_element_get_media(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // SVGStyleElement.media setter: attribute DOMString media
@@ -17834,7 +17842,7 @@ int32_t ranvier_dom_svg_style_element_get_title(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<SVGStyleElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::titleAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::titleAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // SVGStyleElement.title setter: attribute DOMString title
@@ -17874,7 +17882,7 @@ int32_t ranvier_dom_html_link_element_get_href(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::hrefAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::hrefAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.href setter: attribute USVString href
@@ -17928,7 +17936,7 @@ int32_t ranvier_dom_html_link_element_get_rel(RvNode* target, char* buffer, int3
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::relAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.rel setter: attribute DOMString rel
@@ -17955,7 +17963,7 @@ int32_t ranvier_dom_html_link_element_get_as(RvNode* target, char* buffer, int32
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->as(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->as(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.as setter: attribute DOMString as
@@ -17995,7 +18003,7 @@ int32_t ranvier_dom_html_link_element_get_media(RvNode* target, char* buffer, in
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.media setter: attribute DOMString media
@@ -18022,7 +18030,7 @@ int32_t ranvier_dom_html_link_element_get_integrity(RvNode* target, char* buffer
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::integrityAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::integrityAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.integrity setter: attribute DOMString integrity
@@ -18049,7 +18057,7 @@ int32_t ranvier_dom_html_link_element_get_hreflang(RvNode* target, char* buffer,
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::hreflangAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::hreflangAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.hreflang setter: attribute DOMString hreflang
@@ -18076,7 +18084,7 @@ int32_t ranvier_dom_html_link_element_get_type(RvNode* target, char* buffer, int
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.type setter: attribute DOMString type
@@ -18116,7 +18124,7 @@ int32_t ranvier_dom_html_link_element_get_image_srcset(RvNode* target, char* buf
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::imagesrcsetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::imagesrcsetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.imageSrcset setter: attribute DOMString imageSrcset
@@ -18143,7 +18151,7 @@ int32_t ranvier_dom_html_link_element_get_image_sizes(RvNode* target, char* buff
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::imagesizesAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::imagesizesAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.imageSizes setter: attribute DOMString imageSizes
@@ -18170,7 +18178,7 @@ int32_t ranvier_dom_html_link_element_get_referrer_policy(RvNode* target, char* 
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->referrerPolicyForBindings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.referrerPolicy setter: attribute DOMString referrerPolicy
@@ -18236,7 +18244,7 @@ int32_t ranvier_dom_html_link_element_get_fetch_priority(RvNode* target, char* b
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fetchPriorityForBindings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fetchPriorityForBindings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.fetchPriority setter: attribute DOMString fetchPriority
@@ -18263,7 +18271,7 @@ int32_t ranvier_dom_html_link_element_get_charset(RvNode* target, char* buffer, 
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charsetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charsetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.charset setter: attribute DOMString charset
@@ -18290,7 +18298,7 @@ int32_t ranvier_dom_html_link_element_get_rev(RvNode* target, char* buffer, int3
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::revAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::revAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.rev setter: attribute DOMString rev
@@ -18317,7 +18325,7 @@ int32_t ranvier_dom_html_link_element_get_target(RvNode* target, char* buffer, i
     RefPtr impl = dynamicDowncast<HTMLLinkElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // HTMLLinkElement.target setter: attribute DOMString target
@@ -18611,7 +18619,7 @@ int32_t ranvier_dom_media_list_get_media_text(RvMediaList* target, char* buffer,
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<MediaList> impl = reinterpret_cast<MediaList*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->mediaText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->mediaText(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // MediaList.mediaText setter: attribute DOMString mediaText
@@ -18680,7 +18688,7 @@ int32_t ranvier_dom_css_rule_get_css_text(RvCSSRule* target, char* buffer, int32
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<CSSRule> impl = reinterpret_cast<CSSRule*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->cssText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->cssText(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSRule.cssText setter: attribute DOMString cssText
@@ -18760,7 +18768,7 @@ int32_t ranvier_dom_css_style_rule_get_selector_text(RvCSSRule* target, char* bu
     RefPtr impl = dynamicDowncast<CSSStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->selectorText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->selectorText(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSStyleRule.selectorText setter: attribute DOMString selectorText
@@ -18840,7 +18848,7 @@ int32_t ranvier_dom_css_style_properties_get_css_float(RvCSSStyleDeclaration* ta
     RefPtr impl = dynamicDowncast<CSSStyleProperties>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->cssFloat(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->cssFloat(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSStyleProperties.cssFloat setter: attribute CSSOMString cssFloat
@@ -18907,7 +18915,7 @@ int32_t ranvier_dom_css_condition_rule_get_condition_text(RvCSSRule* target, cha
     RefPtr impl = ([&]() -> CSSConditionRule* { auto* base = dynamicDowncast<CSSGroupingRule>(*reinterpret_cast<CSSRule*>(target)); return base ? dynamicDowncast<CSSConditionRule>(*base) : nullptr; }());
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->conditionText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->conditionText(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSMediaRule.media getter: readonly attribute MediaList media; *result is a new reference
@@ -18933,7 +18941,7 @@ int32_t ranvier_dom_css_container_rule_get_container_name(RvCSSRule* target, cha
     RefPtr impl = dynamicDowncast<CSSContainerRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->containerName(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->containerName(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSContainerRule.containerQuery getter: readonly attribute CSSOMString containerQuery
@@ -18946,7 +18954,7 @@ int32_t ranvier_dom_css_container_rule_get_container_query(RvCSSRule* target, ch
     RefPtr impl = dynamicDowncast<CSSContainerRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->containerQuery(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->containerQuery(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSLayerBlockRule.name getter: readonly attribute CSSOMString name
@@ -18959,7 +18967,7 @@ int32_t ranvier_dom_css_layer_block_rule_get_name(RvCSSRule* target, char* buffe
     RefPtr impl = dynamicDowncast<CSSLayerBlockRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSLayerStatementRule.nameList getter: readonly attribute FrozenArray<CSSOMString> nameList; *result owns its contents; release with the matching rv_dom_*_release
@@ -19024,7 +19032,7 @@ int32_t ranvier_dom_css_import_rule_get_href(RvCSSRule* target, char* buffer, in
     RefPtr impl = dynamicDowncast<CSSImportRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->href(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->href(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSImportRule.media getter: readonly attribute MediaList media; *result is a new reference
@@ -19089,7 +19097,7 @@ int32_t ranvier_dom_css_namespace_rule_get_namespace_uri(RvCSSRule* target, char
     RefPtr impl = dynamicDowncast<CSSNamespaceRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->namespaceURI(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->namespaceURI(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSNamespaceRule.prefix getter: readonly attribute CSSOMString prefix
@@ -19102,7 +19110,7 @@ int32_t ranvier_dom_css_namespace_rule_get_prefix(RvCSSRule* target, char* buffe
     RefPtr impl = dynamicDowncast<CSSNamespaceRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->prefix(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->prefix(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSKeyframesRule.name getter: attribute CSSOMString name
@@ -19115,7 +19123,7 @@ int32_t ranvier_dom_css_keyframes_rule_get_name(RvCSSRule* target, char* buffer,
     RefPtr impl = dynamicDowncast<CSSKeyframesRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSKeyframesRule.name setter: attribute CSSOMString name
@@ -19223,7 +19231,7 @@ int32_t ranvier_dom_css_keyframe_rule_get_key_text(RvCSSRule* target, char* buff
     RefPtr impl = dynamicDowncast<CSSKeyframeRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->keyText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->keyText(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSKeyframeRule.keyText setter: attribute CSSOMString keyText
@@ -19276,7 +19284,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_src(RvCSSStyleDeclaration* tar
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->src(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->src(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.src setter: attribute CSSOMString src
@@ -19303,7 +19311,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_family(RvCSSStyleDeclarat
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.fontFamily setter: attribute CSSOMString fontFamily
@@ -19330,7 +19338,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_family_css(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.font-family setter: attribute CSSOMString font-family
@@ -19357,7 +19365,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_style(RvCSSStyleDeclarati
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontStyle(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontStyle(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.fontStyle setter: attribute CSSOMString fontStyle
@@ -19384,7 +19392,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_style_css(RvCSSStyleDecla
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontStyle(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontStyle(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.font-style setter: attribute CSSOMString font-style
@@ -19411,7 +19419,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_weight(RvCSSStyleDeclarat
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontWeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontWeight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.fontWeight setter: attribute CSSOMString fontWeight
@@ -19438,7 +19446,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_weight_css(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontWeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontWeight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.font-weight setter: attribute CSSOMString font-weight
@@ -19465,7 +19473,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_stretch(RvCSSStyleDeclara
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontStretch(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontStretch(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.fontStretch setter: attribute CSSOMString fontStretch
@@ -19492,7 +19500,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_stretch_css(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontStretch(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontStretch(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.font-stretch setter: attribute CSSOMString font-stretch
@@ -19519,7 +19527,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_width(RvCSSStyleDeclarati
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontWidth(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.fontWidth setter: attribute CSSOMString fontWidth
@@ -19546,7 +19554,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_width_css(RvCSSStyleDecla
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontWidth(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.font-width setter: attribute CSSOMString font-width
@@ -19573,7 +19581,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_size_adjust(RvCSSStyleDeclarat
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->sizeAdjust(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->sizeAdjust(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.sizeAdjust setter: attribute CSSOMString sizeAdjust
@@ -19600,7 +19608,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_size_adjust_css(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->sizeAdjust(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->sizeAdjust(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.size-adjust setter: attribute CSSOMString size-adjust
@@ -19627,7 +19635,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_unicode_range(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->unicodeRange(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->unicodeRange(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.unicodeRange setter: attribute CSSOMString unicodeRange
@@ -19654,7 +19662,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_unicode_range_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->unicodeRange(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->unicodeRange(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.unicode-range setter: attribute CSSOMString unicode-range
@@ -19681,7 +19689,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_feature_settings(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontFeatureSettings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontFeatureSettings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.fontFeatureSettings setter: attribute CSSOMString fontFeatureSettings
@@ -19708,7 +19716,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_feature_settings_css(RvCS
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontFeatureSettings(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontFeatureSettings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.font-feature-settings setter: attribute CSSOMString font-feature-settings
@@ -19735,7 +19743,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_display(RvCSSStyleDeclara
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontDisplay(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontDisplay(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.fontDisplay setter: attribute CSSOMString fontDisplay
@@ -19762,7 +19770,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_font_display_css(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontDisplay(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontDisplay(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.font-display setter: attribute CSSOMString font-display
@@ -19798,7 +19806,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_ascent_override(RvCSSStyleDecl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->ascentOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->ascentOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.ascentOverride setter: attribute CSSOMString ascentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
@@ -19843,7 +19851,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_ascent_override_css(RvCSSStyle
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->ascentOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->ascentOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.ascent-override setter: attribute CSSOMString ascent-override; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
@@ -19888,7 +19896,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_descent_override(RvCSSStyleDec
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->descentOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->descentOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.descentOverride setter: attribute CSSOMString descentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
@@ -19933,7 +19941,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_descent_override_css(RvCSSStyl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->descentOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->descentOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.descent-override setter: attribute CSSOMString descent-override; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
@@ -19978,7 +19986,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_line_gap_override(RvCSSStyleDe
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->lineGapOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->lineGapOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.lineGapOverride setter: attribute CSSOMString lineGapOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
@@ -20023,7 +20031,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_line_gap_override_css(RvCSSSty
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->lineGapOverride(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->lineGapOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFaceDescriptors.line-gap-override setter: attribute CSSOMString line-gap-override; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
@@ -20059,7 +20067,7 @@ int32_t ranvier_dom_css_font_feature_values_rule_get_font_family(RvCSSRule* targ
     RefPtr impl = dynamicDowncast<CSSFontFeatureValuesRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontFeatureValuesRule.fontFamily setter: attribute CSSOMString fontFamily
@@ -20086,7 +20094,7 @@ int32_t ranvier_dom_css_font_palette_values_rule_get_name(RvCSSRule* target, cha
     RefPtr impl = dynamicDowncast<CSSFontPaletteValuesRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontPaletteValuesRule.fontFamily getter: readonly attribute CSSOMString fontFamily
@@ -20099,7 +20107,7 @@ int32_t ranvier_dom_css_font_palette_values_rule_get_font_family(RvCSSRule* targ
     RefPtr impl = dynamicDowncast<CSSFontPaletteValuesRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fontFamily(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontPaletteValuesRule.basePalette getter: readonly attribute CSSOMString basePalette
@@ -20112,7 +20120,7 @@ int32_t ranvier_dom_css_font_palette_values_rule_get_base_palette(RvCSSRule* tar
     RefPtr impl = dynamicDowncast<CSSFontPaletteValuesRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->basePalette(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->basePalette(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSFontPaletteValuesRule.overrideColors getter: readonly attribute CSSOMString overrideColors
@@ -20125,7 +20133,7 @@ int32_t ranvier_dom_css_font_palette_values_rule_get_override_colors(RvCSSRule* 
     RefPtr impl = dynamicDowncast<CSSFontPaletteValuesRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->overrideColors(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->overrideColors(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.name getter: attribute DOMString name
@@ -20138,7 +20146,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_name(RvCSSRule* target, char* buf
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.name setter: attribute DOMString name
@@ -20165,7 +20173,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_system(RvCSSRule* target, char* b
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->system(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->system(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.system setter: attribute DOMString system
@@ -20192,7 +20200,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_symbols(RvCSSRule* target, char* 
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->symbols(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->symbols(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.symbols setter: attribute DOMString symbols
@@ -20219,7 +20227,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_additive_symbols(RvCSSRule* targe
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->additiveSymbols(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->additiveSymbols(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.additiveSymbols setter: attribute DOMString additiveSymbols
@@ -20246,7 +20254,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_negative(RvCSSRule* target, char*
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->negative(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->negative(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.negative setter: attribute DOMString negative
@@ -20273,7 +20281,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_prefix(RvCSSRule* target, char* b
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->prefix(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->prefix(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.prefix setter: attribute DOMString prefix
@@ -20300,7 +20308,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_suffix(RvCSSRule* target, char* b
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->suffix(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->suffix(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.suffix setter: attribute DOMString suffix
@@ -20327,7 +20335,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_range(RvCSSRule* target, char* bu
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->range(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->range(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.range setter: attribute DOMString range
@@ -20354,7 +20362,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_pad(RvCSSRule* target, char* buff
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->pad(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->pad(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.pad setter: attribute DOMString pad
@@ -20381,7 +20389,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_speak_as(RvCSSRule* target, char*
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->speakAs(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->speakAs(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.speakAs setter: attribute DOMString speakAs
@@ -20408,7 +20416,7 @@ int32_t ranvier_dom_css_counter_style_rule_get_fallback(RvCSSRule* target, char*
     RefPtr impl = dynamicDowncast<CSSCounterStyleRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->fallback(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->fallback(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSCounterStyleRule.fallback setter: attribute DOMString fallback
@@ -20444,7 +20452,7 @@ int32_t ranvier_dom_css_position_try_rule_get_name(RvCSSRule* target, char* buff
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryRule.style getter: readonly attribute CSSPositionTryDescriptors style; *result is a new reference; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20488,7 +20496,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin(RvCSSStyleDeclaratio
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->margin(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->margin(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin setter: attribute CSSOMString margin; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20533,7 +20541,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_top(RvCSSStyleDeclar
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginTop(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginTop(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginTop setter: attribute CSSOMString marginTop; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20578,7 +20586,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_right(RvCSSStyleDecl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginRight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginRight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginRight setter: attribute CSSOMString marginRight; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20623,7 +20631,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_bottom(RvCSSStyleDec
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginBottom(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginBottom(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginBottom setter: attribute CSSOMString marginBottom; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20668,7 +20676,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_left(RvCSSStyleDecla
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginLeft(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginLeft(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginLeft setter: attribute CSSOMString marginLeft; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20713,7 +20721,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block(RvCSSStyleDecl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginBlock(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginBlock(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginBlock setter: attribute CSSOMString marginBlock; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20758,7 +20766,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_start(RvCSSSty
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginBlockStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginBlockStart(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginBlockStart setter: attribute CSSOMString marginBlockStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20803,7 +20811,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_end(RvCSSStyle
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginBlockEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginBlockEnd(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginBlockEnd setter: attribute CSSOMString marginBlockEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20848,7 +20856,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline(RvCSSStyleDec
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginInline(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginInline(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginInline setter: attribute CSSOMString marginInline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20893,7 +20901,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_start(RvCSSSt
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginInlineStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginInlineStart(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginInlineStart setter: attribute CSSOMString marginInlineStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20938,7 +20946,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_end(RvCSSStyl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginInlineEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginInlineEnd(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.marginInlineEnd setter: attribute CSSOMString marginInlineEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -20983,7 +20991,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_top_css(RvCSSStyleDe
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginTop(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginTop(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-top setter: attribute CSSOMString margin-top; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21028,7 +21036,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_right_css(RvCSSStyle
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginRight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginRight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-right setter: attribute CSSOMString margin-right; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21073,7 +21081,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_bottom_css(RvCSSStyl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginBottom(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginBottom(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-bottom setter: attribute CSSOMString margin-bottom; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21118,7 +21126,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_left_css(RvCSSStyleD
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginLeft(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginLeft(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-left setter: attribute CSSOMString margin-left; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21163,7 +21171,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_css(RvCSSStyle
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginBlock(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginBlock(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-block setter: attribute CSSOMString margin-block; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21208,7 +21216,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_start_css(RvCS
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginBlockStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginBlockStart(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-block-start setter: attribute CSSOMString margin-block-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21253,7 +21261,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_end_css(RvCSSS
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginBlockEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginBlockEnd(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-block-end setter: attribute CSSOMString margin-block-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21298,7 +21306,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_css(RvCSSStyl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginInline(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginInline(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-inline setter: attribute CSSOMString margin-inline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21343,7 +21351,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_start_css(RvC
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginInlineStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginInlineStart(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-inline-start setter: attribute CSSOMString margin-inline-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21388,7 +21396,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_end_css(RvCSS
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->marginInlineEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->marginInlineEnd(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.margin-inline-end setter: attribute CSSOMString margin-inline-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21433,7 +21441,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset(RvCSSStyleDeclaration
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->inset(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->inset(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.inset setter: attribute CSSOMString inset; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21478,7 +21486,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block(RvCSSStyleDecla
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetBlock(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetBlock(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.insetBlock setter: attribute CSSOMString insetBlock; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21523,7 +21531,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_start(RvCSSStyl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetBlockStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetBlockStart(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.insetBlockStart setter: attribute CSSOMString insetBlockStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21568,7 +21576,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_end(RvCSSStyleD
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetBlockEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetBlockEnd(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.insetBlockEnd setter: attribute CSSOMString insetBlockEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21613,7 +21621,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline(RvCSSStyleDecl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetInline(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetInline(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.insetInline setter: attribute CSSOMString insetInline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21658,7 +21666,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_start(RvCSSSty
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetInlineStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetInlineStart(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.insetInlineStart setter: attribute CSSOMString insetInlineStart; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21703,7 +21711,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_end(RvCSSStyle
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetInlineEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetInlineEnd(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.insetInlineEnd setter: attribute CSSOMString insetInlineEnd; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21748,7 +21756,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_top(RvCSSStyleDeclaration* 
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->top(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->top(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.top setter: attribute CSSOMString top; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21793,7 +21801,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_left(RvCSSStyleDeclaration*
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->left(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->left(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.left setter: attribute CSSOMString left; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21838,7 +21846,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_right(RvCSSStyleDeclaration
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->right(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->right(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.right setter: attribute CSSOMString right; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21883,7 +21891,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_bottom(RvCSSStyleDeclaratio
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->bottom(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->bottom(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.bottom setter: attribute CSSOMString bottom; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21928,7 +21936,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_css(RvCSSStyleD
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetBlock(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetBlock(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.inset-block setter: attribute CSSOMString inset-block; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -21973,7 +21981,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_start_css(RvCSS
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetBlockStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetBlockStart(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.inset-block-start setter: attribute CSSOMString inset-block-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22018,7 +22026,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_end_css(RvCSSSt
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetBlockEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetBlockEnd(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.inset-block-end setter: attribute CSSOMString inset-block-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22063,7 +22071,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_css(RvCSSStyle
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetInline(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetInline(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.inset-inline setter: attribute CSSOMString inset-inline; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22108,7 +22116,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_start_css(RvCS
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetInlineStart(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetInlineStart(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.inset-inline-start setter: attribute CSSOMString inset-inline-start; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22153,7 +22161,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_end_css(RvCSSS
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->insetInlineEnd(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->insetInlineEnd(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.inset-inline-end setter: attribute CSSOMString inset-inline-end; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22198,7 +22206,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_width(RvCSSStyleDeclaration
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.width setter: attribute CSSOMString width; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22243,7 +22251,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_width(RvCSSStyleDeclara
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->minWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->minWidth(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.minWidth setter: attribute CSSOMString minWidth; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22288,7 +22296,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_width(RvCSSStyleDeclara
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->maxWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->maxWidth(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.maxWidth setter: attribute CSSOMString maxWidth; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22333,7 +22341,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_height(RvCSSStyleDeclaratio
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->height(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->height(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.height setter: attribute CSSOMString height; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22378,7 +22386,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_height(RvCSSStyleDeclar
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->minHeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->minHeight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.minHeight setter: attribute CSSOMString minHeight; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22423,7 +22431,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_height(RvCSSStyleDeclar
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->maxHeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->maxHeight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.maxHeight setter: attribute CSSOMString maxHeight; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22468,7 +22476,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_block_size(RvCSSStyleDeclar
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->blockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->blockSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.blockSize setter: attribute CSSOMString blockSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22513,7 +22521,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_block_size(RvCSSStyleDe
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->minBlockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->minBlockSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.minBlockSize setter: attribute CSSOMString minBlockSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22558,7 +22566,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_block_size(RvCSSStyleDe
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->maxBlockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->maxBlockSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.maxBlockSize setter: attribute CSSOMString maxBlockSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22603,7 +22611,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inline_size(RvCSSStyleDecla
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->inlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->inlineSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.inlineSize setter: attribute CSSOMString inlineSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22648,7 +22656,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_inline_size(RvCSSStyleD
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->minInlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->minInlineSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.minInlineSize setter: attribute CSSOMString minInlineSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22693,7 +22701,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_inline_size(RvCSSStyleD
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->maxInlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->maxInlineSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.maxInlineSize setter: attribute CSSOMString maxInlineSize; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22738,7 +22746,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_width_css(RvCSSStyleDec
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->minWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->minWidth(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.min-width setter: attribute CSSOMString min-width; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22783,7 +22791,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_width_css(RvCSSStyleDec
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->maxWidth(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->maxWidth(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.max-width setter: attribute CSSOMString max-width; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22828,7 +22836,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_height_css(RvCSSStyleDe
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->minHeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->minHeight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.min-height setter: attribute CSSOMString min-height; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22873,7 +22881,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_height_css(RvCSSStyleDe
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->maxHeight(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->maxHeight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.max-height setter: attribute CSSOMString max-height; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22918,7 +22926,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_block_size_css(RvCSSStyleDe
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->blockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->blockSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.block-size setter: attribute CSSOMString block-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -22963,7 +22971,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_block_size_css(RvCSSSty
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->minBlockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->minBlockSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.min-block-size setter: attribute CSSOMString min-block-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23008,7 +23016,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_block_size_css(RvCSSSty
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->maxBlockSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->maxBlockSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.max-block-size setter: attribute CSSOMString max-block-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23053,7 +23061,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inline_size_css(RvCSSStyleD
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->inlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->inlineSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.inline-size setter: attribute CSSOMString inline-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23098,7 +23106,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_inline_size_css(RvCSSSt
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->minInlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->minInlineSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.min-inline-size setter: attribute CSSOMString min-inline-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23143,7 +23151,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_inline_size_css(RvCSSSt
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->maxInlineSize(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->maxInlineSize(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.max-inline-size setter: attribute CSSOMString max-inline-size; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23188,7 +23196,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_place_self(RvCSSStyleDeclar
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->placeSelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->placeSelf(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.placeSelf setter: attribute CSSOMString placeSelf; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23233,7 +23241,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_align_self(RvCSSStyleDeclar
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->alignSelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->alignSelf(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.alignSelf setter: attribute CSSOMString alignSelf; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23278,7 +23286,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_justify_self(RvCSSStyleDecl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->justifySelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->justifySelf(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.justifySelf setter: attribute CSSOMString justifySelf; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23323,7 +23331,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_place_self_css(RvCSSStyleDe
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->placeSelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->placeSelf(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.place-self setter: attribute CSSOMString place-self; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23368,7 +23376,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_align_self_css(RvCSSStyleDe
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->alignSelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->alignSelf(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.align-self setter: attribute CSSOMString align-self; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23413,7 +23421,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_justify_self_css(RvCSSStyle
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->justifySelf(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->justifySelf(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.justify-self setter: attribute CSSOMString justify-self; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23458,7 +23466,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_position_anchor(RvCSSStyleD
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->positionAnchor(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->positionAnchor(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.positionAnchor setter: attribute CSSOMString positionAnchor; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23503,7 +23511,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_position_anchor_css(RvCSSSt
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->positionAnchor(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->positionAnchor(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.position-anchor setter: attribute CSSOMString position-anchor; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23548,7 +23556,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_position_area(RvCSSStyleDec
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->positionArea(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->positionArea(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.positionArea setter: attribute CSSOMString positionArea; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23593,7 +23601,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_position_area_css(RvCSSStyl
     auto& settings = (*settingsDocument).settingsValues();
     if (!(settings.cssAnchorPositioningEnabled))
         return RV_ERR_UNSUPPORTED;
-    return deliver([&]() -> decltype(auto) { return impl->positionArea(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->positionArea(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSPositionTryDescriptors.position-area setter: attribute CSSOMString position-area; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -23629,7 +23637,7 @@ int32_t ranvier_dom_css_view_transition_rule_get_navigation(RvCSSRule* target, c
     RefPtr impl = dynamicDowncast<CSSViewTransitionRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->navigation(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->navigation(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSViewTransitionRule.types getter: readonly attribute FrozenArray<CSSOMString> types; *result owns its contents; release with the matching rv_dom_*_release
@@ -23653,7 +23661,7 @@ int32_t ranvier_dom_css_style_declaration_get_css_text(RvCSSStyleDeclaration* ta
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<CSSStyleDeclaration> impl = reinterpret_cast<CSSStyleDeclaration*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->cssText(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->cssText(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSStyleDeclaration.cssText setter: attribute CSSOMString cssText
@@ -23709,7 +23717,7 @@ int32_t ranvier_dom_css_style_declaration_item(RvCSSStyleDeclaration* target, ui
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<CSSStyleDeclaration> impl = reinterpret_cast<CSSStyleDeclaration*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSStyleDeclaration.getPropertyValue(CSSOMString property) -> CSSOMString
@@ -23721,7 +23729,7 @@ int32_t ranvier_dom_css_style_declaration_get_property_value(RvCSSStyleDeclarati
         return RV_ERR_WRONG_THREAD;
     RefPtr<CSSStyleDeclaration> impl = reinterpret_cast<CSSStyleDeclaration*>(target);
     StringArg a0 { property };
-    return deliver([&]() -> decltype(auto) { return impl->getPropertyValue(a0.string()); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getPropertyValue(a0.string()); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSStyleDeclaration.getPropertyPriority(CSSOMString property) -> CSSOMString
@@ -23733,7 +23741,7 @@ int32_t ranvier_dom_css_style_declaration_get_property_priority(RvCSSStyleDeclar
         return RV_ERR_WRONG_THREAD;
     RefPtr<CSSStyleDeclaration> impl = reinterpret_cast<CSSStyleDeclaration*>(target);
     StringArg a0 { property };
-    return deliver([&]() -> decltype(auto) { return impl->getPropertyPriority(a0.string()); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->getPropertyPriority(a0.string()); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSSStyleDeclaration.setProperty(CSSOMString property, CSSOMString value, optional CSSOMString priority = "") -> undefined; priority defaults to "" in IDL
@@ -23759,7 +23767,7 @@ int32_t ranvier_dom_css_style_declaration_remove_property(RvCSSStyleDeclaration*
         return RV_ERR_WRONG_THREAD;
     RefPtr<CSSStyleDeclaration> impl = reinterpret_cast<CSSStyleDeclaration*>(target);
     StringArg a0 { property };
-    return deliver([&]() -> decltype(auto) { return impl->removeProperty(a0.string()); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->removeProperty(a0.string()); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // DOMTokenList.length getter: readonly attribute unsigned long length
@@ -23781,7 +23789,7 @@ int32_t ranvier_dom_dom_token_list_get_value(RvDOMTokenList* target, char* buffe
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<DOMTokenList> impl = reinterpret_cast<DOMTokenList*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // DOMTokenList.value setter: attribute DOMString value
@@ -23893,7 +23901,7 @@ int32_t ranvier_dom_dom_string_map_named_item(RvDOMStringMap* target, const char
         return RV_ERR_WRONG_THREAD;
     RefPtr<DOMStringMap> impl = reinterpret_cast<DOMStringMap*>(target);
     StringArg a0 { name };
-    return deliver([&]() -> decltype(auto) { return impl->namedItem(a0.atom()); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->namedItem(a0.atom()); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // DOMStringMap.setNamedItem(DOMString name, DOMString value) -> undefined
@@ -24394,7 +24402,7 @@ int32_t ranvier_dom_dom_selection_get_type(RvDOMSelection* target, char* buffer,
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<DOMSelection> impl = reinterpret_cast<DOMSelection*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // DOMSelection.direction getter: readonly attribute DOMString direction
@@ -24405,7 +24413,7 @@ int32_t ranvier_dom_dom_selection_get_direction(RvDOMSelection* target, char* bu
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<DOMSelection> impl = reinterpret_cast<DOMSelection*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->direction(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->direction(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // DOMSelection.baseNode getter: readonly attribute Node? baseNode; *result is a new reference, or NULL
@@ -24645,7 +24653,7 @@ int32_t ranvier_dom_dom_selection_to_string(RvDOMSelection* target, char* buffer
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<DOMSelection> impl = reinterpret_cast<DOMSelection*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->toString(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->toString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // DOMSelection.modify(optional DOMString alter, optional DOMString direction, optional DOMString granularity) -> undefined; alter may be NULL (absent); direction may be NULL (absent); granularity may be NULL (absent)
@@ -24782,7 +24790,7 @@ int32_t ranvier_dom_radio_node_list_get_value(RvNodeList* target, char* buffer, 
     RefPtr impl = ([&]() -> RadioNodeList* { auto* base = dynamicDowncast<LiveNodeList>(*reinterpret_cast<NodeList*>(target)); return base ? dynamicDowncast<RadioNodeList>(*base) : nullptr; }());
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // RadioNodeList.value setter: attribute DOMString value
@@ -24962,7 +24970,7 @@ int32_t ranvier_dom_event_get_type(RvEvent* target, char* buffer, int32_t capaci
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<Event> impl = eventOf(target);
-    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // Event.target getter: readonly attribute EventTarget? target; *result is a new reference, or NULL
@@ -25644,7 +25652,7 @@ int32_t ranvier_dom_pointer_event_get_pointer_type(RvEvent* target, char* buffer
     RefPtr impl = dynamicDowncast<PointerEvent>(*eventOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->pointerType(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->pointerType(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // PointerEvent.isPrimary getter: readonly attribute boolean isPrimary
@@ -25787,7 +25795,7 @@ int32_t ranvier_dom_keyboard_event_get_key(RvEvent* target, char* buffer, int32_
     RefPtr impl = dynamicDowncast<KeyboardEvent>(*eventOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->key(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->key(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // KeyboardEvent.code getter: readonly attribute DOMString code
@@ -25800,7 +25808,7 @@ int32_t ranvier_dom_keyboard_event_get_code(RvEvent* target, char* buffer, int32
     RefPtr impl = dynamicDowncast<KeyboardEvent>(*eventOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->code(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->code(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // KeyboardEvent.location getter: readonly attribute unsigned long location
@@ -25904,7 +25912,7 @@ int32_t ranvier_dom_keyboard_event_get_key_identifier(RvEvent* target, char* buf
     RefPtr impl = dynamicDowncast<KeyboardEvent>(*eventOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->keyIdentifier(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->keyIdentifier(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // KeyboardEvent.charCode getter: readonly attribute unsigned long charCode
@@ -25970,7 +25978,7 @@ int32_t ranvier_dom_input_event_get_input_type(RvEvent* target, char* buffer, in
     RefPtr impl = dynamicDowncast<InputEvent>(*eventOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->inputType(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->inputType(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // InputEvent.data getter: readonly attribute USVString? data
@@ -26022,13 +26030,13 @@ int32_t ranvier_dom_composition_event_get_data(RvEvent* target, char* buffer, in
     RefPtr impl = dynamicDowncast<CompositionEvent>(*eventOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->data(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+    return deliver([&]() -> decltype(auto) { return impl->data(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
 int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result)
 {
-    if (!target || !(property_length >= 0 && (!property_length || property)) || !(value_length >= 0 && (!value_length || value)) || !result)
+    if (!target || !(property_length >= 0 && (property_length <= 0 || property)) || !(value_length >= 0 && (value_length <= 0 || value)) || !result)
         return RV_ERR_NULL_ARGUMENT;
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
@@ -26046,7 +26054,7 @@ int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int3
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
 int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result)
 {
-    if (!target || !(condition_text_length >= 0 && (!condition_text_length || condition_text)) || !result)
+    if (!target || !(condition_text_length >= 0 && (condition_text_length <= 0 || condition_text)) || !result)
         return RV_ERR_NULL_ARGUMENT;
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
@@ -26057,6 +26065,26 @@ int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text
     StringArg a0 { condition_text, condition_text_length };
     if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
     return deliver([&]() -> decltype(auto) { return DOMCSSNamespace::supports(document.get(), a0.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element defaults to null in IDL; pseudo_element may be NULL (null); *result is a new reference
+int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result)
+{
+    if (!target || !element || !(pseudo_element_length >= -1 && (pseudo_element_length <= 0 || pseudo_element)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!impl->window())
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<Element> a0 = element ? dynamicDowncast<Element>(*nodeOf(element)) : nullptr;
+    if (element && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a1 { pseudo_element, pseudo_element_length };
+    if (pseudo_element_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->window()->getComputedStyle(HandleArg<Element> { a0.get() }, a1.string()); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
 }
 
 int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)

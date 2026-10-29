@@ -5838,3 +5838,6 @@ extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_1(nativeint target, byte[] condition_text, int condition_text_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_get_computed_style(nativeint target, nativeint element, byte[] pseudo_element, int pseudo_element_length, nativeint& result)
