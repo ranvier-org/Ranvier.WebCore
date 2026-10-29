@@ -1,19 +1,21 @@
 # The patch series
 
-`patches/series` lists fourteen patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010 and 0012, changes nothing unless
+`patches/series` lists sixteen patches, applied in order over the WebKit commit in `pins.json` by
+`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012, 0014 and 0015, changes nothing unless
 its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
-WebKit's own sources. 0010 changes which symbols WebCore exports and which members the host may override,
+WebKit's feature implementations. 0010 changes which symbols WebCore exports and which members the host may override,
 and no behavior. 0012 adds the sources an embedder names to WebCore. 0013's option is set for macOS in every
 flavor, because the package always loads WebCore outside its framework bundle (`config/mac.cmake`).
+0014 and 0015 correct stylesheet mutation behavior in every flavor.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
-They edit upstream C++ in three places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
+They edit upstream C++ in these places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
 `CryptoKeyRSA.h`; 0010 changes `EmptyClients.h`, `ChromeClient.h`, `WebAnimation.h`, `CSSTransition.h`, `Element.h`,
 `Document.h` and `AXCoreObject.h`, and exports from `ResizeObserver.h`, `IntersectionObserver.h` and `Pasteboard.h`,
 and also changes `PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjectCache.cpp`, `FrameSelection.h`,
 `FrameSelection.cpp`, `ChromeClient.h` and `OptionsCommon.cmake`. 0012 adds a CMake hook to `Source/WebCore/CMakeLists.txt`. 0013 changes `LocalizedStrings.cpp` and
-`OptionsMac.cmake`. The patches touch 75 files in all.
+`OptionsMac.cmake`. 0014 changes `CSSStyleSheet.cpp`; 0015 changes `CSSKeyframeRule.h`, `CSSKeyframeRule.cpp`,
+`CSSKeyframesRule.cpp` and `CSSStyleSheet.cpp`. The patches touch 79 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -34,6 +36,8 @@ The sizes are the reduction each patch measured when it was added, on Windows x6
 | 0011-ax-embedder-notifications | `USE_AX_EMBEDDER_NOTIFICATIONS` | | none: it adds code (see `docs/ACCESSIBILITY.md`) |
 | 0012-embedder-sources | none, always applies; `WebCore_EMBEDDER_SOURCES` names the sources | | |
 | 0013-unbundled-strings | `USE_UNBUNDLED_LOCALIZED_STRINGS` (macOS) | | none |
+| 0014-constructed-sheet-replacement | none, always applies | | correctness repair |
+| 0015-keyframe-offset-invalidation | none, always applies | | correctness repair |
 
 ## Conventions
 
@@ -262,6 +266,18 @@ null and `CFBundleCopyLocalizedString` crashes reading it (`EXC_BAD_ACCESS` at a
 key when WebCore has no bundle. The keys are the English strings, so WebCore's text matches the Windows port,
 whose `localizedString` returns the key. With a bundle, as in WebKit's own framework build, nothing changes.
 `config/mac.cmake` turns it on in every flavor.
+
+## 0014-constructed-sheet-replacement
+
+Restricts detached constructed-sheet cache reuse to empty, uniquely owned contents outside the in-memory cache. Repeated replacement preserves the sheet wrapper and its current rules.
+
+## 0015-keyframe-offset-invalidation
+
+CSSKeyframeRule offset edits enter the parent CSSKeyframesRule mutation scope so existing CSS animations recompute their keyframes. Deleting a stylesheet rule uses the removed rule as its mutation target, preserving the name needed to invalidate a removed keyframes animation.
+
+StyleRuleKeyframes copies its child offsets and declarations independently when stylesheet contents detach for mutation. Existing CSSKeyframeRule and style wrappers reattach to the copied children. Editing a retained keyframe after deletion also works when its parent is null.
+
+`tests/abi/keyframe_rules.py` holds a CSS animation paused at 25% progress using a negative delay. It verifies computed effects, shared stylesheet isolation, retained wrappers, invalid/no-op input and checked ABI errors; CI runs it against each slim runtime and package audits run it against extracted payloads.
 
 ## Working on the series
 
