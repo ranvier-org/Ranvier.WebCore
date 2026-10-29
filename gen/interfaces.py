@@ -119,6 +119,17 @@ class InterfaceEmitter:
                 if function.interface in owners and function.member
                 and self.world.member_key(function.member) == key and not function.unused]
 
+    def browser_property_expression(self, owner, member):
+        if owner == 'StyleSheetList' and member.name == 'namedItem' and member.special == 'getter':
+            return ("((s,n)=>{const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');const m=globalThis[k];"
+                    "let d;try{d=WeakRef.prototype.deref.call(Object.getOwnPropertyDescriptor(s,k)?.value);}catch{}"
+                    "d=d||m?.get(s)?.deref()||(s.length?s.item(0)?.ownerNode?.ownerDocument:null);"
+                    "if(!d||d.styleSheets!==s)return null;const e=d.getElementById(n??'');"
+                    "return e&&e.namespaceURI==='http://www.w3.org/1999/xhtml'&&e.localName==='style'?e.sheet:null;})($0,$1)")
+        if owner == 'DOMStringMap' and member.name == 'namedItem' and member.special == 'getter':
+            return "(Object.prototype.hasOwnProperty.call($0,$1)?$0[$1]:'')"
+        return {'getter': '$0[$1]', 'setter': '$0[$1] = $2', 'deleter': 'delete $0[$1]'}[member.special]
+
     def emit_member(self, owner, member):
         if member.kind not in ('attribute', 'operation'):
             return []
@@ -160,6 +171,14 @@ class InterfaceEmitter:
             access = ', '.join(name for name, available in [('get', getter), ('set', setter)] if available)
             signature = f'    abstract member {identifier(member.name)}: {result} with {access}'
             if not needs_adapter:
+                if owner in ('Document', 'ShadowRoot', 'DocumentOrShadowRoot') and member.name == 'styleSheets' and getter:
+                    expression = ("((r)=>{const s=r.styleSheets;if(r.nodeType===9){"
+                                  "const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');"
+                                  "const m=globalThis[k]||(globalThis[k]=new WeakMap());let v=m.get(s);"
+                                  "if(!v){v=new WeakRef(r);m.set(s,v);}"
+                                  "if(!Object.getOwnPropertyDescriptor(s,k))Reflect.defineProperty(s,k,{value:v});}return s;})($0)")
+                    return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]',
+                                          '#endif', signature, '']
                 return lines + [signature]
             lines += ['#if FABLE_COMPILER']
             if getter:
@@ -173,7 +192,7 @@ class InterfaceEmitter:
             return lines
         selected_arguments = list(self.choices(member.arguments))
         if anonymous_property and not needs_adapter:
-            expression = {'getter': '$0[$1]', 'setter': '$0[$1] = $2', 'deleter': 'delete $0[$1]'}[member.special]
+            expression = self.browser_property_expression(owner, member)
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
         if needs_adapter:
             raw_params = self.parameters(member.arguments, [a.type for a in member.arguments], raw=True)
@@ -181,7 +200,7 @@ class InterfaceEmitter:
             arg_expressions = [('...' if a.variadic else '') + f'${i + 1}' for i, a in enumerate(member.arguments)]
             expression = f'$0.{member.name}(' + ', '.join(arg_expressions) + ')'
             if anonymous_property:
-                expression = {'getter': '$0[$1]', 'setter': '$0[$1] = $2', 'deleter': 'delete $0[$1]'}[member.special]
+                expression = self.browser_property_expression(owner, member)
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]',
                       f'    abstract member __ranvier_{member.name}: {raw_params} -> {raw_result}', '#else']
         for selected in selected_arguments:

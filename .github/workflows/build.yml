@@ -61,6 +61,16 @@ jobs:
         run: |
           dotnet fickl tests/generator/browser/FullBrowser.fsproj --outDir artifacts/full-browser/js --noCache --extension .js
           node artifacts/full-browser/js/FullBrowser.js
+      - name: Verify named getters against actual Chromium DOM objects
+        run: |
+          dotnet fickl tests/generator/browser/NamedLookupBrowser.fsproj --outDir artifacts/named-lookup/js --noCache --extension .js
+          python -I tests/generator/browser/run_named_lookup.py --browser "$(command -v google-chrome)" --output artifacts/named-lookup/js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: named-lookup-browser-proof
+          path: artifacts/named-lookup/js/named-lookup-*.html
+          if-no-files-found: ignore
 
   plan:
     # The matrix, filtered by the manual run's rids input. On a version tag whose release holds a runtime's
