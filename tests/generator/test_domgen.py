@@ -202,6 +202,56 @@ HTMLElement includes ElementCSSInlineStyle;
         self.assertEqual(getter['contractOwner'], 'ElementCSSInlineStyle')
         self.assertIn('CSSStyleProperties', [i['name'] for i in model['contractInterfaces']])
 
+    def test_configured_table_surface_exports_editor_operations_and_live_collections(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface HTMLCollection { readonly attribute unsigned long length; getter Element? item(unsigned long index); };
+interface HTMLTableCaptionElement : HTMLElement {};
+interface HTMLTableColElement : HTMLElement { attribute unsigned long span; };
+interface HTMLTableCellElement : HTMLElement { attribute unsigned long colSpan; readonly attribute long cellIndex; };
+interface HTMLTableRowElement : HTMLElement {
+    readonly attribute HTMLCollection cells;
+    HTMLElement insertCell(optional long index = -1);
+    undefined deleteCell(long index);
+};
+interface HTMLTableSectionElement : HTMLElement {
+    readonly attribute HTMLCollection rows;
+    HTMLElement insertRow(optional long index = -1);
+    undefined deleteRow(long index);
+};
+interface HTMLTableElement : HTMLElement {
+    readonly attribute HTMLCollection rows;
+    readonly attribute HTMLCollection tBodies;
+    HTMLTableSectionElement createTBody();
+    HTMLElement insertRow(optional long index = -1);
+    undefined deleteRow(long index);
+};
+''')
+        tables = {
+            'HTMLTableElement', 'HTMLTableSectionElement', 'HTMLTableRowElement',
+            'HTMLTableCellElement', 'HTMLTableColElement', 'HTMLTableCaptionElement',
+        }
+        configured = json.loads((ROOT / 'gen/dom.json').read_text())['interfaces']
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'HTMLElement', 'HTMLCollection'] + [name for name in configured if name in tables]
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        functions = {function['function']: function for function in model['functions']}
+        self.assertIn('rv_dom_html_table_element_insert_row', functions)
+        self.assertIn('rv_dom_html_table_element_create_t_body', functions)
+        self.assertIn('rv_dom_html_table_section_element_delete_row', functions)
+        self.assertIn('rv_dom_html_table_row_element_insert_cell', functions)
+        self.assertIn('rv_dom_html_table_cell_element_set_col_span', functions)
+        self.assertIn('rv_dom_html_table_col_element_set_span', functions)
+        rows = functions['rv_dom_html_table_element_get_rows']
+        self.assertEqual(rows['returns']['interface'], 'HTMLCollection')
+        insert = functions['rv_dom_html_table_element_insert_row']
+        self.assertEqual(insert['arguments'][0]['default'], '-1')
+        self.assertIn('abstract member insertCell:', generator.interfaces())
+
 
 if __name__ == '__main__':
     unittest.main()

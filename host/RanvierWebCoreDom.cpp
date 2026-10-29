@@ -858,6 +858,110 @@ int32_t rv_dom_html_slot_element_set_name(RvNode* target, const char* value) { r
 int32_t rv_dom_html_slot_element_assigned_nodes(RvNode* target, const RvDomAssignedNodesOptions* options, RvDomSequenceNode* result) { return ranvier_dom_html_slot_element_assigned_nodes(target, options, result); }
 int32_t rv_dom_html_slot_element_assigned_elements(RvNode* target, const RvDomAssignedNodesOptions* options, RvDomSequenceElement* result) { return ranvier_dom_html_slot_element_assigned_elements(target, options, result); }
 int32_t rv_dom_html_slot_element_assign(RvNode* target, const RvDomSequenceElementOrText* nodes) { return ranvier_dom_html_slot_element_assign(target, nodes); }
+int32_t rv_dom_html_table_element_get_caption(RvNode* target, RvNode** result) { return ranvier_dom_html_table_element_get_caption(target, result); }
+int32_t rv_dom_html_table_element_set_caption(RvNode* target, RvNode* value) { return ranvier_dom_html_table_element_set_caption(target, value); }
+int32_t rv_dom_html_table_element_get_t_head(RvNode* target, RvNode** result) { return ranvier_dom_html_table_element_get_t_head(target, result); }
+int32_t rv_dom_html_table_element_set_t_head(RvNode* target, RvNode* value) { return ranvier_dom_html_table_element_set_t_head(target, value); }
+int32_t rv_dom_html_table_element_get_t_foot(RvNode* target, RvNode** result) { return ranvier_dom_html_table_element_get_t_foot(target, result); }
+int32_t rv_dom_html_table_element_set_t_foot(RvNode* target, RvNode* value) { return ranvier_dom_html_table_element_set_t_foot(target, value); }
+int32_t rv_dom_html_table_element_get_t_bodies(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_html_table_element_get_t_bodies(target, result); }
+int32_t rv_dom_html_table_element_get_rows(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_html_table_element_get_rows(target, result); }
+int32_t rv_dom_html_table_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_element_get_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_element_set_align(RvNode* target, const char* value) { return ranvier_dom_html_table_element_set_align(target, value); }
+int32_t rv_dom_html_table_element_get_border(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_element_get_border(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_element_set_border(RvNode* target, const char* value) { return ranvier_dom_html_table_element_set_border(target, value); }
+int32_t rv_dom_html_table_element_get_frame(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_element_get_frame(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_element_set_frame(RvNode* target, const char* value) { return ranvier_dom_html_table_element_set_frame(target, value); }
+int32_t rv_dom_html_table_element_get_rules(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_element_get_rules(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_element_set_rules(RvNode* target, const char* value) { return ranvier_dom_html_table_element_set_rules(target, value); }
+int32_t rv_dom_html_table_element_get_summary(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_element_get_summary(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_element_set_summary(RvNode* target, const char* value) { return ranvier_dom_html_table_element_set_summary(target, value); }
+int32_t rv_dom_html_table_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_element_get_width(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_element_set_width(RvNode* target, const char* value) { return ranvier_dom_html_table_element_set_width(target, value); }
+int32_t rv_dom_html_table_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_element_get_bg_color(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_element_set_bg_color(RvNode* target, const char* value) { return ranvier_dom_html_table_element_set_bg_color(target, value); }
+int32_t rv_dom_html_table_element_get_cell_padding(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_element_get_cell_padding(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_element_set_cell_padding(RvNode* target, const char* value) { return ranvier_dom_html_table_element_set_cell_padding(target, value); }
+int32_t rv_dom_html_table_element_get_cell_spacing(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_element_get_cell_spacing(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_element_set_cell_spacing(RvNode* target, const char* value) { return ranvier_dom_html_table_element_set_cell_spacing(target, value); }
+int32_t rv_dom_html_table_element_create_caption(RvNode* target, RvNode** result) { return ranvier_dom_html_table_element_create_caption(target, result); }
+int32_t rv_dom_html_table_element_delete_caption(RvNode* target) { return ranvier_dom_html_table_element_delete_caption(target); }
+int32_t rv_dom_html_table_element_create_t_head(RvNode* target, RvNode** result) { return ranvier_dom_html_table_element_create_t_head(target, result); }
+int32_t rv_dom_html_table_element_delete_t_head(RvNode* target) { return ranvier_dom_html_table_element_delete_t_head(target); }
+int32_t rv_dom_html_table_element_create_t_foot(RvNode* target, RvNode** result) { return ranvier_dom_html_table_element_create_t_foot(target, result); }
+int32_t rv_dom_html_table_element_delete_t_foot(RvNode* target) { return ranvier_dom_html_table_element_delete_t_foot(target); }
+int32_t rv_dom_html_table_element_create_t_body(RvNode* target, RvNode** result) { return ranvier_dom_html_table_element_create_t_body(target, result); }
+int32_t rv_dom_html_table_element_insert_row(RvNode* target, int32_t index, RvNode** result) { return ranvier_dom_html_table_element_insert_row(target, index, result); }
+int32_t rv_dom_html_table_element_delete_row(RvNode* target, int32_t index) { return ranvier_dom_html_table_element_delete_row(target, index); }
+int32_t rv_dom_html_table_caption_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_caption_element_get_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_caption_element_set_align(RvNode* target, const char* value) { return ranvier_dom_html_table_caption_element_set_align(target, value); }
+int32_t rv_dom_html_table_col_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_col_element_get_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_col_element_set_align(RvNode* target, const char* value) { return ranvier_dom_html_table_col_element_set_align(target, value); }
+int32_t rv_dom_html_table_col_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_col_element_get_ch(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_col_element_set_ch(RvNode* target, const char* value) { return ranvier_dom_html_table_col_element_set_ch(target, value); }
+int32_t rv_dom_html_table_col_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_col_element_get_ch_off(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_col_element_set_ch_off(RvNode* target, const char* value) { return ranvier_dom_html_table_col_element_set_ch_off(target, value); }
+int32_t rv_dom_html_table_col_element_get_span(RvNode* target, uint32_t* result) { return ranvier_dom_html_table_col_element_get_span(target, result); }
+int32_t rv_dom_html_table_col_element_set_span(RvNode* target, uint32_t value) { return ranvier_dom_html_table_col_element_set_span(target, value); }
+int32_t rv_dom_html_table_col_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_col_element_get_v_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_col_element_set_v_align(RvNode* target, const char* value) { return ranvier_dom_html_table_col_element_set_v_align(target, value); }
+int32_t rv_dom_html_table_col_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_col_element_get_width(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_col_element_set_width(RvNode* target, const char* value) { return ranvier_dom_html_table_col_element_set_width(target, value); }
+int32_t rv_dom_html_table_section_element_get_rows(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_html_table_section_element_get_rows(target, result); }
+int32_t rv_dom_html_table_section_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_section_element_get_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_section_element_set_align(RvNode* target, const char* value) { return ranvier_dom_html_table_section_element_set_align(target, value); }
+int32_t rv_dom_html_table_section_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_section_element_get_ch(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_section_element_set_ch(RvNode* target, const char* value) { return ranvier_dom_html_table_section_element_set_ch(target, value); }
+int32_t rv_dom_html_table_section_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_section_element_get_ch_off(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_section_element_set_ch_off(RvNode* target, const char* value) { return ranvier_dom_html_table_section_element_set_ch_off(target, value); }
+int32_t rv_dom_html_table_section_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_section_element_get_v_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_section_element_set_v_align(RvNode* target, const char* value) { return ranvier_dom_html_table_section_element_set_v_align(target, value); }
+int32_t rv_dom_html_table_section_element_insert_row(RvNode* target, int32_t index, RvNode** result) { return ranvier_dom_html_table_section_element_insert_row(target, index, result); }
+int32_t rv_dom_html_table_section_element_delete_row(RvNode* target, int32_t index) { return ranvier_dom_html_table_section_element_delete_row(target, index); }
+int32_t rv_dom_html_table_row_element_get_row_index(RvNode* target, int32_t* result) { return ranvier_dom_html_table_row_element_get_row_index(target, result); }
+int32_t rv_dom_html_table_row_element_get_section_row_index(RvNode* target, int32_t* result) { return ranvier_dom_html_table_row_element_get_section_row_index(target, result); }
+int32_t rv_dom_html_table_row_element_get_cells(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_html_table_row_element_get_cells(target, result); }
+int32_t rv_dom_html_table_row_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_row_element_get_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_row_element_set_align(RvNode* target, const char* value) { return ranvier_dom_html_table_row_element_set_align(target, value); }
+int32_t rv_dom_html_table_row_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_row_element_get_bg_color(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_row_element_set_bg_color(RvNode* target, const char* value) { return ranvier_dom_html_table_row_element_set_bg_color(target, value); }
+int32_t rv_dom_html_table_row_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_row_element_get_ch(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_row_element_set_ch(RvNode* target, const char* value) { return ranvier_dom_html_table_row_element_set_ch(target, value); }
+int32_t rv_dom_html_table_row_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_row_element_get_ch_off(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_row_element_set_ch_off(RvNode* target, const char* value) { return ranvier_dom_html_table_row_element_set_ch_off(target, value); }
+int32_t rv_dom_html_table_row_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_row_element_get_v_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_row_element_set_v_align(RvNode* target, const char* value) { return ranvier_dom_html_table_row_element_set_v_align(target, value); }
+int32_t rv_dom_html_table_row_element_insert_cell(RvNode* target, int32_t index, RvNode** result) { return ranvier_dom_html_table_row_element_insert_cell(target, index, result); }
+int32_t rv_dom_html_table_row_element_delete_cell(RvNode* target, int32_t index) { return ranvier_dom_html_table_row_element_delete_cell(target, index); }
+int32_t rv_dom_html_table_cell_element_get_cell_index(RvNode* target, int32_t* result) { return ranvier_dom_html_table_cell_element_get_cell_index(target, result); }
+int32_t rv_dom_html_table_cell_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_align(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_align(target, value); }
+int32_t rv_dom_html_table_cell_element_get_axis(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_axis(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_axis(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_axis(target, value); }
+int32_t rv_dom_html_table_cell_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_bg_color(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_bg_color(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_bg_color(target, value); }
+int32_t rv_dom_html_table_cell_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_ch(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_ch(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_ch(target, value); }
+int32_t rv_dom_html_table_cell_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_ch_off(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_ch_off(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_ch_off(target, value); }
+int32_t rv_dom_html_table_cell_element_get_col_span(RvNode* target, uint32_t* result) { return ranvier_dom_html_table_cell_element_get_col_span(target, result); }
+int32_t rv_dom_html_table_cell_element_set_col_span(RvNode* target, uint32_t value) { return ranvier_dom_html_table_cell_element_set_col_span(target, value); }
+int32_t rv_dom_html_table_cell_element_get_row_span(RvNode* target, uint32_t* result) { return ranvier_dom_html_table_cell_element_get_row_span(target, result); }
+int32_t rv_dom_html_table_cell_element_set_row_span(RvNode* target, uint32_t value) { return ranvier_dom_html_table_cell_element_set_row_span(target, value); }
+int32_t rv_dom_html_table_cell_element_get_headers(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_headers(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_headers(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_headers(target, value); }
+int32_t rv_dom_html_table_cell_element_get_height(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_height(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_height(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_height(target, value); }
+int32_t rv_dom_html_table_cell_element_get_no_wrap(RvNode* target, int32_t* result) { return ranvier_dom_html_table_cell_element_get_no_wrap(target, result); }
+int32_t rv_dom_html_table_cell_element_set_no_wrap(RvNode* target, int32_t value) { return ranvier_dom_html_table_cell_element_set_no_wrap(target, value); }
+int32_t rv_dom_html_table_cell_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_v_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_v_align(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_v_align(target, value); }
+int32_t rv_dom_html_table_cell_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_width(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_width(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_width(target, value); }
+int32_t rv_dom_html_table_cell_element_get_abbr(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_abbr(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_abbr(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_abbr(target, value); }
+int32_t rv_dom_html_table_cell_element_get_scope(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_table_cell_element_get_scope(target, buffer, capacity, length); }
+int32_t rv_dom_html_table_cell_element_set_scope(RvNode* target, const char* value) { return ranvier_dom_html_table_cell_element_set_scope(target, value); }
 int32_t rv_dom_html_text_area_element_get_dir_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_text_area_element_get_dir_name(target, buffer, capacity, length); }
 int32_t rv_dom_html_text_area_element_set_dir_name(RvNode* target, const char* value) { return ranvier_dom_html_text_area_element_set_dir_name(target, value); }
 int32_t rv_dom_html_text_area_element_get_disabled(RvNode* target, int32_t* result) { return ranvier_dom_html_text_area_element_get_disabled(target, result); }

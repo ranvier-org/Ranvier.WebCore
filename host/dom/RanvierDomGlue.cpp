@@ -64,6 +64,12 @@
 #include "HTMLSelectElement.h"
 #include "HTMLSlotElement.h"
 #include "HTMLSpanElement.h"
+#include "HTMLTableCaptionElement.h"
+#include "HTMLTableCellElement.h"
+#include "HTMLTableColElement.h"
+#include "HTMLTableElement.h"
+#include "HTMLTableRowElement.h"
+#include "HTMLTableSectionElement.h"
 #include "HTMLTemplateElement.h"
 #include "HTMLTextAreaElement.h"
 #include "HTMLUListElement.h"
@@ -1122,7 +1128,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -12643,6 +12649,1402 @@ int32_t ranvier_dom_html_slot_element_assign(RvNode* target, const RvDomSequence
     auto a0 = decodeRvDomSequenceElementOrText(nodes, status0);
     if (status0 != RV_OK) return status0;
     return invoke([&]() -> decltype(auto) { return impl->assign(DomSequenceArgument<Variant<Ref<Element>, Ref<Text>>> { std::move(*a0) }); });
+}
+
+// HTMLTableElement.caption getter: attribute HTMLTableCaptionElement? caption; *result is a new reference, or NULL
+int32_t ranvier_dom_html_table_element_get_caption(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->caption(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableElement.caption setter: attribute HTMLTableCaptionElement? caption; value may be NULL
+int32_t ranvier_dom_html_table_element_set_caption(RvNode* target, RvNode* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<HTMLTableCaptionElement> a0 = value ? dynamicDowncast<HTMLTableCaptionElement>(*nodeOf(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setCaption(a0.get()); });
+}
+
+// HTMLTableElement.tHead getter: attribute HTMLTableSectionElement? tHead; *result is a new reference, or NULL
+int32_t ranvier_dom_html_table_element_get_t_head(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->tHead(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableElement.tHead setter: attribute HTMLTableSectionElement? tHead; value may be NULL
+int32_t ranvier_dom_html_table_element_set_t_head(RvNode* target, RvNode* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<HTMLTableSectionElement> a0 = value ? dynamicDowncast<HTMLTableSectionElement>(*nodeOf(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setTHead(a0.get()); });
+}
+
+// HTMLTableElement.tFoot getter: attribute HTMLTableSectionElement? tFoot; *result is a new reference, or NULL
+int32_t ranvier_dom_html_table_element_get_t_foot(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->tFoot(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableElement.tFoot setter: attribute HTMLTableSectionElement? tFoot; value may be NULL
+int32_t ranvier_dom_html_table_element_set_t_foot(RvNode* target, RvNode* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<HTMLTableSectionElement> a0 = value ? dynamicDowncast<HTMLTableSectionElement>(*nodeOf(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setTFoot(a0.get()); });
+}
+
+// HTMLTableElement.tBodies getter: readonly attribute HTMLCollection tBodies; *result is a new reference
+int32_t ranvier_dom_html_table_element_get_t_bodies(RvNode* target, RvHTMLCollection** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->tBodies(); }, [&](auto&& value) { return storeHandle<HTMLCollection>(value, result); });
+}
+
+// HTMLTableElement.rows getter: readonly attribute HTMLCollection rows; *result is a new reference
+int32_t ranvier_dom_html_table_element_get_rows(RvNode* target, RvHTMLCollection** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rows(); }, [&](auto&& value) { return storeHandle<HTMLCollection>(value, result); });
+}
+
+// HTMLTableElement.align getter: attribute DOMString align
+int32_t ranvier_dom_html_table_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableElement.align setter: attribute DOMString align
+int32_t ranvier_dom_html_table_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableElement.border getter: attribute DOMString border
+int32_t ranvier_dom_html_table_element_get_border(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::borderAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableElement.border setter: attribute DOMString border
+int32_t ranvier_dom_html_table_element_set_border(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::borderAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableElement.frame getter: attribute DOMString frame
+int32_t ranvier_dom_html_table_element_get_frame(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::frameAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableElement.frame setter: attribute DOMString frame
+int32_t ranvier_dom_html_table_element_set_frame(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::frameAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableElement.rules getter: attribute DOMString rules
+int32_t ranvier_dom_html_table_element_get_rules(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::rulesAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableElement.rules setter: attribute DOMString rules
+int32_t ranvier_dom_html_table_element_set_rules(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::rulesAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableElement.summary getter: attribute DOMString summary
+int32_t ranvier_dom_html_table_element_get_summary(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::summaryAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableElement.summary setter: attribute DOMString summary
+int32_t ranvier_dom_html_table_element_set_summary(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::summaryAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableElement.width getter: attribute DOMString width
+int32_t ranvier_dom_html_table_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableElement.width setter: attribute DOMString width
+int32_t ranvier_dom_html_table_element_set_width(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::widthAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableElement.bgColor getter: attribute DOMString bgColor
+int32_t ranvier_dom_html_table_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableElement.bgColor setter: attribute DOMString bgColor
+int32_t ranvier_dom_html_table_element_set_bg_color(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::bgcolorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableElement.cellPadding getter: attribute DOMString cellPadding
+int32_t ranvier_dom_html_table_element_get_cell_padding(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::cellpaddingAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableElement.cellPadding setter: attribute DOMString cellPadding
+int32_t ranvier_dom_html_table_element_set_cell_padding(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::cellpaddingAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableElement.cellSpacing getter: attribute DOMString cellSpacing
+int32_t ranvier_dom_html_table_element_get_cell_spacing(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::cellspacingAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableElement.cellSpacing setter: attribute DOMString cellSpacing
+int32_t ranvier_dom_html_table_element_set_cell_spacing(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::cellspacingAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableElement.createCaption() -> HTMLTableCaptionElement; *result is a new reference
+int32_t ranvier_dom_html_table_element_create_caption(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createCaption(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableElement.deleteCaption() -> undefined
+int32_t ranvier_dom_html_table_element_delete_caption(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deleteCaption(); });
+}
+
+// HTMLTableElement.createTHead() -> HTMLTableSectionElement; *result is a new reference
+int32_t ranvier_dom_html_table_element_create_t_head(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createTHead(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableElement.deleteTHead() -> undefined
+int32_t ranvier_dom_html_table_element_delete_t_head(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deleteTHead(); });
+}
+
+// HTMLTableElement.createTFoot() -> HTMLTableSectionElement; *result is a new reference
+int32_t ranvier_dom_html_table_element_create_t_foot(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createTFoot(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableElement.deleteTFoot() -> undefined
+int32_t ranvier_dom_html_table_element_delete_t_foot(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deleteTFoot(); });
+}
+
+// HTMLTableElement.createTBody() -> HTMLTableSectionElement; *result is a new reference
+int32_t ranvier_dom_html_table_element_create_t_body(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createTBody(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableElement.insertRow(optional long index = -1) -> HTMLTableRowElement; index defaults to -1 in IDL; *result is a new reference
+int32_t ranvier_dom_html_table_element_insert_row(RvNode* target, int32_t index, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->insertRow(index); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableElement.deleteRow(long index) -> undefined
+int32_t ranvier_dom_html_table_element_delete_row(RvNode* target, int32_t index)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deleteRow(index); });
+}
+
+// HTMLTableCaptionElement.align getter: attribute DOMString align
+int32_t ranvier_dom_html_table_caption_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCaptionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCaptionElement.align setter: attribute DOMString align
+int32_t ranvier_dom_html_table_caption_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCaptionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableColElement.align getter: attribute DOMString align
+int32_t ranvier_dom_html_table_col_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableColElement.align setter: attribute DOMString align
+int32_t ranvier_dom_html_table_col_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableColElement.ch getter: attribute DOMString ch
+int32_t ranvier_dom_html_table_col_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableColElement.ch setter: attribute DOMString ch
+int32_t ranvier_dom_html_table_col_element_set_ch(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::charAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableColElement.chOff getter: attribute DOMString chOff
+int32_t ranvier_dom_html_table_col_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableColElement.chOff setter: attribute DOMString chOff
+int32_t ranvier_dom_html_table_col_element_set_ch_off(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::charoffAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableColElement.span getter: attribute unsigned long span
+int32_t ranvier_dom_html_table_col_element_get_span(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->span(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLTableColElement.span setter: attribute unsigned long span
+int32_t ranvier_dom_html_table_col_element_set_span(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setSpan(value); });
+}
+
+// HTMLTableColElement.vAlign getter: attribute DOMString vAlign
+int32_t ranvier_dom_html_table_col_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableColElement.vAlign setter: attribute DOMString vAlign
+int32_t ranvier_dom_html_table_col_element_set_v_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableColElement.width getter: attribute DOMString width
+int32_t ranvier_dom_html_table_col_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableColElement.width setter: attribute DOMString width
+int32_t ranvier_dom_html_table_col_element_set_width(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableColElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::widthAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableSectionElement.rows getter: readonly attribute HTMLCollection rows; *result is a new reference
+int32_t ranvier_dom_html_table_section_element_get_rows(RvNode* target, RvHTMLCollection** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rows(); }, [&](auto&& value) { return storeHandle<HTMLCollection>(value, result); });
+}
+
+// HTMLTableSectionElement.align getter: attribute DOMString align
+int32_t ranvier_dom_html_table_section_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableSectionElement.align setter: attribute DOMString align
+int32_t ranvier_dom_html_table_section_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableSectionElement.ch getter: attribute DOMString ch
+int32_t ranvier_dom_html_table_section_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableSectionElement.ch setter: attribute DOMString ch
+int32_t ranvier_dom_html_table_section_element_set_ch(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::charAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableSectionElement.chOff getter: attribute DOMString chOff
+int32_t ranvier_dom_html_table_section_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableSectionElement.chOff setter: attribute DOMString chOff
+int32_t ranvier_dom_html_table_section_element_set_ch_off(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::charoffAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableSectionElement.vAlign getter: attribute DOMString vAlign
+int32_t ranvier_dom_html_table_section_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableSectionElement.vAlign setter: attribute DOMString vAlign
+int32_t ranvier_dom_html_table_section_element_set_v_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableSectionElement.insertRow(optional long index = -1) -> HTMLTableRowElement; index defaults to -1 in IDL; *result is a new reference
+int32_t ranvier_dom_html_table_section_element_insert_row(RvNode* target, int32_t index, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->insertRow(index); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableSectionElement.deleteRow(long index) -> undefined
+int32_t ranvier_dom_html_table_section_element_delete_row(RvNode* target, int32_t index)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableSectionElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deleteRow(index); });
+}
+
+// HTMLTableRowElement.rowIndex getter: readonly attribute long rowIndex
+int32_t ranvier_dom_html_table_row_element_get_row_index(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rowIndex(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLTableRowElement.sectionRowIndex getter: readonly attribute long sectionRowIndex
+int32_t ranvier_dom_html_table_row_element_get_section_row_index(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->sectionRowIndex(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLTableRowElement.cells getter: readonly attribute HTMLCollection cells; *result is a new reference
+int32_t ranvier_dom_html_table_row_element_get_cells(RvNode* target, RvHTMLCollection** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cells(); }, [&](auto&& value) { return storeHandle<HTMLCollection>(value, result); });
+}
+
+// HTMLTableRowElement.align getter: attribute DOMString align
+int32_t ranvier_dom_html_table_row_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableRowElement.align setter: attribute DOMString align
+int32_t ranvier_dom_html_table_row_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableRowElement.bgColor getter: attribute DOMString bgColor
+int32_t ranvier_dom_html_table_row_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableRowElement.bgColor setter: attribute DOMString bgColor
+int32_t ranvier_dom_html_table_row_element_set_bg_color(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::bgcolorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableRowElement.ch getter: attribute DOMString ch
+int32_t ranvier_dom_html_table_row_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableRowElement.ch setter: attribute DOMString ch
+int32_t ranvier_dom_html_table_row_element_set_ch(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::charAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableRowElement.chOff getter: attribute DOMString chOff
+int32_t ranvier_dom_html_table_row_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableRowElement.chOff setter: attribute DOMString chOff
+int32_t ranvier_dom_html_table_row_element_set_ch_off(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::charoffAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableRowElement.vAlign getter: attribute DOMString vAlign
+int32_t ranvier_dom_html_table_row_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableRowElement.vAlign setter: attribute DOMString vAlign
+int32_t ranvier_dom_html_table_row_element_set_v_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableRowElement.insertCell(optional long index = -1) -> HTMLElement; index defaults to -1 in IDL; *result is a new reference
+int32_t ranvier_dom_html_table_row_element_insert_cell(RvNode* target, int32_t index, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->insertCell(index); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLTableRowElement.deleteCell(long index) -> undefined
+int32_t ranvier_dom_html_table_row_element_delete_cell(RvNode* target, int32_t index)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableRowElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deleteCell(index); });
+}
+
+// HTMLTableCellElement.cellIndex getter: readonly attribute long cellIndex
+int32_t ranvier_dom_html_table_cell_element_get_cell_index(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cellIndex(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLTableCellElement.align getter: attribute DOMString align
+int32_t ranvier_dom_html_table_cell_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.align setter: attribute DOMString align
+int32_t ranvier_dom_html_table_cell_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.axis getter: attribute DOMString axis
+int32_t ranvier_dom_html_table_cell_element_get_axis(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::axisAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.axis setter: attribute DOMString axis
+int32_t ranvier_dom_html_table_cell_element_set_axis(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::axisAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.bgColor getter: attribute DOMString bgColor
+int32_t ranvier_dom_html_table_cell_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.bgColor setter: attribute DOMString bgColor
+int32_t ranvier_dom_html_table_cell_element_set_bg_color(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::bgcolorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.ch getter: attribute DOMString ch
+int32_t ranvier_dom_html_table_cell_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.ch setter: attribute DOMString ch
+int32_t ranvier_dom_html_table_cell_element_set_ch(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::charAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.chOff getter: attribute DOMString chOff
+int32_t ranvier_dom_html_table_cell_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::charoffAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.chOff setter: attribute DOMString chOff
+int32_t ranvier_dom_html_table_cell_element_set_ch_off(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::charoffAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.colSpan getter: attribute unsigned long colSpan
+int32_t ranvier_dom_html_table_cell_element_get_col_span(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->colSpan(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLTableCellElement.colSpan setter: attribute unsigned long colSpan
+int32_t ranvier_dom_html_table_cell_element_set_col_span(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setColSpan(value); });
+}
+
+// HTMLTableCellElement.rowSpan getter: attribute unsigned long rowSpan
+int32_t ranvier_dom_html_table_cell_element_get_row_span(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rowSpan(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLTableCellElement.rowSpan setter: attribute unsigned long rowSpan
+int32_t ranvier_dom_html_table_cell_element_set_row_span(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setRowSpan(value); });
+}
+
+// HTMLTableCellElement.headers getter: attribute DOMString headers
+int32_t ranvier_dom_html_table_cell_element_get_headers(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::headersAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.headers setter: attribute DOMString headers
+int32_t ranvier_dom_html_table_cell_element_set_headers(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::headersAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.height getter: attribute DOMString height
+int32_t ranvier_dom_html_table_cell_element_get_height(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::heightAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.height setter: attribute DOMString height
+int32_t ranvier_dom_html_table_cell_element_set_height(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::heightAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.noWrap getter: attribute boolean noWrap
+int32_t ranvier_dom_html_table_cell_element_get_no_wrap(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::nowrapAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLTableCellElement.noWrap setter: attribute boolean noWrap
+int32_t ranvier_dom_html_table_cell_element_set_no_wrap(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::nowrapAttr, !!value); });
+}
+
+// HTMLTableCellElement.vAlign getter: attribute DOMString vAlign
+int32_t ranvier_dom_html_table_cell_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.vAlign setter: attribute DOMString vAlign
+int32_t ranvier_dom_html_table_cell_element_set_v_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.width getter: attribute DOMString width
+int32_t ranvier_dom_html_table_cell_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.width setter: attribute DOMString width
+int32_t ranvier_dom_html_table_cell_element_set_width(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::widthAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.abbr getter: attribute DOMString abbr
+int32_t ranvier_dom_html_table_cell_element_get_abbr(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::abbrAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.abbr setter: attribute DOMString abbr
+int32_t ranvier_dom_html_table_cell_element_set_abbr(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::abbrAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTableCellElement.scope getter: attribute DOMString scope
+int32_t ranvier_dom_html_table_cell_element_get_scope(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->scope(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTableCellElement.scope setter: attribute DOMString scope
+int32_t ranvier_dom_html_table_cell_element_set_scope(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTableCellElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::scopeAttr, AtomString { a0.atom() }); });
 }
 
 // HTMLTextAreaElement.dirName getter: attribute DOMString dirName

@@ -1235,6 +1235,154 @@ and [<AllowNullLiteral>] HTMLSlotElement =
 and [<AllowNullLiteral>] HTMLSpanElement =
     inherit HTMLElement
 
+/// <summary>HTMLTableElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableElement =
+    inherit HTMLElement
+    /// <summary>HTMLTableElement.caption.</summary>
+    abstract member caption: HTMLTableCaptionElement with get, set
+    /// <summary>HTMLTableElement.createCaption.</summary>
+    abstract member createCaption: unit -> HTMLTableCaptionElement
+    /// <summary>HTMLTableElement.deleteCaption.</summary>
+    abstract member deleteCaption: unit -> unit
+    /// <summary>HTMLTableElement.tHead.</summary>
+    abstract member tHead: HTMLTableSectionElement with get, set
+    /// <summary>HTMLTableElement.createTHead.</summary>
+    abstract member createTHead: unit -> HTMLTableSectionElement
+    /// <summary>HTMLTableElement.deleteTHead.</summary>
+    abstract member deleteTHead: unit -> unit
+    /// <summary>HTMLTableElement.tFoot.</summary>
+    abstract member tFoot: HTMLTableSectionElement with get, set
+    /// <summary>HTMLTableElement.createTFoot.</summary>
+    abstract member createTFoot: unit -> HTMLTableSectionElement
+    /// <summary>HTMLTableElement.deleteTFoot.</summary>
+    abstract member deleteTFoot: unit -> unit
+    /// <summary>HTMLTableElement.tBodies.</summary>
+    abstract member tBodies: HTMLCollection with get
+    /// <summary>HTMLTableElement.createTBody.</summary>
+    abstract member createTBody: unit -> HTMLTableSectionElement
+    /// <summary>HTMLTableElement.rows.</summary>
+    abstract member rows: HTMLCollection with get
+    /// <summary>HTMLTableElement.insertRow.</summary>
+    abstract member insertRow: ?index: int -> HTMLTableRowElement
+    /// <summary>HTMLTableElement.deleteRow.</summary>
+    abstract member deleteRow: index: int -> unit
+    /// <summary>HTMLTableElement.align.</summary>
+    abstract member align: string with get, set
+    /// <summary>HTMLTableElement.border.</summary>
+    abstract member border: string with get, set
+    /// <summary>HTMLTableElement.frame.</summary>
+    abstract member frame: string with get, set
+    /// <summary>HTMLTableElement.rules.</summary>
+    abstract member rules: string with get, set
+    /// <summary>HTMLTableElement.summary.</summary>
+    abstract member summary: string with get, set
+    /// <summary>HTMLTableElement.width.</summary>
+    abstract member width: string with get, set
+    /// <summary>HTMLTableElement.bgColor.</summary>
+    abstract member bgColor: string with get, set
+    /// <summary>HTMLTableElement.cellPadding.</summary>
+    abstract member cellPadding: string with get, set
+    /// <summary>HTMLTableElement.cellSpacing.</summary>
+    abstract member cellSpacing: string with get, set
+
+/// <summary>HTMLTableCaptionElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableCaptionElement =
+    inherit HTMLElement
+    /// <summary>HTMLTableCaptionElement.align.</summary>
+    abstract member align: string with get, set
+
+/// <summary>HTMLTableColElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableColElement =
+    inherit HTMLElement
+    /// <summary>HTMLTableColElement.align.</summary>
+    abstract member align: string with get, set
+    /// <summary>HTMLTableColElement.ch.</summary>
+    abstract member ch: string with get, set
+    /// <summary>HTMLTableColElement.chOff.</summary>
+    abstract member chOff: string with get, set
+    /// <summary>HTMLTableColElement.span.</summary>
+    abstract member span: uint32 with get, set
+    /// <summary>HTMLTableColElement.vAlign.</summary>
+    abstract member vAlign: string with get, set
+    /// <summary>HTMLTableColElement.width.</summary>
+    abstract member width: string with get, set
+
+/// <summary>HTMLTableSectionElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableSectionElement =
+    inherit HTMLElement
+    /// <summary>HTMLTableSectionElement.rows.</summary>
+    abstract member rows: HTMLCollection with get
+    /// <summary>HTMLTableSectionElement.insertRow.</summary>
+    abstract member insertRow: ?index: int -> HTMLTableRowElement
+    /// <summary>HTMLTableSectionElement.deleteRow.</summary>
+    abstract member deleteRow: index: int -> unit
+    /// <summary>HTMLTableSectionElement.align.</summary>
+    abstract member align: string with get, set
+    /// <summary>HTMLTableSectionElement.ch.</summary>
+    abstract member ch: string with get, set
+    /// <summary>HTMLTableSectionElement.chOff.</summary>
+    abstract member chOff: string with get, set
+    /// <summary>HTMLTableSectionElement.vAlign.</summary>
+    abstract member vAlign: string with get, set
+
+/// <summary>HTMLTableRowElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableRowElement =
+    inherit HTMLElement
+    /// <summary>HTMLTableRowElement.rowIndex.</summary>
+    abstract member rowIndex: int with get
+    /// <summary>HTMLTableRowElement.sectionRowIndex.</summary>
+    abstract member sectionRowIndex: int with get
+    /// <summary>HTMLTableRowElement.cells.</summary>
+    abstract member cells: HTMLCollection with get
+    /// <summary>HTMLTableRowElement.align.</summary>
+    abstract member align: string with get, set
+    /// <summary>HTMLTableRowElement.bgColor.</summary>
+    abstract member bgColor: string with get, set
+    /// <summary>HTMLTableRowElement.ch.</summary>
+    abstract member ch: string with get, set
+    /// <summary>HTMLTableRowElement.chOff.</summary>
+    abstract member chOff: string with get, set
+    /// <summary>HTMLTableRowElement.vAlign.</summary>
+    abstract member vAlign: string with get, set
+    /// <summary>HTMLTableRowElement.insertCell.</summary>
+    abstract member insertCell: ?index: int -> HTMLElement
+    /// <summary>HTMLTableRowElement.deleteCell.</summary>
+    abstract member deleteCell: index: int -> unit
+
+/// <summary>HTMLTableCellElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTableCellElement =
+    inherit HTMLElement
+    /// <summary>HTMLTableCellElement.cellIndex.</summary>
+    abstract member cellIndex: int with get
+    /// <summary>HTMLTableCellElement.align.</summary>
+    abstract member align: string with get, set
+    /// <summary>HTMLTableCellElement.axis.</summary>
+    abstract member axis: string with get, set
+    /// <summary>HTMLTableCellElement.bgColor.</summary>
+    abstract member bgColor: string with get, set
+    /// <summary>HTMLTableCellElement.ch.</summary>
+    abstract member ch: string with get, set
+    /// <summary>HTMLTableCellElement.chOff.</summary>
+    abstract member chOff: string with get, set
+    /// <summary>HTMLTableCellElement.colSpan.</summary>
+    abstract member colSpan: uint32 with get, set
+    /// <summary>HTMLTableCellElement.rowSpan.</summary>
+    abstract member rowSpan: uint32 with get, set
+    /// <summary>HTMLTableCellElement.headers.</summary>
+    abstract member headers: string with get, set
+    /// <summary>HTMLTableCellElement.height.</summary>
+    abstract member height: string with get, set
+    /// <summary>HTMLTableCellElement.noWrap.</summary>
+    abstract member noWrap: bool with get, set
+    /// <summary>HTMLTableCellElement.vAlign.</summary>
+    abstract member vAlign: string with get, set
+    /// <summary>HTMLTableCellElement.width.</summary>
+    abstract member width: string with get, set
+    /// <summary>HTMLTableCellElement.abbr.</summary>
+    abstract member abbr: string with get, set
+    /// <summary>HTMLTableCellElement.scope.</summary>
+    abstract member scope: string with get, set
+
 /// <summary>HTMLTextAreaElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLTextAreaElement =
     inherit HTMLElement
@@ -1833,14 +1981,6 @@ and [<AllowNullLiteral>] HTMLBRElement =
 and [<AllowNullLiteral>] HTMLCanvasElement =
     inherit HTMLElement
 
-/// <summary>HTMLTableCaptionElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLTableCaptionElement =
-    inherit HTMLElement
-
-/// <summary>HTMLTableColElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLTableColElement =
-    inherit HTMLElement
-
 /// <summary>HTMLDataElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLDataElement =
     inherit HTMLElement
@@ -1951,28 +2091,12 @@ and [<AllowNullLiteral>] HTMLStyleElement =
     inherit HTMLElement
     inherit LinkStyle
 
-/// <summary>HTMLTableElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLTableElement =
-    inherit HTMLElement
-
-/// <summary>HTMLTableSectionElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLTableSectionElement =
-    inherit HTMLElement
-
-/// <summary>HTMLTableCellElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLTableCellElement =
-    inherit HTMLElement
-
 /// <summary>HTMLTimeElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLTimeElement =
     inherit HTMLElement
 
 /// <summary>HTMLTitleElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLTitleElement =
-    inherit HTMLElement
-
-/// <summary>HTMLTableRowElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLTableRowElement =
     inherit HTMLElement
 
 /// <summary>HTMLTrackElement in the scoped DOM interface model.</summary>

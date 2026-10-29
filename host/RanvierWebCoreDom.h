@@ -2365,6 +2365,229 @@ RV_EXPORT int32_t rv_dom_html_slot_element_assigned_nodes(RvNode* target, const 
 RV_EXPORT int32_t rv_dom_html_slot_element_assigned_elements(RvNode* target, const RvDomAssignedNodesOptions* options, RvDomSequenceElement* result);
 /* HTMLSlotElement.assign((Element or Text) nodes) -> undefined */
 RV_EXPORT int32_t rv_dom_html_slot_element_assign(RvNode* target, const RvDomSequenceElementOrText* nodes);
+/* HTMLTableElement */
+
+/* HTMLTableElement.caption getter: attribute HTMLTableCaptionElement? caption; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_table_element_get_caption(RvNode* target, RvNode** result);
+/* HTMLTableElement.caption setter: attribute HTMLTableCaptionElement? caption; value may be NULL */
+RV_EXPORT int32_t rv_dom_html_table_element_set_caption(RvNode* target, RvNode* value);
+/* HTMLTableElement.tHead getter: attribute HTMLTableSectionElement? tHead; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_table_element_get_t_head(RvNode* target, RvNode** result);
+/* HTMLTableElement.tHead setter: attribute HTMLTableSectionElement? tHead; value may be NULL */
+RV_EXPORT int32_t rv_dom_html_table_element_set_t_head(RvNode* target, RvNode* value);
+/* HTMLTableElement.tFoot getter: attribute HTMLTableSectionElement? tFoot; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_table_element_get_t_foot(RvNode* target, RvNode** result);
+/* HTMLTableElement.tFoot setter: attribute HTMLTableSectionElement? tFoot; value may be NULL */
+RV_EXPORT int32_t rv_dom_html_table_element_set_t_foot(RvNode* target, RvNode* value);
+/* HTMLTableElement.tBodies getter: readonly attribute HTMLCollection tBodies; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_element_get_t_bodies(RvNode* target, RvHTMLCollection** result);
+/* HTMLTableElement.rows getter: readonly attribute HTMLCollection rows; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_element_get_rows(RvNode* target, RvHTMLCollection** result);
+/* HTMLTableElement.align getter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableElement.align setter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_element_set_align(RvNode* target, const char* value);
+/* HTMLTableElement.border getter: attribute DOMString border */
+RV_EXPORT int32_t rv_dom_html_table_element_get_border(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableElement.border setter: attribute DOMString border */
+RV_EXPORT int32_t rv_dom_html_table_element_set_border(RvNode* target, const char* value);
+/* HTMLTableElement.frame getter: attribute DOMString frame */
+RV_EXPORT int32_t rv_dom_html_table_element_get_frame(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableElement.frame setter: attribute DOMString frame */
+RV_EXPORT int32_t rv_dom_html_table_element_set_frame(RvNode* target, const char* value);
+/* HTMLTableElement.rules getter: attribute DOMString rules */
+RV_EXPORT int32_t rv_dom_html_table_element_get_rules(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableElement.rules setter: attribute DOMString rules */
+RV_EXPORT int32_t rv_dom_html_table_element_set_rules(RvNode* target, const char* value);
+/* HTMLTableElement.summary getter: attribute DOMString summary */
+RV_EXPORT int32_t rv_dom_html_table_element_get_summary(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableElement.summary setter: attribute DOMString summary */
+RV_EXPORT int32_t rv_dom_html_table_element_set_summary(RvNode* target, const char* value);
+/* HTMLTableElement.width getter: attribute DOMString width */
+RV_EXPORT int32_t rv_dom_html_table_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableElement.width setter: attribute DOMString width */
+RV_EXPORT int32_t rv_dom_html_table_element_set_width(RvNode* target, const char* value);
+/* HTMLTableElement.bgColor getter: attribute DOMString bgColor */
+RV_EXPORT int32_t rv_dom_html_table_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableElement.bgColor setter: attribute DOMString bgColor */
+RV_EXPORT int32_t rv_dom_html_table_element_set_bg_color(RvNode* target, const char* value);
+/* HTMLTableElement.cellPadding getter: attribute DOMString cellPadding */
+RV_EXPORT int32_t rv_dom_html_table_element_get_cell_padding(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableElement.cellPadding setter: attribute DOMString cellPadding */
+RV_EXPORT int32_t rv_dom_html_table_element_set_cell_padding(RvNode* target, const char* value);
+/* HTMLTableElement.cellSpacing getter: attribute DOMString cellSpacing */
+RV_EXPORT int32_t rv_dom_html_table_element_get_cell_spacing(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableElement.cellSpacing setter: attribute DOMString cellSpacing */
+RV_EXPORT int32_t rv_dom_html_table_element_set_cell_spacing(RvNode* target, const char* value);
+/* HTMLTableElement.createCaption() -> HTMLTableCaptionElement; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_element_create_caption(RvNode* target, RvNode** result);
+/* HTMLTableElement.deleteCaption() -> undefined */
+RV_EXPORT int32_t rv_dom_html_table_element_delete_caption(RvNode* target);
+/* HTMLTableElement.createTHead() -> HTMLTableSectionElement; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_element_create_t_head(RvNode* target, RvNode** result);
+/* HTMLTableElement.deleteTHead() -> undefined */
+RV_EXPORT int32_t rv_dom_html_table_element_delete_t_head(RvNode* target);
+/* HTMLTableElement.createTFoot() -> HTMLTableSectionElement; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_element_create_t_foot(RvNode* target, RvNode** result);
+/* HTMLTableElement.deleteTFoot() -> undefined */
+RV_EXPORT int32_t rv_dom_html_table_element_delete_t_foot(RvNode* target);
+/* HTMLTableElement.createTBody() -> HTMLTableSectionElement; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_element_create_t_body(RvNode* target, RvNode** result);
+/* HTMLTableElement.insertRow(optional long index = -1) -> HTMLTableRowElement; index defaults to -1 in IDL; *result
+ * is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_element_insert_row(RvNode* target, int32_t index, RvNode** result);
+/* HTMLTableElement.deleteRow(long index) -> undefined */
+RV_EXPORT int32_t rv_dom_html_table_element_delete_row(RvNode* target, int32_t index);
+/* HTMLTableCaptionElement */
+
+/* HTMLTableCaptionElement.align getter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_caption_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCaptionElement.align setter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_caption_element_set_align(RvNode* target, const char* value);
+/* HTMLTableColElement */
+
+/* HTMLTableColElement.align getter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_col_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableColElement.align setter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_align(RvNode* target, const char* value);
+/* HTMLTableColElement.ch getter: attribute DOMString ch */
+RV_EXPORT int32_t rv_dom_html_table_col_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableColElement.ch setter: attribute DOMString ch */
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_ch(RvNode* target, const char* value);
+/* HTMLTableColElement.chOff getter: attribute DOMString chOff */
+RV_EXPORT int32_t rv_dom_html_table_col_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableColElement.chOff setter: attribute DOMString chOff */
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_ch_off(RvNode* target, const char* value);
+/* HTMLTableColElement.span getter: attribute unsigned long span */
+RV_EXPORT int32_t rv_dom_html_table_col_element_get_span(RvNode* target, uint32_t* result);
+/* HTMLTableColElement.span setter: attribute unsigned long span */
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_span(RvNode* target, uint32_t value);
+/* HTMLTableColElement.vAlign getter: attribute DOMString vAlign */
+RV_EXPORT int32_t rv_dom_html_table_col_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableColElement.vAlign setter: attribute DOMString vAlign */
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_v_align(RvNode* target, const char* value);
+/* HTMLTableColElement.width getter: attribute DOMString width */
+RV_EXPORT int32_t rv_dom_html_table_col_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableColElement.width setter: attribute DOMString width */
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_width(RvNode* target, const char* value);
+/* HTMLTableSectionElement */
+
+/* HTMLTableSectionElement.rows getter: readonly attribute HTMLCollection rows; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_section_element_get_rows(RvNode* target, RvHTMLCollection** result);
+/* HTMLTableSectionElement.align getter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_section_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableSectionElement.align setter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_section_element_set_align(RvNode* target, const char* value);
+/* HTMLTableSectionElement.ch getter: attribute DOMString ch */
+RV_EXPORT int32_t rv_dom_html_table_section_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableSectionElement.ch setter: attribute DOMString ch */
+RV_EXPORT int32_t rv_dom_html_table_section_element_set_ch(RvNode* target, const char* value);
+/* HTMLTableSectionElement.chOff getter: attribute DOMString chOff */
+RV_EXPORT int32_t rv_dom_html_table_section_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableSectionElement.chOff setter: attribute DOMString chOff */
+RV_EXPORT int32_t rv_dom_html_table_section_element_set_ch_off(RvNode* target, const char* value);
+/* HTMLTableSectionElement.vAlign getter: attribute DOMString vAlign */
+RV_EXPORT int32_t rv_dom_html_table_section_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableSectionElement.vAlign setter: attribute DOMString vAlign */
+RV_EXPORT int32_t rv_dom_html_table_section_element_set_v_align(RvNode* target, const char* value);
+/* HTMLTableSectionElement.insertRow(optional long index = -1) -> HTMLTableRowElement; index defaults to -1 in IDL;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_section_element_insert_row(RvNode* target, int32_t index, RvNode** result);
+/* HTMLTableSectionElement.deleteRow(long index) -> undefined */
+RV_EXPORT int32_t rv_dom_html_table_section_element_delete_row(RvNode* target, int32_t index);
+/* HTMLTableRowElement */
+
+/* HTMLTableRowElement.rowIndex getter: readonly attribute long rowIndex */
+RV_EXPORT int32_t rv_dom_html_table_row_element_get_row_index(RvNode* target, int32_t* result);
+/* HTMLTableRowElement.sectionRowIndex getter: readonly attribute long sectionRowIndex */
+RV_EXPORT int32_t rv_dom_html_table_row_element_get_section_row_index(RvNode* target, int32_t* result);
+/* HTMLTableRowElement.cells getter: readonly attribute HTMLCollection cells; *result is a new reference */
+RV_EXPORT int32_t rv_dom_html_table_row_element_get_cells(RvNode* target, RvHTMLCollection** result);
+/* HTMLTableRowElement.align getter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_row_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableRowElement.align setter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_align(RvNode* target, const char* value);
+/* HTMLTableRowElement.bgColor getter: attribute DOMString bgColor */
+RV_EXPORT int32_t rv_dom_html_table_row_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableRowElement.bgColor setter: attribute DOMString bgColor */
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_bg_color(RvNode* target, const char* value);
+/* HTMLTableRowElement.ch getter: attribute DOMString ch */
+RV_EXPORT int32_t rv_dom_html_table_row_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableRowElement.ch setter: attribute DOMString ch */
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_ch(RvNode* target, const char* value);
+/* HTMLTableRowElement.chOff getter: attribute DOMString chOff */
+RV_EXPORT int32_t rv_dom_html_table_row_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableRowElement.chOff setter: attribute DOMString chOff */
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_ch_off(RvNode* target, const char* value);
+/* HTMLTableRowElement.vAlign getter: attribute DOMString vAlign */
+RV_EXPORT int32_t rv_dom_html_table_row_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableRowElement.vAlign setter: attribute DOMString vAlign */
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_v_align(RvNode* target, const char* value);
+/* HTMLTableRowElement.insertCell(optional long index = -1) -> HTMLElement; index defaults to -1 in IDL; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_html_table_row_element_insert_cell(RvNode* target, int32_t index, RvNode** result);
+/* HTMLTableRowElement.deleteCell(long index) -> undefined */
+RV_EXPORT int32_t rv_dom_html_table_row_element_delete_cell(RvNode* target, int32_t index);
+/* HTMLTableCellElement */
+
+/* HTMLTableCellElement.cellIndex getter: readonly attribute long cellIndex */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_cell_index(RvNode* target, int32_t* result);
+/* HTMLTableCellElement.align getter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.align setter: attribute DOMString align */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_align(RvNode* target, const char* value);
+/* HTMLTableCellElement.axis getter: attribute DOMString axis */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_axis(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.axis setter: attribute DOMString axis */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_axis(RvNode* target, const char* value);
+/* HTMLTableCellElement.bgColor getter: attribute DOMString bgColor */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.bgColor setter: attribute DOMString bgColor */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_bg_color(RvNode* target, const char* value);
+/* HTMLTableCellElement.ch getter: attribute DOMString ch */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.ch setter: attribute DOMString ch */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_ch(RvNode* target, const char* value);
+/* HTMLTableCellElement.chOff getter: attribute DOMString chOff */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.chOff setter: attribute DOMString chOff */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_ch_off(RvNode* target, const char* value);
+/* HTMLTableCellElement.colSpan getter: attribute unsigned long colSpan */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_col_span(RvNode* target, uint32_t* result);
+/* HTMLTableCellElement.colSpan setter: attribute unsigned long colSpan */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_col_span(RvNode* target, uint32_t value);
+/* HTMLTableCellElement.rowSpan getter: attribute unsigned long rowSpan */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_row_span(RvNode* target, uint32_t* result);
+/* HTMLTableCellElement.rowSpan setter: attribute unsigned long rowSpan */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_row_span(RvNode* target, uint32_t value);
+/* HTMLTableCellElement.headers getter: attribute DOMString headers */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_headers(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.headers setter: attribute DOMString headers */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_headers(RvNode* target, const char* value);
+/* HTMLTableCellElement.height getter: attribute DOMString height */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_height(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.height setter: attribute DOMString height */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_height(RvNode* target, const char* value);
+/* HTMLTableCellElement.noWrap getter: attribute boolean noWrap */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_no_wrap(RvNode* target, int32_t* result);
+/* HTMLTableCellElement.noWrap setter: attribute boolean noWrap */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_no_wrap(RvNode* target, int32_t value);
+/* HTMLTableCellElement.vAlign getter: attribute DOMString vAlign */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.vAlign setter: attribute DOMString vAlign */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_v_align(RvNode* target, const char* value);
+/* HTMLTableCellElement.width getter: attribute DOMString width */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.width setter: attribute DOMString width */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_width(RvNode* target, const char* value);
+/* HTMLTableCellElement.abbr getter: attribute DOMString abbr */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_abbr(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.abbr setter: attribute DOMString abbr */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_abbr(RvNode* target, const char* value);
+/* HTMLTableCellElement.scope getter: attribute DOMString scope */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_get_scope(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* HTMLTableCellElement.scope setter: attribute DOMString scope */
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_scope(RvNode* target, const char* value);
 /* HTMLTextAreaElement */
 
 /* HTMLTextAreaElement.dirName getter: attribute DOMString dirName */
