@@ -5832,3 +5832,9 @@ extern int rv_dom_input_event_get_target_ranges(nativeint target, RvDomSequenceS
 
 [<DllImport(Lib)>]
 extern int rv_dom_composition_event_get_data(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_supports_1(nativeint target, byte[] condition_text, int condition_text_length, int& result)

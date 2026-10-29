@@ -234,7 +234,11 @@
             "Slotable": "Slottable"
         }
     },
-    "runtimeTypeRoots": ["CSSRule", "StyleSheet", "CSSStyleDeclaration"],
+    "runtimeTypeRoots": [
+        "CSSRule",
+        "StyleSheet",
+        "CSSStyleDeclaration"
+    ],
     "nodeCastTags": {
         "HTMLModElement": [
             "del",
@@ -327,5 +331,15 @@
         "HTMLImageElement.decode",
         "HTMLInputElement.showPicker",
         "HTMLSelectElement.showPicker"
-    ]
+    ],
+    "namespaceBindings": {
+        "DOMCSSNamespace": {
+            "receiver": "Document",
+            "members": [
+                "supports"
+            ],
+            "feature": "dom-css-supports",
+            "stringInputs": "utf8-lengths"
+        }
+    }
 }

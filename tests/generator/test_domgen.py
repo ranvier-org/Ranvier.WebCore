@@ -59,6 +59,112 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_namespace_support_queries_use_checked_document_and_complete_input_spans(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[InterfaceName=CSS, Exposed=Window, Conditional=NAMESPACE]
+namespace DOMCSSNamespace {
+    [CallWith=CurrentDocument] boolean supports(DOMString property, DOMString value);
+    DOMString escape(DOMString ident);
+};
+[Conditional=PARTIAL, ImplementedBy=ProbeSupport] partial namespace DOMCSSNamespace {
+    [CallWith=CurrentDocument] boolean supports(DOMString conditionText);
+    boolean unused();
+};
+''')
+        config = dict(self.world.config)
+        config['namespaceBindings'] = {'DOMCSSNamespace': {
+            'receiver': 'Document', 'members': ['supports'], 'feature': 'dom-css-supports',
+            'stringInputs': 'utf8-lengths',
+        }}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        functions = {item['function']: item for item in model['functions']}
+        self.assertIn('rv_dom_css_supports_2', functions)
+        self.assertIn('rv_dom_css_supports_1', functions)
+        self.assertNotIn('rv_dom_css_escape', functions)
+        for name in ['rv_dom_css_supports_2', 'rv_dom_css_supports_1']:
+            item = functions[name]
+            self.assertEqual(item['parameters'][0], {'ctype': 'RvNode*', 'name': 'target'})
+            self.assertEqual(item['parameters'][1]['ctype'], 'const uint8_t*')
+            self.assertEqual(item['parameters'][2]['ctype'], 'int32_t')
+            self.assertEqual(item['receiver'], 'Document')
+            self.assertEqual(item['namespace'], 'CSS')
+            self.assertEqual(item['stringInputs'], 'utf8-lengths')
+            self.assertEqual(item['kind'], 'namespace_operation')
+            self.assertIn('ENABLE(NAMESPACE)', item['conditional'])
+        self.assertIn('ENABLE(PARTIAL)', functions['rv_dom_css_supports_1']['conditional'])
+        self.assertNotIn('ENABLE(PARTIAL)', functions['rv_dom_css_supports_2']['conditional'])
+        glue = generator.glue()
+        self.assertIn('dynamicDowncast<Document>(*nodeOf(target))', glue)
+        self.assertIn('DOMCSSNamespace::supports(document.get(), a0.string(), a1.string())', glue)
+        self.assertIn('ProbeSupport::supports(document.get(), a0.string())', glue)
+        self.assertIn('StringArg a0 { property, property_length }', glue)
+        self.assertIn('property_length >= 0', glue)
+        self.assertIn('std::span<const uint8_t>', glue)
+        self.assertIn('"dom-css-supports"', glue)
+        feature_guard = glue[:glue.index('    if (!std::strcmp(feature, "dom-css-supports"))')].rsplit('#if ', 1)[1]
+        self.assertIn('ENABLE(NAMESPACE)', feature_guard)
+        self.assertIn('ENABLE(PARTIAL)', feature_guard)
+        self.assertNotIn('interface DOMCSSNamespace', generator.interfaces())
+
+    def test_namespace_configuration_fails_closed_for_missing_or_unsupported_operations(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[InterfaceName=CSS] namespace DOMCSSNamespace {
+    [CallWith=CurrentDocument] boolean supports(optional DOMString conditionText);
+};
+''')
+        binding = {'receiver': 'Document', 'members': ['supports'],
+                   'feature': 'dom-css-supports', 'stringInputs': 'utf8-lengths'}
+        cases = [
+            ('AbsentNamespace', binding, 'configured IDL namespace was not found'),
+            ('DOMCSSNamespace', dict(binding, receiver='Event'), 'receiver must be a scoped node'),
+            ('DOMCSSNamespace', dict(binding, stringInputs='cstring'), 'require explicit UTF-8 lengths'),
+            ('DOMCSSNamespace', dict(binding, members=['missing']), 'missing configured namespace operations'),
+            ('DOMCSSNamespace', binding, 'optional or nullable namespace strings need an explicit presence'),
+        ]
+        for name, configured, reason in cases:
+            with self.subTest(reason=reason):
+                config = dict(self.world.config)
+                config['namespaceBindings'] = {name: configured}
+                generator = domgen.Generator(domgen.World(self.source, config))
+                generator.lock = {}
+                generator.lock_structs = {}
+                with self.assertRaisesRegex(SystemExit, reason):
+                    generator.run()
+
+    def test_namespace_compound_gates_preserve_all_enclosing_conditions(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[InterfaceName=CSS, Conditional=OUTER] namespace DOMCSSNamespace {};
+[Conditional=LEFT|RIGHT] partial namespace DOMCSSNamespace {
+    [Conditional=MEMBER|OTHER, CallWith=CurrentDocument] boolean supports(DOMString conditionText);
+};
+''')
+        config = dict(self.world.config)
+        config['namespaceBindings'] = {'DOMCSSNamespace': {
+            'receiver': 'Document', 'members': ['supports'], 'feature': 'dom-css-supports',
+            'stringInputs': 'utf8-lengths',
+        }}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        operation = next(f for f in generator.functions if f.kind == 'namespace_operation')
+        self.assertIn(f'#if ({operation.conditional})\n    if (!std::strcmp(feature, "dom-css-supports"))', generator.glue())
+        import itertools
+        for values in itertools.product([False, True], repeat=5):
+            flags = dict(zip(['OUTER', 'LEFT', 'RIGHT', 'MEMBER', 'OTHER'], values))
+            expression = operation.conditional.replace('&&', ' and ').replace('||', ' or ')
+            for name, value in flags.items():
+                expression = expression.replace(f'ENABLE({name})', str(value))
+            expected = flags['OUTER'] and (flags['LEFT'] or flags['RIGHT']) and (flags['MEMBER'] or flags['OTHER'])
+            self.assertEqual(eval(expression, {'__builtins__': {}}), expected, flags)
+
     def test_adopted_stylesheet_native_bridges_preserve_js_wrapper_contract(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
