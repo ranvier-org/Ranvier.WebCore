@@ -401,6 +401,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/detached_cssom_context.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify custom property registration and interpolation
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/custom_properties.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Build Windows UI Automation OS clients
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
         run: >-

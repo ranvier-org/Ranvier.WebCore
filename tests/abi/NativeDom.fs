@@ -227,6 +227,13 @@ let RV_DOM_VISIBILITY_STATE_HIDDEN = 0
 [<Literal>]
 let RV_DOM_VISIBILITY_STATE_VISIBLE = 1
 
+/// <summary>A present UTF-8 dictionary string with an explicit byte count.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUtf8StringInput =
+    val mutable present: int32
+    val mutable data: nativeint
+    val mutable length: int32
+
 /// <summary>The IDL dictionary GetRootNodeOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomGetRootNodeOptions =
@@ -334,6 +341,15 @@ type RvDomCSSStyleSheetInit =
 type RvDomGetComposedRangesOptions =
     val mutable size: uint32
     val mutable shadow_roots: nativeint
+
+/// <summary>The IDL dictionary DOMCSSCustomPropertyDescriptor; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomDOMCSSCustomPropertyDescriptor =
+    val mutable size: uint32
+    val mutable name: RvDomUtf8StringInput
+    val mutable syntax: RvDomUtf8StringInput
+    val mutable inherits: int
+    val mutable initial_value: RvDomUtf8StringInput
 
 [<Literal>]
 let RV_DOM_UNION_NODE_OR_DOM_STRING_NODE = 1
@@ -4835,6 +4851,18 @@ extern int rv_dom_css_counter_style_rule_get_fallback(nativeint target, byte[] b
 extern int rv_dom_css_counter_style_rule_set_fallback(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_css_property_rule_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_property_rule_get_syntax(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_property_rule_get_inherits(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_property_rule_get_initial_value(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_position_try_rule_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
@@ -5856,6 +5884,9 @@ extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_1(nativeint target, byte[] condition_text, int condition_text_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_register_property(nativeint target, [<In>] RvDomDOMCSSCustomPropertyDescriptor[] descriptor)
 
 [<DllImport(Lib)>]
 extern int rv_dom_window_get_computed_style(nativeint target, nativeint element, byte[] pseudo_element, int pseudo_element_length, nativeint& result)

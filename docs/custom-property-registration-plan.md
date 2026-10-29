@@ -11,6 +11,8 @@ The shared managed API uses an explicit CustomPropertyInitialValue union (Omitte
 - Generator regression reproduced the missing independent capability and now passes with the full generator suite (33 tests before the canonical named-getter merge).
 - Official preview.11 has no rv_dom_css_register_property export, confirmed by the permanent raw regression's missing-symbol RED.
 - Actual Fable browser provider passes 14 focused Chromium assertions with the explicit union, including a mandatory-initial-value grammar that distinguishes present null from omission. Old-document navigation fails rather than registering into the replacement document.
-- Native runtime effects, all target RIDs, managed host provider and public package consumption remain unverified.
+- The private Windows candidate passes105 raw registration/transport/interpolation/property-rule assertions, releasing all handles. It reuses the reviewed context/counter objects with fresh generated glue and host objects; shared source, parent objects and cached baseline outputs remain unchanged.
+- The forward-merged generator suite passes35 tests. An exact comparison against Native123 preserves1702 prior function records and15 existing structures, with only the five selected exports and two new structures added.
+- All target RIDs, managed host provider conformance and public package consumption remain unverified.
 
 Before final regeneration, forward-merge canonical Native122 and the reviewed Native123 context/counter branch. Keep that stack dependency explicit until Native123 merges. The shared WebKit checkout is not changed by this generator repair.

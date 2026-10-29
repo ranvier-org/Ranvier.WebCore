@@ -25,6 +25,7 @@
 #include "CSSNestedDeclarations.h"
 #include "CSSPositionTryDescriptors.h"
 #include "CSSPositionTryRule.h"
+#include "CSSPropertyRule.h"
 #include "CSSRule.h"
 #include "CSSRuleList.h"
 #include "CSSScopeRule.h"
@@ -39,7 +40,9 @@
 #include "CheckVisibilityOptions.h"
 #include "Comment.h"
 #include "CompositionEvent.h"
+#include "DOMCSSCustomPropertyDescriptor.h"
 #include "DOMCSSNamespace.h"
+#include "DOMCSSRegisterCustomProperty.h"
 #include "DOMImplementation.h"
 #include "DOMRect.h"
 #include "DOMRectList.h"
@@ -324,6 +327,19 @@ template<typename T> void assignString(T& field, const char* text)
         field = AtomString::fromUTF8(text);
     else
         field = Type { String::fromUTF8(text) };
+}
+
+template<typename T> bool assignString(T& field, const uint8_t* text, int32_t length)
+{
+    String value = length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString();
+    if (value.isNull())
+        return false;
+    using Type = typename Unwrapped<T>::Type;
+    if constexpr (std::is_same_v<Type, AtomString>)
+        field = AtomString { value };
+    else
+        field = Type { value };
+    return true;
 }
 
 template<typename T, size_t N> bool assignEnumeration(T& field, int32_t index, const ASCIILiteral (&names)[N])
@@ -1314,11 +1330,13 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-constructor:CSSStyleSheet", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-constructor:CSSStyleSheet", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
     if (!std::strcmp(feature, "dom-css-supports"))
+        return 1;
+    if (!std::strcmp(feature, "dom-css-register-property"))
         return 1;
     if (!std::strcmp(feature, "dom-computed-style"))
         return 1;
@@ -20425,6 +20443,58 @@ int32_t ranvier_dom_css_counter_style_rule_set_fallback(RvCSSRule* target, const
     return invoke([&]() -> decltype(auto) { return impl->setFallback(a0.string()); });
 }
 
+// CSSPropertyRule.name getter: readonly attribute CSSOMString name
+int32_t ranvier_dom_css_property_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPropertyRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPropertyRule.syntax getter: readonly attribute CSSOMString syntax
+int32_t ranvier_dom_css_property_rule_get_syntax(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPropertyRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->syntax(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPropertyRule.inherits getter: readonly attribute boolean inherits
+int32_t ranvier_dom_css_property_rule_get_inherits(RvCSSRule* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPropertyRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->inherits(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CSSPropertyRule.initialValue getter: readonly attribute CSSOMString? initialValue
+int32_t ranvier_dom_css_property_rule_get_initial_value(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPropertyRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->initialValue(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
 // CSSPositionTryRule.name getter: readonly attribute CSSOMString name; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
 int32_t ranvier_dom_css_position_try_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -25668,6 +25738,61 @@ int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text
     return deliver([&]() -> decltype(auto) { return DOMCSSNamespace::supports(document.get(), a0.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// CSS.registerProperty: namespace operation with Document context and explicit UTF-8 byte lengths
+int32_t ranvier_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor)
+{
+    if (!target || !descriptor)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    DOMCSSCustomPropertyDescriptor a0 { };
+    if (descriptor) {
+        if (!(descriptor->size >= offsetof(RvDomDOMCSSCustomPropertyDescriptor, name) + sizeof(descriptor->name)))
+            return RV_ERR_NULL_ARGUMENT;
+        if (descriptor->name.present != 1)
+            return RV_ERR_NULL_ARGUMENT;
+        if (true) {
+            if (descriptor->name.present != 0 && descriptor->name.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptor->name.present) {
+                if (descriptor->name.length < 0 || (descriptor->name.length > 0 && !descriptor->name.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a0.name, descriptor->name.data, descriptor->name.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptor->size >= offsetof(RvDomDOMCSSCustomPropertyDescriptor, syntax) + sizeof(descriptor->syntax)) {
+            if (descriptor->syntax.present != 0 && descriptor->syntax.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptor->syntax.present) {
+                if (descriptor->syntax.length < 0 || (descriptor->syntax.length > 0 && !descriptor->syntax.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a0.syntax, descriptor->syntax.data, descriptor->syntax.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (!(descriptor->size >= offsetof(RvDomDOMCSSCustomPropertyDescriptor, inherits) + sizeof(descriptor->inherits)))
+            return RV_ERR_NULL_ARGUMENT;
+        if (true)
+            assignValue(a0.inherits, !!descriptor->inherits);
+        if (descriptor->size >= offsetof(RvDomDOMCSSCustomPropertyDescriptor, initial_value) + sizeof(descriptor->initial_value)) {
+            if (descriptor->initial_value.present != 0 && descriptor->initial_value.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptor->initial_value.present) {
+                if (descriptor->initial_value.length < 0 || (descriptor->initial_value.length > 0 && !descriptor->initial_value.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a0.initialValue, descriptor->initial_value.data, descriptor->initial_value.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+    }
+    return invoke([&]() -> decltype(auto) { return DOMCSSRegisterCustomProperty::registerProperty(document.get(), std::move(a0)); });
+}
+
 // Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element defaults to null in IDL; pseudo_element may be NULL (null); *result is a new reference
 int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result)
 {
@@ -25733,6 +25858,8 @@ int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer,
         return copyString("CSSNestedDeclarations"_s, buffer, capacity, length);
     if (dynamicDowncast<CSSPositionTryRule>(*impl))
         return copyString("CSSPositionTryRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSPropertyRule>(*impl))
+        return copyString("CSSPropertyRule"_s, buffer, capacity, length);
     if (dynamicDowncast<CSSStyleRule>(*impl))
         return copyString("CSSStyleRule"_s, buffer, capacity, length);
     if (dynamicDowncast<CSSViewTransitionRule>(*impl))

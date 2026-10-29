@@ -175,6 +175,13 @@ enum {
     RV_DOM_VISIBILITY_STATE_VISIBLE = 1, /* "visible" */
 };
 
+/* A present UTF-8 dictionary string; length is a byte count and may include NUL. */
+typedef struct RvDomUtf8StringInput {
+    int32_t present;
+    const uint8_t* data;
+    int32_t length;
+} RvDomUtf8StringInput;
+
 /* The IDL dictionary GetRootNodeOptions. size is sizeof(RvDomGetRootNodeOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomGetRootNodeOptions {
@@ -296,6 +303,16 @@ typedef struct RvDomGetComposedRangesOptions {
     uint32_t size;
     const RvDomSequenceShadowRoot* shadow_roots; /* sequence<ShadowRoot>, default [] */
 } RvDomGetComposedRangesOptions;
+
+/* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomDOMCSSCustomPropertyDescriptor {
+    uint32_t size;
+    RvDomUtf8StringInput name; /* DOMString, required */
+    RvDomUtf8StringInput syntax; /* DOMString, default "*" */
+    int32_t inherits; /* boolean, required */
+    RvDomUtf8StringInput initial_value; /* DOMString */
+} RvDomDOMCSSCustomPropertyDescriptor;
 
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
@@ -3727,6 +3744,16 @@ RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_speak_as(RvCSSRule* target, 
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_fallback(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.fallback setter: attribute DOMString fallback */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_fallback(RvCSSRule* target, const char* value);
+/* CSSPropertyRule */
+
+/* CSSPropertyRule.name getter: readonly attribute CSSOMString name */
+RV_EXPORT int32_t rv_dom_css_property_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPropertyRule.syntax getter: readonly attribute CSSOMString syntax */
+RV_EXPORT int32_t rv_dom_css_property_rule_get_syntax(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSPropertyRule.inherits getter: readonly attribute boolean inherits */
+RV_EXPORT int32_t rv_dom_css_property_rule_get_inherits(RvCSSRule* target, int32_t* result);
+/* CSSPropertyRule.initialValue getter: readonly attribute CSSOMString? initialValue */
+RV_EXPORT int32_t rv_dom_css_property_rule_get_initial_value(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryRule */
 
 /* CSSPositionTryRule.name getter: readonly attribute CSSOMString name; RV_ERR_UNSUPPORTED while the setting
@@ -4617,6 +4644,8 @@ RV_EXPORT int32_t rv_dom_composition_event_get_data(RvEvent* target, char* buffe
 RV_EXPORT int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
 RV_EXPORT int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
+/* CSS.registerProperty: namespace operation with Document context and explicit UTF-8 byte lengths */
+RV_EXPORT int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor);
 /* DOMWindow */
 
 /* Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element

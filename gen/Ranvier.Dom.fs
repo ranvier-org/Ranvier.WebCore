@@ -2139,6 +2139,18 @@ and [<AllowNullLiteral>] CSSCounterStyleRule =
     /// <summary>CSSCounterStyleRule.fallback.</summary>
     abstract member fallback: string with get, set
 
+/// <summary>CSSPropertyRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSPropertyRule =
+    inherit CSSRule
+    /// <summary>CSSPropertyRule.name.</summary>
+    abstract member name: string with get
+    /// <summary>CSSPropertyRule.syntax.</summary>
+    abstract member syntax: string with get
+    /// <summary>CSSPropertyRule.inherits.</summary>
+    abstract member inherits: bool with get
+    /// <summary>CSSPropertyRule.initialValue.</summary>
+    abstract member initialValue: string with get
+
 /// <summary>CSSPositionTryRule in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CSSPositionTryRule =
     inherit CSSRule
