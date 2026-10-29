@@ -1681,6 +1681,22 @@ and [<AllowNullLiteral>] HTMLTitleElement =
     /// <summary>HTMLTitleElement.text.</summary>
     abstract member text: string with get, set
 
+/// <summary>SVGElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGElement =
+    inherit Element
+    inherit GlobalEventHandlers
+    inherit HTMLOrSVGElement
+    inherit ElementCSSInlineStyle
+    /// <summary>SVGElement.viewportElement.</summary>
+    abstract member viewportElement: SVGElement with get
+
+/// <summary>MathMLElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MathMLElement =
+    inherit Element
+    inherit GlobalEventHandlers
+    inherit HTMLOrSVGElement
+    inherit ElementCSSInlineStyle
+
 /// <summary>CSSStyleDeclaration in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CSSStyleDeclaration =
     /// <summary>CSSStyleDeclaration.cssText.</summary>
@@ -2222,13 +2238,6 @@ and [<AllowNullLiteral>] HTMLVideoElement =
 /// <summary>SVGAElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGAElement =
     inherit SVGGraphicsElement
-
-/// <summary>SVGElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGElement =
-    inherit Element
-    inherit GlobalEventHandlers
-    inherit HTMLOrSVGElement
-    inherit ElementCSSInlineStyle
 
 /// <summary>SVGAnimateElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGAnimateElement =

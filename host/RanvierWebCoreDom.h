@@ -2759,7 +2759,8 @@ RV_EXPORT int32_t rv_dom_html_data_element_get_value(RvNode* target, char* buffe
 RV_EXPORT int32_t rv_dom_html_data_element_set_value(RvNode* target, const char* value);
 /* HTMLDataListElement */
 
-/* HTMLDataListElement.options getter: readonly attribute HTMLCollection options; *result is a new reference */
+/* HTMLDataListElement.options getter: readonly attribute HTMLCollection options; *result is a new reference;
+ * RV_ERR_UNSUPPORTED while the setting DataListElementEnabled is off */
 RV_EXPORT int32_t rv_dom_html_data_list_element_get_options(RvNode* target, RvHTMLCollection** result);
 /* HTMLDirectoryElement */
 
@@ -2992,6 +2993,65 @@ RV_EXPORT int32_t rv_dom_html_time_element_set_date_time(RvNode* target, const c
 RV_EXPORT int32_t rv_dom_html_title_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTitleElement.text setter: attribute DOMString text */
 RV_EXPORT int32_t rv_dom_html_title_element_set_text(RvNode* target, const char* value);
+/* SVGElement */
+
+/* SVGElement.viewportElement getter: readonly attribute SVGElement? viewportElement; *result is a new reference, or
+ * NULL */
+RV_EXPORT int32_t rv_dom_svg_element_get_viewport_element(RvNode* target, RvNode** result);
+/* SVGElement.dataset getter: readonly attribute DOMStringMap dataset; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_element_get_dataset(RvNode* target, RvDOMStringMap** result);
+/* SVGElement.nonce getter: attribute DOMString nonce */
+RV_EXPORT int32_t rv_dom_svg_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGElement.nonce setter: attribute DOMString nonce */
+RV_EXPORT int32_t rv_dom_svg_element_set_nonce(RvNode* target, const char* value);
+/* SVGElement.autofocus getter: attribute boolean autofocus */
+RV_EXPORT int32_t rv_dom_svg_element_get_autofocus(RvNode* target, int32_t* result);
+/* SVGElement.autofocus setter: attribute boolean autofocus */
+RV_EXPORT int32_t rv_dom_svg_element_set_autofocus(RvNode* target, int32_t value);
+/* SVGElement.tabIndex getter: attribute long tabIndex */
+RV_EXPORT int32_t rv_dom_svg_element_get_tab_index(RvNode* target, int32_t* result);
+/* SVGElement.tabIndex setter: attribute long tabIndex */
+RV_EXPORT int32_t rv_dom_svg_element_set_tab_index(RvNode* target, int32_t value);
+/* SVGElement.style getter: readonly attribute CSSStyleProperties style; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_element_get_style(RvNode* target, RvCSSStyleDeclaration** result);
+/* SVGElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
+ * NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_svg_element_focus(RvNode* target, const RvDomFocusOptions* options);
+/* SVGElement.blur() -> undefined */
+RV_EXPORT int32_t rv_dom_svg_element_blur(RvNode* target);
+/* MathMLElement */
+
+/* MathMLElement.dataset getter: readonly attribute DOMStringMap dataset; *result is a new reference;
+ * RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_get_dataset(RvNode* target, RvDOMStringMap** result);
+/* MathMLElement.nonce getter: attribute DOMString nonce; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off;
+ * RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* MathMLElement.nonce setter: attribute DOMString nonce; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off;
+ * RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_set_nonce(RvNode* target, const char* value);
+/* MathMLElement.autofocus getter: attribute boolean autofocus; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is
+ * off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_get_autofocus(RvNode* target, int32_t* result);
+/* MathMLElement.autofocus setter: attribute boolean autofocus; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is
+ * off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_set_autofocus(RvNode* target, int32_t value);
+/* MathMLElement.tabIndex getter: attribute long tabIndex; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off;
+ * RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_get_tab_index(RvNode* target, int32_t* result);
+/* MathMLElement.tabIndex setter: attribute long tabIndex; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off;
+ * RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_set_tab_index(RvNode* target, int32_t value);
+/* MathMLElement.style getter: readonly attribute CSSStyleProperties style; *result is a new reference;
+ * RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_get_style(RvNode* target, RvCSSStyleDeclaration** result);
+/* MathMLElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
+ * NULL for the IDL default; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where
+ * WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_focus(RvNode* target, const RvDomFocusOptions* options);
+/* MathMLElement.blur() -> undefined; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED
+ * where WebKit builds without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_blur(RvNode* target);
 /* CSSStyleDeclaration */
 
 /* CSSStyleDeclaration.cssText getter: attribute CSSOMString cssText */

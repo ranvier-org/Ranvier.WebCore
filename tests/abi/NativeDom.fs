@@ -3898,6 +3898,69 @@ extern int rv_dom_html_title_element_get_text(nativeint target, byte[] buffer, i
 extern int rv_dom_html_title_element_set_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_svg_element_get_viewport_element(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_get_dataset(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_get_nonce(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_set_nonce(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_get_autofocus(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_set_autofocus(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_get_tab_index(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_set_tab_index(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_get_style(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_focus(nativeint target, [<In>] RvDomFocusOptions[] options)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_element_blur(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_get_dataset(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_get_nonce(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_set_nonce(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_get_autofocus(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_set_autofocus(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_get_tab_index(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_set_tab_index(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_get_style(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_focus(nativeint target, [<In>] RvDomFocusOptions[] options)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_blur(nativeint target)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_style_declaration_get_css_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]

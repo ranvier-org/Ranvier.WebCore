@@ -94,4 +94,5 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run(['dotnet', driver], env=dict(env, RANVIER_WEBCORE_PROBE='teardown'))
     run([sys.executable, '-I', tests / 'table_surface.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'element_reflection.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'svg_mathml_surface.py', '--native-directory', out])
 print('abi tests passed', flush=True)

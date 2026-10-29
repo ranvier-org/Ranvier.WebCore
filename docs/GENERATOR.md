@@ -211,6 +211,10 @@ factory so `HTMLDataListElement.options` returns its live engine collection.
 and qualified HTML tag-name match precede the concrete cast. Mod, pre and quote elements use this route
 for all their tag aliases; a different interface or namespace fails with `RV_ERR_WRONG_INTERFACE`.
 
+SVGElement and MathMLElement expose their shared inline styles, dataset, nonce, autofocus, tab index and
+focus operations through their actual engine types. Interface-level build and setting guards apply to
+their own members and included mixins; unavailable operations keep their ABI and return `RV_ERR_UNSUPPORTED`.
+
 `gen/dom-report.txt` records the generated interface/function counts, handle types, constants, enumerations,
 dictionary structs and every member left out, by reason:
 

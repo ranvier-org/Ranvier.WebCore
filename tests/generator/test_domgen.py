@@ -253,6 +253,61 @@ interface HTMLTableElement : HTMLElement {
         self.assertIn('abstract member insertCell:', generator.interfaces())
 
 
+    def test_interface_build_and_setting_gates_apply_to_own_and_mixin_members(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[Conditional=INTERFACE, EnabledBySetting=GatedEnabled]
+interface GatedElement : Element { [Conditional=OWN] attribute DOMString own; };
+interface mixin GatedMixin { attribute DOMString mixed; };
+GatedElement includes GatedMixin;
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'GatedElement']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = [f for f in generator.functions if f.interface == 'GatedElement']
+        self.assertEqual(len(functions), 4)
+        for function in functions:
+            self.assertIn('ENABLE(INTERFACE)', function.conditional or '')
+        self.assertIn('ENABLE(OWN)', functions[0].conditional)
+        self.assertTrue('settings.gatedEnabled' in generator.glue())
+
+    def test_configured_svg_mathml_shared_style_and_focus_members(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface MathMLElement : Element {};
+interface CSSStyleDeclaration { attribute DOMString cssText; };
+interface mixin ElementCSSInlineStyle { readonly attribute CSSStyleDeclaration style; };
+interface mixin HTMLOrSVGOrMathMLElement {
+    readonly attribute DOMStringMap dataset;
+    attribute DOMString nonce;
+    attribute boolean autofocus;
+    attribute long tabIndex;
+    undefined focus();
+    undefined blur();
+};
+SVGElement includes ElementCSSInlineStyle;
+SVGElement includes HTMLOrSVGOrMathMLElement;
+MathMLElement includes ElementCSSInlineStyle;
+MathMLElement includes HTMLOrSVGOrMathMLElement;
+''')
+        configured = json.loads((ROOT / 'gen/dom.json').read_text())['interfaces']
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'DOMStringMap', 'CSSStyleDeclaration'] + [
+            name for name in configured if name in ['SVGElement', 'MathMLElement']
+        ]
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {function['function'] for function in json.loads(generator.api_model())['functions']}
+        for prefix in ['svg_element', 'math_ml_element']:
+            for member in ['get_style', 'get_dataset', 'get_nonce', 'set_nonce', 'get_autofocus', 'set_autofocus',
+                           'get_tab_index', 'set_tab_index', 'focus', 'blur']:
+                self.assertIn('rv_dom_' + prefix + '_' + member, functions)
+
     def test_node_cast_by_tag_checks_namespace_and_tag_before_static_cast(self):
         self.world.config['nodeCastTags'] = {'HTMLModElement': ['del', 'ins']}
         generator = domgen.Generator(self.world)

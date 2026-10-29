@@ -269,7 +269,7 @@ class World:
 
     def members(self, name):
         """The members of an interface with those of its partials and included mixins, with the extended
-        attributes of the partial, mixin and includes statement merged into each, as CodeGenerator.pm does."""
+        attributes of the interface, partial, mixin and includes statement merged into each, as CodeGenerator.pm does."""
         interface = self.interfaces[name]
         found = [self.copy(member, {}) for member in interface.members]
         for partial in self.partials.get(name, []):
@@ -289,7 +289,9 @@ class World:
                 attrs = dict(partial.attrs)
                 attrs.update(include_attrs)
                 found += [self.copy(member, attrs) for member in partial.members]
-        return found
+        gates = {key: interface.attrs[key] for key in ("Conditional", "EnabledBySetting", "EnabledForWorld")
+                 if key in interface.attrs}
+        return [self.copy(member, gates) for member in found]
 
     @staticmethod
     def copy(member, merged):

@@ -100,6 +100,7 @@
 #include "InputEvent.h"
 #include "KeyboardEvent.h"
 #include "LiveNodeList.h"
+#include "MathMLElement.h"
 #include "MouseEvent.h"
 #include "NamedNodeMap.h"
 #include "Node.h"
@@ -108,6 +109,7 @@
 #include "PointerEvent.h"
 #include "RadioNodeList.h"
 #include "Range.h"
+#include "SVGElement.h"
 #include "ScrollIntoViewOptions.h"
 #include "ScrollToOptions.h"
 #include "Settings.h"
@@ -1151,7 +1153,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -15082,7 +15084,7 @@ int32_t ranvier_dom_html_data_element_set_value(RvNode* target, const char* valu
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valueAttr, AtomString { a0.string() }); });
 }
 
-// HTMLDataListElement.options getter: readonly attribute HTMLCollection options; *result is a new reference
+// HTMLDataListElement.options getter: readonly attribute HTMLCollection options; *result is a new reference; RV_ERR_UNSUPPORTED while the setting DataListElementEnabled is off
 int32_t ranvier_dom_html_data_list_element_get_options(RvNode* target, RvHTMLCollection** result)
 {
     if (!target || !result)
@@ -15092,6 +15094,9 @@ int32_t ranvier_dom_html_data_list_element_get_options(RvNode* target, RvHTMLCol
     RefPtr impl = dynamicDowncast<HTMLDataListElement>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.dataListElementEnabled))
+        return RV_ERR_UNSUPPORTED;
     return deliver([&]() -> decltype(auto) { return impl->options(); }, [&](auto&& value) { return storeHandle<HTMLCollection>(value, result); });
 }
 
@@ -16409,6 +16414,386 @@ int32_t ranvier_dom_html_title_element_set_text(RvNode* target, const char* valu
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { value };
     return invoke([&]() -> decltype(auto) { return impl->setText(a0.string()); });
+}
+
+// SVGElement.viewportElement getter: readonly attribute SVGElement? viewportElement; *result is a new reference, or NULL
+int32_t ranvier_dom_svg_element_get_viewport_element(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->viewportElement(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// SVGElement.dataset getter: readonly attribute DOMStringMap dataset; *result is a new reference
+int32_t ranvier_dom_svg_element_get_dataset(RvNode* target, RvDOMStringMap** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dataset(); }, [&](auto&& value) { return storeHandle<DOMStringMap>(value, result); });
+}
+
+// SVGElement.nonce getter: attribute DOMString nonce
+int32_t ranvier_dom_svg_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// SVGElement.nonce setter: attribute DOMString nonce
+int32_t ranvier_dom_svg_element_set_nonce(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setNonce(a0.atom()); });
+}
+
+// SVGElement.autofocus getter: attribute boolean autofocus
+int32_t ranvier_dom_svg_element_get_autofocus(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::autofocusAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGElement.autofocus setter: attribute boolean autofocus
+int32_t ranvier_dom_svg_element_set_autofocus(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::autofocusAttr, !!value); });
+}
+
+// SVGElement.tabIndex getter: attribute long tabIndex
+int32_t ranvier_dom_svg_element_get_tab_index(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->tabIndexForBindings(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGElement.tabIndex setter: attribute long tabIndex
+int32_t ranvier_dom_svg_element_set_tab_index(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setTabIndexForBindings(value); });
+}
+
+// SVGElement.style getter: readonly attribute CSSStyleProperties style; *result is a new reference
+int32_t ranvier_dom_svg_element_get_style(RvNode* target, RvCSSStyleDeclaration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->cssomStyle(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// SVGElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be NULL for the IDL default
+int32_t ranvier_dom_svg_element_focus(RvNode* target, const RvDomFocusOptions* options)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    FocusOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomFocusOptions, prevent_scroll) + sizeof(options->prevent_scroll))
+            assignValue(a0.preventScroll, !!options->prevent_scroll);
+        if (options->size >= offsetof(RvDomFocusOptions, focus_visible) + sizeof(options->focus_visible) && options->focus_visible)
+            assignValue(a0.focusVisible, !!*options->focus_visible);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->focusForBindings(std::move(a0)); });
+}
+
+// SVGElement.blur() -> undefined
+int32_t ranvier_dom_svg_element_blur(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->blur(); });
+}
+
+// MathMLElement.dataset getter: readonly attribute DOMStringMap dataset; *result is a new reference; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_dataset(RvNode* target, RvDOMStringMap** result)
+{
+#if ENABLE(MATHML)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->dataset(); }, [&](auto&& value) { return storeHandle<DOMStringMap>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.nonce getter: attribute DOMString nonce; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+#if ENABLE(MATHML)
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->nonce(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(buffer);
+    UNUSED_PARAM(capacity);
+    UNUSED_PARAM(length);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.nonce setter: attribute DOMString nonce; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_set_nonce(RvNode* target, const char* value)
+{
+#if ENABLE(MATHML)
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setNonce(a0.atom()); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(value);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.autofocus getter: attribute boolean autofocus; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_autofocus(RvNode* target, int32_t* result)
+{
+#if ENABLE(MATHML)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::autofocusAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.autofocus setter: attribute boolean autofocus; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_set_autofocus(RvNode* target, int32_t value)
+{
+#if ENABLE(MATHML)
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::autofocusAttr, !!value); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(value);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.tabIndex getter: attribute long tabIndex; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_tab_index(RvNode* target, int32_t* result)
+{
+#if ENABLE(MATHML)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->tabIndexForBindings(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.tabIndex setter: attribute long tabIndex; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_set_tab_index(RvNode* target, int32_t value)
+{
+#if ENABLE(MATHML)
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setTabIndexForBindings(value); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(value);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.style getter: readonly attribute CSSStyleProperties style; *result is a new reference; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_style(RvNode* target, RvCSSStyleDeclaration** result)
+{
+#if ENABLE(MATHML)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->cssomStyle(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be NULL for the IDL default; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_focus(RvNode* target, const RvDomFocusOptions* options)
+{
+#if ENABLE(MATHML)
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    FocusOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomFocusOptions, prevent_scroll) + sizeof(options->prevent_scroll))
+            assignValue(a0.preventScroll, !!options->prevent_scroll);
+        if (options->size >= offsetof(RvDomFocusOptions, focus_visible) + sizeof(options->focus_visible) && options->focus_visible)
+            assignValue(a0.focusVisible, !!*options->focus_visible);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->focusForBindings(std::move(a0)); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(options);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.blur() -> undefined; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_blur(RvNode* target)
+{
+#if ENABLE(MATHML)
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->blur(); });
+#else
+    UNUSED_PARAM(target);
+    return RV_ERR_UNSUPPORTED;
+#endif
 }
 
 // CSSStyleDeclaration.cssText getter: attribute CSSOMString cssText

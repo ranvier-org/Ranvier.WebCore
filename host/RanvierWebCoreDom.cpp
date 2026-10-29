@@ -1136,6 +1136,27 @@ int32_t rv_dom_html_time_element_get_date_time(RvNode* target, char* buffer, int
 int32_t rv_dom_html_time_element_set_date_time(RvNode* target, const char* value) { return ranvier_dom_html_time_element_set_date_time(target, value); }
 int32_t rv_dom_html_title_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_title_element_get_text(target, buffer, capacity, length); }
 int32_t rv_dom_html_title_element_set_text(RvNode* target, const char* value) { return ranvier_dom_html_title_element_set_text(target, value); }
+int32_t rv_dom_svg_element_get_viewport_element(RvNode* target, RvNode** result) { return ranvier_dom_svg_element_get_viewport_element(target, result); }
+int32_t rv_dom_svg_element_get_dataset(RvNode* target, RvDOMStringMap** result) { return ranvier_dom_svg_element_get_dataset(target, result); }
+int32_t rv_dom_svg_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_element_get_nonce(target, buffer, capacity, length); }
+int32_t rv_dom_svg_element_set_nonce(RvNode* target, const char* value) { return ranvier_dom_svg_element_set_nonce(target, value); }
+int32_t rv_dom_svg_element_get_autofocus(RvNode* target, int32_t* result) { return ranvier_dom_svg_element_get_autofocus(target, result); }
+int32_t rv_dom_svg_element_set_autofocus(RvNode* target, int32_t value) { return ranvier_dom_svg_element_set_autofocus(target, value); }
+int32_t rv_dom_svg_element_get_tab_index(RvNode* target, int32_t* result) { return ranvier_dom_svg_element_get_tab_index(target, result); }
+int32_t rv_dom_svg_element_set_tab_index(RvNode* target, int32_t value) { return ranvier_dom_svg_element_set_tab_index(target, value); }
+int32_t rv_dom_svg_element_get_style(RvNode* target, RvCSSStyleDeclaration** result) { return ranvier_dom_svg_element_get_style(target, result); }
+int32_t rv_dom_svg_element_focus(RvNode* target, const RvDomFocusOptions* options) { return ranvier_dom_svg_element_focus(target, options); }
+int32_t rv_dom_svg_element_blur(RvNode* target) { return ranvier_dom_svg_element_blur(target); }
+int32_t rv_dom_math_ml_element_get_dataset(RvNode* target, RvDOMStringMap** result) { return ranvier_dom_math_ml_element_get_dataset(target, result); }
+int32_t rv_dom_math_ml_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_math_ml_element_get_nonce(target, buffer, capacity, length); }
+int32_t rv_dom_math_ml_element_set_nonce(RvNode* target, const char* value) { return ranvier_dom_math_ml_element_set_nonce(target, value); }
+int32_t rv_dom_math_ml_element_get_autofocus(RvNode* target, int32_t* result) { return ranvier_dom_math_ml_element_get_autofocus(target, result); }
+int32_t rv_dom_math_ml_element_set_autofocus(RvNode* target, int32_t value) { return ranvier_dom_math_ml_element_set_autofocus(target, value); }
+int32_t rv_dom_math_ml_element_get_tab_index(RvNode* target, int32_t* result) { return ranvier_dom_math_ml_element_get_tab_index(target, result); }
+int32_t rv_dom_math_ml_element_set_tab_index(RvNode* target, int32_t value) { return ranvier_dom_math_ml_element_set_tab_index(target, value); }
+int32_t rv_dom_math_ml_element_get_style(RvNode* target, RvCSSStyleDeclaration** result) { return ranvier_dom_math_ml_element_get_style(target, result); }
+int32_t rv_dom_math_ml_element_focus(RvNode* target, const RvDomFocusOptions* options) { return ranvier_dom_math_ml_element_focus(target, options); }
+int32_t rv_dom_math_ml_element_blur(RvNode* target) { return ranvier_dom_math_ml_element_blur(target); }
 int32_t rv_dom_css_style_declaration_get_css_text(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_style_declaration_get_css_text(target, buffer, capacity, length); }
 int32_t rv_dom_css_style_declaration_set_css_text(RvCSSStyleDeclaration* target, const char* value) { return ranvier_dom_css_style_declaration_set_css_text(target, value); }
 int32_t rv_dom_css_style_declaration_get_length(RvCSSStyleDeclaration* target, uint32_t* result) { return ranvier_dom_css_style_declaration_get_length(target, result); }

@@ -278,6 +278,14 @@
       "base": "HTMLElement"
     },
     {
+      "name": "SVGElement",
+      "base": "Element"
+    },
+    {
+      "name": "MathMLElement",
+      "base": "Element"
+    },
+    {
       "name": "CSSStyleDeclaration",
       "base": null
     },
@@ -1115,6 +1123,32 @@
       "source": "html/HTMLTitleElement.idl"
     },
     {
+      "name": "SVGElement",
+      "idlName": "SVGElement",
+      "base": "Element",
+      "mixins": [
+        "GlobalEventHandlers",
+        "HTMLOrSVGElement",
+        "ElementCSSInlineStyle"
+      ],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGElement.idl"
+    },
+    {
+      "name": "MathMLElement",
+      "idlName": "MathMLElement",
+      "base": "Element",
+      "mixins": [
+        "GlobalEventHandlers",
+        "HTMLOrSVGElement",
+        "ElementCSSInlineStyle"
+      ],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "mathml/MathMLElement.idl"
+    },
+    {
       "name": "CSSStyleDeclaration",
       "idlName": "CSSStyleDeclaration",
       "base": null,
@@ -1470,19 +1504,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "svg/SVGAElement.idl"
-    },
-    {
-      "name": "SVGElement",
-      "idlName": "SVGElement",
-      "base": "Element",
-      "mixins": [
-        "GlobalEventHandlers",
-        "HTMLOrSVGElement",
-        "ElementCSSInlineStyle"
-      ],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGElement.idl"
     },
     {
       "name": "SVGAnimateElement",
@@ -61875,6 +61896,970 @@
           }
         }
       ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "viewportElement",
+      "contractOwner": "SVGElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_element_get_viewport_element",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGElement",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "SVGElement",
+        "root": null,
+        "class": "SVGElement",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "dataset",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_element_get_dataset",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMStringMap**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMStringMap",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMStringMap",
+        "root": "DOMStringMap",
+        "class": "DOMStringMap",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "nonce",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_element_get_nonce",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "nonce",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_element_set_nonce",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "autofocus",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_element_get_autofocus",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "autofocus",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_element_set_autofocus",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "tabIndex",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_element_get_tab_index",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "tabIndex",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_element_set_tab_index",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "style",
+      "contractOwner": "ElementCSSInlineStyle",
+      "kind": "getter",
+      "function": "rv_dom_svg_element_get_style",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleDeclaration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSStyleProperties",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSStyleProperties",
+        "root": "CSSStyleDeclaration",
+        "class": "CSSStyleProperties",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "focus",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "operation",
+      "function": "rv_dom_svg_element_focus",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomFocusOptions*",
+          "name": "options"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "options",
+          "idlType": "FocusOptions",
+          "idl": {
+            "name": "FocusOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "FocusOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
+      "member": "blur",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "operation",
+      "function": "rv_dom_svg_element_blur",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "dataset",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "getter",
+      "function": "rv_dom_math_ml_element_get_dataset",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMStringMap**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMStringMap",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMStringMap",
+        "root": "DOMStringMap",
+        "class": "DOMStringMap",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "nonce",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "getter",
+      "function": "rv_dom_math_ml_element_get_nonce",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "nonce",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "setter",
+      "function": "rv_dom_math_ml_element_set_nonce",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "autofocus",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "getter",
+      "function": "rv_dom_math_ml_element_get_autofocus",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "autofocus",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "setter",
+      "function": "rv_dom_math_ml_element_set_autofocus",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "tabIndex",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "getter",
+      "function": "rv_dom_math_ml_element_get_tab_index",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "tabIndex",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "setter",
+      "function": "rv_dom_math_ml_element_set_tab_index",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "style",
+      "contractOwner": "ElementCSSInlineStyle",
+      "kind": "getter",
+      "function": "rv_dom_math_ml_element_get_style",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleDeclaration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSStyleProperties",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSStyleProperties",
+        "root": "CSSStyleDeclaration",
+        "class": "CSSStyleProperties",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "focus",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "operation",
+      "function": "rv_dom_math_ml_element_focus",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomFocusOptions*",
+          "name": "options"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "options",
+          "idlType": "FocusOptions",
+          "idl": {
+            "name": "FocusOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "FocusOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "blur",
+      "contractOwner": "HTMLOrSVGElement",
+      "kind": "operation",
+      "function": "rv_dom_math_ml_element_blur",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
       "returnIdl": {
         "name": "undefined",
         "nullable": false,
