@@ -4602,6 +4602,11 @@ RV_EXPORT int32_t rv_dom_composition_event_get_data(RvEvent* target, char* buffe
 RV_EXPORT int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
 RV_EXPORT int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
+/* DOMWindow */
+
+/* Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element
+ * defaults to null in IDL; pseudo_element may be NULL (null); *result is a new reference */
+RV_EXPORT int32_t rv_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
 
 #ifdef __cplusplus
 }

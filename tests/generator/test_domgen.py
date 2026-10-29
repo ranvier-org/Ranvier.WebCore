@@ -59,6 +59,69 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_required_dom_strings_normalize_null_engine_values_but_nullable_strings_preserve_null(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+partial interface Element {
+    DOMString requiredText();
+    DOMString? nullableText();
+};
+''')
+        generator = domgen.Generator(domgen.World(self.source, self.world.config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        required = next(f for f in generator.functions if f.name == 'element_required_text')
+        nullable = next(f for f in generator.functions if f.name == 'element_nullable_text')
+        self.assertTrue('copyRequiredString(asString(value), buffer, capacity, length)' in '\n'.join(required.body))
+        self.assertTrue('copyString(asString(value), buffer, capacity, length)' in '\n'.join(nullable.body))
+        self.assertTrue('value.isNull() ? emptyString() : value' in generator.glue())
+
+    def test_window_computed_style_context_binding_uses_real_window_and_nullable_spans(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef USVString CSSOMString;
+interface CSSStyleDeclaration { DOMString getPropertyValue(DOMString property); };
+[InterfaceName=Window, Exposed=Window, Conditional=OUTER] interface DOMWindow : EventTarget {};
+[Conditional=LEFT|RIGHT] partial interface DOMWindow {
+    [NewObject, Conditional=MEMBER|OTHER] CSSStyleDeclaration getComputedStyle(Element element, optional CSSOMString? pseudoElement = null);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleDeclaration']
+        config['windowBindings'] = {'DOMWindow': {
+            'receiver': 'Document', 'members': ['getComputedStyle'],
+            'feature': 'dom-computed-style', 'stringInputs': 'utf8-lengths',
+        }}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertIn('rv_dom_window_get_computed_style', functions)
+        operation = functions['rv_dom_window_get_computed_style']
+        self.assertEqual(operation['kind'], 'context_operation')
+        self.assertEqual(operation['receiver'], 'Document')
+        self.assertEqual(operation['contractOwner'], 'Window')
+        self.assertEqual(operation['feature'], 'dom-computed-style')
+        import itertools
+        for values in itertools.product([False, True], repeat=5):
+            flags = dict(zip(['OUTER', 'LEFT', 'RIGHT', 'MEMBER', 'OTHER'], values))
+            expression = operation['conditional'].replace('&&', ' and ').replace('||', ' or ')
+            for name, value in flags.items():
+                expression = expression.replace(f'ENABLE({name})', str(value))
+            expected = flags['OUTER'] and (flags['LEFT'] or flags['RIGHT']) and (flags['MEMBER'] or flags['OTHER'])
+            self.assertEqual(eval(expression, {'__builtins__': {}}), expected, flags)
+        self.assertIn({'ctype': 'const uint8_t*', 'name': 'pseudo_element'}, operation['parameters'])
+        self.assertIn({'ctype': 'int32_t', 'name': 'pseudo_element_length'}, operation['parameters'])
+        self.assertEqual(operation['parameters'][-1], {'ctype': 'RvCSSStyleDeclaration**', 'name': 'result'})
+        glue = generator.glue()
+        self.assertTrue('impl->window()->getComputedStyle(HandleArg<Element> { a0.get() }, a1.string())' in glue)
+        self.assertIn('if (!impl->window())', glue)
+        self.assertIn('pseudo_element_length >= -1', glue)
+        self.assertIn('pseudo_element_length >= 0 && a1.string().isNull()', glue)
+        self.assertNotIn('type Window =', generator.interfaces())
+
     def test_namespace_support_queries_use_checked_document_and_complete_input_spans(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

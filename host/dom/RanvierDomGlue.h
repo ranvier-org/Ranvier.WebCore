@@ -1778,5 +1778,6 @@ WEBCORE_EXPORT int32_t ranvier_dom_input_event_get_target_ranges(RvEvent* target
 WEBCORE_EXPORT int32_t ranvier_dom_composition_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
 
 }

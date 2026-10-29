@@ -366,6 +366,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/css_supports.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify live computed styles and pseudo-elements
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/computed_style.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Build Windows UI Automation OS clients
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
         run: >-
