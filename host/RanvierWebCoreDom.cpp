@@ -1029,6 +1029,113 @@ int32_t rv_dom_htmlu_list_element_get_compact(RvNode* target, int32_t* result) {
 int32_t rv_dom_htmlu_list_element_set_compact(RvNode* target, int32_t value) { return ranvier_dom_htmlu_list_element_set_compact(target, value); }
 int32_t rv_dom_htmlu_list_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_htmlu_list_element_get_type(target, buffer, capacity, length); }
 int32_t rv_dom_htmlu_list_element_set_type(RvNode* target, const char* value) { return ranvier_dom_htmlu_list_element_set_type(target, value); }
+int32_t rv_dom_html_base_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_base_element_get_href(target, buffer, capacity, length); }
+int32_t rv_dom_html_base_element_set_href(RvNode* target, const char* value) { return ranvier_dom_html_base_element_set_href(target, value); }
+int32_t rv_dom_html_base_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_base_element_get_target(target, buffer, capacity, length); }
+int32_t rv_dom_html_base_element_set_target(RvNode* target, const char* value) { return ranvier_dom_html_base_element_set_target(target, value); }
+int32_t rv_dom_htmlbr_element_get_clear(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_htmlbr_element_get_clear(target, buffer, capacity, length); }
+int32_t rv_dom_htmlbr_element_set_clear(RvNode* target, const char* value) { return ranvier_dom_htmlbr_element_set_clear(target, value); }
+int32_t rv_dom_html_data_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_data_element_get_value(target, buffer, capacity, length); }
+int32_t rv_dom_html_data_element_set_value(RvNode* target, const char* value) { return ranvier_dom_html_data_element_set_value(target, value); }
+int32_t rv_dom_html_data_list_element_get_options(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_html_data_list_element_get_options(target, result); }
+int32_t rv_dom_html_directory_element_get_compact(RvNode* target, int32_t* result) { return ranvier_dom_html_directory_element_get_compact(target, result); }
+int32_t rv_dom_html_directory_element_set_compact(RvNode* target, int32_t value) { return ranvier_dom_html_directory_element_set_compact(target, value); }
+int32_t rv_dom_htmld_list_element_get_compact(RvNode* target, int32_t* result) { return ranvier_dom_htmld_list_element_get_compact(target, result); }
+int32_t rv_dom_htmld_list_element_set_compact(RvNode* target, int32_t value) { return ranvier_dom_htmld_list_element_set_compact(target, value); }
+int32_t rv_dom_html_font_element_get_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_font_element_get_color(target, buffer, capacity, length); }
+int32_t rv_dom_html_font_element_set_color(RvNode* target, const char* value) { return ranvier_dom_html_font_element_set_color(target, value); }
+int32_t rv_dom_html_font_element_get_face(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_font_element_get_face(target, buffer, capacity, length); }
+int32_t rv_dom_html_font_element_set_face(RvNode* target, const char* value) { return ranvier_dom_html_font_element_set_face(target, value); }
+int32_t rv_dom_html_font_element_get_size(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_font_element_get_size(target, buffer, capacity, length); }
+int32_t rv_dom_html_font_element_set_size(RvNode* target, const char* value) { return ranvier_dom_html_font_element_set_size(target, value); }
+int32_t rv_dom_html_heading_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_heading_element_get_align(target, buffer, capacity, length); }
+int32_t rv_dom_html_heading_element_set_align(RvNode* target, const char* value) { return ranvier_dom_html_heading_element_set_align(target, value); }
+int32_t rv_dom_htmlhr_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_htmlhr_element_get_align(target, buffer, capacity, length); }
+int32_t rv_dom_htmlhr_element_set_align(RvNode* target, const char* value) { return ranvier_dom_htmlhr_element_set_align(target, value); }
+int32_t rv_dom_htmlhr_element_get_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_htmlhr_element_get_color(target, buffer, capacity, length); }
+int32_t rv_dom_htmlhr_element_set_color(RvNode* target, const char* value) { return ranvier_dom_htmlhr_element_set_color(target, value); }
+int32_t rv_dom_htmlhr_element_get_no_shade(RvNode* target, int32_t* result) { return ranvier_dom_htmlhr_element_get_no_shade(target, result); }
+int32_t rv_dom_htmlhr_element_set_no_shade(RvNode* target, int32_t value) { return ranvier_dom_htmlhr_element_set_no_shade(target, value); }
+int32_t rv_dom_htmlhr_element_get_size(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_htmlhr_element_get_size(target, buffer, capacity, length); }
+int32_t rv_dom_htmlhr_element_set_size(RvNode* target, const char* value) { return ranvier_dom_htmlhr_element_set_size(target, value); }
+int32_t rv_dom_htmlhr_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_htmlhr_element_get_width(target, buffer, capacity, length); }
+int32_t rv_dom_htmlhr_element_set_width(RvNode* target, const char* value) { return ranvier_dom_htmlhr_element_set_width(target, value); }
+int32_t rv_dom_html_html_element_get_version(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_html_element_get_version(target, buffer, capacity, length); }
+int32_t rv_dom_html_html_element_set_version(RvNode* target, const char* value) { return ranvier_dom_html_html_element_set_version(target, value); }
+int32_t rv_dom_html_map_element_get_areas(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_html_map_element_get_areas(target, result); }
+int32_t rv_dom_html_map_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_map_element_get_name(target, buffer, capacity, length); }
+int32_t rv_dom_html_map_element_set_name(RvNode* target, const char* value) { return ranvier_dom_html_map_element_set_name(target, value); }
+int32_t rv_dom_html_marquee_element_get_behavior(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_marquee_element_get_behavior(target, buffer, capacity, length); }
+int32_t rv_dom_html_marquee_element_set_behavior(RvNode* target, const char* value) { return ranvier_dom_html_marquee_element_set_behavior(target, value); }
+int32_t rv_dom_html_marquee_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_marquee_element_get_bg_color(target, buffer, capacity, length); }
+int32_t rv_dom_html_marquee_element_set_bg_color(RvNode* target, const char* value) { return ranvier_dom_html_marquee_element_set_bg_color(target, value); }
+int32_t rv_dom_html_marquee_element_get_direction(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_marquee_element_get_direction(target, buffer, capacity, length); }
+int32_t rv_dom_html_marquee_element_set_direction(RvNode* target, const char* value) { return ranvier_dom_html_marquee_element_set_direction(target, value); }
+int32_t rv_dom_html_marquee_element_get_height(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_marquee_element_get_height(target, buffer, capacity, length); }
+int32_t rv_dom_html_marquee_element_set_height(RvNode* target, const char* value) { return ranvier_dom_html_marquee_element_set_height(target, value); }
+int32_t rv_dom_html_marquee_element_get_hspace(RvNode* target, uint32_t* result) { return ranvier_dom_html_marquee_element_get_hspace(target, result); }
+int32_t rv_dom_html_marquee_element_set_hspace(RvNode* target, uint32_t value) { return ranvier_dom_html_marquee_element_set_hspace(target, value); }
+int32_t rv_dom_html_marquee_element_get_loop(RvNode* target, int32_t* result) { return ranvier_dom_html_marquee_element_get_loop(target, result); }
+int32_t rv_dom_html_marquee_element_set_loop(RvNode* target, int32_t value) { return ranvier_dom_html_marquee_element_set_loop(target, value); }
+int32_t rv_dom_html_marquee_element_get_scroll_amount(RvNode* target, uint32_t* result) { return ranvier_dom_html_marquee_element_get_scroll_amount(target, result); }
+int32_t rv_dom_html_marquee_element_set_scroll_amount(RvNode* target, uint32_t value) { return ranvier_dom_html_marquee_element_set_scroll_amount(target, value); }
+int32_t rv_dom_html_marquee_element_get_scroll_delay(RvNode* target, uint32_t* result) { return ranvier_dom_html_marquee_element_get_scroll_delay(target, result); }
+int32_t rv_dom_html_marquee_element_set_scroll_delay(RvNode* target, uint32_t value) { return ranvier_dom_html_marquee_element_set_scroll_delay(target, value); }
+int32_t rv_dom_html_marquee_element_get_true_speed(RvNode* target, int32_t* result) { return ranvier_dom_html_marquee_element_get_true_speed(target, result); }
+int32_t rv_dom_html_marquee_element_set_true_speed(RvNode* target, int32_t value) { return ranvier_dom_html_marquee_element_set_true_speed(target, value); }
+int32_t rv_dom_html_marquee_element_get_vspace(RvNode* target, uint32_t* result) { return ranvier_dom_html_marquee_element_get_vspace(target, result); }
+int32_t rv_dom_html_marquee_element_set_vspace(RvNode* target, uint32_t value) { return ranvier_dom_html_marquee_element_set_vspace(target, value); }
+int32_t rv_dom_html_marquee_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_marquee_element_get_width(target, buffer, capacity, length); }
+int32_t rv_dom_html_marquee_element_set_width(RvNode* target, const char* value) { return ranvier_dom_html_marquee_element_set_width(target, value); }
+int32_t rv_dom_html_marquee_element_start(RvNode* target) { return ranvier_dom_html_marquee_element_start(target); }
+int32_t rv_dom_html_marquee_element_stop(RvNode* target) { return ranvier_dom_html_marquee_element_stop(target); }
+int32_t rv_dom_html_menu_element_get_compact(RvNode* target, int32_t* result) { return ranvier_dom_html_menu_element_get_compact(target, result); }
+int32_t rv_dom_html_menu_element_set_compact(RvNode* target, int32_t value) { return ranvier_dom_html_menu_element_set_compact(target, value); }
+int32_t rv_dom_html_meta_element_get_content(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_meta_element_get_content(target, buffer, capacity, length); }
+int32_t rv_dom_html_meta_element_set_content(RvNode* target, const char* value) { return ranvier_dom_html_meta_element_set_content(target, value); }
+int32_t rv_dom_html_meta_element_get_http_equiv(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_meta_element_get_http_equiv(target, buffer, capacity, length); }
+int32_t rv_dom_html_meta_element_set_http_equiv(RvNode* target, const char* value) { return ranvier_dom_html_meta_element_set_http_equiv(target, value); }
+int32_t rv_dom_html_meta_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_meta_element_get_media(target, buffer, capacity, length); }
+int32_t rv_dom_html_meta_element_set_media(RvNode* target, const char* value) { return ranvier_dom_html_meta_element_set_media(target, value); }
+int32_t rv_dom_html_meta_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_meta_element_get_name(target, buffer, capacity, length); }
+int32_t rv_dom_html_meta_element_set_name(RvNode* target, const char* value) { return ranvier_dom_html_meta_element_set_name(target, value); }
+int32_t rv_dom_html_meta_element_get_scheme(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_meta_element_get_scheme(target, buffer, capacity, length); }
+int32_t rv_dom_html_meta_element_set_scheme(RvNode* target, const char* value) { return ranvier_dom_html_meta_element_set_scheme(target, value); }
+int32_t rv_dom_html_mod_element_get_cite(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_mod_element_get_cite(target, buffer, capacity, length); }
+int32_t rv_dom_html_mod_element_set_cite(RvNode* target, const char* value) { return ranvier_dom_html_mod_element_set_cite(target, value); }
+int32_t rv_dom_html_mod_element_get_date_time(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_mod_element_get_date_time(target, buffer, capacity, length); }
+int32_t rv_dom_html_mod_element_set_date_time(RvNode* target, const char* value) { return ranvier_dom_html_mod_element_set_date_time(target, value); }
+int32_t rv_dom_html_param_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_param_element_get_name(target, buffer, capacity, length); }
+int32_t rv_dom_html_param_element_set_name(RvNode* target, const char* value) { return ranvier_dom_html_param_element_set_name(target, value); }
+int32_t rv_dom_html_param_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_param_element_get_type(target, buffer, capacity, length); }
+int32_t rv_dom_html_param_element_set_type(RvNode* target, const char* value) { return ranvier_dom_html_param_element_set_type(target, value); }
+int32_t rv_dom_html_param_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_param_element_get_value(target, buffer, capacity, length); }
+int32_t rv_dom_html_param_element_set_value(RvNode* target, const char* value) { return ranvier_dom_html_param_element_set_value(target, value); }
+int32_t rv_dom_html_param_element_get_value_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_param_element_get_value_type(target, buffer, capacity, length); }
+int32_t rv_dom_html_param_element_set_value_type(RvNode* target, const char* value) { return ranvier_dom_html_param_element_set_value_type(target, value); }
+int32_t rv_dom_html_pre_element_get_width(RvNode* target, int32_t* result) { return ranvier_dom_html_pre_element_get_width(target, result); }
+int32_t rv_dom_html_pre_element_set_width(RvNode* target, int32_t value) { return ranvier_dom_html_pre_element_set_width(target, value); }
+int32_t rv_dom_html_quote_element_get_cite(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_quote_element_get_cite(target, buffer, capacity, length); }
+int32_t rv_dom_html_quote_element_set_cite(RvNode* target, const char* value) { return ranvier_dom_html_quote_element_set_cite(target, value); }
+int32_t rv_dom_html_source_element_get_src(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_source_element_get_src(target, buffer, capacity, length); }
+int32_t rv_dom_html_source_element_set_src(RvNode* target, const char* value) { return ranvier_dom_html_source_element_set_src(target, value); }
+int32_t rv_dom_html_source_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_source_element_get_type(target, buffer, capacity, length); }
+int32_t rv_dom_html_source_element_set_type(RvNode* target, const char* value) { return ranvier_dom_html_source_element_set_type(target, value); }
+int32_t rv_dom_html_source_element_get_srcset(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_source_element_get_srcset(target, buffer, capacity, length); }
+int32_t rv_dom_html_source_element_set_srcset(RvNode* target, const char* value) { return ranvier_dom_html_source_element_set_srcset(target, value); }
+int32_t rv_dom_html_source_element_get_sizes(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_source_element_get_sizes(target, buffer, capacity, length); }
+int32_t rv_dom_html_source_element_set_sizes(RvNode* target, const char* value) { return ranvier_dom_html_source_element_set_sizes(target, value); }
+int32_t rv_dom_html_source_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_source_element_get_media(target, buffer, capacity, length); }
+int32_t rv_dom_html_source_element_set_media(RvNode* target, const char* value) { return ranvier_dom_html_source_element_set_media(target, value); }
+int32_t rv_dom_html_source_element_get_width(RvNode* target, uint32_t* result) { return ranvier_dom_html_source_element_get_width(target, result); }
+int32_t rv_dom_html_source_element_set_width(RvNode* target, uint32_t value) { return ranvier_dom_html_source_element_set_width(target, value); }
+int32_t rv_dom_html_source_element_get_height(RvNode* target, uint32_t* result) { return ranvier_dom_html_source_element_get_height(target, result); }
+int32_t rv_dom_html_source_element_set_height(RvNode* target, uint32_t value) { return ranvier_dom_html_source_element_set_height(target, value); }
+int32_t rv_dom_html_source_element_get_attachment_identifier(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_source_element_get_attachment_identifier(target, buffer, capacity, length); }
+int32_t rv_dom_html_time_element_get_date_time(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_time_element_get_date_time(target, buffer, capacity, length); }
+int32_t rv_dom_html_time_element_set_date_time(RvNode* target, const char* value) { return ranvier_dom_html_time_element_set_date_time(target, value); }
+int32_t rv_dom_html_title_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_title_element_get_text(target, buffer, capacity, length); }
+int32_t rv_dom_html_title_element_set_text(RvNode* target, const char* value) { return ranvier_dom_html_title_element_set_text(target, value); }
 int32_t rv_dom_css_style_declaration_get_css_text(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_style_declaration_get_css_text(target, buffer, capacity, length); }
 int32_t rv_dom_css_style_declaration_set_css_text(RvCSSStyleDeclaration* target, const char* value) { return ranvier_dom_css_style_declaration_set_css_text(target, value); }
 int32_t rv_dom_css_style_declaration_get_length(RvCSSStyleDeclaration* target, uint32_t* result) { return ranvier_dom_css_style_declaration_get_length(target, result); }

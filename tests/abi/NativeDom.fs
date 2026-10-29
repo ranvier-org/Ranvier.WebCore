@@ -3577,6 +3577,327 @@ extern int rv_dom_htmlu_list_element_get_type(nativeint target, byte[] buffer, i
 extern int rv_dom_htmlu_list_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_html_base_element_get_href(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_base_element_set_href(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_base_element_get_target(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_base_element_set_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlbr_element_get_clear(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlbr_element_set_clear(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_data_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_data_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_data_list_element_get_options(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_directory_element_get_compact(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_directory_element_set_compact(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmld_list_element_get_compact(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmld_list_element_set_compact(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_font_element_get_color(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_font_element_set_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_font_element_get_face(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_font_element_set_face(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_font_element_get_size(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_font_element_set_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_heading_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_heading_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_get_color(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_set_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_get_no_shade(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_set_no_shade(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_get_size(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_set_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_htmlhr_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_html_element_get_version(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_html_element_set_version(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_map_element_get_areas(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_map_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_map_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_behavior(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_behavior(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_bg_color(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_bg_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_direction(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_direction(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_height(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_height(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_hspace(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_hspace(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_loop(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_loop(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_scroll_amount(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_scroll_amount(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_scroll_delay(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_scroll_delay(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_true_speed(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_true_speed(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_vspace(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_vspace(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_start(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_marquee_element_stop(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_menu_element_get_compact(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_menu_element_set_compact(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_get_content(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_set_content(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_get_http_equiv(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_set_http_equiv(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_set_media(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_get_scheme(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_meta_element_set_scheme(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_mod_element_get_cite(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_mod_element_set_cite(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_mod_element_get_date_time(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_mod_element_set_date_time(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_param_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_param_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_param_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_param_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_param_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_param_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_param_element_get_value_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_param_element_set_value_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_pre_element_get_width(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_pre_element_set_width(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_quote_element_get_cite(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_quote_element_set_cite(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_get_src(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_set_src(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_get_srcset(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_set_srcset(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_get_sizes(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_set_sizes(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_set_media(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_get_width(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_set_width(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_get_height(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_set_height(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_source_element_get_attachment_identifier(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_time_element_get_date_time(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_time_element_set_date_time(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_title_element_get_text(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_title_element_set_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_style_declaration_get_css_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]

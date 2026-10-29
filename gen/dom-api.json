@@ -186,6 +186,98 @@
       "base": "HTMLElement"
     },
     {
+      "name": "HTMLBaseElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLBRElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLDataElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLDataListElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLDirectoryElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLDListElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLFontElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLHeadingElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLHRElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLHtmlElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLMapElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLMarqueeElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLMenuElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLMetaElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLModElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLParamElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLPictureElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLPreElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLQuoteElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLSelectedContentElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLSourceElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLTimeElement",
+      "base": "HTMLElement"
+    },
+    {
+      "name": "HTMLTitleElement",
+      "base": "HTMLElement"
+    },
+    {
       "name": "CSSStyleDeclaration",
       "base": null
     },
@@ -816,6 +908,213 @@
       "source": "html/HTMLUListElement.idl"
     },
     {
+      "name": "HTMLBaseElement",
+      "idlName": "HTMLBaseElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLBaseElement.idl"
+    },
+    {
+      "name": "HTMLBRElement",
+      "idlName": "HTMLBRElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLBRElement.idl"
+    },
+    {
+      "name": "HTMLDataElement",
+      "idlName": "HTMLDataElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLDataElement.idl"
+    },
+    {
+      "name": "HTMLDataListElement",
+      "idlName": "HTMLDataListElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLDataListElement.idl"
+    },
+    {
+      "name": "HTMLDirectoryElement",
+      "idlName": "HTMLDirectoryElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLDirectoryElement.idl"
+    },
+    {
+      "name": "HTMLDListElement",
+      "idlName": "HTMLDListElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLDListElement.idl"
+    },
+    {
+      "name": "HTMLFontElement",
+      "idlName": "HTMLFontElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLFontElement.idl"
+    },
+    {
+      "name": "HTMLHeadingElement",
+      "idlName": "HTMLHeadingElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLHeadingElement.idl"
+    },
+    {
+      "name": "HTMLHRElement",
+      "idlName": "HTMLHRElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLHRElement.idl"
+    },
+    {
+      "name": "HTMLHtmlElement",
+      "idlName": "HTMLHtmlElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLHtmlElement.idl"
+    },
+    {
+      "name": "HTMLMapElement",
+      "idlName": "HTMLMapElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLMapElement.idl"
+    },
+    {
+      "name": "HTMLMarqueeElement",
+      "idlName": "HTMLMarqueeElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLMarqueeElement.idl"
+    },
+    {
+      "name": "HTMLMenuElement",
+      "idlName": "HTMLMenuElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLMenuElement.idl"
+    },
+    {
+      "name": "HTMLMetaElement",
+      "idlName": "HTMLMetaElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLMetaElement.idl"
+    },
+    {
+      "name": "HTMLModElement",
+      "idlName": "HTMLModElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLModElement.idl"
+    },
+    {
+      "name": "HTMLParamElement",
+      "idlName": "HTMLParamElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLParamElement.idl"
+    },
+    {
+      "name": "HTMLPictureElement",
+      "idlName": "HTMLPictureElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLPictureElement.idl"
+    },
+    {
+      "name": "HTMLPreElement",
+      "idlName": "HTMLPreElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLPreElement.idl"
+    },
+    {
+      "name": "HTMLQuoteElement",
+      "idlName": "HTMLQuoteElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLQuoteElement.idl"
+    },
+    {
+      "name": "HTMLSelectedContentElement",
+      "idlName": "HTMLSelectedContentElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLSelectedContentElement.idl"
+    },
+    {
+      "name": "HTMLSourceElement",
+      "idlName": "HTMLSourceElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLSourceElement.idl"
+    },
+    {
+      "name": "HTMLTimeElement",
+      "idlName": "HTMLTimeElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLTimeElement.idl"
+    },
+    {
+      "name": "HTMLTitleElement",
+      "idlName": "HTMLTitleElement",
+      "base": "HTMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLTitleElement.idl"
+    },
+    {
       "name": "CSSStyleDeclaration",
       "idlName": "CSSStyleDeclaration",
       "base": null,
@@ -1052,33 +1351,6 @@
       "source": "html/HTMLAudioElement.idl"
     },
     {
-      "name": "HTMLBaseElement",
-      "idlName": "HTMLBaseElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLBaseElement.idl"
-    },
-    {
-      "name": "HTMLQuoteElement",
-      "idlName": "HTMLQuoteElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLQuoteElement.idl"
-    },
-    {
-      "name": "HTMLBRElement",
-      "idlName": "HTMLBRElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLBRElement.idl"
-    },
-    {
       "name": "HTMLCanvasElement",
       "idlName": "HTMLCanvasElement",
       "base": "HTMLElement",
@@ -1088,51 +1360,6 @@
       "source": "html/HTMLCanvasElement.idl"
     },
     {
-      "name": "HTMLDataElement",
-      "idlName": "HTMLDataElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLDataElement.idl"
-    },
-    {
-      "name": "HTMLDataListElement",
-      "idlName": "HTMLDataListElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLDataListElement.idl"
-    },
-    {
-      "name": "HTMLModElement",
-      "idlName": "HTMLModElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLModElement.idl"
-    },
-    {
-      "name": "HTMLDirectoryElement",
-      "idlName": "HTMLDirectoryElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLDirectoryElement.idl"
-    },
-    {
-      "name": "HTMLDListElement",
-      "idlName": "HTMLDListElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLDListElement.idl"
-    },
-    {
       "name": "HTMLEmbedElement",
       "idlName": "HTMLEmbedElement",
       "base": "HTMLElement",
@@ -1140,15 +1367,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "html/HTMLEmbedElement.idl"
-    },
-    {
-      "name": "HTMLFontElement",
-      "idlName": "HTMLFontElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLFontElement.idl"
     },
     {
       "name": "HTMLFrameElement",
@@ -1167,33 +1385,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "html/HTMLFrameSetElement.idl"
-    },
-    {
-      "name": "HTMLHeadingElement",
-      "idlName": "HTMLHeadingElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLHeadingElement.idl"
-    },
-    {
-      "name": "HTMLHRElement",
-      "idlName": "HTMLHRElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLHRElement.idl"
-    },
-    {
-      "name": "HTMLHtmlElement",
-      "idlName": "HTMLHtmlElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLHtmlElement.idl"
     },
     {
       "name": "HTMLIFrameElement",
@@ -1216,51 +1407,6 @@
       "source": "html/HTMLLinkElement.idl"
     },
     {
-      "name": "HTMLPreElement",
-      "idlName": "HTMLPreElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLPreElement.idl"
-    },
-    {
-      "name": "HTMLMapElement",
-      "idlName": "HTMLMapElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLMapElement.idl"
-    },
-    {
-      "name": "HTMLMarqueeElement",
-      "idlName": "HTMLMarqueeElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLMarqueeElement.idl"
-    },
-    {
-      "name": "HTMLMenuElement",
-      "idlName": "HTMLMenuElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLMenuElement.idl"
-    },
-    {
-      "name": "HTMLMetaElement",
-      "idlName": "HTMLMetaElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLMetaElement.idl"
-    },
-    {
       "name": "HTMLModelElement",
       "idlName": "HTMLModelElement",
       "base": "HTMLElement",
@@ -1279,24 +1425,6 @@
       "source": "html/HTMLObjectElement.idl"
     },
     {
-      "name": "HTMLParamElement",
-      "idlName": "HTMLParamElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLParamElement.idl"
-    },
-    {
-      "name": "HTMLPictureElement",
-      "idlName": "HTMLPictureElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLPictureElement.idl"
-    },
-    {
       "name": "HTMLScriptElement",
       "idlName": "HTMLScriptElement",
       "base": "HTMLElement",
@@ -1304,24 +1432,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "html/HTMLScriptElement.idl"
-    },
-    {
-      "name": "HTMLSelectedContentElement",
-      "idlName": "HTMLSelectedContentElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLSelectedContentElement.idl"
-    },
-    {
-      "name": "HTMLSourceElement",
-      "idlName": "HTMLSourceElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLSourceElement.idl"
     },
     {
       "name": "HTMLStyleElement",
@@ -1333,24 +1443,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "html/HTMLStyleElement.idl"
-    },
-    {
-      "name": "HTMLTimeElement",
-      "idlName": "HTMLTimeElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLTimeElement.idl"
-    },
-    {
-      "name": "HTMLTitleElement",
-      "idlName": "HTMLTitleElement",
-      "base": "HTMLElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLTitleElement.idl"
     },
     {
       "name": "HTMLTrackElement",
@@ -56315,6 +56407,5437 @@
       "contractOwner": "HTMLUListElement",
       "kind": "setter",
       "function": "rv_dom_htmlu_list_element_set_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLBaseElement",
+      "member": "href",
+      "contractOwner": "HTMLBaseElement",
+      "kind": "getter",
+      "function": "rv_dom_html_base_element_get_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLBaseElement",
+      "member": "href",
+      "contractOwner": "HTMLBaseElement",
+      "kind": "setter",
+      "function": "rv_dom_html_base_element_set_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLBaseElement",
+      "member": "target",
+      "contractOwner": "HTMLBaseElement",
+      "kind": "getter",
+      "function": "rv_dom_html_base_element_get_target",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLBaseElement",
+      "member": "target",
+      "contractOwner": "HTMLBaseElement",
+      "kind": "setter",
+      "function": "rv_dom_html_base_element_set_target",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLBRElement",
+      "member": "clear",
+      "contractOwner": "HTMLBRElement",
+      "kind": "getter",
+      "function": "rv_dom_htmlbr_element_get_clear",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLBRElement",
+      "member": "clear",
+      "contractOwner": "HTMLBRElement",
+      "kind": "setter",
+      "function": "rv_dom_htmlbr_element_set_clear",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLDataElement",
+      "member": "value",
+      "contractOwner": "HTMLDataElement",
+      "kind": "getter",
+      "function": "rv_dom_html_data_element_get_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLDataElement",
+      "member": "value",
+      "contractOwner": "HTMLDataElement",
+      "kind": "setter",
+      "function": "rv_dom_html_data_element_set_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLDataListElement",
+      "member": "options",
+      "contractOwner": "HTMLDataListElement",
+      "kind": "getter",
+      "function": "rv_dom_html_data_list_element_get_options",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvHTMLCollection**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "HTMLCollection",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "HTMLCollection",
+        "root": "HTMLCollection",
+        "class": "HTMLCollection",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLDirectoryElement",
+      "member": "compact",
+      "contractOwner": "HTMLDirectoryElement",
+      "kind": "getter",
+      "function": "rv_dom_html_directory_element_get_compact",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLDirectoryElement",
+      "member": "compact",
+      "contractOwner": "HTMLDirectoryElement",
+      "kind": "setter",
+      "function": "rv_dom_html_directory_element_set_compact",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLDListElement",
+      "member": "compact",
+      "contractOwner": "HTMLDListElement",
+      "kind": "getter",
+      "function": "rv_dom_htmld_list_element_get_compact",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLDListElement",
+      "member": "compact",
+      "contractOwner": "HTMLDListElement",
+      "kind": "setter",
+      "function": "rv_dom_htmld_list_element_set_compact",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLFontElement",
+      "member": "color",
+      "contractOwner": "HTMLFontElement",
+      "kind": "getter",
+      "function": "rv_dom_html_font_element_get_color",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLFontElement",
+      "member": "color",
+      "contractOwner": "HTMLFontElement",
+      "kind": "setter",
+      "function": "rv_dom_html_font_element_set_color",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLFontElement",
+      "member": "face",
+      "contractOwner": "HTMLFontElement",
+      "kind": "getter",
+      "function": "rv_dom_html_font_element_get_face",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLFontElement",
+      "member": "face",
+      "contractOwner": "HTMLFontElement",
+      "kind": "setter",
+      "function": "rv_dom_html_font_element_set_face",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLFontElement",
+      "member": "size",
+      "contractOwner": "HTMLFontElement",
+      "kind": "getter",
+      "function": "rv_dom_html_font_element_get_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLFontElement",
+      "member": "size",
+      "contractOwner": "HTMLFontElement",
+      "kind": "setter",
+      "function": "rv_dom_html_font_element_set_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHeadingElement",
+      "member": "align",
+      "contractOwner": "HTMLHeadingElement",
+      "kind": "getter",
+      "function": "rv_dom_html_heading_element_get_align",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHeadingElement",
+      "member": "align",
+      "contractOwner": "HTMLHeadingElement",
+      "kind": "setter",
+      "function": "rv_dom_html_heading_element_set_align",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "align",
+      "contractOwner": "HTMLHRElement",
+      "kind": "getter",
+      "function": "rv_dom_htmlhr_element_get_align",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "align",
+      "contractOwner": "HTMLHRElement",
+      "kind": "setter",
+      "function": "rv_dom_htmlhr_element_set_align",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "color",
+      "contractOwner": "HTMLHRElement",
+      "kind": "getter",
+      "function": "rv_dom_htmlhr_element_get_color",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "color",
+      "contractOwner": "HTMLHRElement",
+      "kind": "setter",
+      "function": "rv_dom_htmlhr_element_set_color",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "noShade",
+      "contractOwner": "HTMLHRElement",
+      "kind": "getter",
+      "function": "rv_dom_htmlhr_element_get_no_shade",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "noShade",
+      "contractOwner": "HTMLHRElement",
+      "kind": "setter",
+      "function": "rv_dom_htmlhr_element_set_no_shade",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "size",
+      "contractOwner": "HTMLHRElement",
+      "kind": "getter",
+      "function": "rv_dom_htmlhr_element_get_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "size",
+      "contractOwner": "HTMLHRElement",
+      "kind": "setter",
+      "function": "rv_dom_htmlhr_element_set_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "width",
+      "contractOwner": "HTMLHRElement",
+      "kind": "getter",
+      "function": "rv_dom_htmlhr_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHRElement",
+      "member": "width",
+      "contractOwner": "HTMLHRElement",
+      "kind": "setter",
+      "function": "rv_dom_htmlhr_element_set_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHtmlElement",
+      "member": "version",
+      "contractOwner": "HTMLHtmlElement",
+      "kind": "getter",
+      "function": "rv_dom_html_html_element_get_version",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLHtmlElement",
+      "member": "version",
+      "contractOwner": "HTMLHtmlElement",
+      "kind": "setter",
+      "function": "rv_dom_html_html_element_set_version",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMapElement",
+      "member": "areas",
+      "contractOwner": "HTMLMapElement",
+      "kind": "getter",
+      "function": "rv_dom_html_map_element_get_areas",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvHTMLCollection**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "HTMLCollection",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "HTMLCollection",
+        "root": "HTMLCollection",
+        "class": "HTMLCollection",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMapElement",
+      "member": "name",
+      "contractOwner": "HTMLMapElement",
+      "kind": "getter",
+      "function": "rv_dom_html_map_element_get_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMapElement",
+      "member": "name",
+      "contractOwner": "HTMLMapElement",
+      "kind": "setter",
+      "function": "rv_dom_html_map_element_set_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "behavior",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_behavior",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "behavior",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_behavior",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "bgColor",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_bg_color",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "bgColor",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_bg_color",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "direction",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_direction",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "direction",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_direction",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "height",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "height",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "hspace",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_hspace",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "hspace",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_hspace",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "loop",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_loop",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "loop",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_loop",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "scrollAmount",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_scroll_amount",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "scrollAmount",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_scroll_amount",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "scrollDelay",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_scroll_delay",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "scrollDelay",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_scroll_delay",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "trueSpeed",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_true_speed",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "trueSpeed",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_true_speed",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "vspace",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_vspace",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "vspace",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_vspace",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "width",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_marquee_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "width",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_marquee_element_set_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "start",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "operation",
+      "function": "rv_dom_html_marquee_element_start",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMarqueeElement",
+      "member": "stop",
+      "contractOwner": "HTMLMarqueeElement",
+      "kind": "operation",
+      "function": "rv_dom_html_marquee_element_stop",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMenuElement",
+      "member": "compact",
+      "contractOwner": "HTMLMenuElement",
+      "kind": "getter",
+      "function": "rv_dom_html_menu_element_get_compact",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMenuElement",
+      "member": "compact",
+      "contractOwner": "HTMLMenuElement",
+      "kind": "setter",
+      "function": "rv_dom_html_menu_element_set_compact",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "content",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "getter",
+      "function": "rv_dom_html_meta_element_get_content",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "content",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "setter",
+      "function": "rv_dom_html_meta_element_set_content",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "httpEquiv",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "getter",
+      "function": "rv_dom_html_meta_element_get_http_equiv",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "httpEquiv",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "setter",
+      "function": "rv_dom_html_meta_element_set_http_equiv",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "media",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "getter",
+      "function": "rv_dom_html_meta_element_get_media",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "media",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "setter",
+      "function": "rv_dom_html_meta_element_set_media",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "name",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "getter",
+      "function": "rv_dom_html_meta_element_get_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "name",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "setter",
+      "function": "rv_dom_html_meta_element_set_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "scheme",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "getter",
+      "function": "rv_dom_html_meta_element_get_scheme",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLMetaElement",
+      "member": "scheme",
+      "contractOwner": "HTMLMetaElement",
+      "kind": "setter",
+      "function": "rv_dom_html_meta_element_set_scheme",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLModElement",
+      "member": "cite",
+      "contractOwner": "HTMLModElement",
+      "kind": "getter",
+      "function": "rv_dom_html_mod_element_get_cite",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLModElement",
+      "member": "cite",
+      "contractOwner": "HTMLModElement",
+      "kind": "setter",
+      "function": "rv_dom_html_mod_element_set_cite",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLModElement",
+      "member": "dateTime",
+      "contractOwner": "HTMLModElement",
+      "kind": "getter",
+      "function": "rv_dom_html_mod_element_get_date_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLModElement",
+      "member": "dateTime",
+      "contractOwner": "HTMLModElement",
+      "kind": "setter",
+      "function": "rv_dom_html_mod_element_set_date_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLParamElement",
+      "member": "name",
+      "contractOwner": "HTMLParamElement",
+      "kind": "getter",
+      "function": "rv_dom_html_param_element_get_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLParamElement",
+      "member": "name",
+      "contractOwner": "HTMLParamElement",
+      "kind": "setter",
+      "function": "rv_dom_html_param_element_set_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLParamElement",
+      "member": "type",
+      "contractOwner": "HTMLParamElement",
+      "kind": "getter",
+      "function": "rv_dom_html_param_element_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLParamElement",
+      "member": "type",
+      "contractOwner": "HTMLParamElement",
+      "kind": "setter",
+      "function": "rv_dom_html_param_element_set_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLParamElement",
+      "member": "value",
+      "contractOwner": "HTMLParamElement",
+      "kind": "getter",
+      "function": "rv_dom_html_param_element_get_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLParamElement",
+      "member": "value",
+      "contractOwner": "HTMLParamElement",
+      "kind": "setter",
+      "function": "rv_dom_html_param_element_set_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLParamElement",
+      "member": "valueType",
+      "contractOwner": "HTMLParamElement",
+      "kind": "getter",
+      "function": "rv_dom_html_param_element_get_value_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLParamElement",
+      "member": "valueType",
+      "contractOwner": "HTMLParamElement",
+      "kind": "setter",
+      "function": "rv_dom_html_param_element_set_value_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLPreElement",
+      "member": "width",
+      "contractOwner": "HTMLPreElement",
+      "kind": "getter",
+      "function": "rv_dom_html_pre_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLPreElement",
+      "member": "width",
+      "contractOwner": "HTMLPreElement",
+      "kind": "setter",
+      "function": "rv_dom_html_pre_element_set_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLQuoteElement",
+      "member": "cite",
+      "contractOwner": "HTMLQuoteElement",
+      "kind": "getter",
+      "function": "rv_dom_html_quote_element_get_cite",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLQuoteElement",
+      "member": "cite",
+      "contractOwner": "HTMLQuoteElement",
+      "kind": "setter",
+      "function": "rv_dom_html_quote_element_set_cite",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "src",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "getter",
+      "function": "rv_dom_html_source_element_get_src",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "src",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "setter",
+      "function": "rv_dom_html_source_element_set_src",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "type",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "getter",
+      "function": "rv_dom_html_source_element_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "type",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "setter",
+      "function": "rv_dom_html_source_element_set_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "srcset",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "getter",
+      "function": "rv_dom_html_source_element_get_srcset",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "srcset",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "setter",
+      "function": "rv_dom_html_source_element_set_srcset",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "sizes",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "getter",
+      "function": "rv_dom_html_source_element_get_sizes",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "sizes",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "setter",
+      "function": "rv_dom_html_source_element_set_sizes",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "media",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "getter",
+      "function": "rv_dom_html_source_element_get_media",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "media",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "setter",
+      "function": "rv_dom_html_source_element_set_media",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "width",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "getter",
+      "function": "rv_dom_html_source_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "width",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "setter",
+      "function": "rv_dom_html_source_element_set_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "height",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "getter",
+      "function": "rv_dom_html_source_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "height",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "setter",
+      "function": "rv_dom_html_source_element_set_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLSourceElement",
+      "member": "attachmentIdentifier",
+      "contractOwner": "HTMLSourceElement",
+      "kind": "getter",
+      "function": "rv_dom_html_source_element_get_attachment_identifier",
+      "conditional": "ENABLE(ATTACHMENT_ELEMENT)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLTimeElement",
+      "member": "dateTime",
+      "contractOwner": "HTMLTimeElement",
+      "kind": "getter",
+      "function": "rv_dom_html_time_element_get_date_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLTimeElement",
+      "member": "dateTime",
+      "contractOwner": "HTMLTimeElement",
+      "kind": "setter",
+      "function": "rv_dom_html_time_element_set_date_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLTitleElement",
+      "member": "text",
+      "contractOwner": "HTMLTitleElement",
+      "kind": "getter",
+      "function": "rv_dom_html_title_element_get_text",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLTitleElement",
+      "member": "text",
+      "contractOwner": "HTMLTitleElement",
+      "kind": "setter",
+      "function": "rv_dom_html_title_element_set_text",
       "conditional": null,
       "parameters": [
         {

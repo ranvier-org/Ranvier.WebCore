@@ -622,6 +622,12 @@ class Generator(ComplexGeneratorMixin):
         return f"Rv{chain[-1]}*"
 
     def cast_expression(self, cls, root, value):
+        tags = self.world.config.get("nodeCastTags", {}).get(cls) if root == "Node" else None
+        if tags:
+            self.headers.update({"HTMLElement.h", "HTMLNames.h"})
+            matches = " || ".join(f"element->hasTagName(HTMLNames::{tag}Tag)" for tag in tags)
+            return (f"([&]() -> {cls}* {{ auto* element = dynamicDowncast<HTMLElement>({value}); "
+                    f"return element && ({matches}) ? static_cast<{cls}*>(element) : nullptr; }}())")
         via = self.world.config.get("castVia", {}).get(cls)
         if via:
             self.headers.add(f"{via}.h")
@@ -1030,7 +1036,7 @@ class Generator(ComplexGeneratorMixin):
             if cls == "Node":
                 body.append("RefPtr<Node> impl = nodeOf(target);")
             else:
-                body += [f"RefPtr impl = dynamicDowncast<{cls}>(*nodeOf(target));", "if (!impl)", "    return RV_ERR_WRONG_INTERFACE;"]
+                body += [f"RefPtr impl = {self.cast_expression(cls, 'Node', '*nodeOf(target)')};", "if (!impl)", "    return RV_ERR_WRONG_INTERFACE;"]
         elif "Event" in chain:
             if cls == "Event":
                 body.append("RefPtr<Event> impl = eventOf(target);")

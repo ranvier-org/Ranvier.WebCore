@@ -55,6 +55,29 @@
         "HTMLTextAreaElement",
         "HTMLTemplateElement",
         "HTMLUListElement",
+        "HTMLBaseElement",
+        "HTMLBRElement",
+        "HTMLDataElement",
+        "HTMLDataListElement",
+        "HTMLDirectoryElement",
+        "HTMLDListElement",
+        "HTMLFontElement",
+        "HTMLHeadingElement",
+        "HTMLHRElement",
+        "HTMLHtmlElement",
+        "HTMLMapElement",
+        "HTMLMarqueeElement",
+        "HTMLMenuElement",
+        "HTMLMetaElement",
+        "HTMLModElement",
+        "HTMLParamElement",
+        "HTMLPictureElement",
+        "HTMLPreElement",
+        "HTMLQuoteElement",
+        "HTMLSelectedContentElement",
+        "HTMLSourceElement",
+        "HTMLTimeElement",
+        "HTMLTitleElement",
         "CSSStyleDeclaration",
         "DOMTokenList",
         "DOMStringMap",
@@ -117,6 +140,11 @@
             "PopoverInvokerElement": "PopoverTargetAttributes",
             "Slotable": "Slottable"
         }
+    },
+    "nodeCastTags": {
+        "HTMLModElement": ["del", "ins"],
+        "HTMLPreElement": ["pre", "listing", "xmp"],
+        "HTMLQuoteElement": ["blockquote", "q"]
     },
     "castVia": {
         "RadioNodeList": "LiveNodeList"

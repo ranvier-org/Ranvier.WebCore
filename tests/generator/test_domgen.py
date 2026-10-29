@@ -253,5 +253,39 @@ interface HTMLTableElement : HTMLElement {
         self.assertIn('abstract member insertCell:', generator.interfaces())
 
 
+    def test_node_cast_by_tag_checks_namespace_and_tag_before_static_cast(self):
+        self.world.config['nodeCastTags'] = {'HTMLModElement': ['del', 'ins']}
+        generator = domgen.Generator(self.world)
+        expression = generator.cast_expression('HTMLModElement', 'Node', '*nodeOf(target)')
+        self.assertIn('dynamicDowncast<HTMLElement>(*nodeOf(target))', expression)
+        self.assertIn('element->hasTagName(HTMLNames::delTag)', expression)
+        self.assertIn('element->hasTagName(HTMLNames::insTag)', expression)
+        self.assertIn('static_cast<HTMLModElement*>(element)', expression)
+        self.assertIn(': nullptr', expression)
+        self.assertIn('HTMLNames.h', generator.headers)
+
+    def test_configured_html_reflection_scope_includes_selected_semantic_types(self):
+        names = ["HTMLBaseElement","HTMLBRElement","HTMLDataElement","HTMLDataListElement","HTMLDirectoryElement","HTMLDListElement","HTMLFontElement","HTMLHeadingElement","HTMLHRElement","HTMLHtmlElement","HTMLMapElement","HTMLMarqueeElement","HTMLMenuElement","HTMLMetaElement","HTMLModElement","HTMLParamElement","HTMLPictureElement","HTMLPreElement","HTMLQuoteElement","HTMLSelectedContentElement","HTMLSourceElement","HTMLTimeElement","HTMLTitleElement"]
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '\n' + '\n'.join(
+            'interface ' + name + ' : HTMLElement { attribute DOMString reflection; };'
+            for name in names
+        ))
+        configured = json.loads((ROOT / 'gen/dom.json').read_text())['interfaces']
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'HTMLElement'] + [name for name in configured if name in names]
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        reflected = {function['interface'] for function in model['functions'] if function['member'] == 'reflection'}
+        self.assertEqual(reflected, set(names))
+        for name in names:
+            kinds = {function['kind'] for function in model['functions']
+                     if function['interface'] == name and function['member'] == 'reflection'}
+            self.assertEqual(kinds, {'getter', 'setter'}, name)
+
+
 if __name__ == '__main__':
     unittest.main()

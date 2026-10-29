@@ -193,7 +193,7 @@ The C++ the IDL does not determine is listed in `gen/dom.json`: `atomArguments` 
 ## Scope
 
 `gen/dom.json` lists the scoped interfaces: `Node`, `CharacterData`, `Text`, `Comment`, `DocumentFragment`, `ShadowRoot`,
-`Document`, `Element`, `Attr`, `HTMLElement` and 27 HTML elements (form controls, `a`, `img`, `label`, `slot`,
+`Document`, `Element`, `Attr`, `HTMLElement` and selected HTML elements (form controls, `a`, `img`, `label`, `slot`,
 lists, `details`, `dialog`, ...), `CSSStyleDeclaration`, `DOMTokenList`, `DOMStringMap`, `AbstractRange`,
 `Range`, `DOMSelection` (`Selection`), `DOMRectReadOnly`, `NodeList`, `HTMLCollection`, `ValidityState`, and
 `Event`, `UIEvent`, `MouseEvent`, `PointerEvent`, `WheelEvent`, `KeyboardEvent`, `FocusEvent`, `InputEvent` and
@@ -201,6 +201,15 @@ lists, `details`, `dialog`, ...), `CSSStyleDeclaration`, `DOMTokenList`, `DOMStr
 `StaticRange`, `DOMRect` and `RadioNodeList`. The table editor surface additionally includes `HTMLTableElement`,
 `HTMLTableCaptionElement`, `HTMLTableColElement`, `HTMLTableSectionElement`, `HTMLTableRowElement` and
 `HTMLTableCellElement`: live row/cell collections, insertion/deletion and reflected table properties.
+
+Additional HTML reflection covers base, breaks, data/datalist, directory/description lists, fonts, headings,
+rules, html, maps, marquees, menus, metadata, edit annotations, parameters, pictures, preformatted text,
+quotes, selected content, sources, time and title elements. The host enables WebCore's existing datalist
+factory so `HTMLDataListElement.options` returns its live engine collection.
+
+`nodeCastTags` handles concrete HTML classes without WebCore TypeCastTraits: a checked HTMLElement cast
+and qualified HTML tag-name match precede the concrete cast. Mod, pre and quote elements use this route
+for all their tag aliases; a different interface or namespace fails with `RV_ERR_WRONG_INTERFACE`.
 
 `gen/dom-report.txt` records the generated interface/function counts, handle types, constants, enumerations,
 dictionary structs and every member left out, by reason:

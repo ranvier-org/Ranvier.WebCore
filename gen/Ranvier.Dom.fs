@@ -1477,6 +1477,210 @@ and [<AllowNullLiteral>] HTMLUListElement =
     /// <summary>HTMLUListElement.type.</summary>
     abstract member ``type``: string with get, set
 
+/// <summary>HTMLBaseElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLBaseElement =
+    inherit HTMLElement
+    /// <summary>HTMLBaseElement.href.</summary>
+    abstract member href: string with get, set
+    /// <summary>HTMLBaseElement.target.</summary>
+    abstract member target: string with get, set
+
+/// <summary>HTMLBRElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLBRElement =
+    inherit HTMLElement
+    /// <summary>HTMLBRElement.clear.</summary>
+    abstract member clear: string with get, set
+
+/// <summary>HTMLDataElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLDataElement =
+    inherit HTMLElement
+    /// <summary>HTMLDataElement.value.</summary>
+    abstract member value: string with get, set
+
+/// <summary>HTMLDataListElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLDataListElement =
+    inherit HTMLElement
+    /// <summary>HTMLDataListElement.options.</summary>
+    abstract member options: HTMLCollection with get
+
+/// <summary>HTMLDirectoryElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLDirectoryElement =
+    inherit HTMLElement
+    /// <summary>HTMLDirectoryElement.compact.</summary>
+    abstract member compact: bool with get, set
+
+/// <summary>HTMLDListElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLDListElement =
+    inherit HTMLElement
+    /// <summary>HTMLDListElement.compact.</summary>
+    abstract member compact: bool with get, set
+
+/// <summary>HTMLFontElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLFontElement =
+    inherit HTMLElement
+    /// <summary>HTMLFontElement.color.</summary>
+    abstract member color: string with get, set
+    /// <summary>HTMLFontElement.face.</summary>
+    abstract member face: string with get, set
+    /// <summary>HTMLFontElement.size.</summary>
+    abstract member size: string with get, set
+
+/// <summary>HTMLHeadingElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLHeadingElement =
+    inherit HTMLElement
+    /// <summary>HTMLHeadingElement.align.</summary>
+    abstract member align: string with get, set
+
+/// <summary>HTMLHRElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLHRElement =
+    inherit HTMLElement
+    /// <summary>HTMLHRElement.align.</summary>
+    abstract member align: string with get, set
+    /// <summary>HTMLHRElement.color.</summary>
+    abstract member color: string with get, set
+    /// <summary>HTMLHRElement.noShade.</summary>
+    abstract member noShade: bool with get, set
+    /// <summary>HTMLHRElement.size.</summary>
+    abstract member size: string with get, set
+    /// <summary>HTMLHRElement.width.</summary>
+    abstract member width: string with get, set
+
+/// <summary>HTMLHtmlElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLHtmlElement =
+    inherit HTMLElement
+    /// <summary>HTMLHtmlElement.version.</summary>
+    abstract member version: string with get, set
+
+/// <summary>HTMLMapElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLMapElement =
+    inherit HTMLElement
+    /// <summary>HTMLMapElement.areas.</summary>
+    abstract member areas: HTMLCollection with get
+    /// <summary>HTMLMapElement.name.</summary>
+    abstract member name: string with get, set
+
+/// <summary>HTMLMarqueeElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLMarqueeElement =
+    inherit HTMLElement
+    /// <summary>HTMLMarqueeElement.start.</summary>
+    abstract member start: unit -> unit
+    /// <summary>HTMLMarqueeElement.stop.</summary>
+    abstract member stop: unit -> unit
+    /// <summary>HTMLMarqueeElement.behavior.</summary>
+    abstract member behavior: string with get, set
+    /// <summary>HTMLMarqueeElement.bgColor.</summary>
+    abstract member bgColor: string with get, set
+    /// <summary>HTMLMarqueeElement.direction.</summary>
+    abstract member direction: string with get, set
+    /// <summary>HTMLMarqueeElement.height.</summary>
+    abstract member height: string with get, set
+    /// <summary>HTMLMarqueeElement.hspace.</summary>
+    abstract member hspace: uint32 with get, set
+    /// <summary>HTMLMarqueeElement.loop.</summary>
+    abstract member loop: int with get, set
+    /// <summary>HTMLMarqueeElement.scrollAmount.</summary>
+    abstract member scrollAmount: uint32 with get, set
+    /// <summary>HTMLMarqueeElement.scrollDelay.</summary>
+    abstract member scrollDelay: uint32 with get, set
+    /// <summary>HTMLMarqueeElement.trueSpeed.</summary>
+    abstract member trueSpeed: bool with get, set
+    /// <summary>HTMLMarqueeElement.vspace.</summary>
+    abstract member vspace: uint32 with get, set
+    /// <summary>HTMLMarqueeElement.width.</summary>
+    abstract member width: string with get, set
+
+/// <summary>HTMLMenuElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLMenuElement =
+    inherit HTMLElement
+    /// <summary>HTMLMenuElement.compact.</summary>
+    abstract member compact: bool with get, set
+
+/// <summary>HTMLMetaElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLMetaElement =
+    inherit HTMLElement
+    /// <summary>HTMLMetaElement.content.</summary>
+    abstract member content: string with get, set
+    /// <summary>HTMLMetaElement.httpEquiv.</summary>
+    abstract member httpEquiv: string with get, set
+    /// <summary>HTMLMetaElement.media.</summary>
+    abstract member media: string with get, set
+    /// <summary>HTMLMetaElement.name.</summary>
+    abstract member name: string with get, set
+    /// <summary>HTMLMetaElement.scheme.</summary>
+    abstract member scheme: string with get, set
+
+/// <summary>HTMLModElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLModElement =
+    inherit HTMLElement
+    /// <summary>HTMLModElement.cite.</summary>
+    abstract member cite: string with get, set
+    /// <summary>HTMLModElement.dateTime.</summary>
+    abstract member dateTime: string with get, set
+
+/// <summary>HTMLParamElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLParamElement =
+    inherit HTMLElement
+    /// <summary>HTMLParamElement.name.</summary>
+    abstract member name: string with get, set
+    /// <summary>HTMLParamElement.type.</summary>
+    abstract member ``type``: string with get, set
+    /// <summary>HTMLParamElement.value.</summary>
+    abstract member value: string with get, set
+    /// <summary>HTMLParamElement.valueType.</summary>
+    abstract member valueType: string with get, set
+
+/// <summary>HTMLPictureElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLPictureElement =
+    inherit HTMLElement
+
+/// <summary>HTMLPreElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLPreElement =
+    inherit HTMLElement
+    /// <summary>HTMLPreElement.width.</summary>
+    abstract member width: int with get, set
+
+/// <summary>HTMLQuoteElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLQuoteElement =
+    inherit HTMLElement
+    /// <summary>HTMLQuoteElement.cite.</summary>
+    abstract member cite: string with get, set
+
+/// <summary>HTMLSelectedContentElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLSelectedContentElement =
+    inherit HTMLElement
+
+/// <summary>HTMLSourceElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLSourceElement =
+    inherit HTMLElement
+    /// <summary>HTMLSourceElement.src.</summary>
+    abstract member src: string with get, set
+    /// <summary>HTMLSourceElement.type.</summary>
+    abstract member ``type``: string with get, set
+    /// <summary>HTMLSourceElement.srcset.</summary>
+    abstract member srcset: string with get, set
+    /// <summary>HTMLSourceElement.sizes.</summary>
+    abstract member sizes: string with get, set
+    /// <summary>HTMLSourceElement.media.</summary>
+    abstract member media: string with get, set
+    /// <summary>HTMLSourceElement.width.</summary>
+    abstract member width: uint32 with get, set
+    /// <summary>HTMLSourceElement.height.</summary>
+    abstract member height: uint32 with get, set
+    /// <summary>HTMLSourceElement.attachmentIdentifier.</summary>
+    abstract member attachmentIdentifier: string with get
+
+/// <summary>HTMLTimeElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTimeElement =
+    inherit HTMLElement
+    /// <summary>HTMLTimeElement.dateTime.</summary>
+    abstract member dateTime: string with get, set
+
+/// <summary>HTMLTitleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLTitleElement =
+    inherit HTMLElement
+    /// <summary>HTMLTitleElement.text.</summary>
+    abstract member text: string with get, set
+
 /// <summary>CSSStyleDeclaration in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CSSStyleDeclaration =
     /// <summary>CSSStyleDeclaration.cssText.</summary>
@@ -1965,48 +2169,12 @@ and [<AllowNullLiteral>] HTMLAttachmentElement =
 and [<AllowNullLiteral>] HTMLAudioElement =
     inherit HTMLMediaElement
 
-/// <summary>HTMLBaseElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLBaseElement =
-    inherit HTMLElement
-
-/// <summary>HTMLQuoteElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLQuoteElement =
-    inherit HTMLElement
-
-/// <summary>HTMLBRElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLBRElement =
-    inherit HTMLElement
-
 /// <summary>HTMLCanvasElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLCanvasElement =
     inherit HTMLElement
 
-/// <summary>HTMLDataElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLDataElement =
-    inherit HTMLElement
-
-/// <summary>HTMLDataListElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLDataListElement =
-    inherit HTMLElement
-
-/// <summary>HTMLModElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLModElement =
-    inherit HTMLElement
-
-/// <summary>HTMLDirectoryElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLDirectoryElement =
-    inherit HTMLElement
-
-/// <summary>HTMLDListElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLDListElement =
-    inherit HTMLElement
-
 /// <summary>HTMLEmbedElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLEmbedElement =
-    inherit HTMLElement
-
-/// <summary>HTMLFontElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLFontElement =
     inherit HTMLElement
 
 /// <summary>HTMLFrameElement in the scoped DOM interface model.</summary>
@@ -2015,18 +2183,6 @@ and [<AllowNullLiteral>] HTMLFrameElement =
 
 /// <summary>HTMLFrameSetElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLFrameSetElement =
-    inherit HTMLElement
-
-/// <summary>HTMLHeadingElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLHeadingElement =
-    inherit HTMLElement
-
-/// <summary>HTMLHRElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLHRElement =
-    inherit HTMLElement
-
-/// <summary>HTMLHtmlElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLHtmlElement =
     inherit HTMLElement
 
 /// <summary>HTMLIFrameElement in the scoped DOM interface model.</summary>
@@ -2038,26 +2194,6 @@ and [<AllowNullLiteral>] HTMLLinkElement =
     inherit HTMLElement
     inherit LinkStyle
 
-/// <summary>HTMLPreElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLPreElement =
-    inherit HTMLElement
-
-/// <summary>HTMLMapElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLMapElement =
-    inherit HTMLElement
-
-/// <summary>HTMLMarqueeElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLMarqueeElement =
-    inherit HTMLElement
-
-/// <summary>HTMLMenuElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLMenuElement =
-    inherit HTMLElement
-
-/// <summary>HTMLMetaElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLMetaElement =
-    inherit HTMLElement
-
 /// <summary>HTMLModelElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLModelElement =
     inherit HTMLElement
@@ -2066,38 +2202,14 @@ and [<AllowNullLiteral>] HTMLModelElement =
 and [<AllowNullLiteral>] HTMLObjectElement =
     inherit HTMLElement
 
-/// <summary>HTMLParamElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLParamElement =
-    inherit HTMLElement
-
-/// <summary>HTMLPictureElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLPictureElement =
-    inherit HTMLElement
-
 /// <summary>HTMLScriptElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLScriptElement =
-    inherit HTMLElement
-
-/// <summary>HTMLSelectedContentElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLSelectedContentElement =
-    inherit HTMLElement
-
-/// <summary>HTMLSourceElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLSourceElement =
     inherit HTMLElement
 
 /// <summary>HTMLStyleElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLStyleElement =
     inherit HTMLElement
     inherit LinkStyle
-
-/// <summary>HTMLTimeElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLTimeElement =
-    inherit HTMLElement
-
-/// <summary>HTMLTitleElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLTitleElement =
-    inherit HTMLElement
 
 /// <summary>HTMLTrackElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLTrackElement =

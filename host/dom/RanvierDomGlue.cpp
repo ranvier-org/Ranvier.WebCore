@@ -35,24 +35,39 @@
 #include "GetComposedRangesOptions.h"
 #include "GetHTMLOptions.h"
 #include "HTMLAnchorElement.h"
+#include "HTMLBRElement.h"
+#include "HTMLBaseElement.h"
 #include "HTMLBodyElement.h"
 #include "HTMLButtonElement.h"
 #include "HTMLCollection.h"
+#include "HTMLDListElement.h"
+#include "HTMLDataElement.h"
+#include "HTMLDataListElement.h"
 #include "HTMLDetailsElement.h"
 #include "HTMLDialogElement.h"
+#include "HTMLDirectoryElement.h"
 #include "HTMLDivElement.h"
 #include "HTMLDocument.h"
 #include "HTMLElement.h"
 #include "HTMLFieldSetElement.h"
+#include "HTMLFontElement.h"
 #include "HTMLFormControlsCollection.h"
 #include "HTMLFormElement.h"
+#include "HTMLHRElement.h"
 #include "HTMLHeadElement.h"
+#include "HTMLHeadingElement.h"
+#include "HTMLHtmlElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLLIElement.h"
 #include "HTMLLabelElement.h"
 #include "HTMLLegendElement.h"
+#include "HTMLMapElement.h"
+#include "HTMLMarqueeElement.h"
+#include "HTMLMenuElement.h"
+#include "HTMLMetaElement.h"
 #include "HTMLMeterElement.h"
+#include "HTMLModElement.h"
 #include "HTMLNames.h"
 #include "HTMLOListElement.h"
 #include "HTMLOptGroupElement.h"
@@ -60,9 +75,15 @@
 #include "HTMLOptionsCollection.h"
 #include "HTMLOutputElement.h"
 #include "HTMLParagraphElement.h"
+#include "HTMLParamElement.h"
+#include "HTMLPictureElement.h"
+#include "HTMLPreElement.h"
 #include "HTMLProgressElement.h"
+#include "HTMLQuoteElement.h"
 #include "HTMLSelectElement.h"
+#include "HTMLSelectedContentElement.h"
 #include "HTMLSlotElement.h"
+#include "HTMLSourceElement.h"
 #include "HTMLSpanElement.h"
 #include "HTMLTableCaptionElement.h"
 #include "HTMLTableCellElement.h"
@@ -72,6 +93,8 @@
 #include "HTMLTableSectionElement.h"
 #include "HTMLTemplateElement.h"
 #include "HTMLTextAreaElement.h"
+#include "HTMLTimeElement.h"
+#include "HTMLTitleElement.h"
 #include "HTMLUListElement.h"
 #include "ImportNodeOptions.h"
 #include "InputEvent.h"
@@ -1128,7 +1151,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -14949,6 +14972,1443 @@ int32_t ranvier_dom_htmlu_list_element_set_type(RvNode* target, const char* valu
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { value };
     return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLBaseElement.href getter: attribute USVString href
+int32_t ranvier_dom_html_base_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->href(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLBaseElement.href setter: attribute USVString href
+int32_t ranvier_dom_html_base_element_set_href(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::hrefAttr, AtomString { a0.atom() }); });
+}
+
+// HTMLBaseElement.target getter: attribute DOMString target
+int32_t ranvier_dom_html_base_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::targetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLBaseElement.target setter: attribute DOMString target
+int32_t ranvier_dom_html_base_element_set_target(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBaseElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::targetAttr, AtomString { a0.string() }); });
+}
+
+// HTMLBRElement.clear getter: attribute DOMString clear
+int32_t ranvier_dom_htmlbr_element_get_clear(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::clearAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLBRElement.clear setter: attribute DOMString clear
+int32_t ranvier_dom_htmlbr_element_set_clear(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLBRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::clearAttr, AtomString { a0.string() }); });
+}
+
+// HTMLDataElement.value getter: attribute DOMString value
+int32_t ranvier_dom_html_data_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDataElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLDataElement.value setter: attribute DOMString value
+int32_t ranvier_dom_html_data_element_set_value(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDataElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valueAttr, AtomString { a0.string() }); });
+}
+
+// HTMLDataListElement.options getter: readonly attribute HTMLCollection options; *result is a new reference
+int32_t ranvier_dom_html_data_list_element_get_options(RvNode* target, RvHTMLCollection** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDataListElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->options(); }, [&](auto&& value) { return storeHandle<HTMLCollection>(value, result); });
+}
+
+// HTMLDirectoryElement.compact getter: attribute boolean compact
+int32_t ranvier_dom_html_directory_element_get_compact(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDirectoryElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::compactAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLDirectoryElement.compact setter: attribute boolean compact
+int32_t ranvier_dom_html_directory_element_set_compact(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDirectoryElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::compactAttr, !!value); });
+}
+
+// HTMLDListElement.compact getter: attribute boolean compact
+int32_t ranvier_dom_htmld_list_element_get_compact(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDListElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::compactAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLDListElement.compact setter: attribute boolean compact
+int32_t ranvier_dom_htmld_list_element_set_compact(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLDListElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::compactAttr, !!value); });
+}
+
+// HTMLFontElement.color getter: attribute DOMString color
+int32_t ranvier_dom_html_font_element_get_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::colorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLFontElement.color setter: attribute DOMString color
+int32_t ranvier_dom_html_font_element_set_color(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::colorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLFontElement.face getter: attribute DOMString face
+int32_t ranvier_dom_html_font_element_get_face(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::faceAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLFontElement.face setter: attribute DOMString face
+int32_t ranvier_dom_html_font_element_set_face(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::faceAttr, AtomString { a0.string() }); });
+}
+
+// HTMLFontElement.size getter: attribute DOMString size
+int32_t ranvier_dom_html_font_element_get_size(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLFontElement.size setter: attribute DOMString size
+int32_t ranvier_dom_html_font_element_set_size(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFontElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::sizeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHeadingElement.align getter: attribute DOMString align
+int32_t ranvier_dom_html_heading_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHeadingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHeadingElement.align setter: attribute DOMString align
+int32_t ranvier_dom_html_heading_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHeadingElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHRElement.align getter: attribute DOMString align
+int32_t ranvier_dom_htmlhr_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::alignAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHRElement.align setter: attribute DOMString align
+int32_t ranvier_dom_htmlhr_element_set_align(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::alignAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHRElement.color getter: attribute DOMString color
+int32_t ranvier_dom_htmlhr_element_get_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::colorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHRElement.color setter: attribute DOMString color
+int32_t ranvier_dom_htmlhr_element_set_color(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::colorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHRElement.noShade getter: attribute boolean noShade
+int32_t ranvier_dom_htmlhr_element_get_no_shade(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::noshadeAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLHRElement.noShade setter: attribute boolean noShade
+int32_t ranvier_dom_htmlhr_element_set_no_shade(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::noshadeAttr, !!value); });
+}
+
+// HTMLHRElement.size getter: attribute DOMString size
+int32_t ranvier_dom_htmlhr_element_get_size(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHRElement.size setter: attribute DOMString size
+int32_t ranvier_dom_htmlhr_element_set_size(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::sizeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHRElement.width getter: attribute DOMString width
+int32_t ranvier_dom_htmlhr_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHRElement.width setter: attribute DOMString width
+int32_t ranvier_dom_htmlhr_element_set_width(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHRElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::widthAttr, AtomString { a0.string() }); });
+}
+
+// HTMLHtmlElement.version getter: attribute DOMString version
+int32_t ranvier_dom_html_html_element_get_version(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHtmlElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::versionAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLHtmlElement.version setter: attribute DOMString version
+int32_t ranvier_dom_html_html_element_set_version(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLHtmlElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::versionAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMapElement.areas getter: readonly attribute HTMLCollection areas; *result is a new reference
+int32_t ranvier_dom_html_map_element_get_areas(RvNode* target, RvHTMLCollection** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->areas(); }, [&](auto&& value) { return storeHandle<HTMLCollection>(value, result); });
+}
+
+// HTMLMapElement.name getter: attribute DOMString name
+int32_t ranvier_dom_html_map_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMapElement.name setter: attribute DOMString name
+int32_t ranvier_dom_html_map_element_set_name(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMapElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::nameAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.behavior getter: attribute DOMString behavior
+int32_t ranvier_dom_html_marquee_element_get_behavior(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::behaviorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.behavior setter: attribute DOMString behavior
+int32_t ranvier_dom_html_marquee_element_set_behavior(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::behaviorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.bgColor getter: attribute DOMString bgColor
+int32_t ranvier_dom_html_marquee_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::bgcolorAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.bgColor setter: attribute DOMString bgColor
+int32_t ranvier_dom_html_marquee_element_set_bg_color(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::bgcolorAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.direction getter: attribute DOMString direction
+int32_t ranvier_dom_html_marquee_element_get_direction(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::directionAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.direction setter: attribute DOMString direction
+int32_t ranvier_dom_html_marquee_element_set_direction(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::directionAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.height getter: attribute DOMString height
+int32_t ranvier_dom_html_marquee_element_get_height(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::heightAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.height setter: attribute DOMString height
+int32_t ranvier_dom_html_marquee_element_set_height(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::heightAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.hspace getter: attribute unsigned long hspace
+int32_t ranvier_dom_html_marquee_element_get_hspace(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unsignedIntegralAttribute(HTMLNames::hspaceAttr); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.hspace setter: attribute unsigned long hspace
+int32_t ranvier_dom_html_marquee_element_set_hspace(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setUnsignedIntegralAttribute(HTMLNames::hspaceAttr, value); });
+}
+
+// HTMLMarqueeElement.loop getter: attribute long loop
+int32_t ranvier_dom_html_marquee_element_get_loop(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->loop(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.loop setter: attribute long loop
+int32_t ranvier_dom_html_marquee_element_set_loop(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setLoop(value); });
+}
+
+// HTMLMarqueeElement.scrollAmount getter: attribute unsigned long scrollAmount
+int32_t ranvier_dom_html_marquee_element_get_scroll_amount(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->scrollAmount(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.scrollAmount setter: attribute unsigned long scrollAmount
+int32_t ranvier_dom_html_marquee_element_set_scroll_amount(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setScrollAmount(value); });
+}
+
+// HTMLMarqueeElement.scrollDelay getter: attribute unsigned long scrollDelay
+int32_t ranvier_dom_html_marquee_element_get_scroll_delay(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->scrollDelay(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.scrollDelay setter: attribute unsigned long scrollDelay
+int32_t ranvier_dom_html_marquee_element_set_scroll_delay(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setScrollDelay(value); });
+}
+
+// HTMLMarqueeElement.trueSpeed getter: attribute boolean trueSpeed
+int32_t ranvier_dom_html_marquee_element_get_true_speed(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::truespeedAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.trueSpeed setter: attribute boolean trueSpeed
+int32_t ranvier_dom_html_marquee_element_set_true_speed(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::truespeedAttr, !!value); });
+}
+
+// HTMLMarqueeElement.vspace getter: attribute unsigned long vspace
+int32_t ranvier_dom_html_marquee_element_get_vspace(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unsignedIntegralAttribute(HTMLNames::vspaceAttr); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLMarqueeElement.vspace setter: attribute unsigned long vspace
+int32_t ranvier_dom_html_marquee_element_set_vspace(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setUnsignedIntegralAttribute(HTMLNames::vspaceAttr, value); });
+}
+
+// HTMLMarqueeElement.width getter: attribute DOMString width
+int32_t ranvier_dom_html_marquee_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::widthAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMarqueeElement.width setter: attribute DOMString width
+int32_t ranvier_dom_html_marquee_element_set_width(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::widthAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMarqueeElement.start() -> undefined
+int32_t ranvier_dom_html_marquee_element_start(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->start(); });
+}
+
+// HTMLMarqueeElement.stop() -> undefined
+int32_t ranvier_dom_html_marquee_element_stop(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMarqueeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->stop(); });
+}
+
+// HTMLMenuElement.compact getter: attribute boolean compact
+int32_t ranvier_dom_html_menu_element_get_compact(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMenuElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hasAttributeWithoutSynchronization(HTMLNames::compactAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLMenuElement.compact setter: attribute boolean compact
+int32_t ranvier_dom_html_menu_element_set_compact(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMenuElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setBooleanAttribute(HTMLNames::compactAttr, !!value); });
+}
+
+// HTMLMetaElement.content getter: attribute DOMString content
+int32_t ranvier_dom_html_meta_element_get_content(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::contentAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.content setter: attribute DOMString content
+int32_t ranvier_dom_html_meta_element_set_content(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::contentAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMetaElement.httpEquiv getter: attribute DOMString httpEquiv
+int32_t ranvier_dom_html_meta_element_get_http_equiv(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::http_equivAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.httpEquiv setter: attribute DOMString httpEquiv
+int32_t ranvier_dom_html_meta_element_set_http_equiv(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::http_equivAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMetaElement.media getter: attribute DOMString media
+int32_t ranvier_dom_html_meta_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.media setter: attribute DOMString media
+int32_t ranvier_dom_html_meta_element_set_media(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::mediaAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMetaElement.name getter: attribute DOMString name
+int32_t ranvier_dom_html_meta_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.name setter: attribute DOMString name
+int32_t ranvier_dom_html_meta_element_set_name(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::nameAttr, AtomString { a0.string() }); });
+}
+
+// HTMLMetaElement.scheme getter: attribute DOMString scheme
+int32_t ranvier_dom_html_meta_element_get_scheme(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::schemeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLMetaElement.scheme setter: attribute DOMString scheme
+int32_t ranvier_dom_html_meta_element_set_scheme(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLMetaElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::schemeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLModElement.cite getter: attribute USVString cite
+int32_t ranvier_dom_html_mod_element_get_cite(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::citeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLModElement.cite setter: attribute USVString cite
+int32_t ranvier_dom_html_mod_element_set_cite(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::citeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLModElement.dateTime getter: attribute DOMString dateTime
+int32_t ranvier_dom_html_mod_element_get_date_time(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::datetimeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLModElement.dateTime setter: attribute DOMString dateTime
+int32_t ranvier_dom_html_mod_element_set_date_time(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLModElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::delTag) || element->hasTagName(HTMLNames::insTag)) ? static_cast<HTMLModElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::datetimeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLParamElement.name getter: attribute DOMString name
+int32_t ranvier_dom_html_param_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getNameAttribute(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLParamElement.name setter: attribute DOMString name
+int32_t ranvier_dom_html_param_element_set_name(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::nameAttr, AtomString { a0.string() }); });
+}
+
+// HTMLParamElement.type getter: attribute DOMString type
+int32_t ranvier_dom_html_param_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLParamElement.type setter: attribute DOMString type
+int32_t ranvier_dom_html_param_element_set_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLParamElement.value getter: attribute DOMString value
+int32_t ranvier_dom_html_param_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valueAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLParamElement.value setter: attribute DOMString value
+int32_t ranvier_dom_html_param_element_set_value(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valueAttr, AtomString { a0.string() }); });
+}
+
+// HTMLParamElement.valueType getter: attribute DOMString valueType
+int32_t ranvier_dom_html_param_element_get_value_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::valuetypeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLParamElement.valueType setter: attribute DOMString valueType
+int32_t ranvier_dom_html_param_element_set_value_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLParamElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::valuetypeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLPreElement.width getter: attribute long width
+int32_t ranvier_dom_html_pre_element_get_width(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLPreElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::preTag) || element->hasTagName(HTMLNames::listingTag) || element->hasTagName(HTMLNames::xmpTag)) ? static_cast<HTMLPreElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->integralAttribute(HTMLNames::widthAttr); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLPreElement.width setter: attribute long width
+int32_t ranvier_dom_html_pre_element_set_width(RvNode* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLPreElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::preTag) || element->hasTagName(HTMLNames::listingTag) || element->hasTagName(HTMLNames::xmpTag)) ? static_cast<HTMLPreElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setIntegralAttribute(HTMLNames::widthAttr, value); });
+}
+
+// HTMLQuoteElement.cite getter: attribute USVString cite
+int32_t ranvier_dom_html_quote_element_get_cite(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLQuoteElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::blockquoteTag) || element->hasTagName(HTMLNames::qTag)) ? static_cast<HTMLQuoteElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::citeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLQuoteElement.cite setter: attribute USVString cite
+int32_t ranvier_dom_html_quote_element_set_cite(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> HTMLQuoteElement* { auto* element = dynamicDowncast<HTMLElement>(*nodeOf(target)); return element && (element->hasTagName(HTMLNames::blockquoteTag) || element->hasTagName(HTMLNames::qTag)) ? static_cast<HTMLQuoteElement*>(element) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::citeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.src getter: attribute USVString src
+int32_t ranvier_dom_html_source_element_get_src(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getURLAttributeForBindings(HTMLNames::srcAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.src setter: attribute USVString src
+int32_t ranvier_dom_html_source_element_set_src(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::srcAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.type getter: attribute DOMString type
+int32_t ranvier_dom_html_source_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::typeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.type setter: attribute DOMString type
+int32_t ranvier_dom_html_source_element_set_type(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::typeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.srcset getter: attribute USVString srcset
+int32_t ranvier_dom_html_source_element_get_srcset(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::srcsetAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.srcset setter: attribute USVString srcset
+int32_t ranvier_dom_html_source_element_set_srcset(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::srcsetAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.sizes getter: attribute DOMString sizes
+int32_t ranvier_dom_html_source_element_get_sizes(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::sizesAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.sizes setter: attribute DOMString sizes
+int32_t ranvier_dom_html_source_element_set_sizes(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::sizesAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.media getter: attribute DOMString media
+int32_t ranvier_dom_html_source_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::mediaAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLSourceElement.media setter: attribute DOMString media
+int32_t ranvier_dom_html_source_element_set_media(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::mediaAttr, AtomString { a0.string() }); });
+}
+
+// HTMLSourceElement.width getter: attribute unsigned long width
+int32_t ranvier_dom_html_source_element_get_width(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unsignedIntegralAttribute(HTMLNames::widthAttr); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLSourceElement.width setter: attribute unsigned long width
+int32_t ranvier_dom_html_source_element_set_width(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setUnsignedIntegralAttribute(HTMLNames::widthAttr, value); });
+}
+
+// HTMLSourceElement.height getter: attribute unsigned long height
+int32_t ranvier_dom_html_source_element_get_height(RvNode* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unsignedIntegralAttribute(HTMLNames::heightAttr); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLSourceElement.height setter: attribute unsigned long height
+int32_t ranvier_dom_html_source_element_set_height(RvNode* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setUnsignedIntegralAttribute(HTMLNames::heightAttr, value); });
+}
+
+// HTMLSourceElement.attachmentIdentifier getter: readonly attribute DOMString attachmentIdentifier; RV_ERR_UNSUPPORTED where WebKit builds without ATTACHMENT_ELEMENT
+int32_t ranvier_dom_html_source_element_get_attachment_identifier(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+#if ENABLE(ATTACHMENT_ELEMENT)
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLSourceElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attachmentIdentifier(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(buffer);
+    UNUSED_PARAM(capacity);
+    UNUSED_PARAM(length);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// HTMLTimeElement.dateTime getter: attribute DOMString dateTime
+int32_t ranvier_dom_html_time_element_get_date_time(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTimeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->attributeWithoutSynchronization(HTMLNames::datetimeAttr); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTimeElement.dateTime setter: attribute DOMString dateTime
+int32_t ranvier_dom_html_time_element_set_date_time(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTimeElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setAttributeWithoutSynchronization(HTMLNames::datetimeAttr, AtomString { a0.string() }); });
+}
+
+// HTMLTitleElement.text getter: attribute DOMString text
+int32_t ranvier_dom_html_title_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTitleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->text(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// HTMLTitleElement.text setter: attribute DOMString text
+int32_t ranvier_dom_html_title_element_set_text(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLTitleElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setText(a0.string()); });
 }
 
 // CSSStyleDeclaration.cssText getter: attribute CSSOMString cssText
