@@ -59,6 +59,30 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_undefined_result_union_preserves_a_tagged_monostate_without_a_handle(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+partial interface Node { (undefined or CSSStyleValue) maybeValue(); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        header = generator.header()
+        interfaces = generator.interfaces()
+        result = next(item.returns for item in generator.functions if item.name == 'node_maybe_value')
+        self.assertEqual('Variant<std::monostate, Ref<CSSStyleValue>>', generator.transport_cpp(result))
+        self.assertIn('int32_t arm0;', header)
+        self.assertIn('result->arm0 = 0;', glue)
+        self.assertIn('UndefinedOrCSSStyleValue.Undefined ()', interfaces)
+        self.assertNotIn('isUndefined arm', interfaces)
+        self.assertIn('$0 === undefined', interfaces)
+        self.assertTrue("globalThis.CSSStyleValue.prototype.toString.call(v)" in interfaces)
+
     def test_selected_reference_segment_overload_rejects_null_and_checks_the_engine_brand(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

@@ -39,3 +39,9 @@ Actual Chromium 156.0.8078.4, using the repository's Playwright installation, co
 Three background-image values preserve set/append order. An entries iterator created before adding opacity excludes that later entry, consistent with snapshot semantics. Editing the declared width to 44px updates the computed width to 44px. delete removes a property and clear leaves size zero. An unparsed NUL segment is replaced by U+FFFD when parsed into the custom-property declaration; this is a parser result, distinct from C14's length-preserving unparsed object transport.
 
 The ignored audit script/result are artifacts/c13-browser-audit.mjs and artifacts/c13-browser-audit.json. These are exploratory observations, not C13 acceptance or evidence of native map execution. No native map binding is implemented yet.
+
+## First binding primitive checkpoint
+
+The undefined-result union now has an explicit monostate arm, a reserved zero int32 transport slot and no owned handle for that arm. Generated Fable unboxing checks strict undefined separately; CSSStyleValue uses its intrinsic stringifier as a brand check that accepts actual subclasses and rejects forged object tags. The initial generator case failed at transport_cpp with an IndexError, then exposed the inherited base-tag rejection before repair.
+
+All 46 generator tests pass and production generation remains byte-equivalent after newline normalization: no map interface is selected yet and no previous generated contract changes. An actual Fickl 0.6.9/Fable 5.24 synthetic generated-interface probe passes seven assertions in Chromium 156.0.8078.4: undefined, actual parsed unit/keyword/unparsed/image outputs, and null/forged-tag rejection. Independent source review is clear. Native monostate execution awaits the real map bindings; this checkpoint does not claim native or complete C13 conformance.

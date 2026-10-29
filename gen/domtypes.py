@@ -43,6 +43,8 @@ class ComplexGeneratorMixin:
         self.complex_used[mapped.ctype] = mapped
 
     def transport_ctype(self, mapped):
+        if mapped.kind == 'void':
+            return 'int32_t'
         if mapped.kind == 'string':
             return 'RvDomUtf8StringSpan' if mapped.string_spans else 'const char*'
         if mapped.kind in ('node', 'event', 'object'):
@@ -55,6 +57,8 @@ class ComplexGeneratorMixin:
 
     def transport_cpp(self, mapped):
         kind = mapped.kind
+        if kind == 'void':
+            return 'std::monostate'
         if kind == 'string':
             return 'String'
         if kind == 'bool':
@@ -112,6 +116,8 @@ class ComplexGeneratorMixin:
     def decode_value(self, mapped, expression, variable):
         cpp = self.transport_cpp(mapped)
         kind = mapped.kind
+        if kind == 'void':
+            return [f'if ({expression} != 0) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}'], 'std::monostate { }'
         if kind in ('union', 'sequence'):
             return [f'auto {variable} = decode{mapped.ctype}(&{expression}, status);',
                     'if (status != RV_OK) return std::nullopt;'], f'std::move(*{variable})'
@@ -151,6 +157,8 @@ class ComplexGeneratorMixin:
 
     def encode_value(self, mapped, expression, target):
         kind = mapped.kind
+        if kind == 'void':
+            return [f'{target} = 0;']
         if kind in ('union', 'sequence'):
             return [f'encode{mapped.ctype}({expression}, &{target});']
         if kind == 'string':

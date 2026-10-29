@@ -250,6 +250,9 @@ class InterfaceEmitter:
             return []
         lines = ['', '#if FABLE_COMPILER', '[<AutoOpen>]', 'module BrowserUnionAdapters =']
         span_unions = set(self.world.config.get('complexStringSpans', []))
+        if any(self.world.resolve(child).name == 'undefined' for children in self.unions.values() for child in children):
+            lines += ['    [<Fable.Core.Emit("$0 === undefined")>]',
+                      '    let private isUndefinedUnionValue (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         if any(name in span_unions for name in self.unions):
             lines += ["    [<Fable.Core.Emit(\"((v)=>String(v==null?'null':v).toWellFormed())($0)\")>]",
                       '    let private normalizeUSVString (_: string) : string =', '        Fable.Core.Util.jsNative', '']
@@ -264,6 +267,9 @@ class InterfaceEmitter:
         for name in sorted(result_interfaces):
             browser_name = self.world.interfaces[name].attrs.get('InterfaceName', self.world.public_name(name))
             predicate = '$0 != null && $0.nodeType === 1' if name == 'Element' else f'Object.prototype.toString.call($0) === \'[object {browser_name}]\''
+            if name == 'CSSStyleValue':
+                predicate = ("((v)=>{if(v==null)return false;try{globalThis.CSSStyleValue.prototype.toString.call(v);"
+                             "return true;}catch{return false;}})($0)")
             if name == 'CSSOMVariableReferenceValue' and name in strict_interfaces:
                 predicate = ("((v)=>{if(v==null)return false;try{Object.getOwnPropertyDescriptor("
                              "globalThis.CSSVariableReferenceValue.prototype,'variable').get.call(v);"
@@ -274,13 +280,17 @@ class InterfaceEmitter:
             lines += ['', f'    let private box{name} (value: {name}) : obj =', '        match value with']
             for child in children:
                 boxed = 'box (normalizeUSVString value)' if name in span_unions and self.world.resolve(child).name == 'USVString' else 'box value'
+                if self.world.resolve(child).name == 'undefined':
+                    boxed = 'Fable.Core.JsInterop.emitJsExpr () "undefined"'
                 lines += [f'        | {name}.{label(child)} value -> {boxed}']
             if any(self.union(member.type) and label(self.world.resolve(member.type)) == name for _, member in self.adapters):
                 lines += ['', f'    let private unbox{name} (value: obj) : {name} =', '        match value with']
                 for child in children:
                     resolved = self.world.resolve(child)
                     ftype = self.type(child)
-                    if resolved.name in STRINGS or resolved.name in NUMBERS or resolved.name == 'boolean':
+                    if resolved.name == 'undefined':
+                        lines += [f'        | arm when isUndefinedUnionValue arm -> {name}.{label(child)} ()']
+                    elif resolved.name in STRINGS or resolved.name in NUMBERS or resolved.name == 'boolean':
                         lines += [f'        | :? {ftype} as arm -> {name}.{label(child)} arm']
                     else:
                         head = f'        | arm when is{resolved.name} arm ->'
