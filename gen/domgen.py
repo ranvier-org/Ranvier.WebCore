@@ -463,6 +463,22 @@ class Generator(ComplexGeneratorMixin):
         duplicates = {n for n in names if names.count(n) > 1}
         if duplicates:
             raise SystemExit(f"generated names collide: {sorted(duplicates)}")
+        self.runtime_queries = []
+        for root in self.world.config.get("runtimeTypeRoots", []):
+            if root not in self.handles:
+                raise SystemExit(f"{root}: runtime type query requires a scoped object-handle root")
+            interfaces = sorted((name for name in self.world.scope if root in self.world.chain(name) and name != root),
+                                key=lambda name: (-len(self.world.chain(name)), name))
+            for name in interfaces:
+                self.cast_expression(self.world.cpp_class(name), self.world.cpp_class(root), "*impl")
+            self.runtime_queries.append({
+                "root": root,
+                "function": f"rv_dom_{snake(root)}_get_interface_name",
+                "feature": f"dom-type-query:{root}",
+                "interfaces": interfaces + [root],
+                "parameters": [{"ctype": f"Rv{root}*", "name": "target"}, {"ctype": "char*", "name": "buffer"},
+                               {"ctype": "int32_t", "name": "capacity"}, {"ctype": "int32_t*", "name": "length"}],
+            })
 
     def skip(self, interface, member, reason):
         label = member.name or member.special or member.kind
@@ -1141,6 +1157,7 @@ class Generator(ComplexGeneratorMixin):
             })
         model = {
             "schemaVersion": 1,
+            "runtimeTypeQueries": self.runtime_queries,
             "interfaces": [{"name": name, "base": self.world.interfaces[name].base}
                            for name in self.world.scope],
             "contractInterfaces": [{"name": self.world.public_name(name), "idlName": name,
@@ -1249,6 +1266,10 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"RV_EXPORT void rv_dom_{snake(name)}_release(Rv{name}*);")
             lines.append(f"/* Adds a reference to a {name} and returns it. */")
             lines.append(f"RV_EXPORT Rv{name}* rv_dom_{snake(name)}_retain(Rv{name}*);")
+        for query in self.runtime_queries:
+            parameters = [(row['ctype'], row['name']) for row in query['parameters']]
+            lines.append(f"/* Concrete scoped interface name of a {query['root']} handle; borrows target. */")
+            lines.append(f"RV_EXPORT int32_t {query['function']}({params_text(parameters)});")
         lines.append("")
         current = None
         for function in self.functions:
@@ -1293,6 +1314,10 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"WEBCORE_EXPORT void ranvier_dom_{snake(name)}_release(Rv{name}*);")
             lines.append(f"WEBCORE_EXPORT Rv{name}* ranvier_dom_{snake(name)}_retain(Rv{name}*);")
         lines += self.complex_release_declarations("ranvier_dom_", "WEBCORE_EXPORT")
+        for query in self.runtime_queries:
+            parameters = [(row['ctype'], row['name']) for row in query['parameters']]
+            name = query['function'].replace('rv_dom_', 'ranvier_dom_', 1)
+            lines.append(f"WEBCORE_EXPORT int32_t {name}({params_text(parameters)});")
         for function in self.functions:
             lines.append(f"WEBCORE_EXPORT int32_t ranvier_dom_{function.name}({params_text(function.params)});")
         lines += ["", "}", ""]
@@ -1312,6 +1337,11 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"Rv{name}* rv_dom_{snake(name)}_retain(Rv{name}* handle) {{ return ranvier_dom_{snake(name)}_retain(handle); }}")
         for name in self.complex_used:
             lines.append(f"void rv_dom_{transport_token(name)}_release({name}* value) {{ ranvier_dom_{transport_token(name)}_release(value); }}")
+        for query in self.runtime_queries:
+            parameters = [(row['ctype'], row['name']) for row in query['parameters']]
+            name = query['function']
+            twin = name.replace('rv_dom_', 'ranvier_dom_', 1)
+            lines.append(f"int32_t {name}({params_text(parameters)}) {{ return {twin}(target, buffer, capacity, length); }}")
         for function in self.functions:
             args = ", ".join(n for _, n in function.params)
             lines.append(f"int32_t rv_dom_{function.name}({params_text(function.params)}) {{ return ranvier_dom_{function.name}({args}); }}")
@@ -1339,7 +1369,7 @@ class Generator(ComplexGeneratorMixin):
         lines.append("{")
         lines.append("    if (!feature)")
         lines.append("        return 0;")
-        groups = ["dom-generated"] + [f"dom:{name}" for name in self.world.scope]
+        groups = ["dom-generated"] + [f"dom:{name}" for name in self.world.scope] + [query['feature'] for query in self.runtime_queries]
         lines.append("    for (auto* name : { " + ", ".join(f'"{g}"' for g in groups) + " }) {")
         lines.append("        if (!std::strcmp(feature, name))")
         lines.append("            return 1;")
@@ -1384,6 +1414,23 @@ class Generator(ComplexGeneratorMixin):
                 lines.append("#endif")
             lines.append("}")
             lines.append("")
+        for query in self.runtime_queries:
+            parameters = [(row['ctype'], row['name']) for row in query['parameters']]
+            name = query['function'].replace('rv_dom_', 'ranvier_dom_', 1)
+            root = query['root']
+            lines += [f"int32_t {name}({params_text(parameters)})", "{",
+                      "    if (!target || !length)", "        return RV_ERR_NULL_ARGUMENT;",
+                      "    if (!isMainThread())", "        return RV_ERR_WRONG_THREAD;",
+                      f"    auto* impl = reinterpret_cast<{self.world.cpp_class(root)}*>(target);"]
+            for interface in query['interfaces'][:-1]:
+                conditional = self.conditional(self.world.interfaces[interface])
+                if conditional:
+                    lines.append(f"#if {conditional}")
+                cast = self.cast_expression(self.world.cpp_class(interface), self.world.cpp_class(root), "*impl")
+                lines += [f"    if ({cast})", f'        return copyString("{interface}"_s, buffer, capacity, length);']
+                if conditional:
+                    lines.append("#endif")
+            lines += [f'    return copyString("{root}"_s, buffer, capacity, length);', "}", ""]
         lines += ["} // extern \"C\"", ""]
         return "\n".join(lines)
 
@@ -1430,6 +1477,9 @@ class Generator(ComplexGeneratorMixin):
         for name in self.handles:
             lines += ["", "[<DllImport(Lib)>]", f"extern void rv_dom_{snake(name)}_release(nativeint handle)"]
             lines += ["", "[<DllImport(Lib)>]", f"extern nativeint rv_dom_{snake(name)}_retain(nativeint handle)"]
+        for query in self.runtime_queries:
+            rendered = [fsharp_param(row['ctype'], row['name']) for row in query['parameters']]
+            lines += ["", "[<DllImport(Lib)>]", f"extern int {query['function']}({', '.join(rendered)})"]
         for function in self.functions:
             rendered = []
             for ctype, name in function.params:
@@ -1447,6 +1497,7 @@ class Generator(ComplexGeneratorMixin):
             f"operations {sum(f.kind == 'operation' for f in self.functions)}), handle types {len(self.handles)}, "
             f"constants {len(self.constants)}, enumerations {len(self.enums_used)}, dictionaries {len(self.dicts_used)}, "
             f"stubs {len(self.stubs)}, left out {len(self.excluded)}",
+            f"Runtime type queries: {len(self.runtime_queries)} (separate from the IDL member count)",
             "",
             "Functions per interface:",
         ]

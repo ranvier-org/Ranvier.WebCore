@@ -59,6 +59,35 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_runtime_type_queries_classify_derived_interfaces_without_changing_dom_members(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSRule {};
+interface CSSGroupingRule : CSSRule {};
+[Conditional=PROBE] interface CSSStartingStyleRule : CSSGroupingRule {};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = ['CSSRule', 'CSSGroupingRule', 'CSSStartingStyleRule']
+        config['runtimeTypeRoots'] = ['CSSRule']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        query = model['runtimeTypeQueries'][0]
+        self.assertEqual(query['root'], 'CSSRule')
+        self.assertEqual(query['function'], 'rv_dom_css_rule_get_interface_name')
+        self.assertEqual(query['feature'], 'dom-type-query:CSSRule')
+        self.assertEqual(model['functions'], [])
+        self.assertNotIn('get_interface_name', generator.interfaces())
+        for output in [generator.header(), generator.host(), generator.fsharp()]:
+            self.assertIn('rv_dom_css_rule_get_interface_name', output)
+        glue = generator.glue()
+        self.assertIn('#if ENABLE(PROBE)', glue)
+        self.assertIn('"dom-type-query:CSSRule"', glue)
+        self.assertLess(glue.index('dynamicDowncast<CSSStartingStyleRule>'), glue.index('dynamicDowncast<CSSGroupingRule>'))
+        self.assertIn('return copyString("CSSRule"_s, buffer, capacity, length)', glue)
+
     def test_css_rule_and_descriptor_settings_use_owner_or_constructor_document(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

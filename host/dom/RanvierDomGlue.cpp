@@ -1208,7 +1208,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -25708,6 +25708,86 @@ int32_t ranvier_dom_composition_event_get_data(RvEvent* target, char* buffer, in
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->data(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<CSSRule*>(target);
+    if (dynamicDowncast<CSSContainerRule>(*impl))
+        return copyString("CSSContainerRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSMediaRule>(*impl))
+        return copyString("CSSMediaRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSSupportsRule>(*impl))
+        return copyString("CSSSupportsRule"_s, buffer, capacity, length);
+    if (([&]() -> CSSConditionRule* { auto* base = dynamicDowncast<CSSGroupingRule>(*impl); return base ? dynamicDowncast<CSSConditionRule>(*base) : nullptr; }()))
+        return copyString("CSSConditionRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSLayerBlockRule>(*impl))
+        return copyString("CSSLayerBlockRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSScopeRule>(*impl))
+        return copyString("CSSScopeRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSStartingStyleRule>(*impl))
+        return copyString("CSSStartingStyleRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSCounterStyleRule>(*impl))
+        return copyString("CSSCounterStyleRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSFontFaceRule>(*impl))
+        return copyString("CSSFontFaceRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSFontFeatureValuesRule>(*impl))
+        return copyString("CSSFontFeatureValuesRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSFontPaletteValuesRule>(*impl))
+        return copyString("CSSFontPaletteValuesRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSGroupingRule>(*impl))
+        return copyString("CSSGroupingRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSImportRule>(*impl))
+        return copyString("CSSImportRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSKeyframeRule>(*impl))
+        return copyString("CSSKeyframeRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSKeyframesRule>(*impl))
+        return copyString("CSSKeyframesRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSLayerStatementRule>(*impl))
+        return copyString("CSSLayerStatementRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSNamespaceRule>(*impl))
+        return copyString("CSSNamespaceRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSNestedDeclarations>(*impl))
+        return copyString("CSSNestedDeclarations"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSPositionTryRule>(*impl))
+        return copyString("CSSPositionTryRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSStyleRule>(*impl))
+        return copyString("CSSStyleRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSViewTransitionRule>(*impl))
+        return copyString("CSSViewTransitionRule"_s, buffer, capacity, length);
+    return copyString("CSSRule"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_style_sheet_get_interface_name(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<StyleSheet*>(target);
+    if (dynamicDowncast<CSSStyleSheet>(*impl))
+        return copyString("CSSStyleSheet"_s, buffer, capacity, length);
+    return copyString("StyleSheet"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<CSSStyleDeclaration*>(target);
+    if (dynamicDowncast<CSSFontFaceDescriptors>(*impl))
+        return copyString("CSSFontFaceDescriptors"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSPositionTryDescriptors>(*impl))
+        return copyString("CSSPositionTryDescriptors"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSStyleProperties>(*impl))
+        return copyString("CSSStyleProperties"_s, buffer, capacity, length);
+    return copyString("CSSStyleDeclaration"_s, buffer, capacity, length);
 }
 
 } // extern "C"

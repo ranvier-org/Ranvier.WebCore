@@ -704,6 +704,15 @@ extern void rv_dom_validity_state_release(nativeint handle)
 extern nativeint rv_dom_validity_state_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_sheet_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_style_declaration_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
 
 [<DllImport(Lib)>]
