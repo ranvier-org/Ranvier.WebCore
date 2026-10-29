@@ -129,9 +129,15 @@ def verify(native_directory):
             #parent {--inherited-length:83px;--isolated-length:83px}
             #inherited {width:var(--inherited-length)} #isolated {width:var(--isolated-length)}
             #initial {width:var(--unicode-\xcf\x80)} #rule-value {width:var(--from-rule)}
+            #registered-priority {width:var(--registered-length,21px)}
+            #plain-priority {width:var(--plain-priority,21px)}
+            #registered-cascade {--registered-length:40px!important;--registered-length:80px;width:var(--registered-length)}
+            #plain-cascade {--plain-cascade:40px!important;--plain-cascade:80px;width:var(--plain-cascade)}
             </style><div id="registered"></div><div id="plain"></div>
             <div id="parent"><div id="inherited"></div><div id="isolated"></div></div>
-            <div id="initial"></div><div id="rule-value"></div>'''
+            <div id="initial"></div><div id="rule-value"></div>
+            <div id="registered-priority"></div><div id="plain-priority"></div>
+            <div id="registered-cascade"></div><div id="plain-cascade"></div>'''
         call('rv_dom_element_set_inner_html', [pointer, string], body, markup)
         find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
 
@@ -164,6 +170,41 @@ def verify(native_directory):
             buffer, length = ctypes.create_string_buffer(1024), integer()
             call(name, [pointer, pointer, integer, ctypes.POINTER(integer)], target, buffer, len(buffer), ctypes.byref(length))
             return None if length.value == -1 else buffer.raw[:length.value].decode('utf-8')
+
+        def property_text(style, member, name):
+            buffer, length = ctypes.create_string_buffer(1024), integer()
+            call('rv_dom_css_style_declaration_get_property_' + member,
+                 [pointer, string, pointer, integer, ctypes.POINTER(integer)],
+                 style, name, buffer, len(buffer), ctypes.byref(length))
+            return buffer.raw[:length.value].decode('utf-8')
+
+        for element_name, property_name, initial in [(b'registered-priority', b'--registered-length', '20px'),
+                                                      (b'plain-priority', b'--plain-priority', '21px')]:
+            element = node(element_name)
+            declaration = handle('rv_dom_html_element_get_style', [pointer], [element], 'rv_dom_css_style_declaration_release')
+            def set_value(value, priority):
+                call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string],
+                     declaration, property_name, value, priority)
+            def state(expected_value, expected_priority, expected_width):
+                expect(property_text(declaration, 'value', property_name) == expected_value, 'custom specified value')
+                expect(property_text(declaration, 'priority', property_name) == expected_priority, 'custom specified priority')
+                expect(width(element) == expected_width, 'custom priority actual cascade')
+            set_value(b'40px', b'important')
+            state('40px', 'important', '40px')
+            set_value(b'80px', b'')
+            state('80px', '', '80px')
+            set_value(b'80px', b'important')
+            state('80px', 'important', '80px')
+            set_value(b'80px', b'')
+            state('80px', '', '80px')
+            set_value(b'90px', b'invalid-priority')
+            state('80px', '', '80px')
+            set_value(b'var()', b'important')
+            state('80px', '', '80px')
+            set_value(b'', b'')
+            state('', '', initial)
+        expect(width(node(b'registered-cascade')) == '40px', 'stylesheet parsing retains earlier important registered property')
+        expect(width(node(b'plain-cascade')) == '40px', 'stylesheet parsing retains earlier important unregistered property')
 
         sheet = handle('rv_dom_html_style_element_get_sheet', [pointer], [node(b'sheet')], 'rv_dom_style_sheet_release')
         rules = handle('rv_dom_css_style_sheet_get_css_rules', [pointer], [sheet], 'rv_dom_css_rule_list_release')

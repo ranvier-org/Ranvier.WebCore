@@ -1,0 +1,13 @@
+diff --git a/Source/WebCore/css/parser/CSSParser.cpp b/Source/WebCore/css/parser/CSSParser.cpp
+--- a/Source/WebCore/css/parser/CSSParser.cpp
++++ b/Source/WebCore/css/parser/CSSParser.cpp
+@@ -143,7 +143,8 @@ auto CSSParser::parseCustomPropertyValue(MutableStyleProperties& declaration, const
+ 
+     if (parser.topContext().m_parsedProperties.isEmpty())
+         return ParseResult::Error;
+-    return declaration.addParsedProperties(parser.topContext().m_parsedProperties) ? ParseResult::Changed : ParseResult::Unchanged;
++    ASSERT(parser.topContext().m_parsedProperties.size() == 1);
++    return declaration.setProperty(parser.topContext().m_parsedProperties[0]) ? ParseResult::Changed : ParseResult::Unchanged;
+ }
+ 
+ static inline void filterProperties(IsImportant important, const ParsedPropertyVector& input, ParsedPropertyVector& output, size_t& unusedEntries, std::bitset<numCSSProperties>& seenProperties, HashSet<AtomString>& seenCustomProperties)

@@ -17,3 +17,4 @@
 0015-keyframe-offset-invalidation.patch
 0016-counter-style-name.patch
 0017-detached-cssom-context.patch
+0018-cssom-custom-property-priority.patch
