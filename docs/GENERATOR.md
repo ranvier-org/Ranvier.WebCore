@@ -234,6 +234,13 @@ fixtures under `css/scripts/test/` are excluded from runtime partial interfaces.
 Sheet constructors, asynchronous replacement and adopted-sheet lists still need their native bridges;
 these exports do not claim those operations, layout parity or cross-platform conformance is complete.
 
+`runtimeTypeRoots` generates UTF-8 concrete-interface queries for selected object roots. The model's
+`runtimeTypeQueries` names their exports, parameter types and most-derived-first scoped interface names.
+They borrow the target handle, reject null arguments and calls off the owning thread, and do not add
+invented members to the shared DOM interfaces. CSS rule, stylesheet and declaration wrappers use these
+queries because CSSOM's historical `CSSRule.type` returns zero for modern rule types. An unscoped subtype
+reports its nearest scoped ancestor. Query names are reported separately from the IDL member count.
+
 `gen/dom-report.txt` records the generated interface/function counts, handle types, constants, enumerations,
 dictionary structs and every member left out, by reason:
 

@@ -1,5 +1,110 @@
 {
   "schemaVersion": 1,
+  "runtimeTypeQueries": [
+    {
+      "root": "CSSRule",
+      "function": "rv_dom_css_rule_get_interface_name",
+      "feature": "dom-type-query:CSSRule",
+      "interfaces": [
+        "CSSContainerRule",
+        "CSSMediaRule",
+        "CSSSupportsRule",
+        "CSSConditionRule",
+        "CSSLayerBlockRule",
+        "CSSScopeRule",
+        "CSSStartingStyleRule",
+        "CSSCounterStyleRule",
+        "CSSFontFaceRule",
+        "CSSFontFeatureValuesRule",
+        "CSSFontPaletteValuesRule",
+        "CSSGroupingRule",
+        "CSSImportRule",
+        "CSSKeyframeRule",
+        "CSSKeyframesRule",
+        "CSSLayerStatementRule",
+        "CSSNamespaceRule",
+        "CSSNestedDeclarations",
+        "CSSPositionTryRule",
+        "CSSStyleRule",
+        "CSSViewTransitionRule",
+        "CSSRule"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvCSSRule*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    },
+    {
+      "root": "StyleSheet",
+      "function": "rv_dom_style_sheet_get_interface_name",
+      "feature": "dom-type-query:StyleSheet",
+      "interfaces": [
+        "CSSStyleSheet",
+        "StyleSheet"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvStyleSheet*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    },
+    {
+      "root": "CSSStyleDeclaration",
+      "function": "rv_dom_css_style_declaration_get_interface_name",
+      "feature": "dom-type-query:CSSStyleDeclaration",
+      "interfaces": [
+        "CSSFontFaceDescriptors",
+        "CSSPositionTryDescriptors",
+        "CSSStyleProperties",
+        "CSSStyleDeclaration"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleDeclaration*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    }
+  ],
   "interfaces": [
     {
       "name": "Node",

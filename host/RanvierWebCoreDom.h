@@ -606,6 +606,12 @@ RV_EXPORT RvHTMLCollection* rv_dom_html_collection_retain(RvHTMLCollection*);
 RV_EXPORT void rv_dom_validity_state_release(RvValidityState*);
 /* Adds a reference to a ValidityState and returns it. */
 RV_EXPORT RvValidityState* rv_dom_validity_state_retain(RvValidityState*);
+/* Concrete scoped interface name of a CSSRule handle; borrows target. */
+RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
+/* Concrete scoped interface name of a StyleSheet handle; borrows target. */
+RV_EXPORT int32_t rv_dom_style_sheet_get_interface_name(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length);
+/* Concrete scoped interface name of a CSSStyleDeclaration handle; borrows target. */
+RV_EXPORT int32_t rv_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 
 /* Node */
 

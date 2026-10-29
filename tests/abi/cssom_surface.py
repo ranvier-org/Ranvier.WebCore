@@ -3,6 +3,7 @@ import ctypes
 import os
 import pathlib
 import sys
+import threading
 
 
 def verify(native_directory):
@@ -43,6 +44,12 @@ def verify(native_directory):
         return result.value
 
     bind('rv_dom_html_style_element_get_sheet', integer, [pointer, pointers])
+    has = bind('rv_abi_has', integer, [string])
+    for root in ['CSSRule', 'StyleSheet', 'CSSStyleDeclaration']:
+        expect(has(('dom-type-query:' + root).encode()) == 1, root + ' runtime type capability')
+    type_query = bind('rv_dom_css_rule_get_interface_name', integer, [pointer, pointer, integer, numbers])
+    invalid_length = integer()
+    expect(type_query(None, None, 0, ctypes.byref(invalid_length)) == -1, 'runtime type query null target')
     host = bind('rv_host_create', pointer, [integer, integer])(320, 240)
     expect(bool(host), 'host creation')
     try:
@@ -57,6 +64,7 @@ def verify(native_directory):
         call('rv_node_append_child', [pointer, pointer], body, style)
         sheets = handle('rv_dom_document_get_style_sheets', [pointer], document, release='rv_dom_style_sheet_list_release')
         sheet = handle('rv_dom_html_style_element_get_sheet', [pointer], style, release='rv_dom_style_sheet_release')
+        expect(text('rv_dom_style_sheet_get_interface_name', [pointer], sheet) == 'CSSStyleSheet', 'concrete stylesheet type')
         expect(text('rv_dom_style_sheet_get_type', [pointer], sheet) == 'text/css', 'stylesheet MIME type')
         rules = handle('rv_dom_css_style_sheet_get_css_rules', [pointer], sheet, release='rv_dom_css_rule_list_release')
 
@@ -70,6 +78,19 @@ def verify(native_directory):
         rule = handle('rv_dom_css_rule_list_item', [pointer, unsigned], rules, 0, release='rv_dom_css_rule_release')
         expect(text('rv_dom_css_style_rule_get_selector_text', [pointer], rule) == '.probe', 'selector text')
         declaration = handle('rv_dom_css_style_rule_get_style', [pointer], rule, release='rv_dom_css_style_declaration_release')
+        expect(text('rv_dom_css_style_declaration_get_interface_name', [pointer], declaration) == 'CSSStyleProperties', 'concrete style declaration type')
+        expect(text('rv_dom_css_rule_get_interface_name', [pointer], rule) == 'CSSStyleRule', 'concrete style rule type')
+        expect(type_query(rule, None, 0, None) == -1, 'runtime type query null length')
+        other_thread_status = []
+
+        def query_other_thread():
+            length = integer()
+            other_thread_status.append(type_query(rule, None, 0, ctypes.byref(length)))
+
+        thread = threading.Thread(target=query_other_thread)
+        thread.start()
+        thread.join()
+        expect(other_thread_status == [-2], 'runtime type query owning thread')
         expect(text('rv_dom_css_style_declaration_get_property_value', [pointer, string], declaration, b'color') == 'red', 'rule declaration')
         call('rv_dom_css_style_rule_set_selector_text', [pointer, string], rule, b'.changed')
         expect('.changed' in text('rv_dom_css_rule_get_css_text', [pointer], rule), 'selector reflected in cssText')
@@ -110,6 +131,11 @@ def verify(native_directory):
         ]:
             current = append_rule(css)
             expect(text('rv_dom_' + getter, [pointer], current) == expected, getter + ' parsed metadata')
+            concrete = {'@supports': 'CSSSupportsRule', '@container': 'CSSContainerRule', '@layer': 'CSSLayerBlockRule',
+                        '@scope': 'CSSScopeRule', '@font-feature-values': 'CSSFontFeatureValuesRule',
+                        '@font-palette-values': 'CSSFontPaletteValuesRule', '@counter-style': 'CSSCounterStyleRule',
+                        '@view-transition': 'CSSViewTransitionRule'}[css.split()[0]]
+            expect(text('rv_dom_css_rule_get_interface_name', [pointer], current) == concrete, concrete + ' runtime type')
 
         keyframes = append_rule('@keyframes pulse { from { opacity: 0; } to { opacity: 1; } }')
         expect(text('rv_dom_css_keyframes_rule_get_name', [pointer], keyframes) == 'pulse', 'keyframes name')
@@ -125,6 +151,7 @@ def verify(native_directory):
 
         font = append_rule('@font-face { font-family: Fixture; src: local("Fixture"); font-display: swap; }')
         descriptors = handle('rv_dom_css_font_face_rule_get_style', [pointer], font, release='rv_dom_css_style_declaration_release')
+        expect(text('rv_dom_css_style_declaration_get_interface_name', [pointer], descriptors) == 'CSSFontFaceDescriptors', 'concrete font descriptors type')
         expect(text('rv_dom_css_font_face_descriptors_get_font_family', [pointer], descriptors) == 'Fixture', 'font family descriptor')
         call('rv_dom_css_font_face_descriptors_set_font_family_css', [pointer, string], descriptors, b'ChangedFixture')
         expect(text('rv_dom_css_font_face_descriptors_get_font_family', [pointer], descriptors) == 'ChangedFixture', 'dashed descriptor alias')
@@ -134,11 +161,13 @@ def verify(native_directory):
         position = append_rule('@position-try --fallback { top: 10px; margin-left: 4px; }')
         expect(text('rv_dom_css_position_try_rule_get_name', [pointer], position) == '--fallback', 'position fallback name')
         fallback = handle('rv_dom_css_position_try_rule_get_style', [pointer], position, release='rv_dom_css_style_declaration_release')
+        expect(text('rv_dom_css_style_declaration_get_interface_name', [pointer], fallback) == 'CSSPositionTryDescriptors', 'concrete position descriptors type')
         expect(text('rv_dom_css_position_try_descriptors_get_top', [pointer], fallback) == '10px', 'position descriptor')
         call('rv_dom_css_position_try_descriptors_set_margin_left_css', [pointer, string], fallback, b'8px')
         expect(text('rv_dom_css_position_try_descriptors_get_margin_left', [pointer], fallback) == '8px', 'dashed position alias')
 
         starting = append_rule('@starting-style { .probe { opacity: 0; } }')
+        expect(text('rv_dom_css_rule_get_interface_name', [pointer], starting) == 'CSSStartingStyleRule', 'zero-own-member rule type')
         starting_rules = handle('rv_dom_css_grouping_rule_get_css_rules', [pointer], starting, release='rv_dom_css_rule_list_release')
         length_is('rv_dom_css_rule_list_get_length', starting_rules, 1)
         scoped = append_rule('.nest { color: red; & .child { color: blue; } opacity: 0.5; }')

@@ -56,6 +56,9 @@ void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString* value) { ranvier
 void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value) { ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(value); }
 void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value) { ranvier_dom_sequence_static_range_release(value); }
 void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value) { ranvier_dom_sequence_pointer_event_release(value); }
+int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_rule_get_interface_name(target, buffer, capacity, length); }
+int32_t rv_dom_style_sheet_get_interface_name(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_style_sheet_get_interface_name(target, buffer, capacity, length); }
+int32_t rv_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_style_declaration_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_node_type(RvNode* target, uint16_t* result) { return ranvier_dom_node_get_node_type(target, result); }
 int32_t rv_dom_node_get_node_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_node_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_base_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_base_uri(target, buffer, capacity, length); }
