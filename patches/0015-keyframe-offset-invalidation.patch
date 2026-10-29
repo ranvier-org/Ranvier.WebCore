@@ -1,0 +1,124 @@
+diff --git a/Source/WebCore/css/CSSKeyframeRule.cpp b/Source/WebCore/css/CSSKeyframeRule.cpp
+index db55e29..8ddc5d0 100644
+--- a/Source/WebCore/css/CSSKeyframeRule.cpp
++++ b/Source/WebCore/css/CSSKeyframeRule.cpp
+@@ -31,6 +31,7 @@
+ #include "CSSPropertyParserConsumer+Animations.h"
+ #include "CSSSerializationContext.h"
+ #include "CSSStyleProperties.h"
++#include "CSSStyleSheet.h"
+ #include "MutableStyleProperties.h"
+ #include "StyleProperties.h"
+ #include "StylePropertiesInlines.h"
+@@ -86,6 +87,12 @@ Ref<StyleRuleKeyframe> StyleRuleKeyframe::create(Vector<std::pair<CSSValueID, CS
+ 
+ StyleRuleKeyframe::~StyleRuleKeyframe() = default;
+ 
++Ref<StyleRuleKeyframe> StyleRuleKeyframe::copy() const
++{
++    auto keys = m_keys;
++    return adoptRef(*new StyleRuleKeyframe(WTF::move(keys), m_properties->mutableCopy()));
++}
++
+ MutableStyleProperties& StyleRuleKeyframe::mutableProperties()
+ {
+     if (!is<MutableStyleProperties>(m_properties))
+@@ -136,6 +143,13 @@ CSSKeyframeRule::~CSSKeyframeRule()
+         m_propertiesCSSOMWrapper->clearParentRule();
+ }
+ 
++void CSSKeyframeRule::setKeyText(const String& text)
++{
++    RefPtr parent = parentRule();
++    CSSStyleSheet::RuleMutationScope mutationScope(parent.get());
++    m_keyframe->setKeyText(text);
++}
++
+ CSSStyleProperties& CSSKeyframeRule::style()
+ {
+     if (!m_propertiesCSSOMWrapper)
+@@ -143,10 +157,11 @@ CSSStyleProperties& CSSKeyframeRule::style()
+     return *m_propertiesCSSOMWrapper;
+ }
+ 
+-void CSSKeyframeRule::reattach(StyleRuleBase&)
++void CSSKeyframeRule::reattach(StyleRuleBase& rule)
+ {
+-    // No need to reattach, the underlying data is shareable on mutation.
+-    ASSERT_NOT_REACHED();
++    m_keyframe = downcast<StyleRuleKeyframe>(rule);
++    if (m_propertiesCSSOMWrapper)
++        protect(m_propertiesCSSOMWrapper)->reattach(protect(m_keyframe)->mutableProperties());
+ }
+ 
+ } // namespace WebCore
+diff --git a/Source/WebCore/css/CSSKeyframeRule.h b/Source/WebCore/css/CSSKeyframeRule.h
+index bdbd782..e1d0a65 100644
+--- a/Source/WebCore/css/CSSKeyframeRule.h
++++ b/Source/WebCore/css/CSSKeyframeRule.h
+@@ -42,7 +42,7 @@ public:
+     static Ref<StyleRuleKeyframe> create(Vector<std::pair<CSSValueID, CSS::Percentage<>>>&& keys, Ref<StyleProperties>&&);
+     ~StyleRuleKeyframe();
+ 
+-    Ref<StyleRuleKeyframe> copy() const { RELEASE_ASSERT_NOT_REACHED(); }
++    Ref<StyleRuleKeyframe> copy() const;
+ 
+     struct Key {
+         CSSValueID rangeName;
+@@ -84,7 +84,7 @@ public:
+     void NODELETE reattach(StyleRuleBase&) final;
+ 
+     String keyText() const { return m_keyframe->keyText(); }
+-    void setKeyText(const String& text) { m_keyframe->setKeyText(text); }
++    void setKeyText(const String&);
+ 
+     CSSStyleProperties& style();
+ 
+@@ -93,7 +93,7 @@ private:
+ 
+     StyleRuleType styleRuleType() const final { return StyleRuleType::Keyframe; }
+ 
+-    const Ref<StyleRuleKeyframe> m_keyframe;
++    Ref<StyleRuleKeyframe> m_keyframe;
+     mutable RefPtr<StyleRuleCSSStyleProperties> m_propertiesCSSOMWrapper;
+     
+     friend class CSSKeyframesRule;
+diff --git a/Source/WebCore/css/CSSKeyframesRule.cpp b/Source/WebCore/css/CSSKeyframesRule.cpp
+index d26c68d..0ff5828 100644
+--- a/Source/WebCore/css/CSSKeyframesRule.cpp
++++ b/Source/WebCore/css/CSSKeyframesRule.cpp
+@@ -45,7 +45,7 @@ StyleRuleKeyframes::StyleRuleKeyframes(const AtomString& name)
+ 
+ StyleRuleKeyframes::StyleRuleKeyframes(const StyleRuleKeyframes& o)
+     : StyleRuleBase(o)
+-    , m_keyframes(o.keyframes())
++    , m_keyframes(o.keyframes().map([](auto& keyframe) { return keyframe->copy(); }))
+     , m_name(o.m_name)
+ {
+ }
+@@ -203,6 +203,11 @@ CSSRuleList& CSSKeyframesRule::cssRules()
+ void CSSKeyframesRule::reattach(StyleRuleBase& rule)
+ {
+     m_keyframesRule = downcast<StyleRuleKeyframes>(rule);
++    ASSERT(m_childRuleCSSOMWrappers.size() == m_keyframesRule->keyframes().size());
++    for (unsigned i = 0; i < m_childRuleCSSOMWrappers.size(); ++i) {
++        if (m_childRuleCSSOMWrappers[i])
++            m_childRuleCSSOMWrappers[i]->reattach(m_keyframesRule->keyframes()[i].get());
++    }
+ }
+ 
+ } // namespace WebCore
+diff --git a/Source/WebCore/css/CSSStyleSheet.cpp b/Source/WebCore/css/CSSStyleSheet.cpp
+index 2afe523..02dd2b1 100644
+--- a/Source/WebCore/css/CSSStyleSheet.cpp
++++ b/Source/WebCore/css/CSSStyleSheet.cpp
+@@ -414,7 +414,8 @@ ExceptionOr<void> CSSStyleSheet::deleteRule(unsigned index)
+ 
+     if (index >= length())
+         return Exception { ExceptionCode::IndexSizeError };
+-    RuleMutationScope mutationScope(this);
++    RefPtr rule = item(index);
++    RuleMutationScope mutationScope(rule.get());
+ 
+     bool success = protect(m_contents)->wrapperDeleteRule(index);
+     if (!success)
