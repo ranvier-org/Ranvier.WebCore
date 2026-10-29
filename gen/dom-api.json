@@ -8412,6 +8412,145 @@
     },
     {
       "interface": "ShadowRoot",
+      "member": "adoptedStyleSheets",
+      "contractOwner": "ShadowRoot",
+      "kind": "getter",
+      "function": "rv_dom_shadow_root_get_adopted_style_sheets",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceCSSStyleSheet*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "CSSStyleSheet",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceCSSStyleSheet",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSStyleSheet sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleSheet",
+            "root": "StyleSheet",
+            "class": "CSSStyleSheet",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "binding": "facade",
+      "feature": "dom-adopted-style-sheets"
+    },
+    {
+      "interface": "ShadowRoot",
+      "member": "adoptedStyleSheets",
+      "contractOwner": "ShadowRoot",
+      "kind": "setter",
+      "function": "rv_dom_shadow_root_set_adopted_style_sheets",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceCSSStyleSheet*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "sequence<CSSStyleSheet>",
+          "idl": {
+            "name": "sequence",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "CSSStyleSheet",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceCSSStyleSheet",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSStyleSheet sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSStyleSheet",
+                "root": "StyleSheet",
+                "class": "CSSStyleSheet",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "binding": "facade",
+      "feature": "dom-adopted-style-sheets"
+    },
+    {
+      "interface": "ShadowRoot",
       "member": "fullscreenElement",
       "contractOwner": "ShadowRoot",
       "kind": "getter",
@@ -10150,6 +10289,145 @@
         "atom": false,
         "subtypes": []
       }
+    },
+    {
+      "interface": "Document",
+      "member": "adoptedStyleSheets",
+      "contractOwner": "Document",
+      "kind": "getter",
+      "function": "rv_dom_document_get_adopted_style_sheets",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceCSSStyleSheet*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "CSSStyleSheet",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceCSSStyleSheet",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSStyleSheet sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleSheet",
+            "root": "StyleSheet",
+            "class": "CSSStyleSheet",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "binding": "facade",
+      "feature": "dom-adopted-style-sheets"
+    },
+    {
+      "interface": "Document",
+      "member": "adoptedStyleSheets",
+      "contractOwner": "Document",
+      "kind": "setter",
+      "function": "rv_dom_document_set_adopted_style_sheets",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceCSSStyleSheet*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "sequence<CSSStyleSheet>",
+          "idl": {
+            "name": "sequence",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "CSSStyleSheet",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceCSSStyleSheet",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSStyleSheet sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSStyleSheet",
+                "root": "StyleSheet",
+                "class": "CSSStyleSheet",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "binding": "facade",
+      "feature": "dom-adopted-style-sheets"
     },
     {
       "interface": "Document",
@@ -92716,6 +92994,34 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_node_or_dom_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceCSSStyleSheet",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSStyleSheet sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleSheet",
+            "root": "StyleSheet",
+            "class": "CSSStyleSheet",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_css_style_sheet_release"
     },
     {
       "mapping": {

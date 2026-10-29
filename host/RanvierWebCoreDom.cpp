@@ -38,6 +38,7 @@ void rv_dom_validity_state_release(RvValidityState* handle) { ranvier_dom_validi
 RvValidityState* rv_dom_validity_state_retain(RvValidityState* handle) { return ranvier_dom_validity_state_retain(handle); }
 void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value) { ranvier_dom_union_node_or_dom_string_release(value); }
 void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value) { ranvier_dom_sequence_node_or_dom_string_release(value); }
+void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value) { ranvier_dom_sequence_css_style_sheet_release(value); }
 void rv_dom_sequence_element_release(RvDomSequenceElement* value) { ranvier_dom_sequence_element_release(value); }
 void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value) { ranvier_dom_sequence_shadow_root_release(value); }
 void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value) { ranvier_dom_union_dom_string_or_element_creation_options_release(value); }
@@ -129,6 +130,8 @@ int32_t rv_dom_shadow_root_get_reference_target(RvNode* target, char* buffer, in
 int32_t rv_dom_shadow_root_set_reference_target(RvNode* target, const char* value) { return ranvier_dom_shadow_root_set_reference_target(target, value); }
 int32_t rv_dom_shadow_root_get_active_element(RvNode* target, RvNode** result) { return ranvier_dom_shadow_root_get_active_element(target, result); }
 int32_t rv_dom_shadow_root_get_style_sheets(RvNode* target, RvStyleSheetList** result) { return ranvier_dom_shadow_root_get_style_sheets(target, result); }
+int32_t rv_dom_shadow_root_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result) { return ranvier_dom_shadow_root_get_adopted_style_sheets(target, result); }
+int32_t rv_dom_shadow_root_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value) { return ranvier_dom_shadow_root_set_adopted_style_sheets(target, value); }
 int32_t rv_dom_shadow_root_get_fullscreen_element(RvNode* target, RvNode** result) { return ranvier_dom_shadow_root_get_fullscreen_element(target, result); }
 int32_t rv_dom_shadow_root_get_pointer_lock_element(RvNode* target, RvNode** result) { return ranvier_dom_shadow_root_get_pointer_lock_element(target, result); }
 int32_t rv_dom_shadow_root_get_inner_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_shadow_root_get_inner_html(target, buffer, capacity, length); }
@@ -166,6 +169,8 @@ int32_t rv_dom_document_get_last_element_child(RvNode* target, RvNode** result) 
 int32_t rv_dom_document_get_child_element_count(RvNode* target, uint32_t* result) { return ranvier_dom_document_get_child_element_count(target, result); }
 int32_t rv_dom_document_get_active_element(RvNode* target, RvNode** result) { return ranvier_dom_document_get_active_element(target, result); }
 int32_t rv_dom_document_get_style_sheets(RvNode* target, RvStyleSheetList** result) { return ranvier_dom_document_get_style_sheets(target, result); }
+int32_t rv_dom_document_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result) { return ranvier_dom_document_get_adopted_style_sheets(target, result); }
+int32_t rv_dom_document_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value) { return ranvier_dom_document_set_adopted_style_sheets(target, value); }
 int32_t rv_dom_document_create_element(RvNode* target, const char* local_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result) { return ranvier_dom_document_create_element(target, local_name, options, result); }
 int32_t rv_dom_document_create_element_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result) { return ranvier_dom_document_create_element_ns(target, namespace_uri, qualified_name, options, result); }
 int32_t rv_dom_document_get_elements_by_tag_name(RvNode* target, const char* qualified_name, RvHTMLCollection** result) { return ranvier_dom_document_get_elements_by_tag_name(target, qualified_name, result); }

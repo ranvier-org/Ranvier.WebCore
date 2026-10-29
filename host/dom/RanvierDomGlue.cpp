@@ -516,6 +516,44 @@ template<typename V> int32_t encodeRvDomSequenceNodeOrDOMString(V&& input, RvDom
     return RV_OK;
 }
 
+std::optional<Vector<Ref<CSSStyleSheet>>> decodeRvDomSequenceCSSStyleSheet(const RvDomSequenceCSSStyleSheet* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Ref<CSSStyleSheet>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSStyleSheet> item = source->items[i] ? dynamicDowncast<CSSStyleSheet>(*reinterpret_cast<StyleSheet*>(source->items[i])) : nullptr;
+        if (source->items[i] && !item) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        result.append(Ref { *item });
+    }
+    return Vector<Ref<CSSStyleSheet>> { std::move(result) };
+}
+
+void clearRvDomSequenceCSSStyleSheet(RvDomSequenceCSSStyleSheet* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<StyleSheet*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceCSSStyleSheet(V&& input, RvDomSequenceCSSStyleSheet* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvStyleSheet**>(std::calloc(value.size(), sizeof(RvStyleSheet*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<StyleSheet>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
 void clearRvDomSequenceElement(RvDomSequenceElement* value)
 {
     if (!value) return;
@@ -1264,7 +1302,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-constructor:CSSStyleSheet" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-constructor:CSSStyleSheet", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1279,6 +1317,11 @@ void ranvier_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* val
 void ranvier_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value)
 {
     if (isMainThread()) clearRvDomSequenceNodeOrDOMString(value);
+}
+
+void ranvier_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value)
+{
+    if (isMainThread()) clearRvDomSequenceCSSStyleSheet(value);
 }
 
 void ranvier_dom_sequence_element_release(RvDomSequenceElement* value)
@@ -2504,6 +2547,35 @@ int32_t ranvier_dom_shadow_root_get_style_sheets(RvNode* target, RvStyleSheetLis
     return deliver([&]() -> decltype(auto) { return impl->styleSheets(); }, [&](auto&& value) { return storeHandle<StyleSheetList>(value, result); });
 }
 
+// ShadowRoot.adoptedStyleSheets getter: attribute sequence<CSSStyleSheet> adoptedStyleSheets; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_shadow_root_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ShadowRoot>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->adoptedStyleSheets(); }, [&](auto&& value) { return encodeRvDomSequenceCSSStyleSheet(value, result); });
+}
+
+// ShadowRoot.adoptedStyleSheets setter: attribute sequence<CSSStyleSheet> adoptedStyleSheets
+int32_t ranvier_dom_shadow_root_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ShadowRoot>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceCSSStyleSheet(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setAdoptedStyleSheets(DomSequenceArgument<Ref<CSSStyleSheet>> { std::move(*a0) }); });
+}
+
 // ShadowRoot.fullscreenElement getter: readonly attribute Element? fullscreenElement; *result is a new reference, or NULL; RV_ERR_UNSUPPORTED where WebKit builds without FULLSCREEN_API
 int32_t ranvier_dom_shadow_root_get_fullscreen_element(RvNode* target, RvNode** result)
 {
@@ -3017,6 +3089,35 @@ int32_t ranvier_dom_document_get_style_sheets(RvNode* target, RvStyleSheetList**
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->styleSheets(); }, [&](auto&& value) { return storeHandle<StyleSheetList>(value, result); });
+}
+
+// Document.adoptedStyleSheets getter: attribute sequence<CSSStyleSheet> adoptedStyleSheets; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_document_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->adoptedStyleSheets(); }, [&](auto&& value) { return encodeRvDomSequenceCSSStyleSheet(value, result); });
+}
+
+// Document.adoptedStyleSheets setter: attribute sequence<CSSStyleSheet> adoptedStyleSheets
+int32_t ranvier_dom_document_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceCSSStyleSheet(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setAdoptedStyleSheets(DomSequenceArgument<Ref<CSSStyleSheet>> { std::move(*a0) }); });
 }
 
 // Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) -> Element; options defaults to {} in IDL; *result is a new reference

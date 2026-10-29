@@ -356,6 +356,13 @@ type RvDomSequenceNodeOrDOMString =
     val mutable count: int
     val mutable items: nativeint
 
+/// <summary>ABI transport for CSSStyleSheet sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceCSSStyleSheet =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for Element sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceElement =
@@ -575,6 +582,9 @@ extern void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString& v
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_element_release(RvDomSequenceElement& value)
@@ -946,6 +956,12 @@ extern int rv_dom_shadow_root_get_active_element(nativeint target, nativeint& re
 extern int rv_dom_shadow_root_get_style_sheets(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_shadow_root_get_adopted_style_sheets(nativeint target, RvDomSequenceCSSStyleSheet& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_shadow_root_set_adopted_style_sheets(nativeint target, [<In>] RvDomSequenceCSSStyleSheet[] value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_shadow_root_get_fullscreen_element(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -1055,6 +1071,12 @@ extern int rv_dom_document_get_active_element(nativeint target, nativeint& resul
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_style_sheets(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_get_adopted_style_sheets(nativeint target, RvDomSequenceCSSStyleSheet& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_set_adopted_style_sheets(nativeint target, [<In>] RvDomSequenceCSSStyleSheet[] value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_create_element(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, [<In>] RvDomUnionDOMStringOrElementCreationOptions[] options, nativeint& result)

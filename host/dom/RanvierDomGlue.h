@@ -58,6 +58,7 @@ WEBCORE_EXPORT void ranvier_dom_validity_state_release(RvValidityState*);
 WEBCORE_EXPORT RvValidityState* ranvier_dom_validity_state_retain(RvValidityState*);
 WEBCORE_EXPORT void ranvier_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value);
+WEBCORE_EXPORT void ranvier_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_element_release(RvDomSequenceElement* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value);
 WEBCORE_EXPORT void ranvier_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value);
@@ -149,6 +150,8 @@ WEBCORE_EXPORT int32_t ranvier_dom_shadow_root_get_reference_target(RvNode* targ
 WEBCORE_EXPORT int32_t ranvier_dom_shadow_root_set_reference_target(RvNode* target, const char* value);
 WEBCORE_EXPORT int32_t ranvier_dom_shadow_root_get_active_element(RvNode* target, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_shadow_root_get_style_sheets(RvNode* target, RvStyleSheetList** result);
+WEBCORE_EXPORT int32_t ranvier_dom_shadow_root_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result);
+WEBCORE_EXPORT int32_t ranvier_dom_shadow_root_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value);
 WEBCORE_EXPORT int32_t ranvier_dom_shadow_root_get_fullscreen_element(RvNode* target, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_shadow_root_get_pointer_lock_element(RvNode* target, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_shadow_root_get_inner_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -186,6 +189,8 @@ WEBCORE_EXPORT int32_t ranvier_dom_document_get_last_element_child(RvNode* targe
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_child_element_count(RvNode* target, uint32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_active_element(RvNode* target, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_style_sheets(RvNode* target, RvStyleSheetList** result);
+WEBCORE_EXPORT int32_t ranvier_dom_document_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result);
+WEBCORE_EXPORT int32_t ranvier_dom_document_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value);
 WEBCORE_EXPORT int32_t ranvier_dom_document_create_element(RvNode* target, const char* local_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_create_element_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_get_elements_by_tag_name(RvNode* target, const char* qualified_name, RvHTMLCollection** result);
