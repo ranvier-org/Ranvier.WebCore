@@ -607,6 +607,48 @@ type RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable =
     val mutable arm1: nativeint
 
 [<Literal>]
+let RV_DOM_UNION_UNDEFINED_OR_CSS_STYLE_VALUE_VOID = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNDEFINED_OR_CSS_STYLE_VALUE_CSS_STYLE_VALUE = 2
+
+/// <summary>ABI transport for UndefinedOrCSSStyleValue; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUndefinedOrCSSStyleValue =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: int
+    val mutable arm1: nativeint
+
+/// <summary>ABI transport for CSSStyleValueNullableElement sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceCSSStyleValueNullableElement =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_CSS_STYLE_VALUE_OR_USV_STRING_CSS_STYLE_VALUE = 1
+
+[<Literal>]
+let RV_DOM_UNION_CSS_STYLE_VALUE_OR_USV_STRING_STRING = 2
+
+/// <summary>ABI transport for CSSStyleValueOrUSVString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionCSSStyleValueOrUSVString =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: nativeint
+    val mutable arm1: RvDomUtf8StringSpan
+
+/// <summary>ABI transport for CSSStyleValueOrUSVString sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceCSSStyleValueOrUSVString =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+[<Literal>]
 let RV_DOM_UNION_SHADOW_ROOT_OR_GET_COMPOSED_RANGES_OPTIONS_SHADOW_ROOT = 1
 
 [<Literal>]
@@ -708,6 +750,18 @@ extern void rv_dom_sequence_usv_string_or_cssom_variable_reference_value_release
 extern void rv_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_union_undefined_or_css_style_value_release(RvDomUnionUndefinedOrCSSStyleValue& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_css_style_value_nullable_element_release(RvDomSequenceCSSStyleValueNullableElement& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_css_style_value_or_usv_string_release(RvDomUnionCSSStyleValueOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_css_style_value_or_usv_string_release(RvDomSequenceCSSStyleValueOrUSVString& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions& value)
 
 [<DllImport(Lib)>]
@@ -772,6 +826,12 @@ extern void rv_dom_cssom_variable_reference_value_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_cssom_variable_reference_value_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_style_property_map_read_only_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_style_property_map_read_only_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern void rv_dom_css_style_declaration_release(nativeint handle)
@@ -844,6 +904,9 @@ extern int rv_dom_css_style_declaration_get_interface_name(nativeint target, byt
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_value_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_read_only_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
@@ -1785,6 +1848,9 @@ extern int rv_dom_element_release_pointer_capture(nativeint target, int pointer_
 extern int rv_dom_element_has_pointer_capture(nativeint target, int pointer_id, int& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_element_computed_style_map(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_element_before(nativeint target, [<In>] RvDomSequenceNodeOrDOMString[] nodes)
 
 [<DllImport(Lib)>]
@@ -2047,6 +2113,9 @@ extern int rv_dom_html_element_set_tab_index(nativeint target, int value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_style(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_element_get_attribute_style_map(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_click(nativeint target)
@@ -4281,6 +4350,9 @@ extern int rv_dom_svg_element_set_tab_index(nativeint target, int value)
 extern int rv_dom_svg_element_get_style(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_svg_element_get_attribute_style_map(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_svg_element_focus(nativeint target, [<In>] RvDomFocusOptions[] options)
 
 [<DllImport(Lib)>]
@@ -4309,6 +4381,9 @@ extern int rv_dom_math_ml_element_set_tab_index(nativeint target, int value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_math_ml_element_get_style(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_math_ml_element_get_attribute_style_map(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_math_ml_element_focus(nativeint target, [<In>] RvDomFocusOptions[] options)
@@ -4585,6 +4660,9 @@ extern int rv_dom_css_style_rule_get_style(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_rule_get_css_rules(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_style_rule_get_style_map(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_rule_insert_rule(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string rule, uint32 index, uint32& result)
@@ -4984,6 +5062,30 @@ extern int rv_dom_cssom_variable_reference_value_set_variable(nativeint target, 
 
 [<DllImport(Lib)>]
 extern int rv_dom_cssom_variable_reference_value_get_fallback(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_read_only_get_size(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_read_only_get(nativeint target, nativeint context, byte[] property, int property_length, RvDomUnionUndefinedOrCSSStyleValue& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_read_only_get_all(nativeint target, nativeint context, byte[] property, int property_length, RvDomSequenceCSSStyleValueNullableElement& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_read_only_has(nativeint target, nativeint context, byte[] property, int property_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_set(nativeint target, nativeint context, byte[] property, int property_length, [<In>] RvDomSequenceCSSStyleValueOrUSVString[] values)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_append(nativeint target, nativeint context, byte[] property, int property_length, [<In>] RvDomSequenceCSSStyleValueOrUSVString[] values)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_delete(nativeint target, nativeint context, byte[] property, int property_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_clear(nativeint target)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_rule_get_name(nativeint target, byte[] buffer, int capacity, int[] length)

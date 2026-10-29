@@ -161,6 +161,8 @@
 #include "ShadowRoot.h"
 #include "ShadowRootInit.h"
 #include "StaticRange.h"
+#include "StylePropertyMap.h"
+#include "StylePropertyMapReadOnly.h"
 #include "StyleSheet.h"
 #include "StyleSheetList.h"
 #include "Text.h"
@@ -1381,6 +1383,159 @@ template<typename V> int32_t encodeRvDomUnionUSVStringOrCSSOMVariableReferenceVa
     return RV_OK;
 }
 
+void clearRvDomUnionUndefinedOrCSSStyleValue(RvDomUnionUndefinedOrCSSStyleValue* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<CSSStyleValue*>(value->arm1)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUndefinedOrCSSStyleValue(V&& value, RvDomUnionUndefinedOrCSSStyleValue* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = 0;
+            }
+            else if constexpr (I == 1) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionUndefinedOrCSSStyleValue<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUndefinedOrCSSStyleValue(V&& input, RvDomUnionUndefinedOrCSSStyleValue* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUndefinedOrCSSStyleValue(value, result);
+    return RV_OK;
+}
+
+void clearRvDomSequenceCSSStyleValueNullableElement(RvDomSequenceCSSStyleValueNullableElement* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<CSSStyleValue*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceCSSStyleValueNullableElement(V&& input, RvDomSequenceCSSStyleValueNullableElement* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvCSSStyleValue**>(std::calloc(value.size(), sizeof(RvCSSStyleValue*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<CSSStyleValue>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<Ref<CSSStyleValue>, String>> decodeRvDomUnionCSSStyleValueOrUSVString(const RvDomUnionCSSStyleValueOrUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSStyleValue> arm0 = reinterpret_cast<CSSStyleValue*>(source->arm0);
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<CSSStyleValue>, String> { Variant<Ref<CSSStyleValue>, String> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        if (source->arm1.length < 0 || (source->arm1.length > 0 && !source->arm1.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm1 = source->arm1.length < 0 ? String() : source->arm1.length ? String::fromUTF8(std::span<const uint8_t> { source->arm1.data, static_cast<size_t>(source->arm1.length) }) : emptyString();
+        if (source->arm1.length >= 0 && arm1.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<Ref<CSSStyleValue>, String> { Variant<Ref<CSSStyleValue>, String> { WTF::InPlaceIndex<1>, arm1 } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionCSSStyleValueOrUSVString(RvDomUnionCSSStyleValueOrUSVString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<CSSStyleValue*>(value->arm0)->deref();
+        break;
+    case 2:
+        std::free(const_cast<uint8_t*>(value->arm1.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionCSSStyleValueOrUSVString(V&& value, RvDomUnionCSSStyleValueOrUSVString* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionCSSStyleValueOrUSVString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionCSSStyleValueOrUSVString(V&& input, RvDomUnionCSSStyleValueOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionCSSStyleValueOrUSVString(value, result);
+    return RV_OK;
+}
+
+std::optional<Vector<Variant<Ref<CSSStyleValue>, String>>> decodeRvDomSequenceCSSStyleValueOrUSVString(const RvDomSequenceCSSStyleValueOrUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Variant<Ref<CSSStyleValue>, String>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomUnionCSSStyleValueOrUSVString(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Variant<Ref<CSSStyleValue>, String>> { std::move(result) };
+}
+
+void clearRvDomSequenceCSSStyleValueOrUSVString(RvDomSequenceCSSStyleValueOrUSVString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionCSSStyleValueOrUSVString(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceCSSStyleValueOrUSVString(V&& input, RvDomSequenceCSSStyleValueOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomUnionCSSStyleValueOrUSVString*>(std::calloc(value.size(), sizeof(RvDomUnionCSSStyleValueOrUSVString))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomUnionCSSStyleValueOrUSVString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
 std::optional<Variant<Ref<ShadowRoot>, GetComposedRangesOptions>> decodeRvDomUnionShadowRootOrGetComposedRangesOptions(const RvDomUnionShadowRootOrGetComposedRangesOptions* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -1503,7 +1658,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1626,6 +1781,26 @@ void ranvier_dom_sequence_usv_string_or_cssom_variable_reference_value_release(R
 void ranvier_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* value)
 {
     if (isMainThread()) clearRvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable(value);
+}
+
+void ranvier_dom_union_undefined_or_css_style_value_release(RvDomUnionUndefinedOrCSSStyleValue* value)
+{
+    if (isMainThread()) clearRvDomUnionUndefinedOrCSSStyleValue(value);
+}
+
+void ranvier_dom_sequence_css_style_value_nullable_element_release(RvDomSequenceCSSStyleValueNullableElement* value)
+{
+    if (isMainThread()) clearRvDomSequenceCSSStyleValueNullableElement(value);
+}
+
+void ranvier_dom_union_css_style_value_or_usv_string_release(RvDomUnionCSSStyleValueOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomUnionCSSStyleValueOrUSVString(value);
+}
+
+void ranvier_dom_sequence_css_style_value_or_usv_string_release(RvDomSequenceCSSStyleValueOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomSequenceCSSStyleValueOrUSVString(value);
 }
 
 void ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value)
@@ -1771,6 +1946,20 @@ RvCSSOMVariableReferenceValue* ranvier_dom_cssom_variable_reference_value_retain
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<CSSOMVariableReferenceValue*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_style_property_map_read_only_release(RvStylePropertyMapReadOnly* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<StylePropertyMapReadOnly*>(handle)->deref();
+}
+
+RvStylePropertyMapReadOnly* ranvier_dom_style_property_map_read_only_retain(RvStylePropertyMapReadOnly* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<StylePropertyMapReadOnly*>(handle)->ref();
     return handle;
 }
 
@@ -6264,6 +6453,19 @@ int32_t ranvier_dom_element_has_pointer_capture(RvNode* target, int32_t pointer_
     return deliver([&]() -> decltype(auto) { return impl->hasPointerCapture(pointer_id); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// Element.computedStyleMap() -> StylePropertyMapReadOnly; *result is a new reference
+int32_t ranvier_dom_element_computed_style_map(RvNode* target, RvStylePropertyMapReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->computedStyleMap(); }, [&](auto&& value) { return storeHandle<StylePropertyMapReadOnly>(value, result); });
+}
+
 // Element.before((Node or DOMString) nodes) -> undefined
 int32_t ranvier_dom_element_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
 {
@@ -7520,6 +7722,19 @@ int32_t ranvier_dom_html_element_get_style(RvNode* target, RvCSSStyleDeclaration
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->cssomStyle(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// HTMLElement.attributeStyleMap getter: readonly attribute StylePropertyMap attributeStyleMap; *result is a new reference
+int32_t ranvier_dom_html_element_get_attribute_style_map(RvNode* target, RvStylePropertyMapReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->ensureAttributeStyleMap(); }, [&](auto&& value) { return storeHandle<StylePropertyMapReadOnly>(value, result); });
 }
 
 // HTMLElement.click() -> undefined
@@ -17653,6 +17868,19 @@ int32_t ranvier_dom_svg_element_get_style(RvNode* target, RvCSSStyleDeclaration*
     return deliver([&]() -> decltype(auto) { return impl->cssomStyle(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
 }
 
+// SVGElement.attributeStyleMap getter: readonly attribute StylePropertyMap attributeStyleMap; *result is a new reference
+int32_t ranvier_dom_svg_element_get_attribute_style_map(RvNode* target, RvStylePropertyMapReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->ensureAttributeStyleMap(); }, [&](auto&& value) { return storeHandle<StylePropertyMapReadOnly>(value, result); });
+}
+
 // SVGElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be NULL for the IDL default
 int32_t ranvier_dom_svg_element_focus(RvNode* target, const RvDomFocusOptions* options)
 {
@@ -17858,6 +18086,28 @@ int32_t ranvier_dom_math_ml_element_get_style(RvNode* target, RvCSSStyleDeclarat
     if (!(settings.mathMLEnabled))
         return RV_ERR_UNSUPPORTED;
     return deliver([&]() -> decltype(auto) { return impl->cssomStyle(); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// MathMLElement.attributeStyleMap getter: readonly attribute StylePropertyMap attributeStyleMap; *result is a new reference; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML
+int32_t ranvier_dom_math_ml_element_get_attribute_style_map(RvNode* target, RvStylePropertyMapReadOnly** result)
+{
+#if ENABLE(MATHML)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<MathMLElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.mathMLEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->ensureAttributeStyleMap(); }, [&](auto&& value) { return storeHandle<StylePropertyMapReadOnly>(value, result); });
 #else
     UNUSED_PARAM(target);
     UNUSED_PARAM(result);
@@ -19078,6 +19328,19 @@ int32_t ranvier_dom_css_style_rule_get_css_rules(RvCSSRule* target, RvCSSRuleLis
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->cssRules(); }, [&](auto&& value) { return storeHandle<CSSRuleList>(value, result); });
+}
+
+// CSSStyleRule.styleMap getter: readonly attribute StylePropertyMap styleMap; *result is a new reference
+int32_t ranvier_dom_css_style_rule_get_style_map(RvCSSRule* target, RvStylePropertyMapReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSStyleRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->styleMap(); }, [&](auto&& value) { return storeHandle<StylePropertyMapReadOnly>(value, result); });
 }
 
 // CSSStyleRule.insertRule(CSSOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to 0 in IDL
@@ -20939,6 +21202,144 @@ int32_t ranvier_dom_cssom_variable_reference_value_get_fallback(RvCSSOMVariableR
         return RV_ERR_WRONG_THREAD;
     RefPtr<CSSOMVariableReferenceValue> impl = reinterpret_cast<CSSOMVariableReferenceValue*>(target);
     return deliver([&]() -> decltype(auto) { return impl->fallback(); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
+// StylePropertyMapReadOnly.size getter: readonly attribute unsigned long size
+int32_t ranvier_dom_style_property_map_read_only_get_size(RvStylePropertyMapReadOnly* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StylePropertyMapReadOnly> impl = reinterpret_cast<StylePropertyMapReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->size(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// StylePropertyMapReadOnly.get(USVString property) -> (undefined or CSSStyleValue); context is an explicit checked Document for the operation; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_style_property_map_read_only_get(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, RvDomUnionUndefinedOrCSSStyleValue* result)
+{
+    if (!target || !context || !(property_length >= 0 && (property_length <= 0 || property)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StylePropertyMapReadOnly> impl = reinterpret_cast<StylePropertyMapReadOnly*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { property, property_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->get(document.get(), a0.atom()); }, [&](auto&& value) { return encodeRvDomUnionUndefinedOrCSSStyleValue(value, result); });
+}
+
+// StylePropertyMapReadOnly.getAll(USVString property) -> sequence<CSSStyleValue?>; context is an explicit checked Document for the operation; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_style_property_map_read_only_get_all(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, RvDomSequenceCSSStyleValueNullableElement* result)
+{
+    if (!target || !context || !(property_length >= 0 && (property_length <= 0 || property)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StylePropertyMapReadOnly> impl = reinterpret_cast<StylePropertyMapReadOnly*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { property, property_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->getAll(document.get(), a0.atom()); }, [&](auto&& value) { return encodeRvDomSequenceCSSStyleValueNullableElement(value, result); });
+}
+
+// StylePropertyMapReadOnly.has(USVString property) -> boolean; context is an explicit checked Document for the operation
+int32_t ranvier_dom_style_property_map_read_only_has(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, int32_t* result)
+{
+    if (!target || !context || !(property_length >= 0 && (property_length <= 0 || property)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StylePropertyMapReadOnly> impl = reinterpret_cast<StylePropertyMapReadOnly*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { property, property_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->has(document.get(), a0.atom()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// StylePropertyMap.set(USVString property, (CSSStyleValue or USVString) values) -> undefined; context is an explicit checked Document for the operation
+int32_t ranvier_dom_style_property_map_set(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, const RvDomSequenceCSSStyleValueOrUSVString* values)
+{
+    if (!target || !context || !(property_length >= 0 && (property_length <= 0 || property)) || !values)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<StylePropertyMap>(*reinterpret_cast<StylePropertyMapReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { property, property_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomSequenceCSSStyleValueOrUSVString(values, status1);
+    if (status1 != RV_OK) return status1;
+    return invoke([&]() -> decltype(auto) { return impl->set(document.get(), a0.atom(), DomSequenceArgument<Variant<Ref<CSSStyleValue>, String>> { std::move(*a1) }); });
+}
+
+// StylePropertyMap.append(USVString property, (CSSStyleValue or USVString) values) -> undefined; context is an explicit checked Document for the operation
+int32_t ranvier_dom_style_property_map_append(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, const RvDomSequenceCSSStyleValueOrUSVString* values)
+{
+    if (!target || !context || !(property_length >= 0 && (property_length <= 0 || property)) || !values)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<StylePropertyMap>(*reinterpret_cast<StylePropertyMapReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { property, property_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomSequenceCSSStyleValueOrUSVString(values, status1);
+    if (status1 != RV_OK) return status1;
+    return invoke([&]() -> decltype(auto) { return impl->append(document.get(), a0.atom(), DomSequenceArgument<Variant<Ref<CSSStyleValue>, String>> { std::move(*a1) }); });
+}
+
+// StylePropertyMap.delete(USVString property) -> undefined; context is an explicit checked Document for the operation
+int32_t ranvier_dom_style_property_map_delete(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length)
+{
+    if (!target || !context || !(property_length >= 0 && (property_length <= 0 || property)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<StylePropertyMap>(*reinterpret_cast<StylePropertyMapReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { property, property_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->remove(document.get(), a0.atom()); });
+}
+
+// StylePropertyMap.clear() -> undefined
+int32_t ranvier_dom_style_property_map_clear(RvStylePropertyMapReadOnly* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<StylePropertyMap>(*reinterpret_cast<StylePropertyMapReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->clear(); });
 }
 
 // CSSPositionTryRule.name getter: readonly attribute CSSOMString name; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
@@ -26395,6 +26796,18 @@ int32_t ranvier_dom_css_style_value_get_interface_name(RvCSSStyleValue* target, 
     if (dynamicDowncast<CSSUnparsedValue>(*impl))
         return copyString("CSSUnparsedValue"_s, buffer, capacity, length);
     return copyString("CSSStyleValue"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_style_property_map_read_only_get_interface_name(RvStylePropertyMapReadOnly* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<StylePropertyMapReadOnly*>(target);
+    if (dynamicDowncast<StylePropertyMap>(*impl))
+        return copyString("StylePropertyMap"_s, buffer, capacity, length);
+    return copyString("StylePropertyMapReadOnly"_s, buffer, capacity, length);
 }
 
 } // extern "C"

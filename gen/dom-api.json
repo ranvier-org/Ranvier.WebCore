@@ -135,6 +135,33 @@
           "name": "length"
         }
       ]
+    },
+    {
+      "root": "StylePropertyMapReadOnly",
+      "function": "rv_dom_style_property_map_read_only_get_interface_name",
+      "feature": "dom-type-query:StylePropertyMapReadOnly",
+      "interfaces": [
+        "StylePropertyMap",
+        "StylePropertyMapReadOnly"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
     }
   ],
   "interfaces": [
@@ -575,6 +602,14 @@
       "base": null
     },
     {
+      "name": "StylePropertyMapReadOnly",
+      "base": null
+    },
+    {
+      "name": "StylePropertyMap",
+      "base": "StylePropertyMapReadOnly"
+    },
+    {
       "name": "CSSPositionTryRule",
       "base": "CSSRule"
     },
@@ -684,15 +719,6 @@
     }
   ],
   "contractInterfaces": [
-    {
-      "name": "StylePropertyMapReadOnly",
-      "idlName": "StylePropertyMapReadOnly",
-      "base": null,
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "css/typedom/StylePropertyMapReadOnly.idl"
-    },
     {
       "name": "SVGTextContentElement",
       "idlName": "SVGTextContentElement",
@@ -1797,6 +1823,24 @@
       "mixin": false,
       "contractOnly": false,
       "source": "css/typedom/CSSOMVariableReferenceValue.idl"
+    },
+    {
+      "name": "StylePropertyMapReadOnly",
+      "idlName": "StylePropertyMapReadOnly",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/StylePropertyMapReadOnly.idl"
+    },
+    {
+      "name": "StylePropertyMap",
+      "idlName": "StylePropertyMap",
+      "base": "StylePropertyMapReadOnly",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/StylePropertyMap.idl"
     },
     {
       "name": "CSSPositionTryRule",
@@ -2949,15 +2993,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "storage/StorageEvent.idl"
-    },
-    {
-      "name": "StylePropertyMap",
-      "idlName": "StylePropertyMap",
-      "base": "StylePropertyMapReadOnly",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "css/typedom/StylePropertyMap.idl"
     },
     {
       "name": "SubmitEvent",
@@ -22802,6 +22837,42 @@
     },
     {
       "interface": "Element",
+      "member": "computedStyleMap",
+      "contractOwner": "Element",
+      "kind": "operation",
+      "function": "rv_dom_element_computed_style_map",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvStylePropertyMapReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "StylePropertyMapReadOnly",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "StylePropertyMapReadOnly",
+        "root": "StylePropertyMapReadOnly",
+        "class": "StylePropertyMapReadOnly",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Element",
       "member": "before",
       "contractOwner": "ChildNode",
       "kind": "operation",
@@ -27752,6 +27823,42 @@
         "interface": "CSSStyleProperties",
         "root": "CSSStyleDeclaration",
         "class": "CSSStyleProperties",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLElement",
+      "member": "attributeStyleMap",
+      "contractOwner": "ElementCSSInlineStyle",
+      "kind": "getter",
+      "function": "rv_dom_html_element_get_attribute_style_map",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvStylePropertyMapReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "StylePropertyMap",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "StylePropertyMap",
+        "root": "StylePropertyMapReadOnly",
+        "class": "StylePropertyMap",
         "enum": null,
         "label": null,
         "nullable": false,
@@ -65304,6 +65411,42 @@
     },
     {
       "interface": "SVGElement",
+      "member": "attributeStyleMap",
+      "contractOwner": "ElementCSSInlineStyle",
+      "kind": "getter",
+      "function": "rv_dom_svg_element_get_attribute_style_map",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvStylePropertyMapReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "StylePropertyMap",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "StylePropertyMap",
+        "root": "StylePropertyMapReadOnly",
+        "class": "StylePropertyMap",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGElement",
       "member": "focus",
       "contractOwner": "HTMLOrSVGElement",
       "kind": "operation",
@@ -65759,6 +65902,42 @@
         "interface": "CSSStyleProperties",
         "root": "CSSStyleDeclaration",
         "class": "CSSStyleProperties",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "MathMLElement",
+      "member": "attributeStyleMap",
+      "contractOwner": "ElementCSSInlineStyle",
+      "kind": "getter",
+      "function": "rv_dom_math_ml_element_get_attribute_style_map",
+      "conditional": "ENABLE(MATHML)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvStylePropertyMapReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "StylePropertyMap",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "StylePropertyMap",
+        "root": "StylePropertyMapReadOnly",
+        "class": "StylePropertyMap",
         "enum": null,
         "label": null,
         "nullable": false,
@@ -70397,6 +70576,42 @@
         "interface": "CSSRuleList",
         "root": "CSSRuleList",
         "class": "CSSRuleList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSStyleRule",
+      "member": "styleMap",
+      "contractOwner": "CSSStyleRule",
+      "kind": "getter",
+      "function": "rv_dom_css_style_rule_get_style_map",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSRule*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvStylePropertyMapReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "StylePropertyMap",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "StylePropertyMap",
+        "root": "StylePropertyMapReadOnly",
+        "class": "StylePropertyMap",
         "enum": null,
         "label": null,
         "nullable": false,
@@ -77470,6 +77685,730 @@
         "atom": false,
         "subtypes": []
       }
+    },
+    {
+      "interface": "StylePropertyMapReadOnly",
+      "member": "size",
+      "contractOwner": "StylePropertyMapReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_style_property_map_read_only_get_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "StylePropertyMapReadOnly",
+      "member": "get",
+      "contractOwner": "StylePropertyMapReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_style_property_map_read_only_get",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "property"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "property_length"
+        },
+        {
+          "ctype": "RvDomUnionUndefinedOrCSSStyleValue*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "property",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "undefined",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSStyleValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionUndefinedOrCSSStyleValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UndefinedOrCSSStyleValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "void",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleValue",
+            "root": "CSSStyleValue",
+            "class": "CSSStyleValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "StylePropertyMapReadOnly",
+      "member": "getAll",
+      "contractOwner": "StylePropertyMapReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_style_property_map_read_only_get_all",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "property"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "property_length"
+        },
+        {
+          "ctype": "RvDomSequenceCSSStyleValueNullableElement*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "property",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "CSSStyleValue",
+            "nullable": true,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceCSSStyleValueNullableElement",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSStyleValueNullableElement sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleValue",
+            "root": "CSSStyleValue",
+            "class": "CSSStyleValue",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "StylePropertyMapReadOnly",
+      "member": "has",
+      "contractOwner": "StylePropertyMapReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_style_property_map_read_only_has",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "property"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "property_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "property",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "StylePropertyMap",
+      "member": "set",
+      "contractOwner": "StylePropertyMap",
+      "kind": "operation",
+      "function": "rv_dom_style_property_map_set",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "property"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "property_length"
+        },
+        {
+          "ctype": "const RvDomSequenceCSSStyleValueOrUSVString*",
+          "name": "values"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "property",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "values",
+          "idlType": "(CSSStyleValue or USVString)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "CSSStyleValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": true,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceCSSStyleValueOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSStyleValueOrUSVString sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionCSSStyleValueOrUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "CSSStyleValueOrUSVString",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "object",
+                    "ctype": null,
+                    "interface": "CSSStyleValue",
+                    "root": "CSSStyleValue",
+                    "class": "CSSStyleValue",
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "StylePropertyMap",
+      "member": "append",
+      "contractOwner": "StylePropertyMap",
+      "kind": "operation",
+      "function": "rv_dom_style_property_map_append",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "property"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "property_length"
+        },
+        {
+          "ctype": "const RvDomSequenceCSSStyleValueOrUSVString*",
+          "name": "values"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "property",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "values",
+          "idlType": "(CSSStyleValue or USVString)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "CSSStyleValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": true,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceCSSStyleValueOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSStyleValueOrUSVString sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionCSSStyleValueOrUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "CSSStyleValueOrUSVString",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "object",
+                    "ctype": null,
+                    "interface": "CSSStyleValue",
+                    "root": "CSSStyleValue",
+                    "class": "CSSStyleValue",
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "StylePropertyMap",
+      "member": "delete",
+      "contractOwner": "StylePropertyMap",
+      "kind": "operation",
+      "function": "rv_dom_style_property_map_delete",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "property"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "property_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "property",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "StylePropertyMap",
+      "member": "clear",
+      "contractOwner": "StylePropertyMap",
+      "kind": "operation",
+      "function": "rv_dom_style_property_map_clear",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
     },
     {
       "interface": "CSSPositionTryRule",
@@ -95930,6 +96869,169 @@
         ]
       },
       "releaseFunction": "rv_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUndefinedOrCSSStyleValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UndefinedOrCSSStyleValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "void",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleValue",
+            "root": "CSSStyleValue",
+            "class": "CSSStyleValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_undefined_or_css_style_value_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceCSSStyleValueNullableElement",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSStyleValueNullableElement sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleValue",
+            "root": "CSSStyleValue",
+            "class": "CSSStyleValue",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_css_style_value_nullable_element_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionCSSStyleValueOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSStyleValueOrUSVString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleValue",
+            "root": "CSSStyleValue",
+            "class": "CSSStyleValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_css_style_value_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceCSSStyleValueOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSStyleValueOrUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "union",
+            "ctype": "RvDomUnionCSSStyleValueOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSStyleValueOrUSVString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSStyleValue",
+                "root": "CSSStyleValue",
+                "class": "CSSStyleValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_css_style_value_or_usv_string_release"
     },
     {
       "mapping": {

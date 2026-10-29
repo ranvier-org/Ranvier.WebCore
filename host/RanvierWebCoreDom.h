@@ -37,6 +37,7 @@ typedef struct RvCSSRule RvCSSRule;
 typedef struct RvCSSRuleList RvCSSRuleList;
 typedef struct RvCSSStyleValue RvCSSStyleValue;
 typedef struct RvCSSOMVariableReferenceValue RvCSSOMVariableReferenceValue;
+typedef struct RvStylePropertyMapReadOnly RvStylePropertyMapReadOnly;
 typedef struct RvCSSStyleDeclaration RvCSSStyleDeclaration;
 typedef struct RvDOMTokenList RvDOMTokenList;
 typedef struct RvDOMStringMap RvDOMStringMap;
@@ -69,6 +70,10 @@ typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
 typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValue RvDomUnionUSVStringOrCSSOMVariableReferenceValue;
 typedef struct RvDomSequenceUSVStringOrCSSOMVariableReferenceValue RvDomSequenceUSVStringOrCSSOMVariableReferenceValue;
 typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable;
+typedef struct RvDomUnionUndefinedOrCSSStyleValue RvDomUnionUndefinedOrCSSStyleValue;
+typedef struct RvDomSequenceCSSStyleValueNullableElement RvDomSequenceCSSStyleValueNullableElement;
+typedef struct RvDomUnionCSSStyleValueOrUSVString RvDomUnionCSSStyleValueOrUSVString;
+typedef struct RvDomSequenceCSSStyleValueOrUSVString RvDomSequenceCSSStyleValueOrUSVString;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
@@ -349,6 +354,10 @@ typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
 typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValue RvDomUnionUSVStringOrCSSOMVariableReferenceValue;
 typedef struct RvDomSequenceUSVStringOrCSSOMVariableReferenceValue RvDomSequenceUSVStringOrCSSOMVariableReferenceValue;
 typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable;
+typedef struct RvDomUnionUndefinedOrCSSStyleValue RvDomUnionUndefinedOrCSSStyleValue;
+typedef struct RvDomSequenceCSSStyleValueNullableElement RvDomSequenceCSSStyleValueNullableElement;
+typedef struct RvDomUnionCSSStyleValueOrUSVString RvDomUnionCSSStyleValueOrUSVString;
+typedef struct RvDomSequenceCSSStyleValueOrUSVString RvDomSequenceCSSStyleValueOrUSVString;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
@@ -600,6 +609,48 @@ struct RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable {
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 enum {
+    RV_DOM_UNION_UNDEFINED_OR_CSS_STYLE_VALUE_VOID = 1,
+    RV_DOM_UNION_UNDEFINED_OR_CSS_STYLE_VALUE_CSS_STYLE_VALUE = 2,
+};
+struct RvDomUnionUndefinedOrCSSStyleValue {
+    int32_t present;
+    int32_t tag;
+    int32_t arm0;
+    RvCSSStyleValue* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceCSSStyleValueNullableElement {
+    int32_t present;
+    int32_t count;
+    RvCSSStyleValue** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_CSS_STYLE_VALUE_OR_USV_STRING_CSS_STYLE_VALUE = 1,
+    RV_DOM_UNION_CSS_STYLE_VALUE_OR_USV_STRING_STRING = 2,
+};
+struct RvDomUnionCSSStyleValueOrUSVString {
+    int32_t present;
+    int32_t tag;
+    RvCSSStyleValue* arm0;
+    RvDomUtf8StringSpan arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceCSSStyleValueOrUSVString {
+    int32_t present;
+    int32_t count;
+    RvDomUnionCSSStyleValueOrUSVString* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
     RV_DOM_UNION_SHADOW_ROOT_OR_GET_COMPOSED_RANGES_OPTIONS_SHADOW_ROOT = 1,
     RV_DOM_UNION_SHADOW_ROOT_OR_GET_COMPOSED_RANGES_OPTIONS_GET_COMPOSED_RANGES_OPTIONS = 2,
 };
@@ -655,6 +706,10 @@ RV_EXPORT void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString* value)
 RV_EXPORT void rv_dom_union_usv_string_or_cssom_variable_reference_value_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValue* value);
 RV_EXPORT void rv_dom_sequence_usv_string_or_cssom_variable_reference_value_release(RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* value);
 RV_EXPORT void rv_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* value);
+RV_EXPORT void rv_dom_union_undefined_or_css_style_value_release(RvDomUnionUndefinedOrCSSStyleValue* value);
+RV_EXPORT void rv_dom_sequence_css_style_value_nullable_element_release(RvDomSequenceCSSStyleValueNullableElement* value);
+RV_EXPORT void rv_dom_union_css_style_value_or_usv_string_release(RvDomUnionCSSStyleValueOrUSVString* value);
+RV_EXPORT void rv_dom_sequence_css_style_value_or_usv_string_release(RvDomSequenceCSSStyleValueOrUSVString* value);
 RV_EXPORT void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value);
 RV_EXPORT void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
@@ -695,6 +750,10 @@ RV_EXPORT RvCSSStyleValue* rv_dom_css_style_value_retain(RvCSSStyleValue*);
 RV_EXPORT void rv_dom_cssom_variable_reference_value_release(RvCSSOMVariableReferenceValue*);
 /* Adds a reference to a CSSOMVariableReferenceValue and returns it. */
 RV_EXPORT RvCSSOMVariableReferenceValue* rv_dom_cssom_variable_reference_value_retain(RvCSSOMVariableReferenceValue*);
+/* Releases a handle to a StylePropertyMapReadOnly. */
+RV_EXPORT void rv_dom_style_property_map_read_only_release(RvStylePropertyMapReadOnly*);
+/* Adds a reference to a StylePropertyMapReadOnly and returns it. */
+RV_EXPORT RvStylePropertyMapReadOnly* rv_dom_style_property_map_read_only_retain(RvStylePropertyMapReadOnly*);
 /* Releases a handle to a CSSStyleDeclaration. */
 RV_EXPORT void rv_dom_css_style_declaration_release(RvCSSStyleDeclaration*);
 /* Adds a reference to a CSSStyleDeclaration and returns it. */
@@ -743,6 +802,8 @@ RV_EXPORT int32_t rv_dom_style_sheet_get_interface_name(RvStyleSheet* target, ch
 RV_EXPORT int32_t rv_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a CSSStyleValue handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_style_value_get_interface_name(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length);
+/* Concrete scoped interface name of a StylePropertyMapReadOnly handle; borrows target. */
+RV_EXPORT int32_t rv_dom_style_property_map_read_only_get_interface_name(RvStylePropertyMapReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
 
 /* Node */
 
@@ -1435,6 +1496,8 @@ RV_EXPORT int32_t rv_dom_element_set_pointer_capture(RvNode* target, int32_t poi
 RV_EXPORT int32_t rv_dom_element_release_pointer_capture(RvNode* target, int32_t pointer_id);
 /* Element.hasPointerCapture(long pointerId) -> boolean */
 RV_EXPORT int32_t rv_dom_element_has_pointer_capture(RvNode* target, int32_t pointer_id, int32_t* result);
+/* Element.computedStyleMap() -> StylePropertyMapReadOnly; *result is a new reference */
+RV_EXPORT int32_t rv_dom_element_computed_style_map(RvNode* target, RvStylePropertyMapReadOnly** result);
 /* Element.before((Node or DOMString) nodes) -> undefined */
 RV_EXPORT int32_t rv_dom_element_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 /* Element.after((Node or DOMString) nodes) -> undefined */
@@ -1636,6 +1699,9 @@ RV_EXPORT int32_t rv_dom_html_element_get_tab_index(RvNode* target, int32_t* res
 RV_EXPORT int32_t rv_dom_html_element_set_tab_index(RvNode* target, int32_t value);
 /* HTMLElement.style getter: readonly attribute CSSStyleProperties style; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_element_get_style(RvNode* target, RvCSSStyleDeclaration** result);
+/* HTMLElement.attributeStyleMap getter: readonly attribute StylePropertyMap attributeStyleMap; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_html_element_get_attribute_style_map(RvNode* target, RvStylePropertyMapReadOnly** result);
 /* HTMLElement.click() -> undefined */
 RV_EXPORT int32_t rv_dom_html_element_click(RvNode* target);
 /* HTMLElement.showPopover(optional ShowPopoverOptions options = {}) -> undefined; options defaults to {} in IDL;
@@ -3296,6 +3362,9 @@ RV_EXPORT int32_t rv_dom_svg_element_get_tab_index(RvNode* target, int32_t* resu
 RV_EXPORT int32_t rv_dom_svg_element_set_tab_index(RvNode* target, int32_t value);
 /* SVGElement.style getter: readonly attribute CSSStyleProperties style; *result is a new reference */
 RV_EXPORT int32_t rv_dom_svg_element_get_style(RvNode* target, RvCSSStyleDeclaration** result);
+/* SVGElement.attributeStyleMap getter: readonly attribute StylePropertyMap attributeStyleMap; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_element_get_attribute_style_map(RvNode* target, RvStylePropertyMapReadOnly** result);
 /* SVGElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
  * NULL for the IDL default */
 RV_EXPORT int32_t rv_dom_svg_element_focus(RvNode* target, const RvDomFocusOptions* options);
@@ -3327,6 +3396,10 @@ RV_EXPORT int32_t rv_dom_math_ml_element_set_tab_index(RvNode* target, int32_t v
 /* MathMLElement.style getter: readonly attribute CSSStyleProperties style; *result is a new reference;
  * RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
 RV_EXPORT int32_t rv_dom_math_ml_element_get_style(RvNode* target, RvCSSStyleDeclaration** result);
+/* MathMLElement.attributeStyleMap getter: readonly attribute StylePropertyMap attributeStyleMap; *result is a new
+ * reference; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds
+ * without MATHML */
+RV_EXPORT int32_t rv_dom_math_ml_element_get_attribute_style_map(RvNode* target, RvStylePropertyMapReadOnly** result);
 /* MathMLElement.focus(optional FocusOptions options = {}) -> undefined; options defaults to {} in IDL; options may be
  * NULL for the IDL default; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off; RV_ERR_UNSUPPORTED where
  * WebKit builds without MATHML */
@@ -3540,6 +3613,8 @@ RV_EXPORT int32_t rv_dom_css_style_rule_set_selector_text(RvCSSRule* target, con
 RV_EXPORT int32_t rv_dom_css_style_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
 /* CSSStyleRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference */
 RV_EXPORT int32_t rv_dom_css_style_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result);
+/* CSSStyleRule.styleMap getter: readonly attribute StylePropertyMap styleMap; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_style_rule_get_style_map(RvCSSRule* target, RvStylePropertyMapReadOnly** result);
 /* CSSStyleRule.insertRule(CSSOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to 0
  * in IDL */
 RV_EXPORT int32_t rv_dom_css_style_rule_insert_rule(RvCSSRule* target, const char* rule, uint32_t index, uint32_t* result);
@@ -3872,6 +3947,31 @@ RV_EXPORT int32_t rv_dom_cssom_variable_reference_value_set_variable(RvCSSOMVari
 /* CSSOMVariableReferenceValue.fallback getter: readonly attribute CSSUnparsedValue? fallback; *result is a new
  * reference, or NULL */
 RV_EXPORT int32_t rv_dom_cssom_variable_reference_value_get_fallback(RvCSSOMVariableReferenceValue* target, RvCSSStyleValue** result);
+/* StylePropertyMapReadOnly */
+
+/* StylePropertyMapReadOnly.size getter: readonly attribute unsigned long size */
+RV_EXPORT int32_t rv_dom_style_property_map_read_only_get_size(RvStylePropertyMapReadOnly* target, uint32_t* result);
+/* StylePropertyMapReadOnly.get(USVString property) -> (undefined or CSSStyleValue); context is an explicit checked
+ * Document for the operation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_style_property_map_read_only_get(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, RvDomUnionUndefinedOrCSSStyleValue* result);
+/* StylePropertyMapReadOnly.getAll(USVString property) -> sequence<CSSStyleValue?>; context is an explicit checked
+ * Document for the operation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_style_property_map_read_only_get_all(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, RvDomSequenceCSSStyleValueNullableElement* result);
+/* StylePropertyMapReadOnly.has(USVString property) -> boolean; context is an explicit checked Document for the
+ * operation */
+RV_EXPORT int32_t rv_dom_style_property_map_read_only_has(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, int32_t* result);
+/* StylePropertyMap */
+
+/* StylePropertyMap.set(USVString property, (CSSStyleValue or USVString) values) -> undefined; context is an explicit
+ * checked Document for the operation */
+RV_EXPORT int32_t rv_dom_style_property_map_set(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, const RvDomSequenceCSSStyleValueOrUSVString* values);
+/* StylePropertyMap.append(USVString property, (CSSStyleValue or USVString) values) -> undefined; context is an
+ * explicit checked Document for the operation */
+RV_EXPORT int32_t rv_dom_style_property_map_append(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, const RvDomSequenceCSSStyleValueOrUSVString* values);
+/* StylePropertyMap.delete(USVString property) -> undefined; context is an explicit checked Document for the operation */
+RV_EXPORT int32_t rv_dom_style_property_map_delete(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length);
+/* StylePropertyMap.clear() -> undefined */
+RV_EXPORT int32_t rv_dom_style_property_map_clear(RvStylePropertyMapReadOnly* target);
 /* CSSPositionTryRule */
 
 /* CSSPositionTryRule.name getter: readonly attribute CSSOMString name; RV_ERR_UNSUPPORTED while the setting

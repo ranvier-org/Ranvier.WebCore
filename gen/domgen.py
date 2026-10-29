@@ -407,7 +407,10 @@ class World:
                           subtypes=children, label=label)
         if t.name in ("sequence", "FrozenArray"):
             child = self.map(t.subtypes[0])
-            label = type_label(self.resolve(t.subtypes[0]))
+            element = self.resolve(t.subtypes[0])
+            label = type_label(element)
+            if element.nullable and element.name in self.config.get('complexNullableElements', []):
+                label += 'NullableElement'
             return Mapped("sequence", t.nullable, "RvDomSequence" + label + ("Nullable" if t.nullable else ""),
                           subtypes=[child], label=label + " sequence")
         if t.name in ("record", "Promise", "ObservableArray"):
@@ -1170,6 +1173,19 @@ class Generator(ComplexGeneratorMixin):
         prepare = []
         passed = []
         notes = []
+        context_receiver = None
+        if call_with and 'Node' not in self.world.chain(interface):
+            context_receiver = self.world.config.get('objectContexts', {}).get(interface)
+            if context_receiver:
+                if context_receiver != 'Document' or context_receiver not in self.world.scope:
+                    raise SystemExit(f'{interface}: object context must be a scoped Document')
+                if any(c_name(argument.name) == 'context' for argument in arguments):
+                    raise SystemExit(f'{interface}.{member.name}: argument conflicts with checked context parameter')
+                params.append(('RvNode*', 'context'))
+                checks.append('context')
+                self.headers.add('Document.h')
+                function.context_receiver = context_receiver
+                notes.append('context is an explicit checked Document for the operation')
         return_value = None
         for index, (argument, mapped) in enumerate(zip(arguments, mapped_args)):
             name = c_name(argument.name)
@@ -1356,8 +1372,13 @@ class Generator(ComplexGeneratorMixin):
             notes.append(f"RV_ERR_UNSUPPORTED while the setting {setting} is off")
         if call_with:
             if "Node" not in chain:
-                raise Unsupported("[CallWith] on an interface other than a node")
-            body.append("Ref document = impl->document();")
+                if not context_receiver:
+                    raise Unsupported("[CallWith] on an interface other than a node")
+                body += ['RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));',
+                         'if (!contextDocument)', '    return RV_ERR_WRONG_INTERFACE;',
+                         'Ref document = contextDocument.releaseNonNull();']
+            else:
+                body.append("Ref document = impl->document();")
         body += getattr(function, 'context_checks', [])
         body += prepare
         expression = call
@@ -1446,6 +1467,8 @@ class Generator(ComplexGeneratorMixin):
                                      binding='facade', stringInputs='utf8-lengths')
             if function.kind in ('operation', 'setter') and getattr(function, 'string_spans', False):
                 functions[-1]['stringInputs'] = 'utf8-lengths'
+            if getattr(function, 'context_receiver', None):
+                functions[-1].update(contextReceiver=function.context_receiver, contextParameter='context')
             bridge = self.world.config.get("attributeBridges", {}).get(f"{function.interface}.{function.member.name}")
             if bridge:
                 functions[-1]["binding"] = "facade"
