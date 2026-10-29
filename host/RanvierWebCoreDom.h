@@ -3209,6 +3209,26 @@ RV_EXPORT int32_t rv_dom_html_style_element_set_type(RvNode* target, const char*
 RV_EXPORT int32_t rv_dom_html_style_element_get_blocking(RvNode* target, RvDOMTokenList** result);
 /* HTMLStyleElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_style_element_get_sheet(RvNode* target, RvStyleSheet** result);
+/* SVGStyleElement */
+
+/* SVGStyleElement.disabled getter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_disabled(RvNode* target, int32_t* result);
+/* SVGStyleElement.disabled setter: attribute boolean disabled */
+RV_EXPORT int32_t rv_dom_svg_style_element_set_disabled(RvNode* target, int32_t value);
+/* SVGStyleElement.type getter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStyleElement.type setter: attribute DOMString type */
+RV_EXPORT int32_t rv_dom_svg_style_element_set_type(RvNode* target, const char* value);
+/* SVGStyleElement.media getter: attribute DOMString media */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStyleElement.media setter: attribute DOMString media */
+RV_EXPORT int32_t rv_dom_svg_style_element_set_media(RvNode* target, const char* value);
+/* SVGStyleElement.title getter: attribute DOMString title */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_title(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStyleElement.title setter: attribute DOMString title */
+RV_EXPORT int32_t rv_dom_svg_style_element_set_title(RvNode* target, const char* value);
+/* SVGStyleElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_svg_style_element_get_sheet(RvNode* target, RvStyleSheet** result);
 /* HTMLLinkElement */
 
 /* HTMLLinkElement.href getter: attribute USVString href */

@@ -399,6 +399,10 @@
       "base": "HTMLElement"
     },
     {
+      "name": "SVGStyleElement",
+      "base": "SVGElement"
+    },
+    {
       "name": "HTMLLinkElement",
       "base": "HTMLElement"
     },
@@ -1397,6 +1401,17 @@
       "mixin": false,
       "contractOnly": false,
       "source": "html/HTMLStyleElement.idl"
+    },
+    {
+      "name": "SVGStyleElement",
+      "idlName": "SVGStyleElement",
+      "base": "SVGElement",
+      "mixins": [
+        "LinkStyle"
+      ],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGStyleElement.idl"
     },
     {
       "name": "HTMLLinkElement",
@@ -2470,17 +2485,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "svg/SVGStopElement.idl"
-    },
-    {
-      "name": "SVGStyleElement",
-      "idlName": "SVGStyleElement",
-      "base": "SVGElement",
-      "mixins": [
-        "LinkStyle"
-      ],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGStyleElement.idl"
     },
     {
       "name": "SVGSVGElement",
@@ -65741,6 +65745,454 @@
       "contractOwner": "LinkStyle",
       "kind": "getter",
       "function": "rv_dom_html_style_element_get_sheet",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvStyleSheet**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSStyleSheet",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSStyleSheet",
+        "root": "StyleSheet",
+        "class": "CSSStyleSheet",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStyleElement",
+      "member": "disabled",
+      "contractOwner": "SVGStyleElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_style_element_get_disabled",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStyleElement",
+      "member": "disabled",
+      "contractOwner": "SVGStyleElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_style_element_set_disabled",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStyleElement",
+      "member": "type",
+      "contractOwner": "SVGStyleElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_style_element_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStyleElement",
+      "member": "type",
+      "contractOwner": "SVGStyleElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_style_element_set_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStyleElement",
+      "member": "media",
+      "contractOwner": "SVGStyleElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_style_element_get_media",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStyleElement",
+      "member": "media",
+      "contractOwner": "SVGStyleElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_style_element_set_media",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStyleElement",
+      "member": "title",
+      "contractOwner": "SVGStyleElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_style_element_get_title",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStyleElement",
+      "member": "title",
+      "contractOwner": "SVGStyleElement",
+      "kind": "setter",
+      "function": "rv_dom_svg_style_element_set_title",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStyleElement",
+      "member": "sheet",
+      "contractOwner": "LinkStyle",
+      "kind": "getter",
+      "function": "rv_dom_svg_style_element_get_sheet",
       "conditional": null,
       "parameters": [
         {

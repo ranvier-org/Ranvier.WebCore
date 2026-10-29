@@ -209,6 +209,37 @@ def verify(native_directory):
 
         call('rv_node_remove_child', [pointer, pointer], body, style)
         length_is('rv_dom_style_sheet_list_get_length', sheets, 0)
+
+        svg = handle('rv_dom_document_create_element_ns', [pointer, string, string, pointer],
+                     document, b'http://www.w3.org/2000/svg', b'svg', None, release='rv_node_release')
+        svg_style = handle('rv_dom_document_create_element_ns', [pointer, string, string, pointer],
+                           document, b'http://www.w3.org/2000/svg', b'style', None, release='rv_node_release')
+        call('rv_dom_node_set_text_content', [pointer, string], svg_style, b'.svg-probe { opacity: 0.4; }')
+        call('rv_dom_svg_style_element_set_type', [pointer, string], svg_style, b'text/css')
+        call('rv_dom_svg_style_element_set_title', [pointer, string], svg_style, b'SVG fixture')
+        call('rv_dom_svg_style_element_set_media', [pointer, string], svg_style, b'screen')
+        expect(text('rv_dom_svg_style_element_get_type', [pointer], svg_style) == 'text/css', 'SVG style type')
+        expect(text('rv_dom_svg_style_element_get_title', [pointer], svg_style) == 'SVG fixture', 'SVG style title')
+        expect(text('rv_dom_svg_style_element_get_media', [pointer], svg_style) == 'screen', 'SVG style media')
+        call('rv_node_append_child', [pointer, pointer], svg, svg_style)
+        call('rv_node_append_child', [pointer, pointer], body, svg)
+        svg_sheet = handle('rv_dom_svg_style_element_get_sheet', [pointer], svg_style, release='rv_dom_style_sheet_release')
+        expect(text('rv_dom_style_sheet_get_interface_name', [pointer], svg_sheet) == 'CSSStyleSheet', 'SVG concrete sheet')
+        svg_rules = handle('rv_dom_css_style_sheet_get_css_rules', [pointer], svg_sheet, release='rv_dom_css_rule_list_release')
+        length_is('rv_dom_css_rule_list_get_length', svg_rules, 1)
+        owner_node = handle('rv_dom_style_sheet_get_owner_node', [pointer], svg_sheet, release='rv_node_release')
+        expect(owner_node == svg_style, 'SVG stylesheet owner node')
+        disabled = integer()
+        call('rv_dom_svg_style_element_set_disabled', [pointer, integer], svg_style, 1)
+        call('rv_dom_svg_style_element_get_disabled', [pointer, numbers], svg_style, ctypes.byref(disabled))
+        expect(disabled.value == 1, 'SVG style disabled')
+        call('rv_dom_style_sheet_get_disabled', [pointer, numbers], svg_sheet, ctypes.byref(disabled))
+        expect(disabled.value == 1, 'SVG style disabled sheet synchronization')
+        call('rv_dom_svg_style_element_set_disabled', [pointer, integer], svg_style, 0)
+        expect(bind('rv_dom_svg_style_element_get_disabled', integer, [pointer, numbers])(style, ctypes.byref(disabled)) == -11,
+               'SVG style wrong namespace rejected')
+        call('rv_node_remove_child', [pointer, pointer], body, svg)
+        length_is('rv_dom_style_sheet_list_get_length', sheets, 0)
     finally:
         for release, value in reversed(retained):
             bind(release, None, [pointer])(value)

@@ -1219,6 +1219,15 @@ int32_t rv_dom_html_style_element_get_type(RvNode* target, char* buffer, int32_t
 int32_t rv_dom_html_style_element_set_type(RvNode* target, const char* value) { return ranvier_dom_html_style_element_set_type(target, value); }
 int32_t rv_dom_html_style_element_get_blocking(RvNode* target, RvDOMTokenList** result) { return ranvier_dom_html_style_element_get_blocking(target, result); }
 int32_t rv_dom_html_style_element_get_sheet(RvNode* target, RvStyleSheet** result) { return ranvier_dom_html_style_element_get_sheet(target, result); }
+int32_t rv_dom_svg_style_element_get_disabled(RvNode* target, int32_t* result) { return ranvier_dom_svg_style_element_get_disabled(target, result); }
+int32_t rv_dom_svg_style_element_set_disabled(RvNode* target, int32_t value) { return ranvier_dom_svg_style_element_set_disabled(target, value); }
+int32_t rv_dom_svg_style_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_style_element_get_type(target, buffer, capacity, length); }
+int32_t rv_dom_svg_style_element_set_type(RvNode* target, const char* value) { return ranvier_dom_svg_style_element_set_type(target, value); }
+int32_t rv_dom_svg_style_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_style_element_get_media(target, buffer, capacity, length); }
+int32_t rv_dom_svg_style_element_set_media(RvNode* target, const char* value) { return ranvier_dom_svg_style_element_set_media(target, value); }
+int32_t rv_dom_svg_style_element_get_title(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_style_element_get_title(target, buffer, capacity, length); }
+int32_t rv_dom_svg_style_element_set_title(RvNode* target, const char* value) { return ranvier_dom_svg_style_element_set_title(target, value); }
+int32_t rv_dom_svg_style_element_get_sheet(RvNode* target, RvStyleSheet** result) { return ranvier_dom_svg_style_element_get_sheet(target, result); }
 int32_t rv_dom_html_link_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_link_element_get_href(target, buffer, capacity, length); }
 int32_t rv_dom_html_link_element_set_href(RvNode* target, const char* value) { return ranvier_dom_html_link_element_set_href(target, value); }
 int32_t rv_dom_html_link_element_get_cross_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_link_element_get_cross_origin(target, buffer, capacity, length); }

@@ -640,6 +640,8 @@ class Generator(ComplexGeneratorMixin):
         return f"Rv{chain[-1]}*"
 
     def cast_expression(self, cls, root, value):
+        if root == "Node" and cls.startswith("SVG") and cls != "SVGElement":
+            self.headers.add("SVGElementTypeHelpers.h")
         tags = self.world.config.get("nodeCastTags", {}).get(cls) if root == "Node" else None
         if tags:
             self.headers.update({"HTMLElement.h", "HTMLNames.h"})

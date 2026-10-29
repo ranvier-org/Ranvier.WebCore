@@ -1752,6 +1752,19 @@ and [<AllowNullLiteral>] HTMLStyleElement =
     /// <summary>HTMLStyleElement.blocking.</summary>
     abstract member blocking: DOMTokenList with get
 
+/// <summary>SVGStyleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGStyleElement =
+    inherit SVGElement
+    inherit LinkStyle
+    /// <summary>SVGStyleElement.disabled.</summary>
+    abstract member disabled: bool with get, set
+    /// <summary>SVGStyleElement.type.</summary>
+    abstract member ``type``: string with get, set
+    /// <summary>SVGStyleElement.media.</summary>
+    abstract member media: string with get, set
+    /// <summary>SVGStyleElement.title.</summary>
+    abstract member title: string with get, set
+
 /// <summary>HTMLLinkElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLLinkElement =
     inherit HTMLElement
@@ -3016,11 +3029,6 @@ and [<AllowNullLiteral>] SVGScriptElement =
 /// <summary>SVGStopElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGStopElement =
     inherit SVGElement
-
-/// <summary>SVGStyleElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGStyleElement =
-    inherit SVGElement
-    inherit LinkStyle
 
 /// <summary>SVGSVGElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGSVGElement =

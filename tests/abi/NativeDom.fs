@@ -4193,6 +4193,33 @@ extern int rv_dom_html_style_element_get_blocking(nativeint target, nativeint& r
 extern int rv_dom_html_style_element_get_sheet(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_svg_style_element_get_disabled(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_style_element_set_disabled(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_style_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_style_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_style_element_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_style_element_set_media(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_style_element_get_title(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_style_element_set_title(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_style_element_get_sheet(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_href(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]

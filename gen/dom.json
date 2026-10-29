@@ -82,6 +82,7 @@
         "SVGElement",
         "MathMLElement",
         "HTMLStyleElement",
+        "SVGStyleElement",
         "HTMLLinkElement",
         "StyleSheet",
         "StyleSheetList",

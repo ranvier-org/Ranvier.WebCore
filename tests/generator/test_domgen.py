@@ -439,5 +439,37 @@ MathMLElement includes HTMLOrSVGOrMathMLElement;
             self.assertEqual(kinds, {'getter', 'setter'}, name)
 
 
+    def test_configured_svg_style_exposes_link_style_sheet(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface StyleSheet {};
+interface mixin LinkStyle { readonly attribute StyleSheet? sheet; };
+interface SVGStyleElement : SVGElement {
+    attribute boolean disabled;
+    [Reflect] attribute DOMString type;
+    [Reflect] attribute DOMString media;
+    [Reflect] attribute DOMString title;
+};
+SVGStyleElement includes LinkStyle;
+''')
+        configured = json.loads((ROOT / 'gen/dom.json').read_text())['interfaces']
+        config = dict(self.world.config)
+        config['interfaces'] = ['Node', 'Element', 'SVGElement', 'StyleSheet'] + [
+            name for name in configured if name == 'SVGStyleElement'
+        ]
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {function['function']: function for function in json.loads(generator.api_model())['functions']}
+        sheet = functions['rv_dom_svg_style_element_get_sheet']
+        self.assertEqual(sheet['returns']['interface'], 'StyleSheet')
+        self.assertTrue(sheet['returns']['nullable'])
+        self.assertIn('SVGElementTypeHelpers.h', generator.glue())
+        for member in ['disabled', 'type', 'media', 'title']:
+            self.assertIn('rv_dom_svg_style_element_get_' + member, functions)
+            self.assertIn('rv_dom_svg_style_element_set_' + member, functions)
+
+
 if __name__ == '__main__':
     unittest.main()
