@@ -23,7 +23,8 @@ let private exceptionName () =
 let run (_: string) =
     require (rv_abi_has "dom-generated" = 1) "rv_abi_has dom-generated"
     require (rv_abi_has "dom:HTMLInputElement" = 1) "rv_abi_has dom:HTMLInputElement"
-    require (rv_abi_has "dom:HTMLMarqueeElement" = 0) "rv_abi_has of an interface outside the generated set"
+    require (rv_abi_has "dom:HTMLMarqueeElement" = 1) "rv_abi_has dom:HTMLMarqueeElement"
+    require (rv_abi_has "dom:RanvierUnknownElement" = 0) "rv_abi_has of an unknown interface"
     require (RV_DOM_NODE_ELEMENT_NODE = 1) "Node.ELEMENT_NODE"
 
     use host = new Host(200, 100)
