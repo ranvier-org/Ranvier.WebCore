@@ -845,7 +845,12 @@ class Generator(ComplexGeneratorMixin):
             lines = ["RefPtr settingsNode = dynamicDowncast<Node>(impl->target());", "if (!settingsNode)",
                      "    return RV_ERR_UNSUPPORTED;"]
             document = "settingsNode->document()"
-        elif chain[-1] in ("CSSRule", "CSSStyleDeclaration"):
+        elif chain[-1] == "CSSRule" or interface in ("CSSFontFaceDescriptors", "CSSPositionTryDescriptors"):
+            self.headers.add("Document.h")
+            lines = ["RefPtr<Document> settingsDocument = impl->documentForBindings();",
+                     "if (!settingsDocument)", "    return RV_ERR_UNSUPPORTED;"]
+            document = "(*settingsDocument)"
+        elif chain[-1] == "CSSStyleDeclaration":
             root = chain[-1]
             self.headers.add("CSSStyleSheet.h")
             lines = [f"RefPtr settingsSheet = static_cast<{root}&>(*impl).parentStyleSheet();",

@@ -19825,10 +19825,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_ascent_override(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -19847,10 +19844,7 @@ int32_t ranvier_dom_css_font_face_descriptors_set_ascent_override(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -19870,10 +19864,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_ascent_override_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -19892,10 +19883,7 @@ int32_t ranvier_dom_css_font_face_descriptors_set_ascent_override_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -19915,10 +19903,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_descent_override(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -19937,10 +19922,7 @@ int32_t ranvier_dom_css_font_face_descriptors_set_descent_override(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -19960,10 +19942,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_descent_override_css(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -19982,10 +19961,7 @@ int32_t ranvier_dom_css_font_face_descriptors_set_descent_override_css(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20005,10 +19981,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_line_gap_override(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20027,10 +20000,7 @@ int32_t ranvier_dom_css_font_face_descriptors_set_line_gap_override(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20050,10 +20020,7 @@ int32_t ranvier_dom_css_font_face_descriptors_get_line_gap_override_css(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20072,10 +20039,7 @@ int32_t ranvier_dom_css_font_face_descriptors_set_line_gap_override_css(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSFontFaceDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20471,10 +20435,7 @@ int32_t ranvier_dom_css_position_try_rule_get_name(RvCSSRule* target, char* buff
     RefPtr impl = dynamicDowncast<CSSPositionTryRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSRule&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20493,10 +20454,7 @@ int32_t ranvier_dom_css_position_try_rule_get_style(RvCSSRule* target, RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryRule>(*reinterpret_cast<CSSRule*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSRule&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20515,10 +20473,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin(RvCSSStyleDeclaratio
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20537,10 +20492,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin(RvCSSStyleDeclaratio
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20560,10 +20512,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_top(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20582,10 +20531,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_top(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20605,10 +20551,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_right(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20627,10 +20570,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_right(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20650,10 +20590,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_bottom(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20672,10 +20609,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_bottom(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20695,10 +20629,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_left(RvCSSStyleDecla
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20717,10 +20648,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_left(RvCSSStyleDecla
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20740,10 +20668,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20762,10 +20687,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_block(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20785,10 +20707,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_start(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20807,10 +20726,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_start(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20830,10 +20746,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_end(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20852,10 +20765,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_end(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20875,10 +20785,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20897,10 +20804,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20920,10 +20824,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_start(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20942,10 +20843,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_start(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20965,10 +20863,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_end(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -20987,10 +20882,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_end(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21010,10 +20902,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_top_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21032,10 +20921,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_top_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21055,10 +20941,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_right_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21077,10 +20960,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_right_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21100,10 +20980,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_bottom_css(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21122,10 +20999,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_bottom_css(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21145,10 +21019,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_left_css(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21167,10 +21038,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_left_css(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21190,10 +21058,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21212,10 +21077,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21235,10 +21097,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_start_css(RvCS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21257,10 +21116,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_start_css(RvCS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21280,10 +21136,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_block_end_css(RvCSSS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21302,10 +21155,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_block_end_css(RvCSSS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21325,10 +21175,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_css(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21347,10 +21194,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_css(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21370,10 +21214,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_start_css(RvC
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21392,10 +21233,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_start_css(RvC
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21415,10 +21253,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_margin_inline_end_css(RvCSS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21437,10 +21272,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_margin_inline_end_css(RvCSS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21460,10 +21292,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset(RvCSSStyleDeclaration
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21482,10 +21311,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset(RvCSSStyleDeclaration
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21505,10 +21331,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block(RvCSSStyleDecla
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21527,10 +21350,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_block(RvCSSStyleDecla
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21550,10 +21370,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_start(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21572,10 +21389,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_start(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21595,10 +21409,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_end(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21617,10 +21428,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_end(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21640,10 +21448,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21662,10 +21467,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21685,10 +21487,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_start(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21707,10 +21506,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_start(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21730,10 +21526,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_end(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21752,10 +21545,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_end(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21775,10 +21565,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_top(RvCSSStyleDeclaration* 
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21797,10 +21584,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_top(RvCSSStyleDeclaration* 
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21820,10 +21604,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_left(RvCSSStyleDeclaration*
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21842,10 +21623,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_left(RvCSSStyleDeclaration*
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21865,10 +21643,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_right(RvCSSStyleDeclaration
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21887,10 +21662,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_right(RvCSSStyleDeclaration
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21910,10 +21682,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_bottom(RvCSSStyleDeclaratio
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21932,10 +21701,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_bottom(RvCSSStyleDeclaratio
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21955,10 +21721,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_css(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -21977,10 +21740,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_css(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22000,10 +21760,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_start_css(RvCSS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22022,10 +21779,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_start_css(RvCSS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22045,10 +21799,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_block_end_css(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22067,10 +21818,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_block_end_css(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22090,10 +21838,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22112,10 +21857,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22135,10 +21877,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_start_css(RvCS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22157,10 +21896,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_start_css(RvCS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22180,10 +21916,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inset_inline_end_css(RvCSSS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22202,10 +21935,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inset_inline_end_css(RvCSSS
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22225,10 +21955,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_width(RvCSSStyleDeclaration
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22247,10 +21974,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_width(RvCSSStyleDeclaration
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22270,10 +21994,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_width(RvCSSStyleDeclara
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22292,10 +22013,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_min_width(RvCSSStyleDeclara
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22315,10 +22033,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_width(RvCSSStyleDeclara
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22337,10 +22052,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_max_width(RvCSSStyleDeclara
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22360,10 +22072,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_height(RvCSSStyleDeclaratio
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22382,10 +22091,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_height(RvCSSStyleDeclaratio
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22405,10 +22111,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_height(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22427,10 +22130,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_min_height(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22450,10 +22150,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_height(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22472,10 +22169,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_max_height(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22495,10 +22189,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_block_size(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22517,10 +22208,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_block_size(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22540,10 +22228,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_block_size(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22562,10 +22247,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_min_block_size(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22585,10 +22267,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_block_size(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22607,10 +22286,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_max_block_size(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22630,10 +22306,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inline_size(RvCSSStyleDecla
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22652,10 +22325,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inline_size(RvCSSStyleDecla
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22675,10 +22345,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_inline_size(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22697,10 +22364,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_min_inline_size(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22720,10 +22384,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_inline_size(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22742,10 +22403,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_max_inline_size(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22765,10 +22423,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_width_css(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22787,10 +22442,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_min_width_css(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22810,10 +22462,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_width_css(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22832,10 +22481,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_max_width_css(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22855,10 +22501,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_height_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22877,10 +22520,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_min_height_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22900,10 +22540,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_height_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22922,10 +22559,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_max_height_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22945,10 +22579,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_block_size_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22967,10 +22598,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_block_size_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -22990,10 +22618,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_block_size_css(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23012,10 +22637,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_min_block_size_css(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23035,10 +22657,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_block_size_css(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23057,10 +22676,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_max_block_size_css(RvCSSSty
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23080,10 +22696,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_inline_size_css(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23102,10 +22715,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_inline_size_css(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23125,10 +22735,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_min_inline_size_css(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23147,10 +22754,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_min_inline_size_css(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23170,10 +22774,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_max_inline_size_css(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23192,10 +22793,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_max_inline_size_css(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23215,10 +22813,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_place_self(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23237,10 +22832,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_place_self(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23260,10 +22852,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_align_self(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23282,10 +22871,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_align_self(RvCSSStyleDeclar
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23305,10 +22891,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_justify_self(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23327,10 +22910,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_justify_self(RvCSSStyleDecl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23350,10 +22930,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_place_self_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23372,10 +22949,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_place_self_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23395,10 +22969,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_align_self_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23417,10 +22988,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_align_self_css(RvCSSStyleDe
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23440,10 +23008,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_justify_self_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23462,10 +23027,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_justify_self_css(RvCSSStyle
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23485,10 +23047,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_position_anchor(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23507,10 +23066,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_position_anchor(RvCSSStyleD
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23530,10 +23086,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_position_anchor_css(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23552,10 +23105,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_position_anchor_css(RvCSSSt
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23575,10 +23125,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_position_area(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23597,10 +23144,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_position_area(RvCSSStyleDec
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23620,10 +23164,7 @@ int32_t ranvier_dom_css_position_try_descriptors_get_position_area_css(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();
@@ -23642,10 +23183,7 @@ int32_t ranvier_dom_css_position_try_descriptors_set_position_area_css(RvCSSStyl
     RefPtr impl = dynamicDowncast<CSSPositionTryDescriptors>(*reinterpret_cast<CSSStyleDeclaration*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr settingsSheet = static_cast<CSSStyleDeclaration&>(*impl).parentStyleSheet();
-    RefPtr<Document> settingsDocument = settingsSheet ? settingsSheet->ownerDocument() : nullptr;
-    if (!settingsDocument && settingsSheet)
-        settingsDocument = settingsSheet->constructorDocument();
+    RefPtr<Document> settingsDocument = impl->documentForBindings();
     if (!settingsDocument)
         return RV_ERR_UNSUPPORTED;
     auto& settings = (*settingsDocument).settingsValues();

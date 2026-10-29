@@ -286,6 +286,14 @@ CSSCounterStyleRule name edits update both the style rule's public name and its 
 
 `tests/abi/counter_style_rules.py` retains rules from two identical stylesheets, removes the second from the active cascade and renames the first. It checks public metadata, complete copy isolation, rendered old/new-name marker effects against literal and decimal controls, invalid/checked errors and detached-rule edits. Slim CI and extracted-package audits run the regression.
 
+## 0017-detached-cssom-context
+
+Retained CSSOM rules keep a weak original settings document and snapshot parser context before losing their parent. The binding helpers prefer live parent/stylesheet scope context while attached. Descriptor objects retain their own weak context so they survive their rule. Disabled or expired document contexts remain unsupported; no global raw-pointer registry or strong document reference is added.
+
+Detached position-try/font-face descriptor edits copy shared backing rules/property sets before mutation and preserve existing descriptor identity. Attached mutations retain stylesheet notification and copy-on-write pairing. The CSSRule size assertion explicitly accounts for one context pointer; the parsed source rule layout is unchanged.
+
+`tests/abi/detached_cssom_context.py` covers retained and late-acquired rules/descriptors, grouping-rule context, ownerless sheets, shared-sheet isolation with actual anchored layout, checked errors and weak owner expiry. Slim CI and extracted-package audits run it. A live settings-toggle scenario is not currently exercised by the public ABI test.
+
 ## Working on the series
 
 ```
