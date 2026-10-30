@@ -21,8 +21,16 @@ DOMQuadInit contains nested DOMPointInit dictionaries. Null or absent nested inp
 
 No geometry binding or runtime acceptance is claimed by this planning checkpoint.
 
+The selected geometry scope does not require generic toJSON object transport or named Float32Array/Float64Array factories. These incidental IDL members are outside this checkpoint; matrix values still need lossless double input/output and the selected matrix operations.
+
 ## Nested dictionary checkpoint
 
 The focused test first failed because takeQuad was omitted for unsupported nested dictionaries. Opted-in nonnullable fields with an empty dictionary default now borrow a child input pointer. Parent and child independently check their size before reading each field; absent children retain the engine aggregate defaults. Required, nullable or absence-sensitive nested fields remain explicitly unsupported. No production dictionary has been opted in yet.
 
 All 52 generator tests pass. Production generation check is unchanged at 138 interfaces, 1,739 functions, 20 handle roots and 16 dictionaries. Independent source review found no blocker. Null child pointers, short child structs and default w=1 still require execution in the eventual native quad fixture.
+
+## Tracked handle primitive checkpoint
+
+An opt-in root-to-direct-mutable-subtype configuration now selects trusted producer tracking. Compile-time conversion checks constrain each producer's concrete type; casts reject unknown and read-only records. Direct results, nested result containers, root retains and both release paths update external reference counts. The metadata table owns no engine references and removes an entry on its last exported release. Internal argument references do not enter this table.
+
+The initial generator regression failed at the missing tracked producer path. All 53 generator tests now pass, with production generation still unchanged. Independent source review found no blocker. The actual generated helper and raw-pointer conversion compile under clang-cl C++20 with warnings as errors and pass 23 explicit checks against minimal nonvirtual reference-counted types. A deliberately incorrect mutable producer annotation is rejected by the compiler. This helper proof covers const concrete references, read-only rejection, retained references, last-release erasure and conservative address reuse; it does not prove engine bindings or native geometry acceptance. Logs are in the ignored artifacts/geometry-handle-proof directory.

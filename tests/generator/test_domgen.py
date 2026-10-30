@@ -59,6 +59,42 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_tracked_geometry_handles_classify_only_trusted_mutable_producers_and_pair_releases(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface DOMRectReadOnly { readonly attribute unrestricted double x; };
+interface DOMRect : DOMRectReadOnly { attribute unrestricted double x; };
+partial interface Node {
+    DOMRect makeRect();
+    DOMRectReadOnly makeReadOnlyRect();
+    sequence<DOMRect> rects();
+    undefined takeRect(DOMRect rect);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['DOMRectReadOnly', 'DOMRect']
+        config['trackedHandleRoots'] = {'DOMRectReadOnly': 'DOMRect'}
+        config['runtimeTypeRoots'] = ['DOMRectReadOnly']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        self.assertIn('storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result)', glue)
+        self.assertIn('storeTrackedHandle<DOMRectReadOnly, DOMRectReadOnly>(value, result)', glue)
+        self.assertIn('storeTrackedHandle<DOMRectReadOnly, DOMRect>(value[i], &result->items[i])', glue)
+        self.assertIn('castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target))', glue)
+        self.assertIn('retainTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle))', glue)
+        self.assertIn('releaseTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle))', glue)
+        self.assertIn('releaseTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(value->items[i]))', glue)
+        self.assertNotIn('dynamicDowncast<DOMRect>', glue)
+        self.assertIn('auto found = handles.find(&value);', glue)
+        self.assertIn('found->second.mutableType', glue)
+        self.assertIn('if (!--found->second.references)', glue)
+        self.assertIn('handles.erase(found);', glue)
+        self.assertIn('const_cast<Root*>(static_cast<const Root*>(concrete))', glue)
+        self.assertIn('static_assert(std::is_same_v<Concrete, Root> || std::is_same_v<Concrete, Mutable>);', glue)
+
     def test_opted_in_nested_geometry_dictionary_preserves_defaults_and_input_layouts(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

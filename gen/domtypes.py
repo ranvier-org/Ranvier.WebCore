@@ -176,6 +176,8 @@ class ComplexGeneratorMixin:
             return [f'{target} = static_cast<{self.transport_ctype(mapped)}>({expression});']
         if kind in ('node', 'event', 'object'):
             root = {'node': 'Node', 'event': 'Event'}.get(kind) or self.world.cpp_class(mapped.root)
+            if root in self.tracked_roots:
+                return [f'storeTrackedHandle<{root}, {mapped.cls}>({expression}, &{target});']
             return [f'storeHandle<{root}>({expression}, &{target});']
         raise self.unsupported_type(f'{kind} result in a union or sequence')
 
@@ -188,6 +190,8 @@ class ComplexGeneratorMixin:
             return [f'std::free(const_cast<char*>({expression}));']
         if mapped.kind in ('node', 'event', 'object'):
             root = {'node': 'Node', 'event': 'Event'}.get(mapped.kind) or self.world.cpp_class(mapped.root)
+            if root in self.tracked_roots:
+                return [f'if ({expression}) releaseTrackedHandle(reinterpret_cast<{root}*>({expression}));']
             return [f'if ({expression}) reinterpret_cast<{root}*>({expression})->deref();']
         return []
 
