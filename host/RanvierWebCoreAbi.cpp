@@ -51,6 +51,7 @@
 #include <WebCore/PixelBuffer.h>
 #include <WebCore/Range.h>
 #include <WebCore/Settings.h>
+#include <WebCore/MIMETypeRegistry.h>
 #include <WebCore/Text.h>
 #include <WebCore/TrustedHTML.h>
 #include <WebCore/DocumentLoader.h>
@@ -1114,6 +1115,8 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "capabilities"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1140,6 +1143,8 @@ int32_t rv_abi_has(const char* feature)
 #endif
     return 0;
 }
+
+#include "RanvierCapabilities.inc"
 
 int64_t rv_process_id(void) { return static_cast<int64_t>(getCurrentProcessID()); }
 

@@ -120,6 +120,19 @@ enum {
 RV_EXPORT int32_t rv_abi_version(void);
 RV_EXPORT int64_t rv_process_id(void);
 
+/* Passive capability queries. Categories: ABI=0, renderer setting=1, image format=2,
+ * font format=3, platform facility=4. Dimensions: exported=0, implemented=1, enabled=2,
+ * permitted=3, available=4. Facts: unknown=-1, no=0, yes=1. Arbitrary unknown names stay unknown.
+ * Value kinds: absent=0, boolean=1, number=2, text=3. Boolean numeric values are exactly 0/1.
+ * Wrong-kind getters return RV_ERR_UNSUPPORTED with outputs untouched. String length/capacity
+ * count exact UTF-8 bytes, without a NUL terminator, following the existing string transport. */
+RV_EXPORT int32_t rv_capability_count(int32_t category);
+RV_EXPORT int32_t rv_capability_name_at(int32_t category, int32_t index, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_host_capability_fact(RvHost*, int32_t category, const char* name, int32_t dimension, int32_t* fact);
+RV_EXPORT int32_t rv_host_capability_value_kind(RvHost*, int32_t category, const char* name, int32_t* kind);
+RV_EXPORT int32_t rv_host_capability_value_number(RvHost*, int32_t category, const char* name, double* number);
+RV_EXPORT int32_t rv_host_capability_value_text(RvHost*, int32_t category, const char* name, char* buffer, int32_t capacity, int32_t* length);
+
 RV_EXPORT RvHost* rv_host_create(int32_t width, int32_t height);
 RV_EXPORT void rv_host_destroy(RvHost*);
 RV_EXPORT int32_t rv_host_load_html(RvHost*, const char* html);
