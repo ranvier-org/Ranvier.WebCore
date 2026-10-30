@@ -51,7 +51,16 @@
 #include "DOMCSSNamespace.h"
 #include "DOMCSSRegisterCustomProperty.h"
 #include "DOMImplementation.h"
+#include "DOMMatrix.h"
+#include "DOMMatrixInit.h"
+#include "DOMMatrixReadOnly.h"
+#include "DOMPoint.h"
+#include "DOMPointInit.h"
+#include "DOMPointReadOnly.h"
+#include "DOMQuad.h"
+#include "DOMQuadInit.h"
 #include "DOMRect.h"
+#include "DOMRectInit.h"
 #include "DOMRectList.h"
 #include "DOMRectReadOnly.h"
 #include "DOMSelection.h"
@@ -428,6 +437,68 @@ template<typename T> struct HandleArg {
     operator RefPtr<T>() const { return pointer; }
 };
 
+} // namespace
+
+#include <unordered_map>
+namespace {
+template<typename Root> struct TrackedHandleTraits;
+template<> struct TrackedHandleTraits<DOMRectReadOnly> { using Mutable = DOMRect; };
+template<> struct TrackedHandleTraits<DOMPointReadOnly> { using Mutable = DOMPoint; };
+template<> struct TrackedHandleTraits<DOMMatrixReadOnly> { using Mutable = DOMMatrix; };
+
+// Metadata owns no engine references. Entries count only references exported through this ABI.
+struct TrackedHandleState {
+    size_t references { 0 };
+    bool mutableType { false };
+};
+
+template<typename Root> auto& trackedHandles()
+{
+    static std::unordered_map<const Root*, TrackedHandleState> handles;
+    return handles;
+}
+
+template<typename Root, typename Concrete, typename Handle, typename V>
+int32_t storeTrackedHandle(V&& value, Handle** result)
+{
+    using Mutable = typename TrackedHandleTraits<Root>::Mutable;
+    static_assert(std::is_same_v<Concrete, Root> || std::is_same_v<Concrete, Mutable>);
+    const Concrete* concrete = rawPointer<const Concrete>(std::forward<V>(value));
+    auto* pointer = const_cast<Root*>(static_cast<const Root*>(concrete));
+    if (pointer) {
+        pointer->ref();
+        auto& state = trackedHandles<Root>()[pointer];
+        ++state.references;
+        state.mutableType |= std::is_same_v<Concrete, Mutable>;
+    }
+    *result = reinterpret_cast<Handle*>(pointer);
+    return RV_OK;
+}
+
+template<typename Root> void retainTrackedHandle(Root* pointer)
+{
+    pointer->ref();
+    ++trackedHandles<Root>()[pointer].references;
+}
+
+template<typename Root> void releaseTrackedHandle(Root* pointer)
+{
+    auto& handles = trackedHandles<Root>();
+    auto found = handles.find(pointer);
+    if (found != handles.end()) {
+        if (!--found->second.references)
+            handles.erase(found);
+    }
+    pointer->deref();
+}
+
+template<typename Concrete, typename Root> Concrete* castTrackedHandle(Root& value)
+{
+    static_assert(std::is_same_v<Concrete, typename TrackedHandleTraits<Root>::Mutable>);
+    auto& handles = trackedHandles<Root>();
+    auto found = handles.find(&value);
+    return found != handles.end() && found->second.mutableType ? static_cast<Concrete*>(&value) : nullptr;
+}
 } // namespace
 
 static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_s, "all"_s, "pending"_s };
@@ -1604,6 +1675,96 @@ template<typename V> int32_t encodeRvDomSequenceStaticRange(V&& input, RvDomSequ
     return RV_OK;
 }
 
+std::optional<Vector<double>> decodeRvDomSequenceUnrestrictedDouble(const RvDomSequenceUnrestrictedDouble* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<double> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        result.append(static_cast<double>(source->items[i]));
+    }
+    return Vector<double> { std::move(result) };
+}
+
+void clearRvDomSequenceUnrestrictedDouble(RvDomSequenceUnrestrictedDouble* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceUnrestrictedDouble(V&& input, RvDomSequenceUnrestrictedDouble* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<double*>(std::calloc(value.size(), sizeof(double))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        result->items[i] = static_cast<double>(value[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<String, Vector<double>>> decodeRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(const RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (source->arm0.length < 0 || (source->arm0.length > 0 && !source->arm0.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm0 = source->arm0.length < 0 ? String() : source->arm0.length ? String::fromUTF8(std::span<const uint8_t> { source->arm0.data, static_cast<size_t>(source->arm0.length) }) : emptyString();
+        if (source->arm0.length >= 0 && arm0.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<String, Vector<double>> { Variant<String, Vector<double>> { WTF::InPlaceIndex<0>, arm0 } };
+    }
+    case 2: {
+        auto arm1 = decodeRvDomSequenceUnrestrictedDouble(&source->arm1, status);
+        if (status != RV_OK) return std::nullopt;
+        return Variant<String, Vector<double>> { Variant<String, Vector<double>> { WTF::InPlaceIndex<1>, std::move(*arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        std::free(const_cast<uint8_t*>(value->arm0.data));
+        break;
+    case 2:
+        clearRvDomSequenceUnrestrictedDouble(&value->arm1);
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(V&& value, RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+            else if constexpr (I == 1) {
+                encodeRvDomSequenceUnrestrictedDouble(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(V&& input, RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(value, result);
+    return RV_OK;
+}
+
 void clearRvDomSequencePointerEvent(RvDomSequencePointerEvent* value)
 {
     if (!value) return;
@@ -1699,7 +1860,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1708,6 +1869,20 @@ int32_t ranvier_dom_has(const char* feature)
     if (!std::strcmp(feature, "dom-css-register-property"))
         return 1;
     if (!std::strcmp(feature, "dom-computed-style"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-matrix-readonly"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-matrix"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-rect-readonly"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-rect"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-point-readonly"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-point"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-quad"))
         return 1;
     if (!std::strcmp(feature, "dom-css-style-values"))
         return 1;
@@ -1854,6 +2029,16 @@ void ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomU
 void ranvier_dom_sequence_static_range_release(RvDomSequenceStaticRange* value)
 {
     if (isMainThread()) clearRvDomSequenceStaticRange(value);
+}
+
+void ranvier_dom_sequence_unrestricted_double_release(RvDomSequenceUnrestrictedDouble* value)
+{
+    if (isMainThread()) clearRvDomSequenceUnrestrictedDouble(value);
+}
+
+void ranvier_dom_union_dom_string_or_sequence_of_unrestricted_double_release(RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* value)
+{
+    if (isMainThread()) clearRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(value);
 }
 
 void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value)
@@ -2089,14 +2274,14 @@ RvDOMSelection* ranvier_dom_dom_selection_retain(RvDOMSelection* handle)
 void ranvier_dom_dom_rect_read_only_release(RvDOMRectReadOnly* handle)
 {
     if (handle && isMainThread())
-        reinterpret_cast<DOMRectReadOnly*>(handle)->deref();
+        releaseTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle));
 }
 
 RvDOMRectReadOnly* ranvier_dom_dom_rect_read_only_retain(RvDOMRectReadOnly* handle)
 {
     if (!handle || !isMainThread())
         return nullptr;
-    reinterpret_cast<DOMRectReadOnly*>(handle)->ref();
+    retainTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle));
     return handle;
 }
 
@@ -2111,6 +2296,48 @@ RvDOMRectList* ranvier_dom_dom_rect_list_retain(RvDOMRectList* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<DOMRectList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_dom_point_read_only_release(RvDOMPointReadOnly* handle)
+{
+    if (handle && isMainThread())
+        releaseTrackedHandle(reinterpret_cast<DOMPointReadOnly*>(handle));
+}
+
+RvDOMPointReadOnly* ranvier_dom_dom_point_read_only_retain(RvDOMPointReadOnly* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    retainTrackedHandle(reinterpret_cast<DOMPointReadOnly*>(handle));
+    return handle;
+}
+
+void ranvier_dom_dom_quad_release(RvDOMQuad* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<DOMQuad*>(handle)->deref();
+}
+
+RvDOMQuad* ranvier_dom_dom_quad_retain(RvDOMQuad* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<DOMQuad*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_dom_matrix_read_only_release(RvDOMMatrixReadOnly* handle)
+{
+    if (handle && isMainThread())
+        releaseTrackedHandle(reinterpret_cast<DOMMatrixReadOnly*>(handle));
+}
+
+RvDOMMatrixReadOnly* ranvier_dom_dom_matrix_read_only_retain(RvDOMMatrixReadOnly* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    retainTrackedHandle(reinterpret_cast<DOMMatrixReadOnly*>(handle));
     return handle;
 }
 
@@ -6288,7 +6515,7 @@ int32_t ranvier_dom_element_get_bounding_client_rect(RvNode* target, RvDOMRectRe
     RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getBoundingClientRect(); }, [&](auto&& value) { return storeHandle<DOMRectReadOnly>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->getBoundingClientRect(); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
 }
 
 // Element.checkVisibility(optional CheckVisibilityOptions options = {}) -> boolean; options defaults to {} in IDL; options may be NULL for the IDL default
@@ -24860,7 +25087,7 @@ int32_t ranvier_dom_range_get_bounding_client_rect(RvAbstractRange* target, RvDO
     RefPtr impl = dynamicDowncast<Range>(*reinterpret_cast<AbstractRange*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getBoundingClientRect(); }, [&](auto&& value) { return storeHandle<DOMRectReadOnly>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->getBoundingClientRect(); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
 }
 
 // Range.createContextualFragment((TrustedHTML or DOMString) fragment) -> DocumentFragment; *result is a new reference
@@ -25219,6 +25446,19 @@ int32_t ranvier_dom_dom_selection_modify(RvDOMSelection* target, const char* alt
     return invoke([&]() -> decltype(auto) { return impl->modify(a0, a1, a2); });
 }
 
+// DOMRectReadOnly.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in IDL; width defaults to 0 in IDL; height defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_rect_read_only_create(RvNode* target, double x, double y, double width, double height, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DOMRectReadOnly::create(x, y, width, height); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRectReadOnly>(value, result); });
+}
+
 // DOMRectReadOnly.x getter: readonly attribute unrestricted double x
 int32_t ranvier_dom_dom_rect_read_only_get_x(RvDOMRectReadOnly* target, double* result)
 {
@@ -25307,6 +25547,123 @@ int32_t ranvier_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, doubl
     return deliver([&]() -> decltype(auto) { return impl->left(); }, [&](auto&& value) { return store<double>(value, result); });
 }
 
+// DOMRect.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in IDL; width defaults to 0 in IDL; height defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_rect_create(RvNode* target, double x, double y, double width, double height, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DOMRect::create(x, y, width, height); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
+}
+
+// DOMRect.x getter: attribute unrestricted double x
+int32_t ranvier_dom_dom_rect_get_x(RvDOMRectReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMRect.x setter: attribute unrestricted double x
+int32_t ranvier_dom_dom_rect_set_x(RvDOMRectReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setX(value); });
+}
+
+// DOMRect.y getter: attribute unrestricted double y
+int32_t ranvier_dom_dom_rect_get_y(RvDOMRectReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMRect.y setter: attribute unrestricted double y
+int32_t ranvier_dom_dom_rect_set_y(RvDOMRectReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setY(value); });
+}
+
+// DOMRect.width getter: attribute unrestricted double width
+int32_t ranvier_dom_dom_rect_get_width(RvDOMRectReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMRect.width setter: attribute unrestricted double width
+int32_t ranvier_dom_dom_rect_set_width(RvDOMRectReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setWidth(value); });
+}
+
+// DOMRect.height getter: attribute unrestricted double height
+int32_t ranvier_dom_dom_rect_get_height(RvDOMRectReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->height(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMRect.height setter: attribute unrestricted double height
+int32_t ranvier_dom_dom_rect_set_height(RvDOMRectReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setHeight(value); });
+}
+
 // DOMRectList.length getter: readonly attribute unsigned long length
 int32_t ranvier_dom_dom_rect_list_get_length(RvDOMRectList* target, uint32_t* result)
 {
@@ -25326,7 +25683,1712 @@ int32_t ranvier_dom_dom_rect_list_item(RvDOMRectList* target, uint32_t index, Rv
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<DOMRectList> impl = reinterpret_cast<DOMRectList*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<DOMRectReadOnly>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
+}
+
+// DOMPointReadOnly.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in IDL; z defaults to 0 in IDL; w defaults to 1 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_point_read_only_create(RvNode* target, double x, double y, double z, double w, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DOMPointReadOnly::create(x, y, z, w); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPointReadOnly>(value, result); });
+}
+
+// DOMPointReadOnly.x getter: readonly attribute unrestricted double x
+int32_t ranvier_dom_dom_point_read_only_get_x(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMPointReadOnly> impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPointReadOnly.y getter: readonly attribute unrestricted double y
+int32_t ranvier_dom_dom_point_read_only_get_y(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMPointReadOnly> impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPointReadOnly.z getter: readonly attribute unrestricted double z
+int32_t ranvier_dom_dom_point_read_only_get_z(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMPointReadOnly> impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->z(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPointReadOnly.w getter: readonly attribute unrestricted double w
+int32_t ranvier_dom_dom_point_read_only_get_w(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMPointReadOnly> impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->w(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPointReadOnly.matrixTransform(optional DOMMatrixInit matrix = {}) -> DOMPoint; matrix defaults to {} in IDL; matrix may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_point_read_only_matrix_transform(RvDOMPointReadOnly* target, const RvDomDOMMatrixInit* matrix, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMPointReadOnly> impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    DOMMatrixInit a0 { };
+    if (matrix) {
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, a) + sizeof(matrix->a) && matrix->a)
+            assignValue(a0.a, *matrix->a);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, b) + sizeof(matrix->b) && matrix->b)
+            assignValue(a0.b, *matrix->b);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, c) + sizeof(matrix->c) && matrix->c)
+            assignValue(a0.c, *matrix->c);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, d) + sizeof(matrix->d) && matrix->d)
+            assignValue(a0.d, *matrix->d);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, e) + sizeof(matrix->e) && matrix->e)
+            assignValue(a0.e, *matrix->e);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, f) + sizeof(matrix->f) && matrix->f)
+            assignValue(a0.f, *matrix->f);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m11) + sizeof(matrix->m11) && matrix->m11)
+            assignValue(a0.m11, *matrix->m11);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m12) + sizeof(matrix->m12) && matrix->m12)
+            assignValue(a0.m12, *matrix->m12);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m21) + sizeof(matrix->m21) && matrix->m21)
+            assignValue(a0.m21, *matrix->m21);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m22) + sizeof(matrix->m22) && matrix->m22)
+            assignValue(a0.m22, *matrix->m22);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m41) + sizeof(matrix->m41) && matrix->m41)
+            assignValue(a0.m41, *matrix->m41);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m42) + sizeof(matrix->m42) && matrix->m42)
+            assignValue(a0.m42, *matrix->m42);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m13) + sizeof(matrix->m13))
+            assignValue(a0.m13, matrix->m13);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m14) + sizeof(matrix->m14))
+            assignValue(a0.m14, matrix->m14);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m23) + sizeof(matrix->m23))
+            assignValue(a0.m23, matrix->m23);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m24) + sizeof(matrix->m24))
+            assignValue(a0.m24, matrix->m24);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m31) + sizeof(matrix->m31))
+            assignValue(a0.m31, matrix->m31);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m32) + sizeof(matrix->m32))
+            assignValue(a0.m32, matrix->m32);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m33) + sizeof(matrix->m33))
+            assignValue(a0.m33, matrix->m33);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m34) + sizeof(matrix->m34))
+            assignValue(a0.m34, matrix->m34);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m43) + sizeof(matrix->m43))
+            assignValue(a0.m43, matrix->m43);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, m44) + sizeof(matrix->m44))
+            assignValue(a0.m44, matrix->m44);
+        if (matrix->size >= offsetof(RvDomDOMMatrixInit, is2_d) + sizeof(matrix->is2_d) && matrix->is2_d)
+            assignValue(a0.is2D, !!*matrix->is2_d);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->matrixTransform(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMPoint.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in IDL; z defaults to 0 in IDL; w defaults to 1 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_point_create(RvNode* target, double x, double y, double z, double w, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DOMPoint::create(x, y, z, w); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMPoint.x getter: attribute unrestricted double x
+int32_t ranvier_dom_dom_point_get_x(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPoint.x setter: attribute unrestricted double x
+int32_t ranvier_dom_dom_point_set_x(RvDOMPointReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setX(value); });
+}
+
+// DOMPoint.y getter: attribute unrestricted double y
+int32_t ranvier_dom_dom_point_get_y(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPoint.y setter: attribute unrestricted double y
+int32_t ranvier_dom_dom_point_set_y(RvDOMPointReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setY(value); });
+}
+
+// DOMPoint.z getter: attribute unrestricted double z
+int32_t ranvier_dom_dom_point_get_z(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->z(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPoint.z setter: attribute unrestricted double z
+int32_t ranvier_dom_dom_point_set_z(RvDOMPointReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setZ(value); });
+}
+
+// DOMPoint.w getter: attribute unrestricted double w
+int32_t ranvier_dom_dom_point_get_w(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->w(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPoint.w setter: attribute unrestricted double w
+int32_t ranvier_dom_dom_point_set_w(RvDOMPointReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setW(value); });
+}
+
+// DOMQuad.constructor: target is the Document of the constructed object; p1 defaults to {} in IDL; p1 may be NULL for the IDL default; p2 defaults to {} in IDL; p2 may be NULL for the IDL default; p3 defaults to {} in IDL; p3 may be NULL for the IDL default; p4 defaults to {} in IDL; p4 may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_quad_create(RvNode* target, const RvDomDOMPointInit* p1, const RvDomDOMPointInit* p2, const RvDomDOMPointInit* p3, const RvDomDOMPointInit* p4, RvDOMQuad** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMPointInit a0 { };
+    if (p1) {
+        if (p1->size >= offsetof(RvDomDOMPointInit, x) + sizeof(p1->x))
+            assignValue(a0.x, p1->x);
+        if (p1->size >= offsetof(RvDomDOMPointInit, y) + sizeof(p1->y))
+            assignValue(a0.y, p1->y);
+        if (p1->size >= offsetof(RvDomDOMPointInit, z) + sizeof(p1->z))
+            assignValue(a0.z, p1->z);
+        if (p1->size >= offsetof(RvDomDOMPointInit, w) + sizeof(p1->w))
+            assignValue(a0.w, p1->w);
+    }
+    DOMPointInit a1 { };
+    if (p2) {
+        if (p2->size >= offsetof(RvDomDOMPointInit, x) + sizeof(p2->x))
+            assignValue(a1.x, p2->x);
+        if (p2->size >= offsetof(RvDomDOMPointInit, y) + sizeof(p2->y))
+            assignValue(a1.y, p2->y);
+        if (p2->size >= offsetof(RvDomDOMPointInit, z) + sizeof(p2->z))
+            assignValue(a1.z, p2->z);
+        if (p2->size >= offsetof(RvDomDOMPointInit, w) + sizeof(p2->w))
+            assignValue(a1.w, p2->w);
+    }
+    DOMPointInit a2 { };
+    if (p3) {
+        if (p3->size >= offsetof(RvDomDOMPointInit, x) + sizeof(p3->x))
+            assignValue(a2.x, p3->x);
+        if (p3->size >= offsetof(RvDomDOMPointInit, y) + sizeof(p3->y))
+            assignValue(a2.y, p3->y);
+        if (p3->size >= offsetof(RvDomDOMPointInit, z) + sizeof(p3->z))
+            assignValue(a2.z, p3->z);
+        if (p3->size >= offsetof(RvDomDOMPointInit, w) + sizeof(p3->w))
+            assignValue(a2.w, p3->w);
+    }
+    DOMPointInit a3 { };
+    if (p4) {
+        if (p4->size >= offsetof(RvDomDOMPointInit, x) + sizeof(p4->x))
+            assignValue(a3.x, p4->x);
+        if (p4->size >= offsetof(RvDomDOMPointInit, y) + sizeof(p4->y))
+            assignValue(a3.y, p4->y);
+        if (p4->size >= offsetof(RvDomDOMPointInit, z) + sizeof(p4->z))
+            assignValue(a3.z, p4->z);
+        if (p4->size >= offsetof(RvDomDOMPointInit, w) + sizeof(p4->w))
+            assignValue(a3.w, p4->w);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMQuad::create(std::move(a0), std::move(a1), std::move(a2), std::move(a3)); }, [&](auto&& value) { return storeHandle<DOMQuad>(value, result); });
+}
+
+// DOMQuad.p1 getter: readonly attribute DOMPoint p1; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_p1(RvDOMQuad* target, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->p1(); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.p2 getter: readonly attribute DOMPoint p2; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_p2(RvDOMQuad* target, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->p2(); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.p3 getter: readonly attribute DOMPoint p3; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_p3(RvDOMQuad* target, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->p3(); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.p4 getter: readonly attribute DOMPoint p4; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_p4(RvDOMQuad* target, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->p4(); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.getBounds() -> DOMRect; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_bounds(RvDOMQuad* target, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getBounds(); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
+}
+
+// DOMMatrixReadOnly.constructor: target is the Document of the constructed object; init may be NULL for an absent optional argument; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_create(RvNode* target, const RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* init, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    std::optional<Variant<String, Vector<double>>> a0;
+    if (init) {
+        int32_t status0 = RV_OK;
+        a0 = decodeRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(init, status0);
+        if (status0 != RV_OK) return status0;
+    }
+    return deliver([&]() -> decltype(auto) { return DOMMatrixReadOnly::create(*impl, std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrixReadOnly>(value, result); });
+}
+
+// DOMMatrixReadOnly.a getter: readonly attribute unrestricted double a
+int32_t ranvier_dom_dom_matrix_read_only_get_a(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->a(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.b getter: readonly attribute unrestricted double b
+int32_t ranvier_dom_dom_matrix_read_only_get_b(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->b(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.c getter: readonly attribute unrestricted double c
+int32_t ranvier_dom_dom_matrix_read_only_get_c(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->c(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.d getter: readonly attribute unrestricted double d
+int32_t ranvier_dom_dom_matrix_read_only_get_d(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->d(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.e getter: readonly attribute unrestricted double e
+int32_t ranvier_dom_dom_matrix_read_only_get_e(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->e(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.f getter: readonly attribute unrestricted double f
+int32_t ranvier_dom_dom_matrix_read_only_get_f(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->f(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m11 getter: readonly attribute unrestricted double m11
+int32_t ranvier_dom_dom_matrix_read_only_get_m11(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m11(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m12 getter: readonly attribute unrestricted double m12
+int32_t ranvier_dom_dom_matrix_read_only_get_m12(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m12(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m13 getter: readonly attribute unrestricted double m13
+int32_t ranvier_dom_dom_matrix_read_only_get_m13(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m13(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m14 getter: readonly attribute unrestricted double m14
+int32_t ranvier_dom_dom_matrix_read_only_get_m14(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m14(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m21 getter: readonly attribute unrestricted double m21
+int32_t ranvier_dom_dom_matrix_read_only_get_m21(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m21(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m22 getter: readonly attribute unrestricted double m22
+int32_t ranvier_dom_dom_matrix_read_only_get_m22(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m22(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m23 getter: readonly attribute unrestricted double m23
+int32_t ranvier_dom_dom_matrix_read_only_get_m23(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m23(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m24 getter: readonly attribute unrestricted double m24
+int32_t ranvier_dom_dom_matrix_read_only_get_m24(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m24(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m31 getter: readonly attribute unrestricted double m31
+int32_t ranvier_dom_dom_matrix_read_only_get_m31(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m31(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m32 getter: readonly attribute unrestricted double m32
+int32_t ranvier_dom_dom_matrix_read_only_get_m32(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m32(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m33 getter: readonly attribute unrestricted double m33
+int32_t ranvier_dom_dom_matrix_read_only_get_m33(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m33(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m34 getter: readonly attribute unrestricted double m34
+int32_t ranvier_dom_dom_matrix_read_only_get_m34(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m34(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m41 getter: readonly attribute unrestricted double m41
+int32_t ranvier_dom_dom_matrix_read_only_get_m41(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m41(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m42 getter: readonly attribute unrestricted double m42
+int32_t ranvier_dom_dom_matrix_read_only_get_m42(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m42(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m43 getter: readonly attribute unrestricted double m43
+int32_t ranvier_dom_dom_matrix_read_only_get_m43(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m43(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.m44 getter: readonly attribute unrestricted double m44
+int32_t ranvier_dom_dom_matrix_read_only_get_m44(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->m44(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrixReadOnly.is2D getter: readonly attribute boolean is2D
+int32_t ranvier_dom_dom_matrix_read_only_get_is2_d(RvDOMMatrixReadOnly* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->is2D(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// DOMMatrixReadOnly.isIdentity getter: readonly attribute boolean isIdentity
+int32_t ranvier_dom_dom_matrix_read_only_get_is_identity(RvDOMMatrixReadOnly* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->isIdentity(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// DOMMatrixReadOnly.translate(optional unrestricted double tx = 0, optional unrestricted double ty = 0, optional unrestricted double tz = 0) -> DOMMatrix; tx defaults to 0 in IDL; ty defaults to 0 in IDL; tz defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_translate(RvDOMMatrixReadOnly* target, double tx, double ty, double tz, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->translate(tx, ty, tz); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.scale(optional unrestricted double scaleX = 1, optional unrestricted double scaleY, optional unrestricted double scaleZ = 1, optional unrestricted double originX = 0, optional unrestricted double originY = 0, optional unrestricted double originZ = 0) -> DOMMatrix; scale_x defaults to 1 in IDL; scale_y may be NULL (absent); scale_z defaults to 1 in IDL; origin_x defaults to 0 in IDL; origin_y defaults to 0 in IDL; origin_z defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_scale(RvDOMMatrixReadOnly* target, double scale_x, const double* scale_y, double scale_z, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->scale(scale_x, OptionalArg<double> { scale_y }, scale_z, origin_x, origin_y, origin_z); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.scale3d(optional unrestricted double scale = 1, optional unrestricted double originX = 0, optional unrestricted double originY = 0, optional unrestricted double originZ = 0) -> DOMMatrix; scale defaults to 1 in IDL; origin_x defaults to 0 in IDL; origin_y defaults to 0 in IDL; origin_z defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_scale3d(RvDOMMatrixReadOnly* target, double scale, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->scale3d(scale, origin_x, origin_y, origin_z); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.scaleNonUniform(optional unrestricted double scaleX = 1, optional unrestricted double scaleY = 1) -> DOMMatrix; scale_x defaults to 1 in IDL; scale_y defaults to 1 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_scale_non_uniform(RvDOMMatrixReadOnly* target, double scale_x, double scale_y, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->scaleNonUniform(scale_x, scale_y); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.rotate(optional unrestricted double rotX = 0, optional unrestricted double rotY, optional unrestricted double rotZ) -> DOMMatrix; rot_x defaults to 0 in IDL; rot_y may be NULL (absent); rot_z may be NULL (absent); *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_rotate(RvDOMMatrixReadOnly* target, double rot_x, const double* rot_y, const double* rot_z, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->rotate(rot_x, OptionalArg<double> { rot_y }, OptionalArg<double> { rot_z }); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.rotateFromVector(optional unrestricted double x = 0, optional unrestricted double y = 0) -> DOMMatrix; x defaults to 0 in IDL; y defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_rotate_from_vector(RvDOMMatrixReadOnly* target, double x, double y, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->rotateFromVector(x, y); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.rotateAxisAngle(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double z = 0, optional unrestricted double angle = 0) -> DOMMatrix; x defaults to 0 in IDL; y defaults to 0 in IDL; z defaults to 0 in IDL; angle defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_rotate_axis_angle(RvDOMMatrixReadOnly* target, double x, double y, double z, double angle, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->rotateAxisAngle(x, y, z, angle); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.skewX(optional unrestricted double sx = 0) -> DOMMatrix; sx defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_skew_x(RvDOMMatrixReadOnly* target, double sx, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->skewX(sx); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.skewY(optional unrestricted double sy = 0) -> DOMMatrix; sy defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_skew_y(RvDOMMatrixReadOnly* target, double sy, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->skewY(sy); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.multiply(optional DOMMatrixInit other = {}) -> DOMMatrix; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_multiply(RvDOMMatrixReadOnly* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    DOMMatrixInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMMatrixInit, a) + sizeof(other->a) && other->a)
+            assignValue(a0.a, *other->a);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, b) + sizeof(other->b) && other->b)
+            assignValue(a0.b, *other->b);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, c) + sizeof(other->c) && other->c)
+            assignValue(a0.c, *other->c);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, d) + sizeof(other->d) && other->d)
+            assignValue(a0.d, *other->d);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, e) + sizeof(other->e) && other->e)
+            assignValue(a0.e, *other->e);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, f) + sizeof(other->f) && other->f)
+            assignValue(a0.f, *other->f);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m11) + sizeof(other->m11) && other->m11)
+            assignValue(a0.m11, *other->m11);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m12) + sizeof(other->m12) && other->m12)
+            assignValue(a0.m12, *other->m12);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m21) + sizeof(other->m21) && other->m21)
+            assignValue(a0.m21, *other->m21);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m22) + sizeof(other->m22) && other->m22)
+            assignValue(a0.m22, *other->m22);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m41) + sizeof(other->m41) && other->m41)
+            assignValue(a0.m41, *other->m41);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m42) + sizeof(other->m42) && other->m42)
+            assignValue(a0.m42, *other->m42);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m13) + sizeof(other->m13))
+            assignValue(a0.m13, other->m13);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m14) + sizeof(other->m14))
+            assignValue(a0.m14, other->m14);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m23) + sizeof(other->m23))
+            assignValue(a0.m23, other->m23);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m24) + sizeof(other->m24))
+            assignValue(a0.m24, other->m24);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m31) + sizeof(other->m31))
+            assignValue(a0.m31, other->m31);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m32) + sizeof(other->m32))
+            assignValue(a0.m32, other->m32);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m33) + sizeof(other->m33))
+            assignValue(a0.m33, other->m33);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m34) + sizeof(other->m34))
+            assignValue(a0.m34, other->m34);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m43) + sizeof(other->m43))
+            assignValue(a0.m43, other->m43);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m44) + sizeof(other->m44))
+            assignValue(a0.m44, other->m44);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, is2_d) + sizeof(other->is2_d) && other->is2_d)
+            assignValue(a0.is2D, !!*other->is2_d);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->multiply(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.flipX() -> DOMMatrix; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_flip_x(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->flipX(); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.flipY() -> DOMMatrix; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_flip_y(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->flipY(); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.inverse() -> DOMMatrix; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_inverse(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->inverse(); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrixReadOnly.transformPoint(optional DOMPointInit point = {}) -> DOMPoint; point defaults to {} in IDL; point may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_transform_point(RvDOMMatrixReadOnly* target, const RvDomDOMPointInit* point, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    DOMPointInit a0 { };
+    if (point) {
+        if (point->size >= offsetof(RvDomDOMPointInit, x) + sizeof(point->x))
+            assignValue(a0.x, point->x);
+        if (point->size >= offsetof(RvDomDOMPointInit, y) + sizeof(point->y))
+            assignValue(a0.y, point->y);
+        if (point->size >= offsetof(RvDomDOMPointInit, z) + sizeof(point->z))
+            assignValue(a0.z, point->z);
+        if (point->size >= offsetof(RvDomDOMPointInit, w) + sizeof(point->w))
+            assignValue(a0.w, point->w);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->transformPoint(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMMatrixReadOnly.toString() -> DOMString
+int32_t ranvier_dom_dom_matrix_read_only_to_string(RvDOMMatrixReadOnly* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMMatrixReadOnly> impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->toString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMMatrix.constructor: target is the Document of the constructed object; init may be NULL for an absent optional argument; *result is a new reference
+int32_t ranvier_dom_dom_matrix_create(RvNode* target, const RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* init, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    std::optional<Variant<String, Vector<double>>> a0;
+    if (init) {
+        int32_t status0 = RV_OK;
+        a0 = decodeRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(init, status0);
+        if (status0 != RV_OK) return status0;
+    }
+    return deliver([&]() -> decltype(auto) { return DOMMatrix::create(*impl, std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.a getter: attribute unrestricted double a
+int32_t ranvier_dom_dom_matrix_get_a(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->a(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.a setter: attribute unrestricted double a
+int32_t ranvier_dom_dom_matrix_set_a(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setA(value); });
+}
+
+// DOMMatrix.b getter: attribute unrestricted double b
+int32_t ranvier_dom_dom_matrix_get_b(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->b(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.b setter: attribute unrestricted double b
+int32_t ranvier_dom_dom_matrix_set_b(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setB(value); });
+}
+
+// DOMMatrix.c getter: attribute unrestricted double c
+int32_t ranvier_dom_dom_matrix_get_c(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->c(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.c setter: attribute unrestricted double c
+int32_t ranvier_dom_dom_matrix_set_c(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setC(value); });
+}
+
+// DOMMatrix.d getter: attribute unrestricted double d
+int32_t ranvier_dom_dom_matrix_get_d(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->d(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.d setter: attribute unrestricted double d
+int32_t ranvier_dom_dom_matrix_set_d(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setD(value); });
+}
+
+// DOMMatrix.e getter: attribute unrestricted double e
+int32_t ranvier_dom_dom_matrix_get_e(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->e(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.e setter: attribute unrestricted double e
+int32_t ranvier_dom_dom_matrix_set_e(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setE(value); });
+}
+
+// DOMMatrix.f getter: attribute unrestricted double f
+int32_t ranvier_dom_dom_matrix_get_f(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->f(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.f setter: attribute unrestricted double f
+int32_t ranvier_dom_dom_matrix_set_f(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setF(value); });
+}
+
+// DOMMatrix.m11 getter: attribute unrestricted double m11
+int32_t ranvier_dom_dom_matrix_get_m11(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m11(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m11 setter: attribute unrestricted double m11
+int32_t ranvier_dom_dom_matrix_set_m11(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM11(value); });
+}
+
+// DOMMatrix.m12 getter: attribute unrestricted double m12
+int32_t ranvier_dom_dom_matrix_get_m12(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m12(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m12 setter: attribute unrestricted double m12
+int32_t ranvier_dom_dom_matrix_set_m12(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM12(value); });
+}
+
+// DOMMatrix.m13 getter: attribute unrestricted double m13
+int32_t ranvier_dom_dom_matrix_get_m13(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m13(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m13 setter: attribute unrestricted double m13
+int32_t ranvier_dom_dom_matrix_set_m13(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM13(value); });
+}
+
+// DOMMatrix.m14 getter: attribute unrestricted double m14
+int32_t ranvier_dom_dom_matrix_get_m14(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m14(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m14 setter: attribute unrestricted double m14
+int32_t ranvier_dom_dom_matrix_set_m14(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM14(value); });
+}
+
+// DOMMatrix.m21 getter: attribute unrestricted double m21
+int32_t ranvier_dom_dom_matrix_get_m21(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m21(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m21 setter: attribute unrestricted double m21
+int32_t ranvier_dom_dom_matrix_set_m21(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM21(value); });
+}
+
+// DOMMatrix.m22 getter: attribute unrestricted double m22
+int32_t ranvier_dom_dom_matrix_get_m22(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m22(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m22 setter: attribute unrestricted double m22
+int32_t ranvier_dom_dom_matrix_set_m22(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM22(value); });
+}
+
+// DOMMatrix.m23 getter: attribute unrestricted double m23
+int32_t ranvier_dom_dom_matrix_get_m23(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m23(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m23 setter: attribute unrestricted double m23
+int32_t ranvier_dom_dom_matrix_set_m23(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM23(value); });
+}
+
+// DOMMatrix.m24 getter: attribute unrestricted double m24
+int32_t ranvier_dom_dom_matrix_get_m24(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m24(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m24 setter: attribute unrestricted double m24
+int32_t ranvier_dom_dom_matrix_set_m24(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM24(value); });
+}
+
+// DOMMatrix.m31 getter: attribute unrestricted double m31
+int32_t ranvier_dom_dom_matrix_get_m31(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m31(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m31 setter: attribute unrestricted double m31
+int32_t ranvier_dom_dom_matrix_set_m31(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM31(value); });
+}
+
+// DOMMatrix.m32 getter: attribute unrestricted double m32
+int32_t ranvier_dom_dom_matrix_get_m32(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m32(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m32 setter: attribute unrestricted double m32
+int32_t ranvier_dom_dom_matrix_set_m32(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM32(value); });
+}
+
+// DOMMatrix.m33 getter: attribute unrestricted double m33
+int32_t ranvier_dom_dom_matrix_get_m33(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m33(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m33 setter: attribute unrestricted double m33
+int32_t ranvier_dom_dom_matrix_set_m33(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM33(value); });
+}
+
+// DOMMatrix.m34 getter: attribute unrestricted double m34
+int32_t ranvier_dom_dom_matrix_get_m34(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m34(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m34 setter: attribute unrestricted double m34
+int32_t ranvier_dom_dom_matrix_set_m34(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM34(value); });
+}
+
+// DOMMatrix.m41 getter: attribute unrestricted double m41
+int32_t ranvier_dom_dom_matrix_get_m41(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m41(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m41 setter: attribute unrestricted double m41
+int32_t ranvier_dom_dom_matrix_set_m41(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM41(value); });
+}
+
+// DOMMatrix.m42 getter: attribute unrestricted double m42
+int32_t ranvier_dom_dom_matrix_get_m42(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m42(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m42 setter: attribute unrestricted double m42
+int32_t ranvier_dom_dom_matrix_set_m42(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM42(value); });
+}
+
+// DOMMatrix.m43 getter: attribute unrestricted double m43
+int32_t ranvier_dom_dom_matrix_get_m43(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m43(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m43 setter: attribute unrestricted double m43
+int32_t ranvier_dom_dom_matrix_set_m43(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM43(value); });
+}
+
+// DOMMatrix.m44 getter: attribute unrestricted double m44
+int32_t ranvier_dom_dom_matrix_get_m44(RvDOMMatrixReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->m44(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMMatrix.m44 setter: attribute unrestricted double m44
+int32_t ranvier_dom_dom_matrix_set_m44(RvDOMMatrixReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setM44(value); });
+}
+
+// DOMMatrix.multiplySelf(optional DOMMatrixInit other = {}) -> DOMMatrix; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_matrix_multiply_self(RvDOMMatrixReadOnly* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMMatrixInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMMatrixInit, a) + sizeof(other->a) && other->a)
+            assignValue(a0.a, *other->a);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, b) + sizeof(other->b) && other->b)
+            assignValue(a0.b, *other->b);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, c) + sizeof(other->c) && other->c)
+            assignValue(a0.c, *other->c);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, d) + sizeof(other->d) && other->d)
+            assignValue(a0.d, *other->d);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, e) + sizeof(other->e) && other->e)
+            assignValue(a0.e, *other->e);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, f) + sizeof(other->f) && other->f)
+            assignValue(a0.f, *other->f);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m11) + sizeof(other->m11) && other->m11)
+            assignValue(a0.m11, *other->m11);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m12) + sizeof(other->m12) && other->m12)
+            assignValue(a0.m12, *other->m12);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m21) + sizeof(other->m21) && other->m21)
+            assignValue(a0.m21, *other->m21);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m22) + sizeof(other->m22) && other->m22)
+            assignValue(a0.m22, *other->m22);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m41) + sizeof(other->m41) && other->m41)
+            assignValue(a0.m41, *other->m41);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m42) + sizeof(other->m42) && other->m42)
+            assignValue(a0.m42, *other->m42);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m13) + sizeof(other->m13))
+            assignValue(a0.m13, other->m13);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m14) + sizeof(other->m14))
+            assignValue(a0.m14, other->m14);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m23) + sizeof(other->m23))
+            assignValue(a0.m23, other->m23);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m24) + sizeof(other->m24))
+            assignValue(a0.m24, other->m24);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m31) + sizeof(other->m31))
+            assignValue(a0.m31, other->m31);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m32) + sizeof(other->m32))
+            assignValue(a0.m32, other->m32);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m33) + sizeof(other->m33))
+            assignValue(a0.m33, other->m33);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m34) + sizeof(other->m34))
+            assignValue(a0.m34, other->m34);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m43) + sizeof(other->m43))
+            assignValue(a0.m43, other->m43);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m44) + sizeof(other->m44))
+            assignValue(a0.m44, other->m44);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, is2_d) + sizeof(other->is2_d) && other->is2_d)
+            assignValue(a0.is2D, !!*other->is2_d);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->multiplySelf(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.preMultiplySelf(optional DOMMatrixInit other = {}) -> DOMMatrix; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_matrix_pre_multiply_self(RvDOMMatrixReadOnly* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMMatrixInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMMatrixInit, a) + sizeof(other->a) && other->a)
+            assignValue(a0.a, *other->a);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, b) + sizeof(other->b) && other->b)
+            assignValue(a0.b, *other->b);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, c) + sizeof(other->c) && other->c)
+            assignValue(a0.c, *other->c);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, d) + sizeof(other->d) && other->d)
+            assignValue(a0.d, *other->d);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, e) + sizeof(other->e) && other->e)
+            assignValue(a0.e, *other->e);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, f) + sizeof(other->f) && other->f)
+            assignValue(a0.f, *other->f);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m11) + sizeof(other->m11) && other->m11)
+            assignValue(a0.m11, *other->m11);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m12) + sizeof(other->m12) && other->m12)
+            assignValue(a0.m12, *other->m12);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m21) + sizeof(other->m21) && other->m21)
+            assignValue(a0.m21, *other->m21);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m22) + sizeof(other->m22) && other->m22)
+            assignValue(a0.m22, *other->m22);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m41) + sizeof(other->m41) && other->m41)
+            assignValue(a0.m41, *other->m41);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m42) + sizeof(other->m42) && other->m42)
+            assignValue(a0.m42, *other->m42);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m13) + sizeof(other->m13))
+            assignValue(a0.m13, other->m13);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m14) + sizeof(other->m14))
+            assignValue(a0.m14, other->m14);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m23) + sizeof(other->m23))
+            assignValue(a0.m23, other->m23);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m24) + sizeof(other->m24))
+            assignValue(a0.m24, other->m24);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m31) + sizeof(other->m31))
+            assignValue(a0.m31, other->m31);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m32) + sizeof(other->m32))
+            assignValue(a0.m32, other->m32);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m33) + sizeof(other->m33))
+            assignValue(a0.m33, other->m33);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m34) + sizeof(other->m34))
+            assignValue(a0.m34, other->m34);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m43) + sizeof(other->m43))
+            assignValue(a0.m43, other->m43);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m44) + sizeof(other->m44))
+            assignValue(a0.m44, other->m44);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, is2_d) + sizeof(other->is2_d) && other->is2_d)
+            assignValue(a0.is2D, !!*other->is2_d);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->preMultiplySelf(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.translateSelf(optional unrestricted double tx = 0, optional unrestricted double ty = 0, optional unrestricted double tz = 0) -> DOMMatrix; tx defaults to 0 in IDL; ty defaults to 0 in IDL; tz defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_translate_self(RvDOMMatrixReadOnly* target, double tx, double ty, double tz, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->translateSelf(tx, ty, tz); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.scaleSelf(optional unrestricted double scaleX = 1, optional unrestricted double scaleY, optional unrestricted double scaleZ = 1, optional unrestricted double originX = 0, optional unrestricted double originY = 0, optional unrestricted double originZ = 0) -> DOMMatrix; scale_x defaults to 1 in IDL; scale_y may be NULL (absent); scale_z defaults to 1 in IDL; origin_x defaults to 0 in IDL; origin_y defaults to 0 in IDL; origin_z defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_scale_self(RvDOMMatrixReadOnly* target, double scale_x, const double* scale_y, double scale_z, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->scaleSelf(scale_x, OptionalArg<double> { scale_y }, scale_z, origin_x, origin_y, origin_z); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.scale3dSelf(optional unrestricted double scale = 1, optional unrestricted double originX = 0, optional unrestricted double originY = 0, optional unrestricted double originZ = 0) -> DOMMatrix; scale defaults to 1 in IDL; origin_x defaults to 0 in IDL; origin_y defaults to 0 in IDL; origin_z defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_scale3d_self(RvDOMMatrixReadOnly* target, double scale, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->scale3dSelf(scale, origin_x, origin_y, origin_z); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.rotateSelf(optional unrestricted double rotX = 0, optional unrestricted double rotY, optional unrestricted double rotZ) -> DOMMatrix; rot_x defaults to 0 in IDL; rot_y may be NULL (absent); rot_z may be NULL (absent); *result is a new reference
+int32_t ranvier_dom_dom_matrix_rotate_self(RvDOMMatrixReadOnly* target, double rot_x, const double* rot_y, const double* rot_z, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rotateSelf(rot_x, OptionalArg<double> { rot_y }, OptionalArg<double> { rot_z }); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.rotateFromVectorSelf(optional unrestricted double x = 0, optional unrestricted double y = 0) -> DOMMatrix; x defaults to 0 in IDL; y defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_rotate_from_vector_self(RvDOMMatrixReadOnly* target, double x, double y, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rotateFromVectorSelf(x, y); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.rotateAxisAngleSelf(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double z = 0, optional unrestricted double angle = 0) -> DOMMatrix; x defaults to 0 in IDL; y defaults to 0 in IDL; z defaults to 0 in IDL; angle defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_rotate_axis_angle_self(RvDOMMatrixReadOnly* target, double x, double y, double z, double angle, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rotateAxisAngleSelf(x, y, z, angle); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.skewXSelf(optional unrestricted double sx = 0) -> DOMMatrix; sx defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_skew_x_self(RvDOMMatrixReadOnly* target, double sx, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->skewXSelf(sx); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.skewYSelf(optional unrestricted double sy = 0) -> DOMMatrix; sy defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_matrix_skew_y_self(RvDOMMatrixReadOnly* target, double sy, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->skewYSelf(sy); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.invertSelf() -> DOMMatrix; *result is a new reference
+int32_t ranvier_dom_dom_matrix_invert_self(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->invertSelf(); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMMatrix.setMatrixValue(DOMString transformList) -> DOMMatrix; context is an explicit checked Document for the operation; *result is a new reference
+int32_t ranvier_dom_dom_matrix_set_matrix_value(RvDOMMatrixReadOnly* target, RvNode* context, const uint8_t* transform_list, int32_t transform_list_length, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !context || !(transform_list_length >= 0 && (transform_list_length <= 0 || transform_list)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { transform_list, transform_list_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->setMatrixValueForBindings(document.get(), a0.string()); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
 }
 
 // NodeList.length getter: readonly attribute unsigned long length
@@ -26713,6 +28775,310 @@ int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, c
     return deliver([&]() -> decltype(auto) { return impl->window()->getComputedStyle(HandleArg<Element> { a0.get() }, a1.string()); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
 }
 
+// DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMMatrixInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMMatrixInit, a) + sizeof(other->a) && other->a)
+            assignValue(a0.a, *other->a);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, b) + sizeof(other->b) && other->b)
+            assignValue(a0.b, *other->b);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, c) + sizeof(other->c) && other->c)
+            assignValue(a0.c, *other->c);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, d) + sizeof(other->d) && other->d)
+            assignValue(a0.d, *other->d);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, e) + sizeof(other->e) && other->e)
+            assignValue(a0.e, *other->e);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, f) + sizeof(other->f) && other->f)
+            assignValue(a0.f, *other->f);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m11) + sizeof(other->m11) && other->m11)
+            assignValue(a0.m11, *other->m11);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m12) + sizeof(other->m12) && other->m12)
+            assignValue(a0.m12, *other->m12);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m21) + sizeof(other->m21) && other->m21)
+            assignValue(a0.m21, *other->m21);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m22) + sizeof(other->m22) && other->m22)
+            assignValue(a0.m22, *other->m22);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m41) + sizeof(other->m41) && other->m41)
+            assignValue(a0.m41, *other->m41);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m42) + sizeof(other->m42) && other->m42)
+            assignValue(a0.m42, *other->m42);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m13) + sizeof(other->m13))
+            assignValue(a0.m13, other->m13);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m14) + sizeof(other->m14))
+            assignValue(a0.m14, other->m14);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m23) + sizeof(other->m23))
+            assignValue(a0.m23, other->m23);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m24) + sizeof(other->m24))
+            assignValue(a0.m24, other->m24);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m31) + sizeof(other->m31))
+            assignValue(a0.m31, other->m31);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m32) + sizeof(other->m32))
+            assignValue(a0.m32, other->m32);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m33) + sizeof(other->m33))
+            assignValue(a0.m33, other->m33);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m34) + sizeof(other->m34))
+            assignValue(a0.m34, other->m34);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m43) + sizeof(other->m43))
+            assignValue(a0.m43, other->m43);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m44) + sizeof(other->m44))
+            assignValue(a0.m44, other->m44);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, is2_d) + sizeof(other->is2_d) && other->is2_d)
+            assignValue(a0.is2D, !!*other->is2_d);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMMatrixReadOnly::fromMatrix(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrixReadOnly>(value, result); });
+}
+
+// DOMMatrix.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMMatrixInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMMatrixInit, a) + sizeof(other->a) && other->a)
+            assignValue(a0.a, *other->a);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, b) + sizeof(other->b) && other->b)
+            assignValue(a0.b, *other->b);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, c) + sizeof(other->c) && other->c)
+            assignValue(a0.c, *other->c);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, d) + sizeof(other->d) && other->d)
+            assignValue(a0.d, *other->d);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, e) + sizeof(other->e) && other->e)
+            assignValue(a0.e, *other->e);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, f) + sizeof(other->f) && other->f)
+            assignValue(a0.f, *other->f);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m11) + sizeof(other->m11) && other->m11)
+            assignValue(a0.m11, *other->m11);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m12) + sizeof(other->m12) && other->m12)
+            assignValue(a0.m12, *other->m12);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m21) + sizeof(other->m21) && other->m21)
+            assignValue(a0.m21, *other->m21);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m22) + sizeof(other->m22) && other->m22)
+            assignValue(a0.m22, *other->m22);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m41) + sizeof(other->m41) && other->m41)
+            assignValue(a0.m41, *other->m41);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m42) + sizeof(other->m42) && other->m42)
+            assignValue(a0.m42, *other->m42);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m13) + sizeof(other->m13))
+            assignValue(a0.m13, other->m13);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m14) + sizeof(other->m14))
+            assignValue(a0.m14, other->m14);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m23) + sizeof(other->m23))
+            assignValue(a0.m23, other->m23);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m24) + sizeof(other->m24))
+            assignValue(a0.m24, other->m24);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m31) + sizeof(other->m31))
+            assignValue(a0.m31, other->m31);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m32) + sizeof(other->m32))
+            assignValue(a0.m32, other->m32);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m33) + sizeof(other->m33))
+            assignValue(a0.m33, other->m33);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m34) + sizeof(other->m34))
+            assignValue(a0.m34, other->m34);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m43) + sizeof(other->m43))
+            assignValue(a0.m43, other->m43);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, m44) + sizeof(other->m44))
+            assignValue(a0.m44, other->m44);
+        if (other->size >= offsetof(RvDomDOMMatrixInit, is2_d) + sizeof(other->is2_d) && other->is2_d)
+            assignValue(a0.is2D, !!*other->is2_d);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMMatrix::fromMatrix(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// DOMRectReadOnly.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMRectInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMRectInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMRectInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMRectInit, width) + sizeof(other->width))
+            assignValue(a0.width, other->width);
+        if (other->size >= offsetof(RvDomDOMRectInit, height) + sizeof(other->height))
+            assignValue(a0.height, other->height);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMRectReadOnly::fromRect(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRectReadOnly>(value, result); });
+}
+
+// DOMRect.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_rect_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMRectInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMRectInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMRectInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMRectInit, width) + sizeof(other->width))
+            assignValue(a0.width, other->width);
+        if (other->size >= offsetof(RvDomDOMRectInit, height) + sizeof(other->height))
+            assignValue(a0.height, other->height);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMRect::fromRect(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
+}
+
+// DOMPointReadOnly.fromPoint: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_point_read_only_from_point(RvNode* target, const RvDomDOMPointInit* other, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMPointInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMPointInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMPointInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMPointInit, z) + sizeof(other->z))
+            assignValue(a0.z, other->z);
+        if (other->size >= offsetof(RvDomDOMPointInit, w) + sizeof(other->w))
+            assignValue(a0.w, other->w);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMPointReadOnly::fromPoint(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPointReadOnly>(value, result); });
+}
+
+// DOMPoint.fromPoint: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_point_from_point(RvNode* target, const RvDomDOMPointInit* other, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMPointInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMPointInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMPointInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMPointInit, z) + sizeof(other->z))
+            assignValue(a0.z, other->z);
+        if (other->size >= offsetof(RvDomDOMPointInit, w) + sizeof(other->w))
+            assignValue(a0.w, other->w);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMPoint::fromPoint(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_quad_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMQuad** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMRectInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMRectInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMRectInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMRectInit, width) + sizeof(other->width))
+            assignValue(a0.width, other->width);
+        if (other->size >= offsetof(RvDomDOMRectInit, height) + sizeof(other->height))
+            assignValue(a0.height, other->height);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMQuad::fromRect(std::move(a0)); }, [&](auto&& value) { return storeHandle<DOMQuad>(value, result); });
+}
+
+// DOMQuad.fromQuad: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_quad_from_quad(RvNode* target, const RvDomDOMQuadInit* other, RvDOMQuad** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMQuadInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMQuadInit, p1) + sizeof(other->p1) && other->p1) {
+            const auto* nested_a0_p1 = other->p1;
+            if (nested_a0_p1->size >= offsetof(RvDomDOMPointInit, x) + sizeof(nested_a0_p1->x))
+                assignValue(a0.p1.x, nested_a0_p1->x);
+            if (nested_a0_p1->size >= offsetof(RvDomDOMPointInit, y) + sizeof(nested_a0_p1->y))
+                assignValue(a0.p1.y, nested_a0_p1->y);
+            if (nested_a0_p1->size >= offsetof(RvDomDOMPointInit, z) + sizeof(nested_a0_p1->z))
+                assignValue(a0.p1.z, nested_a0_p1->z);
+            if (nested_a0_p1->size >= offsetof(RvDomDOMPointInit, w) + sizeof(nested_a0_p1->w))
+                assignValue(a0.p1.w, nested_a0_p1->w);
+        }
+        if (other->size >= offsetof(RvDomDOMQuadInit, p2) + sizeof(other->p2) && other->p2) {
+            const auto* nested_a0_p2 = other->p2;
+            if (nested_a0_p2->size >= offsetof(RvDomDOMPointInit, x) + sizeof(nested_a0_p2->x))
+                assignValue(a0.p2.x, nested_a0_p2->x);
+            if (nested_a0_p2->size >= offsetof(RvDomDOMPointInit, y) + sizeof(nested_a0_p2->y))
+                assignValue(a0.p2.y, nested_a0_p2->y);
+            if (nested_a0_p2->size >= offsetof(RvDomDOMPointInit, z) + sizeof(nested_a0_p2->z))
+                assignValue(a0.p2.z, nested_a0_p2->z);
+            if (nested_a0_p2->size >= offsetof(RvDomDOMPointInit, w) + sizeof(nested_a0_p2->w))
+                assignValue(a0.p2.w, nested_a0_p2->w);
+        }
+        if (other->size >= offsetof(RvDomDOMQuadInit, p3) + sizeof(other->p3) && other->p3) {
+            const auto* nested_a0_p3 = other->p3;
+            if (nested_a0_p3->size >= offsetof(RvDomDOMPointInit, x) + sizeof(nested_a0_p3->x))
+                assignValue(a0.p3.x, nested_a0_p3->x);
+            if (nested_a0_p3->size >= offsetof(RvDomDOMPointInit, y) + sizeof(nested_a0_p3->y))
+                assignValue(a0.p3.y, nested_a0_p3->y);
+            if (nested_a0_p3->size >= offsetof(RvDomDOMPointInit, z) + sizeof(nested_a0_p3->z))
+                assignValue(a0.p3.z, nested_a0_p3->z);
+            if (nested_a0_p3->size >= offsetof(RvDomDOMPointInit, w) + sizeof(nested_a0_p3->w))
+                assignValue(a0.p3.w, nested_a0_p3->w);
+        }
+        if (other->size >= offsetof(RvDomDOMQuadInit, p4) + sizeof(other->p4) && other->p4) {
+            const auto* nested_a0_p4 = other->p4;
+            if (nested_a0_p4->size >= offsetof(RvDomDOMPointInit, x) + sizeof(nested_a0_p4->x))
+                assignValue(a0.p4.x, nested_a0_p4->x);
+            if (nested_a0_p4->size >= offsetof(RvDomDOMPointInit, y) + sizeof(nested_a0_p4->y))
+                assignValue(a0.p4.y, nested_a0_p4->y);
+            if (nested_a0_p4->size >= offsetof(RvDomDOMPointInit, z) + sizeof(nested_a0_p4->z))
+                assignValue(a0.p4.z, nested_a0_p4->z);
+            if (nested_a0_p4->size >= offsetof(RvDomDOMPointInit, w) + sizeof(nested_a0_p4->w))
+                assignValue(a0.p4.w, nested_a0_p4->w);
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return DOMQuad::fromQuad(std::move(a0)); }, [&](auto&& value) { return storeHandle<DOMQuad>(value, result); });
+}
+
 // CSSStyleValue.parse: static operation with checked Document context and UTF-8 byte lengths; *result is a new reference
 int32_t ranvier_dom_css_style_value_parse(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvCSSStyleValue** result)
 {
@@ -26876,6 +29242,42 @@ int32_t ranvier_dom_style_property_map_read_only_get_interface_name(RvStylePrope
     if (dynamicDowncast<StylePropertyMap>(*impl))
         return copyString("StylePropertyMap"_s, buffer, capacity, length);
     return copyString("StylePropertyMapReadOnly"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_dom_rect_read_only_get_interface_name(RvDOMRectReadOnly* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<DOMRectReadOnly*>(target);
+    if (castTrackedHandle<DOMRect>(*impl))
+        return copyString("DOMRect"_s, buffer, capacity, length);
+    return copyString("DOMRectReadOnly"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_dom_point_read_only_get_interface_name(RvDOMPointReadOnly* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    if (castTrackedHandle<DOMPoint>(*impl))
+        return copyString("DOMPoint"_s, buffer, capacity, length);
+    return copyString("DOMPointReadOnly"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_dom_matrix_read_only_get_interface_name(RvDOMMatrixReadOnly* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<DOMMatrixReadOnly*>(target);
+    if (castTrackedHandle<DOMMatrix>(*impl))
+        return copyString("DOMMatrix"_s, buffer, capacity, length);
+    return copyString("DOMMatrixReadOnly"_s, buffer, capacity, length);
 }
 
 } // extern "C"

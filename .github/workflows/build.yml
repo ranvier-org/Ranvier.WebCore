@@ -422,6 +422,14 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/style_map_entries.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify geometry values and retained mutable points
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/geometry_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify matrix values and transformations
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/matrix_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Build Windows UI Automation OS clients
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
         run: >-

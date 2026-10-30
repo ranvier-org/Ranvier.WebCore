@@ -1,0 +1,62 @@
+{
+  "status": "private-windows-abi24-checkpoint",
+  "abiVersion": 24,
+  "packageVersion": "0.1.0-preview.16",
+  "focusedAssertions": 1772,
+  "finalTeardownCases": 42,
+  "runtime": {
+    "WebCore.dll": "e3e6a80e6f21ca785b37fbbc11cb9a16c28d27a32ba19099a7cc2ea5aeb99870",
+    "RanvierWebCoreHost.dll": "6ed41145b9e47883ea672295fc14f1434d9f532a12817ddb9fa0c1742beb019b",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "probes": [
+    {
+      "probe": "geometry_values",
+      "assertions": 260,
+      "exitCode": 0,
+      "log": "docs/cohort16-abi24-evidence/geometry_values.log",
+      "sha256": "1dffd121ce5b04aa1604b066d9cb45d28013b323df6e11757247753222a24529"
+    },
+    {
+      "probe": "matrix_values",
+      "assertions": 1091,
+      "exitCode": 0,
+      "log": "docs/cohort16-abi24-evidence/matrix_values.log",
+      "sha256": "eb4c585c486246c753fd823e38254003e17ecf09d940fceefb4dca3cf61565cc"
+    },
+    {
+      "probe": "typed_style_values",
+      "assertions": 190,
+      "exitCode": 0,
+      "log": "docs/cohort16-abi24-evidence/typed_style_values.log",
+      "sha256": "ad90626f02ac7000083dd96ffa1b66be1750a075bb509c2185ed7de6406dce19"
+    },
+    {
+      "probe": "custom_properties",
+      "assertions": 231,
+      "exitCode": 0,
+      "log": "docs/cohort16-abi24-evidence/custom_properties.log",
+      "sha256": "a382967c2d75a4afef9646c9042d7bebf492965ce55bf6b388c36931b543652f"
+    },
+    {
+      "probe": "frames",
+      "exitCode": 0,
+      "log": "docs/cohort16-abi24-evidence/frames.log",
+      "sha256": "ac0581375c1acc8b294729df2ddf87650df6c4d9f0826667d37ccb24e2260e4d"
+    },
+    {
+      "probe": "teardown",
+      "exitCode": 0,
+      "log": "docs/cohort16-abi24-evidence/teardown.log",
+      "sha256": "c7265497fffb4b3d2a71c8ba574456edbb2ad0396ca0ba8be71c5a2138b0c084"
+    }
+  ],
+  "priorCombinedBatch": "docs/matrix-values-evidence/evidence.json",
+  "verificationScope": "Only the ABI version and package allocation changed after the combined 5979-assertion batch; this checkpoint verifies affected version probes and both geometry groups plus full driver/final teardown.",
+  "unverified": [
+    "shared NativeAOT/browser geometry and matrix consumers",
+    "nonWindows native platforms",
+    "official packages",
+    "G07/G08 acceptance"
+  ]
+}

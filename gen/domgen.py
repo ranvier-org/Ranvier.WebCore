@@ -356,7 +356,11 @@ class World:
                 mapped = self.map(member.type)
             except Unsupported as error:
                 raise Unsupported(f"dictionary {name}: member {member.name}: {error}")
-            if mapped.kind in ("dict", "object", "event") or mapped.interface == "EventTarget":
+            empty_default = member.default == '{}' or member.attrs.get('ImplementationDefaultValue') == '{}'
+            if mapped.kind == "dict" and (name not in self.config.get("nestedDictionaries", [])
+                                          or member.required or not empty_default or mapped.nullable):
+                raise Unsupported(f"dictionary {name}: nested member {member.name} requires an opted-in nonnullable empty default")
+            if mapped.kind in ("object", "event") or mapped.interface == "EventTarget":
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
             found.append((member, mapped))
         return found
@@ -475,6 +479,11 @@ class Generator(ComplexGeneratorMixin):
         self.complex_used = {}
         self.complex_inputs = set()
         self.namespace_features = []
+        self.tracked_roots = {}
+        for root, concrete in world.config.get('trackedHandleRoots', {}).items():
+            if root not in world.scope or concrete not in world.scope or world.chain(concrete) != [concrete, root]:
+                raise SystemExit(f'{root}: tracked handles require a scoped root and one direct mutable subtype')
+            self.tracked_roots[world.cpp_class(root)] = world.cpp_class(concrete)
 
     def run(self):
         for name in self.world.scope:
@@ -865,6 +874,10 @@ class Generator(ComplexGeneratorMixin):
         return f"Rv{chain[-1]}*"
 
     def cast_expression(self, cls, root, value):
+        if root in self.tracked_roots:
+            if cls != self.tracked_roots[root]:
+                raise Unsupported(f'{root}: unconfigured tracked subtype {cls}')
+            return f'castTrackedHandle<{cls}>({value})'
         if root == "Node" and cls.startswith("SVG") and cls != "SVGElement":
             self.headers.add("SVGElementTypeHelpers.h")
         tags = self.world.config.get("nodeCastTags", {}).get(cls) if root == "Node" else None
@@ -999,6 +1012,8 @@ class Generator(ComplexGeneratorMixin):
         for member, mapped in ordered:
             if mapped.kind == "enum":
                 self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
+            elif mapped.kind == "dict":
+                self.use_dictionary(mapped.interface)
             elif mapped.kind in ("union", "sequence"):
                 self.use_complex(mapped)
         self.dicts_used[name] = ordered
@@ -1013,6 +1028,8 @@ class Generator(ComplexGeneratorMixin):
             return "const char*"
         if mapped.kind == "node":
             return "RvNode*"
+        if mapped.kind == "dict":
+            return f"const {mapped.handle}*"
         if mapped.kind in ("union", "sequence"):
             return f"const {mapped.ctype}*"
         ctype = mapped.ctype
@@ -1055,6 +1072,14 @@ class Generator(ComplexGeneratorMixin):
                 lines.append("    if (!value)")
                 lines.append("        return RV_ERR_WRONG_INTERFACE;")
                 lines.append(f"    {target}.{cpp_field} = value.get();")
+            lines.append("}")
+        elif mapped.kind == "dict":
+            nested = 'nested_' + re.sub(r'\W', '_', f'{target}.{cpp_field}')
+            lines += [f"if ({covered} && {pointer}->{field}) {{",
+                      f"    const auto* {nested} = {pointer}->{field};"]
+            for child_member, child in self.use_dictionary(mapped.interface):
+                lines += ["    " + line for line in self.dictionary_field(
+                    nested, mapped.handle, f"{target}.{cpp_field}", child_member, child, mapped.interface)]
             lines.append("}")
         elif mapped.kind in ("union", "sequence"):
             lines += [f"if ({covered} && {pointer}->{field}) {{", "    int32_t status = RV_OK;",
@@ -1297,6 +1322,14 @@ class Generator(ComplexGeneratorMixin):
                 params.append((f"const {mapped.ctype}*", name))
                 if not maybe_null and not argument.optional:
                     checks.append(name)
+                if argument.optional and argument.default is None and not mapped.nullable:
+                    prepare += [f'std::optional<{self.transport_cpp(mapped)}> a{index};',
+                                f'if ({name}) {{', f'    int32_t status{index} = RV_OK;',
+                                f'    a{index} = decode{mapped.ctype}({name}, status{index});',
+                                f'    if (status{index} != RV_OK) return status{index};', '}']
+                    passed.append(f'std::move(a{index})')
+                    notes.append(f'{name} may be NULL for an absent optional argument')
+                    continue
                 prepare += [f"int32_t status{index} = RV_OK;",
                             f"auto a{index} = decode{mapped.ctype}({name}, status{index});"]
                 if argument.optional and argument.default is not None and not mapped.nullable:
@@ -1323,7 +1356,9 @@ class Generator(ComplexGeneratorMixin):
                 if mapped.cls == base:
                     prepare.append(f"RefPtr<{base}> a{index} = {accessor}({name});")
                 else:
-                    prepare.append(f"RefPtr<{mapped.cls}> a{index} = {name} ? dynamicDowncast<{mapped.cls}>(*{accessor}({name})) : nullptr;")
+                    cast = (self.cast_expression(mapped.cls, base, f'*{accessor}({name})') if base in self.tracked_roots
+                            else f'dynamicDowncast<{mapped.cls}>(*{accessor}({name}))')
+                    prepare.append(f"RefPtr<{mapped.cls}> a{index} = {name} ? {cast} : nullptr;")
                     prepare.append(f"if ({name} && !a{index})")
                     prepare.append("    return RV_ERR_WRONG_INTERFACE;")
                 passed.append(f"a{index}.get()" if maybe_null else f"HandleArg<{mapped.cls}> {{ a{index}.get() }}")
@@ -1368,7 +1403,8 @@ class Generator(ComplexGeneratorMixin):
             if returns.interface == "EventTarget":
                 sink = "storeNode(dynamicDowncast<Node>(rawPointer<EventTarget>(value)), result)"
             else:
-                sink = f"storeHandle<{root}>(value, result)"
+                sink = (f"storeTrackedHandle<{root}, {returns.cls}>(value, result)" if root in self.tracked_roots
+                        else f"storeHandle<{root}>(value, result)")
             notes.append("*result is a new reference" + (", or NULL" if returns.nullable or returns.interface == "EventTarget" else ""))
         elif returns.kind in ("union", "sequence"):
             if not self.transport_can_return(returns):
@@ -1719,6 +1755,7 @@ class Generator(ComplexGeneratorMixin):
         for enum, (_, _, file) in sorted(self.enums_used.items()):
             lines.append(f'#include "JS{pathlib.PurePosixPath(file).stem}.h"')
         lines += ["", RUNTIME, ""]
+        lines += self.tracked_handle_runtime()
         for enum, (values, _, _) in sorted(self.enums_used.items()):
             quoted = ", ".join(f'"{v}"_s' for v in values)
             lines.append(f"static constexpr ASCIILiteral {enum_table(enum)}[] = {{ {quoted} }};")
@@ -1753,18 +1790,22 @@ class Generator(ComplexGeneratorMixin):
                       f"    if (isMainThread()) clear{name}(value);", "}", ""]
         for name in self.handles:
             cls = self.world.cpp_class(name)
+            release = (f'releaseTrackedHandle(reinterpret_cast<{cls}*>(handle));' if cls in self.tracked_roots
+                       else f'reinterpret_cast<{cls}*>(handle)->deref();')
+            retain = (f'retainTrackedHandle(reinterpret_cast<{cls}*>(handle));' if cls in self.tracked_roots
+                      else f'reinterpret_cast<{cls}*>(handle)->ref();')
             lines += [
                 f"void ranvier_dom_{snake(name)}_release(Rv{name}* handle)",
                 "{",
                 "    if (handle && isMainThread())",
-                f"        reinterpret_cast<{cls}*>(handle)->deref();",
+                f"        {release}",
                 "}",
                 "",
                 f"Rv{name}* ranvier_dom_{snake(name)}_retain(Rv{name}* handle)",
                 "{",
                 "    if (!handle || !isMainThread())",
                 "        return nullptr;",
-                f"    reinterpret_cast<{cls}*>(handle)->ref();",
+                f"    {retain}",
                 "    return handle;",
                 "}",
                 "",
@@ -1804,6 +1845,71 @@ class Generator(ComplexGeneratorMixin):
             lines += [f'    return copyString("{root}"_s, buffer, capacity, length);', "}", ""]
         lines += ["} // extern \"C\"", ""]
         return "\n".join(lines)
+
+    def tracked_handle_runtime(self):
+        if not self.tracked_roots:
+            return []
+        lines = ['#include <unordered_map>', 'namespace {',
+                 'template<typename Root> struct TrackedHandleTraits;']
+        for root, concrete in self.tracked_roots.items():
+            lines.append(f'template<> struct TrackedHandleTraits<{root}> {{ using Mutable = {concrete}; }};')
+        lines.append(r'''
+// Metadata owns no engine references. Entries count only references exported through this ABI.
+struct TrackedHandleState {
+    size_t references { 0 };
+    bool mutableType { false };
+};
+
+template<typename Root> auto& trackedHandles()
+{
+    static std::unordered_map<const Root*, TrackedHandleState> handles;
+    return handles;
+}
+
+template<typename Root, typename Concrete, typename Handle, typename V>
+int32_t storeTrackedHandle(V&& value, Handle** result)
+{
+    using Mutable = typename TrackedHandleTraits<Root>::Mutable;
+    static_assert(std::is_same_v<Concrete, Root> || std::is_same_v<Concrete, Mutable>);
+    const Concrete* concrete = rawPointer<const Concrete>(std::forward<V>(value));
+    auto* pointer = const_cast<Root*>(static_cast<const Root*>(concrete));
+    if (pointer) {
+        pointer->ref();
+        auto& state = trackedHandles<Root>()[pointer];
+        ++state.references;
+        state.mutableType |= std::is_same_v<Concrete, Mutable>;
+    }
+    *result = reinterpret_cast<Handle*>(pointer);
+    return RV_OK;
+}
+
+template<typename Root> void retainTrackedHandle(Root* pointer)
+{
+    pointer->ref();
+    ++trackedHandles<Root>()[pointer].references;
+}
+
+template<typename Root> void releaseTrackedHandle(Root* pointer)
+{
+    auto& handles = trackedHandles<Root>();
+    auto found = handles.find(pointer);
+    if (found != handles.end()) {
+        if (!--found->second.references)
+            handles.erase(found);
+    }
+    pointer->deref();
+}
+
+template<typename Concrete, typename Root> Concrete* castTrackedHandle(Root& value)
+{
+    static_assert(std::is_same_v<Concrete, typename TrackedHandleTraits<Root>::Mutable>);
+    auto& handles = trackedHandles<Root>();
+    auto found = handles.find(&value);
+    return found != handles.end() && found->second.mutableType ? static_cast<Concrete*>(&value) : nullptr;
+}
+} // namespace
+''')
+        return lines
 
     def interfaces(self):
         from interfaces import emit_interfaces

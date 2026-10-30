@@ -59,6 +59,188 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_optional_matrix_constructor_union_keeps_absence_distinct_from_present_empty_values(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface DOMMatrixReadOnly {
+    [CallWith=CurrentScriptExecutionContext] constructor(optional (DOMString or sequence<unrestricted double>) init);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['DOMMatrixReadOnly']
+        config['constructors'] = {'DOMMatrixReadOnly': {'receiver': 'Document', 'factory': 'DOMMatrixReadOnly::create'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        factory = next(row for row in model['functions'] if row['function'] == 'rv_dom_dom_matrix_read_only_create')
+        self.assertTrue(factory['arguments'][0]['optional'])
+        self.assertFalse(factory['arguments'][0]['mapping']['nullable'])
+        glue = generator.glue()
+        self.assertIn('std::optional<Variant<String, Vector<double>>> a0;', glue)
+        self.assertIn('if (init) {', glue)
+        self.assertIn('a0 = decodeRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(init, status0);', glue)
+        self.assertIn('DOMMatrixReadOnly::create(*impl, std::move(a0))', glue)
+        self.assertNotIn('DOMMatrixReadOnly::create(*impl, std::move(*a0))', glue)
+        self.assertIn('RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_UNRESTRICTED_DOUBLE_SEQUENCE_UNRESTRICTED_DOUBLE = 2', generator.header())
+
+    def test_configured_geometry_factories_mutation_and_quad_copies_use_engine_operations(self):
+        configured = json.loads((ROOT / 'gen/dom.json').read_text())
+        selected = ['DOMRectReadOnly', 'DOMRect', 'DOMPointReadOnly', 'DOMPoint', 'DOMQuad']
+        self.assertTrue(set(selected).issubset(configured['interfaces']))
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary DOMRectInit { unrestricted double x = 0; unrestricted double y = 0; unrestricted double width = 0; unrestricted double height = 0; };
+dictionary DOMPointInit { unrestricted double x = 0; unrestricted double y = 0; unrestricted double z = 0; unrestricted double w = 1; };
+dictionary DOMQuadInit {
+    [ImplementationDefaultValue={}] DOMPointInit p1;
+    [ImplementationDefaultValue={}] DOMPointInit p2;
+    [ImplementationDefaultValue={}] DOMPointInit p3;
+    [ImplementationDefaultValue={}] DOMPointInit p4;
+};
+interface DOMRectReadOnly {
+    constructor(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double width = 0, optional unrestricted double height = 0);
+    static DOMRectReadOnly fromRect(optional DOMRectInit other = {});
+    readonly attribute unrestricted double x;
+};
+interface DOMRect : DOMRectReadOnly {
+    constructor(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double width = 0, optional unrestricted double height = 0);
+    static DOMRect fromRect(optional DOMRectInit other = {});
+    inherit attribute unrestricted double x;
+};
+interface DOMPointReadOnly {
+    constructor(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double z = 0, optional unrestricted double w = 1);
+    static DOMPointReadOnly fromPoint(optional DOMPointInit other = {});
+    readonly attribute unrestricted double w;
+};
+interface DOMPoint : DOMPointReadOnly {
+    constructor(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double z = 0, optional unrestricted double w = 1);
+    static DOMPoint fromPoint(optional DOMPointInit other = {});
+    inherit attribute unrestricted double w;
+};
+interface DOMQuad {
+    constructor(optional DOMPointInit p1 = {}, optional DOMPointInit p2 = {}, optional DOMPointInit p3 = {}, optional DOMPointInit p4 = {});
+    static DOMQuad fromRect(optional DOMRectInit other = {});
+    static DOMQuad fromQuad(optional DOMQuadInit other = {});
+    [SameObject] readonly attribute DOMPoint p1;
+    DOMRect getBounds();
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + selected
+        config['constructors'] = {name: configured['constructors'][name] for name in selected}
+        config['staticBindings'] = {name: configured['staticBindings'][name] for name in selected}
+        config['trackedHandleRoots'] = {root: concrete for root, concrete in configured['trackedHandleRoots'].items()
+                                        if root in selected}
+        config['nestedDictionaries'] = configured['nestedDictionaries']
+        config['runtimeTypeRoots'] = list(config['trackedHandleRoots'])
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        for name in selected:
+            self.assertIn('rv_dom_' + domgen.snake(name) + '_create', functions)
+        for name, operation in [('DOMRect', 'from_rect'), ('DOMRectReadOnly', 'from_rect'),
+                                ('DOMPoint', 'from_point'), ('DOMPointReadOnly', 'from_point'),
+                                ('DOMQuad', 'from_rect'), ('DOMQuad', 'from_quad')]:
+            self.assertIn('rv_dom_' + domgen.snake(name) + '_' + operation, functions)
+        self.assertIn('rv_dom_dom_rect_set_x', functions)
+        self.assertIn('rv_dom_dom_point_set_w', functions)
+        self.assertNotIn('rv_dom_dom_rect_read_only_set_x', functions)
+        self.assertNotIn('rv_dom_dom_point_read_only_set_w', functions)
+        glue = generator.glue()
+        self.assertIn('DOMQuad::create(std::move(a0), std::move(a1), std::move(a2), std::move(a3))', glue)
+        self.assertIn('DOMQuad::fromQuad(std::move(a0))', glue)
+        self.assertIn('impl->getBounds()', glue)
+        geometry_bodies = '\n'.join('\n'.join(function.body) for function in generator.functions if function.interface in selected)
+        self.assertNotIn('std::isfinite', geometry_bodies)
+
+    def test_tracked_geometry_handles_classify_only_trusted_mutable_producers_and_pair_releases(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface DOMRectReadOnly { readonly attribute unrestricted double x; };
+interface DOMRect : DOMRectReadOnly { attribute unrestricted double x; };
+partial interface Node {
+    DOMRect makeRect();
+    DOMRectReadOnly makeReadOnlyRect();
+    sequence<DOMRect> rects();
+    undefined takeRect(DOMRect rect);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['DOMRectReadOnly', 'DOMRect']
+        config['trackedHandleRoots'] = {'DOMRectReadOnly': 'DOMRect'}
+        config['runtimeTypeRoots'] = ['DOMRectReadOnly']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        self.assertIn('storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result)', glue)
+        self.assertIn('storeTrackedHandle<DOMRectReadOnly, DOMRectReadOnly>(value, result)', glue)
+        self.assertIn('storeTrackedHandle<DOMRectReadOnly, DOMRect>(value[i], &result->items[i])', glue)
+        self.assertIn('castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target))', glue)
+        self.assertIn('retainTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle))', glue)
+        self.assertIn('releaseTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle))', glue)
+        self.assertIn('releaseTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(value->items[i]))', glue)
+        self.assertNotIn('dynamicDowncast<DOMRect>', glue)
+        self.assertIn('auto found = handles.find(&value);', glue)
+        self.assertIn('found->second.mutableType', glue)
+        self.assertIn('if (!--found->second.references)', glue)
+        self.assertIn('handles.erase(found);', glue)
+        self.assertIn('const_cast<Root*>(static_cast<const Root*>(concrete))', glue)
+        self.assertIn('static_assert(std::is_same_v<Concrete, Root> || std::is_same_v<Concrete, Mutable>);', glue)
+
+    def test_opted_in_nested_geometry_dictionary_preserves_defaults_and_input_layouts(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary DOMPointInit { unrestricted double x = 0; unrestricted double w = 1; };
+dictionary DOMQuadInit { DOMPointInit p1 = {}; DOMPointInit p2 = {}; };
+partial interface Node { undefined takeQuad(optional DOMQuadInit quad = {}); };
+''')
+        config = dict(self.world.config)
+        config['nestedDictionaries'] = ['DOMQuadInit']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        functions = {item['function']: item for item in model['functions']}
+        self.assertIn('rv_dom_node_take_quad', functions)
+        self.assertEqual([field['ctype'] for field in model['dictionaries']['DOMQuadInit']],
+                         ['const RvDomDOMPointInit*', 'const RvDomDOMPointInit*'])
+        self.assertEqual([field['default'] for field in model['dictionaries']['DOMPointInit']], ['0', '1'])
+        self.assertIn('const char* label;', generator.header())
+        self.assertLess(generator.header().index('typedef struct RvDomDOMPointInit {'),
+                        generator.header().index('typedef struct RvDomDOMQuadInit {'))
+        glue = generator.glue()
+        self.assertIn('DOMQuadInit a0 { };', glue)
+        self.assertIn('const auto* nested_a0_p1 = quad->p1;', glue)
+        self.assertIn('offsetof(RvDomDOMPointInit, w)', glue)
+        self.assertIn('assignValue(a0.p1.w, nested_a0_p1->w)', glue)
+        self.assertIn('val mutable p1: nativeint', generator.fsharp())
+
+    def test_nested_dictionary_transport_rejects_presence_semantics_it_cannot_represent(self):
+        for member in ['DOMPointInit p1;', 'required DOMPointInit p1;', 'DOMPointInit? p1 = null;']:
+            with self.subTest(member=member):
+                fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+                fixture.write_text(IDL + '''
+dictionary DOMPointInit { unrestricted double w = 1; };
+dictionary DOMQuadInit { ''' + member + ''' };
+partial interface Node { undefined takeQuad(optional DOMQuadInit quad = {}); };
+''')
+                config = dict(self.world.config)
+                config['nestedDictionaries'] = ['DOMQuadInit']
+                generator = domgen.Generator(domgen.World(self.source, config))
+                generator.lock = {}
+                generator.lock_structs = {}
+                generator.run()
+                functions = [item['function'] for item in json.loads(generator.api_model())['functions']]
+                self.assertNotIn('rv_dom_node_take_quad', functions)
+                self.assertIn('requires an opted-in nonnullable empty default', generator.report())
+
     def test_selected_variadic_style_values_validate_reference_arms_before_webidl_coercion(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

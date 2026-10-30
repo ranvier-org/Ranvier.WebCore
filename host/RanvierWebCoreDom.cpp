@@ -38,6 +38,12 @@ void rv_dom_dom_rect_read_only_release(RvDOMRectReadOnly* handle) { ranvier_dom_
 RvDOMRectReadOnly* rv_dom_dom_rect_read_only_retain(RvDOMRectReadOnly* handle) { return ranvier_dom_dom_rect_read_only_retain(handle); }
 void rv_dom_dom_rect_list_release(RvDOMRectList* handle) { ranvier_dom_dom_rect_list_release(handle); }
 RvDOMRectList* rv_dom_dom_rect_list_retain(RvDOMRectList* handle) { return ranvier_dom_dom_rect_list_retain(handle); }
+void rv_dom_dom_point_read_only_release(RvDOMPointReadOnly* handle) { ranvier_dom_dom_point_read_only_release(handle); }
+RvDOMPointReadOnly* rv_dom_dom_point_read_only_retain(RvDOMPointReadOnly* handle) { return ranvier_dom_dom_point_read_only_retain(handle); }
+void rv_dom_dom_quad_release(RvDOMQuad* handle) { ranvier_dom_dom_quad_release(handle); }
+RvDOMQuad* rv_dom_dom_quad_retain(RvDOMQuad* handle) { return ranvier_dom_dom_quad_retain(handle); }
+void rv_dom_dom_matrix_read_only_release(RvDOMMatrixReadOnly* handle) { ranvier_dom_dom_matrix_read_only_release(handle); }
+RvDOMMatrixReadOnly* rv_dom_dom_matrix_read_only_retain(RvDOMMatrixReadOnly* handle) { return ranvier_dom_dom_matrix_read_only_retain(handle); }
 void rv_dom_node_list_release(RvNodeList* handle) { ranvier_dom_node_list_release(handle); }
 RvNodeList* rv_dom_node_list_retain(RvNodeList* handle) { return ranvier_dom_node_list_retain(handle); }
 void rv_dom_html_collection_release(RvHTMLCollection* handle) { ranvier_dom_html_collection_release(handle); }
@@ -72,6 +78,8 @@ void rv_dom_union_css_style_value_or_usv_string_release(RvDomUnionCSSStyleValueO
 void rv_dom_sequence_css_style_value_or_usv_string_release(RvDomSequenceCSSStyleValueOrUSVString* value) { ranvier_dom_sequence_css_style_value_or_usv_string_release(value); }
 void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value) { ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(value); }
 void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value) { ranvier_dom_sequence_static_range_release(value); }
+void rv_dom_sequence_unrestricted_double_release(RvDomSequenceUnrestrictedDouble* value) { ranvier_dom_sequence_unrestricted_double_release(value); }
+void rv_dom_union_dom_string_or_sequence_of_unrestricted_double_release(RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* value) { ranvier_dom_union_dom_string_or_sequence_of_unrestricted_double_release(value); }
 void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value) { ranvier_dom_sequence_pointer_event_release(value); }
 void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value) { ranvier_dom_sequence_css_style_value_release(value); }
 void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value) { ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(value); }
@@ -81,6 +89,9 @@ int32_t rv_dom_style_sheet_get_interface_name(RvStyleSheet* target, char* buffer
 int32_t rv_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_style_declaration_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_css_style_value_get_interface_name(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_style_value_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_style_property_map_read_only_get_interface_name(RvStylePropertyMapReadOnly* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_style_property_map_read_only_get_interface_name(target, buffer, capacity, length); }
+int32_t rv_dom_dom_rect_read_only_get_interface_name(RvDOMRectReadOnly* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_rect_read_only_get_interface_name(target, buffer, capacity, length); }
+int32_t rv_dom_dom_point_read_only_get_interface_name(RvDOMPointReadOnly* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_point_read_only_get_interface_name(target, buffer, capacity, length); }
+int32_t rv_dom_dom_matrix_read_only_get_interface_name(RvDOMMatrixReadOnly* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_matrix_read_only_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_node_type(RvNode* target, uint16_t* result) { return ranvier_dom_node_get_node_type(target, result); }
 int32_t rv_dom_node_get_node_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_node_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_base_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_base_uri(target, buffer, capacity, length); }
@@ -1701,6 +1712,7 @@ int32_t rv_dom_dom_selection_delete_from_document(RvDOMSelection* target) { retu
 int32_t rv_dom_dom_selection_contains_node(RvDOMSelection* target, RvNode* node, int32_t allow_partial_containment, int32_t* result) { return ranvier_dom_dom_selection_contains_node(target, node, allow_partial_containment, result); }
 int32_t rv_dom_dom_selection_to_string(RvDOMSelection* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_selection_to_string(target, buffer, capacity, length); }
 int32_t rv_dom_dom_selection_modify(RvDOMSelection* target, const char* alter, const char* direction, const char* granularity) { return ranvier_dom_dom_selection_modify(target, alter, direction, granularity); }
+int32_t rv_dom_dom_rect_read_only_create(RvNode* target, double x, double y, double width, double height, RvDOMRectReadOnly** result) { return ranvier_dom_dom_rect_read_only_create(target, x, y, width, height, result); }
 int32_t rv_dom_dom_rect_read_only_get_x(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_read_only_get_x(target, result); }
 int32_t rv_dom_dom_rect_read_only_get_y(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_read_only_get_y(target, result); }
 int32_t rv_dom_dom_rect_read_only_get_width(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_read_only_get_width(target, result); }
@@ -1709,8 +1721,135 @@ int32_t rv_dom_dom_rect_read_only_get_top(RvDOMRectReadOnly* target, double* res
 int32_t rv_dom_dom_rect_read_only_get_right(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_read_only_get_right(target, result); }
 int32_t rv_dom_dom_rect_read_only_get_bottom(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_read_only_get_bottom(target, result); }
 int32_t rv_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_read_only_get_left(target, result); }
+int32_t rv_dom_dom_rect_create(RvNode* target, double x, double y, double width, double height, RvDOMRectReadOnly** result) { return ranvier_dom_dom_rect_create(target, x, y, width, height, result); }
+int32_t rv_dom_dom_rect_get_x(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_get_x(target, result); }
+int32_t rv_dom_dom_rect_set_x(RvDOMRectReadOnly* target, double value) { return ranvier_dom_dom_rect_set_x(target, value); }
+int32_t rv_dom_dom_rect_get_y(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_get_y(target, result); }
+int32_t rv_dom_dom_rect_set_y(RvDOMRectReadOnly* target, double value) { return ranvier_dom_dom_rect_set_y(target, value); }
+int32_t rv_dom_dom_rect_get_width(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_get_width(target, result); }
+int32_t rv_dom_dom_rect_set_width(RvDOMRectReadOnly* target, double value) { return ranvier_dom_dom_rect_set_width(target, value); }
+int32_t rv_dom_dom_rect_get_height(RvDOMRectReadOnly* target, double* result) { return ranvier_dom_dom_rect_get_height(target, result); }
+int32_t rv_dom_dom_rect_set_height(RvDOMRectReadOnly* target, double value) { return ranvier_dom_dom_rect_set_height(target, value); }
 int32_t rv_dom_dom_rect_list_get_length(RvDOMRectList* target, uint32_t* result) { return ranvier_dom_dom_rect_list_get_length(target, result); }
 int32_t rv_dom_dom_rect_list_item(RvDOMRectList* target, uint32_t index, RvDOMRectReadOnly** result) { return ranvier_dom_dom_rect_list_item(target, index, result); }
+int32_t rv_dom_dom_point_read_only_create(RvNode* target, double x, double y, double z, double w, RvDOMPointReadOnly** result) { return ranvier_dom_dom_point_read_only_create(target, x, y, z, w, result); }
+int32_t rv_dom_dom_point_read_only_get_x(RvDOMPointReadOnly* target, double* result) { return ranvier_dom_dom_point_read_only_get_x(target, result); }
+int32_t rv_dom_dom_point_read_only_get_y(RvDOMPointReadOnly* target, double* result) { return ranvier_dom_dom_point_read_only_get_y(target, result); }
+int32_t rv_dom_dom_point_read_only_get_z(RvDOMPointReadOnly* target, double* result) { return ranvier_dom_dom_point_read_only_get_z(target, result); }
+int32_t rv_dom_dom_point_read_only_get_w(RvDOMPointReadOnly* target, double* result) { return ranvier_dom_dom_point_read_only_get_w(target, result); }
+int32_t rv_dom_dom_point_read_only_matrix_transform(RvDOMPointReadOnly* target, const RvDomDOMMatrixInit* matrix, RvDOMPointReadOnly** result) { return ranvier_dom_dom_point_read_only_matrix_transform(target, matrix, result); }
+int32_t rv_dom_dom_point_create(RvNode* target, double x, double y, double z, double w, RvDOMPointReadOnly** result) { return ranvier_dom_dom_point_create(target, x, y, z, w, result); }
+int32_t rv_dom_dom_point_get_x(RvDOMPointReadOnly* target, double* result) { return ranvier_dom_dom_point_get_x(target, result); }
+int32_t rv_dom_dom_point_set_x(RvDOMPointReadOnly* target, double value) { return ranvier_dom_dom_point_set_x(target, value); }
+int32_t rv_dom_dom_point_get_y(RvDOMPointReadOnly* target, double* result) { return ranvier_dom_dom_point_get_y(target, result); }
+int32_t rv_dom_dom_point_set_y(RvDOMPointReadOnly* target, double value) { return ranvier_dom_dom_point_set_y(target, value); }
+int32_t rv_dom_dom_point_get_z(RvDOMPointReadOnly* target, double* result) { return ranvier_dom_dom_point_get_z(target, result); }
+int32_t rv_dom_dom_point_set_z(RvDOMPointReadOnly* target, double value) { return ranvier_dom_dom_point_set_z(target, value); }
+int32_t rv_dom_dom_point_get_w(RvDOMPointReadOnly* target, double* result) { return ranvier_dom_dom_point_get_w(target, result); }
+int32_t rv_dom_dom_point_set_w(RvDOMPointReadOnly* target, double value) { return ranvier_dom_dom_point_set_w(target, value); }
+int32_t rv_dom_dom_quad_create(RvNode* target, const RvDomDOMPointInit* p1, const RvDomDOMPointInit* p2, const RvDomDOMPointInit* p3, const RvDomDOMPointInit* p4, RvDOMQuad** result) { return ranvier_dom_dom_quad_create(target, p1, p2, p3, p4, result); }
+int32_t rv_dom_dom_quad_get_p1(RvDOMQuad* target, RvDOMPointReadOnly** result) { return ranvier_dom_dom_quad_get_p1(target, result); }
+int32_t rv_dom_dom_quad_get_p2(RvDOMQuad* target, RvDOMPointReadOnly** result) { return ranvier_dom_dom_quad_get_p2(target, result); }
+int32_t rv_dom_dom_quad_get_p3(RvDOMQuad* target, RvDOMPointReadOnly** result) { return ranvier_dom_dom_quad_get_p3(target, result); }
+int32_t rv_dom_dom_quad_get_p4(RvDOMQuad* target, RvDOMPointReadOnly** result) { return ranvier_dom_dom_quad_get_p4(target, result); }
+int32_t rv_dom_dom_quad_get_bounds(RvDOMQuad* target, RvDOMRectReadOnly** result) { return ranvier_dom_dom_quad_get_bounds(target, result); }
+int32_t rv_dom_dom_matrix_read_only_create(RvNode* target, const RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* init, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_create(target, init, result); }
+int32_t rv_dom_dom_matrix_read_only_get_a(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_a(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_b(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_b(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_c(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_c(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_d(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_d(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_e(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_e(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_f(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_f(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m11(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m11(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m12(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m12(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m13(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m13(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m14(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m14(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m21(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m21(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m22(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m22(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m23(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m23(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m24(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m24(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m31(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m31(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m32(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m32(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m33(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m33(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m34(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m34(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m41(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m41(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m42(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m42(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m43(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m43(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_m44(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_read_only_get_m44(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_is2_d(RvDOMMatrixReadOnly* target, int32_t* result) { return ranvier_dom_dom_matrix_read_only_get_is2_d(target, result); }
+int32_t rv_dom_dom_matrix_read_only_get_is_identity(RvDOMMatrixReadOnly* target, int32_t* result) { return ranvier_dom_dom_matrix_read_only_get_is_identity(target, result); }
+int32_t rv_dom_dom_matrix_read_only_translate(RvDOMMatrixReadOnly* target, double tx, double ty, double tz, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_translate(target, tx, ty, tz, result); }
+int32_t rv_dom_dom_matrix_read_only_scale(RvDOMMatrixReadOnly* target, double scale_x, const double* scale_y, double scale_z, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_scale(target, scale_x, scale_y, scale_z, origin_x, origin_y, origin_z, result); }
+int32_t rv_dom_dom_matrix_read_only_scale3d(RvDOMMatrixReadOnly* target, double scale, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_scale3d(target, scale, origin_x, origin_y, origin_z, result); }
+int32_t rv_dom_dom_matrix_read_only_scale_non_uniform(RvDOMMatrixReadOnly* target, double scale_x, double scale_y, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_scale_non_uniform(target, scale_x, scale_y, result); }
+int32_t rv_dom_dom_matrix_read_only_rotate(RvDOMMatrixReadOnly* target, double rot_x, const double* rot_y, const double* rot_z, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_rotate(target, rot_x, rot_y, rot_z, result); }
+int32_t rv_dom_dom_matrix_read_only_rotate_from_vector(RvDOMMatrixReadOnly* target, double x, double y, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_rotate_from_vector(target, x, y, result); }
+int32_t rv_dom_dom_matrix_read_only_rotate_axis_angle(RvDOMMatrixReadOnly* target, double x, double y, double z, double angle, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_rotate_axis_angle(target, x, y, z, angle, result); }
+int32_t rv_dom_dom_matrix_read_only_skew_x(RvDOMMatrixReadOnly* target, double sx, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_skew_x(target, sx, result); }
+int32_t rv_dom_dom_matrix_read_only_skew_y(RvDOMMatrixReadOnly* target, double sy, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_skew_y(target, sy, result); }
+int32_t rv_dom_dom_matrix_read_only_multiply(RvDOMMatrixReadOnly* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_multiply(target, other, result); }
+int32_t rv_dom_dom_matrix_read_only_flip_x(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_flip_x(target, result); }
+int32_t rv_dom_dom_matrix_read_only_flip_y(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_flip_y(target, result); }
+int32_t rv_dom_dom_matrix_read_only_inverse(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_inverse(target, result); }
+int32_t rv_dom_dom_matrix_read_only_transform_point(RvDOMMatrixReadOnly* target, const RvDomDOMPointInit* point, RvDOMPointReadOnly** result) { return ranvier_dom_dom_matrix_read_only_transform_point(target, point, result); }
+int32_t rv_dom_dom_matrix_read_only_to_string(RvDOMMatrixReadOnly* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_matrix_read_only_to_string(target, buffer, capacity, length); }
+int32_t rv_dom_dom_matrix_create(RvNode* target, const RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* init, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_create(target, init, result); }
+int32_t rv_dom_dom_matrix_get_a(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_a(target, result); }
+int32_t rv_dom_dom_matrix_set_a(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_a(target, value); }
+int32_t rv_dom_dom_matrix_get_b(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_b(target, result); }
+int32_t rv_dom_dom_matrix_set_b(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_b(target, value); }
+int32_t rv_dom_dom_matrix_get_c(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_c(target, result); }
+int32_t rv_dom_dom_matrix_set_c(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_c(target, value); }
+int32_t rv_dom_dom_matrix_get_d(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_d(target, result); }
+int32_t rv_dom_dom_matrix_set_d(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_d(target, value); }
+int32_t rv_dom_dom_matrix_get_e(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_e(target, result); }
+int32_t rv_dom_dom_matrix_set_e(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_e(target, value); }
+int32_t rv_dom_dom_matrix_get_f(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_f(target, result); }
+int32_t rv_dom_dom_matrix_set_f(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_f(target, value); }
+int32_t rv_dom_dom_matrix_get_m11(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m11(target, result); }
+int32_t rv_dom_dom_matrix_set_m11(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m11(target, value); }
+int32_t rv_dom_dom_matrix_get_m12(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m12(target, result); }
+int32_t rv_dom_dom_matrix_set_m12(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m12(target, value); }
+int32_t rv_dom_dom_matrix_get_m13(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m13(target, result); }
+int32_t rv_dom_dom_matrix_set_m13(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m13(target, value); }
+int32_t rv_dom_dom_matrix_get_m14(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m14(target, result); }
+int32_t rv_dom_dom_matrix_set_m14(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m14(target, value); }
+int32_t rv_dom_dom_matrix_get_m21(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m21(target, result); }
+int32_t rv_dom_dom_matrix_set_m21(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m21(target, value); }
+int32_t rv_dom_dom_matrix_get_m22(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m22(target, result); }
+int32_t rv_dom_dom_matrix_set_m22(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m22(target, value); }
+int32_t rv_dom_dom_matrix_get_m23(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m23(target, result); }
+int32_t rv_dom_dom_matrix_set_m23(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m23(target, value); }
+int32_t rv_dom_dom_matrix_get_m24(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m24(target, result); }
+int32_t rv_dom_dom_matrix_set_m24(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m24(target, value); }
+int32_t rv_dom_dom_matrix_get_m31(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m31(target, result); }
+int32_t rv_dom_dom_matrix_set_m31(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m31(target, value); }
+int32_t rv_dom_dom_matrix_get_m32(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m32(target, result); }
+int32_t rv_dom_dom_matrix_set_m32(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m32(target, value); }
+int32_t rv_dom_dom_matrix_get_m33(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m33(target, result); }
+int32_t rv_dom_dom_matrix_set_m33(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m33(target, value); }
+int32_t rv_dom_dom_matrix_get_m34(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m34(target, result); }
+int32_t rv_dom_dom_matrix_set_m34(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m34(target, value); }
+int32_t rv_dom_dom_matrix_get_m41(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m41(target, result); }
+int32_t rv_dom_dom_matrix_set_m41(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m41(target, value); }
+int32_t rv_dom_dom_matrix_get_m42(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m42(target, result); }
+int32_t rv_dom_dom_matrix_set_m42(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m42(target, value); }
+int32_t rv_dom_dom_matrix_get_m43(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m43(target, result); }
+int32_t rv_dom_dom_matrix_set_m43(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m43(target, value); }
+int32_t rv_dom_dom_matrix_get_m44(RvDOMMatrixReadOnly* target, double* result) { return ranvier_dom_dom_matrix_get_m44(target, result); }
+int32_t rv_dom_dom_matrix_set_m44(RvDOMMatrixReadOnly* target, double value) { return ranvier_dom_dom_matrix_set_m44(target, value); }
+int32_t rv_dom_dom_matrix_multiply_self(RvDOMMatrixReadOnly* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_multiply_self(target, other, result); }
+int32_t rv_dom_dom_matrix_pre_multiply_self(RvDOMMatrixReadOnly* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_pre_multiply_self(target, other, result); }
+int32_t rv_dom_dom_matrix_translate_self(RvDOMMatrixReadOnly* target, double tx, double ty, double tz, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_translate_self(target, tx, ty, tz, result); }
+int32_t rv_dom_dom_matrix_scale_self(RvDOMMatrixReadOnly* target, double scale_x, const double* scale_y, double scale_z, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_scale_self(target, scale_x, scale_y, scale_z, origin_x, origin_y, origin_z, result); }
+int32_t rv_dom_dom_matrix_scale3d_self(RvDOMMatrixReadOnly* target, double scale, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_scale3d_self(target, scale, origin_x, origin_y, origin_z, result); }
+int32_t rv_dom_dom_matrix_rotate_self(RvDOMMatrixReadOnly* target, double rot_x, const double* rot_y, const double* rot_z, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_rotate_self(target, rot_x, rot_y, rot_z, result); }
+int32_t rv_dom_dom_matrix_rotate_from_vector_self(RvDOMMatrixReadOnly* target, double x, double y, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_rotate_from_vector_self(target, x, y, result); }
+int32_t rv_dom_dom_matrix_rotate_axis_angle_self(RvDOMMatrixReadOnly* target, double x, double y, double z, double angle, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_rotate_axis_angle_self(target, x, y, z, angle, result); }
+int32_t rv_dom_dom_matrix_skew_x_self(RvDOMMatrixReadOnly* target, double sx, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_skew_x_self(target, sx, result); }
+int32_t rv_dom_dom_matrix_skew_y_self(RvDOMMatrixReadOnly* target, double sy, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_skew_y_self(target, sy, result); }
+int32_t rv_dom_dom_matrix_invert_self(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_invert_self(target, result); }
+int32_t rv_dom_dom_matrix_set_matrix_value(RvDOMMatrixReadOnly* target, RvNode* context, const uint8_t* transform_list, int32_t transform_list_length, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_set_matrix_value(target, context, transform_list, transform_list_length, result); }
 int32_t rv_dom_node_list_get_length(RvNodeList* target, uint32_t* result) { return ranvier_dom_node_list_get_length(target, result); }
 int32_t rv_dom_node_list_item(RvNodeList* target, uint32_t index, RvNode** result) { return ranvier_dom_node_list_item(target, index, result); }
 int32_t rv_dom_radio_node_list_get_value(RvNodeList* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_radio_node_list_get_value(target, buffer, capacity, length); }
@@ -1817,6 +1956,14 @@ int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t p
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor) { return ranvier_dom_css_register_property(target, descriptor); }
 int32_t rv_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result) { return ranvier_dom_window_get_computed_style(target, element, pseudo_element, pseudo_element_length, result); }
+int32_t rv_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_from_matrix(target, other, result); }
+int32_t rv_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_from_matrix(target, other, result); }
+int32_t rv_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result) { return ranvier_dom_dom_rect_read_only_from_rect(target, other, result); }
+int32_t rv_dom_dom_rect_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result) { return ranvier_dom_dom_rect_from_rect(target, other, result); }
+int32_t rv_dom_dom_point_read_only_from_point(RvNode* target, const RvDomDOMPointInit* other, RvDOMPointReadOnly** result) { return ranvier_dom_dom_point_read_only_from_point(target, other, result); }
+int32_t rv_dom_dom_point_from_point(RvNode* target, const RvDomDOMPointInit* other, RvDOMPointReadOnly** result) { return ranvier_dom_dom_point_from_point(target, other, result); }
+int32_t rv_dom_dom_quad_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMQuad** result) { return ranvier_dom_dom_quad_from_rect(target, other, result); }
+int32_t rv_dom_dom_quad_from_quad(RvNode* target, const RvDomDOMQuadInit* other, RvDOMQuad** result) { return ranvier_dom_dom_quad_from_quad(target, other, result); }
 int32_t rv_dom_css_style_value_parse(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvCSSStyleValue** result) { return ranvier_dom_css_style_value_parse(target, property, property_length, css_text, css_text_length, result); }
 int32_t rv_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result) { return ranvier_dom_css_style_value_parse_all(target, property, property_length, css_text, css_text_length, result); }
 int32_t rv_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result) { return ranvier_dom_style_property_map_read_only_entries(target, context, result); }

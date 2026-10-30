@@ -9,6 +9,12 @@ def token(name):
     return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name).lower()
 
 
+def union_arm_name(mapped):
+    if mapped.kind in ('union', 'sequence', 'pair'):
+        return mapped.ctype
+    return mapped.interface or mapped.enum or mapped.label or mapped.kind
+
+
 class ComplexGeneratorMixin:
     def complex_default(self, mapped, value):
         cpp = self.transport_cpp(mapped)
@@ -101,7 +107,7 @@ class ComplexGeneratorMixin:
             if mapped.kind == 'union':
                 lines += ['enum {']
                 for index, child in enumerate(mapped.subtypes):
-                    arm = child.interface or child.enum or child.label or child.kind
+                    arm = union_arm_name(child)
                     lines += [f'    RV_DOM_{token(name).upper()}_{token(arm).upper()} = {index + 1},']
                 lines += ['};']
             lines += [f'struct {name} {{', '    int32_t present;']
@@ -176,6 +182,8 @@ class ComplexGeneratorMixin:
             return [f'{target} = static_cast<{self.transport_ctype(mapped)}>({expression});']
         if kind in ('node', 'event', 'object'):
             root = {'node': 'Node', 'event': 'Event'}.get(kind) or self.world.cpp_class(mapped.root)
+            if root in self.tracked_roots:
+                return [f'storeTrackedHandle<{root}, {mapped.cls}>({expression}, &{target});']
             return [f'storeHandle<{root}>({expression}, &{target});']
         raise self.unsupported_type(f'{kind} result in a union or sequence')
 
@@ -188,6 +196,8 @@ class ComplexGeneratorMixin:
             return [f'std::free(const_cast<char*>({expression}));']
         if mapped.kind in ('node', 'event', 'object'):
             root = {'node': 'Node', 'event': 'Event'}.get(mapped.kind) or self.world.cpp_class(mapped.root)
+            if root in self.tracked_roots:
+                return [f'if ({expression}) releaseTrackedHandle(reinterpret_cast<{root}*>({expression}));']
             return [f'if ({expression}) reinterpret_cast<{root}*>({expression})->deref();']
         return []
 
@@ -311,7 +321,7 @@ class ComplexGeneratorMixin:
         for name, mapped in self.complex_used.items():
             if mapped.kind == 'union':
                 for index, child in enumerate(mapped.subtypes):
-                    arm = child.interface or child.enum or child.label or child.kind
+                    arm = union_arm_name(child)
                     constant = f'RV_DOM_{token(name).upper()}_{token(arm).upper()}'
                     lines += ['', '[<Literal>]', f'let {constant} = {index + 1}']
             lines += ['', f'/// <summary>ABI transport for {mapped.label}; result contents are owned until the matching release call.</summary>',
