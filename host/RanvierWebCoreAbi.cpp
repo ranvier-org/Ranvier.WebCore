@@ -1,6 +1,7 @@
 #include "config.h"
 #include "RanvierWebCoreAbi.h"
 #include "dom/RanvierDomGlue.h"
+#include "RanvierSvgViewGlue.h"
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
@@ -1117,6 +1118,8 @@ int32_t rv_abi_has(const char* feature)
         return 0;
     if (!std::strcmp(feature, "capabilities"))
         return 1;
+    if (!std::strcmp(feature, "svg-view-selection"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1262,6 +1265,17 @@ int32_t rv_host_load_svg(RvHost* host, const char* svg)
     if (host->accessibility)
         host->document().axObjectCache();
     return RV_OK;
+}
+
+int32_t rv_host_select_svg_view(RvHost* host, const char* fragment, int32_t* selected)
+{
+    if (!host || !fragment || !selected)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_host_select_svg_view(reinterpret_cast<RvNode*>(&host->document()), fragment, selected);
 }
 
 int32_t rv_host_scripts_enabled(RvHost* host)

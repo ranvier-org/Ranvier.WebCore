@@ -22,6 +22,8 @@ static constexpr const char* capabilityFacilityNames[] = {
     "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications"
 };
 
+static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
+
 struct CapabilityResult {
     int facts[5] { -1, -1, -1, -1, -1 };
     int kind { 0 };
@@ -230,7 +232,7 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     else if (!std::strcmp(name, "accessibility")) { result.facts[1] = 1; result.boolean(host.accessibility); }
     else if (!std::strcmp(name, "accessibility-events")) { result.facts[1] = rv_abi_has(name); result.boolean(!!host.axCallback); }
     else if (!std::strcmp(name, "accessibility-uia")) result.facts[1] = rv_abi_has(name);
-    else if (capabilityContains(capabilityAbiNames, name) && rv_abi_has(name)) result.facts[1] = 1;
+    else if (capabilityContains(capabilityHostFacilityNames, name)) result.facts[1] = 1;
     if (result.kind == 1) result.facts[2] = result.number ? 1 : 0;
     return result;
 }
