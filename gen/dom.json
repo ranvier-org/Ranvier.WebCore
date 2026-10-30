@@ -61,11 +61,21 @@
         "CSSStyleValue"
     ],
     "complexStringSpans": [
-        "USVStringOrCSSOMVariableReferenceValue"
+        "USVStringOrCSSOMVariableReferenceValue",
+        "CSSStyleValueOrUSVString"
+    ],
+    "complexNullableElements": [
+        "CSSStyleValue"
     ],
     "interfaceStringInputs": {
         "CSSOMKeywordValue": "utf8-lengths",
-        "CSSOMVariableReferenceValue": "utf8-lengths"
+        "CSSOMVariableReferenceValue": "utf8-lengths",
+        "StylePropertyMapReadOnly": "utf8-lengths",
+        "StylePropertyMap": "utf8-lengths"
+    },
+    "objectContexts": {
+        "StylePropertyMapReadOnly": "Document",
+        "StylePropertyMap": "Document"
     },
     "finiteNumberInputs": [
         "CSSUnitValue"
@@ -180,6 +190,8 @@
         "CSSStyleImageValue",
         "CSSUnparsedValue",
         "CSSOMVariableReferenceValue",
+        "StylePropertyMapReadOnly",
+        "StylePropertyMap",
         "CSSPositionTryRule",
         "CSSPositionTryDescriptors",
         "CSSStartingStyleRule",
@@ -289,7 +301,8 @@
         "CSSRule",
         "StyleSheet",
         "CSSStyleDeclaration",
-        "CSSStyleValue"
+        "CSSStyleValue",
+        "StylePropertyMapReadOnly"
     ],
     "nodeCastTags": {
         "HTMLModElement": [
@@ -418,6 +431,11 @@
             ],
             "feature": "dom-css-style-values",
             "stringInputs": "utf8-lengths"
+        }
+    },
+    "iterableBindings": {
+        "StylePropertyMapReadOnly": {
+            "feature": "dom-css-style-map-entries"
         }
     },
     "windowBindings": {

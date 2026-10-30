@@ -42,6 +42,8 @@ WEBCORE_EXPORT void ranvier_dom_css_style_value_release(RvCSSStyleValue*);
 WEBCORE_EXPORT RvCSSStyleValue* ranvier_dom_css_style_value_retain(RvCSSStyleValue*);
 WEBCORE_EXPORT void ranvier_dom_cssom_variable_reference_value_release(RvCSSOMVariableReferenceValue*);
 WEBCORE_EXPORT RvCSSOMVariableReferenceValue* ranvier_dom_cssom_variable_reference_value_retain(RvCSSOMVariableReferenceValue*);
+WEBCORE_EXPORT void ranvier_dom_style_property_map_read_only_release(RvStylePropertyMapReadOnly*);
+WEBCORE_EXPORT RvStylePropertyMapReadOnly* ranvier_dom_style_property_map_read_only_retain(RvStylePropertyMapReadOnly*);
 WEBCORE_EXPORT void ranvier_dom_css_style_declaration_release(RvCSSStyleDeclaration*);
 WEBCORE_EXPORT RvCSSStyleDeclaration* ranvier_dom_css_style_declaration_retain(RvCSSStyleDeclaration*);
 WEBCORE_EXPORT void ranvier_dom_dom_token_list_release(RvDOMTokenList*);
@@ -84,14 +86,21 @@ WEBCORE_EXPORT void ranvier_dom_sequence_usv_string_release(RvDomSequenceUSVStri
 WEBCORE_EXPORT void ranvier_dom_union_usv_string_or_cssom_variable_reference_value_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValue* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_usv_string_or_cssom_variable_reference_value_release(RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* value);
 WEBCORE_EXPORT void ranvier_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* value);
+WEBCORE_EXPORT void ranvier_dom_union_undefined_or_css_style_value_release(RvDomUnionUndefinedOrCSSStyleValue* value);
+WEBCORE_EXPORT void ranvier_dom_sequence_css_style_value_nullable_element_release(RvDomSequenceCSSStyleValueNullableElement* value);
+WEBCORE_EXPORT void ranvier_dom_union_css_style_value_or_usv_string_release(RvDomUnionCSSStyleValueOrUSVString* value);
+WEBCORE_EXPORT void ranvier_dom_sequence_css_style_value_or_usv_string_release(RvDomSequenceCSSStyleValueOrUSVString* value);
 WEBCORE_EXPORT void ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
+WEBCORE_EXPORT void ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
+WEBCORE_EXPORT void ranvier_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 WEBCORE_EXPORT int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_style_sheet_get_interface_name(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_value_get_interface_name(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_read_only_get_interface_name(RvStylePropertyMapReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_node_get_node_type(RvNode* target, uint16_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_node_get_node_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_node_get_base_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -405,6 +414,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_element_insert_adjacent_html(RvNode* target, 
 WEBCORE_EXPORT int32_t ranvier_dom_element_set_pointer_capture(RvNode* target, int32_t pointer_id);
 WEBCORE_EXPORT int32_t ranvier_dom_element_release_pointer_capture(RvNode* target, int32_t pointer_id);
 WEBCORE_EXPORT int32_t ranvier_dom_element_has_pointer_capture(RvNode* target, int32_t pointer_id, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_element_computed_style_map(RvNode* target, RvStylePropertyMapReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_element_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 WEBCORE_EXPORT int32_t ranvier_dom_element_after(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 WEBCORE_EXPORT int32_t ranvier_dom_element_replace_with(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
@@ -493,6 +503,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_html_element_set_autofocus(RvNode* target, in
 WEBCORE_EXPORT int32_t ranvier_dom_html_element_get_tab_index(RvNode* target, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_html_element_set_tab_index(RvNode* target, int32_t value);
 WEBCORE_EXPORT int32_t ranvier_dom_html_element_get_style(RvNode* target, RvCSSStyleDeclaration** result);
+WEBCORE_EXPORT int32_t ranvier_dom_html_element_get_attribute_style_map(RvNode* target, RvStylePropertyMapReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_html_element_click(RvNode* target);
 WEBCORE_EXPORT int32_t ranvier_dom_html_element_show_popover(RvNode* target, const RvDomShowPopoverOptions* options);
 WEBCORE_EXPORT int32_t ranvier_dom_html_element_hide_popover(RvNode* target);
@@ -1237,6 +1248,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_svg_element_set_autofocus(RvNode* target, int
 WEBCORE_EXPORT int32_t ranvier_dom_svg_element_get_tab_index(RvNode* target, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_svg_element_set_tab_index(RvNode* target, int32_t value);
 WEBCORE_EXPORT int32_t ranvier_dom_svg_element_get_style(RvNode* target, RvCSSStyleDeclaration** result);
+WEBCORE_EXPORT int32_t ranvier_dom_svg_element_get_attribute_style_map(RvNode* target, RvStylePropertyMapReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_svg_element_focus(RvNode* target, const RvDomFocusOptions* options);
 WEBCORE_EXPORT int32_t ranvier_dom_svg_element_blur(RvNode* target);
 WEBCORE_EXPORT int32_t ranvier_dom_math_ml_element_get_dataset(RvNode* target, RvDOMStringMap** result);
@@ -1247,6 +1259,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_math_ml_element_set_autofocus(RvNode* target,
 WEBCORE_EXPORT int32_t ranvier_dom_math_ml_element_get_tab_index(RvNode* target, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_math_ml_element_set_tab_index(RvNode* target, int32_t value);
 WEBCORE_EXPORT int32_t ranvier_dom_math_ml_element_get_style(RvNode* target, RvCSSStyleDeclaration** result);
+WEBCORE_EXPORT int32_t ranvier_dom_math_ml_element_get_attribute_style_map(RvNode* target, RvStylePropertyMapReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_math_ml_element_focus(RvNode* target, const RvDomFocusOptions* options);
 WEBCORE_EXPORT int32_t ranvier_dom_math_ml_element_blur(RvNode* target);
 WEBCORE_EXPORT int32_t ranvier_dom_html_style_element_get_disabled(RvNode* target, int32_t* result);
@@ -1339,6 +1352,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_css_style_rule_get_selector_text(RvCSSRule* t
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_rule_set_selector_text(RvCSSRule* target, const char* value);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result);
+WEBCORE_EXPORT int32_t ranvier_dom_css_style_rule_get_style_map(RvCSSRule* target, RvStylePropertyMapReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_rule_insert_rule(RvCSSRule* target, const char* rule, uint32_t index, uint32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_rule_delete_rule(RvCSSRule* target, uint32_t index);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_properties_get_css_float(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
@@ -1472,6 +1486,14 @@ WEBCORE_EXPORT int32_t ranvier_dom_cssom_variable_reference_value_create(RvNode*
 WEBCORE_EXPORT int32_t ranvier_dom_cssom_variable_reference_value_get_variable(RvCSSOMVariableReferenceValue* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_cssom_variable_reference_value_set_variable(RvCSSOMVariableReferenceValue* target, const uint8_t* value, int32_t value_length);
 WEBCORE_EXPORT int32_t ranvier_dom_cssom_variable_reference_value_get_fallback(RvCSSOMVariableReferenceValue* target, RvCSSStyleValue** result);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_read_only_get_size(RvStylePropertyMapReadOnly* target, uint32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_read_only_get(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, RvDomUnionUndefinedOrCSSStyleValue* result);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_read_only_get_all(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, RvDomSequenceCSSStyleValueNullableElement* result);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_read_only_has(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, int32_t* result);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_set(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, const RvDomSequenceCSSStyleValueOrUSVString* values);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_append(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length, const RvDomSequenceCSSStyleValueOrUSVString* values);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_delete(RvStylePropertyMapReadOnly* target, RvNode* context, const uint8_t* property, int32_t property_length);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_clear(RvStylePropertyMapReadOnly* target);
 WEBCORE_EXPORT int32_t ranvier_dom_css_position_try_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_css_position_try_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_position_try_descriptors_get_margin(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
@@ -1817,5 +1839,6 @@ WEBCORE_EXPORT int32_t ranvier_dom_css_register_property(RvNode* target, const R
 WEBCORE_EXPORT int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_value_parse(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvCSSStyleValue** result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result);
 
 }

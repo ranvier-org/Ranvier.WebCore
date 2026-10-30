@@ -59,6 +59,153 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_selected_variadic_style_values_validate_reference_arms_before_webidl_coercion(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface StylePropertyMap { undefined set(USVString property, (CSSStyleValue or USVString)... values); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'StylePropertyMap']
+        config['complexStringSpans'] = ['CSSStyleValueOrUSVString']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        interfaces = generator.interfaces()
+        self.assertTrue('if isNull (box value) then\n            nullArg "value"' in interfaces)
+        self.assertTrue('if not (isCSSStyleValue (box value)) then' in interfaces)
+        self.assertTrue('invalidArg "value" "Expected a CSSStyleValue."' in interfaces)
+        self.assertTrue('CSSStyleValueOrUSVString.USVString value -> box (normalizeUSVString value)' in interfaces)
+
+    def test_configured_iterable_snapshot_owns_keys_and_nullable_value_arrays(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface StylePropertyMapReadOnly {
+    iterable<USVString, sequence<CSSStyleValue?>>;
+    readonly attribute unsigned long size;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'StylePropertyMapReadOnly']
+        config['objectContexts'] = {'StylePropertyMapReadOnly': 'Document'}
+        config['complexNullableElements'] = ['CSSStyleValue']
+        config['iterableBindings'] = {'StylePropertyMapReadOnly': {'feature': 'dom-css-style-map-entries'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        function = next(item for item in generator.functions if item.name == 'style_property_map_read_only_entries')
+        self.assertEqual('iterator_snapshot', function.kind)
+        self.assertEqual([('RvStylePropertyMapReadOnly*', 'target'), ('RvNode*', 'context')], function.params[:2])
+        self.assertEqual('pair', function.returns.subtypes[0].kind)
+        pair = function.returns.subtypes[0]
+        self.assertTrue(pair.subtypes[0].string_spans)
+        self.assertTrue(pair.subtypes[1].subtypes[0].nullable)
+        glue = generator.glue()
+        self.assertTrue('impl->createIterator(&document.get())' in glue)
+        self.assertTrue('entries.append(WTF::move(*entry))' in glue)
+        self.assertTrue('value.key' in glue and 'value.value' in glue)
+        self.assertTrue('std::free(const_cast<uint8_t*>(value->key.data))' in glue)
+        self.assertTrue('clearRvDomSequenceCSSStyleValueNullableElement(&value->value)' in glue)
+        self.assertNotIn('abstract member entries', generator.interfaces())
+        model = json.loads(generator.api_model())
+        operation = next(item for item in model['functions'] if item['function'] == 'rv_dom_style_property_map_read_only_entries')
+        self.assertEqual('facade', operation['binding'])
+        self.assertEqual('iterable', operation['sourceKind'])
+
+    def test_selected_nullable_sequence_elements_do_not_reuse_the_nonnullable_container(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+partial interface Node {
+    sequence<CSSStyleValue> values();
+    sequence<CSSStyleValue?> nullableValues();
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue']
+        config['complexNullableElements'] = ['CSSStyleValue']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        plain = next(item.returns for item in generator.functions if item.name == 'node_values')
+        nullable = next(item.returns for item in generator.functions if item.name == 'node_nullable_values')
+        self.assertEqual('RvDomSequenceCSSStyleValue', plain.ctype)
+        self.assertEqual('RvDomSequenceCSSStyleValueNullableElement', nullable.ctype)
+        self.assertFalse(generator.complex_used[plain.ctype].subtypes[0].nullable)
+        self.assertTrue(generator.complex_used[nullable.ctype].subtypes[0].nullable)
+
+    def test_configured_non_node_callwith_uses_an_explicit_checked_document(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface StylePropertyMapReadOnly {
+    [CallWith=CurrentScriptExecutionContext] boolean has(USVString property);
+    readonly attribute unsigned long size;
+};
+partial interface Node { [CallWith=CurrentDocument] boolean hasInDocument(USVString property); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['StylePropertyMapReadOnly']
+        unconfigured = domgen.Generator(domgen.World(self.source, config))
+        unconfigured.lock = {}
+        unconfigured.lock_structs = {}
+        unconfigured.run()
+        self.assertFalse(any(item.name == 'style_property_map_read_only_has' for item in unconfigured.functions))
+        config['objectContexts'] = {'StylePropertyMapReadOnly': 'Document'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        function = next(item for item in generator.functions if item.name == 'style_property_map_read_only_has')
+        self.assertEqual([('RvStylePropertyMapReadOnly*', 'target'), ('RvNode*', 'context')], function.params[:2])
+        body = '\n'.join(function.body)
+        self.assertTrue('!context' in body)
+        self.assertTrue('dynamicDowncast<Document>(*nodeOf(context))' in body)
+        self.assertTrue('return RV_ERR_WRONG_INTERFACE;' in body)
+        self.assertTrue('Ref document = contextDocument.releaseNonNull();' in body)
+        self.assertTrue('impl->has(document.get(),' in body)
+        model = json.loads(generator.api_model())
+        operation = next(item for item in model['functions'] if item['function'] == 'rv_dom_style_property_map_read_only_has')
+        self.assertEqual('Document', operation['contextReceiver'])
+        size = next(item for item in generator.functions if item.name == 'style_property_map_read_only_get_size')
+        self.assertFalse(any(name == 'context' for _, name in size.params))
+        node = next(item for item in generator.functions if item.name == 'node_has_in_document')
+        self.assertFalse(any(name == 'context' for _, name in node.params))
+        self.assertTrue('Ref document = impl->document();' in '\n'.join(node.body))
+        config['objectContexts'] = {'StylePropertyMapReadOnly': 'Element'}
+        invalid = domgen.Generator(domgen.World(self.source, config))
+        invalid.lock = {}
+        invalid.lock_structs = {}
+        with self.assertRaisesRegex(SystemExit, 'object context must be a scoped Document'):
+            invalid.run()
+
+    def test_undefined_result_union_preserves_a_tagged_monostate_without_a_handle(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+partial interface Node { (undefined or CSSStyleValue) maybeValue(); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        header = generator.header()
+        interfaces = generator.interfaces()
+        result = next(item.returns for item in generator.functions if item.name == 'node_maybe_value')
+        self.assertEqual('Variant<std::monostate, Ref<CSSStyleValue>>', generator.transport_cpp(result))
+        self.assertIn('int32_t arm0;', header)
+        self.assertIn('result->arm0 = 0;', glue)
+        self.assertIn('UndefinedOrCSSStyleValue.Undefined ()', interfaces)
+        self.assertNotIn('isUndefined arm', interfaces)
+        self.assertIn('$0 === undefined', interfaces)
+        self.assertTrue("globalThis.CSSStyleValue.prototype.toString.call(v)" in interfaces)
+
     def test_selected_reference_segment_overload_rejects_null_and_checks_the_engine_brand(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

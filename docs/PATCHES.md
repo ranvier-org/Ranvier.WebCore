@@ -1,12 +1,12 @@
 # The patch series
 
-`patches/series` lists nineteen patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012, 0014, 0015, 0016, 0017 and 0018, changes nothing unless
+`patches/series` lists twenty-two patches, applied in order over the WebKit commit in `pins.json` by
+`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012 and 0014 through 0021, changes nothing unless
 its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
 WebKit's feature implementations. 0010 changes which symbols WebCore exports and which members the host may override,
 and no behavior. 0012 adds the sources an embedder names to WebCore. 0013's option is set for macOS in every
 flavor, because the package always loads WebCore outside its framework bundle (`config/mac.cmake`).
-0014, 0015, 0016, 0017 and 0018 correct stylesheet mutation and retained-object behavior in every flavor.
+0014 through 0021 correct stylesheet mutation, typed lists and retained-object behavior in every flavor.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in these places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
@@ -19,7 +19,9 @@ and also changes `PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjec
 `CSSCounterStyleRule.h`. 0017 changes `CSSRule.h`, `CSSRule.cpp`, `CSSFontFaceRule.h`,
 `PropertySetCSSDescriptors.h`, `PropertySetCSSDescriptors.cpp` and `CSSPositionTryDescriptors.cpp`.
 0018 changes `css/parser/CSSParser.cpp` so an explicit custom-property CSSOM assignment can remove importance.
-The patches touch 88 files in all.
+0019 changes `css/typedom/DeclaredStylePropertyMap.cpp`. 0020 changes `css/CSSProperties.json`.
+0021 changes `css/typedom/DeclaredStylePropertyMap.cpp` and `dom/StyledElement.cpp`.
+The patches touch 91 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -45,6 +47,9 @@ The sizes are the reduction each patch measured when it was added, on Windows x6
 | 0016-counter-style-name | none, always applies | | correctness repair |
 | 0017-detached-cssom-context | none, always applies | | correctness repair |
 | 0018-cssom-custom-property-priority | none, always applies | | correctness repair |
+| 0019-declared-style-map-cow | none, always applies | | correctness repair |
+| 0020-background-typed-list-separators | none, always applies | | correctness repair |
+| 0021-typed-custom-property-priority | none, always applies | | correctness repair |
 
 ## Conventions
 
@@ -305,6 +310,24 @@ Detached position-try/font-face descriptor edits copy shared backing rules/prope
 The single-custom-property CSSOM parser replaces its parsed property directly, rather than applying the declaration-block cascade merge helper. Explicit assignments can therefore remove importance, including when the value is unchanged. Invalid parsing remains a no-op, and stylesheet declaration blocks keep their existing important-precedence rules.
 
 `tests/abi/custom_properties.py` checks registered and unregistered property values, priority and computed dimensions, same-value importance removal, invalid-priority/token preservation, empty-value removal and duplicate stylesheet declarations.
+
+## 0019-declared-style-map-cow
+
+Declared typed style maps enter the rule mutation scope before acquiring the backing StyleRule. The scope can clone shared stylesheet contents and reattach the owning CSSStyleRule. All six mutation paths now use that current backing rule, preserving isolation of another cache-sharing stylesheet and ensuring edits affect the owning sheet and layout. An expired weak owner still takes the existing no-op/false path through the nullable rule mutation scope.
+
+`tests/abi/style_property_maps.py` retains maps from identical sheets, edits one and verifies its current values, the other complete rule and actual geometry. `tests/abi/declared_style_maps.py` covers all six mutators with a fresh cache-sharing pair for each, complete-sheet isolation, wrapper identity, invalid-mutation preservation and expired weak owners.
+
+## 0020-background-typed-list-separators
+
+The metadata for background-image, background-clip, background-origin and background-size now declares a comma outer separator, matching their existing repeated-layer grammars. Typed OM set/append consume this generated separator. Inner background-size pairs keep their spaces; ordinary parser grammars and other legitimate space-separated properties are unchanged.
+
+The focused typed-map fixture checks image set/append ordering, all four background properties, inner size pairs, animation-name comma lists and grid-auto-columns space lists. Private regeneration changes only the four separator returns in CSSPropertyNames.cpp and its gperf source; every generated header and other derived output is unchanged. Cached derived files are not overwritten.
+
+## 0021-typed-custom-property-priority
+
+Explicit typed custom-property assignment replaces the declaration directly instead of using the parser cascade merge helper, which preserved an old important value. This applies to declared maps and the CSSValue overload of StyledElement's inline custom setter; the unrelated string overload is unchanged. The changed inline overload is only called by Typed OM in this source pin.
+
+`tests/abi/declared_style_maps.py` checks both changed-value and same-value importance removal in declared and inline maps, the complete cache-sharing copy and actual var-dependent geometry. The stylesheet parser's important-precedence semantics remain unchanged.
 
 ## Working on the series
 

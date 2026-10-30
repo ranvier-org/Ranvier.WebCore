@@ -1,0 +1,41 @@
+Subject: [PATCH] Use comma separators for layered Typed OM background lists
+
+diff --git a/Source/WebCore/css/CSSProperties.json b/Source/WebCore/css/CSSProperties.json
+--- a/Source/WebCore/css/CSSProperties.json
++++ b/Source/WebCore/css/CSSProperties.json
+@@ -2280,7 +2280,7 @@
+                 "coordinated-value-list-property-item-type": "FillBox",
+                 "computed-style-storage-container": "opaque",
+                 "computed-style-storage-path": ["m_nonInheritedData", "backgroundData", "background"],
+-                "separator": " ",
++                "separator": ",",
+                 "disables-native-appearance": true,
+                 "parser-grammar": "<single-background-clip>#"
+             },
+@@ -2326,7 +2326,7 @@
+                 "computed-style-storage-path": ["m_nonInheritedData", "backgroundData", "background"],
+                 "disables-native-appearance": true,
+                 "medium-priority": true,
+-                "separator": " ",
++                "separator": ",",
+                 "parser-grammar": "<single-background-image>#"
+             },
+             "specification": {
+@@ -2350,7 +2350,7 @@
+                 "computed-style-storage-container": "opaque",
+                 "computed-style-storage-path": ["m_nonInheritedData", "backgroundData", "background"],
+                 "disables-native-appearance": true,
+-                "separator": " ",
++                "separator": ",",
+                 "parser-grammar": "<single-background-origin>#"
+             },
+             "specification": {
+@@ -2449,7 +2449,7 @@
+                 "computed-style-storage-container": "opaque",
+                 "computed-style-storage-path": ["m_nonInheritedData", "backgroundData", "background"],
+                 "disables-native-appearance": true,
+-                "separator": " ",
++                "separator": ",",
+                 "parser-grammar": "<single-background-size>#"
+             },
+             "specification": {

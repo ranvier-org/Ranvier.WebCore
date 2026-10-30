@@ -16,12 +16,9 @@ type internal DomDictionaryAttribute() =
     inherit Attribute()
 #endif
 
-/// <summary>StylePropertyMapReadOnly in the scoped DOM interface model.</summary>
-[<AllowNullLiteral>]
-type StylePropertyMapReadOnly = interface end
-
 /// <summary>SVGTextContentElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGTextContentElement =
+[<AllowNullLiteral>]
+type SVGTextContentElement =
     inherit SVGGraphicsElement
 
 /// <summary>SVGTextPositioningElement in the scoped DOM interface model.</summary>
@@ -494,6 +491,8 @@ and [<AllowNullLiteral>] Element =
     abstract member releasePointerCapture: pointerId: int -> unit
     /// <summary>Element.hasPointerCapture.</summary>
     abstract member hasPointerCapture: pointerId: int -> bool
+    /// <summary>Element.computedStyleMap.</summary>
+    abstract member computedStyleMap: unit -> StylePropertyMapReadOnly
     /// <summary>Element.role.</summary>
     abstract member role: string with get, set
     /// <summary>Element.setHTMLUnsafe.</summary>
@@ -1915,6 +1914,8 @@ and [<AllowNullLiteral>] CSSStyleRule =
     abstract member insertRule: rule: string * ?index: uint32 -> uint32
     /// <summary>CSSStyleRule.deleteRule.</summary>
     abstract member deleteRule: index: uint32 -> unit
+    /// <summary>CSSStyleRule.styleMap.</summary>
+    abstract member styleMap: StylePropertyMap with get
 
 /// <summary>CSSStyleProperties in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CSSStyleProperties =
@@ -2219,6 +2220,47 @@ and [<AllowNullLiteral>] CSSVariableReferenceValue =
 
     /// <summary>CSSVariableReferenceValue.fallback.</summary>
     abstract member fallback: CSSUnparsedValue with get
+
+/// <summary>StylePropertyMapReadOnly in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] StylePropertyMapReadOnly =
+
+    /// <summary>StylePropertyMapReadOnly.get.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.get($1)")>]
+    abstract member __ranvier_get: property: string -> obj
+#else
+    abstract member get: property: string -> UndefinedOrCSSStyleValue
+#endif
+    /// <summary>StylePropertyMapReadOnly.getAll.</summary>
+    abstract member getAll: property: string -> (CSSStyleValue) array
+    /// <summary>StylePropertyMapReadOnly.has.</summary>
+    abstract member has: property: string -> bool
+    /// <summary>StylePropertyMapReadOnly.size.</summary>
+    abstract member size: uint32 with get
+
+/// <summary>StylePropertyMap in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] StylePropertyMap =
+    inherit StylePropertyMapReadOnly
+
+    /// <summary>StylePropertyMap.set.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.set($1, ...$2)")>]
+    abstract member __ranvier_set: property: string * values: obj array -> unit
+#else
+    abstract member set: property: string * [<System.ParamArray>] values: CSSStyleValueOrUSVString array -> unit
+#endif
+
+    /// <summary>StylePropertyMap.append.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.append($1, ...$2)")>]
+    abstract member __ranvier_append: property: string * values: obj array -> unit
+#else
+    abstract member append: property: string * [<System.ParamArray>] values: CSSStyleValueOrUSVString array -> unit
+#endif
+    /// <summary>StylePropertyMap.delete.</summary>
+    abstract member delete: property: string -> unit
+    /// <summary>StylePropertyMap.clear.</summary>
+    abstract member clear: unit -> unit
 
 /// <summary>CSSPositionTryRule in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CSSPositionTryRule =
@@ -3268,10 +3310,6 @@ and [<AllowNullLiteral>] SecurityPolicyViolationEvent =
 and [<AllowNullLiteral>] StorageEvent =
     inherit Event
 
-/// <summary>StylePropertyMap in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] StylePropertyMap =
-    inherit StylePropertyMapReadOnly
-
 /// <summary>SubmitEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SubmitEvent =
     inherit Event
@@ -3470,6 +3508,8 @@ and [<AllowNullLiteral>] GlobalEventHandlers = interface end
 and [<AllowNullLiteral>] ElementCSSInlineStyle =
     /// <summary>ElementCSSInlineStyle.style.</summary>
     abstract member style: CSSStyleProperties with get
+    /// <summary>ElementCSSInlineStyle.attributeStyleMap.</summary>
+    abstract member attributeStyleMap: StylePropertyMap with get
 
 /// <summary>ElementContentEditable in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ElementContentEditable =
@@ -3571,6 +3611,16 @@ and [<RequireQualifiedAccess>] ElementOrText =
 and [<RequireQualifiedAccess>] USVStringOrCSSOMVariableReferenceValue =
     | USVString of string
     | CSSOMVariableReferenceValue of CSSVariableReferenceValue
+
+/// <summary>UndefinedOrCSSStyleValue in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UndefinedOrCSSStyleValue =
+    | Undefined of unit
+    | CSSStyleValue of CSSStyleValue
+
+/// <summary>CSSStyleValueOrUSVString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] CSSStyleValueOrUSVString =
+    | CSSStyleValue of CSSStyleValue
+    | USVString of string
 
 /// <summary>ShadowRootOrGetComposedRangesOptions in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] ShadowRootOrGetComposedRangesOptions =
@@ -3721,12 +3771,20 @@ and [<DomStringEnum; RequireQualifiedAccess>] ScrollLogicalPosition =
 #if FABLE_COMPILER
 [<AutoOpen>]
 module BrowserUnionAdapters =
+    [<Fable.Core.Emit("$0 === undefined")>]
+    let private isUndefinedUnionValue (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
     [<Fable.Core.Emit("((v)=>String(v==null?'null':v).toWellFormed())($0)")>]
     let private normalizeUSVString (_: string) : string =
         Fable.Core.Util.jsNative
 
     [<Fable.Core.Emit("((v)=>{if(v==null)return false;try{Object.getOwnPropertyDescriptor(globalThis.CSSVariableReferenceValue.prototype,'variable').get.call(v);return true;}catch{return false;} })($0)")>]
     let private isCSSOMVariableReferenceValue (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
+    [<Fable.Core.Emit("((v)=>{if(v==null)return false;try{globalThis.CSSStyleValue.prototype.toString.call(v);return true;}catch{return false;}})($0)")>]
+    let private isCSSStyleValue (_: obj) : bool =
         Fable.Core.Util.jsNative
 
     [<Fable.Core.Emit("$0 != null && $0.nodeType === 1")>]
@@ -3798,9 +3856,19 @@ module BrowserUnionAdapters =
         | ElementOrText.Text value -> box value
 
     let private boxUSVStringOrCSSOMVariableReferenceValue (value: USVStringOrCSSOMVariableReferenceValue) : obj =
+        if isNull (box value) then
+            nullArg "value"
+
         match value with
         | USVStringOrCSSOMVariableReferenceValue.USVString value -> box (normalizeUSVString value)
-        | USVStringOrCSSOMVariableReferenceValue.CSSOMVariableReferenceValue value -> box value
+        | USVStringOrCSSOMVariableReferenceValue.CSSOMVariableReferenceValue value ->
+            if isNull (box value) then
+                nullArg "value"
+
+            if not (isCSSOMVariableReferenceValue (box value)) then
+                invalidArg "value" "Expected a CSSVariableReferenceValue."
+
+            box value
 
     let private unboxUSVStringOrCSSOMVariableReferenceValue (value: obj) : USVStringOrCSSOMVariableReferenceValue =
         match value with
@@ -3808,6 +3876,32 @@ module BrowserUnionAdapters =
         | arm when isCSSOMVariableReferenceValue arm ->
             USVStringOrCSSOMVariableReferenceValue.CSSOMVariableReferenceValue (unbox<CSSVariableReferenceValue> arm)
         | _ -> failwith "Unexpected DOM union result"
+
+    let private boxUndefinedOrCSSStyleValue (value: UndefinedOrCSSStyleValue) : obj =
+        match value with
+        | UndefinedOrCSSStyleValue.Undefined value -> Fable.Core.JsInterop.emitJsExpr () "undefined"
+        | UndefinedOrCSSStyleValue.CSSStyleValue value -> box value
+
+    let private unboxUndefinedOrCSSStyleValue (value: obj) : UndefinedOrCSSStyleValue =
+        match value with
+        | arm when isUndefinedUnionValue arm -> UndefinedOrCSSStyleValue.Undefined ()
+        | arm when isCSSStyleValue arm -> UndefinedOrCSSStyleValue.CSSStyleValue (unbox<CSSStyleValue> arm)
+        | _ -> failwith "Unexpected DOM union result"
+
+    let private boxCSSStyleValueOrUSVString (value: CSSStyleValueOrUSVString) : obj =
+        if isNull (box value) then
+            nullArg "value"
+
+        match value with
+        | CSSStyleValueOrUSVString.CSSStyleValue value ->
+            if isNull (box value) then
+                nullArg "value"
+
+            if not (isCSSStyleValue (box value)) then
+                invalidArg "value" "Expected a CSSStyleValue."
+
+            box value
+        | CSSStyleValueOrUSVString.USVString value -> box (normalizeUSVString value)
 
     let private boxShadowRootOrGetComposedRangesOptions (value: ShadowRootOrGetComposedRangesOptions) : obj =
         match value with
@@ -3940,6 +4034,21 @@ module BrowserUnionAdapters =
                 invalidArg "val" "Expected a CSSVariableReferenceValue."
 
             this.__ranvier_setItem (index, box ``val``)
+
+
+    type StylePropertyMapReadOnly with
+        member this.get(property: string) : UndefinedOrCSSStyleValue =
+            let value = this.__ranvier_get (property)
+
+            unboxUndefinedOrCSSStyleValue value
+
+
+    type StylePropertyMap with
+        member this.set(property: string, [<System.ParamArray>] values: CSSStyleValueOrUSVString array) : unit =
+            this.__ranvier_set (property, values |> Array.map boxCSSStyleValueOrUSVString)
+
+        member this.append(property: string, [<System.ParamArray>] values: CSSStyleValueOrUSVString array) : unit =
+            this.__ranvier_append (property, values |> Array.map boxCSSStyleValueOrUSVString)
 
 
     type DOMSelection with

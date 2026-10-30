@@ -5,16 +5,18 @@ as versioned native packages. `Ranvier.WebCore.Native` aggregates the five runti
 `Ranvier.WebCore` provides the canonical managed interop. Ranvier's WebCore view loads the native host
 through those declarations rather than copying them into its own sources.
 
-The ABI 21 batch adds typed union/sequence/variadic DOM transports, namespace and document factories,
-shared .NET/Fable interface generation and a native Windows UI Automation bridge. The generator emits
-1,070 DOM functions and 228 shared contract declarations; [the generator guide](docs/GENERATOR.md) records
-scope, transport ownership and omitted members. [Accessibility](docs/ACCESSIBILITY.md) lists the Windows
-bridge's supported patterns and limitations.
+The current ABI 23 development batch includes typed DOM transports, namespace and document factories,
+shared .NET/Fable contracts, CSS support/registration, typed CSS values/maps and native Windows UI Automation.
+The generator emits 1,739 DOM functions across 138 selected native interfaces, with zero stubs;
+[the generator guide](docs/GENERATOR.md) records scope, ownership and omitted members.
+[Typed map delivery](docs/STYLE-PROPERTY-MAPS-PLAN.md) distinguishes private verification from remaining
+platform/public acceptance. [Accessibility](docs/ACCESSIBILITY.md) lists the Windows bridge's supported
+patterns and limitations.
 
-The shipped build, **slim**, is WebKit's Windows port cut to what presentation needs: no network stack,
+The **slim** flavor cuts WebKit to what presentation needs: no network stack,
 crypto library, GPU code, browser storage, service workers, WebGPU, WebXR or inspector, and JavaScriptCore
-without its JIT tiers. It is
-77.59 MB in 18 DLLs, against 125.84 MB in 31 for the **lean** reference build.
+without its JIT tiers. The initial Windows measurement was 77.59 MB in 18 DLLs,
+against 125.84 MB in 31 for the **lean** reference build; this is not a fresh size measurement of ABI 23.
 
 | | |
 |---|---|
@@ -51,9 +53,8 @@ host, configures, builds and packs. The package lands in `C:/rw/packages`, and t
 
 ## Rules for changes
 
-- One concern per patch, behind a CMake option that defaults to OFF, so the patches stay easy to carry to
-  new WebKit releases and a default build is unaffected.
-- Patches add files and CMake hunks; they do not edit upstream C++ or IDL files (0003 is the one
-  exception, `docs/PATCHES.md`).
+- One concern per patch. Feature-removal options default to OFF; documented correctness repairs apply
+  in every flavor, as listed in `docs/PATCHES.md`.
+- Keep upstream C++ corrections bounded and paired with permanent regressions in `tests/abi`.
 - Generate stubs from upstream headers where a member list follows a header.
 - Speed over size: the build stays at `/O2`.
