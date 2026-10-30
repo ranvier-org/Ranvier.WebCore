@@ -1,2 +1,2 @@
-*.log -text
+*.log -text -whitespace
 *.mjs text eol=lf
