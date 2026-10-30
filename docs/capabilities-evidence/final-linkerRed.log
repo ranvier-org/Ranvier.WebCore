@@ -1,0 +1,11 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+lld-link: warning: vcpkg_installed\x64-windows-webkit\lib\libxml2.lib: skipping imported DllMain symbol [importeddllmain]
+NOTE: this might be a mistake when the DLL/library was produced.
+
+lld-link: error: undefined symbol: public: void __cdecl WebCore::SVGSVGElement::resetScrollAnchor(void)
+>>> referenced by C:\wk\native-capabilities\artifacts\h07\svg-export-link-probe\svg-export-probe.cpp:3
+>>>               C:/wk/native-capabilities/artifacts/h07/svg-export-link-probe/svg-export-probe.obj:(rv_link_probe)
+
+lld-link: error: undefined symbol: public: bool __cdecl WebCore::SVGSVGElement::scrollToFragment(class WTF::StringView)
+>>> referenced by C:\wk\native-capabilities\artifacts\h07\svg-export-link-probe\svg-export-probe.cpp:3
+>>>               C:/wk/native-capabilities/artifacts/h07/svg-export-link-probe/svg-export-probe.obj:(rv_link_probe)

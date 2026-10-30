@@ -1,0 +1,4 @@
+CAPABILITY_CATALOGUE_CHECK=PASS
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

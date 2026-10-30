@@ -1,0 +1,4 @@
+MULTI_RID_PACKAGE_RESOURCES PASS: five-package restore, both Windows RIDs, JIT/publish canonical paths and exact bytes
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0
