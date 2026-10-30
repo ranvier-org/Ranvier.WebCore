@@ -3,7 +3,7 @@
 The C ABI Ranvier's WebCore view calls, built as `RanvierWebCoreHost.dll`.
 
 - `RanvierWebCoreAbi.h`: the boundary (C scalars, UTF-8 strings, opaque handles, an RGBA8 buffer).
-  `rv_abi_version()` returns 20; `scripts/build.py package` records it in `manifest.json`.
+  `rv_abi_version()` returns 23 in the current development batch; `scripts/build.py package` records it in `manifest.json`.
   `rv_abi_has()` names the groups of functions added since 11.
 - `RanvierWebCoreAbi.cpp`: its implementation over WebCore. Each page has two clients of its own:
   - **Chrome client:** reports invalidations and rendering-update requests as the dirty rectangle and the
