@@ -1,0 +1,373 @@
+{
+  "checkedAtUtc": "2026-10-30T06:37:40.153588+00:00",
+  "packages": [
+    {
+      "package": "Ranvier.WebCore",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.win-x64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.win-arm64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.linux-x64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.linux-arm64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.osx-arm64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.osx-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.win-x64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.win-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.win-arm64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.win-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.linux-x64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.linux-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.linux-arm64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.linux-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Gpu.osx-arm64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.gpu.osx-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.win-x64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.win-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.win-arm64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.win-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.linux-x64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.linux-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.linux-arm64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.linux-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.Lean.osx-arm64",
+      "version": "0.1.0-preview.20",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.lean.osx-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.Dom",
+      "version": "0.1.0-alpha.21",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.dom/index.json"
+    },
+    {
+      "package": "Ranvier.Dom",
+      "version": "0.1.0-alpha.22",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.dom/index.json"
+    },
+    {
+      "package": "Ranvier.Dom.Traced",
+      "version": "0.1.0-alpha.21",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.dom.traced/index.json"
+    },
+    {
+      "package": "Ranvier.Dom.Traced",
+      "version": "0.1.0-alpha.22",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.dom.traced/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Dom",
+      "version": "0.1.0-alpha.21",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.dom/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Dom",
+      "version": "0.1.0-alpha.22",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.dom/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Dom.Traced",
+      "version": "0.1.0-alpha.21",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.dom.traced/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Dom.Traced",
+      "version": "0.1.0-alpha.22",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.dom.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View",
+      "version": "0.1.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view/index.json"
+    },
+    {
+      "package": "Ranvier.View",
+      "version": "0.1.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view/index.json"
+    },
+    {
+      "package": "Ranvier.View.Traced",
+      "version": "0.1.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View.Traced",
+      "version": "0.1.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View.Dom",
+      "version": "0.1.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.dom/index.json"
+    },
+    {
+      "package": "Ranvier.View.Dom",
+      "version": "0.1.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.dom/index.json"
+    },
+    {
+      "package": "Ranvier.View.Dom.Traced",
+      "version": "0.1.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.dom.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View.Dom.Traced",
+      "version": "0.1.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.dom.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View.Anime",
+      "version": "0.1.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.anime/index.json"
+    },
+    {
+      "package": "Ranvier.View.Anime",
+      "version": "0.1.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.anime/index.json"
+    },
+    {
+      "package": "Ranvier.View.Anime.Traced",
+      "version": "0.1.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.anime.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View.Anime.Traced",
+      "version": "0.1.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.anime.traced/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Anime",
+      "version": "0.1.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.anime/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Anime",
+      "version": "0.1.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.anime/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Anime.Traced",
+      "version": "0.1.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.anime.traced/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Anime.Traced",
+      "version": "0.1.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.anime.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore",
+      "version": "0.1.0-alpha.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore",
+      "version": "0.1.0-alpha.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore.Traced",
+      "version": "0.1.0-alpha.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore.Traced",
+      "version": "0.1.0-alpha.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore.Sdl",
+      "version": "0.1.0-alpha.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.sdl/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore.Sdl",
+      "version": "0.1.0-alpha.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.sdl/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore.Sdl.Traced",
+      "version": "0.1.0-alpha.11",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.sdl.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore.Sdl.Traced",
+      "version": "0.1.0-alpha.12",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.sdl.traced/index.json"
+    }
+  ],
+  "github": [
+    {
+      "repository": "ranvier-org/Ranvier.WebCore",
+      "matchingTags": [],
+      "openPullRequests": [
+        {
+          "headRefName": "codex/native-api-svg-geometry",
+          "number": 128,
+          "title": "feat(dom): expose SVG geometry and value bindings",
+          "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/128"
+        },
+        {
+          "headRefName": "codex/native-api-css-transforms",
+          "number": 127,
+          "title": "feat(dom): expose typed CSS transform components",
+          "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/127"
+        }
+      ]
+    },
+    {
+      "repository": "ranvier-org/Ranvier",
+      "matchingTags": [],
+      "openPullRequests": [
+        {
+          "headRefName": "codex/native-api-timing",
+          "number": 268,
+          "title": "feat(dom): add shared monotonic user timing",
+          "url": "https://github.com/ranvier-org/Ranvier/pull/268"
+        },
+        {
+          "headRefName": "codex/native-api-transform-values",
+          "number": 267,
+          "title": "feat(dom): expose shared typed transform construction",
+          "url": "https://github.com/ranvier-org/Ranvier/pull/267"
+        },
+        {
+          "headRefName": "codex/native-api-geometry-values",
+          "number": 265,
+          "title": "feat(dom): expose geometry value and matrix services",
+          "url": "https://github.com/ranvier-org/Ranvier/pull/265"
+        }
+      ]
+    },
+    {
+      "repository": "ranvier-org/Ranvier.View",
+      "matchingTags": [],
+      "openPullRequests": [
+        {
+          "headRefName": "codex/native-api-timing",
+          "number": 19,
+          "title": "feat(webcore): share profiling marks with the host frame clock",
+          "url": "https://github.com/ranvier-org/Ranvier.View/pull/19"
+        },
+        {
+          "headRefName": "codex/native-api-transform-values",
+          "number": 18,
+          "title": "feat(webcore): add typed transform services and conformance",
+          "url": "https://github.com/ranvier-org/Ranvier.View/pull/18"
+        },
+        {
+          "headRefName": "codex/release-views16",
+          "number": 17,
+          "title": "feat(webcore): provide shared geometry and matrix values",
+          "url": "https://github.com/ranvier-org/Ranvier.View/pull/17"
+        },
+        {
+          "headRefName": "codex/release-views15",
+          "number": 16,
+          "title": "feat(webcore): provide shared typed style maps",
+          "url": "https://github.com/ranvier-org/Ranvier.View/pull/16"
+        }
+      ]
+    }
+  ]
+}
