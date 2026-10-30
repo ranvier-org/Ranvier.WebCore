@@ -1165,6 +1165,9 @@ RV_EXPORT int32_t rv_ax_text_offset_at(RvAxNode*, int32_t x, int32_t y);
  * appear in its ancestor's plain text: its position there can therefore be an empty range. */
 RV_EXPORT int32_t rv_ax_text_child_range(RvAxNode* ancestor, RvAxNode* child, int32_t* start, int32_t* end);
 
+/* Replaces the main frame with UTF-8 image/svg+xml, with scripts disabled. Malformed XML loads the engine's parser-error document. */
+RV_EXPORT int32_t rv_host_load_svg(RvHost*, const char* svg);
+
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
 

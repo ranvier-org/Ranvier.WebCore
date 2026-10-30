@@ -4,6 +4,7 @@
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
+#include <WebCore/DocumentParser.h>
 #include <WebCore/AXCoreObject.h>
 #include <WebCore/AXNotifications.h>
 #include <WebCore/AXObjectCache.h>
@@ -181,6 +182,7 @@ class RvChromeClient final : public EmptyChromeClient {
     WTF_MAKE_TZONE_ALLOCATED_INLINE(RvChromeClient);
 public:
     RvHost* host { nullptr };
+    bool isEmptyChromeClient() const final { return false; }
 
 private:
     void invalidateRootView(const IntRect& rect) final { invalidate(rect); }
@@ -503,17 +505,27 @@ static Ref<Page> createPage(IntSize viewportSize)
     return page;
 }
 
-static void loadHTML(LocalFrame& frame, const String& html)
+static void loadDocument(LocalFrame& frame, const String& markup, const String& mimeType)
 {
     RefPtr activeDocumentLoader = frame.loader().activeDocumentLoader();
     ASSERT(activeDocumentLoader);
     auto& writer = activeDocumentLoader->writer();
-    writer.setMIMEType("text/html"_s);
+    writer.setMIMEType(mimeType);
     writer.begin();
-    writer.insertDataSynchronously(html);
+    if (mimeType == "text/html"_s)
+        writer.insertDataSynchronously(markup);
+    else {
+        Ref parser = *frame.document()->parser();
+        parser->appendSynchronously(RefPtr { markup.impl() });
+    }
     writer.end();
     if (RefPtr document = frame.document())
         document->updateLayoutIgnorePendingStylesheets();
+}
+
+static void loadHTML(LocalFrame& frame, const String& html)
+{
+    loadDocument(frame, html, "text/html"_s);
 }
 
 #if RANVIER_COMPOSITING
@@ -1088,7 +1100,7 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 26; }
+int32_t rv_abi_version(void) { return 27; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1106,7 +1118,7 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
 #endif
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text", "svg-document" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1230,6 +1242,18 @@ int32_t rv_host_load_html(RvHost* host, const char* html)
         return RV_ERR_WRONG_THREAD;
     loadHTML(host->frame(), utf8(html));
     // The new document posts accessibility notifications once its cache exists.
+    if (host->accessibility)
+        host->document().axObjectCache();
+    return RV_OK;
+}
+
+int32_t rv_host_load_svg(RvHost* host, const char* svg)
+{
+    if (!host || !svg)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    loadDocument(host->frame(), utf8(svg), "image/svg+xml"_s);
     if (host->accessibility)
         host->document().axObjectCache();
     return RV_OK;

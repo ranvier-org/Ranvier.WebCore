@@ -176,7 +176,8 @@
         "SVGNumber",
         "SVGLength",
         "SVGAngle",
-        "SVGAnimatedNumber"
+        "SVGAnimatedNumber",
+        "SVGAnimationElement"
     ],
     "interfaces": [
         "Node",
@@ -367,7 +368,23 @@
         "SVGMarkerElement",
         "SVGPatternElement",
         "SVGTextContentElement",
-        "SVGTextPositioningElement"
+        "SVGTextPositioningElement",
+        "SVGCircleElement",
+        "SVGEllipseElement",
+        "SVGLineElement",
+        "SVGRectElement",
+        "SVGPathElement",
+        "SVGTextElement",
+        "SVGTSpanElement",
+        "SVGTextPathElement",
+        "SVGAnimationElement",
+        "SVGAnimateElement",
+        "SVGAnimateMotionElement",
+        "SVGAnimateTransformElement",
+        "SVGSetElement",
+        "SVGMPathElement",
+        "SVGFEConvolveMatrixElement",
+        "SVGAnimatedInteger"
     ],
     "skipDirectories": [
         "Modules/",
@@ -458,6 +475,7 @@
         "CSSTransformComponent"
     ],
     "interfaceHeaders": {
+        "SVGAnimatedInteger": "svg/properties/SVGAnimatedPropertyImpl.h",
         "SVGAnimatedBoolean": "svg/properties/SVGAnimatedPropertyImpl.h",
         "SVGAnimatedNumber": "svg/properties/SVGAnimatedPropertyImpl.h",
         "SVGAnimatedEnumeration": "svg/properties/SVGAnimatedPropertyImpl.h",
@@ -485,6 +503,7 @@
         ]
     },
     "castVia": {
+        "SVGAnimationElement": "SVGElement",
         "RadioNodeList": "LiveNodeList",
         "CSSConditionRule": "CSSGroupingRule"
     },
@@ -496,6 +515,7 @@
         "HTMLSelectElement.namedItem"
     ],
     "exclude": [
+        "SVGPathElement.getPathSegAtLength",
         "CSSNumericValue.add",
         "CSSNumericValue.sub",
         "CSSNumericValue.mul",

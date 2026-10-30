@@ -25,10 +25,6 @@ type SVGGradientElement =
 and [<AllowNullLiteral>] SVGComponentTransferFunctionElement =
     inherit SVGElement
 
-/// <summary>SVGAnimationElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGAnimationElement =
-    inherit SVGElement
-
 /// <summary>HTMLMediaElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLMediaElement =
     inherit HTMLElement
@@ -3872,6 +3868,171 @@ and [<AllowNullLiteral>] SVGTextPositioningElement =
     /// <summary>SVGTextPositioningElement.rotate.</summary>
     abstract member rotate: SVGAnimatedNumberList with get
 
+/// <summary>SVGCircleElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGCircleElement =
+    inherit SVGGeometryElement
+    /// <summary>SVGCircleElement.cx.</summary>
+    abstract member cx: SVGAnimatedLength with get
+    /// <summary>SVGCircleElement.cy.</summary>
+    abstract member cy: SVGAnimatedLength with get
+    /// <summary>SVGCircleElement.r.</summary>
+    abstract member r: SVGAnimatedLength with get
+
+/// <summary>SVGEllipseElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGEllipseElement =
+    inherit SVGGeometryElement
+    /// <summary>SVGEllipseElement.cx.</summary>
+    abstract member cx: SVGAnimatedLength with get
+    /// <summary>SVGEllipseElement.cy.</summary>
+    abstract member cy: SVGAnimatedLength with get
+    /// <summary>SVGEllipseElement.rx.</summary>
+    abstract member rx: SVGAnimatedLength with get
+    /// <summary>SVGEllipseElement.ry.</summary>
+    abstract member ry: SVGAnimatedLength with get
+
+/// <summary>SVGLineElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGLineElement =
+    inherit SVGGeometryElement
+    /// <summary>SVGLineElement.x1.</summary>
+    abstract member x1: SVGAnimatedLength with get
+    /// <summary>SVGLineElement.y1.</summary>
+    abstract member y1: SVGAnimatedLength with get
+    /// <summary>SVGLineElement.x2.</summary>
+    abstract member x2: SVGAnimatedLength with get
+    /// <summary>SVGLineElement.y2.</summary>
+    abstract member y2: SVGAnimatedLength with get
+
+/// <summary>SVGRectElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGRectElement =
+    inherit SVGGeometryElement
+    /// <summary>SVGRectElement.x.</summary>
+    abstract member x: SVGAnimatedLength with get
+    /// <summary>SVGRectElement.y.</summary>
+    abstract member y: SVGAnimatedLength with get
+    /// <summary>SVGRectElement.width.</summary>
+    abstract member width: SVGAnimatedLength with get
+    /// <summary>SVGRectElement.height.</summary>
+    abstract member height: SVGAnimatedLength with get
+    /// <summary>SVGRectElement.rx.</summary>
+    abstract member rx: SVGAnimatedLength with get
+    /// <summary>SVGRectElement.ry.</summary>
+    abstract member ry: SVGAnimatedLength with get
+
+/// <summary>SVGPathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPathElement =
+    inherit SVGGeometryElement
+
+/// <summary>SVGTextElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTextElement =
+    inherit SVGTextPositioningElement
+
+/// <summary>SVGTSpanElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTSpanElement =
+    inherit SVGTextPositioningElement
+
+/// <summary>SVGTextPathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTextPathElement =
+    inherit SVGTextContentElement
+    /// <summary>SVGTextPathElement.startOffset.</summary>
+    abstract member startOffset: SVGAnimatedLength with get
+    /// <summary>SVGTextPathElement.method.</summary>
+    abstract member method: SVGAnimatedEnumeration with get
+    /// <summary>SVGTextPathElement.spacing.</summary>
+    abstract member spacing: SVGAnimatedEnumeration with get
+    /// <summary>SVGTextPathElement.href.</summary>
+    abstract member href: SVGAnimatedString with get
+
+/// <summary>SVGAnimationElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimationElement =
+    inherit SVGElement
+    /// <summary>SVGAnimationElement.targetElement.</summary>
+    abstract member targetElement: SVGElement with get
+    /// <summary>SVGAnimationElement.getStartTime.</summary>
+    abstract member getStartTime: unit -> float32
+    /// <summary>SVGAnimationElement.getCurrentTime.</summary>
+    abstract member getCurrentTime: unit -> float32
+    /// <summary>SVGAnimationElement.getSimpleDuration.</summary>
+    abstract member getSimpleDuration: unit -> float32
+    /// <summary>SVGAnimationElement.beginElement.</summary>
+    abstract member beginElement: unit -> unit
+    /// <summary>SVGAnimationElement.beginElementAt.</summary>
+    abstract member beginElementAt: offset: float32 -> unit
+    /// <summary>SVGAnimationElement.endElement.</summary>
+    abstract member endElement: unit -> unit
+    /// <summary>SVGAnimationElement.endElementAt.</summary>
+    abstract member endElementAt: offset: float32 -> unit
+    /// <summary>SVGAnimationElement.requiredExtensions.</summary>
+    abstract member requiredExtensions: SVGStringList with get
+    /// <summary>SVGAnimationElement.systemLanguage.</summary>
+    abstract member systemLanguage: SVGStringList with get
+
+/// <summary>SVGAnimateElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimateElement =
+    inherit SVGAnimationElement
+
+/// <summary>SVGAnimateMotionElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimateMotionElement =
+    inherit SVGAnimationElement
+
+/// <summary>SVGAnimateTransformElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimateTransformElement =
+    inherit SVGAnimationElement
+
+/// <summary>SVGSetElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGSetElement =
+    inherit SVGAnimationElement
+
+/// <summary>SVGMPathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGMPathElement =
+    inherit SVGElement
+    /// <summary>SVGMPathElement.href.</summary>
+    abstract member href: SVGAnimatedString with get
+
+/// <summary>SVGFEConvolveMatrixElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGFEConvolveMatrixElement =
+    inherit SVGElement
+    /// <summary>SVGFEConvolveMatrixElement.in1.</summary>
+    abstract member in1: SVGAnimatedString with get
+    /// <summary>SVGFEConvolveMatrixElement.orderX.</summary>
+    abstract member orderX: SVGAnimatedInteger with get
+    /// <summary>SVGFEConvolveMatrixElement.orderY.</summary>
+    abstract member orderY: SVGAnimatedInteger with get
+    /// <summary>SVGFEConvolveMatrixElement.kernelMatrix.</summary>
+    abstract member kernelMatrix: SVGAnimatedNumberList with get
+    /// <summary>SVGFEConvolveMatrixElement.divisor.</summary>
+    abstract member divisor: SVGAnimatedNumber with get
+    /// <summary>SVGFEConvolveMatrixElement.bias.</summary>
+    abstract member bias: SVGAnimatedNumber with get
+    /// <summary>SVGFEConvolveMatrixElement.targetX.</summary>
+    abstract member targetX: SVGAnimatedInteger with get
+    /// <summary>SVGFEConvolveMatrixElement.targetY.</summary>
+    abstract member targetY: SVGAnimatedInteger with get
+    /// <summary>SVGFEConvolveMatrixElement.edgeMode.</summary>
+    abstract member edgeMode: SVGAnimatedEnumeration with get
+    /// <summary>SVGFEConvolveMatrixElement.kernelUnitLengthX.</summary>
+    abstract member kernelUnitLengthX: SVGAnimatedNumber with get
+    /// <summary>SVGFEConvolveMatrixElement.kernelUnitLengthY.</summary>
+    abstract member kernelUnitLengthY: SVGAnimatedNumber with get
+    /// <summary>SVGFEConvolveMatrixElement.preserveAlpha.</summary>
+    abstract member preserveAlpha: SVGAnimatedBoolean with get
+    /// <summary>SVGFEConvolveMatrixElement.x.</summary>
+    abstract member x: SVGAnimatedLength with get
+    /// <summary>SVGFEConvolveMatrixElement.y.</summary>
+    abstract member y: SVGAnimatedLength with get
+    /// <summary>SVGFEConvolveMatrixElement.width.</summary>
+    abstract member width: SVGAnimatedLength with get
+    /// <summary>SVGFEConvolveMatrixElement.height.</summary>
+    abstract member height: SVGAnimatedLength with get
+    /// <summary>SVGFEConvolveMatrixElement.result.</summary>
+    abstract member result: SVGAnimatedString with get
+
+/// <summary>SVGAnimatedInteger in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedInteger =
+    /// <summary>SVGAnimatedInteger.baseVal.</summary>
+    abstract member baseVal: int with get, set
+    /// <summary>SVGAnimatedInteger.animVal.</summary>
+    abstract member animVal: int with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -3928,26 +4089,6 @@ and [<AllowNullLiteral>] HTMLVideoElement =
 and [<AllowNullLiteral>] SVGAElement =
     inherit SVGGraphicsElement
 
-/// <summary>SVGAnimateElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGAnimateElement =
-    inherit SVGAnimationElement
-
-/// <summary>SVGAnimateMotionElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGAnimateMotionElement =
-    inherit SVGAnimationElement
-
-/// <summary>SVGAnimateTransformElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGAnimateTransformElement =
-    inherit SVGAnimationElement
-
-/// <summary>SVGSetElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGSetElement =
-    inherit SVGAnimationElement
-
-/// <summary>SVGCircleElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGCircleElement =
-    inherit SVGGeometryElement
-
 /// <summary>SVGClipPathElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGClipPathElement =
     inherit SVGElement
@@ -3959,10 +4100,6 @@ and [<AllowNullLiteral>] SVGDefsElement =
 /// <summary>SVGDescElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGDescElement =
     inherit SVGElement
-
-/// <summary>SVGEllipseElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGEllipseElement =
-    inherit SVGGeometryElement
 
 /// <summary>SVGFEBlendElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGFEBlendElement =
@@ -3978,10 +4115,6 @@ and [<AllowNullLiteral>] SVGFEComponentTransferElement =
 
 /// <summary>SVGFECompositeElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGFECompositeElement =
-    inherit SVGElement
-
-/// <summary>SVGFEConvolveMatrixElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGFEConvolveMatrixElement =
     inherit SVGElement
 
 /// <summary>SVGFEDiffuseLightingElement in the scoped DOM interface model.</summary>
@@ -4080,10 +4213,6 @@ and [<AllowNullLiteral>] SVGGElement =
 and [<AllowNullLiteral>] SVGImageElement =
     inherit SVGGraphicsElement
 
-/// <summary>SVGLineElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGLineElement =
-    inherit SVGGeometryElement
-
 /// <summary>SVGLinearGradientElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGLinearGradientElement =
     inherit SVGGradientElement
@@ -4096,21 +4225,9 @@ and [<AllowNullLiteral>] SVGMaskElement =
 and [<AllowNullLiteral>] SVGMetadataElement =
     inherit SVGElement
 
-/// <summary>SVGMPathElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGMPathElement =
-    inherit SVGElement
-
-/// <summary>SVGPathElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGPathElement =
-    inherit SVGGeometryElement
-
 /// <summary>SVGRadialGradientElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGRadialGradientElement =
     inherit SVGGradientElement
-
-/// <summary>SVGRectElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGRectElement =
-    inherit SVGGeometryElement
 
 /// <summary>SVGScriptElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGScriptElement =
@@ -4124,21 +4241,9 @@ and [<AllowNullLiteral>] SVGStopElement =
 and [<AllowNullLiteral>] SVGSwitchElement =
     inherit SVGGraphicsElement
 
-/// <summary>SVGTextElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGTextElement =
-    inherit SVGTextPositioningElement
-
-/// <summary>SVGTextPathElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGTextPathElement =
-    inherit SVGTextContentElement
-
 /// <summary>SVGTitleElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGTitleElement =
     inherit SVGElement
-
-/// <summary>SVGTSpanElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGTSpanElement =
-    inherit SVGTextPositioningElement
 
 /// <summary>SVGUseElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGUseElement =

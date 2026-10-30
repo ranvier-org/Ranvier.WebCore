@@ -1,0 +1,64 @@
+diff --git a/Source/WebCore/rendering/svg/SVGTextFragment.h b/Source/WebCore/rendering/svg/SVGTextFragment.h
+index 74281b180e..971aabc70a 100644
+--- a/Source/WebCore/rendering/svg/SVGTextFragment.h
++++ b/Source/WebCore/rendering/svg/SVGTextFragment.h
+@@ -64,7 +64,7 @@ struct SVGTextFragment {
+     // (see SVGTextLayoutEngine, which builds this transformation).
+     AffineTransform transform;
+ 
+-    // Contains lengthAdjust related transformations, which are not allowd to influence the SVGTextQuery code.
++    // Glyph scaling and placement from textLength and lengthAdjust.
+     AffineTransform lengthAdjustTransform;
+ 
+ private:
+diff --git a/Source/WebCore/rendering/svg/SVGTextQuery.cpp b/Source/WebCore/rendering/svg/SVGTextQuery.cpp
+index 9709b8d9a0..b698256d12 100644
+--- a/Source/WebCore/rendering/svg/SVGTextQuery.cpp
++++ b/Source/WebCore/rendering/svg/SVGTextQuery.cpp
+@@ -241,7 +241,8 @@ namespace WebCore {
+ bool SVGTextQuery::textLengthCallback(Data* queryData, const SVGTextFragment& fragment) const
+ {
+     auto* data = downcast<TextLengthData>(queryData);
+-    data->textLength += queryData->isVerticalText ? fragment.height : fragment.width;
++    float lengthScale = narrowPrecisionToFloat(queryData->isVerticalText ? fragment.lengthAdjustTransform.yScale() : fragment.lengthAdjustTransform.xScale());
++    data->textLength += (queryData->isVerticalText ? fragment.height : fragment.width) * lengthScale;
+     return false;
+ }
+ 
+@@ -286,7 +287,8 @@ bool SVGTextQuery::subStringLengthCallback(Data* queryData, const SVGTextFragmen
+         return false;
+ 
+     SVGTextMetrics metrics = SVGTextMetrics::measureCharacterRange(*queryData->textRenderer, fragment.characterOffset + startPosition, endPosition - startPosition);
+-    data->subStringLength += queryData->isVerticalText ? metrics.height() : metrics.width();
++    float lengthScale = narrowPrecisionToFloat(queryData->isVerticalText ? fragment.lengthAdjustTransform.yScale() : fragment.lengthAdjustTransform.xScale());
++    data->subStringLength += (queryData->isVerticalText ? metrics.height() : metrics.width()) * lengthScale;
+     return false;
+ }
+ 
+@@ -344,7 +346,7 @@ bool SVGTextQuery::startPositionOfCharacterCallback(Data* queryData, const SVGTe
+     }
+ 
+     AffineTransform fragmentTransform;
+-    fragment.buildFragmentTransform(fragmentTransform, SVGTextFragment::TransformIgnoringTextLength);
++    fragment.buildFragmentTransform(fragmentTransform);
+     if (fragmentTransform.isIdentity())
+         return true;
+ 
+@@ -404,7 +406,7 @@ bool SVGTextQuery::endPositionOfCharacterCallback(Data* queryData, const SVGText
+         data->endPosition.move(metrics.width(), 0);
+ 
+     AffineTransform fragmentTransform;
+-    fragment.buildFragmentTransform(fragmentTransform, SVGTextFragment::TransformIgnoringTextLength);
++    fragment.buildFragmentTransform(fragmentTransform);
+     if (fragmentTransform.isIdentity())
+         return true;
+ 
+@@ -502,7 +504,7 @@ static inline void calculateGlyphBoundaries(SVGTextQuery::Data* queryData, const
+     extent.setSize(FloatSize(metrics.width(), metrics.height()));
+ 
+     AffineTransform fragmentTransform;
+-    fragment.buildFragmentTransform(fragmentTransform, SVGTextFragment::TransformIgnoringTextLength);
++    fragment.buildFragmentTransform(fragmentTransform);
+     if (fragmentTransform.isIdentity())
+         return;
+ 

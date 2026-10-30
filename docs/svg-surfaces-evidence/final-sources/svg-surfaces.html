@@ -1,0 +1,19 @@
+<style>body{margin:0}@font-face{font-family:SvgProbe;src:url(data:font/ttf;base64,{{FONT_BASE64}})}text{font-family:SvgProbe;font-size:20px}</style>
+<svg id="root" width="500" height="300" viewBox="0 0 500 300">
+<defs><filter id="filter"><feConvolveMatrix id="convolve" order="3" kernelMatrix="0 0 0 0 1 0 0 0 0" preserveAlpha="false"/></filter></defs>
+<view id="detail" viewBox="0 0 100 50"/>
+<rect id="box" x="10" y="10" width="20" height="20"/>
+<circle id="circle" cx="80" cy="20" r="10"/>
+<ellipse id="ellipse" cx="130" cy="20" rx="15" ry="10"/>
+<line id="line" x1="10" y1="40" x2="50" y2="60"/>
+<polygon id="polygon" points="180,10 200,10 200,30"/>
+<polyline id="polyline" points="220,10 240,20 230,30"/>
+<path id="shapePath" d="M10 200H110"/>
+<path id="path" d="M0 150H200"/>
+<text id="plain" x="10" y="100" rotate="0 10 20">ABC</text>
+<text id="vertical" x="300" y="40" style="writing-mode:vertical-rl">ABC</text>
+<text><textPath id="pathText" href="#path" startOffset="10">ABC</textPath></text>
+<rect id="animated" x="200" y="60" width="20" height="20" fill="red"><animate id="animation" attributeName="x" from="200" to="300" dur="2s" begin="indefinite" fill="freeze"/></rect>
+<rect x="400" y="60" width="20" height="20"><animate id="indefinite" attributeName="x" to="450" dur="indefinite" begin="indefinite"/></rect>
+<rect id="liveTarget" x="350" y="220" width="20" height="20"><animate id="liveAnimation" attributeName="x" from="350" to="370" dur="0.1s" repeatCount="2" begin="indefinite" fill="freeze"/></rect>
+</svg>

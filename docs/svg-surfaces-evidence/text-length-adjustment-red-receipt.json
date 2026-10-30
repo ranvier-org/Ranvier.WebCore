@@ -1,0 +1,16 @@
+{
+  "expectedRedExitCode": 1,
+  "nativeRuntime": {
+    "RanvierWebCoreHost.dll": "87a73e96974965ffd7c752723c236769677004d79e9fd1c06bc26f41ff4c1f01",
+    "WebCore.dll": "4422b6c2b9ca5831e3454647272022f57661149cc2ecc3c81d08d51c90aa490d",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "files": {
+    "svg-text-adjustment-oracle.mjs": "2b08098e1f5b6e422376a5ea1e0341478f79815339f19343b7a888d5929317a0",
+    "svg-text-adjustment-oracle.json": "dbb095b3f0c88e149f0734b28a8cd6780757ce3c16b6f63dd685ba14a4361aac",
+    "svg-surfaces-browser-proof.mjs": "e9721362b1e4338dfab0d68359a24d72b862bb7e8629550b16af4ee3da328652",
+    "svg-surfaces-browser-proof.json": "87a401443b016f91f12d435c04dac072e1562aa6072c877a5c4c4a3bb318a9e9",
+    "text-length-adjustment-red.py": "62a7dafc360159ebacfbc62f80ba8e347a6f75609228b9d8ebec25b583964b9b",
+    "text-length-adjustment-red.log": "4abeb38d6d24844fb6997c13b50cac112fa7d5a90b1bdd3cfbff0be3e57ab518"
+  }
+}

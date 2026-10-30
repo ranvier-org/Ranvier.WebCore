@@ -22,3 +22,7 @@
 0020-background-typed-list-separators.patch
 0021-typed-custom-property-priority.patch
 0022-css-transform-matrix-conversion.patch
+0023-embedder-chrome-client-classification.patch
+0024-svg-current-translate-owner.patch
+0025-svg-screen-ctm-pan.patch
+0026-svg-text-length-query-transforms.patch
