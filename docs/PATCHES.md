@@ -1,12 +1,12 @@
 # The patch series
 
-`patches/series` lists eighteen patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012, 0014, 0015, 0016 and 0017, changes nothing unless
+`patches/series` lists nineteen patches, applied in order over the WebKit commit in `pins.json` by
+`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012, 0014, 0015, 0016, 0017 and 0018, changes nothing unless
 its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
 WebKit's feature implementations. 0010 changes which symbols WebCore exports and which members the host may override,
 and no behavior. 0012 adds the sources an embedder names to WebCore. 0013's option is set for macOS in every
 flavor, because the package always loads WebCore outside its framework bundle (`config/mac.cmake`).
-0014, 0015, 0016 and 0017 correct stylesheet mutation and retained-object behavior in every flavor.
+0014, 0015, 0016, 0017 and 0018 correct stylesheet mutation and retained-object behavior in every flavor.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in these places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
@@ -18,7 +18,8 @@ and also changes `PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjec
 `CSSKeyframesRule.cpp` and `CSSStyleSheet.cpp`. 0016 changes `CSSCounterStyleRule.cpp` and
 `CSSCounterStyleRule.h`. 0017 changes `CSSRule.h`, `CSSRule.cpp`, `CSSFontFaceRule.h`,
 `PropertySetCSSDescriptors.h`, `PropertySetCSSDescriptors.cpp` and `CSSPositionTryDescriptors.cpp`.
-The patches touch 87 files in all.
+0018 changes `css/parser/CSSParser.cpp` so an explicit custom-property CSSOM assignment can remove importance.
+The patches touch 88 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -43,6 +44,7 @@ The sizes are the reduction each patch measured when it was added, on Windows x6
 | 0015-keyframe-offset-invalidation | none, always applies | | correctness repair |
 | 0016-counter-style-name | none, always applies | | correctness repair |
 | 0017-detached-cssom-context | none, always applies | | correctness repair |
+| 0018-cssom-custom-property-priority | none, always applies | | correctness repair |
 
 ## Conventions
 
@@ -297,6 +299,12 @@ Retained CSSOM rules keep a weak original settings document and snapshot parser 
 Detached position-try/font-face descriptor edits copy shared backing rules/property sets before mutation and preserve existing descriptor identity. Attached mutations retain stylesheet notification and copy-on-write pairing. The CSSRule size assertion explicitly accounts for one context pointer; the parsed source rule layout is unchanged.
 
 `tests/abi/detached_cssom_context.py` covers retained and late-acquired rules/descriptors, grouping-rule context, ownerless sheets, shared-sheet isolation with actual anchored layout, checked errors and weak owner expiry. Slim CI and extracted-package audits run it. A live settings-toggle scenario is not currently exercised by the public ABI test.
+
+## 0018-cssom-custom-property-priority
+
+The single-custom-property CSSOM parser replaces its parsed property directly, rather than applying the declaration-block cascade merge helper. Explicit assignments can therefore remove importance, including when the value is unchanged. Invalid parsing remains a no-op, and stylesheet declaration blocks keep their existing important-precedence rules.
+
+`tests/abi/custom_properties.py` checks registered and unregistered property values, priority and computed dimensions, same-value importance removal, invalid-priority/token preservation, empty-value removal and duplicate stylesheet declarations.
 
 ## Working on the series
 

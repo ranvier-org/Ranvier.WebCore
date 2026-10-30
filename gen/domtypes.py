@@ -44,7 +44,7 @@ class ComplexGeneratorMixin:
 
     def transport_ctype(self, mapped):
         if mapped.kind == 'string':
-            return 'const char*'
+            return 'RvDomUtf8StringSpan' if mapped.string_spans else 'const char*'
         if mapped.kind in ('node', 'event', 'object'):
             return f'{mapped.handle}*'
         if mapped.kind == 'dict':
@@ -73,8 +73,18 @@ class ComplexGeneratorMixin:
             value = f'Vector<{self.transport_cpp(mapped.subtypes[0])}>'
         return f'std::optional<{value}>' if mapped.nullable else value
 
+    def contains_string_spans(self, mapped):
+        return mapped.kind == 'string' and mapped.string_spans or any(self.contains_string_spans(child) for child in mapped.subtypes)
+
+    def uses_complex_string_spans(self):
+        return any(self.contains_string_spans(mapped) for mapped in self.complex_used.values())
+
     def transport_structs(self):
         lines = []
+        if self.uses_complex_string_spans():
+            lines += ['/* UTF-8 byte length; -1 is null where permitted. Compound results own data until release. */',
+                      'typedef struct RvDomUtf8StringSpan {', '    const uint8_t* data;',
+                      '    int32_t length;', '} RvDomUtf8StringSpan;', '']
         for name in self.complex_used:
             lines += [f'typedef struct {name} {name};']
         for name, mapped in self.complex_used.items():
@@ -106,6 +116,12 @@ class ComplexGeneratorMixin:
             return [f'auto {variable} = decode{mapped.ctype}(&{expression}, status);',
                     'if (status != RV_OK) return std::nullopt;'], f'std::move(*{variable})'
         if kind == 'string':
+            if mapped.string_spans:
+                minimum = -1 if mapped.nullable else 0
+                lines = [f'if ({expression}.length < {minimum} || ({expression}.length > 0 && !{expression}.data)) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}',
+                         f'String {variable} = {expression}.length < 0 ? String() : {expression}.length ? String::fromUTF8(std::span<const uint8_t> {{ {expression}.data, static_cast<size_t>({expression}.length) }}) : emptyString();',
+                         f'if ({expression}.length >= 0 && {variable}.isNull()) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}']
+                return lines, variable
             checks = [] if mapped.nullable else [f'if (!{expression}) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}']
             return checks, f'String::fromUTF8({expression})'
         if kind in ('number', 'bool', 'enum'):
@@ -138,6 +154,8 @@ class ComplexGeneratorMixin:
         if kind in ('union', 'sequence'):
             return [f'encode{mapped.ctype}({expression}, &{target});']
         if kind == 'string':
+            if mapped.string_spans:
+                return [f'{target} = copyOwnedDomStringSpan(asString({expression}));']
             return [f'{target} = copyOwnedDomString(asString({expression}));']
         if kind in ('number', 'bool', 'enum'):
             return [f'{target} = static_cast<{self.transport_ctype(mapped)}>({expression});']
@@ -150,6 +168,8 @@ class ComplexGeneratorMixin:
         if mapped.kind in ('union', 'sequence'):
             return [f'clear{mapped.ctype}(&{expression});']
         if mapped.kind == 'string':
+            if mapped.string_spans:
+                return [f'std::free(const_cast<uint8_t*>({expression}.data));']
             return [f'std::free(const_cast<char*>({expression}));']
         if mapped.kind in ('node', 'event', 'object'):
             root = {'node': 'Node', 'event': 'Event'}.get(mapped.kind) or self.world.cpp_class(mapped.root)
@@ -174,10 +194,20 @@ class ComplexGeneratorMixin:
                  '            else converted.append(U { value.get() });', '        }',
                  '        return FixedVector<U> { std::move(converted) };', '    }',
                  '    operator std::optional<Vector<T>>() && { return std::move(values); }', '};']
+        if self.uses_complex_string_spans():
+            lines += ['RvDomUtf8StringSpan copyOwnedDomStringSpan(const String& value)', '{',
+                      '    if (value.isNull()) return { nullptr, -1 };',
+                      '    auto utf8 = value.utf8();',
+                      '    auto* result = static_cast<uint8_t*>(std::malloc(utf8.length() + 1));',
+                      '    RELEASE_ASSERT(result);', '    std::memcpy(result, utf8.data(), utf8.length());',
+                      '    result[utf8.length()] = 0;',
+                      '    return { result, static_cast<int32_t>(utf8.length()) };', '}']
         for name, mapped in self.complex_used.items():
             cpp = self.transport_cpp(mapped)
             decoder_start = len(lines)
             lines += ['', f'std::optional<{cpp}> decode{name}(const {name}* source, int32_t& status)', '{']
+            if self.contains_string_spans(mapped):
+                lines += ['    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }']
             if mapped.nullable:
                 lines += [f'    if (!source || !source->present) return std::optional<{cpp}> {{ std::in_place, std::nullopt }};']
             else:
@@ -247,6 +277,10 @@ class ComplexGeneratorMixin:
 
     def complex_fsharp(self):
         lines = []
+        if self.uses_complex_string_spans():
+            lines += ['', '/// <summary>Length-delimited UTF-8; compound results own data until their matching release call.</summary>',
+                      '[<Struct; StructLayout(LayoutKind.Sequential)>]', 'type RvDomUtf8StringSpan =',
+                      '    val mutable data: nativeint', '    val mutable length: int']
         for name, mapped in self.complex_used.items():
             if mapped.kind == 'union':
                 for index, child in enumerate(mapped.subtypes):

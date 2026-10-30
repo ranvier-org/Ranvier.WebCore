@@ -264,7 +264,8 @@ RV_EXPORT int32_t rv_event_key(RvEvent*, char* buffer, int32_t capacity, int32_t
 /* The target, or with current set the currentTarget, when it is a node; else NULL. */
 RV_EXPORT RvNode* rv_event_target(RvEvent*, int32_t current);
 
-/* Parts of the DOMException behind the latest RV_ERR_DOM_EXCEPTION, for rv_last_exception. */
+/* Parts of the engine exception behind the latest RV_ERR_DOM_EXCEPTION, for rv_last_exception.
+ * Names include the WebIDL TypeError/RangeError/SyntaxError cases as well as DOMException names. */
 enum {
     RV_EXCEPTION_NAME = 0,
     RV_EXCEPTION_MESSAGE = 1,

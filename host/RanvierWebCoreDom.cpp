@@ -18,6 +18,10 @@ void rv_dom_css_rule_release(RvCSSRule* handle) { ranvier_dom_css_rule_release(h
 RvCSSRule* rv_dom_css_rule_retain(RvCSSRule* handle) { return ranvier_dom_css_rule_retain(handle); }
 void rv_dom_css_rule_list_release(RvCSSRuleList* handle) { ranvier_dom_css_rule_list_release(handle); }
 RvCSSRuleList* rv_dom_css_rule_list_retain(RvCSSRuleList* handle) { return ranvier_dom_css_rule_list_retain(handle); }
+void rv_dom_css_style_value_release(RvCSSStyleValue* handle) { ranvier_dom_css_style_value_release(handle); }
+RvCSSStyleValue* rv_dom_css_style_value_retain(RvCSSStyleValue* handle) { return ranvier_dom_css_style_value_retain(handle); }
+void rv_dom_cssom_variable_reference_value_release(RvCSSOMVariableReferenceValue* handle) { ranvier_dom_cssom_variable_reference_value_release(handle); }
+RvCSSOMVariableReferenceValue* rv_dom_cssom_variable_reference_value_retain(RvCSSOMVariableReferenceValue* handle) { return ranvier_dom_cssom_variable_reference_value_retain(handle); }
 void rv_dom_css_style_declaration_release(RvCSSStyleDeclaration* handle) { ranvier_dom_css_style_declaration_release(handle); }
 RvCSSStyleDeclaration* rv_dom_css_style_declaration_retain(RvCSSStyleDeclaration* handle) { return ranvier_dom_css_style_declaration_retain(handle); }
 void rv_dom_dom_token_list_release(RvDOMTokenList* handle) { ranvier_dom_dom_token_list_release(handle); }
@@ -57,12 +61,17 @@ void rv_dom_union_element_or_text_release(RvDomUnionElementOrText* value) { ranv
 void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value) { ranvier_dom_sequence_element_or_text_release(value); }
 void rv_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrDOMString* value) { ranvier_dom_union_media_list_or_dom_string_release(value); }
 void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString* value) { ranvier_dom_sequence_usv_string_release(value); }
+void rv_dom_union_usv_string_or_cssom_variable_reference_value_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValue* value) { ranvier_dom_union_usv_string_or_cssom_variable_reference_value_release(value); }
+void rv_dom_sequence_usv_string_or_cssom_variable_reference_value_release(RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* value) { ranvier_dom_sequence_usv_string_or_cssom_variable_reference_value_release(value); }
+void rv_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* value) { ranvier_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(value); }
 void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value) { ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(value); }
 void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value) { ranvier_dom_sequence_static_range_release(value); }
 void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value) { ranvier_dom_sequence_pointer_event_release(value); }
+void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value) { ranvier_dom_sequence_css_style_value_release(value); }
 int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_rule_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_style_sheet_get_interface_name(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_style_sheet_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_style_declaration_get_interface_name(target, buffer, capacity, length); }
+int32_t rv_dom_css_style_value_get_interface_name(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_style_value_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_node_type(RvNode* target, uint16_t* result) { return ranvier_dom_node_get_node_type(target, result); }
 int32_t rv_dom_node_get_node_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_node_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_base_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_base_uri(target, buffer, capacity, length); }
@@ -1423,6 +1432,26 @@ int32_t rv_dom_css_counter_style_rule_get_speak_as(RvCSSRule* target, char* buff
 int32_t rv_dom_css_counter_style_rule_set_speak_as(RvCSSRule* target, const char* value) { return ranvier_dom_css_counter_style_rule_set_speak_as(target, value); }
 int32_t rv_dom_css_counter_style_rule_get_fallback(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_counter_style_rule_get_fallback(target, buffer, capacity, length); }
 int32_t rv_dom_css_counter_style_rule_set_fallback(RvCSSRule* target, const char* value) { return ranvier_dom_css_counter_style_rule_set_fallback(target, value); }
+int32_t rv_dom_css_property_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_property_rule_get_name(target, buffer, capacity, length); }
+int32_t rv_dom_css_property_rule_get_syntax(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_property_rule_get_syntax(target, buffer, capacity, length); }
+int32_t rv_dom_css_property_rule_get_inherits(RvCSSRule* target, int32_t* result) { return ranvier_dom_css_property_rule_get_inherits(target, result); }
+int32_t rv_dom_css_property_rule_get_initial_value(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_property_rule_get_initial_value(target, buffer, capacity, length); }
+int32_t rv_dom_css_style_value_to_string(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_style_value_to_string(target, buffer, capacity, length); }
+int32_t rv_dom_css_unit_value_create(RvNode* target, double value, const uint8_t* unit, int32_t unit_length, RvCSSStyleValue** result) { return ranvier_dom_css_unit_value_create(target, value, unit, unit_length, result); }
+int32_t rv_dom_css_unit_value_get_value(RvCSSStyleValue* target, double* result) { return ranvier_dom_css_unit_value_get_value(target, result); }
+int32_t rv_dom_css_unit_value_set_value(RvCSSStyleValue* target, double value) { return ranvier_dom_css_unit_value_set_value(target, value); }
+int32_t rv_dom_css_unit_value_get_unit(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_unit_value_get_unit(target, buffer, capacity, length); }
+int32_t rv_dom_cssom_keyword_value_create(RvNode* target, const uint8_t* value, int32_t value_length, RvCSSStyleValue** result) { return ranvier_dom_cssom_keyword_value_create(target, value, value_length, result); }
+int32_t rv_dom_cssom_keyword_value_get_value(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_cssom_keyword_value_get_value(target, buffer, capacity, length); }
+int32_t rv_dom_cssom_keyword_value_set_value(RvCSSStyleValue* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_cssom_keyword_value_set_value(target, value, value_length); }
+int32_t rv_dom_css_unparsed_value_create(RvNode* target, const RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* members, RvCSSStyleValue** result) { return ranvier_dom_css_unparsed_value_create(target, members, result); }
+int32_t rv_dom_css_unparsed_value_get_length(RvCSSStyleValue* target, uint32_t* result) { return ranvier_dom_css_unparsed_value_get_length(target, result); }
+int32_t rv_dom_css_unparsed_value_item(RvCSSStyleValue* target, uint32_t index, RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* result) { return ranvier_dom_css_unparsed_value_item(target, index, result); }
+int32_t rv_dom_css_unparsed_value_set_item(RvCSSStyleValue* target, uint32_t index, const RvDomUnionUSVStringOrCSSOMVariableReferenceValue* val) { return ranvier_dom_css_unparsed_value_set_item(target, index, val); }
+int32_t rv_dom_cssom_variable_reference_value_create(RvNode* target, const uint8_t* variable, int32_t variable_length, RvCSSStyleValue* fallback, RvCSSOMVariableReferenceValue** result) { return ranvier_dom_cssom_variable_reference_value_create(target, variable, variable_length, fallback, result); }
+int32_t rv_dom_cssom_variable_reference_value_get_variable(RvCSSOMVariableReferenceValue* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_cssom_variable_reference_value_get_variable(target, buffer, capacity, length); }
+int32_t rv_dom_cssom_variable_reference_value_set_variable(RvCSSOMVariableReferenceValue* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_cssom_variable_reference_value_set_variable(target, value, value_length); }
+int32_t rv_dom_cssom_variable_reference_value_get_fallback(RvCSSOMVariableReferenceValue* target, RvCSSStyleValue** result) { return ranvier_dom_cssom_variable_reference_value_get_fallback(target, result); }
 int32_t rv_dom_css_position_try_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_position_try_rule_get_name(target, buffer, capacity, length); }
 int32_t rv_dom_css_position_try_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result) { return ranvier_dom_css_position_try_rule_get_style(target, result); }
 int32_t rv_dom_css_position_try_descriptors_get_margin(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_position_try_descriptors_get_margin(target, buffer, capacity, length); }
@@ -1764,4 +1793,7 @@ int32_t rv_dom_input_event_get_target_ranges(RvEvent* target, RvDomSequenceStati
 int32_t rv_dom_composition_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_composition_event_get_data(target, buffer, capacity, length); }
 int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result) { return ranvier_dom_css_supports_2(target, property, property_length, value, value_length, result); }
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
+int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor) { return ranvier_dom_css_register_property(target, descriptor); }
 int32_t rv_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result) { return ranvier_dom_window_get_computed_style(target, element, pseudo_element, pseudo_element_length, result); }
+int32_t rv_dom_css_style_value_parse(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvCSSStyleValue** result) { return ranvier_dom_css_style_value_parse(target, property, property_length, css_text, css_text_length, result); }
+int32_t rv_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result) { return ranvier_dom_css_style_value_parse_all(target, property, property_length, css_text, css_text_length, result); }

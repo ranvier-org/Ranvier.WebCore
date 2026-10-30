@@ -26,11 +26,50 @@
         "CSSStyleSheet": {
             "receiver": "Document",
             "factory": "CSSStyleSheet::create"
+        },
+        "CSSOMKeywordValue": {
+            "receiver": "Document",
+            "factory": "CSSOMKeywordValue::create",
+            "passReceiver": false,
+            "stringInputs": "utf8-lengths"
+        },
+        "CSSUnitValue": {
+            "receiver": "Document",
+            "factory": "CSSUnitValue::create",
+            "passReceiver": false,
+            "stringInputs": "utf8-lengths"
+        },
+        "CSSUnparsedValue": {
+            "receiver": "Document",
+            "factory": "CSSUnparsedValue::create",
+            "passReceiver": false
+        },
+        "CSSOMVariableReferenceValue": {
+            "receiver": "Document",
+            "factory": "CSSOMVariableReferenceValue::create",
+            "passReceiver": false,
+            "stringInputs": "utf8-lengths"
         }
     },
     "dictionaryCppTypes": {
         "CSSStyleSheetInit": "CSSStyleSheet::Init"
     },
+    "dictionaryStringInputs": {
+        "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence"
+    },
+    "stringifiers": [
+        "CSSStyleValue"
+    ],
+    "complexStringSpans": [
+        "USVStringOrCSSOMVariableReferenceValue"
+    ],
+    "interfaceStringInputs": {
+        "CSSOMKeywordValue": "utf8-lengths",
+        "CSSOMVariableReferenceValue": "utf8-lengths"
+    },
+    "finiteNumberInputs": [
+        "CSSUnitValue"
+    ],
     "interfaces": [
         "Node",
         "CharacterData",
@@ -133,6 +172,14 @@
         "CSSFontFeatureValuesRule",
         "CSSFontPaletteValuesRule",
         "CSSCounterStyleRule",
+        "CSSPropertyRule",
+        "CSSStyleValue",
+        "CSSNumericValue",
+        "CSSUnitValue",
+        "CSSOMKeywordValue",
+        "CSSStyleImageValue",
+        "CSSUnparsedValue",
+        "CSSOMVariableReferenceValue",
         "CSSPositionTryRule",
         "CSSPositionTryDescriptors",
         "CSSStartingStyleRule",
@@ -218,7 +265,10 @@
         ],
         "aliases": {
             "CSSAnimationEvent": "AnimationEvent",
-            "CSSTransitionEvent": "TransitionEvent"
+            "CSSTransitionEvent": "TransitionEvent",
+            "CSSOMKeywordValue": "CSSKeywordValue",
+            "CSSStyleImageValue": "CSSImageValue",
+            "CSSOMVariableReferenceValue": "CSSVariableReferenceValue"
         },
         "mixins": {
             "AriaAttributes": "ARIAMixin",
@@ -238,7 +288,8 @@
     "runtimeTypeRoots": [
         "CSSRule",
         "StyleSheet",
-        "CSSStyleDeclaration"
+        "CSSStyleDeclaration",
+        "CSSStyleValue"
     ],
     "nodeCastTags": {
         "HTMLModElement": [
@@ -267,6 +318,17 @@
         "HTMLSelectElement.namedItem"
     ],
     "exclude": [
+        "CSSNumericValue.add",
+        "CSSNumericValue.sub",
+        "CSSNumericValue.mul",
+        "CSSNumericValue.div",
+        "CSSNumericValue.min",
+        "CSSNumericValue.max",
+        "CSSNumericValue.equals",
+        "CSSNumericValue.to",
+        "CSSNumericValue.toSum",
+        "CSSNumericValue.type",
+        "CSSNumericValue.parse",
         "DOMRect.x",
         "DOMRect.y",
         "DOMRect.width",
@@ -337,9 +399,24 @@
         "DOMCSSNamespace": {
             "receiver": "Document",
             "members": [
-                "supports"
+                "supports",
+                "registerProperty"
             ],
             "feature": "dom-css-supports",
+            "memberFeatures": {
+                "registerProperty": "dom-css-register-property"
+            },
+            "stringInputs": "utf8-lengths"
+        }
+    },
+    "staticBindings": {
+        "CSSStyleValue": {
+            "receiver": "Document",
+            "members": [
+                "parse",
+                "parseAll"
+            ],
+            "feature": "dom-css-style-values",
             "stringInputs": "utf8-lengths"
         }
     },

@@ -23,23 +23,33 @@
 #include "CSSMediaRule.h"
 #include "CSSNamespaceRule.h"
 #include "CSSNestedDeclarations.h"
+#include "CSSNumericValue.h"
+#include "CSSOMKeywordValue.h"
+#include "CSSOMVariableReferenceValue.h"
 #include "CSSPositionTryDescriptors.h"
 #include "CSSPositionTryRule.h"
+#include "CSSPropertyRule.h"
 #include "CSSRule.h"
 #include "CSSRuleList.h"
 #include "CSSScopeRule.h"
 #include "CSSStartingStyleRule.h"
 #include "CSSStyleDeclaration.h"
+#include "CSSStyleImageValue.h"
 #include "CSSStyleProperties.h"
 #include "CSSStyleRule.h"
 #include "CSSStyleSheet.h"
+#include "CSSStyleValue.h"
 #include "CSSSupportsRule.h"
+#include "CSSUnitValue.h"
+#include "CSSUnparsedValue.h"
 #include "CSSViewTransitionRule.h"
 #include "CharacterData.h"
 #include "CheckVisibilityOptions.h"
 #include "Comment.h"
 #include "CompositionEvent.h"
+#include "DOMCSSCustomPropertyDescriptor.h"
 #include "DOMCSSNamespace.h"
+#include "DOMCSSRegisterCustomProperty.h"
 #include "DOMImplementation.h"
 #include "DOMRect.h"
 #include "DOMRectList.h"
@@ -166,6 +176,7 @@
 #include "JSSlotAssignmentMode.h"
 #include "JSVisibilityState.h"
 
+#include <cmath>
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
@@ -326,6 +337,19 @@ template<typename T> void assignString(T& field, const char* text)
         field = Type { String::fromUTF8(text) };
 }
 
+template<typename T> bool assignString(T& field, const uint8_t* text, int32_t length)
+{
+    String value = length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString();
+    if (value.isNull())
+        return false;
+    using Type = typename Unwrapped<T>::Type;
+    if constexpr (std::is_same_v<Type, AtomString>)
+        field = AtomString { value };
+    else
+        field = Type { value };
+    return true;
+}
+
 template<typename T, size_t N> bool assignEnumeration(T& field, int32_t index, const ASCIILiteral (&names)[N])
 {
     auto value = enumerationFromIndex<typename Unwrapped<T>::Type>(index, names);
@@ -436,6 +460,16 @@ template<typename T> struct DomSequenceArgument {
     }
     operator std::optional<Vector<T>>() && { return std::move(values); }
 };
+RvDomUtf8StringSpan copyOwnedDomStringSpan(const String& value)
+{
+    if (value.isNull()) return { nullptr, -1 };
+    auto utf8 = value.utf8();
+    auto* result = static_cast<uint8_t*>(std::malloc(utf8.length() + 1));
+    RELEASE_ASSERT(result);
+    std::memcpy(result, utf8.data(), utf8.length());
+    result[utf8.length()] = 0;
+    return { result, static_cast<int32_t>(utf8.length()) };
+}
 
 std::optional<Variant<Ref<Node>, String>> decodeRvDomUnionNodeOrDOMString(const RvDomUnionNodeOrDOMString* source, int32_t& status)
 {
@@ -1215,6 +1249,138 @@ template<typename V> int32_t encodeRvDomSequenceUSVString(V&& input, RvDomSequen
     return RV_OK;
 }
 
+std::optional<Variant<String, Ref<CSSOMVariableReferenceValue>>> decodeRvDomUnionUSVStringOrCSSOMVariableReferenceValue(const RvDomUnionUSVStringOrCSSOMVariableReferenceValue* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (source->arm0.length < 0 || (source->arm0.length > 0 && !source->arm0.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm0 = source->arm0.length < 0 ? String() : source->arm0.length ? String::fromUTF8(std::span<const uint8_t> { source->arm0.data, static_cast<size_t>(source->arm0.length) }) : emptyString();
+        if (source->arm0.length >= 0 && arm0.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<String, Ref<CSSOMVariableReferenceValue>> { Variant<String, Ref<CSSOMVariableReferenceValue>> { WTF::InPlaceIndex<0>, arm0 } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSOMVariableReferenceValue> arm1 = reinterpret_cast<CSSOMVariableReferenceValue*>(source->arm1);
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<String, Ref<CSSOMVariableReferenceValue>> { Variant<String, Ref<CSSOMVariableReferenceValue>> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUSVStringOrCSSOMVariableReferenceValue(RvDomUnionUSVStringOrCSSOMVariableReferenceValue* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        std::free(const_cast<uint8_t*>(value->arm0.data));
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<CSSOMVariableReferenceValue*>(value->arm1)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUSVStringOrCSSOMVariableReferenceValue(V&& value, RvDomUnionUSVStringOrCSSOMVariableReferenceValue* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+            else if constexpr (I == 1) {
+                storeHandle<CSSOMVariableReferenceValue>(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionUSVStringOrCSSOMVariableReferenceValue<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUSVStringOrCSSOMVariableReferenceValue(V&& input, RvDomUnionUSVStringOrCSSOMVariableReferenceValue* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUSVStringOrCSSOMVariableReferenceValue(value, result);
+    return RV_OK;
+}
+
+std::optional<Vector<Variant<String, Ref<CSSOMVariableReferenceValue>>>> decodeRvDomSequenceUSVStringOrCSSOMVariableReferenceValue(const RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Variant<String, Ref<CSSOMVariableReferenceValue>>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomUnionUSVStringOrCSSOMVariableReferenceValue(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Variant<String, Ref<CSSOMVariableReferenceValue>>> { std::move(result) };
+}
+
+void clearRvDomSequenceUSVStringOrCSSOMVariableReferenceValue(RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionUSVStringOrCSSOMVariableReferenceValue(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceUSVStringOrCSSOMVariableReferenceValue(V&& input, RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomUnionUSVStringOrCSSOMVariableReferenceValue*>(std::calloc(value.size(), sizeof(RvDomUnionUSVStringOrCSSOMVariableReferenceValue))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomUnionUSVStringOrCSSOMVariableReferenceValue(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+void clearRvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        std::free(const_cast<uint8_t*>(value->arm0.data));
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<CSSOMVariableReferenceValue*>(value->arm1)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable(V&& value, RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+            else if constexpr (I == 1) {
+                storeHandle<CSSOMVariableReferenceValue>(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable(V&& input, RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* result)
+{
+    *result = { };
+    if (!input) return RV_OK;
+    auto&& value = *input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable(value, result);
+    return RV_OK;
+}
+
 std::optional<Variant<Ref<ShadowRoot>, GetComposedRangesOptions>> decodeRvDomUnionShadowRootOrGetComposedRangesOptions(const RvDomUnionShadowRootOrGetComposedRangesOptions* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -1304,6 +1470,29 @@ template<typename V> int32_t encodeRvDomSequencePointerEvent(V&& input, RvDomSeq
     }
     return RV_OK;
 }
+
+void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<CSSStyleValue*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceCSSStyleValue(V&& input, RvDomSequenceCSSStyleValue* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvCSSStyleValue**>(std::calloc(value.size(), sizeof(RvCSSStyleValue*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<CSSStyleValue>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
 }
 
 using namespace WebCore;
@@ -1314,13 +1503,17 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-constructor:CSSStyleSheet", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
     if (!std::strcmp(feature, "dom-css-supports"))
         return 1;
+    if (!std::strcmp(feature, "dom-css-register-property"))
+        return 1;
     if (!std::strcmp(feature, "dom-computed-style"))
+        return 1;
+    if (!std::strcmp(feature, "dom-css-style-values"))
         return 1;
     return 0;
 }
@@ -1420,6 +1613,21 @@ void ranvier_dom_sequence_usv_string_release(RvDomSequenceUSVString* value)
     if (isMainThread()) clearRvDomSequenceUSVString(value);
 }
 
+void ranvier_dom_union_usv_string_or_cssom_variable_reference_value_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValue* value)
+{
+    if (isMainThread()) clearRvDomUnionUSVStringOrCSSOMVariableReferenceValue(value);
+}
+
+void ranvier_dom_sequence_usv_string_or_cssom_variable_reference_value_release(RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* value)
+{
+    if (isMainThread()) clearRvDomSequenceUSVStringOrCSSOMVariableReferenceValue(value);
+}
+
+void ranvier_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* value)
+{
+    if (isMainThread()) clearRvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable(value);
+}
+
 void ranvier_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value)
 {
     if (isMainThread()) clearRvDomUnionShadowRootOrGetComposedRangesOptions(value);
@@ -1433,6 +1641,11 @@ void ranvier_dom_sequence_static_range_release(RvDomSequenceStaticRange* value)
 void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value)
 {
     if (isMainThread()) clearRvDomSequencePointerEvent(value);
+}
+
+void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
+{
+    if (isMainThread()) clearRvDomSequenceCSSStyleValue(value);
 }
 
 void ranvier_dom_dom_implementation_release(RvDOMImplementation* handle)
@@ -1530,6 +1743,34 @@ RvCSSRuleList* ranvier_dom_css_rule_list_retain(RvCSSRuleList* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<CSSRuleList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_css_style_value_release(RvCSSStyleValue* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<CSSStyleValue*>(handle)->deref();
+}
+
+RvCSSStyleValue* ranvier_dom_css_style_value_retain(RvCSSStyleValue* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<CSSStyleValue*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_cssom_variable_reference_value_release(RvCSSOMVariableReferenceValue* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<CSSOMVariableReferenceValue*>(handle)->deref();
+}
+
+RvCSSOMVariableReferenceValue* ranvier_dom_cssom_variable_reference_value_retain(RvCSSOMVariableReferenceValue* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<CSSOMVariableReferenceValue*>(handle)->ref();
     return handle;
 }
 
@@ -20425,6 +20666,281 @@ int32_t ranvier_dom_css_counter_style_rule_set_fallback(RvCSSRule* target, const
     return invoke([&]() -> decltype(auto) { return impl->setFallback(a0.string()); });
 }
 
+// CSSPropertyRule.name getter: readonly attribute CSSOMString name
+int32_t ranvier_dom_css_property_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPropertyRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->name(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPropertyRule.syntax getter: readonly attribute CSSOMString syntax
+int32_t ranvier_dom_css_property_rule_get_syntax(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPropertyRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->syntax(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSPropertyRule.inherits getter: readonly attribute boolean inherits
+int32_t ranvier_dom_css_property_rule_get_inherits(RvCSSRule* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPropertyRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->inherits(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CSSPropertyRule.initialValue getter: readonly attribute CSSOMString? initialValue
+int32_t ranvier_dom_css_property_rule_get_initial_value(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPropertyRule>(*reinterpret_cast<CSSRule*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->initialValue(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// CSSStyleValue.toString() -> DOMString
+int32_t ranvier_dom_css_style_value_to_string(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSStyleValue> impl = reinterpret_cast<CSSStyleValue*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->toString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSUnitValue.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_css_unit_value_create(RvNode* target, double value, const uint8_t* unit, int32_t unit_length, RvCSSStyleValue** result)
+{
+    if (!target || !(unit_length >= 0 && (unit_length <= 0 || unit)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    StringArg a1 { unit, unit_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return CSSUnitValue::create(value, a1.string()); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
+// CSSUnitValue.value getter: attribute double value
+int32_t ranvier_dom_css_unit_value_get_value(RvCSSStyleValue* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSUnitValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CSSUnitValue.value setter: attribute double value
+int32_t ranvier_dom_css_unit_value_set_value(RvCSSStyleValue* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSUnitValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setValue(value); });
+}
+
+// CSSUnitValue.unit getter: readonly attribute USVString unit
+int32_t ranvier_dom_css_unit_value_get_unit(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSUnitValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->unit(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSOMKeywordValue.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_cssom_keyword_value_create(RvNode* target, const uint8_t* value, int32_t value_length, RvCSSStyleValue** result)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return CSSOMKeywordValue::create(a0.string()); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
+// CSSOMKeywordValue.value getter: attribute USVString value
+int32_t ranvier_dom_cssom_keyword_value_get_value(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSOMKeywordValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->value(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSOMKeywordValue.value setter: attribute USVString value
+int32_t ranvier_dom_cssom_keyword_value_set_value(RvCSSStyleValue* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSOMKeywordValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setValue(a0.string()); });
+}
+
+// CSSUnparsedValue.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_css_unparsed_value_create(RvNode* target, const RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* members, RvCSSStyleValue** result)
+{
+    if (!target || !members || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceUSVStringOrCSSOMVariableReferenceValue(members, status0);
+    if (status0 != RV_OK) return status0;
+    return deliver([&]() -> decltype(auto) { return CSSUnparsedValue::create(DomSequenceArgument<Variant<String, Ref<CSSOMVariableReferenceValue>>> { std::move(*a0) }); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
+// CSSUnparsedValue.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_css_unparsed_value_get_length(RvCSSStyleValue* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSUnparsedValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// CSSUnparsedValue.item(unsigned long index) -> CSSUnparsedSegment?; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_unparsed_value_item(RvCSSStyleValue* target, uint32_t index, RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSUnparsedValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return encodeRvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable(value, result); });
+}
+
+// CSSUnparsedValue.setItem(unsigned long index, CSSUnparsedSegment val) -> undefined
+int32_t ranvier_dom_css_unparsed_value_set_item(RvCSSStyleValue* target, uint32_t index, const RvDomUnionUSVStringOrCSSOMVariableReferenceValue* val)
+{
+    if (!target || !val)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSUnparsedValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionUSVStringOrCSSOMVariableReferenceValue(val, status1);
+    if (status1 != RV_OK) return status1;
+    return invoke([&]() -> decltype(auto) { return impl->setItem(index, std::move(*a1)); });
+}
+
+// CSSOMVariableReferenceValue.constructor: target is the Document of the constructed object; fallback defaults to null in IDL; fallback may be NULL; *result is a new reference
+int32_t ranvier_dom_cssom_variable_reference_value_create(RvNode* target, const uint8_t* variable, int32_t variable_length, RvCSSStyleValue* fallback, RvCSSOMVariableReferenceValue** result)
+{
+    if (!target || !(variable_length >= 0 && (variable_length <= 0 || variable)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { variable, variable_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    RefPtr<CSSUnparsedValue> a1 = fallback ? dynamicDowncast<CSSUnparsedValue>(*reinterpret_cast<CSSStyleValue*>(fallback)) : nullptr;
+    if (fallback && !a1)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return CSSOMVariableReferenceValue::create(a0.string(), a1.get()); }, [&](auto&& value) { return storeHandle<CSSOMVariableReferenceValue>(value, result); });
+}
+
+// CSSOMVariableReferenceValue.variable getter: attribute USVString variable
+int32_t ranvier_dom_cssom_variable_reference_value_get_variable(RvCSSOMVariableReferenceValue* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSOMVariableReferenceValue> impl = reinterpret_cast<CSSOMVariableReferenceValue*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->variable(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSOMVariableReferenceValue.variable setter: attribute USVString variable
+int32_t ranvier_dom_cssom_variable_reference_value_set_variable(RvCSSOMVariableReferenceValue* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSOMVariableReferenceValue> impl = reinterpret_cast<CSSOMVariableReferenceValue*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setVariable(a0.string()); });
+}
+
+// CSSOMVariableReferenceValue.fallback getter: readonly attribute CSSUnparsedValue? fallback; *result is a new reference, or NULL
+int32_t ranvier_dom_cssom_variable_reference_value_get_fallback(RvCSSOMVariableReferenceValue* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSOMVariableReferenceValue> impl = reinterpret_cast<CSSOMVariableReferenceValue*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->fallback(); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
 // CSSPositionTryRule.name getter: readonly attribute CSSOMString name; RV_ERR_UNSUPPORTED while the setting CSSAnchorPositioningEnabled is off
 int32_t ranvier_dom_css_position_try_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
 {
@@ -25668,6 +26184,61 @@ int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text
     return deliver([&]() -> decltype(auto) { return DOMCSSNamespace::supports(document.get(), a0.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// CSS.registerProperty: namespace operation with Document context and explicit UTF-8 byte lengths
+int32_t ranvier_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor)
+{
+    if (!target || !descriptor)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    DOMCSSCustomPropertyDescriptor a0 { };
+    if (descriptor) {
+        if (!(descriptor->size >= offsetof(RvDomDOMCSSCustomPropertyDescriptor, name) + sizeof(descriptor->name)))
+            return RV_ERR_NULL_ARGUMENT;
+        if (descriptor->name.present != 1)
+            return RV_ERR_NULL_ARGUMENT;
+        if (true) {
+            if (descriptor->name.present != 0 && descriptor->name.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptor->name.present) {
+                if (descriptor->name.length < 0 || (descriptor->name.length > 0 && !descriptor->name.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a0.name, descriptor->name.data, descriptor->name.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptor->size >= offsetof(RvDomDOMCSSCustomPropertyDescriptor, syntax) + sizeof(descriptor->syntax)) {
+            if (descriptor->syntax.present != 0 && descriptor->syntax.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptor->syntax.present) {
+                if (descriptor->syntax.length < 0 || (descriptor->syntax.length > 0 && !descriptor->syntax.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a0.syntax, descriptor->syntax.data, descriptor->syntax.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (!(descriptor->size >= offsetof(RvDomDOMCSSCustomPropertyDescriptor, inherits) + sizeof(descriptor->inherits)))
+            return RV_ERR_NULL_ARGUMENT;
+        if (true)
+            assignValue(a0.inherits, !!descriptor->inherits);
+        if (descriptor->size >= offsetof(RvDomDOMCSSCustomPropertyDescriptor, initial_value) + sizeof(descriptor->initial_value)) {
+            if (descriptor->initial_value.present != 0 && descriptor->initial_value.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptor->initial_value.present) {
+                if (descriptor->initial_value.length < 0 || (descriptor->initial_value.length > 0 && !descriptor->initial_value.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a0.initialValue, descriptor->initial_value.data, descriptor->initial_value.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+    }
+    return invoke([&]() -> decltype(auto) { return DOMCSSRegisterCustomProperty::registerProperty(document.get(), std::move(a0)); });
+}
+
 // Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element defaults to null in IDL; pseudo_element may be NULL (null); *result is a new reference
 int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result)
 {
@@ -25686,6 +26257,42 @@ int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, c
     StringArg a1 { pseudo_element, pseudo_element_length };
     if (pseudo_element_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
     return deliver([&]() -> decltype(auto) { return impl->window()->getComputedStyle(HandleArg<Element> { a0.get() }, a1.string()); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
+}
+
+// CSSStyleValue.parse: static operation with checked Document context and UTF-8 byte lengths; *result is a new reference
+int32_t ranvier_dom_css_style_value_parse(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvCSSStyleValue** result)
+{
+    if (!target || !(property_length >= 0 && (property_length <= 0 || property)) || !(css_text_length >= 0 && (css_text_length <= 0 || css_text)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    StringArg a0 { property, property_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { css_text, css_text_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return CSSStyleValue::parse(document.get(), a0.atom(), a1.string()); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
+// CSSStyleValue.parseAll: static operation with checked Document context and UTF-8 byte lengths; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result)
+{
+    if (!target || !(property_length >= 0 && (property_length <= 0 || property)) || !(css_text_length >= 0 && (css_text_length <= 0 || css_text)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    StringArg a0 { property, property_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { css_text, css_text_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return CSSStyleValue::parseAll(document.get(), a0.atom(), a1.string()); }, [&](auto&& value) { return encodeRvDomSequenceCSSStyleValue(value, result); });
 }
 
 int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
@@ -25733,6 +26340,8 @@ int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer,
         return copyString("CSSNestedDeclarations"_s, buffer, capacity, length);
     if (dynamicDowncast<CSSPositionTryRule>(*impl))
         return copyString("CSSPositionTryRule"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSPropertyRule>(*impl))
+        return copyString("CSSPropertyRule"_s, buffer, capacity, length);
     if (dynamicDowncast<CSSStyleRule>(*impl))
         return copyString("CSSStyleRule"_s, buffer, capacity, length);
     if (dynamicDowncast<CSSViewTransitionRule>(*impl))
@@ -25766,6 +26375,26 @@ int32_t ranvier_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclarati
     if (dynamicDowncast<CSSStyleProperties>(*impl))
         return copyString("CSSStyleProperties"_s, buffer, capacity, length);
     return copyString("CSSStyleDeclaration"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_css_style_value_get_interface_name(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<CSSStyleValue*>(target);
+    if (dynamicDowncast<CSSUnitValue>(*impl))
+        return copyString("CSSUnitValue"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSNumericValue>(*impl))
+        return copyString("CSSNumericValue"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSOMKeywordValue>(*impl))
+        return copyString("CSSOMKeywordValue"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSStyleImageValue>(*impl))
+        return copyString("CSSStyleImageValue"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSUnparsedValue>(*impl))
+        return copyString("CSSUnparsedValue"_s, buffer, capacity, length);
+    return copyString("CSSStyleValue"_s, buffer, capacity, length);
 }
 
 } // extern "C"

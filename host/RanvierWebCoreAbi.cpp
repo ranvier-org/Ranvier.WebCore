@@ -1088,7 +1088,7 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 21; }
+int32_t rv_abi_version(void) { return 22; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -2098,6 +2098,16 @@ int32_t rv_last_exception(int32_t part, char* buffer, int32_t capacity, int32_t*
         return copyString(String { }, buffer, capacity, length);
     switch (part) {
     case RV_EXCEPTION_NAME:
+        switch (*code) {
+        case ExceptionCode::RangeError:
+            return copyString("RangeError"_s, buffer, capacity, length);
+        case ExceptionCode::TypeError:
+            return copyString("TypeError"_s, buffer, capacity, length);
+        case ExceptionCode::JSSyntaxError:
+            return copyString("SyntaxError"_s, buffer, capacity, length);
+        default:
+            break;
+        }
         return copyString(String { DOMException::name(*code) }, buffer, capacity, length);
     case RV_EXCEPTION_MESSAGE:
         return copyString(Ranvier::lastExceptionMessage(), buffer, capacity, length);

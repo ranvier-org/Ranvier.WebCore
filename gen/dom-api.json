@@ -25,6 +25,7 @@
         "CSSNamespaceRule",
         "CSSNestedDeclarations",
         "CSSPositionTryRule",
+        "CSSPropertyRule",
         "CSSStyleRule",
         "CSSViewTransitionRule",
         "CSSRule"
@@ -88,6 +89,37 @@
       "parameters": [
         {
           "ctype": "RvCSSStyleDeclaration*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    },
+    {
+      "root": "CSSStyleValue",
+      "function": "rv_dom_css_style_value_get_interface_name",
+      "feature": "dom-type-query:CSSStyleValue",
+      "interfaces": [
+        "CSSUnitValue",
+        "CSSNumericValue",
+        "CSSOMKeywordValue",
+        "CSSStyleImageValue",
+        "CSSUnparsedValue",
+        "CSSStyleValue"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
           "name": "target"
         },
         {
@@ -509,6 +541,38 @@
     {
       "name": "CSSCounterStyleRule",
       "base": "CSSRule"
+    },
+    {
+      "name": "CSSPropertyRule",
+      "base": "CSSRule"
+    },
+    {
+      "name": "CSSStyleValue",
+      "base": null
+    },
+    {
+      "name": "CSSNumericValue",
+      "base": "CSSStyleValue"
+    },
+    {
+      "name": "CSSUnitValue",
+      "base": "CSSNumericValue"
+    },
+    {
+      "name": "CSSOMKeywordValue",
+      "base": "CSSStyleValue"
+    },
+    {
+      "name": "CSSStyleImageValue",
+      "base": "CSSStyleValue"
+    },
+    {
+      "name": "CSSUnparsedValue",
+      "base": "CSSStyleValue"
+    },
+    {
+      "name": "CSSOMVariableReferenceValue",
+      "base": null
     },
     {
       "name": "CSSPositionTryRule",
@@ -1661,6 +1725,78 @@
       "mixin": false,
       "contractOnly": false,
       "source": "css/CSSCounterStyleRule.idl"
+    },
+    {
+      "name": "CSSPropertyRule",
+      "idlName": "CSSPropertyRule",
+      "base": "CSSRule",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/CSSPropertyRule.idl"
+    },
+    {
+      "name": "CSSStyleValue",
+      "idlName": "CSSStyleValue",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/CSSStyleValue.idl"
+    },
+    {
+      "name": "CSSNumericValue",
+      "idlName": "CSSNumericValue",
+      "base": "CSSStyleValue",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/CSSNumericValue.idl"
+    },
+    {
+      "name": "CSSUnitValue",
+      "idlName": "CSSUnitValue",
+      "base": "CSSNumericValue",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/CSSUnitValue.idl"
+    },
+    {
+      "name": "CSSKeywordValue",
+      "idlName": "CSSOMKeywordValue",
+      "base": "CSSStyleValue",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/CSSOMKeywordValue.idl"
+    },
+    {
+      "name": "CSSImageValue",
+      "idlName": "CSSStyleImageValue",
+      "base": "CSSStyleValue",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/CSSStyleImageValue.idl"
+    },
+    {
+      "name": "CSSUnparsedValue",
+      "idlName": "CSSUnparsedValue",
+      "base": "CSSStyleValue",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/CSSUnparsedValue.idl"
+    },
+    {
+      "name": "CSSVariableReferenceValue",
+      "idlName": "CSSOMVariableReferenceValue",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/CSSOMVariableReferenceValue.idl"
     },
     {
       "name": "CSSPositionTryRule",
@@ -76068,6 +76204,1274 @@
       }
     },
     {
+      "interface": "CSSPropertyRule",
+      "member": "name",
+      "contractOwner": "CSSPropertyRule",
+      "kind": "getter",
+      "function": "rv_dom_css_property_rule_get_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSRule*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSPropertyRule",
+      "member": "syntax",
+      "contractOwner": "CSSPropertyRule",
+      "kind": "getter",
+      "function": "rv_dom_css_property_rule_get_syntax",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSRule*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSPropertyRule",
+      "member": "inherits",
+      "contractOwner": "CSSPropertyRule",
+      "kind": "getter",
+      "function": "rv_dom_css_property_rule_get_inherits",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSRule*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSPropertyRule",
+      "member": "initialValue",
+      "contractOwner": "CSSPropertyRule",
+      "kind": "getter",
+      "function": "rv_dom_css_property_rule_get_initial_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSRule*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSStyleValue",
+      "member": "toString",
+      "contractOwner": "CSSStyleValue",
+      "kind": "operation",
+      "function": "rv_dom_css_style_value_to_string",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSUnitValue",
+      "member": "constructor",
+      "contractOwner": "CSSUnitValue",
+      "kind": "constructor",
+      "function": "rv_dom_css_unit_value_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "unit"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "unit_length"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "double",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "unit",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSUnitValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSUnitValue",
+        "root": "CSSStyleValue",
+        "class": "CSSUnitValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSUnitValue",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CSSUnitValue",
+      "member": "value",
+      "contractOwner": "CSSUnitValue",
+      "kind": "getter",
+      "function": "rv_dom_css_unit_value_get_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSUnitValue",
+      "member": "value",
+      "contractOwner": "CSSUnitValue",
+      "kind": "setter",
+      "function": "rv_dom_css_unit_value_set_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "double",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSUnitValue",
+      "member": "unit",
+      "contractOwner": "CSSUnitValue",
+      "kind": "getter",
+      "function": "rv_dom_css_unit_value_get_unit",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSOMKeywordValue",
+      "member": "constructor",
+      "contractOwner": "CSSKeywordValue",
+      "kind": "constructor",
+      "function": "rv_dom_cssom_keyword_value_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSOMKeywordValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSOMKeywordValue",
+        "root": "CSSStyleValue",
+        "class": "CSSOMKeywordValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSOMKeywordValue",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CSSOMKeywordValue",
+      "member": "value",
+      "contractOwner": "CSSKeywordValue",
+      "kind": "getter",
+      "function": "rv_dom_cssom_keyword_value_get_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSOMKeywordValue",
+      "member": "value",
+      "contractOwner": "CSSKeywordValue",
+      "kind": "setter",
+      "function": "rv_dom_cssom_keyword_value_set_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CSSUnparsedValue",
+      "member": "constructor",
+      "contractOwner": "CSSUnparsedValue",
+      "kind": "constructor",
+      "function": "rv_dom_css_unparsed_value_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceUSVStringOrCSSOMVariableReferenceValue*",
+          "name": "members"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "members",
+          "idlType": "sequence<CSSUnparsedSegment>",
+          "idl": {
+            "name": "sequence",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "union",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "USVString",
+                    "nullable": false,
+                    "subtypes": []
+                  },
+                  {
+                    "name": "CSSOMVariableReferenceValue",
+                    "nullable": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceUSVStringOrCSSOMVariableReferenceValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringOrCSSOMVariableReferenceValue sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionUSVStringOrCSSOMVariableReferenceValue",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "USVStringOrCSSOMVariableReferenceValue",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  },
+                  {
+                    "kind": "object",
+                    "ctype": null,
+                    "interface": "CSSOMVariableReferenceValue",
+                    "root": "CSSOMVariableReferenceValue",
+                    "class": "CSSOMVariableReferenceValue",
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSUnparsedValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSUnparsedValue",
+        "root": "CSSStyleValue",
+        "class": "CSSUnparsedValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSUnparsedValue"
+    },
+    {
+      "interface": "CSSUnparsedValue",
+      "member": "length",
+      "contractOwner": "CSSUnparsedValue",
+      "kind": "getter",
+      "function": "rv_dom_css_unparsed_value_get_length",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSUnparsedValue",
+      "member": "item",
+      "contractOwner": "CSSUnparsedValue",
+      "kind": "operation",
+      "function": "rv_dom_css_unparsed_value_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "union",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSOMVariableReferenceValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringOrCSSOMVariableReferenceValue",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSOMVariableReferenceValue",
+            "root": "CSSOMVariableReferenceValue",
+            "class": "CSSOMVariableReferenceValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "CSSUnparsedValue",
+      "member": "setItem",
+      "contractOwner": "CSSUnparsedValue",
+      "kind": "operation",
+      "function": "rv_dom_css_unparsed_value_set_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "const RvDomUnionUSVStringOrCSSOMVariableReferenceValue*",
+          "name": "val"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "val",
+          "idlType": "CSSUnparsedSegment",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSOMVariableReferenceValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUSVStringOrCSSOMVariableReferenceValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringOrCSSOMVariableReferenceValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSOMVariableReferenceValue",
+                "root": "CSSOMVariableReferenceValue",
+                "class": "CSSOMVariableReferenceValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSOMVariableReferenceValue",
+      "member": "constructor",
+      "contractOwner": "CSSVariableReferenceValue",
+      "kind": "constructor",
+      "function": "rv_dom_cssom_variable_reference_value_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "variable"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "variable_length"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "fallback"
+        },
+        {
+          "ctype": "RvCSSOMVariableReferenceValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "variable",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "fallback",
+          "idlType": "CSSUnparsedValue?",
+          "idl": {
+            "name": "CSSUnparsedValue",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "null",
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSUnparsedValue",
+            "root": "CSSStyleValue",
+            "class": "CSSUnparsedValue",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSOMVariableReferenceValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSOMVariableReferenceValue",
+        "root": "CSSOMVariableReferenceValue",
+        "class": "CSSOMVariableReferenceValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSOMVariableReferenceValue",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CSSOMVariableReferenceValue",
+      "member": "variable",
+      "contractOwner": "CSSVariableReferenceValue",
+      "kind": "getter",
+      "function": "rv_dom_cssom_variable_reference_value_get_variable",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSOMVariableReferenceValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSOMVariableReferenceValue",
+      "member": "variable",
+      "contractOwner": "CSSVariableReferenceValue",
+      "kind": "setter",
+      "function": "rv_dom_cssom_variable_reference_value_set_variable",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSOMVariableReferenceValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CSSOMVariableReferenceValue",
+      "member": "fallback",
+      "contractOwner": "CSSVariableReferenceValue",
+      "kind": "getter",
+      "function": "rv_dom_cssom_variable_reference_value_get_fallback",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSOMVariableReferenceValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSUnparsedValue",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSUnparsedValue",
+        "root": "CSSStyleValue",
+        "class": "CSSUnparsedValue",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "CSSPositionTryRule",
       "member": "name",
       "contractOwner": "CSSPositionTryRule",
@@ -93195,6 +94599,72 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "DOMCSSNamespace",
+      "member": "registerProperty",
+      "contractOwner": "CSS",
+      "kind": "namespace_operation",
+      "function": "rv_dom_css_register_property",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMCSSCustomPropertyDescriptor*",
+          "name": "descriptor"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "descriptor",
+          "idlType": "DOMCSSCustomPropertyDescriptor",
+          "idl": {
+            "name": "DOMCSSCustomPropertyDescriptor",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMCSSCustomPropertyDescriptor",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "namespace": "CSS",
+      "feature": "dom-css-register-property",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "DOMWindow",
       "member": "getComputedStyle",
       "contractOwner": "Window",
@@ -93295,6 +94765,235 @@
       "feature": "dom-computed-style",
       "binding": "facade",
       "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "CSSStyleValue",
+      "member": "parse",
+      "contractOwner": "CSSStyleValue",
+      "kind": "static_operation",
+      "function": "rv_dom_css_style_value_parse",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "property"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "property_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "css_text"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "css_text_length"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "property",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "cssText",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSStyleValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSStyleValue",
+        "root": "CSSStyleValue",
+        "class": "CSSStyleValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-css-style-values",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CSSStyleValue",
+      "member": "parseAll",
+      "contractOwner": "CSSStyleValue",
+      "kind": "static_operation",
+      "function": "rv_dom_css_style_value_parse_all",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "property"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "property_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "css_text"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "css_text_length"
+        },
+        {
+          "ctype": "RvDomSequenceCSSStyleValue*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "property",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "cssText",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "CSSStyleValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceCSSStyleValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSStyleValue sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleValue",
+            "root": "CSSStyleValue",
+            "class": "CSSStyleValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "receiver": "Document",
+      "feature": "dom-css-style-values",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
     }
   ],
   "enumerations": {
@@ -94099,6 +95798,142 @@
     {
       "mapping": {
         "kind": "union",
+        "ctype": "RvDomUnionUSVStringOrCSSOMVariableReferenceValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringOrCSSOMVariableReferenceValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSOMVariableReferenceValue",
+            "root": "CSSOMVariableReferenceValue",
+            "class": "CSSOMVariableReferenceValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_usv_string_or_cssom_variable_reference_value_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceUSVStringOrCSSOMVariableReferenceValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringOrCSSOMVariableReferenceValue sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "union",
+            "ctype": "RvDomUnionUSVStringOrCSSOMVariableReferenceValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringOrCSSOMVariableReferenceValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSOMVariableReferenceValue",
+                "root": "CSSOMVariableReferenceValue",
+                "class": "CSSOMVariableReferenceValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_usv_string_or_cssom_variable_reference_value_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringOrCSSOMVariableReferenceValue",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSOMVariableReferenceValue",
+            "root": "CSSOMVariableReferenceValue",
+            "class": "CSSOMVariableReferenceValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
         "ctype": "RvDomUnionShadowRootOrGetComposedRangesOptions",
         "interface": null,
         "root": null,
@@ -94191,6 +96026,34 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_pointer_event_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceCSSStyleValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSStyleValue sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleValue",
+            "root": "CSSStyleValue",
+            "class": "CSSStyleValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_css_style_value_release"
     }
   ],
   "dictionaries": {
@@ -94879,6 +96742,84 @@
               "subtypes": []
             }
           ]
+        }
+      }
+    ],
+    "DOMCSSCustomPropertyDescriptor": [
+      {
+        "name": "name",
+        "field": "name",
+        "ctype": "RvDomUtf8StringInput",
+        "required": true,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "syntax",
+        "field": "syntax",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"*\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "inherits",
+        "field": "inherits",
+        "ctype": "int32_t",
+        "required": true,
+        "default": null,
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "initialValue",
+        "field": "initial_value",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
         }
       }
     ]

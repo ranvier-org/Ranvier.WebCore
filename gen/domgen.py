@@ -119,7 +119,7 @@ class Mapped:
     """A C mapping of an IDL type."""
 
     def __init__(self, kind, nullable=False, ctype=None, interface=None, root=None, cls=None, enum=None, atom=False,
-                 subtypes=(), label=None):
+                 subtypes=(), label=None, string_spans=False):
         self.kind = kind  # string, bool, number, enum, node, event, object, dict, void
         self.atom = atom  # a string union whose DOMString is [AtomString]
         self.nullable = nullable
@@ -130,6 +130,7 @@ class Mapped:
         self.enum = enum
         self.subtypes = subtypes
         self.label = label
+        self.string_spans = string_spans
 
     @property
     def handle(self):
@@ -398,6 +399,10 @@ class World:
                 return Mapped("string", t.nullable, atom=strings)
             children = [self.map(child) for child in t.subtypes]
             label = "Or".join(type_label(self.resolve(child)) for child in t.subtypes)
+            if label in self.config.get('complexStringSpans', []):
+                for child in children:
+                    if child.kind == 'string':
+                        child.string_spans = True
             return Mapped("union", t.nullable, "RvDomUnion" + label + ("Nullable" if t.nullable else ""),
                           subtypes=children, label=label)
         if t.name in ("sequence", "FrozenArray"):
@@ -471,6 +476,8 @@ class Generator(ComplexGeneratorMixin):
             self.namespace(name, binding)
         for name, binding in self.world.config.get("windowBindings", {}).items():
             self.window_context(name, binding)
+        for name, binding in self.world.config.get("staticBindings", {}).items():
+            self.static_context(name, binding)
         self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
@@ -547,6 +554,50 @@ class Generator(ComplexGeneratorMixin):
                 generated.append(function)
         self.namespace_features.append((binding['feature'], [function.conditional for function in generated if function.conditional]))
 
+    def static_context(self, name, binding):
+        if name not in self.world.scope:
+            raise SystemExit(f'{name}: static binding requires a scoped interface')
+        receiver = binding['receiver']
+        if receiver not in self.world.scope or 'Node' not in self.world.chain(receiver):
+            raise SystemExit(f'{name}: static receiver must be a scoped node interface')
+        if binding.get('stringInputs') != 'utf8-lengths':
+            raise SystemExit(f'{name}: static string inputs require explicit UTF-8 lengths')
+        selected = set(binding['members'])
+        operations = {}
+        for member in self.world.members(name):
+            if member.name not in selected:
+                continue
+            checked = idl.Member(**member.__dict__)
+            checked.static = False
+            reason = self.member_reason(name, checked)
+            if reason or member.kind != 'operation' or not member.static:
+                raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not a static operation"}')
+            operations.setdefault(member.name, []).append(member)
+        if selected != set(operations):
+            raise SystemExit(f'{name}: missing configured static operations {sorted(selected - set(operations))}')
+        generated = []
+        for operation, overloads in operations.items():
+            for member in overloads:
+                suffix = '' if len(overloads) == 1 else f'_{len(member.arguments)}'
+                function = Function(name, member, 'static_operation', f'{snake(name)}_{snake(operation)}{suffix}', [],
+                                    f'{name}.{operation}: static operation with checked {receiver} context and UTF-8 byte lengths')
+                function.receiver = receiver
+                function.feature = binding['feature']
+                function.string_spans = True
+                try:
+                    args = [self.world.map(argument.type) for argument in member.arguments]
+                    result = self.world.map(member.type)
+                    call_with = self.call_with(attr_list(member.attrs.get('CallWith')))
+                    cpp = member.attrs.get('ImplementedBy', self.world.cpp_class(name))
+                    self.headers.add(f'{cpp}.h')
+                    placeholders = ', '.join(f'{{arg{i}}}' for i in range(len(args)))
+                    call = f'{cpp}::{member.attrs.get("ImplementedAs", member.name)}({{call_with_lead}}{placeholders})'
+                    self.finish(function, receiver, member, member.arguments, args, result, call, call_with)
+                except Unsupported as error:
+                    raise SystemExit(f'{name}.{member.name}: {error}') from error
+                generated.append(function)
+        self.namespace_features.append((binding['feature'], [function.conditional for function in generated if function.conditional]))
+
     def scoped_member(self, member, *scopes):
         result = member
         for attrs in scopes:
@@ -596,7 +647,7 @@ class Generator(ComplexGeneratorMixin):
                                     f"{public}.{operation}: namespace operation with {receiver} context and explicit UTF-8 byte lengths")
                 function.namespace = public
                 function.receiver = receiver
-                function.feature = binding["feature"]
+                function.feature = binding.get("memberFeatures", {}).get(operation, binding["feature"])
                 function.string_spans = True
                 try:
                     args = [self.world.map(argument.type) for argument in member.arguments]
@@ -610,7 +661,9 @@ class Generator(ComplexGeneratorMixin):
                 except Unsupported as error:
                     raise SystemExit(f"{name}.{member.name}: {error}") from error
                 generated.append(function)
-        self.namespace_features.append((binding["feature"], [function.conditional for function in generated if function.conditional]))
+        for feature in dict.fromkeys(function.feature for function in generated):
+            self.namespace_features.append((feature, [function.conditional for function in generated
+                                                       if function.feature == feature and function.conditional]))
 
     def interface(self, name):
         members = self.world.members(name)
@@ -630,6 +683,8 @@ class Generator(ComplexGeneratorMixin):
                     self.skip(name, member, "constructor")
                 continue
             if member.kind == "operation":
+                if member.static and member.name in self.world.config.get('staticBindings', {}).get(name, {}).get('members', []):
+                    continue
                 if not member.name and member.special in ("getter", "setter", "deleter") and member.arguments:
                     member = self.special_name(member)
                 operations.setdefault(member.name, []).append(member)
@@ -724,6 +779,8 @@ class Generator(ComplexGeneratorMixin):
         label = f"{interface}.{member.name}"
         if label in self.exclude or member.name in self.exclude:
             return "excluded by gen/dom.json"
+        if member.kind == 'operation' and member.special == 'stringifier' and interface not in self.world.config.get('stringifiers', []):
+            return 'stringifier outside configured binding'
         if not member.name:
             return "unnamed special operation"
         if member.static:
@@ -884,6 +941,10 @@ class Generator(ComplexGeneratorMixin):
             return f"{self.world.cpp_class(stem)}::{name}"
         return name
 
+    def uses_dictionary_string_spans(self):
+        return any(self.field_ctype(member, mapped, name) == "RvDomUtf8StringInput"
+                   for name, fields in self.dicts_used.items() for member, mapped in fields)
+
     def use_dictionary(self, name):
         """The dictionary's fields in struct order: the lock's fields first, in its order, then new ones."""
         if name in self.dicts_used:
@@ -906,11 +967,12 @@ class Generator(ComplexGeneratorMixin):
         self.dicts_used[name] = ordered
         return ordered
 
-    @staticmethod
-    def field_ctype(member, mapped):
+    def field_ctype(self, member, mapped, dictionary=None):
         """The C type of a dictionary field: a pointer for an optional scalar without a default, NULL for absent."""
         absent = mapped.nullable or (not member.required and member.default is None)
         if mapped.kind == "string":
+            if self.world.config.get("dictionaryStringInputs", {}).get(dictionary) == "utf8-lengths-presence":
+                return "RvDomUtf8StringInput"
             return "const char*"
         if mapped.kind == "node":
             return "RvNode*"
@@ -919,19 +981,33 @@ class Generator(ComplexGeneratorMixin):
         ctype = mapped.ctype
         return f"const {ctype}*" if absent else ctype
 
-    def dictionary_field(self, pointer, struct, target, member, mapped):
+    def dictionary_field(self, pointer, struct, target, member, mapped, dictionary=None):
         """The glue that copies one field of a C dictionary into the C++ one, when the struct's size covers it."""
         field = c_name(member.name)
         cpp_field = member.attrs.get("ImplementedAs", member.name)
         covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
-        ctype = self.field_ctype(member, mapped)
+        ctype = self.field_ctype(member, mapped, dictionary)
         lines = []
         if member.required:
             lines += [f"if (!({covered}))", "    return RV_ERR_NULL_ARGUMENT;"]
             covered = "true"
         if mapped.kind == "string":
-            lines.append(f"if ({covered} && {pointer}->{field})")
-            lines.append(f"    assignString({target}.{cpp_field}, {pointer}->{field});")
+            if ctype == "RvDomUtf8StringInput":
+                span = f"{pointer}->{field}"
+                if member.required:
+                    lines += [f"if ({span}.present != 1)", "    return RV_ERR_NULL_ARGUMENT;"]
+                lines += [f"if ({covered}) {{",
+                          f"    if ({span}.present != 0 && {span}.present != 1)",
+                          "        return RV_ERR_NULL_ARGUMENT;",
+                          f"    if ({span}.present) {{",
+                          f"        if ({span}.length < 0 || ({span}.length > 0 && !{span}.data))",
+                          "            return RV_ERR_NULL_ARGUMENT;",
+                          f"        if (!assignString({target}.{cpp_field}, {span}.data, {span}.length))",
+                          "            return RV_ERR_NULL_ARGUMENT;",
+                          "    }", "}"]
+            else:
+                lines.append(f"if ({covered} && {pointer}->{field})")
+                lines.append(f"    assignString({target}.{cpp_field}, {pointer}->{field});")
         elif mapped.kind == "node":
             self.headers.add(f"{mapped.cls}.h")
             lines.append(f"if ({covered} && {pointer}->{field}) {{")
@@ -1049,9 +1125,12 @@ class Generator(ComplexGeneratorMixin):
             args = [self.world.map(argument.type) for argument in member.arguments]
             returns = self.world.map(idl.Type(interface))
             arguments = ", ".join(f"{{arg{i}}}" for i in range(len(args)))
-            call = f"{configured['factory']}(*impl{', ' if arguments else ''}{arguments})"
+            if configured.get('passReceiver', True):
+                arguments = f"*impl{', ' if arguments else ''}{arguments}"
+            call = f"{configured['factory']}({arguments})"
             function = Function(interface, member, "constructor", f"{snake(interface)}_create", [],
                                 f"{interface}.constructor: target is the {receiver} of the constructed object")
+            function.string_spans = configured.get('stringInputs') == 'utf8-lengths'
             self.finish(function, receiver, member, member.arguments, args, returns, call, [])
         except Unsupported as error:
             self.skip(interface, member, f"constructor: {error}")
@@ -1083,6 +1162,8 @@ class Generator(ComplexGeneratorMixin):
 
     def finish(self, function, interface, member, arguments, mapped_args, returns, call, call_with):
         """Fills in the function's C parameters and glue body, then records it."""
+        if self.world.config.get('interfaceStringInputs', {}).get(function.interface) == 'utf8-lengths':
+            function.string_spans = True
         self_type = self.self_param(interface)
         params = [(self_type, "target")]
         checks = ["target"]
@@ -1123,6 +1204,11 @@ class Generator(ComplexGeneratorMixin):
                     notes.append(f"{name} may be NULL" + (" (absent)" if optional_no_default else " (null)"))
             elif mapped.kind in ("bool", "number"):
                 ctype = mapped.ctype
+                if (mapped.kind == 'number' and function.interface in self.world.config.get('finiteNumberInputs', [])
+                        and self.world.resolve(argument.type).name in ('double', 'float')):
+                    condition = f'{name} && !std::isfinite(*{name})' if maybe_null else f'!std::isfinite({name})'
+                    prepare += [f'if ({condition})',
+                                '    return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });']
                 if maybe_null:
                     params.append((f"const {ctype}*", name))
                     passed.append(f"OptionalArg<{ctype}> {{ {name} }}")
@@ -1153,7 +1239,7 @@ class Generator(ComplexGeneratorMixin):
                 prepare.append(f"{cpp} a{index} {{ }};")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
-                    prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped)]
+                    prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped, mapped.interface)]
                 prepare.append("}")
                 passed.append(f"std::move(a{index})")
             elif mapped.kind in ("union", "sequence"):
@@ -1304,12 +1390,15 @@ class Generator(ComplexGeneratorMixin):
 
     @staticmethod
     def describe_mapping(mapped):
-        return {
+        result = {
             "kind": mapped.kind, "ctype": mapped.ctype, "interface": mapped.interface,
             "root": mapped.root, "class": mapped.cls, "enum": mapped.enum,
             "label": mapped.label, "nullable": mapped.nullable, "atom": mapped.atom,
             "subtypes": [Generator.describe_mapping(child) for child in mapped.subtypes],
         }
+        if mapped.kind == 'string' and mapped.string_spans:
+            result['stringTransport'] = 'utf8-lengths'
+        return result
 
     def api_model(self):
         def describe_idl(value):
@@ -1344,12 +1433,19 @@ class Generator(ComplexGeneratorMixin):
             if function.kind == "constructor":
                 functions[-1]["receiver"] = self.world.config["constructors"][function.interface]["receiver"]
                 functions[-1]["feature"] = f"dom-constructor:{function.interface}"
+                if getattr(function, 'string_spans', False):
+                    functions[-1]['stringInputs'] = 'utf8-lengths'
             if function.kind == "namespace_operation":
                 functions[-1].update(receiver=function.receiver, namespace=function.namespace, feature=function.feature,
                                      binding="facade", stringInputs="utf8-lengths")
             if function.kind == 'context_operation':
                 functions[-1].update(receiver=function.receiver, context='Window', feature=function.feature,
                                      binding='facade', stringInputs='utf8-lengths-nullable')
+            if function.kind == 'static_operation':
+                functions[-1].update(receiver=function.receiver, feature=function.feature,
+                                     binding='facade', stringInputs='utf8-lengths')
+            if function.kind in ('operation', 'setter') and getattr(function, 'string_spans', False):
+                functions[-1]['stringInputs'] = 'utf8-lengths'
             bridge = self.world.config.get("attributeBridges", {}).get(f"{function.interface}.{function.member.name}")
             if bridge:
                 functions[-1]["binding"] = "facade"
@@ -1381,7 +1477,7 @@ class Generator(ComplexGeneratorMixin):
                             "releaseFunction": "rv_dom_" + transport_token(name) + "_release"}
                            for name, mapped in self.complex_used.items()],
             "dictionaries": {name: [{"name": member.name, "field": c_name(member.name),
-                                     "ctype": self.field_ctype(member, mapped), "required": member.required,
+                                     "ctype": self.field_ctype(member, mapped, name), "required": member.required,
                                      "default": member.default, "mapping": self.describe_mapping(mapped)}
                                     for member, mapped in fields]
                              for name, fields in self.dicts_used.items()},
@@ -1398,7 +1494,8 @@ class Generator(ComplexGeneratorMixin):
             " * - Each function returns RV_OK or a negative status and writes its result through the last parameters.",
             " * - target is the object the member belongs to. A node handle of another interface returns",
             " *   RV_ERR_WRONG_INTERFACE, as does a node argument of another interface.",
-            " * - Strings in are NUL-terminated UTF-8. Strings out copy into buffer as RanvierWebCoreAbi.h describes.",
+            " * - String inputs use UTF-8, with explicit byte lengths where the signature supplies them; otherwise",
+            " *   inputs are NUL-terminated. String outputs copy into buffer as RanvierWebCoreAbi.h describes.",
             " * - Booleans are int32_t 0 or 1. An argument that is nullable or optional without a default is a pointer,",
             " *   NULL for null or absent.",
             " * - Handles out are new references: rv_node_release, rv_event_release, or the rv_dom_*_release of the type.",
@@ -1438,6 +1535,10 @@ class Generator(ComplexGeneratorMixin):
                 lines.append(f"    RV_DOM_{snake(enum).upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', value).upper() or 'EMPTY'} = {index}, /* \"{value}\" */")
             lines.append("};")
             lines.append("")
+        if self.uses_dictionary_string_spans():
+            lines += ["/* A present UTF-8 dictionary string; length is a byte count and may include NUL. */",
+                      "typedef struct RvDomUtf8StringInput {", "    int32_t present;",
+                      "    const uint8_t* data;", "    int32_t length;", "} RvDomUtf8StringInput;", ""]
         for name, fields in self.dicts_used.items():
             struct = f"RvDom{name}"
             lines.append(f"/* The IDL dictionary {name}. size is sizeof({struct}) as the caller compiles it; a field past")
@@ -1445,7 +1546,7 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f"typedef struct {struct} {{")
             lines.append("    uint32_t size;")
             for member, mapped in fields:
-                ctype = self.field_ctype(member, mapped)
+                ctype = self.field_ctype(member, mapped, name)
                 note = f"{member.type}"
                 if member.required:
                     note += ", required"
@@ -1670,11 +1771,15 @@ class Generator(ComplexGeneratorMixin):
             for index, value in enumerate(values):
                 macro = f"RV_DOM_{snake(enum).upper()}_{re.sub(r'[^A-Za-z0-9]+', '_', value).upper() or 'EMPTY'}"
                 lines += ["", "[<Literal>]", f"let {macro} = {index}"]
+        if self.uses_dictionary_string_spans():
+            lines += ["", "/// <summary>A present UTF-8 dictionary string with an explicit byte count.</summary>",
+                      "[<Struct; StructLayout(LayoutKind.Sequential)>]", "type RvDomUtf8StringInput =",
+                      "    val mutable present: int32", "    val mutable data: nativeint", "    val mutable length: int32"]
         for name, fields in self.dicts_used.items():
             lines += ["", f"/// <summary>The IDL dictionary {name}; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>",
                       "[<Struct; StructLayout(LayoutKind.Sequential)>]", f"type RvDom{name} =", "    val mutable size: uint32"]
             for member, mapped in fields:
-                ctype = self.field_ctype(member, mapped)
+                ctype = self.field_ctype(member, mapped, name)
                 field = c_name(member.name)
                 field = f"``{field}``" if field in FSHARP_KEYWORDS else field
                 if ctype == "const char*":
@@ -1682,6 +1787,8 @@ class Generator(ComplexGeneratorMixin):
                     lines.append(f"    val mutable {field}: string")
                 elif ctype.endswith("*"):
                     lines.append(f"    val mutable {field}: nativeint")
+                elif ctype == "RvDomUtf8StringInput":
+                    lines.append(f"    val mutable {field}: RvDomUtf8StringInput")
                 else:
                     lines.append(f"    val mutable {field}: {FSHARP_NUMBERS[ctype]}")
         lines += self.complex_fsharp()
@@ -1708,6 +1815,7 @@ class Generator(ComplexGeneratorMixin):
             f"operations {sum(f.kind == 'operation' for f in self.functions)}, "
             f"constructors {sum(f.kind == 'constructor' for f in self.functions)}, "
             f"namespace operations {sum(f.kind == 'namespace_operation' for f in self.functions)}, "
+            f"static operations {sum(f.kind == 'static_operation' for f in self.functions)}, "
             f"context operations {sum(f.kind == 'context_operation' for f in self.functions)}), handle types {len(self.handles)}, "
             f"constants {len(self.constants)}, enumerations {len(self.enums_used)}, dictionaries {len(self.dicts_used)}, "
             f"stubs {len(self.stubs)}, left out {len(self.excluded)}",
@@ -1748,7 +1856,8 @@ class Generator(ComplexGeneratorMixin):
         return "\n".join(lines) + "\n"
 
 
-RUNTIME = r"""#include <cstddef>
+RUNTIME = r"""#include <cmath>
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <optional>
@@ -1906,6 +2015,19 @@ template<typename T> void assignString(T& field, const char* text)
         field = AtomString::fromUTF8(text);
     else
         field = Type { String::fromUTF8(text) };
+}
+
+template<typename T> bool assignString(T& field, const uint8_t* text, int32_t length)
+{
+    String value = length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString();
+    if (value.isNull())
+        return false;
+    using Type = typename Unwrapped<T>::Type;
+    if constexpr (std::is_same_v<Type, AtomString>)
+        field = AtomString { value };
+    else
+        field = Type { value };
+    return true;
 }
 
 template<typename T, size_t N> bool assignEnumeration(T& field, int32_t index, const ASCIILiteral (&names)[N])

@@ -2139,6 +2139,87 @@ and [<AllowNullLiteral>] CSSCounterStyleRule =
     /// <summary>CSSCounterStyleRule.fallback.</summary>
     abstract member fallback: string with get, set
 
+/// <summary>CSSPropertyRule in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSPropertyRule =
+    inherit CSSRule
+    /// <summary>CSSPropertyRule.name.</summary>
+    abstract member name: string with get
+    /// <summary>CSSPropertyRule.syntax.</summary>
+    abstract member syntax: string with get
+    /// <summary>CSSPropertyRule.inherits.</summary>
+    abstract member inherits: bool with get
+    /// <summary>CSSPropertyRule.initialValue.</summary>
+    abstract member initialValue: string with get
+
+/// <summary>CSSStyleValue in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSStyleValue =
+    /// <summary>CSSStyleValue.toString.</summary>
+    abstract member toString: unit -> string
+
+/// <summary>CSSNumericValue in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSNumericValue =
+    inherit CSSStyleValue
+
+/// <summary>CSSUnitValue in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSUnitValue =
+    inherit CSSNumericValue
+    /// <summary>CSSUnitValue.value.</summary>
+    abstract member value: float with get, set
+    /// <summary>CSSUnitValue.unit.</summary>
+    abstract member unit: string with get
+
+/// <summary>CSSKeywordValue in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSKeywordValue =
+    inherit CSSStyleValue
+
+    /// <summary>CSSKeywordValue.value.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.value{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member value: string with get, set
+
+
+/// <summary>CSSImageValue in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSImageValue =
+    inherit CSSStyleValue
+
+/// <summary>CSSUnparsedValue in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSUnparsedValue =
+    inherit CSSStyleValue
+    /// <summary>CSSUnparsedValue.length.</summary>
+    abstract member length: uint32 with get
+
+    /// <summary>CSSUnparsedValue.item.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1]")>]
+    abstract member __ranvier_item: index: uint32 -> obj
+#else
+    abstract member item: index: uint32 -> (USVStringOrCSSOMVariableReferenceValue) option
+#endif
+
+
+    /// <summary>CSSUnparsedValue.setItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((v,i,s)=>{if(i===4294967295)throw new RangeError('Index out of range.');v[i]=s;})($0,$1,$2)")>]
+    abstract member __ranvier_setItem: index: uint32 * ``val``: obj -> unit
+#else
+    abstract member setItem: index: uint32 * ``val``: string -> unit
+    abstract member setItem: index: uint32 * ``val``: CSSVariableReferenceValue -> unit
+#endif
+
+
+/// <summary>CSSVariableReferenceValue in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSVariableReferenceValue =
+
+    /// <summary>CSSVariableReferenceValue.variable.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.variable{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member variable: string with get, set
+
+    /// <summary>CSSVariableReferenceValue.fallback.</summary>
+    abstract member fallback: CSSUnparsedValue with get
+
 /// <summary>CSSPositionTryRule in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CSSPositionTryRule =
     inherit CSSRule
@@ -3486,6 +3567,11 @@ and [<RequireQualifiedAccess>] ElementOrText =
     | Element of Element
     | Text of Text
 
+/// <summary>USVStringOrCSSOMVariableReferenceValue in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] USVStringOrCSSOMVariableReferenceValue =
+    | USVString of string
+    | CSSOMVariableReferenceValue of CSSVariableReferenceValue
+
 /// <summary>ShadowRootOrGetComposedRangesOptions in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] ShadowRootOrGetComposedRangesOptions =
     | ShadowRoot of ShadowRoot
@@ -3635,6 +3721,14 @@ and [<DomStringEnum; RequireQualifiedAccess>] ScrollLogicalPosition =
 #if FABLE_COMPILER
 [<AutoOpen>]
 module BrowserUnionAdapters =
+    [<Fable.Core.Emit("((v)=>String(v==null?'null':v).toWellFormed())($0)")>]
+    let private normalizeUSVString (_: string) : string =
+        Fable.Core.Util.jsNative
+
+    [<Fable.Core.Emit("((v)=>{if(v==null)return false;try{Object.getOwnPropertyDescriptor(globalThis.CSSVariableReferenceValue.prototype,'variable').get.call(v);return true;}catch{return false;} })($0)")>]
+    let private isCSSOMVariableReferenceValue (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
     [<Fable.Core.Emit("$0 != null && $0.nodeType === 1")>]
     let private isElement (_: obj) : bool =
         Fable.Core.Util.jsNative
@@ -3702,6 +3796,18 @@ module BrowserUnionAdapters =
         match value with
         | ElementOrText.Element value -> box value
         | ElementOrText.Text value -> box value
+
+    let private boxUSVStringOrCSSOMVariableReferenceValue (value: USVStringOrCSSOMVariableReferenceValue) : obj =
+        match value with
+        | USVStringOrCSSOMVariableReferenceValue.USVString value -> box (normalizeUSVString value)
+        | USVStringOrCSSOMVariableReferenceValue.CSSOMVariableReferenceValue value -> box value
+
+    let private unboxUSVStringOrCSSOMVariableReferenceValue (value: obj) : USVStringOrCSSOMVariableReferenceValue =
+        match value with
+        | :? string as arm -> USVStringOrCSSOMVariableReferenceValue.USVString arm
+        | arm when isCSSOMVariableReferenceValue arm ->
+            USVStringOrCSSOMVariableReferenceValue.CSSOMVariableReferenceValue (unbox<CSSVariableReferenceValue> arm)
+        | _ -> failwith "Unexpected DOM union result"
 
     let private boxShadowRootOrGetComposedRangesOptions (value: ShadowRootOrGetComposedRangesOptions) : obj =
         match value with
@@ -3812,6 +3918,28 @@ module BrowserUnionAdapters =
     type HTMLSlotElement with
         member this.assign([<System.ParamArray>] nodes: ElementOrText array) : unit =
             this.__ranvier_assign (nodes |> Array.map boxElementOrText)
+
+
+    type CSSUnparsedValue with
+        member this.item(index: uint32) : (USVStringOrCSSOMVariableReferenceValue) option =
+            let value = this.__ranvier_item (index)
+
+            if isNull value then
+                None
+            else
+                Some (unboxUSVStringOrCSSOMVariableReferenceValue value)
+
+        member this.setItem(index: uint32, ``val``: string) : unit =
+            this.__ranvier_setItem (index, box (normalizeUSVString ``val``))
+
+        member this.setItem(index: uint32, ``val``: CSSVariableReferenceValue) : unit =
+            if isNull (box ``val``) then
+                nullArg "val"
+
+            if not (isCSSOMVariableReferenceValue (box ``val``)) then
+                invalidArg "val" "Expected a CSSVariableReferenceValue."
+
+            this.__ranvier_setItem (index, box ``val``)
 
 
     type DOMSelection with

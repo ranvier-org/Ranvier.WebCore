@@ -69,8 +69,8 @@ class InterfaceEmitter:
         elif value.name in self.world.enums:
             result = value.name
             self.enums.add(result)
-        elif value.name in self.names:
-            result = value.name
+        elif self.world.public_name(value.name) in self.names:
+            result = self.world.public_name(value.name)
         else:
             raise self.generator.unsupported_type(f'interface surface type {value.name} outside scope')
         if value.nullable and value.name in NUMBERS | {'boolean': ''} or value.nullable and value.name == 'union':
@@ -120,6 +120,8 @@ class InterfaceEmitter:
                 and self.world.member_key(function.member) == key and not function.unused]
 
     def browser_property_expression(self, owner, member):
+        if owner == 'CSSUnparsedValue' and member.name == 'setItem' and member.special == 'setter':
+            return "((v,i,s)=>{if(i===4294967295)throw new RangeError('Index out of range.');v[i]=s;})($0,$1,$2)"
         if owner == 'StyleSheetList' and member.name == 'namedItem' and member.special == 'getter':
             return ("((s,n)=>{const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');const m=globalThis[k];"
                     "let d;try{d=WeakRef.prototype.deref.call(Object.getOwnPropertyDescriptor(s,k)?.value);}catch{}"
@@ -171,6 +173,10 @@ class InterfaceEmitter:
             access = ', '.join(name for name, available in [('get', getter), ('set', setter)] if available)
             signature = f'    abstract member {identifier(member.name)}: {result} with {access}'
             if not needs_adapter:
+                source = self.sources.get(owner, owner)
+                if setter and self.world.resolve(member.type).name == 'USVString' and self.world.config.get('interfaceStringInputs', {}).get(source) == 'utf8-lengths':
+                    expression = '$0.' + member.name + "{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}"
+                    return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif', signature, '']
                 if owner in ('Document', 'ShadowRoot', 'DocumentOrShadowRoot') and member.name == 'styleSheets' and getter:
                     expression = ("((r)=>{const s=r.styleSheets;if(r.nodeType===9){"
                                   "const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');"
@@ -243,19 +249,32 @@ class InterfaceEmitter:
         if not self.adapters:
             return []
         lines = ['', '#if FABLE_COMPILER', '[<AutoOpen>]', 'module BrowserUnionAdapters =']
+        span_unions = set(self.world.config.get('complexStringSpans', []))
+        if any(name in span_unions for name in self.unions):
+            lines += ["    [<Fable.Core.Emit(\"((v)=>String(v==null?'null':v).toWellFormed())($0)\")>]",
+                      '    let private normalizeUSVString (_: string) : string =', '        Fable.Core.Util.jsNative', '']
         result_interfaces = set()
         for _, member in self.adapters:
             t = self.world.resolve(member.type)
             if self.union(t):
-                result_interfaces.update(child.name for child in t.subtypes if child.name in self.names)
+                result_interfaces.update(child.name for child in t.subtypes if self.world.public_name(child.name) in self.names)
+        strict_interfaces = {child.name for name, children in self.unions.items() if name in span_unions
+                             for child in children if self.world.public_name(child.name) in self.names}
+        result_interfaces.update(strict_interfaces)
         for name in sorted(result_interfaces):
-            predicate = '$0 != null && $0.nodeType === 1' if name == 'Element' else f'Object.prototype.toString.call($0) === \'[object {name}]\''
+            browser_name = self.world.interfaces[name].attrs.get('InterfaceName', self.world.public_name(name))
+            predicate = '$0 != null && $0.nodeType === 1' if name == 'Element' else f'Object.prototype.toString.call($0) === \'[object {browser_name}]\''
+            if name == 'CSSOMVariableReferenceValue' and name in strict_interfaces:
+                predicate = ("((v)=>{if(v==null)return false;try{Object.getOwnPropertyDescriptor("
+                             "globalThis.CSSVariableReferenceValue.prototype,'variable').get.call(v);"
+                             "return true;}catch{return false;} })($0)")
             lines += [f'    [<Fable.Core.Emit("{predicate}")>]',
                       f'    let private is{name} (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         for name, children in self.unions.items():
             lines += ['', f'    let private box{name} (value: {name}) : obj =', '        match value with']
             for child in children:
-                lines += [f'        | {name}.{label(child)} value -> box value']
+                boxed = 'box (normalizeUSVString value)' if name in span_unions and self.world.resolve(child).name == 'USVString' else 'box value'
+                lines += [f'        | {name}.{label(child)} value -> {boxed}']
             if any(self.union(member.type) and label(self.world.resolve(member.type)) == name for _, member in self.adapters):
                 lines += ['', f'    let private unbox{name} (value: obj) : {name} =', '        match value with']
                 for child in children:
@@ -264,7 +283,9 @@ class InterfaceEmitter:
                     if resolved.name in STRINGS or resolved.name in NUMBERS or resolved.name == 'boolean':
                         lines += [f'        | :? {ftype} as arm -> {name}.{label(child)} arm']
                     else:
-                        lines += [f'        | arm when is{resolved.name} arm -> {name}.{label(child)} (unbox<{ftype}> arm)']
+                        head = f'        | arm when is{resolved.name} arm ->'
+                        value = f'{name}.{label(child)} (unbox<{ftype}> arm)'
+                        lines += [head, f'            {value}'] if len(head + ' ' + value) > 120 else [head + ' ' + value]
                 lines += ['        | _ -> failwith "Unexpected DOM union result"']
         for owner in dict.fromkeys(owner for owner, _ in self.adapters):
             lines += ['', f'    type {owner} with']
@@ -295,7 +316,7 @@ class InterfaceEmitter:
                     lines += ['']
                     continue
                 for selected in self.choices(member.arguments):
-                    declarations, passed = [], []
+                    declarations, passed, guards = [], [], []
                     for argument_index, (argument, chosen) in enumerate(zip(member.arguments, selected)):
                         name = identifier(argument.name)
                         if chosen is None:
@@ -309,6 +330,14 @@ class InterfaceEmitter:
                         else:
                             declarations.append(f'{"?" if optional else ""}{name}: {ftype}')
                             expr = f'box {name}' if self.union(argument.type) else name
+                            if self.union(argument.type) and label(self.world.resolve(argument.type)) in span_unions and self.world.resolve(chosen).name == 'USVString':
+                                expr = f'box (normalizeUSVString {name})'
+                            if self.union(argument.type) and label(self.world.resolve(argument.type)) in span_unions and self.world.resolve(chosen).name in strict_interfaces:
+                                selected_interface = self.world.resolve(chosen).name
+                                guards += [f'            if isNull (box {name}) then',
+                                           f'                nullArg "{argument.name}"', '',
+                                           f'            if not (is{selected_interface} (box {name})) then',
+                                           f'                invalidArg "{argument.name}" "Expected a {self.world.public_name(selected_interface)}."', '']
                         if argument.optional:
                             if self.union(argument.type):
                                 expr = f'?{name} = Some ({expr})'
@@ -319,6 +348,7 @@ class InterfaceEmitter:
                         passed.append(expr)
                     raw_call = f'this.__ranvier_{member.name} (' + ', '.join(passed) + ')'
                     lines += [f'        member this.{identifier(member.name)}(' + ', '.join(declarations) + f') : {result} =']
+                    lines += guards
                     if self.union(member.type):
                         union_name = label(self.world.resolve(member.type))
                         lines += [f'            let value = {raw_call}', '']
