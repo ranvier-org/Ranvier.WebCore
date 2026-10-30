@@ -277,12 +277,23 @@ class InterfaceEmitter:
             lines += [f'    [<Fable.Core.Emit("{predicate}")>]',
                       f'    let private is{name} (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         for name, children in self.unions.items():
-            lines += ['', f'    let private box{name} (value: {name}) : obj =', '        match value with']
+            lines += ['', f'    let private box{name} (value: {name}) : obj =']
+            if name in span_unions:
+                lines += ['        if isNull (box value) then', '            nullArg "value"', '']
+            lines += ['        match value with']
             for child in children:
                 boxed = 'box (normalizeUSVString value)' if name in span_unions and self.world.resolve(child).name == 'USVString' else 'box value'
                 if self.world.resolve(child).name == 'undefined':
                     boxed = 'Fable.Core.JsInterop.emitJsExpr () "undefined"'
-                lines += [f'        | {name}.{label(child)} value -> {boxed}']
+                resolved = self.world.resolve(child)
+                if name in span_unions and resolved.name in strict_interfaces:
+                    lines += [f'        | {name}.{label(child)} value ->',
+                              '            if isNull (box value) then', '                nullArg "value"', '',
+                              f'            if not (is{resolved.name} (box value)) then',
+                              f'                invalidArg "value" "Expected a {self.world.public_name(resolved.name)}."', '',
+                              f'            {boxed}']
+                else:
+                    lines += [f'        | {name}.{label(child)} value -> {boxed}']
             if any(self.union(member.type) and label(self.world.resolve(member.type)) == name for _, member in self.adapters):
                 lines += ['', f'    let private unbox{name} (value: obj) : {name} =', '        match value with']
                 for child in children:

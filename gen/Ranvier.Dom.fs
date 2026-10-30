@@ -3856,9 +3856,19 @@ module BrowserUnionAdapters =
         | ElementOrText.Text value -> box value
 
     let private boxUSVStringOrCSSOMVariableReferenceValue (value: USVStringOrCSSOMVariableReferenceValue) : obj =
+        if isNull (box value) then
+            nullArg "value"
+
         match value with
         | USVStringOrCSSOMVariableReferenceValue.USVString value -> box (normalizeUSVString value)
-        | USVStringOrCSSOMVariableReferenceValue.CSSOMVariableReferenceValue value -> box value
+        | USVStringOrCSSOMVariableReferenceValue.CSSOMVariableReferenceValue value ->
+            if isNull (box value) then
+                nullArg "value"
+
+            if not (isCSSOMVariableReferenceValue (box value)) then
+                invalidArg "value" "Expected a CSSVariableReferenceValue."
+
+            box value
 
     let private unboxUSVStringOrCSSOMVariableReferenceValue (value: obj) : USVStringOrCSSOMVariableReferenceValue =
         match value with
@@ -3879,8 +3889,18 @@ module BrowserUnionAdapters =
         | _ -> failwith "Unexpected DOM union result"
 
     let private boxCSSStyleValueOrUSVString (value: CSSStyleValueOrUSVString) : obj =
+        if isNull (box value) then
+            nullArg "value"
+
         match value with
-        | CSSStyleValueOrUSVString.CSSStyleValue value -> box value
+        | CSSStyleValueOrUSVString.CSSStyleValue value ->
+            if isNull (box value) then
+                nullArg "value"
+
+            if not (isCSSStyleValue (box value)) then
+                invalidArg "value" "Expected a CSSStyleValue."
+
+            box value
         | CSSStyleValueOrUSVString.USVString value -> box (normalizeUSVString value)
 
     let private boxShadowRootOrGetComposedRangesOptions (value: ShadowRootOrGetComposedRangesOptions) : obj =

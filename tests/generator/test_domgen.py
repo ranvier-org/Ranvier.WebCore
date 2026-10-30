@@ -59,6 +59,25 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_selected_variadic_style_values_validate_reference_arms_before_webidl_coercion(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface StylePropertyMap { undefined set(USVString property, (CSSStyleValue or USVString)... values); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'StylePropertyMap']
+        config['complexStringSpans'] = ['CSSStyleValueOrUSVString']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        interfaces = generator.interfaces()
+        self.assertTrue('if isNull (box value) then\n            nullArg "value"' in interfaces)
+        self.assertTrue('if not (isCSSStyleValue (box value)) then' in interfaces)
+        self.assertTrue('invalidArg "value" "Expected a CSSStyleValue."' in interfaces)
+        self.assertTrue('CSSStyleValueOrUSVString.USVString value -> box (normalizeUSVString value)' in interfaces)
+
     def test_configured_iterable_snapshot_owns_keys_and_nullable_value_arrays(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
