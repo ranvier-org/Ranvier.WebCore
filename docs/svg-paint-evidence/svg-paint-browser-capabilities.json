@@ -1,0 +1,3943 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "rows": [
+    {
+      "group": "S08",
+      "interface": "SVGGradientElement",
+      "member": "gradientUnits",
+      "tag": "linearGradient",
+      "actualBrand": "SVGLinearGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGGradientElement",
+      "member": "gradientTransform",
+      "tag": "linearGradient",
+      "actualBrand": "SVGLinearGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedTransformList",
+        "baseVal": {
+          "brand": "SVGTransformList",
+          "numberOfItems": 0
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGGradientElement",
+      "member": "spreadMethod",
+      "tag": "linearGradient",
+      "actualBrand": "SVGLinearGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGGradientElement",
+      "member": "href",
+      "tag": "linearGradient",
+      "actualBrand": "SVGLinearGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGLinearGradientElement",
+      "member": "x1",
+      "tag": "linearGradient",
+      "actualBrand": "SVGLinearGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGLinearGradientElement",
+      "member": "y1",
+      "tag": "linearGradient",
+      "actualBrand": "SVGLinearGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGLinearGradientElement",
+      "member": "x2",
+      "tag": "linearGradient",
+      "actualBrand": "SVGLinearGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGLinearGradientElement",
+      "member": "y2",
+      "tag": "linearGradient",
+      "actualBrand": "SVGLinearGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "patternUnits",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "patternContentUnits",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "patternTransform",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedTransformList",
+        "baseVal": {
+          "brand": "SVGTransformList",
+          "numberOfItems": 0
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "x",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "y",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "width",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "height",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "viewBox",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedRect",
+        "baseVal": {
+          "brand": "SVGRect"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "preserveAspectRatio",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedPreserveAspectRatio",
+        "baseVal": {
+          "brand": "SVGPreserveAspectRatio"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "requiredExtensions",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGStringList",
+        "numberOfItems": 0
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "systemLanguage",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGStringList",
+        "numberOfItems": 0
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGPatternElement",
+      "member": "href",
+      "tag": "pattern",
+      "actualBrand": "SVGPatternElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGRadialGradientElement",
+      "member": "cx",
+      "tag": "radialGradient",
+      "actualBrand": "SVGRadialGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "50%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGRadialGradientElement",
+      "member": "cy",
+      "tag": "radialGradient",
+      "actualBrand": "SVGRadialGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "50%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGRadialGradientElement",
+      "member": "r",
+      "tag": "radialGradient",
+      "actualBrand": "SVGRadialGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "50%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGRadialGradientElement",
+      "member": "fx",
+      "tag": "radialGradient",
+      "actualBrand": "SVGRadialGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "50%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGRadialGradientElement",
+      "member": "fy",
+      "tag": "radialGradient",
+      "actualBrand": "SVGRadialGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "50%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGRadialGradientElement",
+      "member": "fr",
+      "tag": "radialGradient",
+      "actualBrand": "SVGRadialGradientElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S08",
+      "interface": "SVGStopElement",
+      "member": "offset",
+      "tag": "stop",
+      "actualBrand": "SVGStopElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEBlendElement",
+      "member": "in1",
+      "tag": "feBlend",
+      "actualBrand": "SVGFEBlendElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEBlendElement",
+      "member": "in2",
+      "tag": "feBlend",
+      "actualBrand": "SVGFEBlendElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEBlendElement",
+      "member": "mode",
+      "tag": "feBlend",
+      "actualBrand": "SVGFEBlendElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEBlendElement",
+      "member": "x",
+      "tag": "feBlend",
+      "actualBrand": "SVGFEBlendElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEBlendElement",
+      "member": "y",
+      "tag": "feBlend",
+      "actualBrand": "SVGFEBlendElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEBlendElement",
+      "member": "width",
+      "tag": "feBlend",
+      "actualBrand": "SVGFEBlendElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEBlendElement",
+      "member": "height",
+      "tag": "feBlend",
+      "actualBrand": "SVGFEBlendElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEBlendElement",
+      "member": "result",
+      "tag": "feBlend",
+      "actualBrand": "SVGFEBlendElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEColorMatrixElement",
+      "member": "in1",
+      "tag": "feColorMatrix",
+      "actualBrand": "SVGFEColorMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEColorMatrixElement",
+      "member": "type",
+      "tag": "feColorMatrix",
+      "actualBrand": "SVGFEColorMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEColorMatrixElement",
+      "member": "values",
+      "tag": "feColorMatrix",
+      "actualBrand": "SVGFEColorMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumberList",
+        "baseVal": {
+          "brand": "SVGNumberList",
+          "numberOfItems": 0
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEColorMatrixElement",
+      "member": "x",
+      "tag": "feColorMatrix",
+      "actualBrand": "SVGFEColorMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEColorMatrixElement",
+      "member": "y",
+      "tag": "feColorMatrix",
+      "actualBrand": "SVGFEColorMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEColorMatrixElement",
+      "member": "width",
+      "tag": "feColorMatrix",
+      "actualBrand": "SVGFEColorMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEColorMatrixElement",
+      "member": "height",
+      "tag": "feColorMatrix",
+      "actualBrand": "SVGFEColorMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEColorMatrixElement",
+      "member": "result",
+      "tag": "feColorMatrix",
+      "actualBrand": "SVGFEColorMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEComponentTransferElement",
+      "member": "in1",
+      "tag": "feComponentTransfer",
+      "actualBrand": "SVGFEComponentTransferElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEComponentTransferElement",
+      "member": "x",
+      "tag": "feComponentTransfer",
+      "actualBrand": "SVGFEComponentTransferElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEComponentTransferElement",
+      "member": "y",
+      "tag": "feComponentTransfer",
+      "actualBrand": "SVGFEComponentTransferElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEComponentTransferElement",
+      "member": "width",
+      "tag": "feComponentTransfer",
+      "actualBrand": "SVGFEComponentTransferElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEComponentTransferElement",
+      "member": "height",
+      "tag": "feComponentTransfer",
+      "actualBrand": "SVGFEComponentTransferElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEComponentTransferElement",
+      "member": "result",
+      "tag": "feComponentTransfer",
+      "actualBrand": "SVGFEComponentTransferElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "in1",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "in2",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "operator",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "k1",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "k2",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "k3",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "k4",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "x",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "y",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "width",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "height",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFECompositeElement",
+      "member": "result",
+      "tag": "feComposite",
+      "actualBrand": "SVGFECompositeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "in1",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "orderX",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedInteger",
+        "baseVal": 3
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "orderY",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedInteger",
+        "baseVal": 3
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "kernelMatrix",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumberList",
+        "baseVal": {
+          "brand": "SVGNumberList",
+          "numberOfItems": 0
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "divisor",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "bias",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "targetX",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedInteger",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "targetY",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedInteger",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "edgeMode",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "kernelUnitLengthX",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "kernelUnitLengthY",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "preserveAlpha",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedBoolean",
+        "baseVal": false
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "x",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "y",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "width",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "height",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEConvolveMatrixElement",
+      "member": "result",
+      "tag": "feConvolveMatrix",
+      "actualBrand": "SVGFEConvolveMatrixElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "in1",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "surfaceScale",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "diffuseConstant",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "kernelUnitLengthX",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "kernelUnitLengthY",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "x",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "y",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "width",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "height",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "result",
+      "tag": "feDiffuseLighting",
+      "actualBrand": "SVGFEDiffuseLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "in1",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "in2",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "scale",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "xChannelSelector",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 4
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "yChannelSelector",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 4
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "x",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "y",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "width",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "height",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "result",
+      "tag": "feDisplacementMap",
+      "actualBrand": "SVGFEDisplacementMapElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDistantLightElement",
+      "member": "azimuth",
+      "tag": "feDistantLight",
+      "actualBrand": "SVGFEDistantLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDistantLightElement",
+      "member": "elevation",
+      "tag": "feDistantLight",
+      "actualBrand": "SVGFEDistantLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "in1",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "dx",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "dy",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "stdDeviationX",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "stdDeviationY",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "setStdDeviation",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "function",
+        "value": "function"
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "x",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "y",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "width",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "height",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEDropShadowElement",
+      "member": "result",
+      "tag": "feDropShadow",
+      "actualBrand": "SVGFEDropShadowElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEFloodElement",
+      "member": "x",
+      "tag": "feFlood",
+      "actualBrand": "SVGFEFloodElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEFloodElement",
+      "member": "y",
+      "tag": "feFlood",
+      "actualBrand": "SVGFEFloodElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEFloodElement",
+      "member": "width",
+      "tag": "feFlood",
+      "actualBrand": "SVGFEFloodElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEFloodElement",
+      "member": "height",
+      "tag": "feFlood",
+      "actualBrand": "SVGFEFloodElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEFloodElement",
+      "member": "result",
+      "tag": "feFlood",
+      "actualBrand": "SVGFEFloodElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "in1",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "stdDeviationX",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "stdDeviationY",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "edgeMode",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "NotExposed",
+      "result": {
+        "kind": "undefined"
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "setStdDeviation",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "function",
+        "value": "function"
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "x",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "y",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "width",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "height",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "result",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEImageElement",
+      "member": "preserveAspectRatio",
+      "tag": "feImage",
+      "actualBrand": "SVGFEImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedPreserveAspectRatio",
+        "baseVal": {
+          "brand": "SVGPreserveAspectRatio"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEImageElement",
+      "member": "x",
+      "tag": "feImage",
+      "actualBrand": "SVGFEImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEImageElement",
+      "member": "y",
+      "tag": "feImage",
+      "actualBrand": "SVGFEImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEImageElement",
+      "member": "width",
+      "tag": "feImage",
+      "actualBrand": "SVGFEImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEImageElement",
+      "member": "height",
+      "tag": "feImage",
+      "actualBrand": "SVGFEImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEImageElement",
+      "member": "result",
+      "tag": "feImage",
+      "actualBrand": "SVGFEImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEImageElement",
+      "member": "href",
+      "tag": "feImage",
+      "actualBrand": "SVGFEImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMergeElement",
+      "member": "x",
+      "tag": "feMerge",
+      "actualBrand": "SVGFEMergeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMergeElement",
+      "member": "y",
+      "tag": "feMerge",
+      "actualBrand": "SVGFEMergeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMergeElement",
+      "member": "width",
+      "tag": "feMerge",
+      "actualBrand": "SVGFEMergeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMergeElement",
+      "member": "height",
+      "tag": "feMerge",
+      "actualBrand": "SVGFEMergeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMergeElement",
+      "member": "result",
+      "tag": "feMerge",
+      "actualBrand": "SVGFEMergeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMergeNodeElement",
+      "member": "in1",
+      "tag": "feMergeNode",
+      "actualBrand": "SVGFEMergeNodeElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMorphologyElement",
+      "member": "in1",
+      "tag": "feMorphology",
+      "actualBrand": "SVGFEMorphologyElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMorphologyElement",
+      "member": "operator",
+      "tag": "feMorphology",
+      "actualBrand": "SVGFEMorphologyElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMorphologyElement",
+      "member": "radiusX",
+      "tag": "feMorphology",
+      "actualBrand": "SVGFEMorphologyElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMorphologyElement",
+      "member": "radiusY",
+      "tag": "feMorphology",
+      "actualBrand": "SVGFEMorphologyElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMorphologyElement",
+      "member": "x",
+      "tag": "feMorphology",
+      "actualBrand": "SVGFEMorphologyElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMorphologyElement",
+      "member": "y",
+      "tag": "feMorphology",
+      "actualBrand": "SVGFEMorphologyElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMorphologyElement",
+      "member": "width",
+      "tag": "feMorphology",
+      "actualBrand": "SVGFEMorphologyElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMorphologyElement",
+      "member": "height",
+      "tag": "feMorphology",
+      "actualBrand": "SVGFEMorphologyElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEMorphologyElement",
+      "member": "result",
+      "tag": "feMorphology",
+      "actualBrand": "SVGFEMorphologyElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEOffsetElement",
+      "member": "in1",
+      "tag": "feOffset",
+      "actualBrand": "SVGFEOffsetElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEOffsetElement",
+      "member": "dx",
+      "tag": "feOffset",
+      "actualBrand": "SVGFEOffsetElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEOffsetElement",
+      "member": "dy",
+      "tag": "feOffset",
+      "actualBrand": "SVGFEOffsetElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEOffsetElement",
+      "member": "x",
+      "tag": "feOffset",
+      "actualBrand": "SVGFEOffsetElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEOffsetElement",
+      "member": "y",
+      "tag": "feOffset",
+      "actualBrand": "SVGFEOffsetElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEOffsetElement",
+      "member": "width",
+      "tag": "feOffset",
+      "actualBrand": "SVGFEOffsetElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEOffsetElement",
+      "member": "height",
+      "tag": "feOffset",
+      "actualBrand": "SVGFEOffsetElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEOffsetElement",
+      "member": "result",
+      "tag": "feOffset",
+      "actualBrand": "SVGFEOffsetElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEPointLightElement",
+      "member": "x",
+      "tag": "fePointLight",
+      "actualBrand": "SVGFEPointLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEPointLightElement",
+      "member": "y",
+      "tag": "fePointLight",
+      "actualBrand": "SVGFEPointLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFEPointLightElement",
+      "member": "z",
+      "tag": "fePointLight",
+      "actualBrand": "SVGFEPointLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "in1",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "surfaceScale",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "specularConstant",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "specularExponent",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "kernelUnitLengthX",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "kernelUnitLengthY",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "x",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "y",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "width",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "height",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpecularLightingElement",
+      "member": "result",
+      "tag": "feSpecularLighting",
+      "actualBrand": "SVGFESpecularLightingElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpotLightElement",
+      "member": "x",
+      "tag": "feSpotLight",
+      "actualBrand": "SVGFESpotLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpotLightElement",
+      "member": "y",
+      "tag": "feSpotLight",
+      "actualBrand": "SVGFESpotLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpotLightElement",
+      "member": "z",
+      "tag": "feSpotLight",
+      "actualBrand": "SVGFESpotLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpotLightElement",
+      "member": "pointsAtX",
+      "tag": "feSpotLight",
+      "actualBrand": "SVGFESpotLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpotLightElement",
+      "member": "pointsAtY",
+      "tag": "feSpotLight",
+      "actualBrand": "SVGFESpotLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpotLightElement",
+      "member": "pointsAtZ",
+      "tag": "feSpotLight",
+      "actualBrand": "SVGFESpotLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpotLightElement",
+      "member": "specularExponent",
+      "tag": "feSpotLight",
+      "actualBrand": "SVGFESpotLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFESpotLightElement",
+      "member": "limitingConeAngle",
+      "tag": "feSpotLight",
+      "actualBrand": "SVGFESpotLightElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETileElement",
+      "member": "in1",
+      "tag": "feTile",
+      "actualBrand": "SVGFETileElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETileElement",
+      "member": "x",
+      "tag": "feTile",
+      "actualBrand": "SVGFETileElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETileElement",
+      "member": "y",
+      "tag": "feTile",
+      "actualBrand": "SVGFETileElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETileElement",
+      "member": "width",
+      "tag": "feTile",
+      "actualBrand": "SVGFETileElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETileElement",
+      "member": "height",
+      "tag": "feTile",
+      "actualBrand": "SVGFETileElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETileElement",
+      "member": "result",
+      "tag": "feTile",
+      "actualBrand": "SVGFETileElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "baseFrequencyX",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "baseFrequencyY",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "numOctaves",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedInteger",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "seed",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "stitchTiles",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "type",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "x",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "y",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "width",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "height",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFETurbulenceElement",
+      "member": "result",
+      "tag": "feTurbulence",
+      "actualBrand": "SVGFETurbulenceElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterElement",
+      "member": "filterUnits",
+      "tag": "filter",
+      "actualBrand": "SVGFilterElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterElement",
+      "member": "primitiveUnits",
+      "tag": "filter",
+      "actualBrand": "SVGFilterElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterElement",
+      "member": "x",
+      "tag": "filter",
+      "actualBrand": "SVGFilterElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "-10%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterElement",
+      "member": "y",
+      "tag": "filter",
+      "actualBrand": "SVGFilterElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "-10%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterElement",
+      "member": "width",
+      "tag": "filter",
+      "actualBrand": "SVGFilterElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "120%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterElement",
+      "member": "height",
+      "tag": "filter",
+      "actualBrand": "SVGFilterElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "120%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterElement",
+      "member": "href",
+      "tag": "filter",
+      "actualBrand": "SVGFilterElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterPrimitiveStandardAttributes",
+      "member": "x",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterPrimitiveStandardAttributes",
+      "member": "y",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterPrimitiveStandardAttributes",
+      "member": "width",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterPrimitiveStandardAttributes",
+      "member": "height",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "100%"
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGFilterPrimitiveStandardAttributes",
+      "member": "result",
+      "tag": "feGaussianBlur",
+      "actualBrand": "SVGFEGaussianBlurElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "type",
+      "tag": "feFuncR",
+      "actualBrand": "SVGFEFuncRElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "tableValues",
+      "tag": "feFuncR",
+      "actualBrand": "SVGFEFuncRElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumberList",
+        "baseVal": {
+          "brand": "SVGNumberList",
+          "numberOfItems": 0
+        }
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "slope",
+      "tag": "feFuncR",
+      "actualBrand": "SVGFEFuncRElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "intercept",
+      "tag": "feFuncR",
+      "actualBrand": "SVGFEFuncRElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "amplitude",
+      "tag": "feFuncR",
+      "actualBrand": "SVGFEFuncRElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "exponent",
+      "tag": "feFuncR",
+      "actualBrand": "SVGFEFuncRElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S09",
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "offset",
+      "tag": "feFuncR",
+      "actualBrand": "SVGFEFuncRElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedNumber",
+        "baseVal": 0
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGClipPathElement",
+      "member": "clipPathUnits",
+      "tag": "clipPath",
+      "actualBrand": "SVGClipPathElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGClipPathElement",
+      "member": "transform",
+      "tag": "clipPath",
+      "actualBrand": "SVGClipPathElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedTransformList",
+        "baseVal": {
+          "brand": "SVGTransformList",
+          "numberOfItems": 0
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "refX",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "refY",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "markerUnits",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "markerWidth",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "3"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "markerHeight",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "3"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "orientType",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "orientAngle",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedAngle",
+        "baseVal": {
+          "brand": "SVGAngle",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "orient",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "NotExposed",
+      "result": {
+        "kind": "undefined"
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "setOrientToAuto",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "function",
+        "value": "function"
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "setOrientToAngle",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "function",
+        "value": "function"
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "viewBox",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedRect",
+        "baseVal": {
+          "brand": "SVGRect"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMarkerElement",
+      "member": "preserveAspectRatio",
+      "tag": "marker",
+      "actualBrand": "SVGMarkerElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedPreserveAspectRatio",
+        "baseVal": {
+          "brand": "SVGPreserveAspectRatio"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMaskElement",
+      "member": "maskUnits",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 2
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMaskElement",
+      "member": "maskContentUnits",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedEnumeration",
+        "baseVal": 1
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMaskElement",
+      "member": "x",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "-10%"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMaskElement",
+      "member": "y",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "-10%"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMaskElement",
+      "member": "width",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "120%"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMaskElement",
+      "member": "height",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "120%"
+        }
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMaskElement",
+      "member": "requiredExtensions",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGStringList",
+        "numberOfItems": 0
+      }
+    },
+    {
+      "group": "S10",
+      "interface": "SVGMaskElement",
+      "member": "systemLanguage",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGStringList",
+        "numberOfItems": 0
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "Document",
+      "member": "rootElement",
+      "tag": null,
+      "actualBrand": "XMLDocument",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGSVGElement"
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGAElement",
+      "member": "target",
+      "tag": "a",
+      "actualBrand": "SVGAElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGAElement",
+      "member": "hreflang",
+      "tag": "a",
+      "actualBrand": "SVGAElement",
+      "state": "Available",
+      "result": {
+        "kind": "string",
+        "value": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGAElement",
+      "member": "rel",
+      "tag": "a",
+      "actualBrand": "SVGAElement",
+      "state": "Available",
+      "result": {
+        "kind": "string",
+        "value": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGAElement",
+      "member": "relList",
+      "tag": "a",
+      "actualBrand": "SVGAElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "DOMTokenList"
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGAElement",
+      "member": "type",
+      "tag": "a",
+      "actualBrand": "SVGAElement",
+      "state": "Available",
+      "result": {
+        "kind": "string",
+        "value": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGAElement",
+      "member": "href",
+      "tag": "a",
+      "actualBrand": "SVGAElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGElement",
+      "member": "className",
+      "tag": "altGlyph",
+      "actualBrand": "SVGElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGElement",
+      "member": "ownerSVGElement",
+      "tag": "altGlyph",
+      "actualBrand": "SVGElement",
+      "state": "Available",
+      "result": {
+        "kind": "null"
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGElement",
+      "member": "viewportElement",
+      "tag": "altGlyph",
+      "actualBrand": "SVGElement",
+      "state": "Available",
+      "result": {
+        "kind": "null"
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGForeignObjectElement",
+      "member": "x",
+      "tag": "foreignObject",
+      "actualBrand": "SVGForeignObjectElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGForeignObjectElement",
+      "member": "y",
+      "tag": "foreignObject",
+      "actualBrand": "SVGForeignObjectElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGForeignObjectElement",
+      "member": "width",
+      "tag": "foreignObject",
+      "actualBrand": "SVGForeignObjectElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGForeignObjectElement",
+      "member": "height",
+      "tag": "foreignObject",
+      "actualBrand": "SVGForeignObjectElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGImageElement",
+      "member": "x",
+      "tag": "image",
+      "actualBrand": "SVGImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGImageElement",
+      "member": "y",
+      "tag": "image",
+      "actualBrand": "SVGImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGImageElement",
+      "member": "width",
+      "tag": "image",
+      "actualBrand": "SVGImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGImageElement",
+      "member": "height",
+      "tag": "image",
+      "actualBrand": "SVGImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGImageElement",
+      "member": "preserveAspectRatio",
+      "tag": "image",
+      "actualBrand": "SVGImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedPreserveAspectRatio",
+        "baseVal": {
+          "brand": "SVGPreserveAspectRatio"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGImageElement",
+      "member": "crossOrigin",
+      "tag": "image",
+      "actualBrand": "SVGImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "null"
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGImageElement",
+      "member": "decode",
+      "tag": "image",
+      "actualBrand": "SVGImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "function",
+        "value": "function"
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGImageElement",
+      "member": "href",
+      "tag": "image",
+      "actualBrand": "SVGImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGScriptElement",
+      "member": "type",
+      "tag": "script",
+      "actualBrand": "SVGScriptElement",
+      "state": "Available",
+      "result": {
+        "kind": "string",
+        "value": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGScriptElement",
+      "member": "async",
+      "tag": "script",
+      "actualBrand": "SVGScriptElement",
+      "state": "Available",
+      "result": {
+        "kind": "boolean",
+        "value": false
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGScriptElement",
+      "member": "href",
+      "tag": "script",
+      "actualBrand": "SVGScriptElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGStyleElement",
+      "member": "disabled",
+      "tag": "style",
+      "actualBrand": "SVGStyleElement",
+      "state": "Available",
+      "result": {
+        "kind": "boolean",
+        "value": false
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGStyleElement",
+      "member": "type",
+      "tag": "style",
+      "actualBrand": "SVGStyleElement",
+      "state": "Available",
+      "result": {
+        "kind": "string",
+        "value": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGStyleElement",
+      "member": "media",
+      "tag": "style",
+      "actualBrand": "SVGStyleElement",
+      "state": "Available",
+      "result": {
+        "kind": "string",
+        "value": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGStyleElement",
+      "member": "title",
+      "tag": "style",
+      "actualBrand": "SVGStyleElement",
+      "state": "Available",
+      "result": {
+        "kind": "string",
+        "value": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGStyleElement",
+      "member": "sheet",
+      "tag": "style",
+      "actualBrand": "SVGStyleElement",
+      "state": "Available",
+      "result": {
+        "kind": "null"
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGSymbolElement",
+      "member": "viewBox",
+      "tag": "symbol",
+      "actualBrand": "SVGSymbolElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedRect",
+        "baseVal": {
+          "brand": "SVGRect"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGSymbolElement",
+      "member": "preserveAspectRatio",
+      "tag": "symbol",
+      "actualBrand": "SVGSymbolElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedPreserveAspectRatio",
+        "baseVal": {
+          "brand": "SVGPreserveAspectRatio"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGTests",
+      "member": "requiredExtensions",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGStringList",
+        "numberOfItems": 0
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGTests",
+      "member": "systemLanguage",
+      "tag": "mask",
+      "actualBrand": "SVGMaskElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGStringList",
+        "numberOfItems": 0
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGURIReference",
+      "member": "href",
+      "tag": "image",
+      "actualBrand": "SVGImageElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGUseElement",
+      "member": "x",
+      "tag": "use",
+      "actualBrand": "SVGUseElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGUseElement",
+      "member": "y",
+      "tag": "use",
+      "actualBrand": "SVGUseElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGUseElement",
+      "member": "width",
+      "tag": "use",
+      "actualBrand": "SVGUseElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGUseElement",
+      "member": "height",
+      "tag": "use",
+      "actualBrand": "SVGUseElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedLength",
+        "baseVal": {
+          "brand": "SVGLength",
+          "valueAsString": "0"
+        }
+      }
+    },
+    {
+      "group": "S11",
+      "interface": "SVGUseElement",
+      "member": "href",
+      "tag": "use",
+      "actualBrand": "SVGUseElement",
+      "state": "Available",
+      "result": {
+        "kind": "object",
+        "brand": "SVGAnimatedString",
+        "baseVal": ""
+      }
+    }
+  ],
+  "inertScript": {
+    "connected": false,
+    "type": "application/ecmascript",
+    "async": true,
+    "href": "#inert-reference"
+  },
+  "units": {
+    "unknown": 0,
+    "userSpaceOnUse": 1,
+    "objectBoundingBox": 2
+  }
+}

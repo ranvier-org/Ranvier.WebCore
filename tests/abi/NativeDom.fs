@@ -360,6 +360,18 @@ let RV_DOM_SVGFE_CONVOLVE_MATRIX_ELEMENT_SVG_EDGEMODE_WRAP = 2
 let RV_DOM_SVGFE_CONVOLVE_MATRIX_ELEMENT_SVG_EDGEMODE_NONE = 3
 
 [<Literal>]
+let RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_PAD = 1
+
+[<Literal>]
+let RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_REFLECT = 2
+
+[<Literal>]
+let RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_REPEAT = 3
+
+[<Literal>]
 let RV_DOM_ARIA_NOTIFICATION_INTERRUPT_NONE = 0
 
 [<Literal>]
@@ -8127,6 +8139,51 @@ extern int rv_dom_svg_animated_integer_set_base_val(nativeint target, int value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_animated_integer_get_anim_val(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_gradient_element_get_gradient_units(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_gradient_element_get_gradient_transform(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_gradient_element_get_spread_method(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_gradient_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_linear_gradient_element_get_x1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_linear_gradient_element_get_y1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_linear_gradient_element_get_x2(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_linear_gradient_element_get_y2(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_radial_gradient_element_get_cx(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_radial_gradient_element_get_cy(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_radial_gradient_element_get_r(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_radial_gradient_element_get_fx(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_radial_gradient_element_get_fy(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_radial_gradient_element_get_fr(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_stop_element_get_offset(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)

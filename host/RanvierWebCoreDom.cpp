@@ -2369,6 +2369,21 @@ int32_t rv_dom_svgfe_convolve_matrix_element_get_result(RvNode* target, RvSVGAni
 int32_t rv_dom_svg_animated_integer_get_base_val(RvSVGAnimatedInteger* target, int32_t* result) { return ranvier_dom_svg_animated_integer_get_base_val(target, result); }
 int32_t rv_dom_svg_animated_integer_set_base_val(RvSVGAnimatedInteger* target, int32_t value) { return ranvier_dom_svg_animated_integer_set_base_val(target, value); }
 int32_t rv_dom_svg_animated_integer_get_anim_val(RvSVGAnimatedInteger* target, int32_t* result) { return ranvier_dom_svg_animated_integer_get_anim_val(target, result); }
+int32_t rv_dom_svg_gradient_element_get_gradient_units(RvNode* target, RvSVGAnimatedEnumeration** result) { return ranvier_dom_svg_gradient_element_get_gradient_units(target, result); }
+int32_t rv_dom_svg_gradient_element_get_gradient_transform(RvNode* target, RvSVGAnimatedTransformList** result) { return ranvier_dom_svg_gradient_element_get_gradient_transform(target, result); }
+int32_t rv_dom_svg_gradient_element_get_spread_method(RvNode* target, RvSVGAnimatedEnumeration** result) { return ranvier_dom_svg_gradient_element_get_spread_method(target, result); }
+int32_t rv_dom_svg_gradient_element_get_href(RvNode* target, RvSVGAnimatedString** result) { return ranvier_dom_svg_gradient_element_get_href(target, result); }
+int32_t rv_dom_svg_linear_gradient_element_get_x1(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_linear_gradient_element_get_x1(target, result); }
+int32_t rv_dom_svg_linear_gradient_element_get_y1(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_linear_gradient_element_get_y1(target, result); }
+int32_t rv_dom_svg_linear_gradient_element_get_x2(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_linear_gradient_element_get_x2(target, result); }
+int32_t rv_dom_svg_linear_gradient_element_get_y2(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_linear_gradient_element_get_y2(target, result); }
+int32_t rv_dom_svg_radial_gradient_element_get_cx(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_radial_gradient_element_get_cx(target, result); }
+int32_t rv_dom_svg_radial_gradient_element_get_cy(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_radial_gradient_element_get_cy(target, result); }
+int32_t rv_dom_svg_radial_gradient_element_get_r(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_radial_gradient_element_get_r(target, result); }
+int32_t rv_dom_svg_radial_gradient_element_get_fx(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_radial_gradient_element_get_fx(target, result); }
+int32_t rv_dom_svg_radial_gradient_element_get_fy(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_radial_gradient_element_get_fy(target, result); }
+int32_t rv_dom_svg_radial_gradient_element_get_fr(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_radial_gradient_element_get_fr(target, result); }
+int32_t rv_dom_svg_stop_element_get_offset(RvNode* target, RvSVGAnimatedNumber** result) { return ranvier_dom_svg_stop_element_get_offset(target, result); }
 int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result) { return ranvier_dom_css_supports_2(target, property, property_length, value, value_length, result); }
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor) { return ranvier_dom_css_register_property(target, descriptor); }

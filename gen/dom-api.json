@@ -1100,18 +1100,25 @@
     {
       "name": "SVGAnimatedInteger",
       "base": null
+    },
+    {
+      "name": "SVGGradientElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGLinearGradientElement",
+      "base": "SVGGradientElement"
+    },
+    {
+      "name": "SVGRadialGradientElement",
+      "base": "SVGGradientElement"
+    },
+    {
+      "name": "SVGStopElement",
+      "base": "SVGElement"
     }
   ],
   "contractInterfaces": [
-    {
-      "name": "SVGGradientElement",
-      "idlName": "SVGGradientElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGGradientElement.idl"
-    },
     {
       "name": "SVGComponentTransferFunctionElement",
       "idlName": "SVGComponentTransferFunctionElement",
@@ -3028,6 +3035,42 @@
       "source": "svg/SVGAnimatedInteger.idl"
     },
     {
+      "name": "SVGGradientElement",
+      "idlName": "SVGGradientElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGGradientElement.idl"
+    },
+    {
+      "name": "SVGLinearGradientElement",
+      "idlName": "SVGLinearGradientElement",
+      "base": "SVGGradientElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGLinearGradientElement.idl"
+    },
+    {
+      "name": "SVGRadialGradientElement",
+      "idlName": "SVGRadialGradientElement",
+      "base": "SVGGradientElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGRadialGradientElement.idl"
+    },
+    {
+      "name": "SVGStopElement",
+      "idlName": "SVGStopElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGStopElement.idl"
+    },
+    {
       "name": "HTMLUnknownElement",
       "idlName": "HTMLUnknownElement",
       "base": "HTMLElement",
@@ -3433,15 +3476,6 @@
       "source": "svg/SVGImageElement.idl"
     },
     {
-      "name": "SVGLinearGradientElement",
-      "idlName": "SVGLinearGradientElement",
-      "base": "SVGGradientElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGLinearGradientElement.idl"
-    },
-    {
       "name": "SVGMaskElement",
       "idlName": "SVGMaskElement",
       "base": "SVGElement",
@@ -3460,15 +3494,6 @@
       "source": "svg/SVGMetadataElement.idl"
     },
     {
-      "name": "SVGRadialGradientElement",
-      "idlName": "SVGRadialGradientElement",
-      "base": "SVGGradientElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGRadialGradientElement.idl"
-    },
-    {
       "name": "SVGScriptElement",
       "idlName": "SVGScriptElement",
       "base": "SVGElement",
@@ -3476,15 +3501,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "svg/SVGScriptElement.idl"
-    },
-    {
-      "name": "SVGStopElement",
-      "idlName": "SVGStopElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGStopElement.idl"
     },
     {
       "name": "SVGSwitchElement",
@@ -122548,6 +122564,546 @@
         "interface": null,
         "root": null,
         "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGGradientElement",
+      "member": "gradientUnits",
+      "contractOwner": "SVGGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_gradient_element_get_gradient_units",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGGradientElement",
+      "member": "gradientTransform",
+      "contractOwner": "SVGGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_gradient_element_get_gradient_transform",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedTransformList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedTransformList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedTransformList",
+        "root": "SVGAnimatedTransformList",
+        "class": "SVGAnimatedTransformList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGGradientElement",
+      "member": "spreadMethod",
+      "contractOwner": "SVGGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_gradient_element_get_spread_method",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGGradientElement",
+      "member": "href",
+      "contractOwner": "SVGGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_gradient_element_get_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGLinearGradientElement",
+      "member": "x1",
+      "contractOwner": "SVGLinearGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_linear_gradient_element_get_x1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGLinearGradientElement",
+      "member": "y1",
+      "contractOwner": "SVGLinearGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_linear_gradient_element_get_y1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGLinearGradientElement",
+      "member": "x2",
+      "contractOwner": "SVGLinearGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_linear_gradient_element_get_x2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGLinearGradientElement",
+      "member": "y2",
+      "contractOwner": "SVGLinearGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_linear_gradient_element_get_y2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGRadialGradientElement",
+      "member": "cx",
+      "contractOwner": "SVGRadialGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_radial_gradient_element_get_cx",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGRadialGradientElement",
+      "member": "cy",
+      "contractOwner": "SVGRadialGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_radial_gradient_element_get_cy",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGRadialGradientElement",
+      "member": "r",
+      "contractOwner": "SVGRadialGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_radial_gradient_element_get_r",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGRadialGradientElement",
+      "member": "fx",
+      "contractOwner": "SVGRadialGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_radial_gradient_element_get_fx",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGRadialGradientElement",
+      "member": "fy",
+      "contractOwner": "SVGRadialGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_radial_gradient_element_get_fy",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGRadialGradientElement",
+      "member": "fr",
+      "contractOwner": "SVGRadialGradientElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_radial_gradient_element_get_fr",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGStopElement",
+      "member": "offset",
+      "contractOwner": "SVGStopElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_stop_element_get_offset",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
         "enum": null,
         "label": null,
         "nullable": false,

@@ -1,0 +1,15 @@
+{
+  "exitCode": 1,
+  "baseline": "Native19/ABI27 d5471ced80c72a32e39eba210f89312703a2161a",
+  "runtime": {
+    "RanvierWebCoreHost.dll": "9506e0e995769d85429a6d68ea98a4936000efbe554718f81c01f413ffc39848",
+    "WebCore.dll": "fd4cb94341812dd815c725c2a06aab31793bd8b3e01563d4c1919a295205cd57",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "sources": {
+    "tests/abi/svg_paint_probe.py": "ebd5951ece251a425cf49aeeed9ee33f93acac778aeb5e2931a014e02db5d52e",
+    "tests/abi/svg_paint_servers.py": "a48773c86d306bf8cecf95cd1413a9566ba77318e12f5449f84a2449d74f9e57",
+    "tests/fixtures/svg-paint-servers.svg": "3193f0ae120094fb7808abd6ef382d92e07b4d364b74a3c77fa76f4dee19bb2d"
+  },
+  "logSha256": "a887599a6489330a4d252e93e3853f01d57426cb2a3c545794846c768038d05d"
+}

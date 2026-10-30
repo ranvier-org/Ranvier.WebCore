@@ -16,13 +16,9 @@ type internal DomDictionaryAttribute() =
     inherit Attribute()
 #endif
 
-/// <summary>SVGGradientElement in the scoped DOM interface model.</summary>
-[<AllowNullLiteral>]
-type SVGGradientElement =
-    inherit SVGElement
-
 /// <summary>SVGComponentTransferFunctionElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGComponentTransferFunctionElement =
+[<AllowNullLiteral>]
+type SVGComponentTransferFunctionElement =
     inherit SVGElement
 
 /// <summary>HTMLMediaElement in the scoped DOM interface model.</summary>
@@ -4033,6 +4029,52 @@ and [<AllowNullLiteral>] SVGAnimatedInteger =
     /// <summary>SVGAnimatedInteger.animVal.</summary>
     abstract member animVal: int with get
 
+/// <summary>SVGGradientElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGGradientElement =
+    inherit SVGElement
+    /// <summary>SVGGradientElement.gradientUnits.</summary>
+    abstract member gradientUnits: SVGAnimatedEnumeration with get
+    /// <summary>SVGGradientElement.gradientTransform.</summary>
+    abstract member gradientTransform: SVGAnimatedTransformList with get
+    /// <summary>SVGGradientElement.spreadMethod.</summary>
+    abstract member spreadMethod: SVGAnimatedEnumeration with get
+    /// <summary>SVGGradientElement.href.</summary>
+    abstract member href: SVGAnimatedString with get
+
+/// <summary>SVGLinearGradientElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGLinearGradientElement =
+    inherit SVGGradientElement
+    /// <summary>SVGLinearGradientElement.x1.</summary>
+    abstract member x1: SVGAnimatedLength with get
+    /// <summary>SVGLinearGradientElement.y1.</summary>
+    abstract member y1: SVGAnimatedLength with get
+    /// <summary>SVGLinearGradientElement.x2.</summary>
+    abstract member x2: SVGAnimatedLength with get
+    /// <summary>SVGLinearGradientElement.y2.</summary>
+    abstract member y2: SVGAnimatedLength with get
+
+/// <summary>SVGRadialGradientElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGRadialGradientElement =
+    inherit SVGGradientElement
+    /// <summary>SVGRadialGradientElement.cx.</summary>
+    abstract member cx: SVGAnimatedLength with get
+    /// <summary>SVGRadialGradientElement.cy.</summary>
+    abstract member cy: SVGAnimatedLength with get
+    /// <summary>SVGRadialGradientElement.r.</summary>
+    abstract member r: SVGAnimatedLength with get
+    /// <summary>SVGRadialGradientElement.fx.</summary>
+    abstract member fx: SVGAnimatedLength with get
+    /// <summary>SVGRadialGradientElement.fy.</summary>
+    abstract member fy: SVGAnimatedLength with get
+    /// <summary>SVGRadialGradientElement.fr.</summary>
+    abstract member fr: SVGAnimatedLength with get
+
+/// <summary>SVGStopElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGStopElement =
+    inherit SVGElement
+    /// <summary>SVGStopElement.offset.</summary>
+    abstract member offset: SVGAnimatedNumber with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -4213,10 +4255,6 @@ and [<AllowNullLiteral>] SVGGElement =
 and [<AllowNullLiteral>] SVGImageElement =
     inherit SVGGraphicsElement
 
-/// <summary>SVGLinearGradientElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGLinearGradientElement =
-    inherit SVGGradientElement
-
 /// <summary>SVGMaskElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGMaskElement =
     inherit SVGElement
@@ -4225,16 +4263,8 @@ and [<AllowNullLiteral>] SVGMaskElement =
 and [<AllowNullLiteral>] SVGMetadataElement =
     inherit SVGElement
 
-/// <summary>SVGRadialGradientElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGRadialGradientElement =
-    inherit SVGGradientElement
-
 /// <summary>SVGScriptElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGScriptElement =
-    inherit SVGElement
-
-/// <summary>SVGStopElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGStopElement =
     inherit SVGElement
 
 /// <summary>SVGSwitchElement in the scoped DOM interface model.</summary>

@@ -1,0 +1,12 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+PATTERN_VIEWBOX {'attribute': '0 0 10 10', 'rect': [0.0, 0.0, 10.0, 10.0], 'pixel15_131': [0, 0, 255, 255]}
+Traceback (most recent call last):
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_servers.py", line 182, in <module>
+    verify(parser.parse_args().native_directory)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_servers.py", line 129, in verify
+    p.expect(p.pixel(view_box_paint, 15, 131) == [255, 0, 0, 255], 'pattern viewBox changes actual content scaling')
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-paint\tests\abi\svg_paint_probe.py", line 49, in expect
+    raise AssertionError(label)
+AssertionError: pattern viewBox changes actual content scaling

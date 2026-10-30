@@ -234,6 +234,10 @@ enum {
     RV_DOM_SVGFE_CONVOLVE_MATRIX_ELEMENT_SVG_EDGEMODE_DUPLICATE = 1, /* SVGFEConvolveMatrixElement.SVG_EDGEMODE_DUPLICATE */
     RV_DOM_SVGFE_CONVOLVE_MATRIX_ELEMENT_SVG_EDGEMODE_WRAP = 2, /* SVGFEConvolveMatrixElement.SVG_EDGEMODE_WRAP */
     RV_DOM_SVGFE_CONVOLVE_MATRIX_ELEMENT_SVG_EDGEMODE_NONE = 3, /* SVGFEConvolveMatrixElement.SVG_EDGEMODE_NONE */
+    RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_UNKNOWN = 0, /* SVGGradientElement.SVG_SPREADMETHOD_UNKNOWN */
+    RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_PAD = 1, /* SVGGradientElement.SVG_SPREADMETHOD_PAD */
+    RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_REFLECT = 2, /* SVGGradientElement.SVG_SPREADMETHOD_REFLECT */
+    RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_REPEAT = 3, /* SVGGradientElement.SVG_SPREADMETHOD_REPEAT */
 };
 
 /* The values of the IDL enumeration AriaNotificationInterrupt. */
@@ -6447,6 +6451,47 @@ RV_EXPORT int32_t rv_dom_svg_animated_integer_get_base_val(RvSVGAnimatedInteger*
 RV_EXPORT int32_t rv_dom_svg_animated_integer_set_base_val(RvSVGAnimatedInteger* target, int32_t value);
 /* SVGAnimatedInteger.animVal getter: readonly attribute long animVal */
 RV_EXPORT int32_t rv_dom_svg_animated_integer_get_anim_val(RvSVGAnimatedInteger* target, int32_t* result);
+/* SVGGradientElement */
+
+/* SVGGradientElement.gradientUnits getter: readonly attribute SVGAnimatedEnumeration gradientUnits; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_gradient_element_get_gradient_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGGradientElement.gradientTransform getter: readonly attribute SVGAnimatedTransformList gradientTransform; *result
+ * is a new reference */
+RV_EXPORT int32_t rv_dom_svg_gradient_element_get_gradient_transform(RvNode* target, RvSVGAnimatedTransformList** result);
+/* SVGGradientElement.spreadMethod getter: readonly attribute SVGAnimatedEnumeration spreadMethod; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_gradient_element_get_spread_method(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGGradientElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_gradient_element_get_href(RvNode* target, RvSVGAnimatedString** result);
+/* SVGLinearGradientElement */
+
+/* SVGLinearGradientElement.x1 getter: readonly attribute SVGAnimatedLength x1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_linear_gradient_element_get_x1(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGLinearGradientElement.y1 getter: readonly attribute SVGAnimatedLength y1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_linear_gradient_element_get_y1(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGLinearGradientElement.x2 getter: readonly attribute SVGAnimatedLength x2; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_linear_gradient_element_get_x2(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGLinearGradientElement.y2 getter: readonly attribute SVGAnimatedLength y2; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_linear_gradient_element_get_y2(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGRadialGradientElement */
+
+/* SVGRadialGradientElement.cx getter: readonly attribute SVGAnimatedLength cx; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_radial_gradient_element_get_cx(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGRadialGradientElement.cy getter: readonly attribute SVGAnimatedLength cy; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_radial_gradient_element_get_cy(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGRadialGradientElement.r getter: readonly attribute SVGAnimatedLength r; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_radial_gradient_element_get_r(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGRadialGradientElement.fx getter: readonly attribute SVGAnimatedLength fx; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_radial_gradient_element_get_fx(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGRadialGradientElement.fy getter: readonly attribute SVGAnimatedLength fy; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_radial_gradient_element_get_fy(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGRadialGradientElement.fr getter: readonly attribute SVGAnimatedLength fr; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_radial_gradient_element_get_fr(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGStopElement */
+
+/* SVGStopElement.offset getter: readonly attribute SVGAnimatedNumber offset; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_stop_element_get_offset(RvNode* target, RvSVGAnimatedNumber** result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
