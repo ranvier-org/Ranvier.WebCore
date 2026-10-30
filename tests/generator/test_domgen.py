@@ -59,6 +59,62 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_overloaded_component_constructors_use_arity_exports_and_preserve_a_locked_plain_name(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface CSSNumericValue : CSSStyleValue {};
+interface CSSTransformComponent {};
+interface CSSRotate : CSSTransformComponent {
+    constructor(CSSNumericValue angle);
+    constructor(double x, double y, double z, CSSNumericValue angle);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSNumericValue', 'CSSTransformComponent', 'CSSRotate']
+        config['constructors'] = {'CSSRotate': {'receiver': 'Document', 'factory': 'CSSRotate::create', 'passReceiver': False}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        factories = {function.name: function for function in generator.functions if function.kind == 'constructor'}
+        self.assertEqual(set(factories), {'css_rotate_create_1', 'css_rotate_create_4'})
+        self.assertIn('CSSRotate::create(HandleArg<CSSNumericValue> { a0.get() })', generator.glue())
+        locked = {'params': factories['css_rotate_create_1'].params, 'comment': factories['css_rotate_create_1'].comment}
+        subsequent = domgen.Generator(domgen.World(self.source, config))
+        subsequent.lock = {'css_rotate_create': locked}
+        subsequent.lock_structs = {}
+        subsequent.run()
+        subsequent_factories = {function.name: function for function in subsequent.functions if function.kind == 'constructor'}
+        self.assertEqual(set(subsequent_factories), {'css_rotate_create', 'css_rotate_create_4'})
+        self.assertEqual(subsequent_factories['css_rotate_create'].params, locked['params'])
+        self.assertEqual(subsequent.stubs, [])
+        regenerated = domgen.Generator(domgen.World(self.source, config))
+        regenerated.lock = {name: {'params': function.params, 'comment': function.comment}
+                            for name, function in factories.items()}
+        regenerated.lock_structs = {}
+        regenerated.run()
+        self.assertEqual({function.name for function in regenerated.functions if function.kind == 'constructor'}, set(factories))
+        self.assertEqual(regenerated.stubs, [])
+
+    def test_same_arity_component_constructors_fail_closed_when_exports_cannot_disambiguate(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSNumericValue {};
+interface CSSRotate {
+    constructor(CSSNumericValue angle);
+    constructor(double angle);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSNumericValue', 'CSSRotate']
+        config['constructors'] = {'CSSRotate': {'receiver': 'Document', 'factory': 'CSSRotate::create', 'passReceiver': False}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaisesRegex(SystemExit, 'generated names collide.*css_rotate_create_1'):
+            generator.run()
+
     def test_optional_matrix_constructor_union_keeps_absence_distinct_from_present_empty_values(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

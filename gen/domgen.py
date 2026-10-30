@@ -713,6 +713,7 @@ class Generator(ComplexGeneratorMixin):
 
     def interface(self, name):
         members = self.world.members(name)
+        overloaded_constructor = sum(member.kind == 'constructor' for member in members) > 1
         seen_constants = set()
         operations = {}
         for member in members:
@@ -724,7 +725,7 @@ class Generator(ComplexGeneratorMixin):
                 continue
             if member.kind == "constructor":
                 if name in self.world.config.get("constructors", {}):
-                    self.constructor(name, member)
+                    self.constructor(name, member, overloaded_constructor)
                 else:
                     self.skip(name, member, "constructor")
                 continue
@@ -1178,7 +1179,7 @@ class Generator(ComplexGeneratorMixin):
 
     # Operations.
 
-    def constructor(self, interface, member):
+    def constructor(self, interface, member, overloaded=False):
         configured = self.world.config["constructors"][interface]
         receiver = configured["receiver"]
         if receiver not in self.world.scope:
@@ -1194,6 +1195,10 @@ class Generator(ComplexGeneratorMixin):
                                 f"{interface}.constructor: target is the {receiver} of the constructed object")
             function.string_spans = configured.get('stringInputs') == 'utf8-lengths'
             self.finish(function, receiver, member, member.arguments, args, returns, call, [])
+            if overloaded:
+                locked = self.lock.get(function.name)
+                if not locked or function.params != [tuple(parameter) for parameter in locked['params']]:
+                    function.name += f'_{len(member.arguments)}'
         except Unsupported as error:
             self.skip(interface, member, f"constructor: {error}")
 
