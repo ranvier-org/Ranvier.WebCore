@@ -81,7 +81,6 @@ def verify(native_directory):
             if select is None or key in select:
                 values = [text(entry.value.items[item]) if entry.value.items[item] else None for item in range(entry.value.count)]
                 output.append((key, values))
-        expect(True, 'every snapshot entry has valid owned key and nullable value storage')
         return output
 
     host = bind('rv_host_create', pointer, [integer, integer])(320, 240)
@@ -179,8 +178,8 @@ def verify(native_directory):
         bind('rv_host_destroy', None, [pointer])(host)
         if search:
             search.close()
-    if assertions != 153:
-        raise AssertionError(f'Incomplete typed entry snapshot proof: {assertions} assertions, expected153')
+    if assertions != 144:
+        raise AssertionError(f'Incomplete typed entry snapshot proof: {assertions} assertions, expected144')
     print(f'PASS typed style map entries: {assertions} assertions; owned snapshots released', flush=True)
 
 
