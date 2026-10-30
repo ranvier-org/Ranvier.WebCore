@@ -105,6 +105,7 @@ def verify(directory):
         size = integer(-99)
         expect(text(host, 1, b'compositing-mode', None, 0, ctypes.byref(size)) == -6 and size.value > 0, 'Capability assertion failed')
         buffer = ctypes.create_string_buffer(b'!' * (size.value + 1))
+        buffer.raw = b'!' * len(buffer)
         length = integer(-99)
         expect(text(host, 1, b'compositing-mode', buffer, size.value - 1, ctypes.byref(length)) == -6, 'Capability assertion failed')
         expect(buffer.raw == b'!' * len(buffer) and length.value == size.value, 'Capability assertion failed')
