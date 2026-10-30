@@ -60,3 +60,9 @@ The native matrix fixture passes exactly 1,091 assertions: omitted/string/6-valu
 The combined private Windows batch passes 5,979 assertions across 18 raw probes, the complete ABI driver, and 42 final teardown cases. Some objects remain alive until collection; all final document/target weak references expire. SDK10 builds the generated ABI driver without warnings/errors; 55 generator tests and four package contract tests pass. All G07 checkpoint records remain equal: 1,775 functions, 19 dictionaries, 32 containers and seven runtime queries. Independent review verified the source/runtime/log hashes in matrix-values-evidence/evidence.json and the saved teardown results.
 
 These proofs apply to the private Windows producer. Shared Core/Views providers, Chromium parity, NativeAOT geometry/matrix consumers, other platforms and official packages remain open. No G07/G08 acceptance or public release is claimed.
+
+## Native16 / ABI24 allocation
+
+The release lane checked all 17 native/managed/flavor candidate package IDs, the tag and open producer reservations before allocating unpublished preview16 and ABI24. Native14 and Native15 retain their own release cohorts.
+
+After changing only package allocation, the ABI version constant and matching version checks, the separate ABI24 candidate passes 1,772 affected/focused assertions, the full SDK10 ABI driver and 42 final teardown checks. The earlier 5,979-assertion geometry batch is preserved rather than rerun unnecessarily. cohort16-abi24-evidence/evidence.json records the final executed DLL hashes and six probe logs. Canonical header/Native.fs signatures remain equal at 181 declarations, with zero differences. No platform or public-package result is implied.
