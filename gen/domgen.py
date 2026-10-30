@@ -498,6 +498,7 @@ class Generator(ComplexGeneratorMixin):
         self.complex_used = {}
         self.complex_inputs = set()
         self.namespace_features = []
+        self.const_getters_used = set()
         self.tracked_roots = {}
         for root, concrete in world.config.get('trackedHandleRoots', {}).items():
             if root not in world.scope or concrete not in world.scope or world.chain(concrete) != [concrete, root]:
@@ -524,6 +525,9 @@ class Generator(ComplexGeneratorMixin):
             self.static_context(name, binding)
         for name, binding in self.world.config.get('iterableBindings', {}).items():
             self.iterable_snapshot(name, binding)
+        missing_const_getters = set(self.world.config.get('constGetterBindings', {})) - self.const_getters_used
+        if missing_const_getters:
+            raise SystemExit(f'configured const getters did not match selected object getters: {sorted(missing_const_getters)}')
         self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
@@ -1427,8 +1431,17 @@ class Generator(ComplexGeneratorMixin):
             if returns.interface == "EventTarget":
                 sink = "storeNode(dynamicDowncast<Node>(rawPointer<EventTarget>(value)), result)"
             else:
-                sink = (f"storeTrackedHandle<{root}, {returns.cls}>(value, result)" if root in self.tracked_roots
-                        else f"storeHandle<{root}>(value, result)")
+                label = f'{function.interface}.{member.name}'
+                const_binding = self.world.config.get('constGetterBindings', {}).get(label)
+                if const_binding is not None:
+                    if (function.kind != 'getter' or returns.kind != 'object' or root in self.tracked_roots
+                            or const_binding.get('interface') != returns.interface or const_binding.get('root') != returns.root):
+                        raise SystemExit(f'{label}: const getter requires the exact declared interface/root of a polymorphic object getter')
+                    self.const_getters_used.add(label)
+                    sink = f'storeConstGetter<{root}, {returns.cls}>(value, result)'
+                else:
+                    sink = (f"storeTrackedHandle<{root}, {returns.cls}>(value, result)" if root in self.tracked_roots
+                            else f"storeHandle<{root}>(value, result)")
             notes.append("*result is a new reference" + (", or NULL" if returns.nullable or returns.interface == "EventTarget" else ""))
         elif returns.kind in ("union", "sequence"):
             if not self.transport_can_return(returns):
@@ -1782,6 +1795,7 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f'#include "JS{pathlib.PurePosixPath(file).stem}.h"')
         lines += ["", RUNTIME, ""]
         lines += self.tracked_handle_runtime()
+        lines += self.const_getter_runtime()
         for enum, (values, _, _) in sorted(self.enums_used.items()):
             quoted = ", ".join(f'"{v}"_s' for v in values)
             lines.append(f"static constexpr ASCIILiteral {enum_table(enum)}[] = {{ {quoted} }};")
@@ -1871,6 +1885,25 @@ class Generator(ComplexGeneratorMixin):
             lines += [f'    return copyString("{root}"_s, buffer, capacity, length);', "}", ""]
         lines += ["} // extern \"C\"", ""]
         return "\n".join(lines)
+
+    def const_getter_runtime(self):
+        if not self.const_getters_used:
+            return []
+        return [r'''
+namespace {
+template<typename Root, typename Declared, typename Handle, typename V>
+int32_t storeConstGetter(V&& value, Handle** result)
+{
+    static_assert(std::is_lvalue_reference_v<V> && std::is_const_v<std::remove_reference_t<V>>);
+    static_assert(std::is_same_v<std::remove_cvref_t<V>, Declared>);
+    static_assert(std::is_polymorphic_v<Root>);
+    auto* pointer = static_cast<Root*>(const_cast<Declared*>(&value));
+    pointer->ref();
+    *result = reinterpret_cast<Handle*>(pointer);
+    return RV_OK;
+}
+} // namespace
+''']
 
     def tracked_handle_runtime(self):
         if not self.tracked_roots:

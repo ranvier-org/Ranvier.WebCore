@@ -24,7 +24,7 @@ Three binding gaps remain: overloaded CSSRotate constructors need distinct expor
 
 Angle-only rotation is 2D; axis rotation is 3D. Omitted translate z and scale z differ from explicitly supplied zero/one in is2D. Skew and perspective is2D setters follow their engine no-op behavior. Translate percentage/relative units may construct successfully but cannot resolve to a matrix without supported absolute units; do not invent layout resolution.
 
-Transform lists retain component identity and ordering, append at length and reject larger indices. MatrixComponent construction copies its input, its matrix getter remains live, and toMatrix may preserve identity for a 3D component while a 2D component returns a flattened copy. Returned same-object handles still own a separate exported reference.
+Transform lists retain component identity and ordering, append at length and reject larger indices. MatrixComponent construction copies its input and its matrix getter remains live. The pinned implementation currently aliases its internal matrix from 3D toMatrix, but that is a defect to reproduce rather than a shared identity guarantee. Returned same-object handles elsewhere still own a separate exported reference.
 
 All these assertions require actual probes. This planning checkpoint claims no C16 binding or runtime acceptance.
 
@@ -41,3 +41,17 @@ A regression first observed the perspective typedef as a nested two-arm union wh
 A separate regression first observed missing finite-input validation for CSSNumberish. Configured restricted double/float union arms now record a TypeError before constructing the argument or calling the engine when input is NaN/infinite. Unrestricted geometry doubles are unaffected. The finiteInput model flag describes inputs only; output encoding does not discard or reject engine values.
 
 All 59 generator tests pass and production generation is still unchanged at the Native16 surface. Independent source review is clear. Component selection, compiled engine calls and shared runtime verification remain pending.
+
+## Browser baseline and additional source gaps
+
+Actual Chromium 156.0.8078.4 confirms list ordering/index behavior, 2D default distinctions, finite CSSNumberish rejection and perspective/relative-unit behavior. It rejects invalid translate/scale setter dimensions immediately; the pinned engine's corresponding setters omit those checks. Scoped native binding validation may close that gap without changing engine class signatures or mathematics, after a native regression reproduces it.
+
+Chromium also returns a separate matrix from a 3D MatrixComponent. The [Typed OM toMatrix algorithm](https://drafts.css-houdini.org/css-typed-om/#dom-csstransformcomponent-tomatrix) requires a new matrix whose is2D flag matches the component. Audit the pinned component implementations and reproduce any alias/flag defects before repair.
+
+Several component numeric getters return const CSSNumericValue references in C++. They still expose ordinary mutable Typed OM value objects through WebIDL. Add narrowly configured retained const-result handling for these producers; do not broaden generic handle const casts. The ignored browser audit script and JSON are artifacts/c16-browser-audit.mjs and artifacts/c16-browser-audit.json.
+
+## Const getter primitive
+
+Named const getter bindings now require their exact declared object interface and root; unmatched or mismatched configuration fails closed. A helper emitted only for those getters requires an exact const lvalue reference and polymorphic root at compile time, acquires one external reference, and preserves the existing opaque pointer. Generic storeHandle remains unchanged. The audited fields hold mutable Ref<CSSNumericValue> objects; the const qualifier belongs to the C++ accessor, not an immutable WebIDL object.
+
+The regression first failed at the missing specialized retained-result path. All 60 generator tests pass and Native16 production generation remains unchanged. Independent review is clear. Actual component compilation, returned-value identity and reference-lifetime probes remain pending.

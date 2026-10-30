@@ -59,6 +59,32 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_selected_const_numeric_getter_retains_a_checked_declared_reference_without_global_const_casts(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface CSSNumericValue : CSSStyleValue {};
+interface CSSTranslate { attribute CSSNumericValue x; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSNumericValue', 'CSSTranslate']
+        config['constGetterBindings'] = {'CSSTranslate.x': {'interface': 'CSSNumericValue', 'root': 'CSSStyleValue'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        self.assertIn('storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result)', glue)
+        self.assertIn('static_assert(std::is_lvalue_reference_v<V> && std::is_const_v<std::remove_reference_t<V>>);', glue)
+        self.assertIn('static_assert(std::is_same_v<std::remove_cvref_t<V>, Declared>);', glue)
+        self.assertIn('static_assert(std::is_polymorphic_v<Root>);', glue)
+        self.assertIn('static_cast<Root*>(const_cast<Declared*>(&value))', glue)
+        self.assertIn('Root* pointer = rawPointer<Root>(std::forward<V>(value));', glue)
+        bad = dict(config)
+        bad['constGetterBindings'] = {'CSSTranslate.x': {'interface': 'CSSStyleValue', 'root': 'CSSStyleValue'}}
+        with self.assertRaisesRegex(SystemExit, 'const getter.*declared interface/root'):
+            domgen.Generator(domgen.World(self.source, bad)).run()
+
     def test_selected_restricted_numeric_union_inputs_reject_nonfinite_values_without_restricting_geometry(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
