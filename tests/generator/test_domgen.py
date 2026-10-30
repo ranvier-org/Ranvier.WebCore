@@ -59,6 +59,36 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_scoped_interface_header_override_uses_the_real_cpp_alias_declaration(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '\ninterface SVGAnimatedNumber { attribute float baseVal; };\n')
+        header = self.source / 'Source/WebCore/dom/AliasDeclarations.h'
+        header.write_text('// Test alias declaration header.\n')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['SVGAnimatedNumber']
+        config['interfaceHeaders'] = {'SVGAnimatedNumber': 'dom/AliasDeclarations.h'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        self.assertTrue('#include "dom/AliasDeclarations.h"' in glue)
+        self.assertTrue('#include "SVGAnimatedNumber.h"' not in glue)
+
+    def test_interface_header_override_rejects_unselected_missing_and_external_headers(self):
+        for name, header, error in [
+            ('NotSelected', 'dom/Fixture.h', 'selected interface'),
+            ('Node', 'dom/Missing.h', 'exist inside WebCore'),
+            ('Node', '../Outside.h', 'WebCore-relative header'),
+            ('Node', '/Absolute.h', 'WebCore-relative header'),
+            ('Node', 'C:/Absolute.h', 'WebCore-relative header'),
+        ]:
+            with self.subTest(name=name, header=header):
+                config = dict(self.world.config)
+                config['interfaceHeaders'] = {name: header}
+                with self.assertRaisesRegex(SystemExit, error):
+                    domgen.Generator(domgen.World(self.source, config))
+
     def test_selected_browser_transform_matrix_flags_copy_only_the_measured_false_flag_case(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

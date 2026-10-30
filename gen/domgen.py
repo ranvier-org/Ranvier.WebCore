@@ -489,6 +489,18 @@ class Generator(ComplexGeneratorMixin):
         self.enums_used = {}
         self.handles = []  # object handle roots
         self.headers = {"HTMLNames.h", "ElementInlines.h", "NodeInlines.h", "Exception.h", "ExceptionOr.h"}
+        self.interface_headers = {}
+        for name, header in world.config.get('interfaceHeaders', {}).items():
+            if name not in world.scope:
+                raise SystemExit(f'{name}: interface header override requires a selected interface')
+            if (not isinstance(header, str) or not header.endswith('.h') or '\\' in header
+                    or pathlib.PurePosixPath(header).is_absolute() or pathlib.PureWindowsPath(header).is_absolute()
+                    or '..' in pathlib.PurePosixPath(header).parts):
+                raise SystemExit(f'{name}: interface header must name a WebCore-relative header')
+            path = world.webcore / header
+            if not path.resolve().is_relative_to(world.webcore.resolve()) or not path.is_file():
+                raise SystemExit(f'{name}: interface header must exist inside WebCore: {header}')
+            self.interface_headers[f'{world.cpp_class(name)}.h'] = header
         excludes = world.config["exclude"]
         self.exclude = set(excludes)
         self.dicts_used = {}  # name -> [(member, Mapped)] in struct order
@@ -1820,7 +1832,7 @@ class Generator(ComplexGeneratorMixin):
             '#include "RanvierDomGlue.h"',
             "",
         ]
-        lines += [f'#include "{h}"' for h in sorted(self.headers)]
+        lines += [f'#include "{h}"' for h in sorted({self.interface_headers.get(header, header) for header in self.headers})]
         for enum, (_, _, file) in sorted(self.enums_used.items()):
             lines.append(f'#include "JS{pathlib.PurePosixPath(file).stem}.h"')
         lines += ["", RUNTIME, ""]
