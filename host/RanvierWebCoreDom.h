@@ -52,6 +52,31 @@ typedef struct RvDOMMatrixReadOnly RvDOMMatrixReadOnly;
 typedef struct RvNodeList RvNodeList;
 typedef struct RvHTMLCollection RvHTMLCollection;
 typedef struct RvValidityState RvValidityState;
+typedef struct RvSVGRect RvSVGRect;
+typedef struct RvSVGMatrix RvSVGMatrix;
+typedef struct RvSVGPoint RvSVGPoint;
+typedef struct RvSVGAnimatedRect RvSVGAnimatedRect;
+typedef struct RvSVGPreserveAspectRatio RvSVGPreserveAspectRatio;
+typedef struct RvSVGAnimatedPreserveAspectRatio RvSVGAnimatedPreserveAspectRatio;
+typedef struct RvSVGTransform RvSVGTransform;
+typedef struct RvSVGTransformList RvSVGTransformList;
+typedef struct RvSVGAnimatedTransformList RvSVGAnimatedTransformList;
+typedef struct RvSVGNumber RvSVGNumber;
+typedef struct RvSVGLength RvSVGLength;
+typedef struct RvSVGAngle RvSVGAngle;
+typedef struct RvSVGNumberList RvSVGNumberList;
+typedef struct RvSVGLengthList RvSVGLengthList;
+typedef struct RvSVGPointList RvSVGPointList;
+typedef struct RvSVGAnimatedNumber RvSVGAnimatedNumber;
+typedef struct RvSVGAnimatedLength RvSVGAnimatedLength;
+typedef struct RvSVGAnimatedLengthList RvSVGAnimatedLengthList;
+typedef struct RvSVGAnimatedNumberList RvSVGAnimatedNumberList;
+typedef struct RvSVGAnimatedEnumeration RvSVGAnimatedEnumeration;
+typedef struct RvSVGAnimatedString RvSVGAnimatedString;
+typedef struct RvSVGAnimatedBoolean RvSVGAnimatedBoolean;
+typedef struct RvSVGStringList RvSVGStringList;
+typedef struct RvSVGViewSpec RvSVGViewSpec;
+typedef struct RvSVGAnimatedAngle RvSVGAnimatedAngle;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -142,6 +167,62 @@ enum {
     RV_DOM_KEYBOARD_EVENT_DOM_KEY_LOCATION_LEFT = 0x01, /* KeyboardEvent.DOM_KEY_LOCATION_LEFT */
     RV_DOM_KEYBOARD_EVENT_DOM_KEY_LOCATION_RIGHT = 0x02, /* KeyboardEvent.DOM_KEY_LOCATION_RIGHT */
     RV_DOM_KEYBOARD_EVENT_DOM_KEY_LOCATION_NUMPAD = 0x03, /* KeyboardEvent.DOM_KEY_LOCATION_NUMPAD */
+    RV_DOM_SVGSVG_ELEMENT_SVG_ZOOMANDPAN_UNKNOWN = 0, /* SVGSVGElement.SVG_ZOOMANDPAN_UNKNOWN */
+    RV_DOM_SVGSVG_ELEMENT_SVG_ZOOMANDPAN_DISABLE = 1, /* SVGSVGElement.SVG_ZOOMANDPAN_DISABLE */
+    RV_DOM_SVGSVG_ELEMENT_SVG_ZOOMANDPAN_MAGNIFY = 2, /* SVGSVGElement.SVG_ZOOMANDPAN_MAGNIFY */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_UNKNOWN = 0, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_UNKNOWN */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_NONE = 1, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_NONE */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_XMINYMIN = 2, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMINYMIN */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_XMIDYMIN = 3, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMIDYMIN */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_XMAXYMIN = 4, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMAXYMIN */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_XMINYMID = 5, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMINYMID */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_XMIDYMID = 6, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMIDYMID */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_XMAXYMID = 7, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMAXYMID */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_XMINYMAX = 8, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMINYMAX */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_XMIDYMAX = 9, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMIDYMAX */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_PRESERVEASPECTRATIO_XMAXYMAX = 10, /* SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMAXYMAX */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_MEETORSLICE_UNKNOWN = 0, /* SVGPreserveAspectRatio.SVG_MEETORSLICE_UNKNOWN */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_MEETORSLICE_MEET = 1, /* SVGPreserveAspectRatio.SVG_MEETORSLICE_MEET */
+    RV_DOM_SVG_PRESERVE_ASPECT_RATIO_SVG_MEETORSLICE_SLICE = 2, /* SVGPreserveAspectRatio.SVG_MEETORSLICE_SLICE */
+    RV_DOM_SVG_TRANSFORM_SVG_TRANSFORM_UNKNOWN = 0, /* SVGTransform.SVG_TRANSFORM_UNKNOWN */
+    RV_DOM_SVG_TRANSFORM_SVG_TRANSFORM_MATRIX = 1, /* SVGTransform.SVG_TRANSFORM_MATRIX */
+    RV_DOM_SVG_TRANSFORM_SVG_TRANSFORM_TRANSLATE = 2, /* SVGTransform.SVG_TRANSFORM_TRANSLATE */
+    RV_DOM_SVG_TRANSFORM_SVG_TRANSFORM_SCALE = 3, /* SVGTransform.SVG_TRANSFORM_SCALE */
+    RV_DOM_SVG_TRANSFORM_SVG_TRANSFORM_ROTATE = 4, /* SVGTransform.SVG_TRANSFORM_ROTATE */
+    RV_DOM_SVG_TRANSFORM_SVG_TRANSFORM_SKEWX = 5, /* SVGTransform.SVG_TRANSFORM_SKEWX */
+    RV_DOM_SVG_TRANSFORM_SVG_TRANSFORM_SKEWY = 6, /* SVGTransform.SVG_TRANSFORM_SKEWY */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_UNKNOWN = 0, /* SVGLength.SVG_LENGTHTYPE_UNKNOWN */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_NUMBER = 1, /* SVGLength.SVG_LENGTHTYPE_NUMBER */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_PERCENTAGE = 2, /* SVGLength.SVG_LENGTHTYPE_PERCENTAGE */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_EMS = 3, /* SVGLength.SVG_LENGTHTYPE_EMS */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_EXS = 4, /* SVGLength.SVG_LENGTHTYPE_EXS */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_PX = 5, /* SVGLength.SVG_LENGTHTYPE_PX */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_CM = 6, /* SVGLength.SVG_LENGTHTYPE_CM */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_MM = 7, /* SVGLength.SVG_LENGTHTYPE_MM */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_IN = 8, /* SVGLength.SVG_LENGTHTYPE_IN */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_PT = 9, /* SVGLength.SVG_LENGTHTYPE_PT */
+    RV_DOM_SVG_LENGTH_SVG_LENGTHTYPE_PC = 10, /* SVGLength.SVG_LENGTHTYPE_PC */
+    RV_DOM_SVG_ANGLE_SVG_ANGLETYPE_UNKNOWN = 0, /* SVGAngle.SVG_ANGLETYPE_UNKNOWN */
+    RV_DOM_SVG_ANGLE_SVG_ANGLETYPE_UNSPECIFIED = 1, /* SVGAngle.SVG_ANGLETYPE_UNSPECIFIED */
+    RV_DOM_SVG_ANGLE_SVG_ANGLETYPE_DEG = 2, /* SVGAngle.SVG_ANGLETYPE_DEG */
+    RV_DOM_SVG_ANGLE_SVG_ANGLETYPE_RAD = 3, /* SVGAngle.SVG_ANGLETYPE_RAD */
+    RV_DOM_SVG_ANGLE_SVG_ANGLETYPE_GRAD = 4, /* SVGAngle.SVG_ANGLETYPE_GRAD */
+    RV_DOM_SVG_VIEW_SPEC_SVG_ZOOMANDPAN_UNKNOWN = 0, /* SVGViewSpec.SVG_ZOOMANDPAN_UNKNOWN */
+    RV_DOM_SVG_VIEW_SPEC_SVG_ZOOMANDPAN_DISABLE = 1, /* SVGViewSpec.SVG_ZOOMANDPAN_DISABLE */
+    RV_DOM_SVG_VIEW_SPEC_SVG_ZOOMANDPAN_MAGNIFY = 2, /* SVGViewSpec.SVG_ZOOMANDPAN_MAGNIFY */
+    RV_DOM_SVG_VIEW_ELEMENT_SVG_ZOOMANDPAN_UNKNOWN = 0, /* SVGViewElement.SVG_ZOOMANDPAN_UNKNOWN */
+    RV_DOM_SVG_VIEW_ELEMENT_SVG_ZOOMANDPAN_DISABLE = 1, /* SVGViewElement.SVG_ZOOMANDPAN_DISABLE */
+    RV_DOM_SVG_VIEW_ELEMENT_SVG_ZOOMANDPAN_MAGNIFY = 2, /* SVGViewElement.SVG_ZOOMANDPAN_MAGNIFY */
+    RV_DOM_SVG_MARKER_ELEMENT_SVG_MARKERUNITS_UNKNOWN = 0, /* SVGMarkerElement.SVG_MARKERUNITS_UNKNOWN */
+    RV_DOM_SVG_MARKER_ELEMENT_SVG_MARKERUNITS_USERSPACEONUSE = 1, /* SVGMarkerElement.SVG_MARKERUNITS_USERSPACEONUSE */
+    RV_DOM_SVG_MARKER_ELEMENT_SVG_MARKERUNITS_STROKEWIDTH = 2, /* SVGMarkerElement.SVG_MARKERUNITS_STROKEWIDTH */
+    RV_DOM_SVG_MARKER_ELEMENT_SVG_MARKER_ORIENT_UNKNOWN = 0, /* SVGMarkerElement.SVG_MARKER_ORIENT_UNKNOWN */
+    RV_DOM_SVG_MARKER_ELEMENT_SVG_MARKER_ORIENT_AUTO = 1, /* SVGMarkerElement.SVG_MARKER_ORIENT_AUTO */
+    RV_DOM_SVG_MARKER_ELEMENT_SVG_MARKER_ORIENT_ANGLE = 2, /* SVGMarkerElement.SVG_MARKER_ORIENT_ANGLE */
+    RV_DOM_SVG_MARKER_ELEMENT_SVG_MARKER_ORIENT_AUTO_START_REVERSE = 3, /* SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE */
+    RV_DOM_SVG_TEXT_CONTENT_ELEMENT_LENGTHADJUST_UNKNOWN = 0, /* SVGTextContentElement.LENGTHADJUST_UNKNOWN */
+    RV_DOM_SVG_TEXT_CONTENT_ELEMENT_LENGTHADJUST_SPACING = 1, /* SVGTextContentElement.LENGTHADJUST_SPACING */
+    RV_DOM_SVG_TEXT_CONTENT_ELEMENT_LENGTHADJUST_SPACINGANDGLYPHS = 2, /* SVGTextContentElement.LENGTHADJUST_SPACINGANDGLYPHS */
 };
 
 /* The values of the IDL enumeration AriaNotificationInterrupt. */
@@ -372,6 +453,24 @@ typedef struct RvDomDOMPointInit {
     double z; /* unrestricted double, default 0 */
     double w; /* unrestricted double, default 1 */
 } RvDomDOMPointInit;
+
+/* The IDL dictionary DOMMatrix2DInit. size is sizeof(RvDomDOMMatrix2DInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomDOMMatrix2DInit {
+    uint32_t size;
+    const double* a; /* unrestricted double, NULL for absent */
+    const double* b; /* unrestricted double, NULL for absent */
+    const double* c; /* unrestricted double, NULL for absent */
+    const double* d; /* unrestricted double, NULL for absent */
+    const double* e; /* unrestricted double, NULL for absent */
+    const double* f; /* unrestricted double, NULL for absent */
+    const double* m11; /* unrestricted double, NULL for absent */
+    const double* m12; /* unrestricted double, NULL for absent */
+    const double* m21; /* unrestricted double, NULL for absent */
+    const double* m22; /* unrestricted double, NULL for absent */
+    const double* m41; /* unrestricted double, NULL for absent */
+    const double* m42; /* unrestricted double, NULL for absent */
+} RvDomDOMMatrix2DInit;
 
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -974,6 +1073,106 @@ RV_EXPORT RvHTMLCollection* rv_dom_html_collection_retain(RvHTMLCollection*);
 RV_EXPORT void rv_dom_validity_state_release(RvValidityState*);
 /* Adds a reference to a ValidityState and returns it. */
 RV_EXPORT RvValidityState* rv_dom_validity_state_retain(RvValidityState*);
+/* Releases a handle to a SVGRect. */
+RV_EXPORT void rv_dom_svg_rect_release(RvSVGRect*);
+/* Adds a reference to a SVGRect and returns it. */
+RV_EXPORT RvSVGRect* rv_dom_svg_rect_retain(RvSVGRect*);
+/* Releases a handle to a SVGMatrix. */
+RV_EXPORT void rv_dom_svg_matrix_release(RvSVGMatrix*);
+/* Adds a reference to a SVGMatrix and returns it. */
+RV_EXPORT RvSVGMatrix* rv_dom_svg_matrix_retain(RvSVGMatrix*);
+/* Releases a handle to a SVGPoint. */
+RV_EXPORT void rv_dom_svg_point_release(RvSVGPoint*);
+/* Adds a reference to a SVGPoint and returns it. */
+RV_EXPORT RvSVGPoint* rv_dom_svg_point_retain(RvSVGPoint*);
+/* Releases a handle to a SVGAnimatedRect. */
+RV_EXPORT void rv_dom_svg_animated_rect_release(RvSVGAnimatedRect*);
+/* Adds a reference to a SVGAnimatedRect and returns it. */
+RV_EXPORT RvSVGAnimatedRect* rv_dom_svg_animated_rect_retain(RvSVGAnimatedRect*);
+/* Releases a handle to a SVGPreserveAspectRatio. */
+RV_EXPORT void rv_dom_svg_preserve_aspect_ratio_release(RvSVGPreserveAspectRatio*);
+/* Adds a reference to a SVGPreserveAspectRatio and returns it. */
+RV_EXPORT RvSVGPreserveAspectRatio* rv_dom_svg_preserve_aspect_ratio_retain(RvSVGPreserveAspectRatio*);
+/* Releases a handle to a SVGAnimatedPreserveAspectRatio. */
+RV_EXPORT void rv_dom_svg_animated_preserve_aspect_ratio_release(RvSVGAnimatedPreserveAspectRatio*);
+/* Adds a reference to a SVGAnimatedPreserveAspectRatio and returns it. */
+RV_EXPORT RvSVGAnimatedPreserveAspectRatio* rv_dom_svg_animated_preserve_aspect_ratio_retain(RvSVGAnimatedPreserveAspectRatio*);
+/* Releases a handle to a SVGTransform. */
+RV_EXPORT void rv_dom_svg_transform_release(RvSVGTransform*);
+/* Adds a reference to a SVGTransform and returns it. */
+RV_EXPORT RvSVGTransform* rv_dom_svg_transform_retain(RvSVGTransform*);
+/* Releases a handle to a SVGTransformList. */
+RV_EXPORT void rv_dom_svg_transform_list_release(RvSVGTransformList*);
+/* Adds a reference to a SVGTransformList and returns it. */
+RV_EXPORT RvSVGTransformList* rv_dom_svg_transform_list_retain(RvSVGTransformList*);
+/* Releases a handle to a SVGAnimatedTransformList. */
+RV_EXPORT void rv_dom_svg_animated_transform_list_release(RvSVGAnimatedTransformList*);
+/* Adds a reference to a SVGAnimatedTransformList and returns it. */
+RV_EXPORT RvSVGAnimatedTransformList* rv_dom_svg_animated_transform_list_retain(RvSVGAnimatedTransformList*);
+/* Releases a handle to a SVGNumber. */
+RV_EXPORT void rv_dom_svg_number_release(RvSVGNumber*);
+/* Adds a reference to a SVGNumber and returns it. */
+RV_EXPORT RvSVGNumber* rv_dom_svg_number_retain(RvSVGNumber*);
+/* Releases a handle to a SVGLength. */
+RV_EXPORT void rv_dom_svg_length_release(RvSVGLength*);
+/* Adds a reference to a SVGLength and returns it. */
+RV_EXPORT RvSVGLength* rv_dom_svg_length_retain(RvSVGLength*);
+/* Releases a handle to a SVGAngle. */
+RV_EXPORT void rv_dom_svg_angle_release(RvSVGAngle*);
+/* Adds a reference to a SVGAngle and returns it. */
+RV_EXPORT RvSVGAngle* rv_dom_svg_angle_retain(RvSVGAngle*);
+/* Releases a handle to a SVGNumberList. */
+RV_EXPORT void rv_dom_svg_number_list_release(RvSVGNumberList*);
+/* Adds a reference to a SVGNumberList and returns it. */
+RV_EXPORT RvSVGNumberList* rv_dom_svg_number_list_retain(RvSVGNumberList*);
+/* Releases a handle to a SVGLengthList. */
+RV_EXPORT void rv_dom_svg_length_list_release(RvSVGLengthList*);
+/* Adds a reference to a SVGLengthList and returns it. */
+RV_EXPORT RvSVGLengthList* rv_dom_svg_length_list_retain(RvSVGLengthList*);
+/* Releases a handle to a SVGPointList. */
+RV_EXPORT void rv_dom_svg_point_list_release(RvSVGPointList*);
+/* Adds a reference to a SVGPointList and returns it. */
+RV_EXPORT RvSVGPointList* rv_dom_svg_point_list_retain(RvSVGPointList*);
+/* Releases a handle to a SVGAnimatedNumber. */
+RV_EXPORT void rv_dom_svg_animated_number_release(RvSVGAnimatedNumber*);
+/* Adds a reference to a SVGAnimatedNumber and returns it. */
+RV_EXPORT RvSVGAnimatedNumber* rv_dom_svg_animated_number_retain(RvSVGAnimatedNumber*);
+/* Releases a handle to a SVGAnimatedLength. */
+RV_EXPORT void rv_dom_svg_animated_length_release(RvSVGAnimatedLength*);
+/* Adds a reference to a SVGAnimatedLength and returns it. */
+RV_EXPORT RvSVGAnimatedLength* rv_dom_svg_animated_length_retain(RvSVGAnimatedLength*);
+/* Releases a handle to a SVGAnimatedLengthList. */
+RV_EXPORT void rv_dom_svg_animated_length_list_release(RvSVGAnimatedLengthList*);
+/* Adds a reference to a SVGAnimatedLengthList and returns it. */
+RV_EXPORT RvSVGAnimatedLengthList* rv_dom_svg_animated_length_list_retain(RvSVGAnimatedLengthList*);
+/* Releases a handle to a SVGAnimatedNumberList. */
+RV_EXPORT void rv_dom_svg_animated_number_list_release(RvSVGAnimatedNumberList*);
+/* Adds a reference to a SVGAnimatedNumberList and returns it. */
+RV_EXPORT RvSVGAnimatedNumberList* rv_dom_svg_animated_number_list_retain(RvSVGAnimatedNumberList*);
+/* Releases a handle to a SVGAnimatedEnumeration. */
+RV_EXPORT void rv_dom_svg_animated_enumeration_release(RvSVGAnimatedEnumeration*);
+/* Adds a reference to a SVGAnimatedEnumeration and returns it. */
+RV_EXPORT RvSVGAnimatedEnumeration* rv_dom_svg_animated_enumeration_retain(RvSVGAnimatedEnumeration*);
+/* Releases a handle to a SVGAnimatedString. */
+RV_EXPORT void rv_dom_svg_animated_string_release(RvSVGAnimatedString*);
+/* Adds a reference to a SVGAnimatedString and returns it. */
+RV_EXPORT RvSVGAnimatedString* rv_dom_svg_animated_string_retain(RvSVGAnimatedString*);
+/* Releases a handle to a SVGAnimatedBoolean. */
+RV_EXPORT void rv_dom_svg_animated_boolean_release(RvSVGAnimatedBoolean*);
+/* Adds a reference to a SVGAnimatedBoolean and returns it. */
+RV_EXPORT RvSVGAnimatedBoolean* rv_dom_svg_animated_boolean_retain(RvSVGAnimatedBoolean*);
+/* Releases a handle to a SVGStringList. */
+RV_EXPORT void rv_dom_svg_string_list_release(RvSVGStringList*);
+/* Adds a reference to a SVGStringList and returns it. */
+RV_EXPORT RvSVGStringList* rv_dom_svg_string_list_retain(RvSVGStringList*);
+/* Releases a handle to a SVGViewSpec. */
+RV_EXPORT void rv_dom_svg_view_spec_release(RvSVGViewSpec*);
+/* Adds a reference to a SVGViewSpec and returns it. */
+RV_EXPORT RvSVGViewSpec* rv_dom_svg_view_spec_retain(RvSVGViewSpec*);
+/* Releases a handle to a SVGAnimatedAngle. */
+RV_EXPORT void rv_dom_svg_animated_angle_release(RvSVGAnimatedAngle*);
+/* Adds a reference to a SVGAnimatedAngle and returns it. */
+RV_EXPORT RvSVGAnimatedAngle* rv_dom_svg_animated_angle_retain(RvSVGAnimatedAngle*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -1223,6 +1422,8 @@ RV_EXPORT int32_t rv_dom_document_get_anchors(RvNode* target, RvHTMLCollection**
 RV_EXPORT int32_t rv_dom_document_get_hidden(RvNode* target, int32_t* result);
 /* Document.visibilityState getter: readonly attribute VisibilityState visibilityState */
 RV_EXPORT int32_t rv_dom_document_get_visibility_state(RvNode* target, int32_t* result);
+/* Document.rootElement getter: readonly attribute SVGSVGElement? rootElement; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_document_get_root_element(RvNode* target, RvNode** result);
 /* Document.children getter: readonly attribute HTMLCollection children; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_get_children(RvNode* target, RvHTMLCollection** result);
 /* Document.firstElementChild getter: readonly attribute Element? firstElementChild; *result is a new reference, or
@@ -3531,6 +3732,11 @@ RV_EXPORT int32_t rv_dom_html_title_element_get_text(RvNode* target, char* buffe
 RV_EXPORT int32_t rv_dom_html_title_element_set_text(RvNode* target, const char* value);
 /* SVGElement */
 
+/* SVGElement.className getter: readonly attribute SVGAnimatedString className; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_element_get_class_name(RvNode* target, RvSVGAnimatedString** result);
+/* SVGElement.ownerSVGElement getter: readonly attribute SVGSVGElement? ownerSVGElement; *result is a new reference,
+ * or NULL */
+RV_EXPORT int32_t rv_dom_svg_element_get_owner_svg_element(RvNode* target, RvNode** result);
 /* SVGElement.viewportElement getter: readonly attribute SVGElement? viewportElement; *result is a new reference, or
  * NULL */
 RV_EXPORT int32_t rv_dom_svg_element_get_viewport_element(RvNode* target, RvNode** result);
@@ -5485,6 +5691,615 @@ RV_EXPORT int32_t rv_dom_input_event_get_target_ranges(RvEvent* target, RvDomSeq
 
 /* CompositionEvent.data getter: readonly attribute USVString data */
 RV_EXPORT int32_t rv_dom_composition_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGGraphicsElement */
+
+/* SVGGraphicsElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_graphics_element_get_transform(RvNode* target, RvSVGAnimatedTransformList** result);
+/* SVGGraphicsElement.requiredExtensions getter: readonly attribute SVGStringList requiredExtensions; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_graphics_element_get_required_extensions(RvNode* target, RvSVGStringList** result);
+/* SVGGraphicsElement.systemLanguage getter: readonly attribute SVGStringList systemLanguage; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_graphics_element_get_system_language(RvNode* target, RvSVGStringList** result);
+/* SVGGraphicsElement.getBBox() -> SVGRect; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_graphics_element_get_b_box(RvNode* target, RvSVGRect** result);
+/* SVGGraphicsElement.getCTM() -> SVGMatrix?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_svg_graphics_element_get_ctm(RvNode* target, RvSVGMatrix** result);
+/* SVGGraphicsElement.getScreenCTM() -> SVGMatrix?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_svg_graphics_element_get_screen_ctm(RvNode* target, RvSVGMatrix** result);
+/* SVGGeometryElement */
+
+/* SVGGeometryElement.pathLength getter: readonly attribute SVGAnimatedNumber pathLength; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_geometry_element_get_path_length(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGGeometryElement.isPointInFill(optional DOMPointInit point = {}) -> boolean; point defaults to {} in IDL; point
+ * may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_svg_geometry_element_is_point_in_fill(RvNode* target, const RvDomDOMPointInit* point, int32_t* result);
+/* SVGGeometryElement.isPointInStroke(optional DOMPointInit point = {}) -> boolean; point defaults to {} in IDL; point
+ * may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_svg_geometry_element_is_point_in_stroke(RvNode* target, const RvDomDOMPointInit* point, int32_t* result);
+/* SVGGeometryElement.getTotalLength() -> unrestricted float */
+RV_EXPORT int32_t rv_dom_svg_geometry_element_get_total_length(RvNode* target, float* result);
+/* SVGGeometryElement.getPointAtLength(float distance) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_geometry_element_get_point_at_length(RvNode* target, float distance, RvSVGPoint** result);
+/* SVGPolygonElement */
+
+/* SVGPolygonElement.points getter: readonly attribute SVGPointList points; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_polygon_element_get_points(RvNode* target, RvSVGPointList** result);
+/* SVGPolygonElement.animatedPoints getter: readonly attribute SVGPointList animatedPoints; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_polygon_element_get_animated_points(RvNode* target, RvSVGPointList** result);
+/* SVGPolylineElement */
+
+/* SVGPolylineElement.points getter: readonly attribute SVGPointList points; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_polyline_element_get_points(RvNode* target, RvSVGPointList** result);
+/* SVGPolylineElement.animatedPoints getter: readonly attribute SVGPointList animatedPoints; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_polyline_element_get_animated_points(RvNode* target, RvSVGPointList** result);
+/* SVGSVGElement */
+
+/* SVGSVGElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGSVGElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGSVGElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGSVGElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGSVGElement.currentScale getter: attribute float currentScale */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_current_scale(RvNode* target, float* result);
+/* SVGSVGElement.currentScale setter: attribute float currentScale */
+RV_EXPORT int32_t rv_dom_svgsvg_element_set_current_scale(RvNode* target, float value);
+/* SVGSVGElement.currentTranslate getter: readonly attribute SVGPoint currentTranslate; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_current_translate(RvNode* target, RvSVGPoint** result);
+/* SVGSVGElement.useCurrentView getter: readonly attribute boolean useCurrentView */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_use_current_view(RvNode* target, int32_t* result);
+/* SVGSVGElement.currentView getter: readonly attribute SVGViewSpec currentView; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_current_view(RvNode* target, RvSVGViewSpec** result);
+/* SVGSVGElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result);
+/* SVGSVGElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result);
+/* SVGSVGElement.zoomAndPan getter: attribute unsigned short zoomAndPan */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_zoom_and_pan(RvNode* target, uint16_t* result);
+/* SVGSVGElement.zoomAndPan setter: attribute unsigned short zoomAndPan */
+RV_EXPORT int32_t rv_dom_svgsvg_element_set_zoom_and_pan(RvNode* target, uint16_t value);
+/* SVGSVGElement.getIntersectionList(SVGRect rect, SVGElement? referenceElement) -> NodeList; reference_element may be
+ * NULL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_intersection_list(RvNode* target, RvSVGRect* rect, RvNode* reference_element, RvNodeList** result);
+/* SVGSVGElement.getEnclosureList(SVGRect rect, SVGElement? referenceElement) -> NodeList; reference_element may be
+ * NULL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_enclosure_list(RvNode* target, RvSVGRect* rect, RvNode* reference_element, RvNodeList** result);
+/* SVGSVGElement.checkIntersection(SVGElement element, SVGRect rect) -> boolean */
+RV_EXPORT int32_t rv_dom_svgsvg_element_check_intersection(RvNode* target, RvNode* element, RvSVGRect* rect, int32_t* result);
+/* SVGSVGElement.checkEnclosure(SVGElement element, SVGRect rect) -> boolean */
+RV_EXPORT int32_t rv_dom_svgsvg_element_check_enclosure(RvNode* target, RvNode* element, RvSVGRect* rect, int32_t* result);
+/* SVGSVGElement.deselectAll() -> undefined */
+RV_EXPORT int32_t rv_dom_svgsvg_element_deselect_all(RvNode* target);
+/* SVGSVGElement.createSVGNumber() -> SVGNumber; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_number(RvNode* target, RvSVGNumber** result);
+/* SVGSVGElement.createSVGLength() -> SVGLength; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_length(RvNode* target, RvSVGLength** result);
+/* SVGSVGElement.createSVGAngle() -> SVGAngle; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_angle(RvNode* target, RvSVGAngle** result);
+/* SVGSVGElement.createSVGPoint() -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_point(RvNode* target, RvSVGPoint** result);
+/* SVGSVGElement.createSVGMatrix() -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_matrix(RvNode* target, RvSVGMatrix** result);
+/* SVGSVGElement.createSVGRect() -> SVGRect; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_rect(RvNode* target, RvSVGRect** result);
+/* SVGSVGElement.createSVGTransform() -> SVGTransform; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_transform(RvNode* target, RvSVGTransform** result);
+/* SVGSVGElement.createSVGTransformFromMatrix(optional DOMMatrix2DInit matrix = {}) -> SVGTransform; matrix defaults
+ * to {} in IDL; matrix may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_transform_from_matrix(RvNode* target, const RvDomDOMMatrix2DInit* matrix, RvSVGTransform** result);
+/* SVGSVGElement.getElementById(DOMString elementId) -> Element?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_element_by_id(RvNode* target, const char* element_id, RvNode** result);
+/* SVGSVGElement.pauseAnimations() -> undefined */
+RV_EXPORT int32_t rv_dom_svgsvg_element_pause_animations(RvNode* target);
+/* SVGSVGElement.unpauseAnimations() -> undefined */
+RV_EXPORT int32_t rv_dom_svgsvg_element_unpause_animations(RvNode* target);
+/* SVGSVGElement.animationsPaused() -> boolean */
+RV_EXPORT int32_t rv_dom_svgsvg_element_animations_paused(RvNode* target, int32_t* result);
+/* SVGSVGElement.getCurrentTime() -> float */
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_current_time(RvNode* target, float* result);
+/* SVGSVGElement.setCurrentTime(float seconds) -> undefined */
+RV_EXPORT int32_t rv_dom_svgsvg_element_set_current_time(RvNode* target, float seconds);
+/* SVGSVGElement.suspendRedraw(unsigned long maxWaitMilliseconds) -> unsigned long */
+RV_EXPORT int32_t rv_dom_svgsvg_element_suspend_redraw(RvNode* target, uint32_t max_wait_milliseconds, uint32_t* result);
+/* SVGSVGElement.unsuspendRedraw(unsigned long suspendHandleId) -> undefined */
+RV_EXPORT int32_t rv_dom_svgsvg_element_unsuspend_redraw(RvNode* target, uint32_t suspend_handle_id);
+/* SVGSVGElement.unsuspendRedrawAll() -> undefined */
+RV_EXPORT int32_t rv_dom_svgsvg_element_unsuspend_redraw_all(RvNode* target);
+/* SVGSVGElement.forceRedraw() -> undefined */
+RV_EXPORT int32_t rv_dom_svgsvg_element_force_redraw(RvNode* target);
+/* SVGRect */
+
+/* SVGRect.x getter: attribute float x */
+RV_EXPORT int32_t rv_dom_svg_rect_get_x(RvSVGRect* target, float* result);
+/* SVGRect.x setter: attribute float x */
+RV_EXPORT int32_t rv_dom_svg_rect_set_x(RvSVGRect* target, float value);
+/* SVGRect.y getter: attribute float y */
+RV_EXPORT int32_t rv_dom_svg_rect_get_y(RvSVGRect* target, float* result);
+/* SVGRect.y setter: attribute float y */
+RV_EXPORT int32_t rv_dom_svg_rect_set_y(RvSVGRect* target, float value);
+/* SVGRect.width getter: attribute float width */
+RV_EXPORT int32_t rv_dom_svg_rect_get_width(RvSVGRect* target, float* result);
+/* SVGRect.width setter: attribute float width */
+RV_EXPORT int32_t rv_dom_svg_rect_set_width(RvSVGRect* target, float value);
+/* SVGRect.height getter: attribute float height */
+RV_EXPORT int32_t rv_dom_svg_rect_get_height(RvSVGRect* target, float* result);
+/* SVGRect.height setter: attribute float height */
+RV_EXPORT int32_t rv_dom_svg_rect_set_height(RvSVGRect* target, float value);
+/* SVGMatrix */
+
+/* SVGMatrix.a getter: attribute double a */
+RV_EXPORT int32_t rv_dom_svg_matrix_get_a(RvSVGMatrix* target, double* result);
+/* SVGMatrix.a setter: attribute double a */
+RV_EXPORT int32_t rv_dom_svg_matrix_set_a(RvSVGMatrix* target, double value);
+/* SVGMatrix.b getter: attribute double b */
+RV_EXPORT int32_t rv_dom_svg_matrix_get_b(RvSVGMatrix* target, double* result);
+/* SVGMatrix.b setter: attribute double b */
+RV_EXPORT int32_t rv_dom_svg_matrix_set_b(RvSVGMatrix* target, double value);
+/* SVGMatrix.c getter: attribute double c */
+RV_EXPORT int32_t rv_dom_svg_matrix_get_c(RvSVGMatrix* target, double* result);
+/* SVGMatrix.c setter: attribute double c */
+RV_EXPORT int32_t rv_dom_svg_matrix_set_c(RvSVGMatrix* target, double value);
+/* SVGMatrix.d getter: attribute double d */
+RV_EXPORT int32_t rv_dom_svg_matrix_get_d(RvSVGMatrix* target, double* result);
+/* SVGMatrix.d setter: attribute double d */
+RV_EXPORT int32_t rv_dom_svg_matrix_set_d(RvSVGMatrix* target, double value);
+/* SVGMatrix.e getter: attribute double e */
+RV_EXPORT int32_t rv_dom_svg_matrix_get_e(RvSVGMatrix* target, double* result);
+/* SVGMatrix.e setter: attribute double e */
+RV_EXPORT int32_t rv_dom_svg_matrix_set_e(RvSVGMatrix* target, double value);
+/* SVGMatrix.f getter: attribute double f */
+RV_EXPORT int32_t rv_dom_svg_matrix_get_f(RvSVGMatrix* target, double* result);
+/* SVGMatrix.f setter: attribute double f */
+RV_EXPORT int32_t rv_dom_svg_matrix_set_f(RvSVGMatrix* target, double value);
+/* SVGMatrix.multiply(SVGMatrix secondMatrix) -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_multiply(RvSVGMatrix* target, RvSVGMatrix* second_matrix, RvSVGMatrix** result);
+/* SVGMatrix.inverse() -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_inverse(RvSVGMatrix* target, RvSVGMatrix** result);
+/* SVGMatrix.translate(float x, float y) -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_translate(RvSVGMatrix* target, float x, float y, RvSVGMatrix** result);
+/* SVGMatrix.scale(float scaleFactor) -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_scale(RvSVGMatrix* target, float scale_factor, RvSVGMatrix** result);
+/* SVGMatrix.scaleNonUniform(float scaleFactorX, float scaleFactorY) -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_scale_non_uniform(RvSVGMatrix* target, float scale_factor_x, float scale_factor_y, RvSVGMatrix** result);
+/* SVGMatrix.rotate(float angle) -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_rotate(RvSVGMatrix* target, float angle, RvSVGMatrix** result);
+/* SVGMatrix.rotateFromVector(float x, float y) -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_rotate_from_vector(RvSVGMatrix* target, float x, float y, RvSVGMatrix** result);
+/* SVGMatrix.flipX() -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_flip_x(RvSVGMatrix* target, RvSVGMatrix** result);
+/* SVGMatrix.flipY() -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_flip_y(RvSVGMatrix* target, RvSVGMatrix** result);
+/* SVGMatrix.skewX(float angle) -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_skew_x(RvSVGMatrix* target, float angle, RvSVGMatrix** result);
+/* SVGMatrix.skewY(float angle) -> SVGMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_matrix_skew_y(RvSVGMatrix* target, float angle, RvSVGMatrix** result);
+/* SVGPoint */
+
+/* SVGPoint.x getter: attribute float x */
+RV_EXPORT int32_t rv_dom_svg_point_get_x(RvSVGPoint* target, float* result);
+/* SVGPoint.x setter: attribute float x */
+RV_EXPORT int32_t rv_dom_svg_point_set_x(RvSVGPoint* target, float value);
+/* SVGPoint.y getter: attribute float y */
+RV_EXPORT int32_t rv_dom_svg_point_get_y(RvSVGPoint* target, float* result);
+/* SVGPoint.y setter: attribute float y */
+RV_EXPORT int32_t rv_dom_svg_point_set_y(RvSVGPoint* target, float value);
+/* SVGPoint.matrixTransform(SVGMatrix matrix) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_point_matrix_transform(RvSVGPoint* target, RvSVGMatrix* matrix, RvSVGPoint** result);
+/* SVGAnimatedRect */
+
+/* SVGAnimatedRect.baseVal getter: readonly attribute SVGRect baseVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_rect_get_base_val(RvSVGAnimatedRect* target, RvSVGRect** result);
+/* SVGAnimatedRect.animVal getter: readonly attribute SVGRect animVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_rect_get_anim_val(RvSVGAnimatedRect* target, RvSVGRect** result);
+/* SVGPreserveAspectRatio */
+
+/* SVGPreserveAspectRatio.align getter: attribute unsigned short align */
+RV_EXPORT int32_t rv_dom_svg_preserve_aspect_ratio_get_align(RvSVGPreserveAspectRatio* target, uint16_t* result);
+/* SVGPreserveAspectRatio.align setter: attribute unsigned short align */
+RV_EXPORT int32_t rv_dom_svg_preserve_aspect_ratio_set_align(RvSVGPreserveAspectRatio* target, uint16_t value);
+/* SVGPreserveAspectRatio.meetOrSlice getter: attribute unsigned short meetOrSlice */
+RV_EXPORT int32_t rv_dom_svg_preserve_aspect_ratio_get_meet_or_slice(RvSVGPreserveAspectRatio* target, uint16_t* result);
+/* SVGPreserveAspectRatio.meetOrSlice setter: attribute unsigned short meetOrSlice */
+RV_EXPORT int32_t rv_dom_svg_preserve_aspect_ratio_set_meet_or_slice(RvSVGPreserveAspectRatio* target, uint16_t value);
+/* SVGAnimatedPreserveAspectRatio */
+
+/* SVGAnimatedPreserveAspectRatio.baseVal getter: readonly attribute SVGPreserveAspectRatio baseVal; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_animated_preserve_aspect_ratio_get_base_val(RvSVGAnimatedPreserveAspectRatio* target, RvSVGPreserveAspectRatio** result);
+/* SVGAnimatedPreserveAspectRatio.animVal getter: readonly attribute SVGPreserveAspectRatio animVal; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_animated_preserve_aspect_ratio_get_anim_val(RvSVGAnimatedPreserveAspectRatio* target, RvSVGPreserveAspectRatio** result);
+/* SVGTransform */
+
+/* SVGTransform.type getter: readonly attribute unsigned short type */
+RV_EXPORT int32_t rv_dom_svg_transform_get_type(RvSVGTransform* target, uint16_t* result);
+/* SVGTransform.matrix getter: readonly attribute SVGMatrix matrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_transform_get_matrix(RvSVGTransform* target, RvSVGMatrix** result);
+/* SVGTransform.angle getter: readonly attribute float angle */
+RV_EXPORT int32_t rv_dom_svg_transform_get_angle(RvSVGTransform* target, float* result);
+/* SVGTransform.setMatrix(optional DOMMatrix2DInit matrix = {}) -> undefined; matrix defaults to {} in IDL; matrix may
+ * be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_svg_transform_set_matrix(RvSVGTransform* target, const RvDomDOMMatrix2DInit* matrix);
+/* SVGTransform.setTranslate(float tx, float ty) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_transform_set_translate(RvSVGTransform* target, float tx, float ty);
+/* SVGTransform.setScale(float sx, float sy) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_transform_set_scale(RvSVGTransform* target, float sx, float sy);
+/* SVGTransform.setRotate(float angle, float cx, float cy) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_transform_set_rotate(RvSVGTransform* target, float angle, float cx, float cy);
+/* SVGTransform.setSkewX(float angle) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_transform_set_skew_x(RvSVGTransform* target, float angle);
+/* SVGTransform.setSkewY(float angle) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_transform_set_skew_y(RvSVGTransform* target, float angle);
+/* SVGTransformList */
+
+/* SVGTransformList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_svg_transform_list_get_length(RvSVGTransformList* target, uint32_t* result);
+/* SVGTransformList.numberOfItems getter: readonly attribute unsigned long numberOfItems */
+RV_EXPORT int32_t rv_dom_svg_transform_list_get_number_of_items(RvSVGTransformList* target, uint32_t* result);
+/* SVGTransformList.clear() -> undefined */
+RV_EXPORT int32_t rv_dom_svg_transform_list_clear(RvSVGTransformList* target);
+/* SVGTransformList.initialize(SVGTransform newItem) -> SVGTransform; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_transform_list_initialize(RvSVGTransformList* target, RvSVGTransform* new_item, RvSVGTransform** result);
+/* SVGTransformList.getItem(unsigned long index) -> SVGTransform; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_transform_list_get_item(RvSVGTransformList* target, uint32_t index, RvSVGTransform** result);
+/* SVGTransformList.insertItemBefore(SVGTransform newItem, unsigned long index) -> SVGTransform; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_transform_list_insert_item_before(RvSVGTransformList* target, RvSVGTransform* new_item, uint32_t index, RvSVGTransform** result);
+/* SVGTransformList.replaceItem(SVGTransform newItem, unsigned long index) -> SVGTransform; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_transform_list_replace_item(RvSVGTransformList* target, RvSVGTransform* new_item, uint32_t index, RvSVGTransform** result);
+/* SVGTransformList.removeItem(unsigned long index) -> SVGTransform; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_transform_list_remove_item(RvSVGTransformList* target, uint32_t index, RvSVGTransform** result);
+/* SVGTransformList.appendItem(SVGTransform newItem) -> SVGTransform; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_transform_list_append_item(RvSVGTransformList* target, RvSVGTransform* new_item, RvSVGTransform** result);
+/* SVGTransformList.setItem(unsigned long index, SVGTransform newItem) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_transform_list_set_item(RvSVGTransformList* target, uint32_t index, RvSVGTransform* new_item);
+/* SVGTransformList.createSVGTransformFromMatrix(optional DOMMatrix2DInit matrix = {}) -> SVGTransform; matrix
+ * defaults to {} in IDL; matrix may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_transform_list_create_svg_transform_from_matrix(RvSVGTransformList* target, const RvDomDOMMatrix2DInit* matrix, RvSVGTransform** result);
+/* SVGTransformList.consolidate() -> SVGTransform?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_svg_transform_list_consolidate(RvSVGTransformList* target, RvSVGTransform** result);
+/* SVGAnimatedTransformList */
+
+/* SVGAnimatedTransformList.baseVal getter: readonly attribute SVGTransformList baseVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_transform_list_get_base_val(RvSVGAnimatedTransformList* target, RvSVGTransformList** result);
+/* SVGAnimatedTransformList.animVal getter: readonly attribute SVGTransformList animVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_transform_list_get_anim_val(RvSVGAnimatedTransformList* target, RvSVGTransformList** result);
+/* SVGNumber */
+
+/* SVGNumber.value getter: attribute float value */
+RV_EXPORT int32_t rv_dom_svg_number_get_value(RvSVGNumber* target, float* result);
+/* SVGNumber.value setter: attribute float value */
+RV_EXPORT int32_t rv_dom_svg_number_set_value(RvSVGNumber* target, float value);
+/* SVGLength */
+
+/* SVGLength.unitType getter: readonly attribute unsigned short unitType */
+RV_EXPORT int32_t rv_dom_svg_length_get_unit_type(RvSVGLength* target, uint16_t* result);
+/* SVGLength.value getter: attribute float value */
+RV_EXPORT int32_t rv_dom_svg_length_get_value(RvSVGLength* target, float* result);
+/* SVGLength.value setter: attribute float value */
+RV_EXPORT int32_t rv_dom_svg_length_set_value(RvSVGLength* target, float value);
+/* SVGLength.valueInSpecifiedUnits getter: attribute float valueInSpecifiedUnits */
+RV_EXPORT int32_t rv_dom_svg_length_get_value_in_specified_units(RvSVGLength* target, float* result);
+/* SVGLength.valueInSpecifiedUnits setter: attribute float valueInSpecifiedUnits */
+RV_EXPORT int32_t rv_dom_svg_length_set_value_in_specified_units(RvSVGLength* target, float value);
+/* SVGLength.valueAsString getter: attribute DOMString valueAsString */
+RV_EXPORT int32_t rv_dom_svg_length_get_value_as_string(RvSVGLength* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGLength.valueAsString setter: attribute DOMString valueAsString */
+RV_EXPORT int32_t rv_dom_svg_length_set_value_as_string(RvSVGLength* target, const char* value);
+/* SVGLength.newValueSpecifiedUnits(unsigned short unitType, float valueInSpecifiedUnits) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_length_new_value_specified_units(RvSVGLength* target, uint16_t unit_type, float value_in_specified_units);
+/* SVGLength.convertToSpecifiedUnits(unsigned short unitType) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_length_convert_to_specified_units(RvSVGLength* target, uint16_t unit_type);
+/* SVGAngle */
+
+/* SVGAngle.unitType getter: readonly attribute unsigned short unitType */
+RV_EXPORT int32_t rv_dom_svg_angle_get_unit_type(RvSVGAngle* target, uint16_t* result);
+/* SVGAngle.value getter: attribute float value */
+RV_EXPORT int32_t rv_dom_svg_angle_get_value(RvSVGAngle* target, float* result);
+/* SVGAngle.value setter: attribute float value */
+RV_EXPORT int32_t rv_dom_svg_angle_set_value(RvSVGAngle* target, float value);
+/* SVGAngle.valueInSpecifiedUnits getter: attribute float valueInSpecifiedUnits */
+RV_EXPORT int32_t rv_dom_svg_angle_get_value_in_specified_units(RvSVGAngle* target, float* result);
+/* SVGAngle.valueInSpecifiedUnits setter: attribute float valueInSpecifiedUnits */
+RV_EXPORT int32_t rv_dom_svg_angle_set_value_in_specified_units(RvSVGAngle* target, float value);
+/* SVGAngle.valueAsString getter: attribute DOMString valueAsString */
+RV_EXPORT int32_t rv_dom_svg_angle_get_value_as_string(RvSVGAngle* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGAngle.valueAsString setter: attribute DOMString valueAsString */
+RV_EXPORT int32_t rv_dom_svg_angle_set_value_as_string(RvSVGAngle* target, const char* value);
+/* SVGAngle.newValueSpecifiedUnits(unsigned short unitType, float valueInSpecifiedUnits) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_angle_new_value_specified_units(RvSVGAngle* target, uint16_t unit_type, float value_in_specified_units);
+/* SVGAngle.convertToSpecifiedUnits(unsigned short unitType) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_angle_convert_to_specified_units(RvSVGAngle* target, uint16_t unit_type);
+/* SVGNumberList */
+
+/* SVGNumberList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_svg_number_list_get_length(RvSVGNumberList* target, uint32_t* result);
+/* SVGNumberList.numberOfItems getter: readonly attribute unsigned long numberOfItems */
+RV_EXPORT int32_t rv_dom_svg_number_list_get_number_of_items(RvSVGNumberList* target, uint32_t* result);
+/* SVGNumberList.clear() -> undefined */
+RV_EXPORT int32_t rv_dom_svg_number_list_clear(RvSVGNumberList* target);
+/* SVGNumberList.initialize(SVGNumber newItem) -> SVGNumber; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_number_list_initialize(RvSVGNumberList* target, RvSVGNumber* new_item, RvSVGNumber** result);
+/* SVGNumberList.getItem(unsigned long index) -> SVGNumber; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_number_list_get_item(RvSVGNumberList* target, uint32_t index, RvSVGNumber** result);
+/* SVGNumberList.insertItemBefore(SVGNumber newItem, unsigned long index) -> SVGNumber; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_number_list_insert_item_before(RvSVGNumberList* target, RvSVGNumber* new_item, uint32_t index, RvSVGNumber** result);
+/* SVGNumberList.replaceItem(SVGNumber newItem, unsigned long index) -> SVGNumber; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_number_list_replace_item(RvSVGNumberList* target, RvSVGNumber* new_item, uint32_t index, RvSVGNumber** result);
+/* SVGNumberList.removeItem(unsigned long index) -> SVGNumber; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_number_list_remove_item(RvSVGNumberList* target, uint32_t index, RvSVGNumber** result);
+/* SVGNumberList.appendItem(SVGNumber newItem) -> SVGNumber; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_number_list_append_item(RvSVGNumberList* target, RvSVGNumber* new_item, RvSVGNumber** result);
+/* SVGNumberList.setItem(unsigned long index, SVGNumber newItem) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_number_list_set_item(RvSVGNumberList* target, uint32_t index, RvSVGNumber* new_item);
+/* SVGLengthList */
+
+/* SVGLengthList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_svg_length_list_get_length(RvSVGLengthList* target, uint32_t* result);
+/* SVGLengthList.numberOfItems getter: readonly attribute unsigned long numberOfItems */
+RV_EXPORT int32_t rv_dom_svg_length_list_get_number_of_items(RvSVGLengthList* target, uint32_t* result);
+/* SVGLengthList.clear() -> undefined */
+RV_EXPORT int32_t rv_dom_svg_length_list_clear(RvSVGLengthList* target);
+/* SVGLengthList.initialize(SVGLength newItem) -> SVGLength; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_length_list_initialize(RvSVGLengthList* target, RvSVGLength* new_item, RvSVGLength** result);
+/* SVGLengthList.getItem(unsigned long index) -> SVGLength; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_length_list_get_item(RvSVGLengthList* target, uint32_t index, RvSVGLength** result);
+/* SVGLengthList.insertItemBefore(SVGLength newItem, unsigned long index) -> SVGLength; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_length_list_insert_item_before(RvSVGLengthList* target, RvSVGLength* new_item, uint32_t index, RvSVGLength** result);
+/* SVGLengthList.replaceItem(SVGLength newItem, unsigned long index) -> SVGLength; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_length_list_replace_item(RvSVGLengthList* target, RvSVGLength* new_item, uint32_t index, RvSVGLength** result);
+/* SVGLengthList.removeItem(unsigned long index) -> SVGLength; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_length_list_remove_item(RvSVGLengthList* target, uint32_t index, RvSVGLength** result);
+/* SVGLengthList.appendItem(SVGLength newItem) -> SVGLength; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_length_list_append_item(RvSVGLengthList* target, RvSVGLength* new_item, RvSVGLength** result);
+/* SVGLengthList.setItem(unsigned long index, SVGLength newItem) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_length_list_set_item(RvSVGLengthList* target, uint32_t index, RvSVGLength* new_item);
+/* SVGPointList */
+
+/* SVGPointList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_svg_point_list_get_length(RvSVGPointList* target, uint32_t* result);
+/* SVGPointList.numberOfItems getter: readonly attribute unsigned long numberOfItems */
+RV_EXPORT int32_t rv_dom_svg_point_list_get_number_of_items(RvSVGPointList* target, uint32_t* result);
+/* SVGPointList.clear() -> undefined */
+RV_EXPORT int32_t rv_dom_svg_point_list_clear(RvSVGPointList* target);
+/* SVGPointList.initialize(SVGPoint newItem) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_point_list_initialize(RvSVGPointList* target, RvSVGPoint* new_item, RvSVGPoint** result);
+/* SVGPointList.getItem(unsigned long index) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_point_list_get_item(RvSVGPointList* target, uint32_t index, RvSVGPoint** result);
+/* SVGPointList.insertItemBefore(SVGPoint newItem, unsigned long index) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_point_list_insert_item_before(RvSVGPointList* target, RvSVGPoint* new_item, uint32_t index, RvSVGPoint** result);
+/* SVGPointList.replaceItem(SVGPoint newItem, unsigned long index) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_point_list_replace_item(RvSVGPointList* target, RvSVGPoint* new_item, uint32_t index, RvSVGPoint** result);
+/* SVGPointList.removeItem(unsigned long index) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_point_list_remove_item(RvSVGPointList* target, uint32_t index, RvSVGPoint** result);
+/* SVGPointList.appendItem(SVGPoint newItem) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_point_list_append_item(RvSVGPointList* target, RvSVGPoint* new_item, RvSVGPoint** result);
+/* SVGPointList.setItem(unsigned long index, SVGPoint newItem) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_point_list_set_item(RvSVGPointList* target, uint32_t index, RvSVGPoint* new_item);
+/* SVGAnimatedNumber */
+
+/* SVGAnimatedNumber.baseVal getter: attribute float baseVal */
+RV_EXPORT int32_t rv_dom_svg_animated_number_get_base_val(RvSVGAnimatedNumber* target, float* result);
+/* SVGAnimatedNumber.baseVal setter: attribute float baseVal */
+RV_EXPORT int32_t rv_dom_svg_animated_number_set_base_val(RvSVGAnimatedNumber* target, float value);
+/* SVGAnimatedNumber.animVal getter: readonly attribute float animVal */
+RV_EXPORT int32_t rv_dom_svg_animated_number_get_anim_val(RvSVGAnimatedNumber* target, float* result);
+/* SVGAnimatedLength */
+
+/* SVGAnimatedLength.baseVal getter: readonly attribute SVGLength baseVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_length_get_base_val(RvSVGAnimatedLength* target, RvSVGLength** result);
+/* SVGAnimatedLength.animVal getter: readonly attribute SVGLength animVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_length_get_anim_val(RvSVGAnimatedLength* target, RvSVGLength** result);
+/* SVGAnimatedLengthList */
+
+/* SVGAnimatedLengthList.baseVal getter: readonly attribute SVGLengthList baseVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_length_list_get_base_val(RvSVGAnimatedLengthList* target, RvSVGLengthList** result);
+/* SVGAnimatedLengthList.animVal getter: readonly attribute SVGLengthList animVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_length_list_get_anim_val(RvSVGAnimatedLengthList* target, RvSVGLengthList** result);
+/* SVGAnimatedNumberList */
+
+/* SVGAnimatedNumberList.baseVal getter: readonly attribute SVGNumberList baseVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_number_list_get_base_val(RvSVGAnimatedNumberList* target, RvSVGNumberList** result);
+/* SVGAnimatedNumberList.animVal getter: readonly attribute SVGNumberList animVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_number_list_get_anim_val(RvSVGAnimatedNumberList* target, RvSVGNumberList** result);
+/* SVGAnimatedEnumeration */
+
+/* SVGAnimatedEnumeration.baseVal getter: attribute unsigned short baseVal */
+RV_EXPORT int32_t rv_dom_svg_animated_enumeration_get_base_val(RvSVGAnimatedEnumeration* target, uint16_t* result);
+/* SVGAnimatedEnumeration.baseVal setter: attribute unsigned short baseVal */
+RV_EXPORT int32_t rv_dom_svg_animated_enumeration_set_base_val(RvSVGAnimatedEnumeration* target, uint16_t value);
+/* SVGAnimatedEnumeration.animVal getter: readonly attribute unsigned short animVal */
+RV_EXPORT int32_t rv_dom_svg_animated_enumeration_get_anim_val(RvSVGAnimatedEnumeration* target, uint16_t* result);
+/* SVGAnimatedString */
+
+/* SVGAnimatedString.baseVal getter: attribute (DOMString or TrustedScriptURL) baseVal */
+RV_EXPORT int32_t rv_dom_svg_animated_string_get_base_val(RvSVGAnimatedString* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGAnimatedString.baseVal setter: attribute (DOMString or TrustedScriptURL) baseVal */
+RV_EXPORT int32_t rv_dom_svg_animated_string_set_base_val(RvSVGAnimatedString* target, const char* value);
+/* SVGAnimatedString.animVal getter: readonly attribute DOMString animVal */
+RV_EXPORT int32_t rv_dom_svg_animated_string_get_anim_val(RvSVGAnimatedString* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGAnimatedBoolean */
+
+/* SVGAnimatedBoolean.baseVal getter: attribute boolean baseVal */
+RV_EXPORT int32_t rv_dom_svg_animated_boolean_get_base_val(RvSVGAnimatedBoolean* target, int32_t* result);
+/* SVGAnimatedBoolean.baseVal setter: attribute boolean baseVal */
+RV_EXPORT int32_t rv_dom_svg_animated_boolean_set_base_val(RvSVGAnimatedBoolean* target, int32_t value);
+/* SVGAnimatedBoolean.animVal getter: readonly attribute boolean animVal */
+RV_EXPORT int32_t rv_dom_svg_animated_boolean_get_anim_val(RvSVGAnimatedBoolean* target, int32_t* result);
+/* SVGStringList */
+
+/* SVGStringList.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_svg_string_list_get_length(RvSVGStringList* target, uint32_t* result);
+/* SVGStringList.numberOfItems getter: readonly attribute unsigned long numberOfItems */
+RV_EXPORT int32_t rv_dom_svg_string_list_get_number_of_items(RvSVGStringList* target, uint32_t* result);
+/* SVGStringList.clear() -> undefined */
+RV_EXPORT int32_t rv_dom_svg_string_list_clear(RvSVGStringList* target);
+/* SVGStringList.initialize(DOMString newItem) -> DOMString */
+RV_EXPORT int32_t rv_dom_svg_string_list_initialize(RvSVGStringList* target, const char* new_item, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStringList.getItem(unsigned long index) -> DOMString */
+RV_EXPORT int32_t rv_dom_svg_string_list_get_item(RvSVGStringList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStringList.insertItemBefore(DOMString newItem, unsigned long index) -> DOMString */
+RV_EXPORT int32_t rv_dom_svg_string_list_insert_item_before(RvSVGStringList* target, const char* new_item, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStringList.replaceItem(DOMString newItem, unsigned long index) -> DOMString */
+RV_EXPORT int32_t rv_dom_svg_string_list_replace_item(RvSVGStringList* target, const char* new_item, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStringList.removeItem(unsigned long index) -> DOMString */
+RV_EXPORT int32_t rv_dom_svg_string_list_remove_item(RvSVGStringList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStringList.appendItem(DOMString newItem) -> DOMString */
+RV_EXPORT int32_t rv_dom_svg_string_list_append_item(RvSVGStringList* target, const char* new_item, char* buffer, int32_t capacity, int32_t* length);
+/* SVGStringList.setItem(unsigned long index, DOMString newItem) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_string_list_set_item(RvSVGStringList* target, uint32_t index, const char* new_item);
+/* SVGViewSpec */
+
+/* SVGViewSpec.transform getter: readonly attribute SVGTransformList transform; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_view_spec_get_transform(RvSVGViewSpec* target, RvSVGTransformList** result);
+/* SVGViewSpec.viewBoxString getter: readonly attribute DOMString viewBoxString */
+RV_EXPORT int32_t rv_dom_svg_view_spec_get_view_box_string(RvSVGViewSpec* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGViewSpec.preserveAspectRatioString getter: readonly attribute DOMString preserveAspectRatioString */
+RV_EXPORT int32_t rv_dom_svg_view_spec_get_preserve_aspect_ratio_string(RvSVGViewSpec* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGViewSpec.transformString getter: readonly attribute DOMString transformString */
+RV_EXPORT int32_t rv_dom_svg_view_spec_get_transform_string(RvSVGViewSpec* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGViewSpec.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_view_spec_get_view_box(RvSVGViewSpec* target, RvSVGAnimatedRect** result);
+/* SVGViewSpec.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_view_spec_get_preserve_aspect_ratio(RvSVGViewSpec* target, RvSVGAnimatedPreserveAspectRatio** result);
+/* SVGViewSpec.zoomAndPan getter: attribute unsigned short zoomAndPan */
+RV_EXPORT int32_t rv_dom_svg_view_spec_get_zoom_and_pan(RvSVGViewSpec* target, uint16_t* result);
+/* SVGViewSpec.zoomAndPan setter: attribute unsigned short zoomAndPan */
+RV_EXPORT int32_t rv_dom_svg_view_spec_set_zoom_and_pan(RvSVGViewSpec* target, uint16_t value);
+/* SVGAnimatedAngle */
+
+/* SVGAnimatedAngle.baseVal getter: readonly attribute SVGAngle baseVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_angle_get_base_val(RvSVGAnimatedAngle* target, RvSVGAngle** result);
+/* SVGAnimatedAngle.animVal getter: readonly attribute SVGAngle animVal; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_animated_angle_get_anim_val(RvSVGAnimatedAngle* target, RvSVGAngle** result);
+/* SVGSymbolElement */
+
+/* SVGSymbolElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_symbol_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result);
+/* SVGSymbolElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_symbol_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result);
+/* SVGViewElement */
+
+/* SVGViewElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_view_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result);
+/* SVGViewElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_view_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result);
+/* SVGViewElement.zoomAndPan getter: attribute unsigned short zoomAndPan */
+RV_EXPORT int32_t rv_dom_svg_view_element_get_zoom_and_pan(RvNode* target, uint16_t* result);
+/* SVGViewElement.zoomAndPan setter: attribute unsigned short zoomAndPan */
+RV_EXPORT int32_t rv_dom_svg_view_element_set_zoom_and_pan(RvNode* target, uint16_t value);
+/* SVGMarkerElement */
+
+/* SVGMarkerElement.refX getter: readonly attribute SVGAnimatedLength refX; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_ref_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGMarkerElement.refY getter: readonly attribute SVGAnimatedLength refY; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_ref_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGMarkerElement.markerUnits getter: readonly attribute SVGAnimatedEnumeration markerUnits; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_marker_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGMarkerElement.markerWidth getter: readonly attribute SVGAnimatedLength markerWidth; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_marker_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGMarkerElement.markerHeight getter: readonly attribute SVGAnimatedLength markerHeight; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_marker_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGMarkerElement.orientType getter: readonly attribute SVGAnimatedEnumeration orientType; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_orient_type(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGMarkerElement.orientAngle getter: readonly attribute SVGAnimatedAngle orientAngle; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_orient_angle(RvNode* target, RvSVGAnimatedAngle** result);
+/* SVGMarkerElement.orient getter: attribute DOMString orient */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_orient(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* SVGMarkerElement.orient setter: attribute DOMString orient */
+RV_EXPORT int32_t rv_dom_svg_marker_element_set_orient(RvNode* target, const char* value);
+/* SVGMarkerElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result);
+/* SVGMarkerElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_marker_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result);
+/* SVGMarkerElement.setOrientToAuto() -> undefined */
+RV_EXPORT int32_t rv_dom_svg_marker_element_set_orient_to_auto(RvNode* target);
+/* SVGMarkerElement.setOrientToAngle(SVGAngle angle) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_marker_element_set_orient_to_angle(RvNode* target, RvSVGAngle* angle);
+/* SVGPatternElement */
+
+/* SVGPatternElement.patternUnits getter: readonly attribute SVGAnimatedEnumeration patternUnits; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_pattern_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGPatternElement.patternContentUnits getter: readonly attribute SVGAnimatedEnumeration patternContentUnits;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_pattern_content_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGPatternElement.patternTransform getter: readonly attribute SVGAnimatedTransformList patternTransform; *result is
+ * a new reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_pattern_transform(RvNode* target, RvSVGAnimatedTransformList** result);
+/* SVGPatternElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGPatternElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGPatternElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGPatternElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGPatternElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result);
+/* SVGPatternElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio
+ * preserveAspectRatio; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result);
+/* SVGPatternElement.requiredExtensions getter: readonly attribute SVGStringList requiredExtensions; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_required_extensions(RvNode* target, RvSVGStringList** result);
+/* SVGPatternElement.systemLanguage getter: readonly attribute SVGStringList systemLanguage; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_system_language(RvNode* target, RvSVGStringList** result);
+/* SVGPatternElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_pattern_element_get_href(RvNode* target, RvSVGAnimatedString** result);
+/* SVGTextContentElement */
+
+/* SVGTextContentElement.textLength getter: readonly attribute SVGAnimatedLength textLength; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_text_length(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGTextContentElement.lengthAdjust getter: readonly attribute SVGAnimatedEnumeration lengthAdjust; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_length_adjust(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGTextContentElement.getNumberOfChars() -> long */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_number_of_chars(RvNode* target, int32_t* result);
+/* SVGTextContentElement.getComputedTextLength() -> float */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_computed_text_length(RvNode* target, float* result);
+/* SVGTextContentElement.getSubStringLength(unsigned long charnum, unsigned long nchars) -> float */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_sub_string_length(RvNode* target, uint32_t charnum, uint32_t nchars, float* result);
+/* SVGTextContentElement.getStartPositionOfChar(unsigned long charnum) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_start_position_of_char(RvNode* target, uint32_t charnum, RvSVGPoint** result);
+/* SVGTextContentElement.getEndPositionOfChar(unsigned long charnum) -> SVGPoint; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_end_position_of_char(RvNode* target, uint32_t charnum, RvSVGPoint** result);
+/* SVGTextContentElement.getExtentOfChar(unsigned long charnum) -> SVGRect; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_extent_of_char(RvNode* target, uint32_t charnum, RvSVGRect** result);
+/* SVGTextContentElement.getRotationOfChar(unsigned long charnum) -> float */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_rotation_of_char(RvNode* target, uint32_t charnum, float* result);
+/* SVGTextContentElement.getCharNumAtPosition(optional DOMPointInit point = {}) -> long; point defaults to {} in IDL;
+ * point may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_get_char_num_at_position(RvNode* target, const RvDomDOMPointInit* point, int32_t* result);
+/* SVGTextContentElement.selectSubString(unsigned long charnum, unsigned long nchars) -> undefined */
+RV_EXPORT int32_t rv_dom_svg_text_content_element_select_sub_string(RvNode* target, uint32_t charnum, uint32_t nchars);
+/* SVGTextPositioningElement */
+
+/* SVGTextPositioningElement.x getter: readonly attribute SVGAnimatedLengthList x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_text_positioning_element_get_x(RvNode* target, RvSVGAnimatedLengthList** result);
+/* SVGTextPositioningElement.y getter: readonly attribute SVGAnimatedLengthList y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_text_positioning_element_get_y(RvNode* target, RvSVGAnimatedLengthList** result);
+/* SVGTextPositioningElement.dx getter: readonly attribute SVGAnimatedLengthList dx; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_text_positioning_element_get_dx(RvNode* target, RvSVGAnimatedLengthList** result);
+/* SVGTextPositioningElement.dy getter: readonly attribute SVGAnimatedLengthList dy; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_text_positioning_element_get_dy(RvNode* target, RvSVGAnimatedLengthList** result);
+/* SVGTextPositioningElement.rotate getter: readonly attribute SVGAnimatedNumberList rotate; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_text_positioning_element_get_rotate(RvNode* target, RvSVGAnimatedNumberList** result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

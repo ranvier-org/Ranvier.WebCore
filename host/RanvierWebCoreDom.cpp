@@ -52,6 +52,56 @@ void rv_dom_html_collection_release(RvHTMLCollection* handle) { ranvier_dom_html
 RvHTMLCollection* rv_dom_html_collection_retain(RvHTMLCollection* handle) { return ranvier_dom_html_collection_retain(handle); }
 void rv_dom_validity_state_release(RvValidityState* handle) { ranvier_dom_validity_state_release(handle); }
 RvValidityState* rv_dom_validity_state_retain(RvValidityState* handle) { return ranvier_dom_validity_state_retain(handle); }
+void rv_dom_svg_rect_release(RvSVGRect* handle) { ranvier_dom_svg_rect_release(handle); }
+RvSVGRect* rv_dom_svg_rect_retain(RvSVGRect* handle) { return ranvier_dom_svg_rect_retain(handle); }
+void rv_dom_svg_matrix_release(RvSVGMatrix* handle) { ranvier_dom_svg_matrix_release(handle); }
+RvSVGMatrix* rv_dom_svg_matrix_retain(RvSVGMatrix* handle) { return ranvier_dom_svg_matrix_retain(handle); }
+void rv_dom_svg_point_release(RvSVGPoint* handle) { ranvier_dom_svg_point_release(handle); }
+RvSVGPoint* rv_dom_svg_point_retain(RvSVGPoint* handle) { return ranvier_dom_svg_point_retain(handle); }
+void rv_dom_svg_animated_rect_release(RvSVGAnimatedRect* handle) { ranvier_dom_svg_animated_rect_release(handle); }
+RvSVGAnimatedRect* rv_dom_svg_animated_rect_retain(RvSVGAnimatedRect* handle) { return ranvier_dom_svg_animated_rect_retain(handle); }
+void rv_dom_svg_preserve_aspect_ratio_release(RvSVGPreserveAspectRatio* handle) { ranvier_dom_svg_preserve_aspect_ratio_release(handle); }
+RvSVGPreserveAspectRatio* rv_dom_svg_preserve_aspect_ratio_retain(RvSVGPreserveAspectRatio* handle) { return ranvier_dom_svg_preserve_aspect_ratio_retain(handle); }
+void rv_dom_svg_animated_preserve_aspect_ratio_release(RvSVGAnimatedPreserveAspectRatio* handle) { ranvier_dom_svg_animated_preserve_aspect_ratio_release(handle); }
+RvSVGAnimatedPreserveAspectRatio* rv_dom_svg_animated_preserve_aspect_ratio_retain(RvSVGAnimatedPreserveAspectRatio* handle) { return ranvier_dom_svg_animated_preserve_aspect_ratio_retain(handle); }
+void rv_dom_svg_transform_release(RvSVGTransform* handle) { ranvier_dom_svg_transform_release(handle); }
+RvSVGTransform* rv_dom_svg_transform_retain(RvSVGTransform* handle) { return ranvier_dom_svg_transform_retain(handle); }
+void rv_dom_svg_transform_list_release(RvSVGTransformList* handle) { ranvier_dom_svg_transform_list_release(handle); }
+RvSVGTransformList* rv_dom_svg_transform_list_retain(RvSVGTransformList* handle) { return ranvier_dom_svg_transform_list_retain(handle); }
+void rv_dom_svg_animated_transform_list_release(RvSVGAnimatedTransformList* handle) { ranvier_dom_svg_animated_transform_list_release(handle); }
+RvSVGAnimatedTransformList* rv_dom_svg_animated_transform_list_retain(RvSVGAnimatedTransformList* handle) { return ranvier_dom_svg_animated_transform_list_retain(handle); }
+void rv_dom_svg_number_release(RvSVGNumber* handle) { ranvier_dom_svg_number_release(handle); }
+RvSVGNumber* rv_dom_svg_number_retain(RvSVGNumber* handle) { return ranvier_dom_svg_number_retain(handle); }
+void rv_dom_svg_length_release(RvSVGLength* handle) { ranvier_dom_svg_length_release(handle); }
+RvSVGLength* rv_dom_svg_length_retain(RvSVGLength* handle) { return ranvier_dom_svg_length_retain(handle); }
+void rv_dom_svg_angle_release(RvSVGAngle* handle) { ranvier_dom_svg_angle_release(handle); }
+RvSVGAngle* rv_dom_svg_angle_retain(RvSVGAngle* handle) { return ranvier_dom_svg_angle_retain(handle); }
+void rv_dom_svg_number_list_release(RvSVGNumberList* handle) { ranvier_dom_svg_number_list_release(handle); }
+RvSVGNumberList* rv_dom_svg_number_list_retain(RvSVGNumberList* handle) { return ranvier_dom_svg_number_list_retain(handle); }
+void rv_dom_svg_length_list_release(RvSVGLengthList* handle) { ranvier_dom_svg_length_list_release(handle); }
+RvSVGLengthList* rv_dom_svg_length_list_retain(RvSVGLengthList* handle) { return ranvier_dom_svg_length_list_retain(handle); }
+void rv_dom_svg_point_list_release(RvSVGPointList* handle) { ranvier_dom_svg_point_list_release(handle); }
+RvSVGPointList* rv_dom_svg_point_list_retain(RvSVGPointList* handle) { return ranvier_dom_svg_point_list_retain(handle); }
+void rv_dom_svg_animated_number_release(RvSVGAnimatedNumber* handle) { ranvier_dom_svg_animated_number_release(handle); }
+RvSVGAnimatedNumber* rv_dom_svg_animated_number_retain(RvSVGAnimatedNumber* handle) { return ranvier_dom_svg_animated_number_retain(handle); }
+void rv_dom_svg_animated_length_release(RvSVGAnimatedLength* handle) { ranvier_dom_svg_animated_length_release(handle); }
+RvSVGAnimatedLength* rv_dom_svg_animated_length_retain(RvSVGAnimatedLength* handle) { return ranvier_dom_svg_animated_length_retain(handle); }
+void rv_dom_svg_animated_length_list_release(RvSVGAnimatedLengthList* handle) { ranvier_dom_svg_animated_length_list_release(handle); }
+RvSVGAnimatedLengthList* rv_dom_svg_animated_length_list_retain(RvSVGAnimatedLengthList* handle) { return ranvier_dom_svg_animated_length_list_retain(handle); }
+void rv_dom_svg_animated_number_list_release(RvSVGAnimatedNumberList* handle) { ranvier_dom_svg_animated_number_list_release(handle); }
+RvSVGAnimatedNumberList* rv_dom_svg_animated_number_list_retain(RvSVGAnimatedNumberList* handle) { return ranvier_dom_svg_animated_number_list_retain(handle); }
+void rv_dom_svg_animated_enumeration_release(RvSVGAnimatedEnumeration* handle) { ranvier_dom_svg_animated_enumeration_release(handle); }
+RvSVGAnimatedEnumeration* rv_dom_svg_animated_enumeration_retain(RvSVGAnimatedEnumeration* handle) { return ranvier_dom_svg_animated_enumeration_retain(handle); }
+void rv_dom_svg_animated_string_release(RvSVGAnimatedString* handle) { ranvier_dom_svg_animated_string_release(handle); }
+RvSVGAnimatedString* rv_dom_svg_animated_string_retain(RvSVGAnimatedString* handle) { return ranvier_dom_svg_animated_string_retain(handle); }
+void rv_dom_svg_animated_boolean_release(RvSVGAnimatedBoolean* handle) { ranvier_dom_svg_animated_boolean_release(handle); }
+RvSVGAnimatedBoolean* rv_dom_svg_animated_boolean_retain(RvSVGAnimatedBoolean* handle) { return ranvier_dom_svg_animated_boolean_retain(handle); }
+void rv_dom_svg_string_list_release(RvSVGStringList* handle) { ranvier_dom_svg_string_list_release(handle); }
+RvSVGStringList* rv_dom_svg_string_list_retain(RvSVGStringList* handle) { return ranvier_dom_svg_string_list_retain(handle); }
+void rv_dom_svg_view_spec_release(RvSVGViewSpec* handle) { ranvier_dom_svg_view_spec_release(handle); }
+RvSVGViewSpec* rv_dom_svg_view_spec_retain(RvSVGViewSpec* handle) { return ranvier_dom_svg_view_spec_retain(handle); }
+void rv_dom_svg_animated_angle_release(RvSVGAnimatedAngle* handle) { ranvier_dom_svg_animated_angle_release(handle); }
+RvSVGAnimatedAngle* rv_dom_svg_animated_angle_retain(RvSVGAnimatedAngle* handle) { return ranvier_dom_svg_animated_angle_retain(handle); }
 void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value) { ranvier_dom_union_node_or_dom_string_release(value); }
 void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value) { ranvier_dom_sequence_node_or_dom_string_release(value); }
 void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value) { ranvier_dom_sequence_css_style_sheet_release(value); }
@@ -200,6 +250,7 @@ int32_t rv_dom_document_set_design_mode(RvNode* target, const char* value) { ret
 int32_t rv_dom_document_get_anchors(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_document_get_anchors(target, result); }
 int32_t rv_dom_document_get_hidden(RvNode* target, int32_t* result) { return ranvier_dom_document_get_hidden(target, result); }
 int32_t rv_dom_document_get_visibility_state(RvNode* target, int32_t* result) { return ranvier_dom_document_get_visibility_state(target, result); }
+int32_t rv_dom_document_get_root_element(RvNode* target, RvNode** result) { return ranvier_dom_document_get_root_element(target, result); }
 int32_t rv_dom_document_get_children(RvNode* target, RvHTMLCollection** result) { return ranvier_dom_document_get_children(target, result); }
 int32_t rv_dom_document_get_first_element_child(RvNode* target, RvNode** result) { return ranvier_dom_document_get_first_element_child(target, result); }
 int32_t rv_dom_document_get_last_element_child(RvNode* target, RvNode** result) { return ranvier_dom_document_get_last_element_child(target, result); }
@@ -1236,6 +1287,8 @@ int32_t rv_dom_html_time_element_get_date_time(RvNode* target, char* buffer, int
 int32_t rv_dom_html_time_element_set_date_time(RvNode* target, const char* value) { return ranvier_dom_html_time_element_set_date_time(target, value); }
 int32_t rv_dom_html_title_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_html_title_element_get_text(target, buffer, capacity, length); }
 int32_t rv_dom_html_title_element_set_text(RvNode* target, const char* value) { return ranvier_dom_html_title_element_set_text(target, value); }
+int32_t rv_dom_svg_element_get_class_name(RvNode* target, RvSVGAnimatedString** result) { return ranvier_dom_svg_element_get_class_name(target, result); }
+int32_t rv_dom_svg_element_get_owner_svg_element(RvNode* target, RvNode** result) { return ranvier_dom_svg_element_get_owner_svg_element(target, result); }
 int32_t rv_dom_svg_element_get_viewport_element(RvNode* target, RvNode** result) { return ranvier_dom_svg_element_get_viewport_element(target, result); }
 int32_t rv_dom_svg_element_get_dataset(RvNode* target, RvDOMStringMap** result) { return ranvier_dom_svg_element_get_dataset(target, result); }
 int32_t rv_dom_svg_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_element_get_nonce(target, buffer, capacity, length); }
@@ -2009,6 +2062,259 @@ int32_t rv_dom_input_event_get_data(RvEvent* target, char* buffer, int32_t capac
 int32_t rv_dom_input_event_get_is_composing(RvEvent* target, int32_t* result) { return ranvier_dom_input_event_get_is_composing(target, result); }
 int32_t rv_dom_input_event_get_target_ranges(RvEvent* target, RvDomSequenceStaticRange* result) { return ranvier_dom_input_event_get_target_ranges(target, result); }
 int32_t rv_dom_composition_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_composition_event_get_data(target, buffer, capacity, length); }
+int32_t rv_dom_svg_graphics_element_get_transform(RvNode* target, RvSVGAnimatedTransformList** result) { return ranvier_dom_svg_graphics_element_get_transform(target, result); }
+int32_t rv_dom_svg_graphics_element_get_required_extensions(RvNode* target, RvSVGStringList** result) { return ranvier_dom_svg_graphics_element_get_required_extensions(target, result); }
+int32_t rv_dom_svg_graphics_element_get_system_language(RvNode* target, RvSVGStringList** result) { return ranvier_dom_svg_graphics_element_get_system_language(target, result); }
+int32_t rv_dom_svg_graphics_element_get_b_box(RvNode* target, RvSVGRect** result) { return ranvier_dom_svg_graphics_element_get_b_box(target, result); }
+int32_t rv_dom_svg_graphics_element_get_ctm(RvNode* target, RvSVGMatrix** result) { return ranvier_dom_svg_graphics_element_get_ctm(target, result); }
+int32_t rv_dom_svg_graphics_element_get_screen_ctm(RvNode* target, RvSVGMatrix** result) { return ranvier_dom_svg_graphics_element_get_screen_ctm(target, result); }
+int32_t rv_dom_svg_geometry_element_get_path_length(RvNode* target, RvSVGAnimatedNumber** result) { return ranvier_dom_svg_geometry_element_get_path_length(target, result); }
+int32_t rv_dom_svg_geometry_element_is_point_in_fill(RvNode* target, const RvDomDOMPointInit* point, int32_t* result) { return ranvier_dom_svg_geometry_element_is_point_in_fill(target, point, result); }
+int32_t rv_dom_svg_geometry_element_is_point_in_stroke(RvNode* target, const RvDomDOMPointInit* point, int32_t* result) { return ranvier_dom_svg_geometry_element_is_point_in_stroke(target, point, result); }
+int32_t rv_dom_svg_geometry_element_get_total_length(RvNode* target, float* result) { return ranvier_dom_svg_geometry_element_get_total_length(target, result); }
+int32_t rv_dom_svg_geometry_element_get_point_at_length(RvNode* target, float distance, RvSVGPoint** result) { return ranvier_dom_svg_geometry_element_get_point_at_length(target, distance, result); }
+int32_t rv_dom_svg_polygon_element_get_points(RvNode* target, RvSVGPointList** result) { return ranvier_dom_svg_polygon_element_get_points(target, result); }
+int32_t rv_dom_svg_polygon_element_get_animated_points(RvNode* target, RvSVGPointList** result) { return ranvier_dom_svg_polygon_element_get_animated_points(target, result); }
+int32_t rv_dom_svg_polyline_element_get_points(RvNode* target, RvSVGPointList** result) { return ranvier_dom_svg_polyline_element_get_points(target, result); }
+int32_t rv_dom_svg_polyline_element_get_animated_points(RvNode* target, RvSVGPointList** result) { return ranvier_dom_svg_polyline_element_get_animated_points(target, result); }
+int32_t rv_dom_svgsvg_element_get_x(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svgsvg_element_get_x(target, result); }
+int32_t rv_dom_svgsvg_element_get_y(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svgsvg_element_get_y(target, result); }
+int32_t rv_dom_svgsvg_element_get_width(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svgsvg_element_get_width(target, result); }
+int32_t rv_dom_svgsvg_element_get_height(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svgsvg_element_get_height(target, result); }
+int32_t rv_dom_svgsvg_element_get_current_scale(RvNode* target, float* result) { return ranvier_dom_svgsvg_element_get_current_scale(target, result); }
+int32_t rv_dom_svgsvg_element_set_current_scale(RvNode* target, float value) { return ranvier_dom_svgsvg_element_set_current_scale(target, value); }
+int32_t rv_dom_svgsvg_element_get_current_translate(RvNode* target, RvSVGPoint** result) { return ranvier_dom_svgsvg_element_get_current_translate(target, result); }
+int32_t rv_dom_svgsvg_element_get_use_current_view(RvNode* target, int32_t* result) { return ranvier_dom_svgsvg_element_get_use_current_view(target, result); }
+int32_t rv_dom_svgsvg_element_get_current_view(RvNode* target, RvSVGViewSpec** result) { return ranvier_dom_svgsvg_element_get_current_view(target, result); }
+int32_t rv_dom_svgsvg_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result) { return ranvier_dom_svgsvg_element_get_view_box(target, result); }
+int32_t rv_dom_svgsvg_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result) { return ranvier_dom_svgsvg_element_get_preserve_aspect_ratio(target, result); }
+int32_t rv_dom_svgsvg_element_get_zoom_and_pan(RvNode* target, uint16_t* result) { return ranvier_dom_svgsvg_element_get_zoom_and_pan(target, result); }
+int32_t rv_dom_svgsvg_element_set_zoom_and_pan(RvNode* target, uint16_t value) { return ranvier_dom_svgsvg_element_set_zoom_and_pan(target, value); }
+int32_t rv_dom_svgsvg_element_get_intersection_list(RvNode* target, RvSVGRect* rect, RvNode* reference_element, RvNodeList** result) { return ranvier_dom_svgsvg_element_get_intersection_list(target, rect, reference_element, result); }
+int32_t rv_dom_svgsvg_element_get_enclosure_list(RvNode* target, RvSVGRect* rect, RvNode* reference_element, RvNodeList** result) { return ranvier_dom_svgsvg_element_get_enclosure_list(target, rect, reference_element, result); }
+int32_t rv_dom_svgsvg_element_check_intersection(RvNode* target, RvNode* element, RvSVGRect* rect, int32_t* result) { return ranvier_dom_svgsvg_element_check_intersection(target, element, rect, result); }
+int32_t rv_dom_svgsvg_element_check_enclosure(RvNode* target, RvNode* element, RvSVGRect* rect, int32_t* result) { return ranvier_dom_svgsvg_element_check_enclosure(target, element, rect, result); }
+int32_t rv_dom_svgsvg_element_deselect_all(RvNode* target) { return ranvier_dom_svgsvg_element_deselect_all(target); }
+int32_t rv_dom_svgsvg_element_create_svg_number(RvNode* target, RvSVGNumber** result) { return ranvier_dom_svgsvg_element_create_svg_number(target, result); }
+int32_t rv_dom_svgsvg_element_create_svg_length(RvNode* target, RvSVGLength** result) { return ranvier_dom_svgsvg_element_create_svg_length(target, result); }
+int32_t rv_dom_svgsvg_element_create_svg_angle(RvNode* target, RvSVGAngle** result) { return ranvier_dom_svgsvg_element_create_svg_angle(target, result); }
+int32_t rv_dom_svgsvg_element_create_svg_point(RvNode* target, RvSVGPoint** result) { return ranvier_dom_svgsvg_element_create_svg_point(target, result); }
+int32_t rv_dom_svgsvg_element_create_svg_matrix(RvNode* target, RvSVGMatrix** result) { return ranvier_dom_svgsvg_element_create_svg_matrix(target, result); }
+int32_t rv_dom_svgsvg_element_create_svg_rect(RvNode* target, RvSVGRect** result) { return ranvier_dom_svgsvg_element_create_svg_rect(target, result); }
+int32_t rv_dom_svgsvg_element_create_svg_transform(RvNode* target, RvSVGTransform** result) { return ranvier_dom_svgsvg_element_create_svg_transform(target, result); }
+int32_t rv_dom_svgsvg_element_create_svg_transform_from_matrix(RvNode* target, const RvDomDOMMatrix2DInit* matrix, RvSVGTransform** result) { return ranvier_dom_svgsvg_element_create_svg_transform_from_matrix(target, matrix, result); }
+int32_t rv_dom_svgsvg_element_get_element_by_id(RvNode* target, const char* element_id, RvNode** result) { return ranvier_dom_svgsvg_element_get_element_by_id(target, element_id, result); }
+int32_t rv_dom_svgsvg_element_pause_animations(RvNode* target) { return ranvier_dom_svgsvg_element_pause_animations(target); }
+int32_t rv_dom_svgsvg_element_unpause_animations(RvNode* target) { return ranvier_dom_svgsvg_element_unpause_animations(target); }
+int32_t rv_dom_svgsvg_element_animations_paused(RvNode* target, int32_t* result) { return ranvier_dom_svgsvg_element_animations_paused(target, result); }
+int32_t rv_dom_svgsvg_element_get_current_time(RvNode* target, float* result) { return ranvier_dom_svgsvg_element_get_current_time(target, result); }
+int32_t rv_dom_svgsvg_element_set_current_time(RvNode* target, float seconds) { return ranvier_dom_svgsvg_element_set_current_time(target, seconds); }
+int32_t rv_dom_svgsvg_element_suspend_redraw(RvNode* target, uint32_t max_wait_milliseconds, uint32_t* result) { return ranvier_dom_svgsvg_element_suspend_redraw(target, max_wait_milliseconds, result); }
+int32_t rv_dom_svgsvg_element_unsuspend_redraw(RvNode* target, uint32_t suspend_handle_id) { return ranvier_dom_svgsvg_element_unsuspend_redraw(target, suspend_handle_id); }
+int32_t rv_dom_svgsvg_element_unsuspend_redraw_all(RvNode* target) { return ranvier_dom_svgsvg_element_unsuspend_redraw_all(target); }
+int32_t rv_dom_svgsvg_element_force_redraw(RvNode* target) { return ranvier_dom_svgsvg_element_force_redraw(target); }
+int32_t rv_dom_svg_rect_get_x(RvSVGRect* target, float* result) { return ranvier_dom_svg_rect_get_x(target, result); }
+int32_t rv_dom_svg_rect_set_x(RvSVGRect* target, float value) { return ranvier_dom_svg_rect_set_x(target, value); }
+int32_t rv_dom_svg_rect_get_y(RvSVGRect* target, float* result) { return ranvier_dom_svg_rect_get_y(target, result); }
+int32_t rv_dom_svg_rect_set_y(RvSVGRect* target, float value) { return ranvier_dom_svg_rect_set_y(target, value); }
+int32_t rv_dom_svg_rect_get_width(RvSVGRect* target, float* result) { return ranvier_dom_svg_rect_get_width(target, result); }
+int32_t rv_dom_svg_rect_set_width(RvSVGRect* target, float value) { return ranvier_dom_svg_rect_set_width(target, value); }
+int32_t rv_dom_svg_rect_get_height(RvSVGRect* target, float* result) { return ranvier_dom_svg_rect_get_height(target, result); }
+int32_t rv_dom_svg_rect_set_height(RvSVGRect* target, float value) { return ranvier_dom_svg_rect_set_height(target, value); }
+int32_t rv_dom_svg_matrix_get_a(RvSVGMatrix* target, double* result) { return ranvier_dom_svg_matrix_get_a(target, result); }
+int32_t rv_dom_svg_matrix_set_a(RvSVGMatrix* target, double value) { return ranvier_dom_svg_matrix_set_a(target, value); }
+int32_t rv_dom_svg_matrix_get_b(RvSVGMatrix* target, double* result) { return ranvier_dom_svg_matrix_get_b(target, result); }
+int32_t rv_dom_svg_matrix_set_b(RvSVGMatrix* target, double value) { return ranvier_dom_svg_matrix_set_b(target, value); }
+int32_t rv_dom_svg_matrix_get_c(RvSVGMatrix* target, double* result) { return ranvier_dom_svg_matrix_get_c(target, result); }
+int32_t rv_dom_svg_matrix_set_c(RvSVGMatrix* target, double value) { return ranvier_dom_svg_matrix_set_c(target, value); }
+int32_t rv_dom_svg_matrix_get_d(RvSVGMatrix* target, double* result) { return ranvier_dom_svg_matrix_get_d(target, result); }
+int32_t rv_dom_svg_matrix_set_d(RvSVGMatrix* target, double value) { return ranvier_dom_svg_matrix_set_d(target, value); }
+int32_t rv_dom_svg_matrix_get_e(RvSVGMatrix* target, double* result) { return ranvier_dom_svg_matrix_get_e(target, result); }
+int32_t rv_dom_svg_matrix_set_e(RvSVGMatrix* target, double value) { return ranvier_dom_svg_matrix_set_e(target, value); }
+int32_t rv_dom_svg_matrix_get_f(RvSVGMatrix* target, double* result) { return ranvier_dom_svg_matrix_get_f(target, result); }
+int32_t rv_dom_svg_matrix_set_f(RvSVGMatrix* target, double value) { return ranvier_dom_svg_matrix_set_f(target, value); }
+int32_t rv_dom_svg_matrix_multiply(RvSVGMatrix* target, RvSVGMatrix* second_matrix, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_multiply(target, second_matrix, result); }
+int32_t rv_dom_svg_matrix_inverse(RvSVGMatrix* target, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_inverse(target, result); }
+int32_t rv_dom_svg_matrix_translate(RvSVGMatrix* target, float x, float y, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_translate(target, x, y, result); }
+int32_t rv_dom_svg_matrix_scale(RvSVGMatrix* target, float scale_factor, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_scale(target, scale_factor, result); }
+int32_t rv_dom_svg_matrix_scale_non_uniform(RvSVGMatrix* target, float scale_factor_x, float scale_factor_y, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_scale_non_uniform(target, scale_factor_x, scale_factor_y, result); }
+int32_t rv_dom_svg_matrix_rotate(RvSVGMatrix* target, float angle, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_rotate(target, angle, result); }
+int32_t rv_dom_svg_matrix_rotate_from_vector(RvSVGMatrix* target, float x, float y, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_rotate_from_vector(target, x, y, result); }
+int32_t rv_dom_svg_matrix_flip_x(RvSVGMatrix* target, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_flip_x(target, result); }
+int32_t rv_dom_svg_matrix_flip_y(RvSVGMatrix* target, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_flip_y(target, result); }
+int32_t rv_dom_svg_matrix_skew_x(RvSVGMatrix* target, float angle, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_skew_x(target, angle, result); }
+int32_t rv_dom_svg_matrix_skew_y(RvSVGMatrix* target, float angle, RvSVGMatrix** result) { return ranvier_dom_svg_matrix_skew_y(target, angle, result); }
+int32_t rv_dom_svg_point_get_x(RvSVGPoint* target, float* result) { return ranvier_dom_svg_point_get_x(target, result); }
+int32_t rv_dom_svg_point_set_x(RvSVGPoint* target, float value) { return ranvier_dom_svg_point_set_x(target, value); }
+int32_t rv_dom_svg_point_get_y(RvSVGPoint* target, float* result) { return ranvier_dom_svg_point_get_y(target, result); }
+int32_t rv_dom_svg_point_set_y(RvSVGPoint* target, float value) { return ranvier_dom_svg_point_set_y(target, value); }
+int32_t rv_dom_svg_point_matrix_transform(RvSVGPoint* target, RvSVGMatrix* matrix, RvSVGPoint** result) { return ranvier_dom_svg_point_matrix_transform(target, matrix, result); }
+int32_t rv_dom_svg_animated_rect_get_base_val(RvSVGAnimatedRect* target, RvSVGRect** result) { return ranvier_dom_svg_animated_rect_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_rect_get_anim_val(RvSVGAnimatedRect* target, RvSVGRect** result) { return ranvier_dom_svg_animated_rect_get_anim_val(target, result); }
+int32_t rv_dom_svg_preserve_aspect_ratio_get_align(RvSVGPreserveAspectRatio* target, uint16_t* result) { return ranvier_dom_svg_preserve_aspect_ratio_get_align(target, result); }
+int32_t rv_dom_svg_preserve_aspect_ratio_set_align(RvSVGPreserveAspectRatio* target, uint16_t value) { return ranvier_dom_svg_preserve_aspect_ratio_set_align(target, value); }
+int32_t rv_dom_svg_preserve_aspect_ratio_get_meet_or_slice(RvSVGPreserveAspectRatio* target, uint16_t* result) { return ranvier_dom_svg_preserve_aspect_ratio_get_meet_or_slice(target, result); }
+int32_t rv_dom_svg_preserve_aspect_ratio_set_meet_or_slice(RvSVGPreserveAspectRatio* target, uint16_t value) { return ranvier_dom_svg_preserve_aspect_ratio_set_meet_or_slice(target, value); }
+int32_t rv_dom_svg_animated_preserve_aspect_ratio_get_base_val(RvSVGAnimatedPreserveAspectRatio* target, RvSVGPreserveAspectRatio** result) { return ranvier_dom_svg_animated_preserve_aspect_ratio_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_preserve_aspect_ratio_get_anim_val(RvSVGAnimatedPreserveAspectRatio* target, RvSVGPreserveAspectRatio** result) { return ranvier_dom_svg_animated_preserve_aspect_ratio_get_anim_val(target, result); }
+int32_t rv_dom_svg_transform_get_type(RvSVGTransform* target, uint16_t* result) { return ranvier_dom_svg_transform_get_type(target, result); }
+int32_t rv_dom_svg_transform_get_matrix(RvSVGTransform* target, RvSVGMatrix** result) { return ranvier_dom_svg_transform_get_matrix(target, result); }
+int32_t rv_dom_svg_transform_get_angle(RvSVGTransform* target, float* result) { return ranvier_dom_svg_transform_get_angle(target, result); }
+int32_t rv_dom_svg_transform_set_matrix(RvSVGTransform* target, const RvDomDOMMatrix2DInit* matrix) { return ranvier_dom_svg_transform_set_matrix(target, matrix); }
+int32_t rv_dom_svg_transform_set_translate(RvSVGTransform* target, float tx, float ty) { return ranvier_dom_svg_transform_set_translate(target, tx, ty); }
+int32_t rv_dom_svg_transform_set_scale(RvSVGTransform* target, float sx, float sy) { return ranvier_dom_svg_transform_set_scale(target, sx, sy); }
+int32_t rv_dom_svg_transform_set_rotate(RvSVGTransform* target, float angle, float cx, float cy) { return ranvier_dom_svg_transform_set_rotate(target, angle, cx, cy); }
+int32_t rv_dom_svg_transform_set_skew_x(RvSVGTransform* target, float angle) { return ranvier_dom_svg_transform_set_skew_x(target, angle); }
+int32_t rv_dom_svg_transform_set_skew_y(RvSVGTransform* target, float angle) { return ranvier_dom_svg_transform_set_skew_y(target, angle); }
+int32_t rv_dom_svg_transform_list_get_length(RvSVGTransformList* target, uint32_t* result) { return ranvier_dom_svg_transform_list_get_length(target, result); }
+int32_t rv_dom_svg_transform_list_get_number_of_items(RvSVGTransformList* target, uint32_t* result) { return ranvier_dom_svg_transform_list_get_number_of_items(target, result); }
+int32_t rv_dom_svg_transform_list_clear(RvSVGTransformList* target) { return ranvier_dom_svg_transform_list_clear(target); }
+int32_t rv_dom_svg_transform_list_initialize(RvSVGTransformList* target, RvSVGTransform* new_item, RvSVGTransform** result) { return ranvier_dom_svg_transform_list_initialize(target, new_item, result); }
+int32_t rv_dom_svg_transform_list_get_item(RvSVGTransformList* target, uint32_t index, RvSVGTransform** result) { return ranvier_dom_svg_transform_list_get_item(target, index, result); }
+int32_t rv_dom_svg_transform_list_insert_item_before(RvSVGTransformList* target, RvSVGTransform* new_item, uint32_t index, RvSVGTransform** result) { return ranvier_dom_svg_transform_list_insert_item_before(target, new_item, index, result); }
+int32_t rv_dom_svg_transform_list_replace_item(RvSVGTransformList* target, RvSVGTransform* new_item, uint32_t index, RvSVGTransform** result) { return ranvier_dom_svg_transform_list_replace_item(target, new_item, index, result); }
+int32_t rv_dom_svg_transform_list_remove_item(RvSVGTransformList* target, uint32_t index, RvSVGTransform** result) { return ranvier_dom_svg_transform_list_remove_item(target, index, result); }
+int32_t rv_dom_svg_transform_list_append_item(RvSVGTransformList* target, RvSVGTransform* new_item, RvSVGTransform** result) { return ranvier_dom_svg_transform_list_append_item(target, new_item, result); }
+int32_t rv_dom_svg_transform_list_set_item(RvSVGTransformList* target, uint32_t index, RvSVGTransform* new_item) { return ranvier_dom_svg_transform_list_set_item(target, index, new_item); }
+int32_t rv_dom_svg_transform_list_create_svg_transform_from_matrix(RvSVGTransformList* target, const RvDomDOMMatrix2DInit* matrix, RvSVGTransform** result) { return ranvier_dom_svg_transform_list_create_svg_transform_from_matrix(target, matrix, result); }
+int32_t rv_dom_svg_transform_list_consolidate(RvSVGTransformList* target, RvSVGTransform** result) { return ranvier_dom_svg_transform_list_consolidate(target, result); }
+int32_t rv_dom_svg_animated_transform_list_get_base_val(RvSVGAnimatedTransformList* target, RvSVGTransformList** result) { return ranvier_dom_svg_animated_transform_list_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_transform_list_get_anim_val(RvSVGAnimatedTransformList* target, RvSVGTransformList** result) { return ranvier_dom_svg_animated_transform_list_get_anim_val(target, result); }
+int32_t rv_dom_svg_number_get_value(RvSVGNumber* target, float* result) { return ranvier_dom_svg_number_get_value(target, result); }
+int32_t rv_dom_svg_number_set_value(RvSVGNumber* target, float value) { return ranvier_dom_svg_number_set_value(target, value); }
+int32_t rv_dom_svg_length_get_unit_type(RvSVGLength* target, uint16_t* result) { return ranvier_dom_svg_length_get_unit_type(target, result); }
+int32_t rv_dom_svg_length_get_value(RvSVGLength* target, float* result) { return ranvier_dom_svg_length_get_value(target, result); }
+int32_t rv_dom_svg_length_set_value(RvSVGLength* target, float value) { return ranvier_dom_svg_length_set_value(target, value); }
+int32_t rv_dom_svg_length_get_value_in_specified_units(RvSVGLength* target, float* result) { return ranvier_dom_svg_length_get_value_in_specified_units(target, result); }
+int32_t rv_dom_svg_length_set_value_in_specified_units(RvSVGLength* target, float value) { return ranvier_dom_svg_length_set_value_in_specified_units(target, value); }
+int32_t rv_dom_svg_length_get_value_as_string(RvSVGLength* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_length_get_value_as_string(target, buffer, capacity, length); }
+int32_t rv_dom_svg_length_set_value_as_string(RvSVGLength* target, const char* value) { return ranvier_dom_svg_length_set_value_as_string(target, value); }
+int32_t rv_dom_svg_length_new_value_specified_units(RvSVGLength* target, uint16_t unit_type, float value_in_specified_units) { return ranvier_dom_svg_length_new_value_specified_units(target, unit_type, value_in_specified_units); }
+int32_t rv_dom_svg_length_convert_to_specified_units(RvSVGLength* target, uint16_t unit_type) { return ranvier_dom_svg_length_convert_to_specified_units(target, unit_type); }
+int32_t rv_dom_svg_angle_get_unit_type(RvSVGAngle* target, uint16_t* result) { return ranvier_dom_svg_angle_get_unit_type(target, result); }
+int32_t rv_dom_svg_angle_get_value(RvSVGAngle* target, float* result) { return ranvier_dom_svg_angle_get_value(target, result); }
+int32_t rv_dom_svg_angle_set_value(RvSVGAngle* target, float value) { return ranvier_dom_svg_angle_set_value(target, value); }
+int32_t rv_dom_svg_angle_get_value_in_specified_units(RvSVGAngle* target, float* result) { return ranvier_dom_svg_angle_get_value_in_specified_units(target, result); }
+int32_t rv_dom_svg_angle_set_value_in_specified_units(RvSVGAngle* target, float value) { return ranvier_dom_svg_angle_set_value_in_specified_units(target, value); }
+int32_t rv_dom_svg_angle_get_value_as_string(RvSVGAngle* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_angle_get_value_as_string(target, buffer, capacity, length); }
+int32_t rv_dom_svg_angle_set_value_as_string(RvSVGAngle* target, const char* value) { return ranvier_dom_svg_angle_set_value_as_string(target, value); }
+int32_t rv_dom_svg_angle_new_value_specified_units(RvSVGAngle* target, uint16_t unit_type, float value_in_specified_units) { return ranvier_dom_svg_angle_new_value_specified_units(target, unit_type, value_in_specified_units); }
+int32_t rv_dom_svg_angle_convert_to_specified_units(RvSVGAngle* target, uint16_t unit_type) { return ranvier_dom_svg_angle_convert_to_specified_units(target, unit_type); }
+int32_t rv_dom_svg_number_list_get_length(RvSVGNumberList* target, uint32_t* result) { return ranvier_dom_svg_number_list_get_length(target, result); }
+int32_t rv_dom_svg_number_list_get_number_of_items(RvSVGNumberList* target, uint32_t* result) { return ranvier_dom_svg_number_list_get_number_of_items(target, result); }
+int32_t rv_dom_svg_number_list_clear(RvSVGNumberList* target) { return ranvier_dom_svg_number_list_clear(target); }
+int32_t rv_dom_svg_number_list_initialize(RvSVGNumberList* target, RvSVGNumber* new_item, RvSVGNumber** result) { return ranvier_dom_svg_number_list_initialize(target, new_item, result); }
+int32_t rv_dom_svg_number_list_get_item(RvSVGNumberList* target, uint32_t index, RvSVGNumber** result) { return ranvier_dom_svg_number_list_get_item(target, index, result); }
+int32_t rv_dom_svg_number_list_insert_item_before(RvSVGNumberList* target, RvSVGNumber* new_item, uint32_t index, RvSVGNumber** result) { return ranvier_dom_svg_number_list_insert_item_before(target, new_item, index, result); }
+int32_t rv_dom_svg_number_list_replace_item(RvSVGNumberList* target, RvSVGNumber* new_item, uint32_t index, RvSVGNumber** result) { return ranvier_dom_svg_number_list_replace_item(target, new_item, index, result); }
+int32_t rv_dom_svg_number_list_remove_item(RvSVGNumberList* target, uint32_t index, RvSVGNumber** result) { return ranvier_dom_svg_number_list_remove_item(target, index, result); }
+int32_t rv_dom_svg_number_list_append_item(RvSVGNumberList* target, RvSVGNumber* new_item, RvSVGNumber** result) { return ranvier_dom_svg_number_list_append_item(target, new_item, result); }
+int32_t rv_dom_svg_number_list_set_item(RvSVGNumberList* target, uint32_t index, RvSVGNumber* new_item) { return ranvier_dom_svg_number_list_set_item(target, index, new_item); }
+int32_t rv_dom_svg_length_list_get_length(RvSVGLengthList* target, uint32_t* result) { return ranvier_dom_svg_length_list_get_length(target, result); }
+int32_t rv_dom_svg_length_list_get_number_of_items(RvSVGLengthList* target, uint32_t* result) { return ranvier_dom_svg_length_list_get_number_of_items(target, result); }
+int32_t rv_dom_svg_length_list_clear(RvSVGLengthList* target) { return ranvier_dom_svg_length_list_clear(target); }
+int32_t rv_dom_svg_length_list_initialize(RvSVGLengthList* target, RvSVGLength* new_item, RvSVGLength** result) { return ranvier_dom_svg_length_list_initialize(target, new_item, result); }
+int32_t rv_dom_svg_length_list_get_item(RvSVGLengthList* target, uint32_t index, RvSVGLength** result) { return ranvier_dom_svg_length_list_get_item(target, index, result); }
+int32_t rv_dom_svg_length_list_insert_item_before(RvSVGLengthList* target, RvSVGLength* new_item, uint32_t index, RvSVGLength** result) { return ranvier_dom_svg_length_list_insert_item_before(target, new_item, index, result); }
+int32_t rv_dom_svg_length_list_replace_item(RvSVGLengthList* target, RvSVGLength* new_item, uint32_t index, RvSVGLength** result) { return ranvier_dom_svg_length_list_replace_item(target, new_item, index, result); }
+int32_t rv_dom_svg_length_list_remove_item(RvSVGLengthList* target, uint32_t index, RvSVGLength** result) { return ranvier_dom_svg_length_list_remove_item(target, index, result); }
+int32_t rv_dom_svg_length_list_append_item(RvSVGLengthList* target, RvSVGLength* new_item, RvSVGLength** result) { return ranvier_dom_svg_length_list_append_item(target, new_item, result); }
+int32_t rv_dom_svg_length_list_set_item(RvSVGLengthList* target, uint32_t index, RvSVGLength* new_item) { return ranvier_dom_svg_length_list_set_item(target, index, new_item); }
+int32_t rv_dom_svg_point_list_get_length(RvSVGPointList* target, uint32_t* result) { return ranvier_dom_svg_point_list_get_length(target, result); }
+int32_t rv_dom_svg_point_list_get_number_of_items(RvSVGPointList* target, uint32_t* result) { return ranvier_dom_svg_point_list_get_number_of_items(target, result); }
+int32_t rv_dom_svg_point_list_clear(RvSVGPointList* target) { return ranvier_dom_svg_point_list_clear(target); }
+int32_t rv_dom_svg_point_list_initialize(RvSVGPointList* target, RvSVGPoint* new_item, RvSVGPoint** result) { return ranvier_dom_svg_point_list_initialize(target, new_item, result); }
+int32_t rv_dom_svg_point_list_get_item(RvSVGPointList* target, uint32_t index, RvSVGPoint** result) { return ranvier_dom_svg_point_list_get_item(target, index, result); }
+int32_t rv_dom_svg_point_list_insert_item_before(RvSVGPointList* target, RvSVGPoint* new_item, uint32_t index, RvSVGPoint** result) { return ranvier_dom_svg_point_list_insert_item_before(target, new_item, index, result); }
+int32_t rv_dom_svg_point_list_replace_item(RvSVGPointList* target, RvSVGPoint* new_item, uint32_t index, RvSVGPoint** result) { return ranvier_dom_svg_point_list_replace_item(target, new_item, index, result); }
+int32_t rv_dom_svg_point_list_remove_item(RvSVGPointList* target, uint32_t index, RvSVGPoint** result) { return ranvier_dom_svg_point_list_remove_item(target, index, result); }
+int32_t rv_dom_svg_point_list_append_item(RvSVGPointList* target, RvSVGPoint* new_item, RvSVGPoint** result) { return ranvier_dom_svg_point_list_append_item(target, new_item, result); }
+int32_t rv_dom_svg_point_list_set_item(RvSVGPointList* target, uint32_t index, RvSVGPoint* new_item) { return ranvier_dom_svg_point_list_set_item(target, index, new_item); }
+int32_t rv_dom_svg_animated_number_get_base_val(RvSVGAnimatedNumber* target, float* result) { return ranvier_dom_svg_animated_number_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_number_set_base_val(RvSVGAnimatedNumber* target, float value) { return ranvier_dom_svg_animated_number_set_base_val(target, value); }
+int32_t rv_dom_svg_animated_number_get_anim_val(RvSVGAnimatedNumber* target, float* result) { return ranvier_dom_svg_animated_number_get_anim_val(target, result); }
+int32_t rv_dom_svg_animated_length_get_base_val(RvSVGAnimatedLength* target, RvSVGLength** result) { return ranvier_dom_svg_animated_length_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_length_get_anim_val(RvSVGAnimatedLength* target, RvSVGLength** result) { return ranvier_dom_svg_animated_length_get_anim_val(target, result); }
+int32_t rv_dom_svg_animated_length_list_get_base_val(RvSVGAnimatedLengthList* target, RvSVGLengthList** result) { return ranvier_dom_svg_animated_length_list_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_length_list_get_anim_val(RvSVGAnimatedLengthList* target, RvSVGLengthList** result) { return ranvier_dom_svg_animated_length_list_get_anim_val(target, result); }
+int32_t rv_dom_svg_animated_number_list_get_base_val(RvSVGAnimatedNumberList* target, RvSVGNumberList** result) { return ranvier_dom_svg_animated_number_list_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_number_list_get_anim_val(RvSVGAnimatedNumberList* target, RvSVGNumberList** result) { return ranvier_dom_svg_animated_number_list_get_anim_val(target, result); }
+int32_t rv_dom_svg_animated_enumeration_get_base_val(RvSVGAnimatedEnumeration* target, uint16_t* result) { return ranvier_dom_svg_animated_enumeration_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_enumeration_set_base_val(RvSVGAnimatedEnumeration* target, uint16_t value) { return ranvier_dom_svg_animated_enumeration_set_base_val(target, value); }
+int32_t rv_dom_svg_animated_enumeration_get_anim_val(RvSVGAnimatedEnumeration* target, uint16_t* result) { return ranvier_dom_svg_animated_enumeration_get_anim_val(target, result); }
+int32_t rv_dom_svg_animated_string_get_base_val(RvSVGAnimatedString* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_animated_string_get_base_val(target, buffer, capacity, length); }
+int32_t rv_dom_svg_animated_string_set_base_val(RvSVGAnimatedString* target, const char* value) { return ranvier_dom_svg_animated_string_set_base_val(target, value); }
+int32_t rv_dom_svg_animated_string_get_anim_val(RvSVGAnimatedString* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_animated_string_get_anim_val(target, buffer, capacity, length); }
+int32_t rv_dom_svg_animated_boolean_get_base_val(RvSVGAnimatedBoolean* target, int32_t* result) { return ranvier_dom_svg_animated_boolean_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_boolean_set_base_val(RvSVGAnimatedBoolean* target, int32_t value) { return ranvier_dom_svg_animated_boolean_set_base_val(target, value); }
+int32_t rv_dom_svg_animated_boolean_get_anim_val(RvSVGAnimatedBoolean* target, int32_t* result) { return ranvier_dom_svg_animated_boolean_get_anim_val(target, result); }
+int32_t rv_dom_svg_string_list_get_length(RvSVGStringList* target, uint32_t* result) { return ranvier_dom_svg_string_list_get_length(target, result); }
+int32_t rv_dom_svg_string_list_get_number_of_items(RvSVGStringList* target, uint32_t* result) { return ranvier_dom_svg_string_list_get_number_of_items(target, result); }
+int32_t rv_dom_svg_string_list_clear(RvSVGStringList* target) { return ranvier_dom_svg_string_list_clear(target); }
+int32_t rv_dom_svg_string_list_initialize(RvSVGStringList* target, const char* new_item, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_string_list_initialize(target, new_item, buffer, capacity, length); }
+int32_t rv_dom_svg_string_list_get_item(RvSVGStringList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_string_list_get_item(target, index, buffer, capacity, length); }
+int32_t rv_dom_svg_string_list_insert_item_before(RvSVGStringList* target, const char* new_item, uint32_t index, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_string_list_insert_item_before(target, new_item, index, buffer, capacity, length); }
+int32_t rv_dom_svg_string_list_replace_item(RvSVGStringList* target, const char* new_item, uint32_t index, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_string_list_replace_item(target, new_item, index, buffer, capacity, length); }
+int32_t rv_dom_svg_string_list_remove_item(RvSVGStringList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_string_list_remove_item(target, index, buffer, capacity, length); }
+int32_t rv_dom_svg_string_list_append_item(RvSVGStringList* target, const char* new_item, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_string_list_append_item(target, new_item, buffer, capacity, length); }
+int32_t rv_dom_svg_string_list_set_item(RvSVGStringList* target, uint32_t index, const char* new_item) { return ranvier_dom_svg_string_list_set_item(target, index, new_item); }
+int32_t rv_dom_svg_view_spec_get_transform(RvSVGViewSpec* target, RvSVGTransformList** result) { return ranvier_dom_svg_view_spec_get_transform(target, result); }
+int32_t rv_dom_svg_view_spec_get_view_box_string(RvSVGViewSpec* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_view_spec_get_view_box_string(target, buffer, capacity, length); }
+int32_t rv_dom_svg_view_spec_get_preserve_aspect_ratio_string(RvSVGViewSpec* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_view_spec_get_preserve_aspect_ratio_string(target, buffer, capacity, length); }
+int32_t rv_dom_svg_view_spec_get_transform_string(RvSVGViewSpec* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_view_spec_get_transform_string(target, buffer, capacity, length); }
+int32_t rv_dom_svg_view_spec_get_view_box(RvSVGViewSpec* target, RvSVGAnimatedRect** result) { return ranvier_dom_svg_view_spec_get_view_box(target, result); }
+int32_t rv_dom_svg_view_spec_get_preserve_aspect_ratio(RvSVGViewSpec* target, RvSVGAnimatedPreserveAspectRatio** result) { return ranvier_dom_svg_view_spec_get_preserve_aspect_ratio(target, result); }
+int32_t rv_dom_svg_view_spec_get_zoom_and_pan(RvSVGViewSpec* target, uint16_t* result) { return ranvier_dom_svg_view_spec_get_zoom_and_pan(target, result); }
+int32_t rv_dom_svg_view_spec_set_zoom_and_pan(RvSVGViewSpec* target, uint16_t value) { return ranvier_dom_svg_view_spec_set_zoom_and_pan(target, value); }
+int32_t rv_dom_svg_animated_angle_get_base_val(RvSVGAnimatedAngle* target, RvSVGAngle** result) { return ranvier_dom_svg_animated_angle_get_base_val(target, result); }
+int32_t rv_dom_svg_animated_angle_get_anim_val(RvSVGAnimatedAngle* target, RvSVGAngle** result) { return ranvier_dom_svg_animated_angle_get_anim_val(target, result); }
+int32_t rv_dom_svg_symbol_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result) { return ranvier_dom_svg_symbol_element_get_view_box(target, result); }
+int32_t rv_dom_svg_symbol_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result) { return ranvier_dom_svg_symbol_element_get_preserve_aspect_ratio(target, result); }
+int32_t rv_dom_svg_view_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result) { return ranvier_dom_svg_view_element_get_view_box(target, result); }
+int32_t rv_dom_svg_view_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result) { return ranvier_dom_svg_view_element_get_preserve_aspect_ratio(target, result); }
+int32_t rv_dom_svg_view_element_get_zoom_and_pan(RvNode* target, uint16_t* result) { return ranvier_dom_svg_view_element_get_zoom_and_pan(target, result); }
+int32_t rv_dom_svg_view_element_set_zoom_and_pan(RvNode* target, uint16_t value) { return ranvier_dom_svg_view_element_set_zoom_and_pan(target, value); }
+int32_t rv_dom_svg_marker_element_get_ref_x(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_marker_element_get_ref_x(target, result); }
+int32_t rv_dom_svg_marker_element_get_ref_y(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_marker_element_get_ref_y(target, result); }
+int32_t rv_dom_svg_marker_element_get_marker_units(RvNode* target, RvSVGAnimatedEnumeration** result) { return ranvier_dom_svg_marker_element_get_marker_units(target, result); }
+int32_t rv_dom_svg_marker_element_get_marker_width(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_marker_element_get_marker_width(target, result); }
+int32_t rv_dom_svg_marker_element_get_marker_height(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_marker_element_get_marker_height(target, result); }
+int32_t rv_dom_svg_marker_element_get_orient_type(RvNode* target, RvSVGAnimatedEnumeration** result) { return ranvier_dom_svg_marker_element_get_orient_type(target, result); }
+int32_t rv_dom_svg_marker_element_get_orient_angle(RvNode* target, RvSVGAnimatedAngle** result) { return ranvier_dom_svg_marker_element_get_orient_angle(target, result); }
+int32_t rv_dom_svg_marker_element_get_orient(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_svg_marker_element_get_orient(target, buffer, capacity, length); }
+int32_t rv_dom_svg_marker_element_set_orient(RvNode* target, const char* value) { return ranvier_dom_svg_marker_element_set_orient(target, value); }
+int32_t rv_dom_svg_marker_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result) { return ranvier_dom_svg_marker_element_get_view_box(target, result); }
+int32_t rv_dom_svg_marker_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result) { return ranvier_dom_svg_marker_element_get_preserve_aspect_ratio(target, result); }
+int32_t rv_dom_svg_marker_element_set_orient_to_auto(RvNode* target) { return ranvier_dom_svg_marker_element_set_orient_to_auto(target); }
+int32_t rv_dom_svg_marker_element_set_orient_to_angle(RvNode* target, RvSVGAngle* angle) { return ranvier_dom_svg_marker_element_set_orient_to_angle(target, angle); }
+int32_t rv_dom_svg_pattern_element_get_pattern_units(RvNode* target, RvSVGAnimatedEnumeration** result) { return ranvier_dom_svg_pattern_element_get_pattern_units(target, result); }
+int32_t rv_dom_svg_pattern_element_get_pattern_content_units(RvNode* target, RvSVGAnimatedEnumeration** result) { return ranvier_dom_svg_pattern_element_get_pattern_content_units(target, result); }
+int32_t rv_dom_svg_pattern_element_get_pattern_transform(RvNode* target, RvSVGAnimatedTransformList** result) { return ranvier_dom_svg_pattern_element_get_pattern_transform(target, result); }
+int32_t rv_dom_svg_pattern_element_get_x(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_pattern_element_get_x(target, result); }
+int32_t rv_dom_svg_pattern_element_get_y(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_pattern_element_get_y(target, result); }
+int32_t rv_dom_svg_pattern_element_get_width(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_pattern_element_get_width(target, result); }
+int32_t rv_dom_svg_pattern_element_get_height(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_pattern_element_get_height(target, result); }
+int32_t rv_dom_svg_pattern_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result) { return ranvier_dom_svg_pattern_element_get_view_box(target, result); }
+int32_t rv_dom_svg_pattern_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result) { return ranvier_dom_svg_pattern_element_get_preserve_aspect_ratio(target, result); }
+int32_t rv_dom_svg_pattern_element_get_required_extensions(RvNode* target, RvSVGStringList** result) { return ranvier_dom_svg_pattern_element_get_required_extensions(target, result); }
+int32_t rv_dom_svg_pattern_element_get_system_language(RvNode* target, RvSVGStringList** result) { return ranvier_dom_svg_pattern_element_get_system_language(target, result); }
+int32_t rv_dom_svg_pattern_element_get_href(RvNode* target, RvSVGAnimatedString** result) { return ranvier_dom_svg_pattern_element_get_href(target, result); }
+int32_t rv_dom_svg_text_content_element_get_text_length(RvNode* target, RvSVGAnimatedLength** result) { return ranvier_dom_svg_text_content_element_get_text_length(target, result); }
+int32_t rv_dom_svg_text_content_element_get_length_adjust(RvNode* target, RvSVGAnimatedEnumeration** result) { return ranvier_dom_svg_text_content_element_get_length_adjust(target, result); }
+int32_t rv_dom_svg_text_content_element_get_number_of_chars(RvNode* target, int32_t* result) { return ranvier_dom_svg_text_content_element_get_number_of_chars(target, result); }
+int32_t rv_dom_svg_text_content_element_get_computed_text_length(RvNode* target, float* result) { return ranvier_dom_svg_text_content_element_get_computed_text_length(target, result); }
+int32_t rv_dom_svg_text_content_element_get_sub_string_length(RvNode* target, uint32_t charnum, uint32_t nchars, float* result) { return ranvier_dom_svg_text_content_element_get_sub_string_length(target, charnum, nchars, result); }
+int32_t rv_dom_svg_text_content_element_get_start_position_of_char(RvNode* target, uint32_t charnum, RvSVGPoint** result) { return ranvier_dom_svg_text_content_element_get_start_position_of_char(target, charnum, result); }
+int32_t rv_dom_svg_text_content_element_get_end_position_of_char(RvNode* target, uint32_t charnum, RvSVGPoint** result) { return ranvier_dom_svg_text_content_element_get_end_position_of_char(target, charnum, result); }
+int32_t rv_dom_svg_text_content_element_get_extent_of_char(RvNode* target, uint32_t charnum, RvSVGRect** result) { return ranvier_dom_svg_text_content_element_get_extent_of_char(target, charnum, result); }
+int32_t rv_dom_svg_text_content_element_get_rotation_of_char(RvNode* target, uint32_t charnum, float* result) { return ranvier_dom_svg_text_content_element_get_rotation_of_char(target, charnum, result); }
+int32_t rv_dom_svg_text_content_element_get_char_num_at_position(RvNode* target, const RvDomDOMPointInit* point, int32_t* result) { return ranvier_dom_svg_text_content_element_get_char_num_at_position(target, point, result); }
+int32_t rv_dom_svg_text_content_element_select_sub_string(RvNode* target, uint32_t charnum, uint32_t nchars) { return ranvier_dom_svg_text_content_element_select_sub_string(target, charnum, nchars); }
+int32_t rv_dom_svg_text_positioning_element_get_x(RvNode* target, RvSVGAnimatedLengthList** result) { return ranvier_dom_svg_text_positioning_element_get_x(target, result); }
+int32_t rv_dom_svg_text_positioning_element_get_y(RvNode* target, RvSVGAnimatedLengthList** result) { return ranvier_dom_svg_text_positioning_element_get_y(target, result); }
+int32_t rv_dom_svg_text_positioning_element_get_dx(RvNode* target, RvSVGAnimatedLengthList** result) { return ranvier_dom_svg_text_positioning_element_get_dx(target, result); }
+int32_t rv_dom_svg_text_positioning_element_get_dy(RvNode* target, RvSVGAnimatedLengthList** result) { return ranvier_dom_svg_text_positioning_element_get_dy(target, result); }
+int32_t rv_dom_svg_text_positioning_element_get_rotate(RvNode* target, RvSVGAnimatedNumberList** result) { return ranvier_dom_svg_text_positioning_element_get_rotate(target, result); }
 int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result) { return ranvier_dom_css_supports_2(target, property, property_length, value, value_length, result); }
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor) { return ranvier_dom_css_register_property(target, descriptor); }

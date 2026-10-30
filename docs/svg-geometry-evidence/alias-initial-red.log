@@ -1,0 +1,22 @@
+rtk : [rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+At line:1 char:1
++ rtk proxy C:/Python314/python.exe -I -X utf8 tests/abi/svg_geometry.p ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([rtk] /!\ No ho...c token savings:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Traceback (most recent call last):
+  File "C:\wk\native-svg-geometry\tests\abi\svg_geometry.py", line 327, in <module>
+    verify(parser.parse_args().native_directory)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-geometry\tests\abi\svg_geometry.py", line 251, in verify
+    close(matrix(alias_matrix), (2, 3, 4, 5, 6, 7), 'transform factory normalizes matrix dictionary aliases')
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-geometry\tests\abi\svg_geometry.py", line 63, in close
+    expect(len(actual) == len(expected) and all(math.isclose(a, e, rel_tol=0, abs_tol=tolerance) for a, e in 
+zip(actual, expected)), label + ': ' + str(actual))
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-geometry\tests\abi\svg_geometry.py", line 38, in expect
+    raise AssertionError(label)
+AssertionError: transform factory normalizes matrix dictionary aliases: (1.0, 0.0, 0.0, 1.0, 0.0, 0.0)

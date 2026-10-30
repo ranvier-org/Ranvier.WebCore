@@ -1,0 +1,317 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "rows": [
+    {
+      "value": "NaN",
+      "operation": "matrix.a",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "NaN",
+      "operation": "point.x",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'x' property on 'SVGPoint': The provided float value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "NaN",
+      "operation": "number.value",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'value' property on 'SVGNumber': The provided float value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "NaN",
+      "operation": "getPointAtLength",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'getPointAtLength' on 'SVGGeometryElement': The provided float value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "NaN",
+      "operation": "dictionaryRoot",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "NaN",
+      "operation": "dictionarySet",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "NaN",
+      "operation": "dictionaryList",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "Infinity",
+      "operation": "matrix.a",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "Infinity",
+      "operation": "point.x",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'x' property on 'SVGPoint': The provided float value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "Infinity",
+      "operation": "number.value",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'value' property on 'SVGNumber': The provided float value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "Infinity",
+      "operation": "getPointAtLength",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'getPointAtLength' on 'SVGGeometryElement': The provided float value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "Infinity",
+      "operation": "dictionaryRoot",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "Infinity",
+      "operation": "dictionarySet",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "Infinity",
+      "operation": "dictionaryList",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "-Infinity",
+      "operation": "matrix.a",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "-Infinity",
+      "operation": "point.x",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'x' property on 'SVGPoint': The provided float value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "-Infinity",
+      "operation": "number.value",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'value' property on 'SVGNumber': The provided float value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "-Infinity",
+      "operation": "getPointAtLength",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'getPointAtLength' on 'SVGGeometryElement': The provided float value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "-Infinity",
+      "operation": "dictionaryRoot",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "-Infinity",
+      "operation": "dictionarySet",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "-Infinity",
+      "operation": "dictionaryList",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to set the 'a' property on 'SVGMatrix': The provided double value is non-finite.",
+      "preserved": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "operation": "overflowRoot",
+      "status": "ok",
+      "input": [
+        "Infinity",
+        0,
+        0,
+        "Infinity",
+        0,
+        0
+      ],
+      "output": [
+        "Infinity",
+        0,
+        0,
+        "Infinity",
+        0,
+        0
+      ]
+    },
+    {
+      "operation": "overflowSet",
+      "status": "ok",
+      "input": [
+        "Infinity",
+        0,
+        0,
+        "Infinity",
+        0,
+        0
+      ],
+      "output": [
+        "Infinity",
+        0,
+        0,
+        "Infinity",
+        0,
+        0
+      ]
+    },
+    {
+      "operation": "overflowList",
+      "status": "ok",
+      "input": [
+        "Infinity",
+        0,
+        0,
+        "Infinity",
+        0,
+        0
+      ],
+      "output": [
+        "Infinity",
+        0,
+        0,
+        "Infinity",
+        0,
+        0
+      ]
+    }
+  ]
+}

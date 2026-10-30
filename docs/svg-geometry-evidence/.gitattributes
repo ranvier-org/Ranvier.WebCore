@@ -1,0 +1,2 @@
+*.log -text
+*.mjs text eol=lf

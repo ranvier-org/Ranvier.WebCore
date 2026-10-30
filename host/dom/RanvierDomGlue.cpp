@@ -63,6 +63,7 @@
 #include "DOMCSSRegisterCustomProperty.h"
 #include "DOMImplementation.h"
 #include "DOMMatrix.h"
+#include "DOMMatrix2DInit.h"
 #include "DOMMatrixInit.h"
 #include "DOMMatrixReadOnly.h"
 #include "DOMPoint.h"
@@ -80,6 +81,7 @@
 #include "Document.h"
 #include "DocumentFragment.h"
 #include "DocumentOrShadowRootFullscreen.h"
+#include "DocumentSVG.h"
 #include "DocumentSettingsValues.h"
 #include "Element.h"
 #include "ElementCreationOptions.h"
@@ -172,9 +174,35 @@
 #include "PointerEvent.h"
 #include "RadioNodeList.h"
 #include "Range.h"
+#include "SVGAngle.h"
+#include "SVGAnimatedString.h"
 #include "SVGElement.h"
 #include "SVGElementTypeHelpers.h"
+#include "SVGGeometryElement.h"
+#include "SVGGraphicsElement.h"
+#include "SVGLength.h"
+#include "SVGLengthList.h"
+#include "SVGMarkerElement.h"
+#include "SVGMatrix.h"
+#include "SVGNumber.h"
+#include "SVGNumberList.h"
+#include "SVGPatternElement.h"
+#include "SVGPoint.h"
+#include "SVGPointList.h"
+#include "SVGPolygonElement.h"
+#include "SVGPolylineElement.h"
+#include "SVGPreserveAspectRatio.h"
+#include "SVGRect.h"
+#include "SVGSVGElement.h"
+#include "SVGStringList.h"
 #include "SVGStyleElement.h"
+#include "SVGSymbolElement.h"
+#include "SVGTextContentElement.h"
+#include "SVGTextPositioningElement.h"
+#include "SVGTransform.h"
+#include "SVGTransformList.h"
+#include "SVGViewElement.h"
+#include "SVGViewSpec.h"
 #include "ScrollIntoViewOptions.h"
 #include "ScrollToOptions.h"
 #include "Settings.h"
@@ -186,9 +214,11 @@
 #include "StyleSheet.h"
 #include "StyleSheetList.h"
 #include "Text.h"
+#include "TrustedScriptURL.h"
 #include "UIEvent.h"
 #include "ValidityState.h"
 #include "WheelEvent.h"
+#include "svg/properties/SVGAnimatedPropertyImpl.h"
 #include "wtf/KeyValuePair.h"
 #include "JSAriaNotifyOptions.h"
 #include "JSAriaNotifyOptions.h"
@@ -2049,7 +2079,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2598,6 +2628,356 @@ RvValidityState* ranvier_dom_validity_state_retain(RvValidityState* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<ValidityState*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_rect_release(RvSVGRect* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGRect*>(handle)->deref();
+}
+
+RvSVGRect* ranvier_dom_svg_rect_retain(RvSVGRect* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGRect*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_matrix_release(RvSVGMatrix* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGMatrix*>(handle)->deref();
+}
+
+RvSVGMatrix* ranvier_dom_svg_matrix_retain(RvSVGMatrix* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGMatrix*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_point_release(RvSVGPoint* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGPoint*>(handle)->deref();
+}
+
+RvSVGPoint* ranvier_dom_svg_point_retain(RvSVGPoint* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGPoint*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_rect_release(RvSVGAnimatedRect* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedRect*>(handle)->deref();
+}
+
+RvSVGAnimatedRect* ranvier_dom_svg_animated_rect_retain(RvSVGAnimatedRect* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedRect*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_preserve_aspect_ratio_release(RvSVGPreserveAspectRatio* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGPreserveAspectRatio*>(handle)->deref();
+}
+
+RvSVGPreserveAspectRatio* ranvier_dom_svg_preserve_aspect_ratio_retain(RvSVGPreserveAspectRatio* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGPreserveAspectRatio*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_preserve_aspect_ratio_release(RvSVGAnimatedPreserveAspectRatio* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedPreserveAspectRatio*>(handle)->deref();
+}
+
+RvSVGAnimatedPreserveAspectRatio* ranvier_dom_svg_animated_preserve_aspect_ratio_retain(RvSVGAnimatedPreserveAspectRatio* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedPreserveAspectRatio*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_transform_release(RvSVGTransform* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGTransform*>(handle)->deref();
+}
+
+RvSVGTransform* ranvier_dom_svg_transform_retain(RvSVGTransform* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGTransform*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_transform_list_release(RvSVGTransformList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGTransformList*>(handle)->deref();
+}
+
+RvSVGTransformList* ranvier_dom_svg_transform_list_retain(RvSVGTransformList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGTransformList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_transform_list_release(RvSVGAnimatedTransformList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedTransformList*>(handle)->deref();
+}
+
+RvSVGAnimatedTransformList* ranvier_dom_svg_animated_transform_list_retain(RvSVGAnimatedTransformList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedTransformList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_number_release(RvSVGNumber* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGNumber*>(handle)->deref();
+}
+
+RvSVGNumber* ranvier_dom_svg_number_retain(RvSVGNumber* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGNumber*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_length_release(RvSVGLength* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGLength*>(handle)->deref();
+}
+
+RvSVGLength* ranvier_dom_svg_length_retain(RvSVGLength* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGLength*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_angle_release(RvSVGAngle* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAngle*>(handle)->deref();
+}
+
+RvSVGAngle* ranvier_dom_svg_angle_retain(RvSVGAngle* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAngle*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_number_list_release(RvSVGNumberList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGNumberList*>(handle)->deref();
+}
+
+RvSVGNumberList* ranvier_dom_svg_number_list_retain(RvSVGNumberList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGNumberList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_length_list_release(RvSVGLengthList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGLengthList*>(handle)->deref();
+}
+
+RvSVGLengthList* ranvier_dom_svg_length_list_retain(RvSVGLengthList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGLengthList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_point_list_release(RvSVGPointList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGPointList*>(handle)->deref();
+}
+
+RvSVGPointList* ranvier_dom_svg_point_list_retain(RvSVGPointList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGPointList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_number_release(RvSVGAnimatedNumber* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedNumber*>(handle)->deref();
+}
+
+RvSVGAnimatedNumber* ranvier_dom_svg_animated_number_retain(RvSVGAnimatedNumber* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedNumber*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_length_release(RvSVGAnimatedLength* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedLength*>(handle)->deref();
+}
+
+RvSVGAnimatedLength* ranvier_dom_svg_animated_length_retain(RvSVGAnimatedLength* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedLength*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_length_list_release(RvSVGAnimatedLengthList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedLengthList*>(handle)->deref();
+}
+
+RvSVGAnimatedLengthList* ranvier_dom_svg_animated_length_list_retain(RvSVGAnimatedLengthList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedLengthList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_number_list_release(RvSVGAnimatedNumberList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedNumberList*>(handle)->deref();
+}
+
+RvSVGAnimatedNumberList* ranvier_dom_svg_animated_number_list_retain(RvSVGAnimatedNumberList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedNumberList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_enumeration_release(RvSVGAnimatedEnumeration* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedEnumeration*>(handle)->deref();
+}
+
+RvSVGAnimatedEnumeration* ranvier_dom_svg_animated_enumeration_retain(RvSVGAnimatedEnumeration* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedEnumeration*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_string_release(RvSVGAnimatedString* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedString*>(handle)->deref();
+}
+
+RvSVGAnimatedString* ranvier_dom_svg_animated_string_retain(RvSVGAnimatedString* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedString*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_boolean_release(RvSVGAnimatedBoolean* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedBoolean*>(handle)->deref();
+}
+
+RvSVGAnimatedBoolean* ranvier_dom_svg_animated_boolean_retain(RvSVGAnimatedBoolean* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedBoolean*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_string_list_release(RvSVGStringList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGStringList*>(handle)->deref();
+}
+
+RvSVGStringList* ranvier_dom_svg_string_list_retain(RvSVGStringList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGStringList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_view_spec_release(RvSVGViewSpec* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGViewSpec*>(handle)->deref();
+}
+
+RvSVGViewSpec* ranvier_dom_svg_view_spec_retain(RvSVGViewSpec* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGViewSpec*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_svg_animated_angle_release(RvSVGAnimatedAngle* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<SVGAnimatedAngle*>(handle)->deref();
+}
+
+RvSVGAnimatedAngle* ranvier_dom_svg_animated_angle_retain(RvSVGAnimatedAngle* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<SVGAnimatedAngle*>(handle)->ref();
     return handle;
 }
 
@@ -3365,7 +3745,7 @@ int32_t ranvier_dom_document_fragment_get_element_by_id(RvNode* target, const ch
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { element_id };
-    return deliver([&]() -> decltype(auto) { return impl->getElementById(a0.atom()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->getElementById(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // ShadowRoot.mode getter: readonly attribute ShadowRootMode mode
@@ -3971,6 +4351,19 @@ int32_t ranvier_dom_document_get_visibility_state(RvNode* target, int32_t* resul
     return deliver([&]() -> decltype(auto) { return impl->visibilityState(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationVisibilityState); });
 }
 
+// Document.rootElement getter: readonly attribute SVGSVGElement? rootElement; *result is a new reference, or NULL
+int32_t ranvier_dom_document_get_root_element(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return WebCore::DocumentSVG::rootElement(*impl); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
 // Document.children getter: readonly attribute HTMLCollection children; *result is a new reference
 int32_t ranvier_dom_document_get_children(RvNode* target, RvHTMLCollection** result)
 {
@@ -4571,7 +4964,7 @@ int32_t ranvier_dom_document_get_element_by_id(RvNode* target, const char* eleme
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { element_id };
-    return deliver([&]() -> decltype(auto) { return impl->getElementById(a0.string()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->getElementById(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // Document.elementFromPoint(double x, double y) -> Element?; *result is a new reference, or NULL
@@ -10858,7 +11251,7 @@ int32_t ranvier_dom_html_form_element_named_item(RvNode* target, const char* nam
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { name };
-    return deliver([&]() -> decltype(auto) { return impl->namedItem(a0.atom()); }, [&](auto&& value) { return encodeRvDomUnionRadioNodeListOrElementNullable(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->namedItem(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return encodeRvDomUnionRadioNodeListOrElementNullable(value, result); });
 }
 
 // HTMLFormElement.reset() -> undefined
@@ -14322,7 +14715,7 @@ int32_t ranvier_dom_html_select_element_named_item(RvNode* target, const char* n
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { name };
-    return deliver([&]() -> decltype(auto) { return impl->namedItem(a0.atom()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->namedItem(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // HTMLSelectElement.add((HTMLOptionElement or HTMLOptGroupElement) element, optional (HTMLElement or long)? before = null) -> undefined; before defaults to null in IDL
@@ -18246,6 +18639,32 @@ int32_t ranvier_dom_html_title_element_set_text(RvNode* target, const char* valu
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { value };
     return invoke([&]() -> decltype(auto) { return impl->setText(a0.string()); });
+}
+
+// SVGElement.className getter: readonly attribute SVGAnimatedString className; *result is a new reference
+int32_t ranvier_dom_svg_element_get_class_name(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->classNameAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGElement.ownerSVGElement getter: readonly attribute SVGSVGElement? ownerSVGElement; *result is a new reference, or NULL
+int32_t ranvier_dom_svg_element_get_owner_svg_element(RvNode* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->ownerSVGElement(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // SVGElement.viewportElement getter: readonly attribute SVGElement? viewportElement; *result is a new reference, or NULL
@@ -28463,7 +28882,7 @@ int32_t ranvier_dom_html_collection_named_item(RvHTMLCollection* target, const c
         return RV_ERR_WRONG_THREAD;
     RefPtr<HTMLCollection> impl = reinterpret_cast<HTMLCollection*>(target);
     StringArg a0 { name };
-    return deliver([&]() -> decltype(auto) { return impl->namedItem(a0.atom()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->namedItem(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
 // ValidityState.valueMissing getter: readonly attribute boolean valueMissing
@@ -29656,6 +30075,3259 @@ int32_t ranvier_dom_composition_event_get_data(RvEvent* target, char* buffer, in
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->data(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGGraphicsElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new reference
+int32_t ranvier_dom_svg_graphics_element_get_transform(RvNode* target, RvSVGAnimatedTransformList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGraphicsElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->transformAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedTransformList>(value, result); });
+}
+
+// SVGGraphicsElement.requiredExtensions getter: readonly attribute SVGStringList requiredExtensions; *result is a new reference
+int32_t ranvier_dom_svg_graphics_element_get_required_extensions(RvNode* target, RvSVGStringList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGraphicsElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->requiredExtensions(); }, [&](auto&& value) { return storeHandle<SVGStringList>(value, result); });
+}
+
+// SVGGraphicsElement.systemLanguage getter: readonly attribute SVGStringList systemLanguage; *result is a new reference
+int32_t ranvier_dom_svg_graphics_element_get_system_language(RvNode* target, RvSVGStringList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGraphicsElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->systemLanguage(); }, [&](auto&& value) { return storeHandle<SVGStringList>(value, result); });
+}
+
+// SVGGraphicsElement.getBBox() -> SVGRect; *result is a new reference
+int32_t ranvier_dom_svg_graphics_element_get_b_box(RvNode* target, RvSVGRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGraphicsElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getBBoxForBindings(); }, [&](auto&& value) { return storeHandle<SVGRect>(value, result); });
+}
+
+// SVGGraphicsElement.getCTM() -> SVGMatrix?; *result is a new reference, or NULL
+int32_t ranvier_dom_svg_graphics_element_get_ctm(RvNode* target, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGraphicsElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getCTMForBindings(); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGGraphicsElement.getScreenCTM() -> SVGMatrix?; *result is a new reference, or NULL
+int32_t ranvier_dom_svg_graphics_element_get_screen_ctm(RvNode* target, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGraphicsElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getScreenCTMForBindings(); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGGeometryElement.pathLength getter: readonly attribute SVGAnimatedNumber pathLength; *result is a new reference
+int32_t ranvier_dom_svg_geometry_element_get_path_length(RvNode* target, RvSVGAnimatedNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGeometryElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->pathLengthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumber>(value, result); });
+}
+
+// SVGGeometryElement.isPointInFill(optional DOMPointInit point = {}) -> boolean; point defaults to {} in IDL; point may be NULL for the IDL default
+int32_t ranvier_dom_svg_geometry_element_is_point_in_fill(RvNode* target, const RvDomDOMPointInit* point, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGeometryElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMPointInit a0 { };
+    if (point) {
+        if (point->size >= offsetof(RvDomDOMPointInit, x) + sizeof(point->x))
+            assignValue(a0.x, point->x);
+        if (point->size >= offsetof(RvDomDOMPointInit, y) + sizeof(point->y))
+            assignValue(a0.y, point->y);
+        if (point->size >= offsetof(RvDomDOMPointInit, z) + sizeof(point->z))
+            assignValue(a0.z, point->z);
+        if (point->size >= offsetof(RvDomDOMPointInit, w) + sizeof(point->w))
+            assignValue(a0.w, point->w);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->isPointInFill(std::move(a0)); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGGeometryElement.isPointInStroke(optional DOMPointInit point = {}) -> boolean; point defaults to {} in IDL; point may be NULL for the IDL default
+int32_t ranvier_dom_svg_geometry_element_is_point_in_stroke(RvNode* target, const RvDomDOMPointInit* point, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGeometryElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMPointInit a0 { };
+    if (point) {
+        if (point->size >= offsetof(RvDomDOMPointInit, x) + sizeof(point->x))
+            assignValue(a0.x, point->x);
+        if (point->size >= offsetof(RvDomDOMPointInit, y) + sizeof(point->y))
+            assignValue(a0.y, point->y);
+        if (point->size >= offsetof(RvDomDOMPointInit, z) + sizeof(point->z))
+            assignValue(a0.z, point->z);
+        if (point->size >= offsetof(RvDomDOMPointInit, w) + sizeof(point->w))
+            assignValue(a0.w, point->w);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->isPointInStroke(std::move(a0)); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGGeometryElement.getTotalLength() -> unrestricted float
+int32_t ranvier_dom_svg_geometry_element_get_total_length(RvNode* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGeometryElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getTotalLength(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGGeometryElement.getPointAtLength(float distance) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_geometry_element_get_point_at_length(RvNode* target, float distance, RvSVGPoint** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGGeometryElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!std::isfinite(distance))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->getPointAtLength(distance); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGPolygonElement.points getter: readonly attribute SVGPointList points; *result is a new reference
+int32_t ranvier_dom_svg_polygon_element_get_points(RvNode* target, RvSVGPointList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPolygonElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->points(); }, [&](auto&& value) { return storeHandle<SVGPointList>(value, result); });
+}
+
+// SVGPolygonElement.animatedPoints getter: readonly attribute SVGPointList animatedPoints; *result is a new reference
+int32_t ranvier_dom_svg_polygon_element_get_animated_points(RvNode* target, RvSVGPointList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPolygonElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->animatedPoints(); }, [&](auto&& value) { return storeHandle<SVGPointList>(value, result); });
+}
+
+// SVGPolylineElement.points getter: readonly attribute SVGPointList points; *result is a new reference
+int32_t ranvier_dom_svg_polyline_element_get_points(RvNode* target, RvSVGPointList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPolylineElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->points(); }, [&](auto&& value) { return storeHandle<SVGPointList>(value, result); });
+}
+
+// SVGPolylineElement.animatedPoints getter: readonly attribute SVGPointList animatedPoints; *result is a new reference
+int32_t ranvier_dom_svg_polyline_element_get_animated_points(RvNode* target, RvSVGPointList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPolylineElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->animatedPoints(); }, [&](auto&& value) { return storeHandle<SVGPointList>(value, result); });
+}
+
+// SVGSVGElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGSVGElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGSVGElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGSVGElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGSVGElement.currentScale getter: attribute float currentScale
+int32_t ranvier_dom_svgsvg_element_get_current_scale(RvNode* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->currentScale(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGSVGElement.currentScale setter: attribute float currentScale
+int32_t ranvier_dom_svgsvg_element_set_current_scale(RvNode* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setCurrentScale(value); });
+}
+
+// SVGSVGElement.currentTranslate getter: readonly attribute SVGPoint currentTranslate; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_current_translate(RvNode* target, RvSVGPoint** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->currentTranslate(); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGSVGElement.useCurrentView getter: readonly attribute boolean useCurrentView
+int32_t ranvier_dom_svgsvg_element_get_use_current_view(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->useCurrentView(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGSVGElement.currentView getter: readonly attribute SVGViewSpec currentView; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_current_view(RvNode* target, RvSVGViewSpec** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->currentView(); }, [&](auto&& value) { return storeHandle<SVGViewSpec>(value, result); });
+}
+
+// SVGSVGElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->viewBoxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedRect>(value, result); });
+}
+
+// SVGSVGElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->preserveAspectRatioAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedPreserveAspectRatio>(value, result); });
+}
+
+// SVGSVGElement.zoomAndPan getter: attribute unsigned short zoomAndPan
+int32_t ranvier_dom_svgsvg_element_get_zoom_and_pan(RvNode* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->zoomAndPan(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGSVGElement.zoomAndPan setter: attribute unsigned short zoomAndPan
+int32_t ranvier_dom_svgsvg_element_set_zoom_and_pan(RvNode* target, uint16_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setZoomAndPan(value); });
+}
+
+// SVGSVGElement.getIntersectionList(SVGRect rect, SVGElement? referenceElement) -> NodeList; reference_element may be NULL; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_intersection_list(RvNode* target, RvSVGRect* rect, RvNode* reference_element, RvNodeList** result)
+{
+    if (!target || !rect || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<SVGRect> a0 = reinterpret_cast<SVGRect*>(rect);
+    RefPtr<SVGElement> a1 = reference_element ? dynamicDowncast<SVGElement>(*nodeOf(reference_element)) : nullptr;
+    if (reference_element && !a1)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getIntersectionList(HandleArg<SVGRect> { a0.get() }, a1.get()); }, [&](auto&& value) { return storeHandle<NodeList>(value, result); });
+}
+
+// SVGSVGElement.getEnclosureList(SVGRect rect, SVGElement? referenceElement) -> NodeList; reference_element may be NULL; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_get_enclosure_list(RvNode* target, RvSVGRect* rect, RvNode* reference_element, RvNodeList** result)
+{
+    if (!target || !rect || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<SVGRect> a0 = reinterpret_cast<SVGRect*>(rect);
+    RefPtr<SVGElement> a1 = reference_element ? dynamicDowncast<SVGElement>(*nodeOf(reference_element)) : nullptr;
+    if (reference_element && !a1)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getEnclosureList(HandleArg<SVGRect> { a0.get() }, a1.get()); }, [&](auto&& value) { return storeHandle<NodeList>(value, result); });
+}
+
+// SVGSVGElement.checkIntersection(SVGElement element, SVGRect rect) -> boolean
+int32_t ranvier_dom_svgsvg_element_check_intersection(RvNode* target, RvNode* element, RvSVGRect* rect, int32_t* result)
+{
+    if (!target || !element || !rect || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<SVGElement> a0 = element ? dynamicDowncast<SVGElement>(*nodeOf(element)) : nullptr;
+    if (element && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<SVGRect> a1 = reinterpret_cast<SVGRect*>(rect);
+    return deliver([&]() -> decltype(auto) { return impl->checkIntersection(HandleArg<SVGElement> { a0.get() }, HandleArg<SVGRect> { a1.get() }); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGSVGElement.checkEnclosure(SVGElement element, SVGRect rect) -> boolean
+int32_t ranvier_dom_svgsvg_element_check_enclosure(RvNode* target, RvNode* element, RvSVGRect* rect, int32_t* result)
+{
+    if (!target || !element || !rect || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<SVGElement> a0 = element ? dynamicDowncast<SVGElement>(*nodeOf(element)) : nullptr;
+    if (element && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<SVGRect> a1 = reinterpret_cast<SVGRect*>(rect);
+    return deliver([&]() -> decltype(auto) { return impl->checkEnclosure(HandleArg<SVGElement> { a0.get() }, HandleArg<SVGRect> { a1.get() }); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGSVGElement.deselectAll() -> undefined
+int32_t ranvier_dom_svgsvg_element_deselect_all(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->deselectAll(); });
+}
+
+// SVGSVGElement.createSVGNumber() -> SVGNumber; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_create_svg_number(RvNode* target, RvSVGNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createSVGNumber(); }, [&](auto&& value) { return storeHandle<SVGNumber>(value, result); });
+}
+
+// SVGSVGElement.createSVGLength() -> SVGLength; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_create_svg_length(RvNode* target, RvSVGLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createSVGLength(); }, [&](auto&& value) { return storeHandle<SVGLength>(value, result); });
+}
+
+// SVGSVGElement.createSVGAngle() -> SVGAngle; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_create_svg_angle(RvNode* target, RvSVGAngle** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createSVGAngle(); }, [&](auto&& value) { return storeHandle<SVGAngle>(value, result); });
+}
+
+// SVGSVGElement.createSVGPoint() -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_create_svg_point(RvNode* target, RvSVGPoint** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createSVGPoint(); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGSVGElement.createSVGMatrix() -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_create_svg_matrix(RvNode* target, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createSVGMatrix(); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGSVGElement.createSVGRect() -> SVGRect; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_create_svg_rect(RvNode* target, RvSVGRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createSVGRect(); }, [&](auto&& value) { return storeHandle<SVGRect>(value, result); });
+}
+
+// SVGSVGElement.createSVGTransform() -> SVGTransform; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_create_svg_transform(RvNode* target, RvSVGTransform** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->createSVGTransform(); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGSVGElement.createSVGTransformFromMatrix(optional DOMMatrix2DInit matrix = {}) -> SVGTransform; matrix defaults to {} in IDL; matrix may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_svgsvg_element_create_svg_transform_from_matrix(RvNode* target, const RvDomDOMMatrix2DInit* matrix, RvSVGTransform** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMMatrix2DInit a0 { };
+    if (matrix) {
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, a) + sizeof(matrix->a) && matrix->a)
+            assignValue(a0.a, *matrix->a);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, b) + sizeof(matrix->b) && matrix->b)
+            assignValue(a0.b, *matrix->b);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, c) + sizeof(matrix->c) && matrix->c)
+            assignValue(a0.c, *matrix->c);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, d) + sizeof(matrix->d) && matrix->d)
+            assignValue(a0.d, *matrix->d);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, e) + sizeof(matrix->e) && matrix->e)
+            assignValue(a0.e, *matrix->e);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, f) + sizeof(matrix->f) && matrix->f)
+            assignValue(a0.f, *matrix->f);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m11) + sizeof(matrix->m11) && matrix->m11)
+            assignValue(a0.m11, *matrix->m11);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m12) + sizeof(matrix->m12) && matrix->m12)
+            assignValue(a0.m12, *matrix->m12);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m21) + sizeof(matrix->m21) && matrix->m21)
+            assignValue(a0.m21, *matrix->m21);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m22) + sizeof(matrix->m22) && matrix->m22)
+            assignValue(a0.m22, *matrix->m22);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m41) + sizeof(matrix->m41) && matrix->m41)
+            assignValue(a0.m41, *matrix->m41);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m42) + sizeof(matrix->m42) && matrix->m42)
+            assignValue(a0.m42, *matrix->m42);
+    }
+    auto matrixValidation0 = DOMMatrixReadOnly::validateAndFixup(a0);
+    if (matrixValidation0.hasException())
+        return Ranvier::recordException(matrixValidation0.releaseException());
+    a0.a = a0.m11;
+    a0.b = a0.m12;
+    a0.c = a0.m21;
+    a0.d = a0.m22;
+    a0.e = a0.m41;
+    a0.f = a0.m42;
+    return deliver([&]() -> decltype(auto) { return impl->createSVGTransformFromMatrix(std::move(a0)); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGSVGElement.getElementById(DOMString elementId) -> Element?; *result is a new reference, or NULL
+int32_t ranvier_dom_svgsvg_element_get_element_by_id(RvNode* target, const char* element_id, RvNode** result)
+{
+    if (!target || !element_id || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { element_id };
+    return deliver([&]() -> decltype(auto) { return impl->getElementById(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// SVGSVGElement.pauseAnimations() -> undefined
+int32_t ranvier_dom_svgsvg_element_pause_animations(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->pauseAnimations(); });
+}
+
+// SVGSVGElement.unpauseAnimations() -> undefined
+int32_t ranvier_dom_svgsvg_element_unpause_animations(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->unpauseAnimations(); });
+}
+
+// SVGSVGElement.animationsPaused() -> boolean
+int32_t ranvier_dom_svgsvg_element_animations_paused(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->animationsPaused(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGSVGElement.getCurrentTime() -> float
+int32_t ranvier_dom_svgsvg_element_get_current_time(RvNode* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getCurrentTime(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGSVGElement.setCurrentTime(float seconds) -> undefined
+int32_t ranvier_dom_svgsvg_element_set_current_time(RvNode* target, float seconds)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!std::isfinite(seconds))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setCurrentTime(seconds); });
+}
+
+// SVGSVGElement.suspendRedraw(unsigned long maxWaitMilliseconds) -> unsigned long
+int32_t ranvier_dom_svgsvg_element_suspend_redraw(RvNode* target, uint32_t max_wait_milliseconds, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->suspendRedraw(max_wait_milliseconds); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGSVGElement.unsuspendRedraw(unsigned long suspendHandleId) -> undefined
+int32_t ranvier_dom_svgsvg_element_unsuspend_redraw(RvNode* target, uint32_t suspend_handle_id)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->unsuspendRedraw(suspend_handle_id); });
+}
+
+// SVGSVGElement.unsuspendRedrawAll() -> undefined
+int32_t ranvier_dom_svgsvg_element_unsuspend_redraw_all(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->unsuspendRedrawAll(); });
+}
+
+// SVGSVGElement.forceRedraw() -> undefined
+int32_t ranvier_dom_svgsvg_element_force_redraw(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSVGElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->forceRedraw(); });
+}
+
+// SVGRect.x getter: attribute float x
+int32_t ranvier_dom_svg_rect_get_x(RvSVGRect* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGRect> impl = reinterpret_cast<SVGRect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGRect.x setter: attribute float x
+int32_t ranvier_dom_svg_rect_set_x(RvSVGRect* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGRect> impl = reinterpret_cast<SVGRect*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setX(value); });
+}
+
+// SVGRect.y getter: attribute float y
+int32_t ranvier_dom_svg_rect_get_y(RvSVGRect* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGRect> impl = reinterpret_cast<SVGRect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGRect.y setter: attribute float y
+int32_t ranvier_dom_svg_rect_set_y(RvSVGRect* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGRect> impl = reinterpret_cast<SVGRect*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setY(value); });
+}
+
+// SVGRect.width getter: attribute float width
+int32_t ranvier_dom_svg_rect_get_width(RvSVGRect* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGRect> impl = reinterpret_cast<SVGRect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGRect.width setter: attribute float width
+int32_t ranvier_dom_svg_rect_set_width(RvSVGRect* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGRect> impl = reinterpret_cast<SVGRect*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setWidth(value); });
+}
+
+// SVGRect.height getter: attribute float height
+int32_t ranvier_dom_svg_rect_get_height(RvSVGRect* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGRect> impl = reinterpret_cast<SVGRect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->height(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGRect.height setter: attribute float height
+int32_t ranvier_dom_svg_rect_set_height(RvSVGRect* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGRect> impl = reinterpret_cast<SVGRect*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setHeight(value); });
+}
+
+// SVGMatrix.a getter: attribute double a
+int32_t ranvier_dom_svg_matrix_get_a(RvSVGMatrix* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->a(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// SVGMatrix.a setter: attribute double a
+int32_t ranvier_dom_svg_matrix_set_a(RvSVGMatrix* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setA(value); });
+}
+
+// SVGMatrix.b getter: attribute double b
+int32_t ranvier_dom_svg_matrix_get_b(RvSVGMatrix* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->b(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// SVGMatrix.b setter: attribute double b
+int32_t ranvier_dom_svg_matrix_set_b(RvSVGMatrix* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setB(value); });
+}
+
+// SVGMatrix.c getter: attribute double c
+int32_t ranvier_dom_svg_matrix_get_c(RvSVGMatrix* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->c(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// SVGMatrix.c setter: attribute double c
+int32_t ranvier_dom_svg_matrix_set_c(RvSVGMatrix* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setC(value); });
+}
+
+// SVGMatrix.d getter: attribute double d
+int32_t ranvier_dom_svg_matrix_get_d(RvSVGMatrix* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->d(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// SVGMatrix.d setter: attribute double d
+int32_t ranvier_dom_svg_matrix_set_d(RvSVGMatrix* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setD(value); });
+}
+
+// SVGMatrix.e getter: attribute double e
+int32_t ranvier_dom_svg_matrix_get_e(RvSVGMatrix* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->e(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// SVGMatrix.e setter: attribute double e
+int32_t ranvier_dom_svg_matrix_set_e(RvSVGMatrix* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setE(value); });
+}
+
+// SVGMatrix.f getter: attribute double f
+int32_t ranvier_dom_svg_matrix_get_f(RvSVGMatrix* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->f(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// SVGMatrix.f setter: attribute double f
+int32_t ranvier_dom_svg_matrix_set_f(RvSVGMatrix* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setF(value); });
+}
+
+// SVGMatrix.multiply(SVGMatrix secondMatrix) -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_multiply(RvSVGMatrix* target, RvSVGMatrix* second_matrix, RvSVGMatrix** result)
+{
+    if (!target || !second_matrix || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    RefPtr<SVGMatrix> a0 = reinterpret_cast<SVGMatrix*>(second_matrix);
+    return deliver([&]() -> decltype(auto) { return impl->multiply(HandleArg<SVGMatrix> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.inverse() -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_inverse(RvSVGMatrix* target, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->inverse(); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.translate(float x, float y) -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_translate(RvSVGMatrix* target, float x, float y, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(x))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->translate(x, y); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.scale(float scaleFactor) -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_scale(RvSVGMatrix* target, float scale_factor, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(scale_factor))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->scale(scale_factor); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.scaleNonUniform(float scaleFactorX, float scaleFactorY) -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_scale_non_uniform(RvSVGMatrix* target, float scale_factor_x, float scale_factor_y, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(scale_factor_x))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(scale_factor_y))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->scaleNonUniform(scale_factor_x, scale_factor_y); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.rotate(float angle) -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_rotate(RvSVGMatrix* target, float angle, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(angle))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->rotate(angle); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.rotateFromVector(float x, float y) -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_rotate_from_vector(RvSVGMatrix* target, float x, float y, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(x))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->rotateFromVector(x, y); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.flipX() -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_flip_x(RvSVGMatrix* target, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->flipX(); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.flipY() -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_flip_y(RvSVGMatrix* target, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->flipY(); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.skewX(float angle) -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_skew_x(RvSVGMatrix* target, float angle, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(angle))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->skewX(angle); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGMatrix.skewY(float angle) -> SVGMatrix; *result is a new reference
+int32_t ranvier_dom_svg_matrix_skew_y(RvSVGMatrix* target, float angle, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGMatrix> impl = reinterpret_cast<SVGMatrix*>(target);
+    if (!std::isfinite(angle))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->skewY(angle); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGPoint.x getter: attribute float x
+int32_t ranvier_dom_svg_point_get_x(RvSVGPoint* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPoint> impl = reinterpret_cast<SVGPoint*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGPoint.x setter: attribute float x
+int32_t ranvier_dom_svg_point_set_x(RvSVGPoint* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPoint> impl = reinterpret_cast<SVGPoint*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setX(value); });
+}
+
+// SVGPoint.y getter: attribute float y
+int32_t ranvier_dom_svg_point_get_y(RvSVGPoint* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPoint> impl = reinterpret_cast<SVGPoint*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGPoint.y setter: attribute float y
+int32_t ranvier_dom_svg_point_set_y(RvSVGPoint* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPoint> impl = reinterpret_cast<SVGPoint*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setY(value); });
+}
+
+// SVGPoint.matrixTransform(SVGMatrix matrix) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_point_matrix_transform(RvSVGPoint* target, RvSVGMatrix* matrix, RvSVGPoint** result)
+{
+    if (!target || !matrix || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPoint> impl = reinterpret_cast<SVGPoint*>(target);
+    RefPtr<SVGMatrix> a0 = reinterpret_cast<SVGMatrix*>(matrix);
+    return deliver([&]() -> decltype(auto) { return impl->matrixTransform(HandleArg<SVGMatrix> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGAnimatedRect.baseVal getter: readonly attribute SVGRect baseVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_rect_get_base_val(RvSVGAnimatedRect* target, RvSVGRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedRect> impl = reinterpret_cast<SVGAnimatedRect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return storeHandle<SVGRect>(value, result); });
+}
+
+// SVGAnimatedRect.animVal getter: readonly attribute SVGRect animVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_rect_get_anim_val(RvSVGAnimatedRect* target, RvSVGRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedRect> impl = reinterpret_cast<SVGAnimatedRect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return storeHandle<SVGRect>(value, result); });
+}
+
+// SVGPreserveAspectRatio.align getter: attribute unsigned short align
+int32_t ranvier_dom_svg_preserve_aspect_ratio_get_align(RvSVGPreserveAspectRatio* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPreserveAspectRatio> impl = reinterpret_cast<SVGPreserveAspectRatio*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->align(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGPreserveAspectRatio.align setter: attribute unsigned short align
+int32_t ranvier_dom_svg_preserve_aspect_ratio_set_align(RvSVGPreserveAspectRatio* target, uint16_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPreserveAspectRatio> impl = reinterpret_cast<SVGPreserveAspectRatio*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setAlign(value); });
+}
+
+// SVGPreserveAspectRatio.meetOrSlice getter: attribute unsigned short meetOrSlice
+int32_t ranvier_dom_svg_preserve_aspect_ratio_get_meet_or_slice(RvSVGPreserveAspectRatio* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPreserveAspectRatio> impl = reinterpret_cast<SVGPreserveAspectRatio*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->meetOrSlice(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGPreserveAspectRatio.meetOrSlice setter: attribute unsigned short meetOrSlice
+int32_t ranvier_dom_svg_preserve_aspect_ratio_set_meet_or_slice(RvSVGPreserveAspectRatio* target, uint16_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPreserveAspectRatio> impl = reinterpret_cast<SVGPreserveAspectRatio*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setMeetOrSlice(value); });
+}
+
+// SVGAnimatedPreserveAspectRatio.baseVal getter: readonly attribute SVGPreserveAspectRatio baseVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_preserve_aspect_ratio_get_base_val(RvSVGAnimatedPreserveAspectRatio* target, RvSVGPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedPreserveAspectRatio> impl = reinterpret_cast<SVGAnimatedPreserveAspectRatio*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return storeHandle<SVGPreserveAspectRatio>(value, result); });
+}
+
+// SVGAnimatedPreserveAspectRatio.animVal getter: readonly attribute SVGPreserveAspectRatio animVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_preserve_aspect_ratio_get_anim_val(RvSVGAnimatedPreserveAspectRatio* target, RvSVGPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedPreserveAspectRatio> impl = reinterpret_cast<SVGAnimatedPreserveAspectRatio*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return storeHandle<SVGPreserveAspectRatio>(value, result); });
+}
+
+// SVGTransform.type getter: readonly attribute unsigned short type
+int32_t ranvier_dom_svg_transform_get_type(RvSVGTransform* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransform> impl = reinterpret_cast<SVGTransform*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGTransform.matrix getter: readonly attribute SVGMatrix matrix; *result is a new reference
+int32_t ranvier_dom_svg_transform_get_matrix(RvSVGTransform* target, RvSVGMatrix** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransform> impl = reinterpret_cast<SVGTransform*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->matrix(); }, [&](auto&& value) { return storeHandle<SVGMatrix>(value, result); });
+}
+
+// SVGTransform.angle getter: readonly attribute float angle
+int32_t ranvier_dom_svg_transform_get_angle(RvSVGTransform* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransform> impl = reinterpret_cast<SVGTransform*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->angle(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGTransform.setMatrix(optional DOMMatrix2DInit matrix = {}) -> undefined; matrix defaults to {} in IDL; matrix may be NULL for the IDL default
+int32_t ranvier_dom_svg_transform_set_matrix(RvSVGTransform* target, const RvDomDOMMatrix2DInit* matrix)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransform> impl = reinterpret_cast<SVGTransform*>(target);
+    DOMMatrix2DInit a0 { };
+    if (matrix) {
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, a) + sizeof(matrix->a) && matrix->a)
+            assignValue(a0.a, *matrix->a);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, b) + sizeof(matrix->b) && matrix->b)
+            assignValue(a0.b, *matrix->b);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, c) + sizeof(matrix->c) && matrix->c)
+            assignValue(a0.c, *matrix->c);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, d) + sizeof(matrix->d) && matrix->d)
+            assignValue(a0.d, *matrix->d);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, e) + sizeof(matrix->e) && matrix->e)
+            assignValue(a0.e, *matrix->e);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, f) + sizeof(matrix->f) && matrix->f)
+            assignValue(a0.f, *matrix->f);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m11) + sizeof(matrix->m11) && matrix->m11)
+            assignValue(a0.m11, *matrix->m11);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m12) + sizeof(matrix->m12) && matrix->m12)
+            assignValue(a0.m12, *matrix->m12);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m21) + sizeof(matrix->m21) && matrix->m21)
+            assignValue(a0.m21, *matrix->m21);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m22) + sizeof(matrix->m22) && matrix->m22)
+            assignValue(a0.m22, *matrix->m22);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m41) + sizeof(matrix->m41) && matrix->m41)
+            assignValue(a0.m41, *matrix->m41);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m42) + sizeof(matrix->m42) && matrix->m42)
+            assignValue(a0.m42, *matrix->m42);
+    }
+    auto matrixValidation0 = DOMMatrixReadOnly::validateAndFixup(a0);
+    if (matrixValidation0.hasException())
+        return Ranvier::recordException(matrixValidation0.releaseException());
+    a0.a = a0.m11;
+    a0.b = a0.m12;
+    a0.c = a0.m21;
+    a0.d = a0.m22;
+    a0.e = a0.m41;
+    a0.f = a0.m42;
+    return invoke([&]() -> decltype(auto) { return impl->setMatrix(std::move(a0)); });
+}
+
+// SVGTransform.setTranslate(float tx, float ty) -> undefined
+int32_t ranvier_dom_svg_transform_set_translate(RvSVGTransform* target, float tx, float ty)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransform> impl = reinterpret_cast<SVGTransform*>(target);
+    if (!std::isfinite(tx))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(ty))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setTranslate(tx, ty); });
+}
+
+// SVGTransform.setScale(float sx, float sy) -> undefined
+int32_t ranvier_dom_svg_transform_set_scale(RvSVGTransform* target, float sx, float sy)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransform> impl = reinterpret_cast<SVGTransform*>(target);
+    if (!std::isfinite(sx))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(sy))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setScale(sx, sy); });
+}
+
+// SVGTransform.setRotate(float angle, float cx, float cy) -> undefined
+int32_t ranvier_dom_svg_transform_set_rotate(RvSVGTransform* target, float angle, float cx, float cy)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransform> impl = reinterpret_cast<SVGTransform*>(target);
+    if (!std::isfinite(angle))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(cx))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(cy))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setRotate(angle, cx, cy); });
+}
+
+// SVGTransform.setSkewX(float angle) -> undefined
+int32_t ranvier_dom_svg_transform_set_skew_x(RvSVGTransform* target, float angle)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransform> impl = reinterpret_cast<SVGTransform*>(target);
+    if (!std::isfinite(angle))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setSkewX(angle); });
+}
+
+// SVGTransform.setSkewY(float angle) -> undefined
+int32_t ranvier_dom_svg_transform_set_skew_y(RvSVGTransform* target, float angle)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransform> impl = reinterpret_cast<SVGTransform*>(target);
+    if (!std::isfinite(angle))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setSkewY(angle); });
+}
+
+// SVGTransformList.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_svg_transform_list_get_length(RvSVGTransformList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGTransformList.numberOfItems getter: readonly attribute unsigned long numberOfItems
+int32_t ranvier_dom_svg_transform_list_get_number_of_items(RvSVGTransformList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->numberOfItems(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGTransformList.clear() -> undefined
+int32_t ranvier_dom_svg_transform_list_clear(RvSVGTransformList* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->clear(); });
+}
+
+// SVGTransformList.initialize(SVGTransform newItem) -> SVGTransform; *result is a new reference
+int32_t ranvier_dom_svg_transform_list_initialize(RvSVGTransformList* target, RvSVGTransform* new_item, RvSVGTransform** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    RefPtr<SVGTransform> a0 = reinterpret_cast<SVGTransform*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->initialize(HandleArg<SVGTransform> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGTransformList.getItem(unsigned long index) -> SVGTransform; *result is a new reference
+int32_t ranvier_dom_svg_transform_list_get_item(RvSVGTransformList* target, uint32_t index, RvSVGTransform** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getItem(index); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGTransformList.insertItemBefore(SVGTransform newItem, unsigned long index) -> SVGTransform; *result is a new reference
+int32_t ranvier_dom_svg_transform_list_insert_item_before(RvSVGTransformList* target, RvSVGTransform* new_item, uint32_t index, RvSVGTransform** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    RefPtr<SVGTransform> a0 = reinterpret_cast<SVGTransform*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->insertItemBefore(HandleArg<SVGTransform> { a0.get() }, index); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGTransformList.replaceItem(SVGTransform newItem, unsigned long index) -> SVGTransform; *result is a new reference
+int32_t ranvier_dom_svg_transform_list_replace_item(RvSVGTransformList* target, RvSVGTransform* new_item, uint32_t index, RvSVGTransform** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    RefPtr<SVGTransform> a0 = reinterpret_cast<SVGTransform*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->replaceItem(HandleArg<SVGTransform> { a0.get() }, index); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGTransformList.removeItem(unsigned long index) -> SVGTransform; *result is a new reference
+int32_t ranvier_dom_svg_transform_list_remove_item(RvSVGTransformList* target, uint32_t index, RvSVGTransform** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->removeItem(index); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGTransformList.appendItem(SVGTransform newItem) -> SVGTransform; *result is a new reference
+int32_t ranvier_dom_svg_transform_list_append_item(RvSVGTransformList* target, RvSVGTransform* new_item, RvSVGTransform** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    RefPtr<SVGTransform> a0 = reinterpret_cast<SVGTransform*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->appendItem(HandleArg<SVGTransform> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGTransformList.setItem(unsigned long index, SVGTransform newItem) -> undefined
+int32_t ranvier_dom_svg_transform_list_set_item(RvSVGTransformList* target, uint32_t index, RvSVGTransform* new_item)
+{
+    if (!target || !new_item)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    RefPtr<SVGTransform> a1 = reinterpret_cast<SVGTransform*>(new_item);
+    return invoke([&]() -> decltype(auto) { return impl->setItem(index, HandleArg<SVGTransform> { a1.get() }); });
+}
+
+// SVGTransformList.createSVGTransformFromMatrix(optional DOMMatrix2DInit matrix = {}) -> SVGTransform; matrix defaults to {} in IDL; matrix may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_svg_transform_list_create_svg_transform_from_matrix(RvSVGTransformList* target, const RvDomDOMMatrix2DInit* matrix, RvSVGTransform** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    DOMMatrix2DInit a0 { };
+    if (matrix) {
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, a) + sizeof(matrix->a) && matrix->a)
+            assignValue(a0.a, *matrix->a);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, b) + sizeof(matrix->b) && matrix->b)
+            assignValue(a0.b, *matrix->b);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, c) + sizeof(matrix->c) && matrix->c)
+            assignValue(a0.c, *matrix->c);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, d) + sizeof(matrix->d) && matrix->d)
+            assignValue(a0.d, *matrix->d);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, e) + sizeof(matrix->e) && matrix->e)
+            assignValue(a0.e, *matrix->e);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, f) + sizeof(matrix->f) && matrix->f)
+            assignValue(a0.f, *matrix->f);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m11) + sizeof(matrix->m11) && matrix->m11)
+            assignValue(a0.m11, *matrix->m11);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m12) + sizeof(matrix->m12) && matrix->m12)
+            assignValue(a0.m12, *matrix->m12);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m21) + sizeof(matrix->m21) && matrix->m21)
+            assignValue(a0.m21, *matrix->m21);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m22) + sizeof(matrix->m22) && matrix->m22)
+            assignValue(a0.m22, *matrix->m22);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m41) + sizeof(matrix->m41) && matrix->m41)
+            assignValue(a0.m41, *matrix->m41);
+        if (matrix->size >= offsetof(RvDomDOMMatrix2DInit, m42) + sizeof(matrix->m42) && matrix->m42)
+            assignValue(a0.m42, *matrix->m42);
+    }
+    auto matrixValidation0 = DOMMatrixReadOnly::validateAndFixup(a0);
+    if (matrixValidation0.hasException())
+        return Ranvier::recordException(matrixValidation0.releaseException());
+    a0.a = a0.m11;
+    a0.b = a0.m12;
+    a0.c = a0.m21;
+    a0.d = a0.m22;
+    a0.e = a0.m41;
+    a0.f = a0.m42;
+    return deliver([&]() -> decltype(auto) { return impl->createSVGTransformFromMatrix(std::move(a0)); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGTransformList.consolidate() -> SVGTransform?; *result is a new reference, or NULL
+int32_t ranvier_dom_svg_transform_list_consolidate(RvSVGTransformList* target, RvSVGTransform** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGTransformList> impl = reinterpret_cast<SVGTransformList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->consolidate(); }, [&](auto&& value) { return storeHandle<SVGTransform>(value, result); });
+}
+
+// SVGAnimatedTransformList.baseVal getter: readonly attribute SVGTransformList baseVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_transform_list_get_base_val(RvSVGAnimatedTransformList* target, RvSVGTransformList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedTransformList> impl = reinterpret_cast<SVGAnimatedTransformList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return storeHandle<SVGTransformList>(value, result); });
+}
+
+// SVGAnimatedTransformList.animVal getter: readonly attribute SVGTransformList animVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_transform_list_get_anim_val(RvSVGAnimatedTransformList* target, RvSVGTransformList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedTransformList> impl = reinterpret_cast<SVGAnimatedTransformList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return storeHandle<SVGTransformList>(value, result); });
+}
+
+// SVGNumber.value getter: attribute float value
+int32_t ranvier_dom_svg_number_get_value(RvSVGNumber* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumber> impl = reinterpret_cast<SVGNumber*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->valueForBindings(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGNumber.value setter: attribute float value
+int32_t ranvier_dom_svg_number_set_value(RvSVGNumber* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumber> impl = reinterpret_cast<SVGNumber*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setValueForBindings(value); });
+}
+
+// SVGLength.unitType getter: readonly attribute unsigned short unitType
+int32_t ranvier_dom_svg_length_get_unit_type(RvSVGLength* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLength> impl = reinterpret_cast<SVGLength*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->unitType(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGLength.value getter: attribute float value
+int32_t ranvier_dom_svg_length_get_value(RvSVGLength* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLength> impl = reinterpret_cast<SVGLength*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->valueForBindings(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGLength.value setter: attribute float value
+int32_t ranvier_dom_svg_length_set_value(RvSVGLength* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLength> impl = reinterpret_cast<SVGLength*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setValueForBindings(value); });
+}
+
+// SVGLength.valueInSpecifiedUnits getter: attribute float valueInSpecifiedUnits
+int32_t ranvier_dom_svg_length_get_value_in_specified_units(RvSVGLength* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLength> impl = reinterpret_cast<SVGLength*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->valueInSpecifiedUnits(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGLength.valueInSpecifiedUnits setter: attribute float valueInSpecifiedUnits
+int32_t ranvier_dom_svg_length_set_value_in_specified_units(RvSVGLength* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLength> impl = reinterpret_cast<SVGLength*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setValueInSpecifiedUnits(value); });
+}
+
+// SVGLength.valueAsString getter: attribute DOMString valueAsString
+int32_t ranvier_dom_svg_length_get_value_as_string(RvSVGLength* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLength> impl = reinterpret_cast<SVGLength*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->valueAsString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGLength.valueAsString setter: attribute DOMString valueAsString
+int32_t ranvier_dom_svg_length_set_value_as_string(RvSVGLength* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLength> impl = reinterpret_cast<SVGLength*>(target);
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setValueAsString(a0.string()); });
+}
+
+// SVGLength.newValueSpecifiedUnits(unsigned short unitType, float valueInSpecifiedUnits) -> undefined
+int32_t ranvier_dom_svg_length_new_value_specified_units(RvSVGLength* target, uint16_t unit_type, float value_in_specified_units)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLength> impl = reinterpret_cast<SVGLength*>(target);
+    if (!std::isfinite(value_in_specified_units))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->newValueSpecifiedUnits(unit_type, value_in_specified_units); });
+}
+
+// SVGLength.convertToSpecifiedUnits(unsigned short unitType) -> undefined
+int32_t ranvier_dom_svg_length_convert_to_specified_units(RvSVGLength* target, uint16_t unit_type)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLength> impl = reinterpret_cast<SVGLength*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->convertToSpecifiedUnits(unit_type); });
+}
+
+// SVGAngle.unitType getter: readonly attribute unsigned short unitType
+int32_t ranvier_dom_svg_angle_get_unit_type(RvSVGAngle* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAngle> impl = reinterpret_cast<SVGAngle*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->unitType(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGAngle.value getter: attribute float value
+int32_t ranvier_dom_svg_angle_get_value(RvSVGAngle* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAngle> impl = reinterpret_cast<SVGAngle*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->valueForBindings(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGAngle.value setter: attribute float value
+int32_t ranvier_dom_svg_angle_set_value(RvSVGAngle* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAngle> impl = reinterpret_cast<SVGAngle*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setValueForBindings(value); });
+}
+
+// SVGAngle.valueInSpecifiedUnits getter: attribute float valueInSpecifiedUnits
+int32_t ranvier_dom_svg_angle_get_value_in_specified_units(RvSVGAngle* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAngle> impl = reinterpret_cast<SVGAngle*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->valueInSpecifiedUnits(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGAngle.valueInSpecifiedUnits setter: attribute float valueInSpecifiedUnits
+int32_t ranvier_dom_svg_angle_set_value_in_specified_units(RvSVGAngle* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAngle> impl = reinterpret_cast<SVGAngle*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setValueInSpecifiedUnits(value); });
+}
+
+// SVGAngle.valueAsString getter: attribute DOMString valueAsString
+int32_t ranvier_dom_svg_angle_get_value_as_string(RvSVGAngle* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAngle> impl = reinterpret_cast<SVGAngle*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->valueAsString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGAngle.valueAsString setter: attribute DOMString valueAsString
+int32_t ranvier_dom_svg_angle_set_value_as_string(RvSVGAngle* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAngle> impl = reinterpret_cast<SVGAngle*>(target);
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setValueAsString(a0.string()); });
+}
+
+// SVGAngle.newValueSpecifiedUnits(unsigned short unitType, float valueInSpecifiedUnits) -> undefined
+int32_t ranvier_dom_svg_angle_new_value_specified_units(RvSVGAngle* target, uint16_t unit_type, float value_in_specified_units)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAngle> impl = reinterpret_cast<SVGAngle*>(target);
+    if (!std::isfinite(value_in_specified_units))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->newValueSpecifiedUnits(unit_type, value_in_specified_units); });
+}
+
+// SVGAngle.convertToSpecifiedUnits(unsigned short unitType) -> undefined
+int32_t ranvier_dom_svg_angle_convert_to_specified_units(RvSVGAngle* target, uint16_t unit_type)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAngle> impl = reinterpret_cast<SVGAngle*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->convertToSpecifiedUnits(unit_type); });
+}
+
+// SVGNumberList.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_svg_number_list_get_length(RvSVGNumberList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGNumberList.numberOfItems getter: readonly attribute unsigned long numberOfItems
+int32_t ranvier_dom_svg_number_list_get_number_of_items(RvSVGNumberList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->numberOfItems(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGNumberList.clear() -> undefined
+int32_t ranvier_dom_svg_number_list_clear(RvSVGNumberList* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->clear(); });
+}
+
+// SVGNumberList.initialize(SVGNumber newItem) -> SVGNumber; *result is a new reference
+int32_t ranvier_dom_svg_number_list_initialize(RvSVGNumberList* target, RvSVGNumber* new_item, RvSVGNumber** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    RefPtr<SVGNumber> a0 = reinterpret_cast<SVGNumber*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->initialize(HandleArg<SVGNumber> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGNumber>(value, result); });
+}
+
+// SVGNumberList.getItem(unsigned long index) -> SVGNumber; *result is a new reference
+int32_t ranvier_dom_svg_number_list_get_item(RvSVGNumberList* target, uint32_t index, RvSVGNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getItem(index); }, [&](auto&& value) { return storeHandle<SVGNumber>(value, result); });
+}
+
+// SVGNumberList.insertItemBefore(SVGNumber newItem, unsigned long index) -> SVGNumber; *result is a new reference
+int32_t ranvier_dom_svg_number_list_insert_item_before(RvSVGNumberList* target, RvSVGNumber* new_item, uint32_t index, RvSVGNumber** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    RefPtr<SVGNumber> a0 = reinterpret_cast<SVGNumber*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->insertItemBefore(HandleArg<SVGNumber> { a0.get() }, index); }, [&](auto&& value) { return storeHandle<SVGNumber>(value, result); });
+}
+
+// SVGNumberList.replaceItem(SVGNumber newItem, unsigned long index) -> SVGNumber; *result is a new reference
+int32_t ranvier_dom_svg_number_list_replace_item(RvSVGNumberList* target, RvSVGNumber* new_item, uint32_t index, RvSVGNumber** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    RefPtr<SVGNumber> a0 = reinterpret_cast<SVGNumber*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->replaceItem(HandleArg<SVGNumber> { a0.get() }, index); }, [&](auto&& value) { return storeHandle<SVGNumber>(value, result); });
+}
+
+// SVGNumberList.removeItem(unsigned long index) -> SVGNumber; *result is a new reference
+int32_t ranvier_dom_svg_number_list_remove_item(RvSVGNumberList* target, uint32_t index, RvSVGNumber** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->removeItem(index); }, [&](auto&& value) { return storeHandle<SVGNumber>(value, result); });
+}
+
+// SVGNumberList.appendItem(SVGNumber newItem) -> SVGNumber; *result is a new reference
+int32_t ranvier_dom_svg_number_list_append_item(RvSVGNumberList* target, RvSVGNumber* new_item, RvSVGNumber** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    RefPtr<SVGNumber> a0 = reinterpret_cast<SVGNumber*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->appendItem(HandleArg<SVGNumber> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGNumber>(value, result); });
+}
+
+// SVGNumberList.setItem(unsigned long index, SVGNumber newItem) -> undefined
+int32_t ranvier_dom_svg_number_list_set_item(RvSVGNumberList* target, uint32_t index, RvSVGNumber* new_item)
+{
+    if (!target || !new_item)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGNumberList> impl = reinterpret_cast<SVGNumberList*>(target);
+    RefPtr<SVGNumber> a1 = reinterpret_cast<SVGNumber*>(new_item);
+    return invoke([&]() -> decltype(auto) { return impl->setItem(index, HandleArg<SVGNumber> { a1.get() }); });
+}
+
+// SVGLengthList.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_svg_length_list_get_length(RvSVGLengthList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGLengthList.numberOfItems getter: readonly attribute unsigned long numberOfItems
+int32_t ranvier_dom_svg_length_list_get_number_of_items(RvSVGLengthList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->numberOfItems(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGLengthList.clear() -> undefined
+int32_t ranvier_dom_svg_length_list_clear(RvSVGLengthList* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->clear(); });
+}
+
+// SVGLengthList.initialize(SVGLength newItem) -> SVGLength; *result is a new reference
+int32_t ranvier_dom_svg_length_list_initialize(RvSVGLengthList* target, RvSVGLength* new_item, RvSVGLength** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    RefPtr<SVGLength> a0 = reinterpret_cast<SVGLength*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->initialize(HandleArg<SVGLength> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGLength>(value, result); });
+}
+
+// SVGLengthList.getItem(unsigned long index) -> SVGLength; *result is a new reference
+int32_t ranvier_dom_svg_length_list_get_item(RvSVGLengthList* target, uint32_t index, RvSVGLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getItem(index); }, [&](auto&& value) { return storeHandle<SVGLength>(value, result); });
+}
+
+// SVGLengthList.insertItemBefore(SVGLength newItem, unsigned long index) -> SVGLength; *result is a new reference
+int32_t ranvier_dom_svg_length_list_insert_item_before(RvSVGLengthList* target, RvSVGLength* new_item, uint32_t index, RvSVGLength** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    RefPtr<SVGLength> a0 = reinterpret_cast<SVGLength*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->insertItemBefore(HandleArg<SVGLength> { a0.get() }, index); }, [&](auto&& value) { return storeHandle<SVGLength>(value, result); });
+}
+
+// SVGLengthList.replaceItem(SVGLength newItem, unsigned long index) -> SVGLength; *result is a new reference
+int32_t ranvier_dom_svg_length_list_replace_item(RvSVGLengthList* target, RvSVGLength* new_item, uint32_t index, RvSVGLength** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    RefPtr<SVGLength> a0 = reinterpret_cast<SVGLength*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->replaceItem(HandleArg<SVGLength> { a0.get() }, index); }, [&](auto&& value) { return storeHandle<SVGLength>(value, result); });
+}
+
+// SVGLengthList.removeItem(unsigned long index) -> SVGLength; *result is a new reference
+int32_t ranvier_dom_svg_length_list_remove_item(RvSVGLengthList* target, uint32_t index, RvSVGLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->removeItem(index); }, [&](auto&& value) { return storeHandle<SVGLength>(value, result); });
+}
+
+// SVGLengthList.appendItem(SVGLength newItem) -> SVGLength; *result is a new reference
+int32_t ranvier_dom_svg_length_list_append_item(RvSVGLengthList* target, RvSVGLength* new_item, RvSVGLength** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    RefPtr<SVGLength> a0 = reinterpret_cast<SVGLength*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->appendItem(HandleArg<SVGLength> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGLength>(value, result); });
+}
+
+// SVGLengthList.setItem(unsigned long index, SVGLength newItem) -> undefined
+int32_t ranvier_dom_svg_length_list_set_item(RvSVGLengthList* target, uint32_t index, RvSVGLength* new_item)
+{
+    if (!target || !new_item)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGLengthList> impl = reinterpret_cast<SVGLengthList*>(target);
+    RefPtr<SVGLength> a1 = reinterpret_cast<SVGLength*>(new_item);
+    return invoke([&]() -> decltype(auto) { return impl->setItem(index, HandleArg<SVGLength> { a1.get() }); });
+}
+
+// SVGPointList.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_svg_point_list_get_length(RvSVGPointList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGPointList.numberOfItems getter: readonly attribute unsigned long numberOfItems
+int32_t ranvier_dom_svg_point_list_get_number_of_items(RvSVGPointList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->numberOfItems(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGPointList.clear() -> undefined
+int32_t ranvier_dom_svg_point_list_clear(RvSVGPointList* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->clear(); });
+}
+
+// SVGPointList.initialize(SVGPoint newItem) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_point_list_initialize(RvSVGPointList* target, RvSVGPoint* new_item, RvSVGPoint** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    RefPtr<SVGPoint> a0 = reinterpret_cast<SVGPoint*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->initialize(HandleArg<SVGPoint> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGPointList.getItem(unsigned long index) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_point_list_get_item(RvSVGPointList* target, uint32_t index, RvSVGPoint** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getItem(index); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGPointList.insertItemBefore(SVGPoint newItem, unsigned long index) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_point_list_insert_item_before(RvSVGPointList* target, RvSVGPoint* new_item, uint32_t index, RvSVGPoint** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    RefPtr<SVGPoint> a0 = reinterpret_cast<SVGPoint*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->insertItemBefore(HandleArg<SVGPoint> { a0.get() }, index); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGPointList.replaceItem(SVGPoint newItem, unsigned long index) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_point_list_replace_item(RvSVGPointList* target, RvSVGPoint* new_item, uint32_t index, RvSVGPoint** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    RefPtr<SVGPoint> a0 = reinterpret_cast<SVGPoint*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->replaceItem(HandleArg<SVGPoint> { a0.get() }, index); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGPointList.removeItem(unsigned long index) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_point_list_remove_item(RvSVGPointList* target, uint32_t index, RvSVGPoint** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->removeItem(index); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGPointList.appendItem(SVGPoint newItem) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_point_list_append_item(RvSVGPointList* target, RvSVGPoint* new_item, RvSVGPoint** result)
+{
+    if (!target || !new_item || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    RefPtr<SVGPoint> a0 = reinterpret_cast<SVGPoint*>(new_item);
+    return deliver([&]() -> decltype(auto) { return impl->appendItem(HandleArg<SVGPoint> { a0.get() }); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGPointList.setItem(unsigned long index, SVGPoint newItem) -> undefined
+int32_t ranvier_dom_svg_point_list_set_item(RvSVGPointList* target, uint32_t index, RvSVGPoint* new_item)
+{
+    if (!target || !new_item)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGPointList> impl = reinterpret_cast<SVGPointList*>(target);
+    RefPtr<SVGPoint> a1 = reinterpret_cast<SVGPoint*>(new_item);
+    return invoke([&]() -> decltype(auto) { return impl->setItem(index, HandleArg<SVGPoint> { a1.get() }); });
+}
+
+// SVGAnimatedNumber.baseVal getter: attribute float baseVal
+int32_t ranvier_dom_svg_animated_number_get_base_val(RvSVGAnimatedNumber* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedNumber> impl = reinterpret_cast<SVGAnimatedNumber*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGAnimatedNumber.baseVal setter: attribute float baseVal
+int32_t ranvier_dom_svg_animated_number_set_base_val(RvSVGAnimatedNumber* target, float value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedNumber> impl = reinterpret_cast<SVGAnimatedNumber*>(target);
+    if (!std::isfinite(value))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setBaseVal(value); });
+}
+
+// SVGAnimatedNumber.animVal getter: readonly attribute float animVal
+int32_t ranvier_dom_svg_animated_number_get_anim_val(RvSVGAnimatedNumber* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedNumber> impl = reinterpret_cast<SVGAnimatedNumber*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGAnimatedLength.baseVal getter: readonly attribute SVGLength baseVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_length_get_base_val(RvSVGAnimatedLength* target, RvSVGLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedLength> impl = reinterpret_cast<SVGAnimatedLength*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return storeHandle<SVGLength>(value, result); });
+}
+
+// SVGAnimatedLength.animVal getter: readonly attribute SVGLength animVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_length_get_anim_val(RvSVGAnimatedLength* target, RvSVGLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedLength> impl = reinterpret_cast<SVGAnimatedLength*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return storeHandle<SVGLength>(value, result); });
+}
+
+// SVGAnimatedLengthList.baseVal getter: readonly attribute SVGLengthList baseVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_length_list_get_base_val(RvSVGAnimatedLengthList* target, RvSVGLengthList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedLengthList> impl = reinterpret_cast<SVGAnimatedLengthList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return storeHandle<SVGLengthList>(value, result); });
+}
+
+// SVGAnimatedLengthList.animVal getter: readonly attribute SVGLengthList animVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_length_list_get_anim_val(RvSVGAnimatedLengthList* target, RvSVGLengthList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedLengthList> impl = reinterpret_cast<SVGAnimatedLengthList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return storeHandle<SVGLengthList>(value, result); });
+}
+
+// SVGAnimatedNumberList.baseVal getter: readonly attribute SVGNumberList baseVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_number_list_get_base_val(RvSVGAnimatedNumberList* target, RvSVGNumberList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedNumberList> impl = reinterpret_cast<SVGAnimatedNumberList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return storeHandle<SVGNumberList>(value, result); });
+}
+
+// SVGAnimatedNumberList.animVal getter: readonly attribute SVGNumberList animVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_number_list_get_anim_val(RvSVGAnimatedNumberList* target, RvSVGNumberList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedNumberList> impl = reinterpret_cast<SVGAnimatedNumberList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return storeHandle<SVGNumberList>(value, result); });
+}
+
+// SVGAnimatedEnumeration.baseVal getter: attribute unsigned short baseVal
+int32_t ranvier_dom_svg_animated_enumeration_get_base_val(RvSVGAnimatedEnumeration* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedEnumeration> impl = reinterpret_cast<SVGAnimatedEnumeration*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGAnimatedEnumeration.baseVal setter: attribute unsigned short baseVal
+int32_t ranvier_dom_svg_animated_enumeration_set_base_val(RvSVGAnimatedEnumeration* target, uint16_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedEnumeration> impl = reinterpret_cast<SVGAnimatedEnumeration*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setBaseVal(value); });
+}
+
+// SVGAnimatedEnumeration.animVal getter: readonly attribute unsigned short animVal
+int32_t ranvier_dom_svg_animated_enumeration_get_anim_val(RvSVGAnimatedEnumeration* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedEnumeration> impl = reinterpret_cast<SVGAnimatedEnumeration*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGAnimatedString.baseVal getter: attribute (DOMString or TrustedScriptURL) baseVal
+int32_t ranvier_dom_svg_animated_string_get_base_val(RvSVGAnimatedString* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedString> impl = reinterpret_cast<SVGAnimatedString*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGAnimatedString.baseVal setter: attribute (DOMString or TrustedScriptURL) baseVal
+int32_t ranvier_dom_svg_animated_string_set_base_val(RvSVGAnimatedString* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedString> impl = reinterpret_cast<SVGAnimatedString*>(target);
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setBaseVal(a0.string()); });
+}
+
+// SVGAnimatedString.animVal getter: readonly attribute DOMString animVal
+int32_t ranvier_dom_svg_animated_string_get_anim_val(RvSVGAnimatedString* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedString> impl = reinterpret_cast<SVGAnimatedString*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGAnimatedBoolean.baseVal getter: attribute boolean baseVal
+int32_t ranvier_dom_svg_animated_boolean_get_base_val(RvSVGAnimatedBoolean* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedBoolean> impl = reinterpret_cast<SVGAnimatedBoolean*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGAnimatedBoolean.baseVal setter: attribute boolean baseVal
+int32_t ranvier_dom_svg_animated_boolean_set_base_val(RvSVGAnimatedBoolean* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedBoolean> impl = reinterpret_cast<SVGAnimatedBoolean*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setBaseVal(!!value); });
+}
+
+// SVGAnimatedBoolean.animVal getter: readonly attribute boolean animVal
+int32_t ranvier_dom_svg_animated_boolean_get_anim_val(RvSVGAnimatedBoolean* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedBoolean> impl = reinterpret_cast<SVGAnimatedBoolean*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGStringList.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_svg_string_list_get_length(RvSVGStringList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGStringList.numberOfItems getter: readonly attribute unsigned long numberOfItems
+int32_t ranvier_dom_svg_string_list_get_number_of_items(RvSVGStringList* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->numberOfItems(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// SVGStringList.clear() -> undefined
+int32_t ranvier_dom_svg_string_list_clear(RvSVGStringList* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->clear(); });
+}
+
+// SVGStringList.initialize(DOMString newItem) -> DOMString
+int32_t ranvier_dom_svg_string_list_initialize(RvSVGStringList* target, const char* new_item, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !new_item || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    StringArg a0 { new_item };
+    return deliver([&]() -> decltype(auto) { return impl->initialize(a0.string()); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGStringList.getItem(unsigned long index) -> DOMString
+int32_t ranvier_dom_svg_string_list_get_item(RvSVGStringList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getItem(index); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGStringList.insertItemBefore(DOMString newItem, unsigned long index) -> DOMString
+int32_t ranvier_dom_svg_string_list_insert_item_before(RvSVGStringList* target, const char* new_item, uint32_t index, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !new_item || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    StringArg a0 { new_item };
+    return deliver([&]() -> decltype(auto) { return impl->insertItemBefore(a0.string(), index); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGStringList.replaceItem(DOMString newItem, unsigned long index) -> DOMString
+int32_t ranvier_dom_svg_string_list_replace_item(RvSVGStringList* target, const char* new_item, uint32_t index, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !new_item || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    StringArg a0 { new_item };
+    return deliver([&]() -> decltype(auto) { return impl->replaceItem(a0.string(), index); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGStringList.removeItem(unsigned long index) -> DOMString
+int32_t ranvier_dom_svg_string_list_remove_item(RvSVGStringList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->removeItem(index); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGStringList.appendItem(DOMString newItem) -> DOMString
+int32_t ranvier_dom_svg_string_list_append_item(RvSVGStringList* target, const char* new_item, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !new_item || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    StringArg a0 { new_item };
+    return deliver([&]() -> decltype(auto) { return impl->appendItem(a0.string()); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGStringList.setItem(unsigned long index, DOMString newItem) -> undefined
+int32_t ranvier_dom_svg_string_list_set_item(RvSVGStringList* target, uint32_t index, const char* new_item)
+{
+    if (!target || !new_item)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGStringList> impl = reinterpret_cast<SVGStringList*>(target);
+    StringArg a1 { new_item };
+    return invoke([&]() -> decltype(auto) { return impl->setItem(index, a1.string()); });
+}
+
+// SVGViewSpec.transform getter: readonly attribute SVGTransformList transform; *result is a new reference
+int32_t ranvier_dom_svg_view_spec_get_transform(RvSVGViewSpec* target, RvSVGTransformList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGViewSpec> impl = reinterpret_cast<SVGViewSpec*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->transform(); }, [&](auto&& value) { return storeHandle<SVGTransformList>(value, result); });
+}
+
+// SVGViewSpec.viewBoxString getter: readonly attribute DOMString viewBoxString
+int32_t ranvier_dom_svg_view_spec_get_view_box_string(RvSVGViewSpec* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGViewSpec> impl = reinterpret_cast<SVGViewSpec*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->viewBoxString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGViewSpec.preserveAspectRatioString getter: readonly attribute DOMString preserveAspectRatioString
+int32_t ranvier_dom_svg_view_spec_get_preserve_aspect_ratio_string(RvSVGViewSpec* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGViewSpec> impl = reinterpret_cast<SVGViewSpec*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->preserveAspectRatioString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGViewSpec.transformString getter: readonly attribute DOMString transformString
+int32_t ranvier_dom_svg_view_spec_get_transform_string(RvSVGViewSpec* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGViewSpec> impl = reinterpret_cast<SVGViewSpec*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->transformString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGViewSpec.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference
+int32_t ranvier_dom_svg_view_spec_get_view_box(RvSVGViewSpec* target, RvSVGAnimatedRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGViewSpec> impl = reinterpret_cast<SVGViewSpec*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->viewBoxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedRect>(value, result); });
+}
+
+// SVGViewSpec.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio; *result is a new reference
+int32_t ranvier_dom_svg_view_spec_get_preserve_aspect_ratio(RvSVGViewSpec* target, RvSVGAnimatedPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGViewSpec> impl = reinterpret_cast<SVGViewSpec*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->preserveAspectRatioAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedPreserveAspectRatio>(value, result); });
+}
+
+// SVGViewSpec.zoomAndPan getter: attribute unsigned short zoomAndPan
+int32_t ranvier_dom_svg_view_spec_get_zoom_and_pan(RvSVGViewSpec* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGViewSpec> impl = reinterpret_cast<SVGViewSpec*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->zoomAndPan(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGViewSpec.zoomAndPan setter: attribute unsigned short zoomAndPan
+int32_t ranvier_dom_svg_view_spec_set_zoom_and_pan(RvSVGViewSpec* target, uint16_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGViewSpec> impl = reinterpret_cast<SVGViewSpec*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setZoomAndPan(value); });
+}
+
+// SVGAnimatedAngle.baseVal getter: readonly attribute SVGAngle baseVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_angle_get_base_val(RvSVGAnimatedAngle* target, RvSVGAngle** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedAngle> impl = reinterpret_cast<SVGAnimatedAngle*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->baseVal(); }, [&](auto&& value) { return storeHandle<SVGAngle>(value, result); });
+}
+
+// SVGAnimatedAngle.animVal getter: readonly attribute SVGAngle animVal; *result is a new reference
+int32_t ranvier_dom_svg_animated_angle_get_anim_val(RvSVGAnimatedAngle* target, RvSVGAngle** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<SVGAnimatedAngle> impl = reinterpret_cast<SVGAnimatedAngle*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->animVal(); }, [&](auto&& value) { return storeHandle<SVGAngle>(value, result); });
+}
+
+// SVGSymbolElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference
+int32_t ranvier_dom_svg_symbol_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSymbolElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->viewBoxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedRect>(value, result); });
+}
+
+// SVGSymbolElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio; *result is a new reference
+int32_t ranvier_dom_svg_symbol_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGSymbolElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->preserveAspectRatioAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedPreserveAspectRatio>(value, result); });
+}
+
+// SVGViewElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference
+int32_t ranvier_dom_svg_view_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGViewElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->viewBoxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedRect>(value, result); });
+}
+
+// SVGViewElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio; *result is a new reference
+int32_t ranvier_dom_svg_view_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGViewElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->preserveAspectRatioAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedPreserveAspectRatio>(value, result); });
+}
+
+// SVGViewElement.zoomAndPan getter: attribute unsigned short zoomAndPan
+int32_t ranvier_dom_svg_view_element_get_zoom_and_pan(RvNode* target, uint16_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGViewElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->zoomAndPan(); }, [&](auto&& value) { return store<uint16_t>(value, result); });
+}
+
+// SVGViewElement.zoomAndPan setter: attribute unsigned short zoomAndPan
+int32_t ranvier_dom_svg_view_element_set_zoom_and_pan(RvNode* target, uint16_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGViewElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setZoomAndPan(value); });
+}
+
+// SVGMarkerElement.refX getter: readonly attribute SVGAnimatedLength refX; *result is a new reference
+int32_t ranvier_dom_svg_marker_element_get_ref_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->refXAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMarkerElement.refY getter: readonly attribute SVGAnimatedLength refY; *result is a new reference
+int32_t ranvier_dom_svg_marker_element_get_ref_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->refYAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMarkerElement.markerUnits getter: readonly attribute SVGAnimatedEnumeration markerUnits; *result is a new reference
+int32_t ranvier_dom_svg_marker_element_get_marker_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->markerUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGMarkerElement.markerWidth getter: readonly attribute SVGAnimatedLength markerWidth; *result is a new reference
+int32_t ranvier_dom_svg_marker_element_get_marker_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->markerWidthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMarkerElement.markerHeight getter: readonly attribute SVGAnimatedLength markerHeight; *result is a new reference
+int32_t ranvier_dom_svg_marker_element_get_marker_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->markerHeightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGMarkerElement.orientType getter: readonly attribute SVGAnimatedEnumeration orientType; *result is a new reference
+int32_t ranvier_dom_svg_marker_element_get_orient_type(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->orientTypeAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGMarkerElement.orientAngle getter: readonly attribute SVGAnimatedAngle orientAngle; *result is a new reference
+int32_t ranvier_dom_svg_marker_element_get_orient_angle(RvNode* target, RvSVGAnimatedAngle** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->orientAngleAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedAngle>(value, result); });
+}
+
+// SVGMarkerElement.orient getter: attribute DOMString orient
+int32_t ranvier_dom_svg_marker_element_get_orient(RvNode* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->orient(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SVGMarkerElement.orient setter: attribute DOMString orient
+int32_t ranvier_dom_svg_marker_element_set_orient(RvNode* target, const char* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value };
+    return invoke([&]() -> decltype(auto) { return impl->setOrient(a0.atom()); });
+}
+
+// SVGMarkerElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference
+int32_t ranvier_dom_svg_marker_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->viewBoxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedRect>(value, result); });
+}
+
+// SVGMarkerElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio; *result is a new reference
+int32_t ranvier_dom_svg_marker_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->preserveAspectRatioAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedPreserveAspectRatio>(value, result); });
+}
+
+// SVGMarkerElement.setOrientToAuto() -> undefined
+int32_t ranvier_dom_svg_marker_element_set_orient_to_auto(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setOrientToAuto(); });
+}
+
+// SVGMarkerElement.setOrientToAngle(SVGAngle angle) -> undefined
+int32_t ranvier_dom_svg_marker_element_set_orient_to_angle(RvNode* target, RvSVGAngle* angle)
+{
+    if (!target || !angle)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGMarkerElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<SVGAngle> a0 = reinterpret_cast<SVGAngle*>(angle);
+    return invoke([&]() -> decltype(auto) { return impl->setOrientToAngle(HandleArg<SVGAngle> { a0.get() }); });
+}
+
+// SVGPatternElement.patternUnits getter: readonly attribute SVGAnimatedEnumeration patternUnits; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_pattern_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->patternUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGPatternElement.patternContentUnits getter: readonly attribute SVGAnimatedEnumeration patternContentUnits; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_pattern_content_units(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->patternContentUnitsAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGPatternElement.patternTransform getter: readonly attribute SVGAnimatedTransformList patternTransform; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_pattern_transform(RvNode* target, RvSVGAnimatedTransformList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->patternTransformAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedTransformList>(value, result); });
+}
+
+// SVGPatternElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_x(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGPatternElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_y(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGPatternElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_width(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->widthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGPatternElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_height(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->heightAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGPatternElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->viewBoxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedRect>(value, result); });
+}
+
+// SVGPatternElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->preserveAspectRatioAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedPreserveAspectRatio>(value, result); });
+}
+
+// SVGPatternElement.requiredExtensions getter: readonly attribute SVGStringList requiredExtensions; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_required_extensions(RvNode* target, RvSVGStringList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->requiredExtensions(); }, [&](auto&& value) { return storeHandle<SVGStringList>(value, result); });
+}
+
+// SVGPatternElement.systemLanguage getter: readonly attribute SVGStringList systemLanguage; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_system_language(RvNode* target, RvSVGStringList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->systemLanguage(); }, [&](auto&& value) { return storeHandle<SVGStringList>(value, result); });
+}
+
+// SVGPatternElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference
+int32_t ranvier_dom_svg_pattern_element_get_href(RvNode* target, RvSVGAnimatedString** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGPatternElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->hrefAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedString>(value, result); });
+}
+
+// SVGTextContentElement.textLength getter: readonly attribute SVGAnimatedLength textLength; *result is a new reference
+int32_t ranvier_dom_svg_text_content_element_get_text_length(RvNode* target, RvSVGAnimatedLength** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->textLengthAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLength>(value, result); });
+}
+
+// SVGTextContentElement.lengthAdjust getter: readonly attribute SVGAnimatedEnumeration lengthAdjust; *result is a new reference
+int32_t ranvier_dom_svg_text_content_element_get_length_adjust(RvNode* target, RvSVGAnimatedEnumeration** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->lengthAdjustAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedEnumeration>(value, result); });
+}
+
+// SVGTextContentElement.getNumberOfChars() -> long
+int32_t ranvier_dom_svg_text_content_element_get_number_of_chars(RvNode* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getNumberOfChars(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGTextContentElement.getComputedTextLength() -> float
+int32_t ranvier_dom_svg_text_content_element_get_computed_text_length(RvNode* target, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getComputedTextLength(); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGTextContentElement.getSubStringLength(unsigned long charnum, unsigned long nchars) -> float
+int32_t ranvier_dom_svg_text_content_element_get_sub_string_length(RvNode* target, uint32_t charnum, uint32_t nchars, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getSubStringLength(charnum, nchars); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGTextContentElement.getStartPositionOfChar(unsigned long charnum) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_text_content_element_get_start_position_of_char(RvNode* target, uint32_t charnum, RvSVGPoint** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getStartPositionOfChar(charnum); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGTextContentElement.getEndPositionOfChar(unsigned long charnum) -> SVGPoint; *result is a new reference
+int32_t ranvier_dom_svg_text_content_element_get_end_position_of_char(RvNode* target, uint32_t charnum, RvSVGPoint** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getEndPositionOfChar(charnum); }, [&](auto&& value) { return storeHandle<SVGPoint>(value, result); });
+}
+
+// SVGTextContentElement.getExtentOfChar(unsigned long charnum) -> SVGRect; *result is a new reference
+int32_t ranvier_dom_svg_text_content_element_get_extent_of_char(RvNode* target, uint32_t charnum, RvSVGRect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getExtentOfChar(charnum); }, [&](auto&& value) { return storeHandle<SVGRect>(value, result); });
+}
+
+// SVGTextContentElement.getRotationOfChar(unsigned long charnum) -> float
+int32_t ranvier_dom_svg_text_content_element_get_rotation_of_char(RvNode* target, uint32_t charnum, float* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getRotationOfChar(charnum); }, [&](auto&& value) { return store<float>(value, result); });
+}
+
+// SVGTextContentElement.getCharNumAtPosition(optional DOMPointInit point = {}) -> long; point defaults to {} in IDL; point may be NULL for the IDL default
+int32_t ranvier_dom_svg_text_content_element_get_char_num_at_position(RvNode* target, const RvDomDOMPointInit* point, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMPointInit a0 { };
+    if (point) {
+        if (point->size >= offsetof(RvDomDOMPointInit, x) + sizeof(point->x))
+            assignValue(a0.x, point->x);
+        if (point->size >= offsetof(RvDomDOMPointInit, y) + sizeof(point->y))
+            assignValue(a0.y, point->y);
+        if (point->size >= offsetof(RvDomDOMPointInit, z) + sizeof(point->z))
+            assignValue(a0.z, point->z);
+        if (point->size >= offsetof(RvDomDOMPointInit, w) + sizeof(point->w))
+            assignValue(a0.w, point->w);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->getCharNumAtPosition(std::move(a0)); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// SVGTextContentElement.selectSubString(unsigned long charnum, unsigned long nchars) -> undefined
+int32_t ranvier_dom_svg_text_content_element_select_sub_string(RvNode* target, uint32_t charnum, uint32_t nchars)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextContentElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->selectSubString(charnum, nchars); });
+}
+
+// SVGTextPositioningElement.x getter: readonly attribute SVGAnimatedLengthList x; *result is a new reference
+int32_t ranvier_dom_svg_text_positioning_element_get_x(RvNode* target, RvSVGAnimatedLengthList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextPositioningElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->xAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLengthList>(value, result); });
+}
+
+// SVGTextPositioningElement.y getter: readonly attribute SVGAnimatedLengthList y; *result is a new reference
+int32_t ranvier_dom_svg_text_positioning_element_get_y(RvNode* target, RvSVGAnimatedLengthList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextPositioningElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->yAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLengthList>(value, result); });
+}
+
+// SVGTextPositioningElement.dx getter: readonly attribute SVGAnimatedLengthList dx; *result is a new reference
+int32_t ranvier_dom_svg_text_positioning_element_get_dx(RvNode* target, RvSVGAnimatedLengthList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextPositioningElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dxAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLengthList>(value, result); });
+}
+
+// SVGTextPositioningElement.dy getter: readonly attribute SVGAnimatedLengthList dy; *result is a new reference
+int32_t ranvier_dom_svg_text_positioning_element_get_dy(RvNode* target, RvSVGAnimatedLengthList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextPositioningElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dyAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedLengthList>(value, result); });
+}
+
+// SVGTextPositioningElement.rotate getter: readonly attribute SVGAnimatedNumberList rotate; *result is a new reference
+int32_t ranvier_dom_svg_text_positioning_element_get_rotate(RvNode* target, RvSVGAnimatedNumberList** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SVGTextPositioningElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->rotateAnimated(); }, [&](auto&& value) { return storeHandle<SVGAnimatedNumberList>(value, result); });
 }
 
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
