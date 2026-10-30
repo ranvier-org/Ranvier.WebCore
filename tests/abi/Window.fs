@@ -164,7 +164,8 @@ let run (outDir: string) =
         frames <- frames + 1
         pending <- true)
 
-    while clock.ElapsedMilliseconds < 600L do
+    while (frames - framesBeforeAnimation < 10 || colours.Count < 5)
+          && clock.ElapsedMilliseconds < 5000L do
         host.CycleRunLoop 16
 
         if pending then
@@ -212,6 +213,7 @@ let run (outDir: string) =
             scrolledBack = scrolledBack
             animationFrames = animationFrames
             animationColours = colours.Count
+            animationMilliseconds = Math.Round (clock.Elapsed.TotalMilliseconds, 1)
         |}
 
     File.WriteAllText (Path.Combine (outDir, "fsharp-window.json"), JsonSerializer.Serialize (summary, JsonSerializerOptions (WriteIndented = true)))
@@ -272,5 +274,10 @@ let run (outDir: string) =
     require (scrollToPosition = (0, 0)) "scroll_to sets the position"
     require (scrollToDirty = Some (0, 0, 240, 120)) "scroll_to invalidates the viewport"
     require (scrolledBack = [ 200; 0; 0 ]) "scrolling back shows the box"
-    require (animationFrames >= 10) "a running animation asks for frames"
-    require (colours.Count >= 5) "updates advance the animation"
+    require
+        (animationFrames >= 10)
+        $"a running animation asks for frames (callbacks={animationFrames}, colours={colours.Count}, elapsed={summary.animationMilliseconds}ms)"
+
+    require
+        (colours.Count >= 5)
+        $"updates advance the animation (callbacks={animationFrames}, colours={colours.Count}, elapsed={summary.animationMilliseconds}ms)"

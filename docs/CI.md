@@ -83,7 +83,11 @@ Creating the release pushes its tag, and the tag's run of this workflow:
 - `prebuilt` downloads the package on a clean runner of its platform and runs `smoke.py` on it. The
   manifest must name the tag's commit, from a clean tree, and the tag's version. Loading on clean
   runners also catches a library the package lacks that the workstation happened to have.
-- `native` builds the other runtimes as usual, and `publish` pushes every package that passed.
+- `native` builds the other runtimes as usual. `publish` requires every selected runtime and the
+  package-contract gate to pass before pushing any package. A full slim release also requires the paired
+  managed interop and aggregate packages; a manual slim subset can build artifacts but cannot publish a
+  partial cohort. Explicit GPU and lean runs retain their selected-runtime gate without rebuilding the
+  managed cohort.
 
 A tag pushed without a release builds every runtime in CI, as before. A package built on a workstation
 records `"builder": "local"` in the `source` field of its `manifest.json`; CI's record `"ci"`.
