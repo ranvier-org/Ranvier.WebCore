@@ -59,6 +59,69 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_selected_restricted_numeric_union_inputs_reject_nonfinite_values_without_restricting_geometry(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSNumericValue {};
+typedef (double or CSSNumericValue) CSSNumberish;
+typedef (unrestricted double or CSSNumericValue) GeometryNumberish;
+partial interface Node {
+    undefined restricted(CSSNumberish value);
+    undefined unrestricted(GeometryNumberish value);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSNumericValue']
+        config['finiteUnionInputs'] = ['DoubleOrCSSNumericValue', 'UnrestrictedDoubleOrCSSNumericValue']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {row['function']: row for row in json.loads(generator.api_model())['functions']}
+        restricted = functions['rv_dom_node_restricted']['arguments'][0]['mapping']['subtypes'][0]
+        unrestricted = functions['rv_dom_node_unrestricted']['arguments'][0]['mapping']['subtypes'][0]
+        self.assertTrue(restricted.get('finiteInput', False))
+        self.assertNotIn('finiteInput', unrestricted)
+        glue = generator.glue()
+        self.assertEqual(glue.count('!std::isfinite(source->arm0)'), 1)
+        self.assertIn('status = Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });', glue)
+
+    def test_selected_perspective_typedef_flattens_nested_union_for_cpp_and_shared_contracts(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface CSSNumericValue : CSSStyleValue {};
+interface CSSOMKeywordValue : CSSStyleValue {};
+typedef (DOMString or CSSOMKeywordValue) CSSOMKeywordish;
+typedef (CSSNumericValue or CSSOMKeywordish) CSSPerspectiveValue;
+interface CSSTransformComponent {};
+interface CSSPerspective : CSSTransformComponent {
+    constructor(CSSPerspectiveValue length);
+    attribute CSSPerspectiveValue length;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSNumericValue', 'CSSOMKeywordValue', 'CSSTransformComponent', 'CSSPerspective']
+        config['constructors'] = {'CSSPerspective': {'receiver': 'Document', 'factory': 'CSSPerspective::create', 'passReceiver': False}}
+        config['flattenUnionTypedefs'] = ['CSSPerspectiveValue']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        factory = next(row for row in json.loads(generator.api_model())['functions'] if row['function'] == 'rv_dom_css_perspective_create')
+        mapping = factory['arguments'][0]['mapping']
+        self.assertEqual([child['kind'] for child in mapping['subtypes']], ['object', 'string', 'object'])
+        self.assertIn('Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>', generator.glue())
+        shared = generator.interfaces()
+        self.assertIn('| CSSNumericValue of CSSNumericValue', shared)
+        self.assertIn('| DOMString of string', shared)
+        self.assertIn('| CSSOMKeywordValue of CSSOMKeywordValue', shared)
+        self.assertNotIn('| DOMStringOrCSSOMKeywordValue of', shared)
+        unselected = dict(config)
+        unselected.pop('flattenUnionTypedefs')
+        untouched = domgen.World(self.source, unselected).map(domgen.idl.Type('CSSPerspectiveValue'))
+        self.assertEqual([child.kind for child in untouched.subtypes], ['object', 'union'])
+
     def test_overloaded_component_constructors_use_arity_exports_and_preserve_a_locked_plain_name(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

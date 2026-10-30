@@ -13,7 +13,7 @@ Three binding gaps remain: overloaded CSSRotate constructors need distinct expor
 ## Implementation sequence
 
 - [x] Add arity-aware constructor exports with locked-name preservation, first observing a duplicate-export regression.
-- [ ] Add selected union flattening and finite numeric arm validation with old-model compatibility checks.
+- [x] Add selected union flattening and finite numeric arm validation with old-model compatibility checks.
 - [ ] Select TransformValue, TransformComponent, Translate, Rotate, Scale, Skew, SkewX, SkewY, Perspective and MatrixComponent plus its options dictionary.
 - [ ] Verify raw typed component construction, mutation, serialization, transform list ordering and toMatrix results against a coherent private producer.
 - [ ] Add shared constructor providers and generated native wrappers; compare JIT/AOT/Chromium with exact errors and lifetime checks.
@@ -33,3 +33,11 @@ All these assertions require actual probes. This planning checkpoint claims no C
 The first regression reproduced duplicate css_rotate_create exports for the angle and axis constructors. New overloaded constructors now use arity suffixes. An exact previously locked plain C signature keeps its name, and subsequent arity-named generations remain stable. Ambiguous same-arity overloads still fail closed through the existing duplicate-export check.
 
 All 57 generator tests pass. Production generation remains unchanged at 143 interfaces and 1,875 functions because no transform component is selected yet. Independent source review found no blocker. This checkpoint is generator proof, not native component execution or C16 acceptance.
+
+## Union input primitives
+
+A regression first observed the perspective typedef as a nested two-arm union where C++ requires three flat arms. Explicitly selected typedefs now flatten into the same leaf order for native and shared contracts. Unselected union shapes remain unchanged; nullable nested unions remain unsupported rather than silently changing their meaning.
+
+A separate regression first observed missing finite-input validation for CSSNumberish. Configured restricted double/float union arms now record a TypeError before constructing the argument or calling the engine when input is NaN/infinite. Unrestricted geometry doubles are unaffected. The finiteInput model flag describes inputs only; output encoding does not discard or reject engine values.
+
+All 59 generator tests pass and production generation is still unchanged at the Native16 surface. Independent source review is clear. Component selection, compiled engine calls and shared runtime verification remain pending.

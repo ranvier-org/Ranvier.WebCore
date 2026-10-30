@@ -131,6 +131,7 @@ class Mapped:
         self.subtypes = subtypes
         self.label = label
         self.string_spans = string_spans
+        self.finite_input = False
 
     @property
     def handle(self):
@@ -316,9 +317,24 @@ class World:
         return result
 
     def resolve(self, t: idl.Type) -> idl.Type:
+        flatten = False
         while t.name in self.typedefs:
+            flatten |= t.name in self.config.get('flattenUnionTypedefs', [])
             target = self.typedefs[t.name]
             t = idl.Type(target.name, t.nullable or target.nullable, target.subtypes, {**target.attrs, **t.attrs})
+        if flatten:
+            if t.name != 'union':
+                raise Unsupported('configured union flattening requires a union typedef')
+            def leaves(children):
+                for child in children:
+                    child = self.resolve(child)
+                    if child.name == 'union':
+                        if child.nullable:
+                            raise Unsupported('configured union flattening does not support nullable nested unions')
+                        yield from leaves(child.subtypes)
+                    else:
+                        yield child
+            t = idl.Type('union', t.nullable, list(leaves(t.subtypes)), t.attrs)
         return t
 
     def string_union(self, t: idl.Type):
@@ -403,6 +419,9 @@ class World:
                 return Mapped("string", t.nullable, atom=strings)
             children = [self.map(child) for child in t.subtypes]
             label = "Or".join(type_label(self.resolve(child)) for child in t.subtypes)
+            if label in self.config.get('finiteUnionInputs', []):
+                for source, child in zip(t.subtypes, children):
+                    child.finite_input = self.resolve(source).name in ('double', 'float')
             if label in self.config.get('complexStringSpans', []):
                 for child in children:
                     if child.kind == 'string':
@@ -1494,6 +1513,8 @@ class Generator(ComplexGeneratorMixin):
         }
         if mapped.kind == 'string' and mapped.string_spans:
             result['stringTransport'] = 'utf8-lengths'
+        if mapped.finite_input:
+            result['finiteInput'] = True
         return result
 
     def api_model(self):
