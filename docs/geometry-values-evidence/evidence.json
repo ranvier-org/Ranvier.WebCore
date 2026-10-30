@@ -1,0 +1,51 @@
+{
+  "status": "private-windows-focus-only",
+  "newGeometryAssertions": 260,
+  "controlAssertions": 284,
+  "rawBaselineFailure": "Previous ABI23 producer lacks rv_dom_dom_point_create; observed AttributeError before host creation.",
+  "producerSources": {
+    "gen/domgen.py": "a37c7c0507671a28c1fd68e85c0deabe339e0a80f0e1d1a5cced518ec689836b",
+    "gen/domtypes.py": "8e2af2ff9c841fed671e1e0f7aa876481aa854253e9883e2595ca7e700342a63",
+    "gen/dom.json": "1cb50a6aeeeb2580e4a50e1834930af4940f4c9e376b958f474c1b7ffee9a914",
+    "gen/dom-api.json": "8b00c2c783014c4c24406019e9aee523a1d068f31e0f674e78e2b9d2981d94f8",
+    "host/dom/RanvierDomGlue.cpp": "c37de755fafb7649a56cd4eca4528a708daf42bf3495e9139a9c949667b53a66",
+    "host/RanvierWebCoreDom.cpp": "095f0b547f58635f5c62cd84d16b28f92aee5150adc6259b54a5a7f1b8453d44",
+    "tests/abi/geometry_values.py": "df24fa7a320af87b83633332343e022970e08a204096243b85164de015962fbc"
+  },
+  "runtime": {
+    "WebCore.dll": "87ec6abc7611b550c4b13114145487ea4b93081b68751d8294057e99bc85e418",
+    "RanvierWebCoreHost.dll": "007d505e0fa20fb34f3edc8a2a7e1bde46fa23c02fc71cdb3de44c8594be98e3",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "probes": [
+    {
+      "probe": "geometry_values",
+      "expectedAssertions": 260,
+      "exitCode": 0,
+      "log": "docs/geometry-values-evidence/geometry_values.log",
+      "sha256": "1dffd121ce5b04aa1604b066d9cb45d28013b323df6e11757247753222a24529"
+    },
+    {
+      "probe": "fragment_rectangles",
+      "expectedAssertions": 140,
+      "exitCode": 0,
+      "log": "docs/geometry-values-evidence/fragment_rectangles.log",
+      "sha256": "d39085368def0d7fdc5c4b627a7c340fcad0e868e1ce4445746765666561f2c7"
+    },
+    {
+      "probe": "style_map_entries",
+      "expectedAssertions": 144,
+      "exitCode": 0,
+      "log": "docs/geometry-values-evidence/style_map_entries.log",
+      "sha256": "35991fb9af099dd4195e00daf9d9379febb91494c88a689ad492dd8630f1d073"
+    }
+  ],
+  "unverified": [
+    "shared Core/Views providers",
+    "Chromium parity",
+    "NativeAOT geometry consumers",
+    "other native platforms",
+    "official packages",
+    "complete G07 acceptance"
+  ]
+}

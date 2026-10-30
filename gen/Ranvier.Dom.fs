@@ -2656,6 +2656,14 @@ and [<AllowNullLiteral>] DOMRectReadOnly =
 /// <summary>DOMRect in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DOMRect =
     inherit DOMRectReadOnly
+    /// <summary>DOMRect.x.</summary>
+    abstract member x: float with get, set
+    /// <summary>DOMRect.y.</summary>
+    abstract member y: float with get, set
+    /// <summary>DOMRect.width.</summary>
+    abstract member width: float with get, set
+    /// <summary>DOMRect.height.</summary>
+    abstract member height: float with get, set
 
 /// <summary>DOMRectList in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DOMRectList =
@@ -2663,6 +2671,42 @@ and [<AllowNullLiteral>] DOMRectList =
     abstract member length: uint32 with get
     /// <summary>DOMRectList.item.</summary>
     abstract member item: index: uint32 -> DOMRect
+
+/// <summary>DOMPointReadOnly in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DOMPointReadOnly =
+    /// <summary>DOMPointReadOnly.x.</summary>
+    abstract member x: float with get
+    /// <summary>DOMPointReadOnly.y.</summary>
+    abstract member y: float with get
+    /// <summary>DOMPointReadOnly.z.</summary>
+    abstract member z: float with get
+    /// <summary>DOMPointReadOnly.w.</summary>
+    abstract member w: float with get
+
+/// <summary>DOMPoint in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DOMPoint =
+    inherit DOMPointReadOnly
+    /// <summary>DOMPoint.x.</summary>
+    abstract member x: float with get, set
+    /// <summary>DOMPoint.y.</summary>
+    abstract member y: float with get, set
+    /// <summary>DOMPoint.z.</summary>
+    abstract member z: float with get, set
+    /// <summary>DOMPoint.w.</summary>
+    abstract member w: float with get, set
+
+/// <summary>DOMQuad in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DOMQuad =
+    /// <summary>DOMQuad.p1.</summary>
+    abstract member p1: DOMPoint with get
+    /// <summary>DOMQuad.p2.</summary>
+    abstract member p2: DOMPoint with get
+    /// <summary>DOMQuad.p3.</summary>
+    abstract member p3: DOMPoint with get
+    /// <summary>DOMQuad.p4.</summary>
+    abstract member p4: DOMPoint with get
+    /// <summary>DOMQuad.getBounds.</summary>
+    abstract member getBounds: unit -> DOMRect
 
 /// <summary>NodeList in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] NodeList =

@@ -45,6 +45,8 @@ typedef struct RvAbstractRange RvAbstractRange;
 typedef struct RvDOMSelection RvDOMSelection;
 typedef struct RvDOMRectReadOnly RvDOMRectReadOnly;
 typedef struct RvDOMRectList RvDOMRectList;
+typedef struct RvDOMPointReadOnly RvDOMPointReadOnly;
+typedef struct RvDOMQuad RvDOMQuad;
 typedef struct RvNodeList RvNodeList;
 typedef struct RvHTMLCollection RvHTMLCollection;
 typedef struct RvValidityState RvValidityState;
@@ -318,6 +320,16 @@ typedef struct RvDomGetComposedRangesOptions {
     const RvDomSequenceShadowRoot* shadow_roots; /* sequence<ShadowRoot>, default [] */
 } RvDomGetComposedRangesOptions;
 
+/* The IDL dictionary DOMPointInit. size is sizeof(RvDomDOMPointInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomDOMPointInit {
+    uint32_t size;
+    double x; /* unrestricted double, default 0 */
+    double y; /* unrestricted double, default 0 */
+    double z; /* unrestricted double, default 0 */
+    double w; /* unrestricted double, default 1 */
+} RvDomDOMPointInit;
+
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDOMCSSCustomPropertyDescriptor {
@@ -327,6 +339,26 @@ typedef struct RvDomDOMCSSCustomPropertyDescriptor {
     int32_t inherits; /* boolean, required */
     RvDomUtf8StringInput initial_value; /* DOMString */
 } RvDomDOMCSSCustomPropertyDescriptor;
+
+/* The IDL dictionary DOMRectInit. size is sizeof(RvDomDOMRectInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomDOMRectInit {
+    uint32_t size;
+    double x; /* unrestricted double, default 0 */
+    double y; /* unrestricted double, default 0 */
+    double width; /* unrestricted double, default 0 */
+    double height; /* unrestricted double, default 0 */
+} RvDomDOMRectInit;
+
+/* The IDL dictionary DOMQuadInit. size is sizeof(RvDomDOMQuadInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomDOMQuadInit {
+    uint32_t size;
+    const RvDomDOMPointInit* p1; /* DOMPointInit, NULL for absent */
+    const RvDomDOMPointInit* p2; /* DOMPointInit, NULL for absent */
+    const RvDomDOMPointInit* p3; /* DOMPointInit, NULL for absent */
+    const RvDomDOMPointInit* p4; /* DOMPointInit, NULL for absent */
+} RvDomDOMQuadInit;
 
 /* UTF-8 byte length; -1 is null where permitted. Compound results own data until release. */
 typedef struct RvDomUtf8StringSpan {
@@ -804,6 +836,14 @@ RV_EXPORT RvDOMRectReadOnly* rv_dom_dom_rect_read_only_retain(RvDOMRectReadOnly*
 RV_EXPORT void rv_dom_dom_rect_list_release(RvDOMRectList*);
 /* Adds a reference to a DOMRectList and returns it. */
 RV_EXPORT RvDOMRectList* rv_dom_dom_rect_list_retain(RvDOMRectList*);
+/* Releases a handle to a DOMPointReadOnly. */
+RV_EXPORT void rv_dom_dom_point_read_only_release(RvDOMPointReadOnly*);
+/* Adds a reference to a DOMPointReadOnly and returns it. */
+RV_EXPORT RvDOMPointReadOnly* rv_dom_dom_point_read_only_retain(RvDOMPointReadOnly*);
+/* Releases a handle to a DOMQuad. */
+RV_EXPORT void rv_dom_dom_quad_release(RvDOMQuad*);
+/* Adds a reference to a DOMQuad and returns it. */
+RV_EXPORT RvDOMQuad* rv_dom_dom_quad_retain(RvDOMQuad*);
 /* Releases a handle to a NodeList. */
 RV_EXPORT void rv_dom_node_list_release(RvNodeList*);
 /* Adds a reference to a NodeList and returns it. */
@@ -826,6 +866,10 @@ RV_EXPORT int32_t rv_dom_css_style_declaration_get_interface_name(RvCSSStyleDecl
 RV_EXPORT int32_t rv_dom_css_style_value_get_interface_name(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StylePropertyMapReadOnly handle; borrows target. */
 RV_EXPORT int32_t rv_dom_style_property_map_read_only_get_interface_name(RvStylePropertyMapReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
+/* Concrete scoped interface name of a DOMRectReadOnly handle; borrows target. */
+RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_interface_name(RvDOMRectReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
+/* Concrete scoped interface name of a DOMPointReadOnly handle; borrows target. */
+RV_EXPORT int32_t rv_dom_dom_point_read_only_get_interface_name(RvDOMPointReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
 
 /* Node */
 
@@ -4620,6 +4664,9 @@ RV_EXPORT int32_t rv_dom_dom_selection_to_string(RvDOMSelection* target, char* b
 RV_EXPORT int32_t rv_dom_dom_selection_modify(RvDOMSelection* target, const char* alter, const char* direction, const char* granularity);
 /* DOMRectReadOnly */
 
+/* DOMRectReadOnly.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults
+ * to 0 in IDL; width defaults to 0 in IDL; height defaults to 0 in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_rect_read_only_create(RvNode* target, double x, double y, double width, double height, RvDOMRectReadOnly** result);
 /* DOMRectReadOnly.x getter: readonly attribute unrestricted double x */
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_x(RvDOMRectReadOnly* target, double* result);
 /* DOMRectReadOnly.y getter: readonly attribute unrestricted double y */
@@ -4636,12 +4683,83 @@ RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_right(RvDOMRectReadOnly* target,
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_bottom(RvDOMRectReadOnly* target, double* result);
 /* DOMRectReadOnly.left getter: readonly attribute unrestricted double left */
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, double* result);
+/* DOMRect */
+
+/* DOMRect.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in
+ * IDL; width defaults to 0 in IDL; height defaults to 0 in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_rect_create(RvNode* target, double x, double y, double width, double height, RvDOMRectReadOnly** result);
+/* DOMRect.x getter: attribute unrestricted double x */
+RV_EXPORT int32_t rv_dom_dom_rect_get_x(RvDOMRectReadOnly* target, double* result);
+/* DOMRect.x setter: attribute unrestricted double x */
+RV_EXPORT int32_t rv_dom_dom_rect_set_x(RvDOMRectReadOnly* target, double value);
+/* DOMRect.y getter: attribute unrestricted double y */
+RV_EXPORT int32_t rv_dom_dom_rect_get_y(RvDOMRectReadOnly* target, double* result);
+/* DOMRect.y setter: attribute unrestricted double y */
+RV_EXPORT int32_t rv_dom_dom_rect_set_y(RvDOMRectReadOnly* target, double value);
+/* DOMRect.width getter: attribute unrestricted double width */
+RV_EXPORT int32_t rv_dom_dom_rect_get_width(RvDOMRectReadOnly* target, double* result);
+/* DOMRect.width setter: attribute unrestricted double width */
+RV_EXPORT int32_t rv_dom_dom_rect_set_width(RvDOMRectReadOnly* target, double value);
+/* DOMRect.height getter: attribute unrestricted double height */
+RV_EXPORT int32_t rv_dom_dom_rect_get_height(RvDOMRectReadOnly* target, double* result);
+/* DOMRect.height setter: attribute unrestricted double height */
+RV_EXPORT int32_t rv_dom_dom_rect_set_height(RvDOMRectReadOnly* target, double value);
 /* DOMRectList */
 
 /* DOMRectList.length getter: readonly attribute unsigned long length */
 RV_EXPORT int32_t rv_dom_dom_rect_list_get_length(RvDOMRectList* target, uint32_t* result);
 /* DOMRectList.item(unsigned long index) -> DOMRect?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_dom_rect_list_item(RvDOMRectList* target, uint32_t index, RvDOMRectReadOnly** result);
+/* DOMPointReadOnly */
+
+/* DOMPointReadOnly.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults
+ * to 0 in IDL; z defaults to 0 in IDL; w defaults to 1 in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_point_read_only_create(RvNode* target, double x, double y, double z, double w, RvDOMPointReadOnly** result);
+/* DOMPointReadOnly.x getter: readonly attribute unrestricted double x */
+RV_EXPORT int32_t rv_dom_dom_point_read_only_get_x(RvDOMPointReadOnly* target, double* result);
+/* DOMPointReadOnly.y getter: readonly attribute unrestricted double y */
+RV_EXPORT int32_t rv_dom_dom_point_read_only_get_y(RvDOMPointReadOnly* target, double* result);
+/* DOMPointReadOnly.z getter: readonly attribute unrestricted double z */
+RV_EXPORT int32_t rv_dom_dom_point_read_only_get_z(RvDOMPointReadOnly* target, double* result);
+/* DOMPointReadOnly.w getter: readonly attribute unrestricted double w */
+RV_EXPORT int32_t rv_dom_dom_point_read_only_get_w(RvDOMPointReadOnly* target, double* result);
+/* DOMPoint */
+
+/* DOMPoint.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in
+ * IDL; z defaults to 0 in IDL; w defaults to 1 in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_point_create(RvNode* target, double x, double y, double z, double w, RvDOMPointReadOnly** result);
+/* DOMPoint.x getter: attribute unrestricted double x */
+RV_EXPORT int32_t rv_dom_dom_point_get_x(RvDOMPointReadOnly* target, double* result);
+/* DOMPoint.x setter: attribute unrestricted double x */
+RV_EXPORT int32_t rv_dom_dom_point_set_x(RvDOMPointReadOnly* target, double value);
+/* DOMPoint.y getter: attribute unrestricted double y */
+RV_EXPORT int32_t rv_dom_dom_point_get_y(RvDOMPointReadOnly* target, double* result);
+/* DOMPoint.y setter: attribute unrestricted double y */
+RV_EXPORT int32_t rv_dom_dom_point_set_y(RvDOMPointReadOnly* target, double value);
+/* DOMPoint.z getter: attribute unrestricted double z */
+RV_EXPORT int32_t rv_dom_dom_point_get_z(RvDOMPointReadOnly* target, double* result);
+/* DOMPoint.z setter: attribute unrestricted double z */
+RV_EXPORT int32_t rv_dom_dom_point_set_z(RvDOMPointReadOnly* target, double value);
+/* DOMPoint.w getter: attribute unrestricted double w */
+RV_EXPORT int32_t rv_dom_dom_point_get_w(RvDOMPointReadOnly* target, double* result);
+/* DOMPoint.w setter: attribute unrestricted double w */
+RV_EXPORT int32_t rv_dom_dom_point_set_w(RvDOMPointReadOnly* target, double value);
+/* DOMQuad */
+
+/* DOMQuad.constructor: target is the Document of the constructed object; p1 defaults to {} in IDL; p1 may be NULL for
+ * the IDL default; p2 defaults to {} in IDL; p2 may be NULL for the IDL default; p3 defaults to {} in IDL; p3 may be
+ * NULL for the IDL default; p4 defaults to {} in IDL; p4 may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_quad_create(RvNode* target, const RvDomDOMPointInit* p1, const RvDomDOMPointInit* p2, const RvDomDOMPointInit* p3, const RvDomDOMPointInit* p4, RvDOMQuad** result);
+/* DOMQuad.p1 getter: readonly attribute DOMPoint p1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_quad_get_p1(RvDOMQuad* target, RvDOMPointReadOnly** result);
+/* DOMQuad.p2 getter: readonly attribute DOMPoint p2; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_quad_get_p2(RvDOMQuad* target, RvDOMPointReadOnly** result);
+/* DOMQuad.p3 getter: readonly attribute DOMPoint p3; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_quad_get_p3(RvDOMQuad* target, RvDOMPointReadOnly** result);
+/* DOMQuad.p4 getter: readonly attribute DOMPoint p4; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_quad_get_p4(RvDOMQuad* target, RvDOMPointReadOnly** result);
+/* DOMQuad.getBounds() -> DOMRect; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_quad_get_bounds(RvDOMQuad* target, RvDOMRectReadOnly** result);
 /* NodeList */
 
 /* NodeList.length getter: readonly attribute unsigned long length */
@@ -4891,6 +5009,34 @@ RV_EXPORT int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSS
 /* Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element
  * defaults to null in IDL; pseudo_element may be NULL (null); *result is a new reference */
 RV_EXPORT int32_t rv_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
+/* DOMRectReadOnly */
+
+/* DOMRectReadOnly.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to
+ * {} in IDL; other may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result);
+/* DOMRect */
+
+/* DOMRect.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in
+ * IDL; other may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_rect_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result);
+/* DOMPointReadOnly */
+
+/* DOMPointReadOnly.fromPoint: static operation with checked Document context and UTF-8 byte lengths; other defaults
+ * to {} in IDL; other may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_point_read_only_from_point(RvNode* target, const RvDomDOMPointInit* other, RvDOMPointReadOnly** result);
+/* DOMPoint */
+
+/* DOMPoint.fromPoint: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in
+ * IDL; other may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_point_from_point(RvNode* target, const RvDomDOMPointInit* other, RvDOMPointReadOnly** result);
+/* DOMQuad */
+
+/* DOMQuad.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in
+ * IDL; other may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_quad_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMQuad** result);
+/* DOMQuad.fromQuad: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in
+ * IDL; other may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_quad_from_quad(RvNode* target, const RvDomDOMQuadInit* other, RvDOMQuad** result);
 /* CSSStyleValue */
 
 /* CSSStyleValue.parse: static operation with checked Document context and UTF-8 byte lengths; *result is a new

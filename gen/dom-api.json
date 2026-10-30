@@ -162,6 +162,60 @@
           "name": "length"
         }
       ]
+    },
+    {
+      "root": "DOMRectReadOnly",
+      "function": "rv_dom_dom_rect_read_only_get_interface_name",
+      "feature": "dom-type-query:DOMRectReadOnly",
+      "interfaces": [
+        "DOMRect",
+        "DOMRectReadOnly"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvDOMRectReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    },
+    {
+      "root": "DOMPointReadOnly",
+      "function": "rv_dom_dom_point_read_only_get_interface_name",
+      "feature": "dom-type-query:DOMPointReadOnly",
+      "interfaces": [
+        "DOMPoint",
+        "DOMPointReadOnly"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
     }
   ],
   "interfaces": [
@@ -663,6 +717,18 @@
     },
     {
       "name": "DOMRectList",
+      "base": null
+    },
+    {
+      "name": "DOMPointReadOnly",
+      "base": null
+    },
+    {
+      "name": "DOMPoint",
+      "base": "DOMPointReadOnly"
+    },
+    {
+      "name": "DOMQuad",
       "base": null
     },
     {
@@ -1967,6 +2033,33 @@
       "mixin": false,
       "contractOnly": false,
       "source": "dom/DOMRectList.idl"
+    },
+    {
+      "name": "DOMPointReadOnly",
+      "idlName": "DOMPointReadOnly",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/DOMPointReadOnly.idl"
+    },
+    {
+      "name": "DOMPoint",
+      "idlName": "DOMPoint",
+      "base": "DOMPointReadOnly",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/DOMPoint.idl"
+    },
+    {
+      "name": "DOMQuad",
+      "idlName": "DOMQuad",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/DOMQuad.idl"
     },
     {
       "name": "NodeList",
@@ -90880,6 +90973,157 @@
     },
     {
       "interface": "DOMRectReadOnly",
+      "member": "constructor",
+      "contractOwner": "DOMRectReadOnly",
+      "kind": "constructor",
+      "function": "rv_dom_dom_rect_read_only_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "double",
+          "name": "width"
+        },
+        {
+          "ctype": "double",
+          "name": "height"
+        },
+        {
+          "ctype": "RvDOMRectReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "width",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "height",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMRectReadOnly",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMRectReadOnly",
+        "root": "DOMRectReadOnly",
+        "class": "DOMRectReadOnly",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DOMRectReadOnly"
+    },
+    {
+      "interface": "DOMRectReadOnly",
       "member": "x",
       "contractOwner": "DOMRectReadOnly",
       "kind": "getter",
@@ -91167,6 +91411,545 @@
       }
     },
     {
+      "interface": "DOMRect",
+      "member": "constructor",
+      "contractOwner": "DOMRect",
+      "kind": "constructor",
+      "function": "rv_dom_dom_rect_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "double",
+          "name": "width"
+        },
+        {
+          "ctype": "double",
+          "name": "height"
+        },
+        {
+          "ctype": "RvDOMRectReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "width",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "height",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMRect",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMRect",
+        "root": "DOMRectReadOnly",
+        "class": "DOMRect",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DOMRect"
+    },
+    {
+      "interface": "DOMRect",
+      "member": "x",
+      "contractOwner": "DOMRect",
+      "kind": "getter",
+      "function": "rv_dom_dom_rect_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMRect",
+      "member": "x",
+      "contractOwner": "DOMRect",
+      "kind": "setter",
+      "function": "rv_dom_dom_rect_set_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMRect",
+      "member": "y",
+      "contractOwner": "DOMRect",
+      "kind": "getter",
+      "function": "rv_dom_dom_rect_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMRect",
+      "member": "y",
+      "contractOwner": "DOMRect",
+      "kind": "setter",
+      "function": "rv_dom_dom_rect_set_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMRect",
+      "member": "width",
+      "contractOwner": "DOMRect",
+      "kind": "getter",
+      "function": "rv_dom_dom_rect_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMRect",
+      "member": "width",
+      "contractOwner": "DOMRect",
+      "kind": "setter",
+      "function": "rv_dom_dom_rect_set_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMRect",
+      "member": "height",
+      "contractOwner": "DOMRect",
+      "kind": "getter",
+      "function": "rv_dom_dom_rect_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMRect",
+      "member": "height",
+      "contractOwner": "DOMRect",
+      "kind": "setter",
+      "function": "rv_dom_dom_rect_set_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMRectReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMRectList",
       "member": "length",
       "contractOwner": "DOMRectList",
@@ -91263,6 +92046,1171 @@
         "enum": null,
         "label": null,
         "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPointReadOnly",
+      "member": "constructor",
+      "contractOwner": "DOMPointReadOnly",
+      "kind": "constructor",
+      "function": "rv_dom_dom_point_read_only_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "double",
+          "name": "z"
+        },
+        {
+          "ctype": "double",
+          "name": "w"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "z",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "w",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMPointReadOnly",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPointReadOnly",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPointReadOnly",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DOMPointReadOnly"
+    },
+    {
+      "interface": "DOMPointReadOnly",
+      "member": "x",
+      "contractOwner": "DOMPointReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_point_read_only_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPointReadOnly",
+      "member": "y",
+      "contractOwner": "DOMPointReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_point_read_only_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPointReadOnly",
+      "member": "z",
+      "contractOwner": "DOMPointReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_point_read_only_get_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPointReadOnly",
+      "member": "w",
+      "contractOwner": "DOMPointReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_point_read_only_get_w",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "constructor",
+      "contractOwner": "DOMPoint",
+      "kind": "constructor",
+      "function": "rv_dom_dom_point_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "double",
+          "name": "z"
+        },
+        {
+          "ctype": "double",
+          "name": "w"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "z",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "w",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMPoint",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPoint",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPoint",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DOMPoint"
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "x",
+      "contractOwner": "DOMPoint",
+      "kind": "getter",
+      "function": "rv_dom_dom_point_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "x",
+      "contractOwner": "DOMPoint",
+      "kind": "setter",
+      "function": "rv_dom_dom_point_set_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "y",
+      "contractOwner": "DOMPoint",
+      "kind": "getter",
+      "function": "rv_dom_dom_point_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "y",
+      "contractOwner": "DOMPoint",
+      "kind": "setter",
+      "function": "rv_dom_dom_point_set_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "z",
+      "contractOwner": "DOMPoint",
+      "kind": "getter",
+      "function": "rv_dom_dom_point_get_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "z",
+      "contractOwner": "DOMPoint",
+      "kind": "setter",
+      "function": "rv_dom_dom_point_set_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "w",
+      "contractOwner": "DOMPoint",
+      "kind": "getter",
+      "function": "rv_dom_dom_point_get_w",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "w",
+      "contractOwner": "DOMPoint",
+      "kind": "setter",
+      "function": "rv_dom_dom_point_set_w",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMQuad",
+      "member": "constructor",
+      "contractOwner": "DOMQuad",
+      "kind": "constructor",
+      "function": "rv_dom_dom_quad_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMPointInit*",
+          "name": "p1"
+        },
+        {
+          "ctype": "const RvDomDOMPointInit*",
+          "name": "p2"
+        },
+        {
+          "ctype": "const RvDomDOMPointInit*",
+          "name": "p3"
+        },
+        {
+          "ctype": "const RvDomDOMPointInit*",
+          "name": "p4"
+        },
+        {
+          "ctype": "RvDOMQuad**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "p1",
+          "idlType": "DOMPointInit",
+          "idl": {
+            "name": "DOMPointInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMPointInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "p2",
+          "idlType": "DOMPointInit",
+          "idl": {
+            "name": "DOMPointInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMPointInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "p3",
+          "idlType": "DOMPointInit",
+          "idl": {
+            "name": "DOMPointInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMPointInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "p4",
+          "idlType": "DOMPointInit",
+          "idl": {
+            "name": "DOMPointInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMPointInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMQuad",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMQuad",
+        "root": "DOMQuad",
+        "class": "DOMQuad",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DOMQuad"
+    },
+    {
+      "interface": "DOMQuad",
+      "member": "p1",
+      "contractOwner": "DOMQuad",
+      "kind": "getter",
+      "function": "rv_dom_dom_quad_get_p1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMQuad*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMPoint",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPoint",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPoint",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMQuad",
+      "member": "p2",
+      "contractOwner": "DOMQuad",
+      "kind": "getter",
+      "function": "rv_dom_dom_quad_get_p2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMQuad*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMPoint",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPoint",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPoint",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMQuad",
+      "member": "p3",
+      "contractOwner": "DOMQuad",
+      "kind": "getter",
+      "function": "rv_dom_dom_quad_get_p3",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMQuad*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMPoint",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPoint",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPoint",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMQuad",
+      "member": "p4",
+      "contractOwner": "DOMQuad",
+      "kind": "getter",
+      "function": "rv_dom_dom_quad_get_p4",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMQuad*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMPoint",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPoint",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPoint",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMQuad",
+      "member": "getBounds",
+      "contractOwner": "DOMQuad",
+      "kind": "operation",
+      "function": "rv_dom_dom_quad_get_bounds",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMQuad*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMRectReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMRect",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMRect",
+        "root": "DOMRectReadOnly",
+        "class": "DOMRect",
+        "enum": null,
+        "label": null,
+        "nullable": false,
         "atom": false,
         "subtypes": []
       }
@@ -95706,6 +97654,420 @@
       "stringInputs": "utf8-lengths-nullable"
     },
     {
+      "interface": "DOMRectReadOnly",
+      "member": "fromRect",
+      "contractOwner": "DOMRectReadOnly",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_rect_read_only_from_rect",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMRectInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMRectReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMRectInit",
+          "idl": {
+            "name": "DOMRectInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMRectInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMRectReadOnly",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMRectReadOnly",
+        "root": "DOMRectReadOnly",
+        "class": "DOMRectReadOnly",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-rect-readonly",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMRect",
+      "member": "fromRect",
+      "contractOwner": "DOMRect",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_rect_from_rect",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMRectInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMRectReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMRectInit",
+          "idl": {
+            "name": "DOMRectInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMRectInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMRect",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMRect",
+        "root": "DOMRectReadOnly",
+        "class": "DOMRect",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-rect",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMPointReadOnly",
+      "member": "fromPoint",
+      "contractOwner": "DOMPointReadOnly",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_point_read_only_from_point",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMPointInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMPointInit",
+          "idl": {
+            "name": "DOMPointInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMPointInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMPointReadOnly",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPointReadOnly",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPointReadOnly",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-point-readonly",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMPoint",
+      "member": "fromPoint",
+      "contractOwner": "DOMPoint",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_point_from_point",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMPointInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMPointInit",
+          "idl": {
+            "name": "DOMPointInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMPointInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMPoint",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPoint",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPoint",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-point",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMQuad",
+      "member": "fromRect",
+      "contractOwner": "DOMQuad",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_quad_from_rect",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMRectInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMQuad**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMRectInit",
+          "idl": {
+            "name": "DOMRectInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMRectInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMQuad",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMQuad",
+        "root": "DOMQuad",
+        "class": "DOMQuad",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-quad",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMQuad",
+      "member": "fromQuad",
+      "contractOwner": "DOMQuad",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_quad_from_quad",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMQuadInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMQuad**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMQuadInit",
+          "idl": {
+            "name": "DOMQuadInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMQuadInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMQuad",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMQuad",
+        "root": "DOMQuad",
+        "class": "DOMQuad",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-quad",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "CSSStyleValue",
       "member": "parse",
       "contractOwner": "CSSStyleValue",
@@ -98088,6 +100450,84 @@
         }
       }
     ],
+    "DOMPointInit": [
+      {
+        "name": "x",
+        "field": "x",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "y",
+        "field": "y",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "z",
+        "field": "z",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "w",
+        "field": "w",
+        "ctype": "double",
+        "required": false,
+        "default": "1",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
     "DOMCSSCustomPropertyDescriptor": [
       {
         "name": "name",
@@ -98156,6 +100596,162 @@
           "kind": "string",
           "ctype": null,
           "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "DOMRectInit": [
+      {
+        "name": "x",
+        "field": "x",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "y",
+        "field": "y",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "width",
+        "field": "width",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "height",
+        "field": "height",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "DOMQuadInit": [
+      {
+        "name": "p1",
+        "field": "p1",
+        "ctype": "const RvDomDOMPointInit*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "DOMPointInit",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "p2",
+        "field": "p2",
+        "ctype": "const RvDomDOMPointInit*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "DOMPointInit",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "p3",
+        "field": "p3",
+        "ctype": "const RvDomDOMPointInit*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "DOMPointInit",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "p4",
+        "field": "p4",
+        "ctype": "const RvDomDOMPointInit*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "DOMPointInit",
           "root": null,
           "class": null,
           "enum": null,

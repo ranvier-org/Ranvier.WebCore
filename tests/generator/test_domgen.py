@@ -59,6 +59,77 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_configured_geometry_factories_mutation_and_quad_copies_use_engine_operations(self):
+        configured = json.loads((ROOT / 'gen/dom.json').read_text())
+        selected = ['DOMRectReadOnly', 'DOMRect', 'DOMPointReadOnly', 'DOMPoint', 'DOMQuad']
+        self.assertTrue(set(selected).issubset(configured['interfaces']))
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary DOMRectInit { unrestricted double x = 0; unrestricted double y = 0; unrestricted double width = 0; unrestricted double height = 0; };
+dictionary DOMPointInit { unrestricted double x = 0; unrestricted double y = 0; unrestricted double z = 0; unrestricted double w = 1; };
+dictionary DOMQuadInit {
+    [ImplementationDefaultValue={}] DOMPointInit p1;
+    [ImplementationDefaultValue={}] DOMPointInit p2;
+    [ImplementationDefaultValue={}] DOMPointInit p3;
+    [ImplementationDefaultValue={}] DOMPointInit p4;
+};
+interface DOMRectReadOnly {
+    constructor(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double width = 0, optional unrestricted double height = 0);
+    static DOMRectReadOnly fromRect(optional DOMRectInit other = {});
+    readonly attribute unrestricted double x;
+};
+interface DOMRect : DOMRectReadOnly {
+    constructor(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double width = 0, optional unrestricted double height = 0);
+    static DOMRect fromRect(optional DOMRectInit other = {});
+    inherit attribute unrestricted double x;
+};
+interface DOMPointReadOnly {
+    constructor(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double z = 0, optional unrestricted double w = 1);
+    static DOMPointReadOnly fromPoint(optional DOMPointInit other = {});
+    readonly attribute unrestricted double w;
+};
+interface DOMPoint : DOMPointReadOnly {
+    constructor(optional unrestricted double x = 0, optional unrestricted double y = 0, optional unrestricted double z = 0, optional unrestricted double w = 1);
+    static DOMPoint fromPoint(optional DOMPointInit other = {});
+    inherit attribute unrestricted double w;
+};
+interface DOMQuad {
+    constructor(optional DOMPointInit p1 = {}, optional DOMPointInit p2 = {}, optional DOMPointInit p3 = {}, optional DOMPointInit p4 = {});
+    static DOMQuad fromRect(optional DOMRectInit other = {});
+    static DOMQuad fromQuad(optional DOMQuadInit other = {});
+    [SameObject] readonly attribute DOMPoint p1;
+    DOMRect getBounds();
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + selected
+        config['constructors'] = {name: configured['constructors'][name] for name in selected}
+        config['staticBindings'] = {name: configured['staticBindings'][name] for name in selected}
+        config['trackedHandleRoots'] = configured['trackedHandleRoots']
+        config['nestedDictionaries'] = configured['nestedDictionaries']
+        config['runtimeTypeRoots'] = list(config['trackedHandleRoots'])
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        for name in selected:
+            self.assertIn('rv_dom_' + domgen.snake(name) + '_create', functions)
+        for name, operation in [('DOMRect', 'from_rect'), ('DOMRectReadOnly', 'from_rect'),
+                                ('DOMPoint', 'from_point'), ('DOMPointReadOnly', 'from_point'),
+                                ('DOMQuad', 'from_rect'), ('DOMQuad', 'from_quad')]:
+            self.assertIn('rv_dom_' + domgen.snake(name) + '_' + operation, functions)
+        self.assertIn('rv_dom_dom_rect_set_x', functions)
+        self.assertIn('rv_dom_dom_point_set_w', functions)
+        self.assertNotIn('rv_dom_dom_rect_read_only_set_x', functions)
+        self.assertNotIn('rv_dom_dom_point_read_only_set_w', functions)
+        glue = generator.glue()
+        self.assertIn('DOMQuad::create(std::move(a0), std::move(a1), std::move(a2), std::move(a3))', glue)
+        self.assertIn('DOMQuad::fromQuad(std::move(a0))', glue)
+        self.assertIn('impl->getBounds()', glue)
+        geometry_bodies = '\n'.join('\n'.join(function.body) for function in generator.functions if function.interface in selected)
+        self.assertNotIn('std::isfinite', geometry_bodies)
+
     def test_tracked_geometry_handles_classify_only_trusted_mutable_producers_and_pair_releases(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

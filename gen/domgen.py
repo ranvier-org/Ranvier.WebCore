@@ -356,8 +356,9 @@ class World:
                 mapped = self.map(member.type)
             except Unsupported as error:
                 raise Unsupported(f"dictionary {name}: member {member.name}: {error}")
+            empty_default = member.default == '{}' or member.attrs.get('ImplementationDefaultValue') == '{}'
             if mapped.kind == "dict" and (name not in self.config.get("nestedDictionaries", [])
-                                          or member.required or member.default != '{}' or mapped.nullable):
+                                          or member.required or not empty_default or mapped.nullable):
                 raise Unsupported(f"dictionary {name}: nested member {member.name} requires an opted-in nonnullable empty default")
             if mapped.kind in ("object", "event") or mapped.interface == "EventTarget":
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")

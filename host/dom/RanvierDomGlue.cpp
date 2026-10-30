@@ -51,7 +51,13 @@
 #include "DOMCSSNamespace.h"
 #include "DOMCSSRegisterCustomProperty.h"
 #include "DOMImplementation.h"
+#include "DOMPoint.h"
+#include "DOMPointInit.h"
+#include "DOMPointReadOnly.h"
+#include "DOMQuad.h"
+#include "DOMQuadInit.h"
 #include "DOMRect.h"
+#include "DOMRectInit.h"
 #include "DOMRectList.h"
 #include "DOMRectReadOnly.h"
 #include "DOMSelection.h"
@@ -428,6 +434,67 @@ template<typename T> struct HandleArg {
     operator RefPtr<T>() const { return pointer; }
 };
 
+} // namespace
+
+#include <unordered_map>
+namespace {
+template<typename Root> struct TrackedHandleTraits;
+template<> struct TrackedHandleTraits<DOMRectReadOnly> { using Mutable = DOMRect; };
+template<> struct TrackedHandleTraits<DOMPointReadOnly> { using Mutable = DOMPoint; };
+
+// Metadata owns no engine references. Entries count only references exported through this ABI.
+struct TrackedHandleState {
+    size_t references { 0 };
+    bool mutableType { false };
+};
+
+template<typename Root> auto& trackedHandles()
+{
+    static std::unordered_map<const Root*, TrackedHandleState> handles;
+    return handles;
+}
+
+template<typename Root, typename Concrete, typename Handle, typename V>
+int32_t storeTrackedHandle(V&& value, Handle** result)
+{
+    using Mutable = typename TrackedHandleTraits<Root>::Mutable;
+    static_assert(std::is_same_v<Concrete, Root> || std::is_same_v<Concrete, Mutable>);
+    const Concrete* concrete = rawPointer<const Concrete>(std::forward<V>(value));
+    auto* pointer = const_cast<Root*>(static_cast<const Root*>(concrete));
+    if (pointer) {
+        pointer->ref();
+        auto& state = trackedHandles<Root>()[pointer];
+        ++state.references;
+        state.mutableType |= std::is_same_v<Concrete, Mutable>;
+    }
+    *result = reinterpret_cast<Handle*>(pointer);
+    return RV_OK;
+}
+
+template<typename Root> void retainTrackedHandle(Root* pointer)
+{
+    pointer->ref();
+    ++trackedHandles<Root>()[pointer].references;
+}
+
+template<typename Root> void releaseTrackedHandle(Root* pointer)
+{
+    auto& handles = trackedHandles<Root>();
+    auto found = handles.find(pointer);
+    if (found != handles.end()) {
+        if (!--found->second.references)
+            handles.erase(found);
+    }
+    pointer->deref();
+}
+
+template<typename Concrete, typename Root> Concrete* castTrackedHandle(Root& value)
+{
+    static_assert(std::is_same_v<Concrete, typename TrackedHandleTraits<Root>::Mutable>);
+    auto& handles = trackedHandles<Root>();
+    auto found = handles.find(&value);
+    return found != handles.end() && found->second.mutableType ? static_cast<Concrete*>(&value) : nullptr;
+}
 } // namespace
 
 static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_s, "all"_s, "pending"_s };
@@ -1699,7 +1766,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1708,6 +1775,16 @@ int32_t ranvier_dom_has(const char* feature)
     if (!std::strcmp(feature, "dom-css-register-property"))
         return 1;
     if (!std::strcmp(feature, "dom-computed-style"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-rect-readonly"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-rect"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-point-readonly"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-point"))
+        return 1;
+    if (!std::strcmp(feature, "dom-geometry-quad"))
         return 1;
     if (!std::strcmp(feature, "dom-css-style-values"))
         return 1;
@@ -2089,14 +2166,14 @@ RvDOMSelection* ranvier_dom_dom_selection_retain(RvDOMSelection* handle)
 void ranvier_dom_dom_rect_read_only_release(RvDOMRectReadOnly* handle)
 {
     if (handle && isMainThread())
-        reinterpret_cast<DOMRectReadOnly*>(handle)->deref();
+        releaseTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle));
 }
 
 RvDOMRectReadOnly* ranvier_dom_dom_rect_read_only_retain(RvDOMRectReadOnly* handle)
 {
     if (!handle || !isMainThread())
         return nullptr;
-    reinterpret_cast<DOMRectReadOnly*>(handle)->ref();
+    retainTrackedHandle(reinterpret_cast<DOMRectReadOnly*>(handle));
     return handle;
 }
 
@@ -2111,6 +2188,34 @@ RvDOMRectList* ranvier_dom_dom_rect_list_retain(RvDOMRectList* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<DOMRectList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_dom_point_read_only_release(RvDOMPointReadOnly* handle)
+{
+    if (handle && isMainThread())
+        releaseTrackedHandle(reinterpret_cast<DOMPointReadOnly*>(handle));
+}
+
+RvDOMPointReadOnly* ranvier_dom_dom_point_read_only_retain(RvDOMPointReadOnly* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    retainTrackedHandle(reinterpret_cast<DOMPointReadOnly*>(handle));
+    return handle;
+}
+
+void ranvier_dom_dom_quad_release(RvDOMQuad* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<DOMQuad*>(handle)->deref();
+}
+
+RvDOMQuad* ranvier_dom_dom_quad_retain(RvDOMQuad* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<DOMQuad*>(handle)->ref();
     return handle;
 }
 
@@ -6288,7 +6393,7 @@ int32_t ranvier_dom_element_get_bounding_client_rect(RvNode* target, RvDOMRectRe
     RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getBoundingClientRect(); }, [&](auto&& value) { return storeHandle<DOMRectReadOnly>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->getBoundingClientRect(); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
 }
 
 // Element.checkVisibility(optional CheckVisibilityOptions options = {}) -> boolean; options defaults to {} in IDL; options may be NULL for the IDL default
@@ -24860,7 +24965,7 @@ int32_t ranvier_dom_range_get_bounding_client_rect(RvAbstractRange* target, RvDO
     RefPtr impl = dynamicDowncast<Range>(*reinterpret_cast<AbstractRange*>(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    return deliver([&]() -> decltype(auto) { return impl->getBoundingClientRect(); }, [&](auto&& value) { return storeHandle<DOMRectReadOnly>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->getBoundingClientRect(); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
 }
 
 // Range.createContextualFragment((TrustedHTML or DOMString) fragment) -> DocumentFragment; *result is a new reference
@@ -25219,6 +25324,19 @@ int32_t ranvier_dom_dom_selection_modify(RvDOMSelection* target, const char* alt
     return invoke([&]() -> decltype(auto) { return impl->modify(a0, a1, a2); });
 }
 
+// DOMRectReadOnly.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in IDL; width defaults to 0 in IDL; height defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_rect_read_only_create(RvNode* target, double x, double y, double width, double height, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DOMRectReadOnly::create(x, y, width, height); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRectReadOnly>(value, result); });
+}
+
 // DOMRectReadOnly.x getter: readonly attribute unrestricted double x
 int32_t ranvier_dom_dom_rect_read_only_get_x(RvDOMRectReadOnly* target, double* result)
 {
@@ -25307,6 +25425,123 @@ int32_t ranvier_dom_dom_rect_read_only_get_left(RvDOMRectReadOnly* target, doubl
     return deliver([&]() -> decltype(auto) { return impl->left(); }, [&](auto&& value) { return store<double>(value, result); });
 }
 
+// DOMRect.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in IDL; width defaults to 0 in IDL; height defaults to 0 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_rect_create(RvNode* target, double x, double y, double width, double height, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DOMRect::create(x, y, width, height); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
+}
+
+// DOMRect.x getter: attribute unrestricted double x
+int32_t ranvier_dom_dom_rect_get_x(RvDOMRectReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMRect.x setter: attribute unrestricted double x
+int32_t ranvier_dom_dom_rect_set_x(RvDOMRectReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setX(value); });
+}
+
+// DOMRect.y getter: attribute unrestricted double y
+int32_t ranvier_dom_dom_rect_get_y(RvDOMRectReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMRect.y setter: attribute unrestricted double y
+int32_t ranvier_dom_dom_rect_set_y(RvDOMRectReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setY(value); });
+}
+
+// DOMRect.width getter: attribute unrestricted double width
+int32_t ranvier_dom_dom_rect_get_width(RvDOMRectReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMRect.width setter: attribute unrestricted double width
+int32_t ranvier_dom_dom_rect_set_width(RvDOMRectReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setWidth(value); });
+}
+
+// DOMRect.height getter: attribute unrestricted double height
+int32_t ranvier_dom_dom_rect_get_height(RvDOMRectReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->height(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMRect.height setter: attribute unrestricted double height
+int32_t ranvier_dom_dom_rect_set_height(RvDOMRectReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMRect>(*reinterpret_cast<DOMRectReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setHeight(value); });
+}
+
 // DOMRectList.length getter: readonly attribute unsigned long length
 int32_t ranvier_dom_dom_rect_list_get_length(RvDOMRectList* target, uint32_t* result)
 {
@@ -25326,7 +25561,293 @@ int32_t ranvier_dom_dom_rect_list_item(RvDOMRectList* target, uint32_t index, Rv
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     RefPtr<DOMRectList> impl = reinterpret_cast<DOMRectList*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<DOMRectReadOnly>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
+}
+
+// DOMPointReadOnly.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in IDL; z defaults to 0 in IDL; w defaults to 1 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_point_read_only_create(RvNode* target, double x, double y, double z, double w, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DOMPointReadOnly::create(x, y, z, w); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPointReadOnly>(value, result); });
+}
+
+// DOMPointReadOnly.x getter: readonly attribute unrestricted double x
+int32_t ranvier_dom_dom_point_read_only_get_x(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMPointReadOnly> impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPointReadOnly.y getter: readonly attribute unrestricted double y
+int32_t ranvier_dom_dom_point_read_only_get_y(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMPointReadOnly> impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPointReadOnly.z getter: readonly attribute unrestricted double z
+int32_t ranvier_dom_dom_point_read_only_get_z(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMPointReadOnly> impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->z(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPointReadOnly.w getter: readonly attribute unrestricted double w
+int32_t ranvier_dom_dom_point_read_only_get_w(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMPointReadOnly> impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->w(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPoint.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in IDL; z defaults to 0 in IDL; w defaults to 1 in IDL; *result is a new reference
+int32_t ranvier_dom_dom_point_create(RvNode* target, double x, double y, double z, double w, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DOMPoint::create(x, y, z, w); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMPoint.x getter: attribute unrestricted double x
+int32_t ranvier_dom_dom_point_get_x(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPoint.x setter: attribute unrestricted double x
+int32_t ranvier_dom_dom_point_set_x(RvDOMPointReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setX(value); });
+}
+
+// DOMPoint.y getter: attribute unrestricted double y
+int32_t ranvier_dom_dom_point_get_y(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPoint.y setter: attribute unrestricted double y
+int32_t ranvier_dom_dom_point_set_y(RvDOMPointReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setY(value); });
+}
+
+// DOMPoint.z getter: attribute unrestricted double z
+int32_t ranvier_dom_dom_point_get_z(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->z(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPoint.z setter: attribute unrestricted double z
+int32_t ranvier_dom_dom_point_set_z(RvDOMPointReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setZ(value); });
+}
+
+// DOMPoint.w getter: attribute unrestricted double w
+int32_t ranvier_dom_dom_point_get_w(RvDOMPointReadOnly* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->w(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// DOMPoint.w setter: attribute unrestricted double w
+int32_t ranvier_dom_dom_point_set_w(RvDOMPointReadOnly* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = castTrackedHandle<DOMPoint>(*reinterpret_cast<DOMPointReadOnly*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setW(value); });
+}
+
+// DOMQuad.constructor: target is the Document of the constructed object; p1 defaults to {} in IDL; p1 may be NULL for the IDL default; p2 defaults to {} in IDL; p2 may be NULL for the IDL default; p3 defaults to {} in IDL; p3 may be NULL for the IDL default; p4 defaults to {} in IDL; p4 may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_quad_create(RvNode* target, const RvDomDOMPointInit* p1, const RvDomDOMPointInit* p2, const RvDomDOMPointInit* p3, const RvDomDOMPointInit* p4, RvDOMQuad** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMPointInit a0 { };
+    if (p1) {
+        if (p1->size >= offsetof(RvDomDOMPointInit, x) + sizeof(p1->x))
+            assignValue(a0.x, p1->x);
+        if (p1->size >= offsetof(RvDomDOMPointInit, y) + sizeof(p1->y))
+            assignValue(a0.y, p1->y);
+        if (p1->size >= offsetof(RvDomDOMPointInit, z) + sizeof(p1->z))
+            assignValue(a0.z, p1->z);
+        if (p1->size >= offsetof(RvDomDOMPointInit, w) + sizeof(p1->w))
+            assignValue(a0.w, p1->w);
+    }
+    DOMPointInit a1 { };
+    if (p2) {
+        if (p2->size >= offsetof(RvDomDOMPointInit, x) + sizeof(p2->x))
+            assignValue(a1.x, p2->x);
+        if (p2->size >= offsetof(RvDomDOMPointInit, y) + sizeof(p2->y))
+            assignValue(a1.y, p2->y);
+        if (p2->size >= offsetof(RvDomDOMPointInit, z) + sizeof(p2->z))
+            assignValue(a1.z, p2->z);
+        if (p2->size >= offsetof(RvDomDOMPointInit, w) + sizeof(p2->w))
+            assignValue(a1.w, p2->w);
+    }
+    DOMPointInit a2 { };
+    if (p3) {
+        if (p3->size >= offsetof(RvDomDOMPointInit, x) + sizeof(p3->x))
+            assignValue(a2.x, p3->x);
+        if (p3->size >= offsetof(RvDomDOMPointInit, y) + sizeof(p3->y))
+            assignValue(a2.y, p3->y);
+        if (p3->size >= offsetof(RvDomDOMPointInit, z) + sizeof(p3->z))
+            assignValue(a2.z, p3->z);
+        if (p3->size >= offsetof(RvDomDOMPointInit, w) + sizeof(p3->w))
+            assignValue(a2.w, p3->w);
+    }
+    DOMPointInit a3 { };
+    if (p4) {
+        if (p4->size >= offsetof(RvDomDOMPointInit, x) + sizeof(p4->x))
+            assignValue(a3.x, p4->x);
+        if (p4->size >= offsetof(RvDomDOMPointInit, y) + sizeof(p4->y))
+            assignValue(a3.y, p4->y);
+        if (p4->size >= offsetof(RvDomDOMPointInit, z) + sizeof(p4->z))
+            assignValue(a3.z, p4->z);
+        if (p4->size >= offsetof(RvDomDOMPointInit, w) + sizeof(p4->w))
+            assignValue(a3.w, p4->w);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMQuad::create(std::move(a0), std::move(a1), std::move(a2), std::move(a3)); }, [&](auto&& value) { return storeHandle<DOMQuad>(value, result); });
+}
+
+// DOMQuad.p1 getter: readonly attribute DOMPoint p1; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_p1(RvDOMQuad* target, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->p1(); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.p2 getter: readonly attribute DOMPoint p2; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_p2(RvDOMQuad* target, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->p2(); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.p3 getter: readonly attribute DOMPoint p3; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_p3(RvDOMQuad* target, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->p3(); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.p4 getter: readonly attribute DOMPoint p4; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_p4(RvDOMQuad* target, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->p4(); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.getBounds() -> DOMRect; *result is a new reference
+int32_t ranvier_dom_dom_quad_get_bounds(RvDOMQuad* target, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMQuad> impl = reinterpret_cast<DOMQuad*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getBounds(); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
 }
 
 // NodeList.length getter: readonly attribute unsigned long length
@@ -26713,6 +27234,186 @@ int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, c
     return deliver([&]() -> decltype(auto) { return impl->window()->getComputedStyle(HandleArg<Element> { a0.get() }, a1.string()); }, [&](auto&& value) { return storeHandle<CSSStyleDeclaration>(value, result); });
 }
 
+// DOMRectReadOnly.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMRectInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMRectInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMRectInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMRectInit, width) + sizeof(other->width))
+            assignValue(a0.width, other->width);
+        if (other->size >= offsetof(RvDomDOMRectInit, height) + sizeof(other->height))
+            assignValue(a0.height, other->height);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMRectReadOnly::fromRect(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRectReadOnly>(value, result); });
+}
+
+// DOMRect.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_rect_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMRectInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMRectInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMRectInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMRectInit, width) + sizeof(other->width))
+            assignValue(a0.width, other->width);
+        if (other->size >= offsetof(RvDomDOMRectInit, height) + sizeof(other->height))
+            assignValue(a0.height, other->height);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMRect::fromRect(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMRectReadOnly, DOMRect>(value, result); });
+}
+
+// DOMPointReadOnly.fromPoint: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_point_read_only_from_point(RvNode* target, const RvDomDOMPointInit* other, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMPointInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMPointInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMPointInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMPointInit, z) + sizeof(other->z))
+            assignValue(a0.z, other->z);
+        if (other->size >= offsetof(RvDomDOMPointInit, w) + sizeof(other->w))
+            assignValue(a0.w, other->w);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMPointReadOnly::fromPoint(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPointReadOnly>(value, result); });
+}
+
+// DOMPoint.fromPoint: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_point_from_point(RvNode* target, const RvDomDOMPointInit* other, RvDOMPointReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMPointInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMPointInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMPointInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMPointInit, z) + sizeof(other->z))
+            assignValue(a0.z, other->z);
+        if (other->size >= offsetof(RvDomDOMPointInit, w) + sizeof(other->w))
+            assignValue(a0.w, other->w);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMPoint::fromPoint(std::move(a0)); }, [&](auto&& value) { return storeTrackedHandle<DOMPointReadOnly, DOMPoint>(value, result); });
+}
+
+// DOMQuad.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_quad_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMQuad** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMRectInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMRectInit, x) + sizeof(other->x))
+            assignValue(a0.x, other->x);
+        if (other->size >= offsetof(RvDomDOMRectInit, y) + sizeof(other->y))
+            assignValue(a0.y, other->y);
+        if (other->size >= offsetof(RvDomDOMRectInit, width) + sizeof(other->width))
+            assignValue(a0.width, other->width);
+        if (other->size >= offsetof(RvDomDOMRectInit, height) + sizeof(other->height))
+            assignValue(a0.height, other->height);
+    }
+    return deliver([&]() -> decltype(auto) { return DOMQuad::fromRect(std::move(a0)); }, [&](auto&& value) { return storeHandle<DOMQuad>(value, result); });
+}
+
+// DOMQuad.fromQuad: static operation with checked Document context and UTF-8 byte lengths; other defaults to {} in IDL; other may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_dom_quad_from_quad(RvNode* target, const RvDomDOMQuadInit* other, RvDOMQuad** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DOMQuadInit a0 { };
+    if (other) {
+        if (other->size >= offsetof(RvDomDOMQuadInit, p1) + sizeof(other->p1) && other->p1) {
+            const auto* nested_a0_p1 = other->p1;
+            if (nested_a0_p1->size >= offsetof(RvDomDOMPointInit, x) + sizeof(nested_a0_p1->x))
+                assignValue(a0.p1.x, nested_a0_p1->x);
+            if (nested_a0_p1->size >= offsetof(RvDomDOMPointInit, y) + sizeof(nested_a0_p1->y))
+                assignValue(a0.p1.y, nested_a0_p1->y);
+            if (nested_a0_p1->size >= offsetof(RvDomDOMPointInit, z) + sizeof(nested_a0_p1->z))
+                assignValue(a0.p1.z, nested_a0_p1->z);
+            if (nested_a0_p1->size >= offsetof(RvDomDOMPointInit, w) + sizeof(nested_a0_p1->w))
+                assignValue(a0.p1.w, nested_a0_p1->w);
+        }
+        if (other->size >= offsetof(RvDomDOMQuadInit, p2) + sizeof(other->p2) && other->p2) {
+            const auto* nested_a0_p2 = other->p2;
+            if (nested_a0_p2->size >= offsetof(RvDomDOMPointInit, x) + sizeof(nested_a0_p2->x))
+                assignValue(a0.p2.x, nested_a0_p2->x);
+            if (nested_a0_p2->size >= offsetof(RvDomDOMPointInit, y) + sizeof(nested_a0_p2->y))
+                assignValue(a0.p2.y, nested_a0_p2->y);
+            if (nested_a0_p2->size >= offsetof(RvDomDOMPointInit, z) + sizeof(nested_a0_p2->z))
+                assignValue(a0.p2.z, nested_a0_p2->z);
+            if (nested_a0_p2->size >= offsetof(RvDomDOMPointInit, w) + sizeof(nested_a0_p2->w))
+                assignValue(a0.p2.w, nested_a0_p2->w);
+        }
+        if (other->size >= offsetof(RvDomDOMQuadInit, p3) + sizeof(other->p3) && other->p3) {
+            const auto* nested_a0_p3 = other->p3;
+            if (nested_a0_p3->size >= offsetof(RvDomDOMPointInit, x) + sizeof(nested_a0_p3->x))
+                assignValue(a0.p3.x, nested_a0_p3->x);
+            if (nested_a0_p3->size >= offsetof(RvDomDOMPointInit, y) + sizeof(nested_a0_p3->y))
+                assignValue(a0.p3.y, nested_a0_p3->y);
+            if (nested_a0_p3->size >= offsetof(RvDomDOMPointInit, z) + sizeof(nested_a0_p3->z))
+                assignValue(a0.p3.z, nested_a0_p3->z);
+            if (nested_a0_p3->size >= offsetof(RvDomDOMPointInit, w) + sizeof(nested_a0_p3->w))
+                assignValue(a0.p3.w, nested_a0_p3->w);
+        }
+        if (other->size >= offsetof(RvDomDOMQuadInit, p4) + sizeof(other->p4) && other->p4) {
+            const auto* nested_a0_p4 = other->p4;
+            if (nested_a0_p4->size >= offsetof(RvDomDOMPointInit, x) + sizeof(nested_a0_p4->x))
+                assignValue(a0.p4.x, nested_a0_p4->x);
+            if (nested_a0_p4->size >= offsetof(RvDomDOMPointInit, y) + sizeof(nested_a0_p4->y))
+                assignValue(a0.p4.y, nested_a0_p4->y);
+            if (nested_a0_p4->size >= offsetof(RvDomDOMPointInit, z) + sizeof(nested_a0_p4->z))
+                assignValue(a0.p4.z, nested_a0_p4->z);
+            if (nested_a0_p4->size >= offsetof(RvDomDOMPointInit, w) + sizeof(nested_a0_p4->w))
+                assignValue(a0.p4.w, nested_a0_p4->w);
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return DOMQuad::fromQuad(std::move(a0)); }, [&](auto&& value) { return storeHandle<DOMQuad>(value, result); });
+}
+
 // CSSStyleValue.parse: static operation with checked Document context and UTF-8 byte lengths; *result is a new reference
 int32_t ranvier_dom_css_style_value_parse(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvCSSStyleValue** result)
 {
@@ -26876,6 +27577,30 @@ int32_t ranvier_dom_style_property_map_read_only_get_interface_name(RvStylePrope
     if (dynamicDowncast<StylePropertyMap>(*impl))
         return copyString("StylePropertyMap"_s, buffer, capacity, length);
     return copyString("StylePropertyMapReadOnly"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_dom_rect_read_only_get_interface_name(RvDOMRectReadOnly* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<DOMRectReadOnly*>(target);
+    if (castTrackedHandle<DOMRect>(*impl))
+        return copyString("DOMRect"_s, buffer, capacity, length);
+    return copyString("DOMRectReadOnly"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_dom_point_read_only_get_interface_name(RvDOMPointReadOnly* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<DOMPointReadOnly*>(target);
+    if (castTrackedHandle<DOMPoint>(*impl))
+        return copyString("DOMPoint"_s, buffer, capacity, length);
+    return copyString("DOMPointReadOnly"_s, buffer, capacity, length);
 }
 
 } // extern "C"

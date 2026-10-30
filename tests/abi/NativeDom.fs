@@ -342,6 +342,15 @@ type RvDomGetComposedRangesOptions =
     val mutable size: uint32
     val mutable shadow_roots: nativeint
 
+/// <summary>The IDL dictionary DOMPointInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomDOMPointInit =
+    val mutable size: uint32
+    val mutable x: float
+    val mutable y: float
+    val mutable z: float
+    val mutable w: float
+
 /// <summary>The IDL dictionary DOMCSSCustomPropertyDescriptor; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomDOMCSSCustomPropertyDescriptor =
@@ -350,6 +359,24 @@ type RvDomDOMCSSCustomPropertyDescriptor =
     val mutable syntax: RvDomUtf8StringInput
     val mutable inherits: int
     val mutable initial_value: RvDomUtf8StringInput
+
+/// <summary>The IDL dictionary DOMRectInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomDOMRectInit =
+    val mutable size: uint32
+    val mutable x: float
+    val mutable y: float
+    val mutable width: float
+    val mutable height: float
+
+/// <summary>The IDL dictionary DOMQuadInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomDOMQuadInit =
+    val mutable size: uint32
+    val mutable p1: nativeint
+    val mutable p2: nativeint
+    val mutable p3: nativeint
+    val mutable p4: nativeint
 
 /// <summary>Length-delimited UTF-8; compound results own data until their matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -896,6 +923,18 @@ extern void rv_dom_dom_rect_list_release(nativeint handle)
 extern nativeint rv_dom_dom_rect_list_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_dom_point_read_only_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_dom_point_read_only_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_dom_quad_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_dom_quad_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern void rv_dom_node_list_release(nativeint handle)
 
 [<DllImport(Lib)>]
@@ -927,6 +966,12 @@ extern int rv_dom_css_style_value_get_interface_name(nativeint target, byte[] bu
 
 [<DllImport(Lib)>]
 extern int rv_dom_style_property_map_read_only_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_read_only_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_read_only_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
@@ -5789,6 +5834,9 @@ extern int rv_dom_dom_selection_to_string(nativeint target, byte[] buffer, int c
 extern int rv_dom_dom_selection_modify(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string alter, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string direction, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string granularity)
 
 [<DllImport(Lib)>]
+extern int rv_dom_dom_rect_read_only_create(nativeint target, float x, float y, float width, float height, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_dom_rect_read_only_get_x(nativeint target, float& result)
 
 [<DllImport(Lib)>]
@@ -5813,10 +5861,97 @@ extern int rv_dom_dom_rect_read_only_get_bottom(nativeint target, float& result)
 extern int rv_dom_dom_rect_read_only_get_left(nativeint target, float& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_dom_rect_create(nativeint target, float x, float y, float width, float height, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_get_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_set_x(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_get_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_set_y(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_get_width(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_set_width(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_get_height(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_set_height(nativeint target, float value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_dom_rect_list_get_length(nativeint target, uint32& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_rect_list_item(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_read_only_create(nativeint target, float x, float y, float z, float w, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_read_only_get_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_read_only_get_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_read_only_get_z(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_read_only_get_w(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_create(nativeint target, float x, float y, float z, float w, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_get_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_set_x(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_get_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_set_y(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_get_z(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_set_z(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_get_w(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_set_w(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_quad_create(nativeint target, [<In>] RvDomDOMPointInit[] p1, [<In>] RvDomDOMPointInit[] p2, [<In>] RvDomDOMPointInit[] p3, [<In>] RvDomDOMPointInit[] p4, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_quad_get_p1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_quad_get_p2(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_quad_get_p3(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_quad_get_p4(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_quad_get_bounds(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_list_get_length(nativeint target, uint32& result)
@@ -6135,6 +6270,24 @@ extern int rv_dom_css_register_property(nativeint target, [<In>] RvDomDOMCSSCust
 
 [<DllImport(Lib)>]
 extern int rv_dom_window_get_computed_style(nativeint target, nativeint element, byte[] pseudo_element, int pseudo_element_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_read_only_from_rect(nativeint target, [<In>] RvDomDOMRectInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_rect_from_rect(nativeint target, [<In>] RvDomDOMRectInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_read_only_from_point(nativeint target, [<In>] RvDomDOMPointInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_point_from_point(nativeint target, [<In>] RvDomDOMPointInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_quad_from_rect(nativeint target, [<In>] RvDomDOMRectInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_quad_from_quad(nativeint target, [<In>] RvDomDOMQuadInit[] other, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_value_parse(nativeint target, byte[] property, int property_length, byte[] css_text, int css_text_length, nativeint& result)

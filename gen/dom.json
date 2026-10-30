@@ -23,6 +23,31 @@
         }
     },
     "constructors": {
+        "DOMRectReadOnly": {
+            "receiver": "Document",
+            "factory": "DOMRectReadOnly::create",
+            "passReceiver": false
+        },
+        "DOMRect": {
+            "receiver": "Document",
+            "factory": "DOMRect::create",
+            "passReceiver": false
+        },
+        "DOMPointReadOnly": {
+            "receiver": "Document",
+            "factory": "DOMPointReadOnly::create",
+            "passReceiver": false
+        },
+        "DOMPoint": {
+            "receiver": "Document",
+            "factory": "DOMPoint::create",
+            "passReceiver": false
+        },
+        "DOMQuad": {
+            "receiver": "Document",
+            "factory": "DOMQuad::create",
+            "passReceiver": false
+        },
         "CSSStyleSheet": {
             "receiver": "Document",
             "factory": "CSSStyleSheet::create"
@@ -53,6 +78,13 @@
     },
     "dictionaryCppTypes": {
         "CSSStyleSheetInit": "CSSStyleSheet::Init"
+    },
+    "nestedDictionaries": [
+        "DOMQuadInit"
+    ],
+    "trackedHandleRoots": {
+        "DOMRectReadOnly": "DOMRect",
+        "DOMPointReadOnly": "DOMPoint"
     },
     "dictionaryStringInputs": {
         "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence"
@@ -206,6 +238,9 @@
         "DOMRectReadOnly",
         "DOMRect",
         "DOMRectList",
+        "DOMPointReadOnly",
+        "DOMPoint",
+        "DOMQuad",
         "NodeList",
         "RadioNodeList",
         "HTMLCollection",
@@ -302,7 +337,9 @@
         "StyleSheet",
         "CSSStyleDeclaration",
         "CSSStyleValue",
-        "StylePropertyMapReadOnly"
+        "StylePropertyMapReadOnly",
+        "DOMRectReadOnly",
+        "DOMPointReadOnly"
     ],
     "nodeCastTags": {
         "HTMLModElement": [
@@ -342,10 +379,7 @@
         "CSSNumericValue.toSum",
         "CSSNumericValue.type",
         "CSSNumericValue.parse",
-        "DOMRect.x",
-        "DOMRect.y",
-        "DOMRect.width",
-        "DOMRect.height",
+        "DOMPointReadOnly.matrixTransform",
         "ElementCreationOptions.customElementRegistry",
         "ImportNodeOptions.customElementRegistry",
         "AddEventListenerOptions.signal",
@@ -423,6 +457,36 @@
         }
     },
     "staticBindings": {
+        "DOMRectReadOnly": {
+            "receiver": "Document",
+            "members": ["fromRect"],
+            "feature": "dom-geometry-rect-readonly",
+            "stringInputs": "utf8-lengths"
+        },
+        "DOMRect": {
+            "receiver": "Document",
+            "members": ["fromRect"],
+            "feature": "dom-geometry-rect",
+            "stringInputs": "utf8-lengths"
+        },
+        "DOMPointReadOnly": {
+            "receiver": "Document",
+            "members": ["fromPoint"],
+            "feature": "dom-geometry-point-readonly",
+            "stringInputs": "utf8-lengths"
+        },
+        "DOMPoint": {
+            "receiver": "Document",
+            "members": ["fromPoint"],
+            "feature": "dom-geometry-point",
+            "stringInputs": "utf8-lengths"
+        },
+        "DOMQuad": {
+            "receiver": "Document",
+            "members": ["fromRect", "fromQuad"],
+            "feature": "dom-geometry-quad",
+            "stringInputs": "utf8-lengths"
+        },
         "CSSStyleValue": {
             "receiver": "Document",
             "members": [
