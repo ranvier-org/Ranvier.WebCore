@@ -1322,6 +1322,14 @@ class Generator(ComplexGeneratorMixin):
                 params.append((f"const {mapped.ctype}*", name))
                 if not maybe_null and not argument.optional:
                     checks.append(name)
+                if argument.optional and argument.default is None and not mapped.nullable:
+                    prepare += [f'std::optional<{self.transport_cpp(mapped)}> a{index};',
+                                f'if ({name}) {{', f'    int32_t status{index} = RV_OK;',
+                                f'    a{index} = decode{mapped.ctype}({name}, status{index});',
+                                f'    if (status{index} != RV_OK) return status{index};', '}']
+                    passed.append(f'std::move(a{index})')
+                    notes.append(f'{name} may be NULL for an absent optional argument')
+                    continue
                 prepare += [f"int32_t status{index} = RV_OK;",
                             f"auto a{index} = decode{mapped.ctype}({name}, status{index});"]
                 if argument.optional and argument.default is not None and not mapped.nullable:

@@ -59,6 +59,31 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_optional_matrix_constructor_union_keeps_absence_distinct_from_present_empty_values(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface DOMMatrixReadOnly {
+    [CallWith=CurrentScriptExecutionContext] constructor(optional (DOMString or sequence<unrestricted double>) init);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['DOMMatrixReadOnly']
+        config['constructors'] = {'DOMMatrixReadOnly': {'receiver': 'Document', 'factory': 'DOMMatrixReadOnly::create'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        factory = next(row for row in model['functions'] if row['function'] == 'rv_dom_dom_matrix_read_only_create')
+        self.assertTrue(factory['arguments'][0]['optional'])
+        self.assertFalse(factory['arguments'][0]['mapping']['nullable'])
+        glue = generator.glue()
+        self.assertIn('std::optional<Variant<String, Vector<double>>> a0;', glue)
+        self.assertIn('if (init) {', glue)
+        self.assertIn('a0 = decodeRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(init, status0);', glue)
+        self.assertIn('DOMMatrixReadOnly::create(*impl, std::move(a0))', glue)
+        self.assertNotIn('DOMMatrixReadOnly::create(*impl, std::move(*a0))', glue)
+
     def test_configured_geometry_factories_mutation_and_quad_copies_use_engine_operations(self):
         configured = json.loads((ROOT / 'gen/dom.json').read_text())
         selected = ['DOMRectReadOnly', 'DOMRect', 'DOMPointReadOnly', 'DOMPoint', 'DOMQuad']
