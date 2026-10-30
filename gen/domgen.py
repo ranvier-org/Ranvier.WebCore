@@ -499,6 +499,7 @@ class Generator(ComplexGeneratorMixin):
         self.complex_inputs = set()
         self.namespace_features = []
         self.const_getters_used = set()
+        self.setter_checks_used = set()
         self.tracked_roots = {}
         for root, concrete in world.config.get('trackedHandleRoots', {}).items():
             if root not in world.scope or concrete not in world.scope or world.chain(concrete) != [concrete, root]:
@@ -528,6 +529,9 @@ class Generator(ComplexGeneratorMixin):
         missing_const_getters = set(self.world.config.get('constGetterBindings', {})) - self.const_getters_used
         if missing_const_getters:
             raise SystemExit(f'configured const getters did not match selected object getters: {sorted(missing_const_getters)}')
+        missing_setter_checks = set(self.world.config.get('setterValueChecks', {})) - self.setter_checks_used
+        if missing_setter_checks:
+            raise SystemExit(f'configured setter checks did not match selected setters: {sorted(missing_setter_checks)}')
         self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
@@ -1396,6 +1400,7 @@ class Generator(ComplexGeneratorMixin):
                     return_value = (index, mapped)
             else:
                 raise Unsupported(f"{mapped.kind} argument")
+        prepare += self.setter_value_checks(function, mapped_args)
         # The result.
         sink = None
         if return_value is not None:
@@ -1513,6 +1518,31 @@ class Generator(ComplexGeneratorMixin):
             notes.append(f"RV_ERR_UNSUPPORTED where WebKit builds without {member.attrs['Conditional']}")
         function.comment += "".join(f"; {note}" for note in notes)
         self.functions.append(function)
+
+    def setter_value_checks(self, function, mapped_args):
+        if function.kind != 'setter':
+            return []
+        label = f'{function.interface}.{function.member.name}'
+        kind = self.world.config.get('setterValueChecks', {}).get(label)
+        if kind is None:
+            return []
+        mapped = mapped_args[0]
+        if kind == 'css-length-or-percentage':
+            if mapped.kind != 'object' or mapped.interface != 'CSSNumericValue' or mapped.nullable:
+                raise SystemExit(f'{label}: setter check requires CSSNumericValue')
+            predicate = 'a0->type().matchesTypeOrPercentage<CSSNumericBaseType::Length>()'
+        elif kind == 'css-numberish-number':
+            if (mapped.kind != 'union' or mapped.nullable or len(mapped.subtypes) != 2
+                    or mapped.subtypes[0].kind != 'number' or mapped.subtypes[0].ctype != 'double'
+                    or mapped.subtypes[1].interface != 'CSSNumericValue'):
+                raise SystemExit(f'{label}: setter check requires a double/CSSNumericValue union')
+            predicate = ('WTF::switchOn(*a0, [](double) { return true; }, '
+                         '[](const Ref<CSSNumericValue>& numeric) { return numeric->type().matchesNumber(); })')
+        else:
+            raise SystemExit(f'{label}: unknown setter check {kind}')
+        self.setter_checks_used.add(label)
+        return [f'if (!({predicate}))',
+                '    return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A compatible numeric value is required."_s });']
 
     # Output.
 

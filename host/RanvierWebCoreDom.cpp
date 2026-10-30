@@ -20,6 +20,8 @@ void rv_dom_css_rule_list_release(RvCSSRuleList* handle) { ranvier_dom_css_rule_
 RvCSSRuleList* rv_dom_css_rule_list_retain(RvCSSRuleList* handle) { return ranvier_dom_css_rule_list_retain(handle); }
 void rv_dom_css_style_value_release(RvCSSStyleValue* handle) { ranvier_dom_css_style_value_release(handle); }
 RvCSSStyleValue* rv_dom_css_style_value_retain(RvCSSStyleValue* handle) { return ranvier_dom_css_style_value_retain(handle); }
+void rv_dom_css_transform_component_release(RvCSSTransformComponent* handle) { ranvier_dom_css_transform_component_release(handle); }
+RvCSSTransformComponent* rv_dom_css_transform_component_retain(RvCSSTransformComponent* handle) { return ranvier_dom_css_transform_component_retain(handle); }
 void rv_dom_cssom_variable_reference_value_release(RvCSSOMVariableReferenceValue* handle) { ranvier_dom_cssom_variable_reference_value_release(handle); }
 RvCSSOMVariableReferenceValue* rv_dom_cssom_variable_reference_value_retain(RvCSSOMVariableReferenceValue* handle) { return ranvier_dom_cssom_variable_reference_value_retain(handle); }
 void rv_dom_style_property_map_read_only_release(RvStylePropertyMapReadOnly* handle) { ranvier_dom_style_property_map_read_only_release(handle); }
@@ -69,6 +71,9 @@ void rv_dom_union_element_or_text_release(RvDomUnionElementOrText* value) { ranv
 void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value) { ranvier_dom_sequence_element_or_text_release(value); }
 void rv_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrDOMString* value) { ranvier_dom_union_media_list_or_dom_string_release(value); }
 void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString* value) { ranvier_dom_sequence_usv_string_release(value); }
+void rv_dom_sequence_css_transform_component_release(RvDomSequenceCSSTransformComponent* value) { ranvier_dom_sequence_css_transform_component_release(value); }
+void rv_dom_union_double_or_css_numeric_value_release(RvDomUnionDoubleOrCSSNumericValue* value) { ranvier_dom_union_double_or_css_numeric_value_release(value); }
+void rv_dom_union_css_numeric_value_or_dom_string_or_cssom_keyword_value_release(RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* value) { ranvier_dom_union_css_numeric_value_or_dom_string_or_cssom_keyword_value_release(value); }
 void rv_dom_union_usv_string_or_cssom_variable_reference_value_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValue* value) { ranvier_dom_union_usv_string_or_cssom_variable_reference_value_release(value); }
 void rv_dom_sequence_usv_string_or_cssom_variable_reference_value_release(RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* value) { ranvier_dom_sequence_usv_string_or_cssom_variable_reference_value_release(value); }
 void rv_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* value) { ranvier_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(value); }
@@ -92,6 +97,7 @@ int32_t rv_dom_style_property_map_read_only_get_interface_name(RvStylePropertyMa
 int32_t rv_dom_dom_rect_read_only_get_interface_name(RvDOMRectReadOnly* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_rect_read_only_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_dom_point_read_only_get_interface_name(RvDOMPointReadOnly* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_point_read_only_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_dom_matrix_read_only_get_interface_name(RvDOMMatrixReadOnly* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_matrix_read_only_get_interface_name(target, buffer, capacity, length); }
+int32_t rv_dom_css_transform_component_get_interface_name(RvCSSTransformComponent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_transform_component_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_node_type(RvNode* target, uint16_t* result) { return ranvier_dom_node_get_node_type(target, result); }
 int32_t rv_dom_node_get_node_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_node_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_base_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_base_uri(target, buffer, capacity, length); }
@@ -1462,6 +1468,57 @@ int32_t rv_dom_css_property_rule_get_syntax(RvCSSRule* target, char* buffer, int
 int32_t rv_dom_css_property_rule_get_inherits(RvCSSRule* target, int32_t* result) { return ranvier_dom_css_property_rule_get_inherits(target, result); }
 int32_t rv_dom_css_property_rule_get_initial_value(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_property_rule_get_initial_value(target, buffer, capacity, length); }
 int32_t rv_dom_css_style_value_to_string(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_style_value_to_string(target, buffer, capacity, length); }
+int32_t rv_dom_css_transform_value_create(RvNode* target, const RvDomSequenceCSSTransformComponent* transforms, RvCSSStyleValue** result) { return ranvier_dom_css_transform_value_create(target, transforms, result); }
+int32_t rv_dom_css_transform_value_get_length(RvCSSStyleValue* target, uint32_t* result) { return ranvier_dom_css_transform_value_get_length(target, result); }
+int32_t rv_dom_css_transform_value_get_is2_d(RvCSSStyleValue* target, int32_t* result) { return ranvier_dom_css_transform_value_get_is2_d(target, result); }
+int32_t rv_dom_css_transform_value_item(RvCSSStyleValue* target, uint32_t index, RvCSSTransformComponent** result) { return ranvier_dom_css_transform_value_item(target, index, result); }
+int32_t rv_dom_css_transform_value_set_item(RvCSSStyleValue* target, uint32_t index, RvCSSTransformComponent* val) { return ranvier_dom_css_transform_value_set_item(target, index, val); }
+int32_t rv_dom_css_transform_value_to_matrix(RvCSSStyleValue* target, RvDOMMatrixReadOnly** result) { return ranvier_dom_css_transform_value_to_matrix(target, result); }
+int32_t rv_dom_css_transform_component_get_is2_d(RvCSSTransformComponent* target, int32_t* result) { return ranvier_dom_css_transform_component_get_is2_d(target, result); }
+int32_t rv_dom_css_transform_component_set_is2_d(RvCSSTransformComponent* target, int32_t value) { return ranvier_dom_css_transform_component_set_is2_d(target, value); }
+int32_t rv_dom_css_transform_component_to_string(RvCSSTransformComponent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_transform_component_to_string(target, buffer, capacity, length); }
+int32_t rv_dom_css_transform_component_to_matrix(RvCSSTransformComponent* target, RvDOMMatrixReadOnly** result) { return ranvier_dom_css_transform_component_to_matrix(target, result); }
+int32_t rv_dom_css_translate_create(RvNode* target, RvCSSStyleValue* x, RvCSSStyleValue* y, RvCSSStyleValue* z, RvCSSTransformComponent** result) { return ranvier_dom_css_translate_create(target, x, y, z, result); }
+int32_t rv_dom_css_translate_get_x(RvCSSTransformComponent* target, RvCSSStyleValue** result) { return ranvier_dom_css_translate_get_x(target, result); }
+int32_t rv_dom_css_translate_set_x(RvCSSTransformComponent* target, RvCSSStyleValue* value) { return ranvier_dom_css_translate_set_x(target, value); }
+int32_t rv_dom_css_translate_get_y(RvCSSTransformComponent* target, RvCSSStyleValue** result) { return ranvier_dom_css_translate_get_y(target, result); }
+int32_t rv_dom_css_translate_set_y(RvCSSTransformComponent* target, RvCSSStyleValue* value) { return ranvier_dom_css_translate_set_y(target, value); }
+int32_t rv_dom_css_translate_get_z(RvCSSTransformComponent* target, RvCSSStyleValue** result) { return ranvier_dom_css_translate_get_z(target, result); }
+int32_t rv_dom_css_translate_set_z(RvCSSTransformComponent* target, RvCSSStyleValue* value) { return ranvier_dom_css_translate_set_z(target, value); }
+int32_t rv_dom_css_rotate_create_1(RvNode* target, RvCSSStyleValue* angle, RvCSSTransformComponent** result) { return ranvier_dom_css_rotate_create_1(target, angle, result); }
+int32_t rv_dom_css_rotate_create_4(RvNode* target, const RvDomUnionDoubleOrCSSNumericValue* x, const RvDomUnionDoubleOrCSSNumericValue* y, const RvDomUnionDoubleOrCSSNumericValue* z, RvCSSStyleValue* angle, RvCSSTransformComponent** result) { return ranvier_dom_css_rotate_create_4(target, x, y, z, angle, result); }
+int32_t rv_dom_css_rotate_get_x(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result) { return ranvier_dom_css_rotate_get_x(target, result); }
+int32_t rv_dom_css_rotate_set_x(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value) { return ranvier_dom_css_rotate_set_x(target, value); }
+int32_t rv_dom_css_rotate_get_y(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result) { return ranvier_dom_css_rotate_get_y(target, result); }
+int32_t rv_dom_css_rotate_set_y(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value) { return ranvier_dom_css_rotate_set_y(target, value); }
+int32_t rv_dom_css_rotate_get_z(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result) { return ranvier_dom_css_rotate_get_z(target, result); }
+int32_t rv_dom_css_rotate_set_z(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value) { return ranvier_dom_css_rotate_set_z(target, value); }
+int32_t rv_dom_css_rotate_get_angle(RvCSSTransformComponent* target, RvCSSStyleValue** result) { return ranvier_dom_css_rotate_get_angle(target, result); }
+int32_t rv_dom_css_rotate_set_angle(RvCSSTransformComponent* target, RvCSSStyleValue* value) { return ranvier_dom_css_rotate_set_angle(target, value); }
+int32_t rv_dom_css_scale_create(RvNode* target, const RvDomUnionDoubleOrCSSNumericValue* x, const RvDomUnionDoubleOrCSSNumericValue* y, const RvDomUnionDoubleOrCSSNumericValue* z, RvCSSTransformComponent** result) { return ranvier_dom_css_scale_create(target, x, y, z, result); }
+int32_t rv_dom_css_scale_get_x(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result) { return ranvier_dom_css_scale_get_x(target, result); }
+int32_t rv_dom_css_scale_set_x(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value) { return ranvier_dom_css_scale_set_x(target, value); }
+int32_t rv_dom_css_scale_get_y(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result) { return ranvier_dom_css_scale_get_y(target, result); }
+int32_t rv_dom_css_scale_set_y(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value) { return ranvier_dom_css_scale_set_y(target, value); }
+int32_t rv_dom_css_scale_get_z(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result) { return ranvier_dom_css_scale_get_z(target, result); }
+int32_t rv_dom_css_scale_set_z(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value) { return ranvier_dom_css_scale_set_z(target, value); }
+int32_t rv_dom_css_skew_create(RvNode* target, RvCSSStyleValue* ax, RvCSSStyleValue* ay, RvCSSTransformComponent** result) { return ranvier_dom_css_skew_create(target, ax, ay, result); }
+int32_t rv_dom_css_skew_get_ax(RvCSSTransformComponent* target, RvCSSStyleValue** result) { return ranvier_dom_css_skew_get_ax(target, result); }
+int32_t rv_dom_css_skew_set_ax(RvCSSTransformComponent* target, RvCSSStyleValue* value) { return ranvier_dom_css_skew_set_ax(target, value); }
+int32_t rv_dom_css_skew_get_ay(RvCSSTransformComponent* target, RvCSSStyleValue** result) { return ranvier_dom_css_skew_get_ay(target, result); }
+int32_t rv_dom_css_skew_set_ay(RvCSSTransformComponent* target, RvCSSStyleValue* value) { return ranvier_dom_css_skew_set_ay(target, value); }
+int32_t rv_dom_css_skew_x_create(RvNode* target, RvCSSStyleValue* ax, RvCSSTransformComponent** result) { return ranvier_dom_css_skew_x_create(target, ax, result); }
+int32_t rv_dom_css_skew_x_get_ax(RvCSSTransformComponent* target, RvCSSStyleValue** result) { return ranvier_dom_css_skew_x_get_ax(target, result); }
+int32_t rv_dom_css_skew_x_set_ax(RvCSSTransformComponent* target, RvCSSStyleValue* value) { return ranvier_dom_css_skew_x_set_ax(target, value); }
+int32_t rv_dom_css_skew_y_create(RvNode* target, RvCSSStyleValue* ay, RvCSSTransformComponent** result) { return ranvier_dom_css_skew_y_create(target, ay, result); }
+int32_t rv_dom_css_skew_y_get_ay(RvCSSTransformComponent* target, RvCSSStyleValue** result) { return ranvier_dom_css_skew_y_get_ay(target, result); }
+int32_t rv_dom_css_skew_y_set_ay(RvCSSTransformComponent* target, RvCSSStyleValue* value) { return ranvier_dom_css_skew_y_set_ay(target, value); }
+int32_t rv_dom_css_perspective_create(RvNode* target, const RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* length_, RvCSSTransformComponent** result) { return ranvier_dom_css_perspective_create(target, length_, result); }
+int32_t rv_dom_css_perspective_get_length(RvCSSTransformComponent* target, RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* result) { return ranvier_dom_css_perspective_get_length(target, result); }
+int32_t rv_dom_css_perspective_set_length(RvCSSTransformComponent* target, const RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* value) { return ranvier_dom_css_perspective_set_length(target, value); }
+int32_t rv_dom_css_matrix_component_create(RvNode* target, RvDOMMatrixReadOnly* matrix, const RvDomCSSMatrixComponentOptions* options, RvCSSTransformComponent** result) { return ranvier_dom_css_matrix_component_create(target, matrix, options, result); }
+int32_t rv_dom_css_matrix_component_get_matrix(RvCSSTransformComponent* target, RvDOMMatrixReadOnly** result) { return ranvier_dom_css_matrix_component_get_matrix(target, result); }
+int32_t rv_dom_css_matrix_component_set_matrix(RvCSSTransformComponent* target, RvDOMMatrixReadOnly* value) { return ranvier_dom_css_matrix_component_set_matrix(target, value); }
 int32_t rv_dom_css_unit_value_create(RvNode* target, double value, const uint8_t* unit, int32_t unit_length, RvCSSStyleValue** result) { return ranvier_dom_css_unit_value_create(target, value, unit, unit_length, result); }
 int32_t rv_dom_css_unit_value_get_value(RvCSSStyleValue* target, double* result) { return ranvier_dom_css_unit_value_get_value(target, result); }
 int32_t rv_dom_css_unit_value_set_value(RvCSSStyleValue* target, double value) { return ranvier_dom_css_unit_value_set_value(target, value); }

@@ -2161,6 +2161,174 @@ and [<AllowNullLiteral>] CSSStyleValue =
 and [<AllowNullLiteral>] CSSNumericValue =
     inherit CSSStyleValue
 
+/// <summary>CSSTransformValue in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSTransformValue =
+    inherit CSSStyleValue
+    /// <summary>CSSTransformValue.length.</summary>
+    abstract member length: uint32 with get
+
+    /// <summary>CSSTransformValue.item.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1]")>]
+#endif
+    abstract member item: index: uint32 -> CSSTransformComponent
+
+
+    /// <summary>CSSTransformValue.setItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((v,i,s)=>{if(i===4294967295)throw new RangeError('Index out of range.');v[i]=s;})($0,$1,$2)")>]
+#endif
+    abstract member setItem: index: uint32 * ``val``: CSSTransformComponent -> unit
+
+    /// <summary>CSSTransformValue.is2D.</summary>
+    abstract member is2D: bool with get
+
+    /// <summary>CSSTransformValue.toMatrix.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((v)=>{const m=v.toMatrix();return v.is2D===false&&m.is2D===true?new m.constructor([m.m11,m.m12,m.m13,m.m14,m.m21,m.m22,m.m23,m.m24,m.m31,m.m32,m.m33,m.m34,m.m41,m.m42,m.m43,m.m44]):m;})($0)")>]
+#endif
+    abstract member toMatrix: unit -> DOMMatrix
+
+/// <summary>CSSTransformComponent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSTransformComponent =
+    /// <summary>CSSTransformComponent.toString.</summary>
+    abstract member toString: unit -> string
+    /// <summary>CSSTransformComponent.is2D.</summary>
+    abstract member is2D: bool with get, set
+
+    /// <summary>CSSTransformComponent.toMatrix.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((v)=>{const m=v.toMatrix();return v.is2D===false&&m.is2D===true?new m.constructor([m.m11,m.m12,m.m13,m.m14,m.m21,m.m22,m.m23,m.m24,m.m31,m.m32,m.m33,m.m34,m.m41,m.m42,m.m43,m.m44]):m;})($0)")>]
+#endif
+    abstract member toMatrix: unit -> DOMMatrix
+
+/// <summary>CSSTranslate in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSTranslate =
+    inherit CSSTransformComponent
+    /// <summary>CSSTranslate.x.</summary>
+    abstract member x: CSSNumericValue with get, set
+    /// <summary>CSSTranslate.y.</summary>
+    abstract member y: CSSNumericValue with get, set
+    /// <summary>CSSTranslate.z.</summary>
+    abstract member z: CSSNumericValue with get, set
+
+/// <summary>CSSRotate in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSRotate =
+    inherit CSSTransformComponent
+
+    /// <summary>CSSRotate.x.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.x")>]
+    abstract member __ranvier_get_x: unit -> obj
+
+    [<Fable.Core.Emit("$0.x = $1")>]
+    abstract member __ranvier_set_x: value: obj -> unit
+#else
+    abstract member x: DoubleOrCSSNumericValue with get, set
+#endif
+
+    /// <summary>CSSRotate.y.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.y")>]
+    abstract member __ranvier_get_y: unit -> obj
+
+    [<Fable.Core.Emit("$0.y = $1")>]
+    abstract member __ranvier_set_y: value: obj -> unit
+#else
+    abstract member y: DoubleOrCSSNumericValue with get, set
+#endif
+
+    /// <summary>CSSRotate.z.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.z")>]
+    abstract member __ranvier_get_z: unit -> obj
+
+    [<Fable.Core.Emit("$0.z = $1")>]
+    abstract member __ranvier_set_z: value: obj -> unit
+#else
+    abstract member z: DoubleOrCSSNumericValue with get, set
+#endif
+    /// <summary>CSSRotate.angle.</summary>
+    abstract member angle: CSSNumericValue with get, set
+
+/// <summary>CSSScale in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSScale =
+    inherit CSSTransformComponent
+
+    /// <summary>CSSScale.x.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.x")>]
+    abstract member __ranvier_get_x: unit -> obj
+
+    [<Fable.Core.Emit("$0.x = $1")>]
+    abstract member __ranvier_set_x: value: obj -> unit
+#else
+    abstract member x: DoubleOrCSSNumericValue with get, set
+#endif
+
+    /// <summary>CSSScale.y.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.y")>]
+    abstract member __ranvier_get_y: unit -> obj
+
+    [<Fable.Core.Emit("$0.y = $1")>]
+    abstract member __ranvier_set_y: value: obj -> unit
+#else
+    abstract member y: DoubleOrCSSNumericValue with get, set
+#endif
+
+    /// <summary>CSSScale.z.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.z")>]
+    abstract member __ranvier_get_z: unit -> obj
+
+    [<Fable.Core.Emit("$0.z = $1")>]
+    abstract member __ranvier_set_z: value: obj -> unit
+#else
+    abstract member z: DoubleOrCSSNumericValue with get, set
+#endif
+
+/// <summary>CSSSkew in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSSkew =
+    inherit CSSTransformComponent
+    /// <summary>CSSSkew.ax.</summary>
+    abstract member ax: CSSNumericValue with get, set
+    /// <summary>CSSSkew.ay.</summary>
+    abstract member ay: CSSNumericValue with get, set
+
+/// <summary>CSSSkewX in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSSkewX =
+    inherit CSSTransformComponent
+    /// <summary>CSSSkewX.ax.</summary>
+    abstract member ax: CSSNumericValue with get, set
+
+/// <summary>CSSSkewY in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSSkewY =
+    inherit CSSTransformComponent
+    /// <summary>CSSSkewY.ay.</summary>
+    abstract member ay: CSSNumericValue with get, set
+
+/// <summary>CSSPerspective in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSPerspective =
+    inherit CSSTransformComponent
+
+    /// <summary>CSSPerspective.length.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.length")>]
+    abstract member __ranvier_get_length: unit -> obj
+
+    [<Fable.Core.Emit("$0.length = $1")>]
+    abstract member __ranvier_set_length: value: obj -> unit
+#else
+    abstract member length: CSSNumericValueOrDOMStringOrCSSOMKeywordValue with get, set
+#endif
+
+/// <summary>CSSMatrixComponent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSMatrixComponent =
+    inherit CSSTransformComponent
+    /// <summary>CSSMatrixComponent.matrix.</summary>
+    abstract member matrix: DOMMatrix with get, set
+
 /// <summary>CSSUnitValue in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CSSUnitValue =
     inherit CSSNumericValue
@@ -3806,6 +3974,17 @@ and [<RequireQualifiedAccess>] ElementOrText =
     | Element of Element
     | Text of Text
 
+/// <summary>DoubleOrCSSNumericValue in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] DoubleOrCSSNumericValue =
+    | Double of float
+    | CSSNumericValue of CSSNumericValue
+
+/// <summary>CSSNumericValueOrDOMStringOrCSSOMKeywordValue in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] CSSNumericValueOrDOMStringOrCSSOMKeywordValue =
+    | CSSNumericValue of CSSNumericValue
+    | DOMString of string
+    | CSSOMKeywordValue of CSSKeywordValue
+
 /// <summary>USVStringOrCSSOMVariableReferenceValue in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] USVStringOrCSSOMVariableReferenceValue =
     | USVString of string
@@ -4011,6 +4190,14 @@ module BrowserUnionAdapters =
     let private normalizeUSVString (_: string) : string =
         Fable.Core.Util.jsNative
 
+    [<Fable.Core.Emit("((v)=>{if(v==null)return false;try{globalThis.CSSNumericValue.prototype.type.call(v);return true;}catch{return false;}})($0)")>]
+    let private isCSSNumericValue (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
+    [<Fable.Core.Emit("((v)=>{if(v==null)return false;try{Object.getOwnPropertyDescriptor(globalThis.CSSKeywordValue.prototype,'value').get.call(v);return true;}catch{return false;}})($0)")>]
+    let private isCSSOMKeywordValue (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
     [<Fable.Core.Emit("((v)=>{if(v==null)return false;try{Object.getOwnPropertyDescriptor(globalThis.CSSVariableReferenceValue.prototype,'variable').get.call(v);return true;}catch{return false;} })($0)")>]
     let private isCSSOMVariableReferenceValue (_: obj) : bool =
         Fable.Core.Util.jsNative
@@ -4086,6 +4273,57 @@ module BrowserUnionAdapters =
         match value with
         | ElementOrText.Element value -> box value
         | ElementOrText.Text value -> box value
+
+    let private boxDoubleOrCSSNumericValue (value: DoubleOrCSSNumericValue) : obj =
+        if isNull (box value) then
+            nullArg "value"
+
+        match value with
+        | DoubleOrCSSNumericValue.Double value -> box value
+        | DoubleOrCSSNumericValue.CSSNumericValue value ->
+            if isNull (box value) then
+                nullArg "value"
+
+            if not (isCSSNumericValue (box value)) then
+                invalidArg "value" "Expected a CSSNumericValue."
+
+            box value
+
+    let private unboxDoubleOrCSSNumericValue (value: obj) : DoubleOrCSSNumericValue =
+        match value with
+        | :? float as arm -> DoubleOrCSSNumericValue.Double arm
+        | arm when isCSSNumericValue arm -> DoubleOrCSSNumericValue.CSSNumericValue (unbox<CSSNumericValue> arm)
+        | _ -> failwith "Unexpected DOM union result"
+
+    let private boxCSSNumericValueOrDOMStringOrCSSOMKeywordValue (value: CSSNumericValueOrDOMStringOrCSSOMKeywordValue) : obj =
+        if isNull (box value) then
+            nullArg "value"
+
+        match value with
+        | CSSNumericValueOrDOMStringOrCSSOMKeywordValue.CSSNumericValue value ->
+            if isNull (box value) then
+                nullArg "value"
+
+            if not (isCSSNumericValue (box value)) then
+                invalidArg "value" "Expected a CSSNumericValue."
+
+            box value
+        | CSSNumericValueOrDOMStringOrCSSOMKeywordValue.DOMString value -> box value
+        | CSSNumericValueOrDOMStringOrCSSOMKeywordValue.CSSOMKeywordValue value ->
+            if isNull (box value) then
+                nullArg "value"
+
+            if not (isCSSOMKeywordValue (box value)) then
+                invalidArg "value" "Expected a CSSKeywordValue."
+
+            box value
+
+    let private unboxCSSNumericValueOrDOMStringOrCSSOMKeywordValue (value: obj) : CSSNumericValueOrDOMStringOrCSSOMKeywordValue =
+        match value with
+        | arm when isCSSNumericValue arm -> CSSNumericValueOrDOMStringOrCSSOMKeywordValue.CSSNumericValue (unbox<CSSNumericValue> arm)
+        | :? string as arm -> CSSNumericValueOrDOMStringOrCSSOMKeywordValue.DOMString arm
+        | arm when isCSSOMKeywordValue arm -> CSSNumericValueOrDOMStringOrCSSOMKeywordValue.CSSOMKeywordValue (unbox<CSSKeywordValue> arm)
+        | _ -> failwith "Unexpected DOM union result"
 
     let private boxUSVStringOrCSSOMVariableReferenceValue (value: USVStringOrCSSOMVariableReferenceValue) : obj =
         if isNull (box value) then
@@ -4244,6 +4482,55 @@ module BrowserUnionAdapters =
     type HTMLSlotElement with
         member this.assign([<System.ParamArray>] nodes: ElementOrText array) : unit =
             this.__ranvier_assign (nodes |> Array.map boxElementOrText)
+
+
+    type CSSRotate with
+        member this.x
+            with get (): DoubleOrCSSNumericValue =
+                let value = this.__ranvier_get_x ()
+                unboxDoubleOrCSSNumericValue value
+            and set (value: DoubleOrCSSNumericValue) = this.__ranvier_set_x (boxDoubleOrCSSNumericValue value)
+
+        member this.y
+            with get (): DoubleOrCSSNumericValue =
+                let value = this.__ranvier_get_y ()
+                unboxDoubleOrCSSNumericValue value
+            and set (value: DoubleOrCSSNumericValue) = this.__ranvier_set_y (boxDoubleOrCSSNumericValue value)
+
+        member this.z
+            with get (): DoubleOrCSSNumericValue =
+                let value = this.__ranvier_get_z ()
+                unboxDoubleOrCSSNumericValue value
+            and set (value: DoubleOrCSSNumericValue) = this.__ranvier_set_z (boxDoubleOrCSSNumericValue value)
+
+
+    type CSSScale with
+        member this.x
+            with get (): DoubleOrCSSNumericValue =
+                let value = this.__ranvier_get_x ()
+                unboxDoubleOrCSSNumericValue value
+            and set (value: DoubleOrCSSNumericValue) = this.__ranvier_set_x (boxDoubleOrCSSNumericValue value)
+
+        member this.y
+            with get (): DoubleOrCSSNumericValue =
+                let value = this.__ranvier_get_y ()
+                unboxDoubleOrCSSNumericValue value
+            and set (value: DoubleOrCSSNumericValue) = this.__ranvier_set_y (boxDoubleOrCSSNumericValue value)
+
+        member this.z
+            with get (): DoubleOrCSSNumericValue =
+                let value = this.__ranvier_get_z ()
+                unboxDoubleOrCSSNumericValue value
+            and set (value: DoubleOrCSSNumericValue) = this.__ranvier_set_z (boxDoubleOrCSSNumericValue value)
+
+
+    type CSSPerspective with
+        member this.length
+            with get (): CSSNumericValueOrDOMStringOrCSSOMKeywordValue =
+                let value = this.__ranvier_get_length ()
+                unboxCSSNumericValueOrDOMStringOrCSSOMKeywordValue value
+            and set (value: CSSNumericValueOrDOMStringOrCSSOMKeywordValue) =
+                this.__ranvier_set_length (boxCSSNumericValueOrDOMStringOrCSSOMKeywordValue value)
 
 
     type CSSUnparsedValue with

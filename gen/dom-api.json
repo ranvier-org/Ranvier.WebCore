@@ -114,6 +114,7 @@
         "CSSNumericValue",
         "CSSOMKeywordValue",
         "CSSStyleImageValue",
+        "CSSTransformValue",
         "CSSUnparsedValue",
         "CSSStyleValue"
       ],
@@ -228,6 +229,40 @@
       "parameters": [
         {
           "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    },
+    {
+      "root": "CSSTransformComponent",
+      "function": "rv_dom_css_transform_component_get_interface_name",
+      "feature": "dom-type-query:CSSTransformComponent",
+      "interfaces": [
+        "CSSMatrixComponent",
+        "CSSPerspective",
+        "CSSRotate",
+        "CSSScale",
+        "CSSSkew",
+        "CSSSkewX",
+        "CSSSkewY",
+        "CSSTranslate",
+        "CSSTransformComponent"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
           "name": "target"
         },
         {
@@ -661,6 +696,46 @@
     {
       "name": "CSSNumericValue",
       "base": "CSSStyleValue"
+    },
+    {
+      "name": "CSSTransformValue",
+      "base": "CSSStyleValue"
+    },
+    {
+      "name": "CSSTransformComponent",
+      "base": null
+    },
+    {
+      "name": "CSSTranslate",
+      "base": "CSSTransformComponent"
+    },
+    {
+      "name": "CSSRotate",
+      "base": "CSSTransformComponent"
+    },
+    {
+      "name": "CSSScale",
+      "base": "CSSTransformComponent"
+    },
+    {
+      "name": "CSSSkew",
+      "base": "CSSTransformComponent"
+    },
+    {
+      "name": "CSSSkewX",
+      "base": "CSSTransformComponent"
+    },
+    {
+      "name": "CSSSkewY",
+      "base": "CSSTransformComponent"
+    },
+    {
+      "name": "CSSPerspective",
+      "base": "CSSTransformComponent"
+    },
+    {
+      "name": "CSSMatrixComponent",
+      "base": "CSSTransformComponent"
     },
     {
       "name": "CSSUnitValue",
@@ -1879,6 +1954,96 @@
       "mixin": false,
       "contractOnly": false,
       "source": "css/typedom/CSSNumericValue.idl"
+    },
+    {
+      "name": "CSSTransformValue",
+      "idlName": "CSSTransformValue",
+      "base": "CSSStyleValue",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSTransformValue.idl"
+    },
+    {
+      "name": "CSSTransformComponent",
+      "idlName": "CSSTransformComponent",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSTransformComponent.idl"
+    },
+    {
+      "name": "CSSTranslate",
+      "idlName": "CSSTranslate",
+      "base": "CSSTransformComponent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSTranslate.idl"
+    },
+    {
+      "name": "CSSRotate",
+      "idlName": "CSSRotate",
+      "base": "CSSTransformComponent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSRotate.idl"
+    },
+    {
+      "name": "CSSScale",
+      "idlName": "CSSScale",
+      "base": "CSSTransformComponent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSScale.idl"
+    },
+    {
+      "name": "CSSSkew",
+      "idlName": "CSSSkew",
+      "base": "CSSTransformComponent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSSkew.idl"
+    },
+    {
+      "name": "CSSSkewX",
+      "idlName": "CSSSkewX",
+      "base": "CSSTransformComponent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSSkewX.idl"
+    },
+    {
+      "name": "CSSSkewY",
+      "idlName": "CSSSkewY",
+      "base": "CSSTransformComponent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSSkewY.idl"
+    },
+    {
+      "name": "CSSPerspective",
+      "idlName": "CSSPerspective",
+      "base": "CSSTransformComponent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSPerspective.idl"
+    },
+    {
+      "name": "CSSMatrixComponent",
+      "idlName": "CSSMatrixComponent",
+      "base": "CSSTransformComponent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/typedom/transform/CSSMatrixComponent.idl"
     },
     {
       "name": "CSSUnitValue",
@@ -76777,6 +76942,3766 @@
       }
     },
     {
+      "interface": "CSSTransformValue",
+      "member": "constructor",
+      "contractOwner": "CSSTransformValue",
+      "kind": "constructor",
+      "function": "rv_dom_css_transform_value_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceCSSTransformComponent*",
+          "name": "transforms"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "transforms",
+          "idlType": "sequence<CSSTransformComponent>",
+          "idl": {
+            "name": "sequence",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "CSSTransformComponent",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceCSSTransformComponent",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSTransformComponent sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSTransformComponent",
+                "root": "CSSTransformComponent",
+                "class": "CSSTransformComponent",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSTransformValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSTransformValue",
+        "root": "CSSStyleValue",
+        "class": "CSSTransformValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSTransformValue"
+    },
+    {
+      "interface": "CSSTransformValue",
+      "member": "length",
+      "contractOwner": "CSSTransformValue",
+      "kind": "getter",
+      "function": "rv_dom_css_transform_value_get_length",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransformValue",
+      "member": "is2D",
+      "contractOwner": "CSSTransformValue",
+      "kind": "getter",
+      "function": "rv_dom_css_transform_value_get_is2_d",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransformValue",
+      "member": "item",
+      "contractOwner": "CSSTransformValue",
+      "kind": "operation",
+      "function": "rv_dom_css_transform_value_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSTransformComponent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSTransformComponent",
+        "root": "CSSTransformComponent",
+        "class": "CSSTransformComponent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransformValue",
+      "member": "setItem",
+      "contractOwner": "CSSTransformValue",
+      "kind": "operation",
+      "function": "rv_dom_css_transform_value_set_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "val"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "val",
+          "idlType": "CSSTransformComponent",
+          "idl": {
+            "name": "CSSTransformComponent",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSTransformComponent",
+            "root": "CSSTransformComponent",
+            "class": "CSSTransformComponent",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransformValue",
+      "member": "toMatrix",
+      "contractOwner": "CSSTransformValue",
+      "kind": "operation",
+      "function": "rv_dom_css_transform_value_to_matrix",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransformComponent",
+      "member": "is2D",
+      "contractOwner": "CSSTransformComponent",
+      "kind": "getter",
+      "function": "rv_dom_css_transform_component_get_is2_d",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransformComponent",
+      "member": "is2D",
+      "contractOwner": "CSSTransformComponent",
+      "kind": "setter",
+      "function": "rv_dom_css_transform_component_set_is2_d",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "boolean",
+          "idl": {
+            "name": "boolean",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "bool",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransformComponent",
+      "member": "toString",
+      "contractOwner": "CSSTransformComponent",
+      "kind": "operation",
+      "function": "rv_dom_css_transform_component_to_string",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransformComponent",
+      "member": "toMatrix",
+      "contractOwner": "CSSTransformComponent",
+      "kind": "operation",
+      "function": "rv_dom_css_transform_component_to_matrix",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTranslate",
+      "member": "constructor",
+      "contractOwner": "CSSTranslate",
+      "kind": "constructor",
+      "function": "rv_dom_css_translate_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "x"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "y"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "z"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "z",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSTranslate",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSTranslate",
+        "root": "CSSTransformComponent",
+        "class": "CSSTranslate",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSTranslate"
+    },
+    {
+      "interface": "CSSTranslate",
+      "member": "x",
+      "contractOwner": "CSSTranslate",
+      "kind": "getter",
+      "function": "rv_dom_css_translate_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTranslate",
+      "member": "x",
+      "contractOwner": "CSSTranslate",
+      "kind": "setter",
+      "function": "rv_dom_css_translate_set_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTranslate",
+      "member": "y",
+      "contractOwner": "CSSTranslate",
+      "kind": "getter",
+      "function": "rv_dom_css_translate_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTranslate",
+      "member": "y",
+      "contractOwner": "CSSTranslate",
+      "kind": "setter",
+      "function": "rv_dom_css_translate_set_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTranslate",
+      "member": "z",
+      "contractOwner": "CSSTranslate",
+      "kind": "getter",
+      "function": "rv_dom_css_translate_get_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTranslate",
+      "member": "z",
+      "contractOwner": "CSSTranslate",
+      "kind": "setter",
+      "function": "rv_dom_css_translate_set_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "constructor",
+      "contractOwner": "CSSRotate",
+      "kind": "constructor",
+      "function": "rv_dom_css_rotate_create_1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "angle"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "angle",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSRotate",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSRotate",
+        "root": "CSSTransformComponent",
+        "class": "CSSRotate",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSRotate"
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "constructor",
+      "contractOwner": "CSSRotate",
+      "kind": "constructor",
+      "function": "rv_dom_css_rotate_create_4",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "x"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "y"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "z"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "angle"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "z",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "angle",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSRotate",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSRotate",
+        "root": "CSSTransformComponent",
+        "class": "CSSRotate",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSRotate"
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "x",
+      "contractOwner": "CSSRotate",
+      "kind": "getter",
+      "function": "rv_dom_css_rotate_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "x",
+      "contractOwner": "CSSRotate",
+      "kind": "setter",
+      "function": "rv_dom_css_rotate_set_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "y",
+      "contractOwner": "CSSRotate",
+      "kind": "getter",
+      "function": "rv_dom_css_rotate_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "y",
+      "contractOwner": "CSSRotate",
+      "kind": "setter",
+      "function": "rv_dom_css_rotate_set_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "z",
+      "contractOwner": "CSSRotate",
+      "kind": "getter",
+      "function": "rv_dom_css_rotate_get_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "z",
+      "contractOwner": "CSSRotate",
+      "kind": "setter",
+      "function": "rv_dom_css_rotate_set_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "angle",
+      "contractOwner": "CSSRotate",
+      "kind": "getter",
+      "function": "rv_dom_css_rotate_get_angle",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSRotate",
+      "member": "angle",
+      "contractOwner": "CSSRotate",
+      "kind": "setter",
+      "function": "rv_dom_css_rotate_set_angle",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSScale",
+      "member": "constructor",
+      "contractOwner": "CSSScale",
+      "kind": "constructor",
+      "function": "rv_dom_css_scale_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "x"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "y"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "z"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "z",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSScale",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSScale",
+        "root": "CSSTransformComponent",
+        "class": "CSSScale",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSScale"
+    },
+    {
+      "interface": "CSSScale",
+      "member": "x",
+      "contractOwner": "CSSScale",
+      "kind": "getter",
+      "function": "rv_dom_css_scale_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "CSSScale",
+      "member": "x",
+      "contractOwner": "CSSScale",
+      "kind": "setter",
+      "function": "rv_dom_css_scale_set_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSScale",
+      "member": "y",
+      "contractOwner": "CSSScale",
+      "kind": "getter",
+      "function": "rv_dom_css_scale_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "CSSScale",
+      "member": "y",
+      "contractOwner": "CSSScale",
+      "kind": "setter",
+      "function": "rv_dom_css_scale_set_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSScale",
+      "member": "z",
+      "contractOwner": "CSSScale",
+      "kind": "getter",
+      "function": "rv_dom_css_scale_get_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "CSSScale",
+      "member": "z",
+      "contractOwner": "CSSScale",
+      "kind": "setter",
+      "function": "rv_dom_css_scale_set_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumberish",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSSkew",
+      "member": "constructor",
+      "contractOwner": "CSSSkew",
+      "kind": "constructor",
+      "function": "rv_dom_css_skew_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "ax"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "ay"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "ax",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "ay",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSSkew",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSSkew",
+        "root": "CSSTransformComponent",
+        "class": "CSSSkew",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSSkew"
+    },
+    {
+      "interface": "CSSSkew",
+      "member": "ax",
+      "contractOwner": "CSSSkew",
+      "kind": "getter",
+      "function": "rv_dom_css_skew_get_ax",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSSkew",
+      "member": "ax",
+      "contractOwner": "CSSSkew",
+      "kind": "setter",
+      "function": "rv_dom_css_skew_set_ax",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSSkew",
+      "member": "ay",
+      "contractOwner": "CSSSkew",
+      "kind": "getter",
+      "function": "rv_dom_css_skew_get_ay",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSSkew",
+      "member": "ay",
+      "contractOwner": "CSSSkew",
+      "kind": "setter",
+      "function": "rv_dom_css_skew_set_ay",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSSkewX",
+      "member": "constructor",
+      "contractOwner": "CSSSkewX",
+      "kind": "constructor",
+      "function": "rv_dom_css_skew_x_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "ax"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "ax",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSSkewX",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSSkewX",
+        "root": "CSSTransformComponent",
+        "class": "CSSSkewX",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSSkewX"
+    },
+    {
+      "interface": "CSSSkewX",
+      "member": "ax",
+      "contractOwner": "CSSSkewX",
+      "kind": "getter",
+      "function": "rv_dom_css_skew_x_get_ax",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSSkewX",
+      "member": "ax",
+      "contractOwner": "CSSSkewX",
+      "kind": "setter",
+      "function": "rv_dom_css_skew_x_set_ax",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSSkewY",
+      "member": "constructor",
+      "contractOwner": "CSSSkewY",
+      "kind": "constructor",
+      "function": "rv_dom_css_skew_y_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "ay"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "ay",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSSkewY",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSSkewY",
+        "root": "CSSTransformComponent",
+        "class": "CSSSkewY",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSSkewY"
+    },
+    {
+      "interface": "CSSSkewY",
+      "member": "ay",
+      "contractOwner": "CSSSkewY",
+      "kind": "getter",
+      "function": "rv_dom_css_skew_y_get_ay",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSSkewY",
+      "member": "ay",
+      "contractOwner": "CSSSkewY",
+      "kind": "setter",
+      "function": "rv_dom_css_skew_y_set_ay",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumericValue",
+          "idl": {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSPerspective",
+      "member": "constructor",
+      "contractOwner": "CSSPerspective",
+      "kind": "constructor",
+      "function": "rv_dom_css_perspective_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue*",
+          "name": "length_"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "length",
+          "idlType": "CSSPerspectiveValue",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSOMKeywordValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSOMKeywordValue",
+                "root": "CSSStyleValue",
+                "class": "CSSOMKeywordValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSPerspective",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSPerspective",
+        "root": "CSSTransformComponent",
+        "class": "CSSPerspective",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSPerspective"
+    },
+    {
+      "interface": "CSSPerspective",
+      "member": "length",
+      "contractOwner": "CSSPerspective",
+      "kind": "getter",
+      "function": "rv_dom_css_perspective_get_length",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSOMKeywordValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSOMKeywordValue",
+            "root": "CSSStyleValue",
+            "class": "CSSOMKeywordValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "CSSPerspective",
+      "member": "length",
+      "contractOwner": "CSSPerspective",
+      "kind": "setter",
+      "function": "rv_dom_css_perspective_set_length",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSPerspectiveValue",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSOMKeywordValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSOMKeywordValue",
+                "root": "CSSStyleValue",
+                "class": "CSSOMKeywordValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSMatrixComponent",
+      "member": "constructor",
+      "contractOwner": "CSSMatrixComponent",
+      "kind": "constructor",
+      "function": "rv_dom_css_matrix_component_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "matrix"
+        },
+        {
+          "ctype": "const RvDomCSSMatrixComponentOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvCSSTransformComponent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "matrix",
+          "idlType": "DOMMatrixReadOnly",
+          "idl": {
+            "name": "DOMMatrixReadOnly",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "DOMMatrixReadOnly",
+            "root": "DOMMatrixReadOnly",
+            "class": "DOMMatrixReadOnly",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "CSSMatrixComponentOptions",
+          "idl": {
+            "name": "CSSMatrixComponentOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "CSSMatrixComponentOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CSSMatrixComponent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSMatrixComponent",
+        "root": "CSSTransformComponent",
+        "class": "CSSMatrixComponent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CSSMatrixComponent"
+    },
+    {
+      "interface": "CSSMatrixComponent",
+      "member": "matrix",
+      "contractOwner": "CSSMatrixComponent",
+      "kind": "getter",
+      "function": "rv_dom_css_matrix_component_get_matrix",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSMatrixComponent",
+      "member": "matrix",
+      "contractOwner": "CSSMatrixComponent",
+      "kind": "setter",
+      "function": "rv_dom_css_matrix_component_set_matrix",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCSSTransformComponent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMMatrix",
+          "idl": {
+            "name": "DOMMatrix",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "DOMMatrix",
+            "root": "DOMMatrixReadOnly",
+            "class": "DOMMatrix",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "CSSUnitValue",
       "member": "constructor",
       "contractOwner": "CSSUnitValue",
@@ -105305,6 +109230,128 @@
     },
     {
       "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceCSSTransformComponent",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSTransformComponent sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSTransformComponent",
+            "root": "CSSTransformComponent",
+            "class": "CSSTransformComponent",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_css_transform_component_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_double_or_css_numeric_value_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSOMKeywordValue",
+            "root": "CSSStyleValue",
+            "class": "CSSOMKeywordValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_css_numeric_value_or_dom_string_or_cssom_keyword_value_release"
+    },
+    {
+      "mapping": {
         "kind": "union",
         "ctype": "RvDomUnionUSVStringOrCSSOMVariableReferenceValue",
         "interface": null,
@@ -106571,6 +110618,27 @@
         "ctype": "int32_t",
         "required": false,
         "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "CSSMatrixComponentOptions": [
+      {
+        "name": "is2D",
+        "field": "is2_d",
+        "ctype": "const int32_t*",
+        "required": false,
+        "default": null,
         "mapping": {
           "kind": "bool",
           "ctype": "int32_t",

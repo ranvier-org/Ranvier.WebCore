@@ -59,6 +59,105 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_selected_browser_transform_matrix_flags_copy_only_the_measured_false_flag_case(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface DOMMatrixReadOnly {};
+interface DOMMatrix : DOMMatrixReadOnly {};
+interface CSSTransformComponent { attribute boolean is2D; DOMMatrix toMatrix(); };
+interface CSSTransformValue : CSSStyleValue { readonly attribute boolean is2D; DOMMatrix toMatrix(); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'DOMMatrixReadOnly', 'DOMMatrix', 'CSSTransformComponent', 'CSSTransformValue']
+        config['browserMatrixFlagAdapters'] = ['CSSTransformComponent.toMatrix', 'CSSTransformValue.toMatrix']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        shared = generator.interfaces()
+        self.assertEqual(shared.count('v.is2D===false&&m.is2D===true'), 2)
+        self.assertIn('new m.constructor([m.m11,m.m12,m.m13,m.m14,m.m21,m.m22,m.m23,m.m24,m.m31,m.m32,m.m33,m.m34,m.m41,m.m42,m.m43,m.m44])', shared)
+        self.assertIn(':m;})($0)', shared)
+
+    def test_browser_matrix_flag_adapter_rejects_other_matrix_operations(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface DOMMatrix {};
+interface CSSTransformComponent { DOMMatrix anotherMatrix(); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['DOMMatrix', 'CSSTransformComponent']
+        config['browserMatrixFlagAdapters'] = ['CSSTransformComponent.anotherMatrix']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        with self.assertRaisesRegex(SystemExit, 'plain zero-argument DOMMatrix operation'):
+            generator.interfaces()
+
+    def test_selected_transform_browser_adapters_brand_numeric_subtypes_and_guard_index_and_reference_coercion(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface CSSNumericValue : CSSStyleValue {};
+interface CSSOMKeywordValue : CSSStyleValue {};
+typedef (double or CSSNumericValue) CSSNumberish;
+typedef (DOMString or CSSOMKeywordValue) CSSOMKeywordish;
+typedef (CSSNumericValue or CSSOMKeywordish) CSSPerspectiveValue;
+interface CSSTransformComponent {};
+interface CSSScale : CSSTransformComponent { attribute CSSNumberish x; };
+interface CSSPerspective : CSSTransformComponent { attribute CSSPerspectiveValue length; };
+interface CSSTransformValue : CSSStyleValue {
+    getter CSSTransformComponent (unsigned long index);
+    setter undefined (unsigned long index, CSSTransformComponent val);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSNumericValue', 'CSSOMKeywordValue', 'CSSTransformComponent', 'CSSScale', 'CSSPerspective', 'CSSTransformValue']
+        config['flattenUnionTypedefs'] = ['CSSPerspectiveValue']
+        config['validatedReferenceUnions'] = ['DoubleOrCSSNumericValue', 'CSSNumericValueOrDOMStringOrCSSOMKeywordValue']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        shared = generator.interfaces()
+        self.assertIn('globalThis.CSSNumericValue.prototype.type.call(v)', shared)
+        self.assertIn("globalThis.CSSKeywordValue.prototype,'value').get.call(v)", shared)
+        self.assertIn('if not (isCSSNumericValue (box value)) then', shared)
+        self.assertIn('if not (isCSSOMKeywordValue (box value)) then', shared)
+        self.assertIn('if(i===4294967295)throw new RangeError', shared)
+        self.assertNotIn("Object.prototype.toString.call($0) === '[object CSSNumericValue]'", shared)
+
+    def test_selected_transform_setters_validate_dimensions_before_calling_engine_mutators(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface CSSNumericValue : CSSStyleValue {};
+typedef (double or CSSNumericValue) CSSNumberish;
+interface CSSTranslate { attribute CSSNumericValue x; };
+interface CSSScale { attribute CSSNumberish x; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'CSSNumericValue', 'CSSTranslate', 'CSSScale']
+        config['setterValueChecks'] = {'CSSTranslate.x': 'css-length-or-percentage', 'CSSScale.x': 'css-numberish-number'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        translation = next(function for function in generator.functions if function.name == 'css_translate_set_x')
+        scale = next(function for function in generator.functions if function.name == 'css_scale_set_x')
+        translation_body, scale_body = '\n'.join(translation.body), '\n'.join(scale.body)
+        self.assertIn('a0->type().matchesTypeOrPercentage<CSSNumericBaseType::Length>()', translation_body)
+        self.assertLess(translation_body.index('matchesTypeOrPercentage'), translation_body.index('impl->setX'))
+        self.assertIn('numeric->type().matchesNumber()', scale_body)
+        self.assertLess(scale_body.index('matchesNumber'), scale_body.index('impl->setX'))
+        self.assertIn('ExceptionCode::TypeError', scale_body)
+        bad = dict(config)
+        bad['setterValueChecks'] = {'CSSScale.x': 'css-length-or-percentage'}
+        with self.assertRaisesRegex(SystemExit, 'setter check.*requires CSSNumericValue'):
+            domgen.Generator(domgen.World(self.source, bad)).run()
+
     def test_selected_const_numeric_getter_retains_a_checked_declared_reference_without_global_const_casts(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

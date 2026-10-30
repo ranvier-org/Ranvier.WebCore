@@ -20,18 +20,26 @@
 #include "CSSKeyframesRule.h"
 #include "CSSLayerBlockRule.h"
 #include "CSSLayerStatementRule.h"
+#include "CSSMatrixComponent.h"
+#include "CSSMatrixComponentOptions.h"
 #include "CSSMediaRule.h"
 #include "CSSNamespaceRule.h"
 #include "CSSNestedDeclarations.h"
 #include "CSSNumericValue.h"
 #include "CSSOMKeywordValue.h"
 #include "CSSOMVariableReferenceValue.h"
+#include "CSSPerspective.h"
 #include "CSSPositionTryDescriptors.h"
 #include "CSSPositionTryRule.h"
 #include "CSSPropertyRule.h"
+#include "CSSRotate.h"
 #include "CSSRule.h"
 #include "CSSRuleList.h"
+#include "CSSScale.h"
 #include "CSSScopeRule.h"
+#include "CSSSkew.h"
+#include "CSSSkewX.h"
+#include "CSSSkewY.h"
 #include "CSSStartingStyleRule.h"
 #include "CSSStyleDeclaration.h"
 #include "CSSStyleImageValue.h"
@@ -40,6 +48,9 @@
 #include "CSSStyleSheet.h"
 #include "CSSStyleValue.h"
 #include "CSSSupportsRule.h"
+#include "CSSTransformComponent.h"
+#include "CSSTransformValue.h"
+#include "CSSTranslate.h"
 #include "CSSUnitValue.h"
 #include "CSSUnparsedValue.h"
 #include "CSSViewTransitionRule.h"
@@ -498,6 +509,21 @@ template<typename Concrete, typename Root> Concrete* castTrackedHandle(Root& val
     auto& handles = trackedHandles<Root>();
     auto found = handles.find(&value);
     return found != handles.end() && found->second.mutableType ? static_cast<Concrete*>(&value) : nullptr;
+}
+} // namespace
+
+
+namespace {
+template<typename Root, typename Declared, typename Handle, typename V>
+int32_t storeConstGetter(V&& value, Handle** result)
+{
+    static_assert(std::is_lvalue_reference_v<V> && std::is_const_v<std::remove_reference_t<V>>);
+    static_assert(std::is_same_v<std::remove_cvref_t<V>, Declared>);
+    static_assert(std::is_polymorphic_v<Root>);
+    auto* pointer = static_cast<Root*>(const_cast<Declared*>(&value));
+    pointer->ref();
+    *result = reinterpret_cast<Handle*>(pointer);
+    return RV_OK;
 }
 } // namespace
 
@@ -1323,6 +1349,169 @@ template<typename V> int32_t encodeRvDomSequenceUSVString(V&& input, RvDomSequen
     return RV_OK;
 }
 
+std::optional<Vector<Ref<CSSTransformComponent>>> decodeRvDomSequenceCSSTransformComponent(const RvDomSequenceCSSTransformComponent* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Ref<CSSTransformComponent>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSTransformComponent> item = reinterpret_cast<CSSTransformComponent*>(source->items[i]);
+        if (source->items[i] && !item) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        result.append(Ref { *item });
+    }
+    return Vector<Ref<CSSTransformComponent>> { std::move(result) };
+}
+
+void clearRvDomSequenceCSSTransformComponent(RvDomSequenceCSSTransformComponent* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<CSSTransformComponent*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceCSSTransformComponent(V&& input, RvDomSequenceCSSTransformComponent* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvCSSTransformComponent**>(std::calloc(value.size(), sizeof(RvCSSTransformComponent*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<CSSTransformComponent>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<double, Ref<CSSNumericValue>>> decodeRvDomUnionDoubleOrCSSNumericValue(const RvDomUnionDoubleOrCSSNumericValue* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!std::isfinite(source->arm0)) {
+            status = Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+            return std::nullopt;
+        }
+        return Variant<double, Ref<CSSNumericValue>> { Variant<double, Ref<CSSNumericValue>> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSNumericValue> arm1 = source->arm1 ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(source->arm1)) : nullptr;
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<double, Ref<CSSNumericValue>> { Variant<double, Ref<CSSNumericValue>> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionDoubleOrCSSNumericValue(RvDomUnionDoubleOrCSSNumericValue* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<CSSStyleValue*>(value->arm1)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionDoubleOrCSSNumericValue(V&& value, RvDomUnionDoubleOrCSSNumericValue* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = static_cast<double>(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionDoubleOrCSSNumericValue<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionDoubleOrCSSNumericValue(V&& input, RvDomUnionDoubleOrCSSNumericValue* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionDoubleOrCSSNumericValue(value, result);
+    return RV_OK;
+}
+
+std::optional<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>> decodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(const RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSNumericValue> arm0 = source->arm0 ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(source->arm0)) : nullptr;
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>> { Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        if (source->arm1.length < 0 || (source->arm1.length > 0 && !source->arm1.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm1 = source->arm1.length < 0 ? String() : source->arm1.length ? String::fromUTF8(std::span<const uint8_t> { source->arm1.data, static_cast<size_t>(source->arm1.length) }) : emptyString();
+        if (source->arm1.length >= 0 && arm1.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>> { Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>> { WTF::InPlaceIndex<1>, arm1 } };
+    }
+    case 3: {
+        if (!source->arm2) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSOMKeywordValue> arm2 = source->arm2 ? dynamicDowncast<CSSOMKeywordValue>(*reinterpret_cast<CSSStyleValue*>(source->arm2)) : nullptr;
+        if (source->arm2 && !arm2) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>> { Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>> { WTF::InPlaceIndex<2>, Ref { *arm2 } } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<CSSStyleValue*>(value->arm0)->deref();
+        break;
+    case 2:
+        std::free(const_cast<uint8_t*>(value->arm1.data));
+        break;
+    case 3:
+        if (value->arm2) reinterpret_cast<CSSStyleValue*>(value->arm2)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(V&& value, RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* result)
+{
+    if constexpr (I < 3) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+            else if constexpr (I == 2) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm2);
+            }
+        } else encodeArmsRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(V&& input, RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(value, result);
+    return RV_OK;
+}
+
 std::optional<Variant<String, Ref<CSSOMVariableReferenceValue>>> decodeRvDomUnionUSVStringOrCSSOMVariableReferenceValue(const RvDomUnionUSVStringOrCSSOMVariableReferenceValue* source, int32_t& status)
 {
     if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -1860,7 +2049,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -1984,6 +2173,21 @@ void ranvier_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrDOM
 void ranvier_dom_sequence_usv_string_release(RvDomSequenceUSVString* value)
 {
     if (isMainThread()) clearRvDomSequenceUSVString(value);
+}
+
+void ranvier_dom_sequence_css_transform_component_release(RvDomSequenceCSSTransformComponent* value)
+{
+    if (isMainThread()) clearRvDomSequenceCSSTransformComponent(value);
+}
+
+void ranvier_dom_union_double_or_css_numeric_value_release(RvDomUnionDoubleOrCSSNumericValue* value)
+{
+    if (isMainThread()) clearRvDomUnionDoubleOrCSSNumericValue(value);
+}
+
+void ranvier_dom_union_css_numeric_value_or_dom_string_or_cssom_keyword_value_release(RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* value)
+{
+    if (isMainThread()) clearRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(value);
 }
 
 void ranvier_dom_union_usv_string_or_cssom_variable_reference_value_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValue* value)
@@ -2170,6 +2374,20 @@ RvCSSStyleValue* ranvier_dom_css_style_value_retain(RvCSSStyleValue* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<CSSStyleValue*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_css_transform_component_release(RvCSSTransformComponent* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<CSSTransformComponent*>(handle)->deref();
+}
+
+RvCSSTransformComponent* ranvier_dom_css_transform_component_retain(RvCSSTransformComponent* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<CSSTransformComponent*>(handle)->ref();
     return handle;
 }
 
@@ -21272,6 +21490,780 @@ int32_t ranvier_dom_css_style_value_to_string(RvCSSStyleValue* target, char* buf
     return deliver([&]() -> decltype(auto) { return impl->toString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
 }
 
+// CSSTransformValue.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_css_transform_value_create(RvNode* target, const RvDomSequenceCSSTransformComponent* transforms, RvCSSStyleValue** result)
+{
+    if (!target || !transforms || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceCSSTransformComponent(transforms, status0);
+    if (status0 != RV_OK) return status0;
+    return deliver([&]() -> decltype(auto) { return CSSTransformValue::create(DomSequenceArgument<Ref<CSSTransformComponent>> { std::move(*a0) }); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
+// CSSTransformValue.length getter: readonly attribute unsigned long length
+int32_t ranvier_dom_css_transform_value_get_length(RvCSSStyleValue* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTransformValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// CSSTransformValue.is2D getter: readonly attribute boolean is2D
+int32_t ranvier_dom_css_transform_value_get_is2_d(RvCSSStyleValue* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTransformValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->is2D(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CSSTransformValue.item(unsigned long index) -> CSSTransformComponent; *result is a new reference
+int32_t ranvier_dom_css_transform_value_item(RvCSSStyleValue* target, uint32_t index, RvCSSTransformComponent** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTransformValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSTransformValue.setItem(unsigned long index, CSSTransformComponent val) -> undefined
+int32_t ranvier_dom_css_transform_value_set_item(RvCSSStyleValue* target, uint32_t index, RvCSSTransformComponent* val)
+{
+    if (!target || !val)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTransformValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSTransformComponent> a1 = reinterpret_cast<CSSTransformComponent*>(val);
+    return invoke([&]() -> decltype(auto) { return impl->setItem(index, HandleArg<CSSTransformComponent> { a1.get() }); });
+}
+
+// CSSTransformValue.toMatrix() -> DOMMatrix; *result is a new reference
+int32_t ranvier_dom_css_transform_value_to_matrix(RvCSSStyleValue* target, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTransformValue>(*reinterpret_cast<CSSStyleValue*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->toMatrix(); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// CSSTransformComponent.is2D getter: attribute boolean is2D
+int32_t ranvier_dom_css_transform_component_get_is2_d(RvCSSTransformComponent* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSTransformComponent> impl = reinterpret_cast<CSSTransformComponent*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->is2D(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CSSTransformComponent.is2D setter: attribute boolean is2D
+int32_t ranvier_dom_css_transform_component_set_is2_d(RvCSSTransformComponent* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSTransformComponent> impl = reinterpret_cast<CSSTransformComponent*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setIs2D(!!value); });
+}
+
+// CSSTransformComponent.toString() -> DOMString
+int32_t ranvier_dom_css_transform_component_to_string(RvCSSTransformComponent* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSTransformComponent> impl = reinterpret_cast<CSSTransformComponent*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->toString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CSSTransformComponent.toMatrix() -> DOMMatrix; *result is a new reference
+int32_t ranvier_dom_css_transform_component_to_matrix(RvCSSTransformComponent* target, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CSSTransformComponent> impl = reinterpret_cast<CSSTransformComponent*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->toMatrix(); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// CSSTranslate.constructor: target is the Document of the constructed object; z may be NULL; *result is a new reference
+int32_t ranvier_dom_css_translate_create(RvNode* target, RvCSSStyleValue* x, RvCSSStyleValue* y, RvCSSStyleValue* z, RvCSSTransformComponent** result)
+{
+    if (!target || !x || !y || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = x ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(x)) : nullptr;
+    if (x && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a1 = y ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(y)) : nullptr;
+    if (y && !a1)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a2 = z ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(z)) : nullptr;
+    if (z && !a2)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return CSSTranslate::create(HandleArg<CSSNumericValue> { a0.get() }, HandleArg<CSSNumericValue> { a1.get() }, a2.get()); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSTranslate.x getter: attribute CSSNumericValue x; *result is a new reference
+int32_t ranvier_dom_css_translate_get_x(RvCSSTransformComponent* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTranslate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result); });
+}
+
+// CSSTranslate.x setter: attribute CSSNumericValue x
+int32_t ranvier_dom_css_translate_set_x(RvCSSTransformComponent* target, RvCSSStyleValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTranslate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = value ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!(a0->type().matchesTypeOrPercentage<CSSNumericBaseType::Length>()))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A compatible numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setX(HandleArg<CSSNumericValue> { a0.get() }); });
+}
+
+// CSSTranslate.y getter: attribute CSSNumericValue y; *result is a new reference
+int32_t ranvier_dom_css_translate_get_y(RvCSSTransformComponent* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTranslate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result); });
+}
+
+// CSSTranslate.y setter: attribute CSSNumericValue y
+int32_t ranvier_dom_css_translate_set_y(RvCSSTransformComponent* target, RvCSSStyleValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTranslate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = value ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!(a0->type().matchesTypeOrPercentage<CSSNumericBaseType::Length>()))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A compatible numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setY(HandleArg<CSSNumericValue> { a0.get() }); });
+}
+
+// CSSTranslate.z getter: attribute CSSNumericValue z; *result is a new reference
+int32_t ranvier_dom_css_translate_get_z(RvCSSTransformComponent* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTranslate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->z(); }, [&](auto&& value) { return storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result); });
+}
+
+// CSSTranslate.z setter: attribute CSSNumericValue z
+int32_t ranvier_dom_css_translate_set_z(RvCSSTransformComponent* target, RvCSSStyleValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSTranslate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = value ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setZ(HandleArg<CSSNumericValue> { a0.get() }); });
+}
+
+// CSSRotate.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_css_rotate_create_1(RvNode* target, RvCSSStyleValue* angle, RvCSSTransformComponent** result)
+{
+    if (!target || !angle || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = angle ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(angle)) : nullptr;
+    if (angle && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return CSSRotate::create(HandleArg<CSSNumericValue> { a0.get() }); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSRotate.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_css_rotate_create_4(RvNode* target, const RvDomUnionDoubleOrCSSNumericValue* x, const RvDomUnionDoubleOrCSSNumericValue* y, const RvDomUnionDoubleOrCSSNumericValue* z, RvCSSStyleValue* angle, RvCSSTransformComponent** result)
+{
+    if (!target || !x || !y || !z || !angle || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValue(x, status0);
+    if (status0 != RV_OK) return status0;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionDoubleOrCSSNumericValue(y, status1);
+    if (status1 != RV_OK) return status1;
+    int32_t status2 = RV_OK;
+    auto a2 = decodeRvDomUnionDoubleOrCSSNumericValue(z, status2);
+    if (status2 != RV_OK) return status2;
+    RefPtr<CSSNumericValue> a3 = angle ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(angle)) : nullptr;
+    if (angle && !a3)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return CSSRotate::create(std::move(*a0), std::move(*a1), std::move(*a2), HandleArg<CSSNumericValue> { a3.get() }); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSRotate.x getter: attribute CSSNumberish x; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_rotate_get_x(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSRotate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValue(value, result); });
+}
+
+// CSSRotate.x setter: attribute CSSNumberish x
+int32_t ranvier_dom_css_rotate_set_x(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSRotate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValue(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setX(std::move(*a0)); });
+}
+
+// CSSRotate.y getter: attribute CSSNumberish y; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_rotate_get_y(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSRotate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValue(value, result); });
+}
+
+// CSSRotate.y setter: attribute CSSNumberish y
+int32_t ranvier_dom_css_rotate_set_y(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSRotate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValue(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setY(std::move(*a0)); });
+}
+
+// CSSRotate.z getter: attribute CSSNumberish z; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_rotate_get_z(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSRotate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->z(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValue(value, result); });
+}
+
+// CSSRotate.z setter: attribute CSSNumberish z
+int32_t ranvier_dom_css_rotate_set_z(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSRotate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValue(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setZ(std::move(*a0)); });
+}
+
+// CSSRotate.angle getter: attribute CSSNumericValue angle; *result is a new reference
+int32_t ranvier_dom_css_rotate_get_angle(RvCSSTransformComponent* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSRotate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->angle(); }, [&](auto&& value) { return storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result); });
+}
+
+// CSSRotate.angle setter: attribute CSSNumericValue angle
+int32_t ranvier_dom_css_rotate_set_angle(RvCSSTransformComponent* target, RvCSSStyleValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSRotate>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = value ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setAngle(HandleArg<CSSNumericValue> { a0.get() }); });
+}
+
+// CSSScale.constructor: target is the Document of the constructed object; z may be NULL for an absent optional argument; *result is a new reference
+int32_t ranvier_dom_css_scale_create(RvNode* target, const RvDomUnionDoubleOrCSSNumericValue* x, const RvDomUnionDoubleOrCSSNumericValue* y, const RvDomUnionDoubleOrCSSNumericValue* z, RvCSSTransformComponent** result)
+{
+    if (!target || !x || !y || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValue(x, status0);
+    if (status0 != RV_OK) return status0;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionDoubleOrCSSNumericValue(y, status1);
+    if (status1 != RV_OK) return status1;
+    std::optional<Variant<double, Ref<CSSNumericValue>>> a2;
+    if (z) {
+        int32_t status2 = RV_OK;
+        a2 = decodeRvDomUnionDoubleOrCSSNumericValue(z, status2);
+        if (status2 != RV_OK) return status2;
+    }
+    return deliver([&]() -> decltype(auto) { return CSSScale::create(std::move(*a0), std::move(*a1), std::move(a2)); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSScale.x getter: attribute CSSNumberish x; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_scale_get_x(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSScale>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->x(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValue(value, result); });
+}
+
+// CSSScale.x setter: attribute CSSNumberish x
+int32_t ranvier_dom_css_scale_set_x(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSScale>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValue(value, status0);
+    if (status0 != RV_OK) return status0;
+    if (!(WTF::switchOn(*a0, [](double) { return true; }, [](const Ref<CSSNumericValue>& numeric) { return numeric->type().matchesNumber(); })))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A compatible numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setX(std::move(*a0)); });
+}
+
+// CSSScale.y getter: attribute CSSNumberish y; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_scale_get_y(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSScale>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->y(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValue(value, result); });
+}
+
+// CSSScale.y setter: attribute CSSNumberish y
+int32_t ranvier_dom_css_scale_set_y(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSScale>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValue(value, status0);
+    if (status0 != RV_OK) return status0;
+    if (!(WTF::switchOn(*a0, [](double) { return true; }, [](const Ref<CSSNumericValue>& numeric) { return numeric->type().matchesNumber(); })))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A compatible numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setY(std::move(*a0)); });
+}
+
+// CSSScale.z getter: attribute CSSNumberish z; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_scale_get_z(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSScale>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->z(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValue(value, result); });
+}
+
+// CSSScale.z setter: attribute CSSNumberish z
+int32_t ranvier_dom_css_scale_set_z(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSScale>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValue(value, status0);
+    if (status0 != RV_OK) return status0;
+    if (!(WTF::switchOn(*a0, [](double) { return true; }, [](const Ref<CSSNumericValue>& numeric) { return numeric->type().matchesNumber(); })))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A compatible numeric value is required."_s });
+    return invoke([&]() -> decltype(auto) { return impl->setZ(std::move(*a0)); });
+}
+
+// CSSSkew.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_css_skew_create(RvNode* target, RvCSSStyleValue* ax, RvCSSStyleValue* ay, RvCSSTransformComponent** result)
+{
+    if (!target || !ax || !ay || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = ax ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(ax)) : nullptr;
+    if (ax && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a1 = ay ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(ay)) : nullptr;
+    if (ay && !a1)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return CSSSkew::create(HandleArg<CSSNumericValue> { a0.get() }, HandleArg<CSSNumericValue> { a1.get() }); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSSkew.ax getter: attribute CSSNumericValue ax; *result is a new reference
+int32_t ranvier_dom_css_skew_get_ax(RvCSSTransformComponent* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSSkew>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->ax(); }, [&](auto&& value) { return storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result); });
+}
+
+// CSSSkew.ax setter: attribute CSSNumericValue ax
+int32_t ranvier_dom_css_skew_set_ax(RvCSSTransformComponent* target, RvCSSStyleValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSSkew>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = value ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setAx(HandleArg<CSSNumericValue> { a0.get() }); });
+}
+
+// CSSSkew.ay getter: attribute CSSNumericValue ay; *result is a new reference
+int32_t ranvier_dom_css_skew_get_ay(RvCSSTransformComponent* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSSkew>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->ay(); }, [&](auto&& value) { return storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result); });
+}
+
+// CSSSkew.ay setter: attribute CSSNumericValue ay
+int32_t ranvier_dom_css_skew_set_ay(RvCSSTransformComponent* target, RvCSSStyleValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSSkew>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = value ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setAy(HandleArg<CSSNumericValue> { a0.get() }); });
+}
+
+// CSSSkewX.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_css_skew_x_create(RvNode* target, RvCSSStyleValue* ax, RvCSSTransformComponent** result)
+{
+    if (!target || !ax || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = ax ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(ax)) : nullptr;
+    if (ax && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return CSSSkewX::create(HandleArg<CSSNumericValue> { a0.get() }); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSSkewX.ax getter: attribute CSSNumericValue ax; *result is a new reference
+int32_t ranvier_dom_css_skew_x_get_ax(RvCSSTransformComponent* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSSkewX>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->ax(); }, [&](auto&& value) { return storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result); });
+}
+
+// CSSSkewX.ax setter: attribute CSSNumericValue ax
+int32_t ranvier_dom_css_skew_x_set_ax(RvCSSTransformComponent* target, RvCSSStyleValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSSkewX>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = value ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setAx(HandleArg<CSSNumericValue> { a0.get() }); });
+}
+
+// CSSSkewY.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_css_skew_y_create(RvNode* target, RvCSSStyleValue* ay, RvCSSTransformComponent** result)
+{
+    if (!target || !ay || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = ay ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(ay)) : nullptr;
+    if (ay && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return CSSSkewY::create(HandleArg<CSSNumericValue> { a0.get() }); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSSkewY.ay getter: attribute CSSNumericValue ay; *result is a new reference
+int32_t ranvier_dom_css_skew_y_get_ay(RvCSSTransformComponent* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSSkewY>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->ay(); }, [&](auto&& value) { return storeConstGetter<CSSStyleValue, CSSNumericValue>(value, result); });
+}
+
+// CSSSkewY.ay setter: attribute CSSNumericValue ay
+int32_t ranvier_dom_css_skew_y_set_ay(RvCSSTransformComponent* target, RvCSSStyleValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSSkewY>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<CSSNumericValue> a0 = value ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setAy(HandleArg<CSSNumericValue> { a0.get() }); });
+}
+
+// CSSPerspective.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_css_perspective_create(RvNode* target, const RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* length_, RvCSSTransformComponent** result)
+{
+    if (!target || !length_ || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(length_, status0);
+    if (status0 != RV_OK) return status0;
+    return deliver([&]() -> decltype(auto) { return CSSPerspective::create(std::move(*a0)); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSPerspective.length getter: attribute CSSPerspectiveValue length; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_css_perspective_get_length(RvCSSTransformComponent* target, RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPerspective>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return encodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(value, result); });
+}
+
+// CSSPerspective.length setter: attribute CSSPerspectiveValue length
+int32_t ranvier_dom_css_perspective_set_length(RvCSSTransformComponent* target, const RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSPerspective>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setLength(std::move(*a0)); });
+}
+
+// CSSMatrixComponent.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_css_matrix_component_create(RvNode* target, RvDOMMatrixReadOnly* matrix, const RvDomCSSMatrixComponentOptions* options, RvCSSTransformComponent** result)
+{
+    if (!target || !matrix || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<DOMMatrixReadOnly> a0 = reinterpret_cast<DOMMatrixReadOnly*>(matrix);
+    CSSMatrixComponentOptions a1 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomCSSMatrixComponentOptions, is2_d) + sizeof(options->is2_d) && options->is2_d)
+            assignValue(a1.is2D, !!*options->is2_d);
+    }
+    return deliver([&]() -> decltype(auto) { return CSSMatrixComponent::create(HandleArg<DOMMatrixReadOnly> { a0.get() }, std::move(a1)); }, [&](auto&& value) { return storeHandle<CSSTransformComponent>(value, result); });
+}
+
+// CSSMatrixComponent.matrix getter: attribute DOMMatrix matrix; *result is a new reference
+int32_t ranvier_dom_css_matrix_component_get_matrix(RvCSSTransformComponent* target, RvDOMMatrixReadOnly** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSMatrixComponent>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->matrix(); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
+}
+
+// CSSMatrixComponent.matrix setter: attribute DOMMatrix matrix
+int32_t ranvier_dom_css_matrix_component_set_matrix(RvCSSTransformComponent* target, RvDOMMatrixReadOnly* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<CSSMatrixComponent>(*reinterpret_cast<CSSTransformComponent*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<DOMMatrix> a0 = value ? castTrackedHandle<DOMMatrix>(*reinterpret_cast<DOMMatrixReadOnly*>(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setMatrix(HandleArg<DOMMatrix> { a0.get() }); });
+}
+
 // CSSUnitValue.constructor: target is the Document of the constructed object; *result is a new reference
 int32_t ranvier_dom_css_unit_value_create(RvNode* target, double value, const uint8_t* unit, int32_t unit_length, RvCSSStyleValue** result)
 {
@@ -29227,6 +30219,8 @@ int32_t ranvier_dom_css_style_value_get_interface_name(RvCSSStyleValue* target, 
         return copyString("CSSOMKeywordValue"_s, buffer, capacity, length);
     if (dynamicDowncast<CSSStyleImageValue>(*impl))
         return copyString("CSSStyleImageValue"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSTransformValue>(*impl))
+        return copyString("CSSTransformValue"_s, buffer, capacity, length);
     if (dynamicDowncast<CSSUnparsedValue>(*impl))
         return copyString("CSSUnparsedValue"_s, buffer, capacity, length);
     return copyString("CSSStyleValue"_s, buffer, capacity, length);
@@ -29278,6 +30272,32 @@ int32_t ranvier_dom_dom_matrix_read_only_get_interface_name(RvDOMMatrixReadOnly*
     if (castTrackedHandle<DOMMatrix>(*impl))
         return copyString("DOMMatrix"_s, buffer, capacity, length);
     return copyString("DOMMatrixReadOnly"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_css_transform_component_get_interface_name(RvCSSTransformComponent* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<CSSTransformComponent*>(target);
+    if (dynamicDowncast<CSSMatrixComponent>(*impl))
+        return copyString("CSSMatrixComponent"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSPerspective>(*impl))
+        return copyString("CSSPerspective"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSRotate>(*impl))
+        return copyString("CSSRotate"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSScale>(*impl))
+        return copyString("CSSScale"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSSkew>(*impl))
+        return copyString("CSSSkew"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSSkewX>(*impl))
+        return copyString("CSSSkewX"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSSkewY>(*impl))
+        return copyString("CSSSkewY"_s, buffer, capacity, length);
+    if (dynamicDowncast<CSSTranslate>(*impl))
+        return copyString("CSSTranslate"_s, buffer, capacity, length);
+    return copyString("CSSTransformComponent"_s, buffer, capacity, length);
 }
 
 } // extern "C"

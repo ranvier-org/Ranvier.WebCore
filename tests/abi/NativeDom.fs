@@ -336,6 +336,12 @@ type RvDomCSSStyleSheetInit =
     val mutable media: nativeint
     val mutable disabled: int
 
+/// <summary>The IDL dictionary CSSMatrixComponentOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomCSSMatrixComponentOptions =
+    val mutable size: uint32
+    val mutable is2_d: nativeint
+
 /// <summary>The IDL dictionary GetComposedRangesOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomGetComposedRangesOptions =
@@ -626,6 +632,45 @@ type RvDomSequenceUSVString =
     val mutable count: int
     val mutable items: nativeint
 
+/// <summary>ABI transport for CSSTransformComponent sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceCSSTransformComponent =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_CSS_NUMERIC_VALUE = 2
+
+/// <summary>ABI transport for DoubleOrCSSNumericValue; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionDoubleOrCSSNumericValue =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
+    val mutable arm1: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_CSS_NUMERIC_VALUE_OR_DOM_STRING_OR_CSSOM_KEYWORD_VALUE_CSS_NUMERIC_VALUE = 1
+
+[<Literal>]
+let RV_DOM_UNION_CSS_NUMERIC_VALUE_OR_DOM_STRING_OR_CSSOM_KEYWORD_VALUE_STRING = 2
+
+[<Literal>]
+let RV_DOM_UNION_CSS_NUMERIC_VALUE_OR_DOM_STRING_OR_CSSOM_KEYWORD_VALUE_CSSOM_KEYWORD_VALUE = 3
+
+/// <summary>ABI transport for CSSNumericValueOrDOMStringOrCSSOMKeywordValue; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: nativeint
+    val mutable arm1: RvDomUtf8StringSpan
+    val mutable arm2: nativeint
+
 [<Literal>]
 let RV_DOM_UNION_USV_STRING_OR_CSSOM_VARIABLE_REFERENCE_VALUE_STRING = 1
 
@@ -831,6 +876,15 @@ extern void rv_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrD
 extern void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_sequence_css_transform_component_release(RvDomSequenceCSSTransformComponent& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_double_or_css_numeric_value_release(RvDomUnionDoubleOrCSSNumericValue& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_css_numeric_value_or_dom_string_or_cssom_keyword_value_release(RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_union_usv_string_or_cssom_variable_reference_value_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValue& value)
 
 [<DllImport(Lib)>]
@@ -922,6 +976,12 @@ extern void rv_dom_css_style_value_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_css_style_value_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_css_transform_component_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_css_transform_component_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern void rv_dom_cssom_variable_reference_value_release(nativeint handle)
@@ -1036,6 +1096,9 @@ extern int rv_dom_dom_point_read_only_get_interface_name(nativeint target, byte[
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_matrix_read_only_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_component_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
@@ -5146,6 +5209,159 @@ extern int rv_dom_css_property_rule_get_initial_value(nativeint target, byte[] b
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_value_to_string(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_value_create(nativeint target, [<In>] RvDomSequenceCSSTransformComponent[] transforms, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_value_get_length(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_value_get_is2_d(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_value_item(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_value_set_item(nativeint target, uint32 index, nativeint ``val``)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_value_to_matrix(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_component_get_is2_d(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_component_set_is2_d(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_component_to_string(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transform_component_to_matrix(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_translate_create(nativeint target, nativeint x, nativeint y, nativeint z, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_translate_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_translate_set_x(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_translate_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_translate_set_y(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_translate_get_z(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_translate_set_z(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_create_1(nativeint target, nativeint angle, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_create_4(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValue[] x, [<In>] RvDomUnionDoubleOrCSSNumericValue[] y, [<In>] RvDomUnionDoubleOrCSSNumericValue[] z, nativeint angle, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_get_x(nativeint target, RvDomUnionDoubleOrCSSNumericValue& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_set_x(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValue[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_get_y(nativeint target, RvDomUnionDoubleOrCSSNumericValue& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_set_y(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValue[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_get_z(nativeint target, RvDomUnionDoubleOrCSSNumericValue& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_set_z(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValue[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_get_angle(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_rotate_set_angle(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_scale_create(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValue[] x, [<In>] RvDomUnionDoubleOrCSSNumericValue[] y, [<In>] RvDomUnionDoubleOrCSSNumericValue[] z, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_scale_get_x(nativeint target, RvDomUnionDoubleOrCSSNumericValue& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_scale_set_x(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValue[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_scale_get_y(nativeint target, RvDomUnionDoubleOrCSSNumericValue& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_scale_set_y(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValue[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_scale_get_z(nativeint target, RvDomUnionDoubleOrCSSNumericValue& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_scale_set_z(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValue[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_create(nativeint target, nativeint ax, nativeint ay, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_get_ax(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_set_ax(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_get_ay(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_set_ay(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_x_create(nativeint target, nativeint ax, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_x_get_ax(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_x_set_ax(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_y_create(nativeint target, nativeint ay, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_y_get_ay(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_skew_y_set_ay(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_perspective_create(nativeint target, [<In>] RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue[] length_, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_perspective_get_length(nativeint target, RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_perspective_set_length(nativeint target, [<In>] RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_matrix_component_create(nativeint target, nativeint matrix, [<In>] RvDomCSSMatrixComponentOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_matrix_component_get_matrix(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_matrix_component_set_matrix(nativeint target, nativeint value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_unit_value_create(nativeint target, float value, byte[] unit, int unit_length, nativeint& result)

@@ -36,6 +36,7 @@ typedef struct RvMediaList RvMediaList;
 typedef struct RvCSSRule RvCSSRule;
 typedef struct RvCSSRuleList RvCSSRuleList;
 typedef struct RvCSSStyleValue RvCSSStyleValue;
+typedef struct RvCSSTransformComponent RvCSSTransformComponent;
 typedef struct RvCSSOMVariableReferenceValue RvCSSOMVariableReferenceValue;
 typedef struct RvStylePropertyMapReadOnly RvStylePropertyMapReadOnly;
 typedef struct RvCSSStyleDeclaration RvCSSStyleDeclaration;
@@ -70,6 +71,9 @@ typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
 typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
 typedef struct RvDomUnionMediaListOrDOMString RvDomUnionMediaListOrDOMString;
 typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
+typedef struct RvDomSequenceCSSTransformComponent RvDomSequenceCSSTransformComponent;
+typedef struct RvDomUnionDoubleOrCSSNumericValue RvDomUnionDoubleOrCSSNumericValue;
+typedef struct RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue;
 typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValue RvDomUnionUSVStringOrCSSOMVariableReferenceValue;
 typedef struct RvDomSequenceUSVStringOrCSSOMVariableReferenceValue RvDomSequenceUSVStringOrCSSOMVariableReferenceValue;
 typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable;
@@ -316,6 +320,13 @@ typedef struct RvDomCSSStyleSheetInit {
     int32_t disabled; /* boolean, default false */
 } RvDomCSSStyleSheetInit;
 
+/* The IDL dictionary CSSMatrixComponentOptions. size is sizeof(RvDomCSSMatrixComponentOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomCSSMatrixComponentOptions {
+    uint32_t size;
+    const int32_t* is2_d; /* boolean, NULL for absent */
+} RvDomCSSMatrixComponentOptions;
+
 /* The IDL dictionary GetComposedRangesOptions. size is sizeof(RvDomGetComposedRangesOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomGetComposedRangesOptions {
@@ -417,6 +428,9 @@ typedef struct RvDomUnionElementOrText RvDomUnionElementOrText;
 typedef struct RvDomSequenceElementOrText RvDomSequenceElementOrText;
 typedef struct RvDomUnionMediaListOrDOMString RvDomUnionMediaListOrDOMString;
 typedef struct RvDomSequenceUSVString RvDomSequenceUSVString;
+typedef struct RvDomSequenceCSSTransformComponent RvDomSequenceCSSTransformComponent;
+typedef struct RvDomUnionDoubleOrCSSNumericValue RvDomUnionDoubleOrCSSNumericValue;
+typedef struct RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue;
 typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValue RvDomUnionUSVStringOrCSSOMVariableReferenceValue;
 typedef struct RvDomSequenceUSVStringOrCSSOMVariableReferenceValue RvDomSequenceUSVStringOrCSSOMVariableReferenceValue;
 typedef struct RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable;
@@ -644,6 +658,42 @@ struct RvDomSequenceUSVString {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceCSSTransformComponent {
+    int32_t present;
+    int32_t count;
+    RvCSSTransformComponent** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NUMBER = 1,
+    RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_CSS_NUMERIC_VALUE = 2,
+};
+struct RvDomUnionDoubleOrCSSNumericValue {
+    int32_t present;
+    int32_t tag;
+    double arm0;
+    RvCSSStyleValue* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_CSS_NUMERIC_VALUE_OR_DOM_STRING_OR_CSSOM_KEYWORD_VALUE_CSS_NUMERIC_VALUE = 1,
+    RV_DOM_UNION_CSS_NUMERIC_VALUE_OR_DOM_STRING_OR_CSSOM_KEYWORD_VALUE_STRING = 2,
+    RV_DOM_UNION_CSS_NUMERIC_VALUE_OR_DOM_STRING_OR_CSSOM_KEYWORD_VALUE_CSSOM_KEYWORD_VALUE = 3,
+};
+struct RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue {
+    int32_t present;
+    int32_t tag;
+    RvCSSStyleValue* arm0;
+    RvDomUtf8StringSpan arm1;
+    RvCSSStyleValue* arm2;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 enum {
     RV_DOM_UNION_USV_STRING_OR_CSSOM_VARIABLE_REFERENCE_VALUE_STRING = 1,
     RV_DOM_UNION_USV_STRING_OR_CSSOM_VARIABLE_REFERENCE_VALUE_CSSOM_VARIABLE_REFERENCE_VALUE = 2,
@@ -810,6 +860,9 @@ RV_EXPORT void rv_dom_union_element_or_text_release(RvDomUnionElementOrText* val
 RV_EXPORT void rv_dom_sequence_element_or_text_release(RvDomSequenceElementOrText* value);
 RV_EXPORT void rv_dom_union_media_list_or_dom_string_release(RvDomUnionMediaListOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_usv_string_release(RvDomSequenceUSVString* value);
+RV_EXPORT void rv_dom_sequence_css_transform_component_release(RvDomSequenceCSSTransformComponent* value);
+RV_EXPORT void rv_dom_union_double_or_css_numeric_value_release(RvDomUnionDoubleOrCSSNumericValue* value);
+RV_EXPORT void rv_dom_union_css_numeric_value_or_dom_string_or_cssom_keyword_value_release(RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* value);
 RV_EXPORT void rv_dom_union_usv_string_or_cssom_variable_reference_value_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValue* value);
 RV_EXPORT void rv_dom_sequence_usv_string_or_cssom_variable_reference_value_release(RvDomSequenceUSVStringOrCSSOMVariableReferenceValue* value);
 RV_EXPORT void rv_dom_union_usv_string_or_cssom_variable_reference_value_nullable_release(RvDomUnionUSVStringOrCSSOMVariableReferenceValueNullable* value);
@@ -857,6 +910,10 @@ RV_EXPORT RvCSSRuleList* rv_dom_css_rule_list_retain(RvCSSRuleList*);
 RV_EXPORT void rv_dom_css_style_value_release(RvCSSStyleValue*);
 /* Adds a reference to a CSSStyleValue and returns it. */
 RV_EXPORT RvCSSStyleValue* rv_dom_css_style_value_retain(RvCSSStyleValue*);
+/* Releases a handle to a CSSTransformComponent. */
+RV_EXPORT void rv_dom_css_transform_component_release(RvCSSTransformComponent*);
+/* Adds a reference to a CSSTransformComponent and returns it. */
+RV_EXPORT RvCSSTransformComponent* rv_dom_css_transform_component_retain(RvCSSTransformComponent*);
 /* Releases a handle to a CSSOMVariableReferenceValue. */
 RV_EXPORT void rv_dom_cssom_variable_reference_value_release(RvCSSOMVariableReferenceValue*);
 /* Adds a reference to a CSSOMVariableReferenceValue and returns it. */
@@ -933,6 +990,8 @@ RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_interface_name(RvDOMRectReadOnly
 RV_EXPORT int32_t rv_dom_dom_point_read_only_get_interface_name(RvDOMPointReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a DOMMatrixReadOnly handle; borrows target. */
 RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_interface_name(RvDOMMatrixReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
+/* Concrete scoped interface name of a CSSTransformComponent handle; borrows target. */
+RV_EXPORT int32_t rv_dom_css_transform_component_get_interface_name(RvCSSTransformComponent* target, char* buffer, int32_t capacity, int32_t* length);
 
 /* Node */
 
@@ -4035,6 +4094,132 @@ RV_EXPORT int32_t rv_dom_css_property_rule_get_initial_value(RvCSSRule* target, 
 
 /* CSSStyleValue.toString() -> DOMString */
 RV_EXPORT int32_t rv_dom_css_style_value_to_string(RvCSSStyleValue* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSTransformValue */
+
+/* CSSTransformValue.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_transform_value_create(RvNode* target, const RvDomSequenceCSSTransformComponent* transforms, RvCSSStyleValue** result);
+/* CSSTransformValue.length getter: readonly attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_css_transform_value_get_length(RvCSSStyleValue* target, uint32_t* result);
+/* CSSTransformValue.is2D getter: readonly attribute boolean is2D */
+RV_EXPORT int32_t rv_dom_css_transform_value_get_is2_d(RvCSSStyleValue* target, int32_t* result);
+/* CSSTransformValue.item(unsigned long index) -> CSSTransformComponent; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_transform_value_item(RvCSSStyleValue* target, uint32_t index, RvCSSTransformComponent** result);
+/* CSSTransformValue.setItem(unsigned long index, CSSTransformComponent val) -> undefined */
+RV_EXPORT int32_t rv_dom_css_transform_value_set_item(RvCSSStyleValue* target, uint32_t index, RvCSSTransformComponent* val);
+/* CSSTransformValue.toMatrix() -> DOMMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_transform_value_to_matrix(RvCSSStyleValue* target, RvDOMMatrixReadOnly** result);
+/* CSSTransformComponent */
+
+/* CSSTransformComponent.is2D getter: attribute boolean is2D */
+RV_EXPORT int32_t rv_dom_css_transform_component_get_is2_d(RvCSSTransformComponent* target, int32_t* result);
+/* CSSTransformComponent.is2D setter: attribute boolean is2D */
+RV_EXPORT int32_t rv_dom_css_transform_component_set_is2_d(RvCSSTransformComponent* target, int32_t value);
+/* CSSTransformComponent.toString() -> DOMString */
+RV_EXPORT int32_t rv_dom_css_transform_component_to_string(RvCSSTransformComponent* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSTransformComponent.toMatrix() -> DOMMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_transform_component_to_matrix(RvCSSTransformComponent* target, RvDOMMatrixReadOnly** result);
+/* CSSTranslate */
+
+/* CSSTranslate.constructor: target is the Document of the constructed object; z may be NULL; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_css_translate_create(RvNode* target, RvCSSStyleValue* x, RvCSSStyleValue* y, RvCSSStyleValue* z, RvCSSTransformComponent** result);
+/* CSSTranslate.x getter: attribute CSSNumericValue x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_translate_get_x(RvCSSTransformComponent* target, RvCSSStyleValue** result);
+/* CSSTranslate.x setter: attribute CSSNumericValue x */
+RV_EXPORT int32_t rv_dom_css_translate_set_x(RvCSSTransformComponent* target, RvCSSStyleValue* value);
+/* CSSTranslate.y getter: attribute CSSNumericValue y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_translate_get_y(RvCSSTransformComponent* target, RvCSSStyleValue** result);
+/* CSSTranslate.y setter: attribute CSSNumericValue y */
+RV_EXPORT int32_t rv_dom_css_translate_set_y(RvCSSTransformComponent* target, RvCSSStyleValue* value);
+/* CSSTranslate.z getter: attribute CSSNumericValue z; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_translate_get_z(RvCSSTransformComponent* target, RvCSSStyleValue** result);
+/* CSSTranslate.z setter: attribute CSSNumericValue z */
+RV_EXPORT int32_t rv_dom_css_translate_set_z(RvCSSTransformComponent* target, RvCSSStyleValue* value);
+/* CSSRotate */
+
+/* CSSRotate.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_rotate_create_1(RvNode* target, RvCSSStyleValue* angle, RvCSSTransformComponent** result);
+/* CSSRotate.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_rotate_create_4(RvNode* target, const RvDomUnionDoubleOrCSSNumericValue* x, const RvDomUnionDoubleOrCSSNumericValue* y, const RvDomUnionDoubleOrCSSNumericValue* z, RvCSSStyleValue* angle, RvCSSTransformComponent** result);
+/* CSSRotate.x getter: attribute CSSNumberish x; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_rotate_get_x(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result);
+/* CSSRotate.x setter: attribute CSSNumberish x */
+RV_EXPORT int32_t rv_dom_css_rotate_set_x(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value);
+/* CSSRotate.y getter: attribute CSSNumberish y; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_rotate_get_y(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result);
+/* CSSRotate.y setter: attribute CSSNumberish y */
+RV_EXPORT int32_t rv_dom_css_rotate_set_y(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value);
+/* CSSRotate.z getter: attribute CSSNumberish z; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_rotate_get_z(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result);
+/* CSSRotate.z setter: attribute CSSNumberish z */
+RV_EXPORT int32_t rv_dom_css_rotate_set_z(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value);
+/* CSSRotate.angle getter: attribute CSSNumericValue angle; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_rotate_get_angle(RvCSSTransformComponent* target, RvCSSStyleValue** result);
+/* CSSRotate.angle setter: attribute CSSNumericValue angle */
+RV_EXPORT int32_t rv_dom_css_rotate_set_angle(RvCSSTransformComponent* target, RvCSSStyleValue* value);
+/* CSSScale */
+
+/* CSSScale.constructor: target is the Document of the constructed object; z may be NULL for an absent optional
+ * argument; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_scale_create(RvNode* target, const RvDomUnionDoubleOrCSSNumericValue* x, const RvDomUnionDoubleOrCSSNumericValue* y, const RvDomUnionDoubleOrCSSNumericValue* z, RvCSSTransformComponent** result);
+/* CSSScale.x getter: attribute CSSNumberish x; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_scale_get_x(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result);
+/* CSSScale.x setter: attribute CSSNumberish x */
+RV_EXPORT int32_t rv_dom_css_scale_set_x(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value);
+/* CSSScale.y getter: attribute CSSNumberish y; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_scale_get_y(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result);
+/* CSSScale.y setter: attribute CSSNumberish y */
+RV_EXPORT int32_t rv_dom_css_scale_set_y(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value);
+/* CSSScale.z getter: attribute CSSNumberish z; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_scale_get_z(RvCSSTransformComponent* target, RvDomUnionDoubleOrCSSNumericValue* result);
+/* CSSScale.z setter: attribute CSSNumberish z */
+RV_EXPORT int32_t rv_dom_css_scale_set_z(RvCSSTransformComponent* target, const RvDomUnionDoubleOrCSSNumericValue* value);
+/* CSSSkew */
+
+/* CSSSkew.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_skew_create(RvNode* target, RvCSSStyleValue* ax, RvCSSStyleValue* ay, RvCSSTransformComponent** result);
+/* CSSSkew.ax getter: attribute CSSNumericValue ax; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_skew_get_ax(RvCSSTransformComponent* target, RvCSSStyleValue** result);
+/* CSSSkew.ax setter: attribute CSSNumericValue ax */
+RV_EXPORT int32_t rv_dom_css_skew_set_ax(RvCSSTransformComponent* target, RvCSSStyleValue* value);
+/* CSSSkew.ay getter: attribute CSSNumericValue ay; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_skew_get_ay(RvCSSTransformComponent* target, RvCSSStyleValue** result);
+/* CSSSkew.ay setter: attribute CSSNumericValue ay */
+RV_EXPORT int32_t rv_dom_css_skew_set_ay(RvCSSTransformComponent* target, RvCSSStyleValue* value);
+/* CSSSkewX */
+
+/* CSSSkewX.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_skew_x_create(RvNode* target, RvCSSStyleValue* ax, RvCSSTransformComponent** result);
+/* CSSSkewX.ax getter: attribute CSSNumericValue ax; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_skew_x_get_ax(RvCSSTransformComponent* target, RvCSSStyleValue** result);
+/* CSSSkewX.ax setter: attribute CSSNumericValue ax */
+RV_EXPORT int32_t rv_dom_css_skew_x_set_ax(RvCSSTransformComponent* target, RvCSSStyleValue* value);
+/* CSSSkewY */
+
+/* CSSSkewY.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_skew_y_create(RvNode* target, RvCSSStyleValue* ay, RvCSSTransformComponent** result);
+/* CSSSkewY.ay getter: attribute CSSNumericValue ay; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_skew_y_get_ay(RvCSSTransformComponent* target, RvCSSStyleValue** result);
+/* CSSSkewY.ay setter: attribute CSSNumericValue ay */
+RV_EXPORT int32_t rv_dom_css_skew_y_set_ay(RvCSSTransformComponent* target, RvCSSStyleValue* value);
+/* CSSPerspective */
+
+/* CSSPerspective.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_perspective_create(RvNode* target, const RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* length_, RvCSSTransformComponent** result);
+/* CSSPerspective.length getter: attribute CSSPerspectiveValue length; *result owns its contents; release with the
+ * matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_css_perspective_get_length(RvCSSTransformComponent* target, RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* result);
+/* CSSPerspective.length setter: attribute CSSPerspectiveValue length */
+RV_EXPORT int32_t rv_dom_css_perspective_set_length(RvCSSTransformComponent* target, const RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* value);
+/* CSSMatrixComponent */
+
+/* CSSMatrixComponent.constructor: target is the Document of the constructed object; options defaults to {} in IDL;
+ * options may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_matrix_component_create(RvNode* target, RvDOMMatrixReadOnly* matrix, const RvDomCSSMatrixComponentOptions* options, RvCSSTransformComponent** result);
+/* CSSMatrixComponent.matrix getter: attribute DOMMatrix matrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_matrix_component_get_matrix(RvCSSTransformComponent* target, RvDOMMatrixReadOnly** result);
+/* CSSMatrixComponent.matrix setter: attribute DOMMatrix matrix */
+RV_EXPORT int32_t rv_dom_css_matrix_component_set_matrix(RvCSSTransformComponent* target, RvDOMMatrixReadOnly* value);
 /* CSSUnitValue */
 
 /* CSSUnitValue.constructor: target is the Document of the constructed object; *result is a new reference */

@@ -14,8 +14,8 @@ Three binding gaps remain: overloaded CSSRotate constructors need distinct expor
 
 - [x] Add arity-aware constructor exports with locked-name preservation, first observing a duplicate-export regression.
 - [x] Add selected union flattening and finite numeric arm validation with old-model compatibility checks.
-- [ ] Select TransformValue, TransformComponent, Translate, Rotate, Scale, Skew, SkewX, SkewY, Perspective and MatrixComponent plus its options dictionary.
-- [ ] Verify raw typed component construction, mutation, serialization, transform list ordering and toMatrix results against a coherent private producer.
+- [x] Select TransformValue, TransformComponent, Translate, Rotate, Scale, Skew, SkewX, SkewY, Perspective and MatrixComponent plus its options dictionary.
+- [x] Verify raw typed component construction, mutation, serialization, transform list ordering and toMatrix results against a coherent private producer.
 - [ ] Add shared constructor providers and generated native wrappers; compare JIT/AOT/Chromium with exact errors and lifetime checks.
 - [ ] Run a combined batch, review source and old ABI compatibility, then allocate the next unpublished producer cohort and stack it behind Native16.
 - [ ] Complete all-platform and official consumer acceptance before closing C16.
@@ -55,3 +55,13 @@ Several component numeric getters return const CSSNumericValue references in C++
 Named const getter bindings now require their exact declared object interface and root; unmatched or mismatched configuration fails closed. A helper emitted only for those getters requires an exact const lvalue reference and polymorphic root at compile time, acquires one external reference, and preserves the existing opaque pointer. Generic storeHandle remains unchanged. The audited fields hold mutable Ref<CSSNumericValue> objects; the const qualifier belongs to the C++ accessor, not an immutable WebIDL object.
 
 The regression first failed at the missing specialized retained-result path. All 60 generator tests pass and Native16 production generation remains unchanged. Independent review is clear. Actual component compilation, returned-value identity and reference-lifetime probes remain pending.
+
+## Native17 producer verification
+
+The selected surface now contains 153 interfaces, 1,926 functions, 24 handle roots and 21 dictionaries, with no stubs. Native17 uses ABI25. The final private Windows batch passed 6,384 assertions across 19 raw API probes, the full ABI driver and 42 final teardown cases. The transform fixture contributes 405 assertions, including typed-map assignment and actual element geometry. [The evidence manifest](css-transforms-evidence/evidence.json) records executed runtime hashes, source hashes and individual log hashes. Immediate engine references can survive until collection; final expiry is the checked teardown requirement.
+
+Native regressions reproduced invalid translate/scale setter acceptance, matrix aliasing and incorrect matrix flags. Scoped input validation checks dimensions before mutation. Patch 0022 makes matrix conversion return an independent matrix with the component's flag, including perspective-none. No engine mathematics or class signatures were replaced.
+
+The browser binding validates actual numeric/keyword objects before WebIDL coercion and prevents the maximum unsigned index from becoming an expando property. A narrowly configured toMatrix adapter preserves all sixteen matrix values while correcting Chromium's observed false-component/true-matrix flag mismatch. Configuration is restricted to the named zero-argument toMatrix operations. All 64 generator tests, four package-contract tests and five publication-barrier tests pass; regeneration is exact.
+
+Shared Core/Views providers, NativeAOT, non-Windows runtimes, official packages and C16 acceptance remain separate gates. This producer evidence does not close C16.

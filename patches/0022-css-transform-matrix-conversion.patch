@@ -1,0 +1,26 @@
+diff --git a/Source/WebCore/css/typedom/transform/CSSMatrixComponent.cpp b/Source/WebCore/css/typedom/transform/CSSMatrixComponent.cpp
+index e50e40c9a5..1b85a48e27 100644
+--- a/Source/WebCore/css/typedom/transform/CSSMatrixComponent.cpp
++++ b/Source/WebCore/css/typedom/transform/CSSMatrixComponent.cpp
+@@ -123,7 +123,7 @@ void CSSMatrixComponent::serialize(StringBuilder& builder) const
+ ExceptionOr<Ref<DOMMatrix>> CSSMatrixComponent::toMatrix()
+ {
+     if (!is2D())
+-        return { m_matrix.get() };
++        return { DOMMatrix::create(m_matrix->transformationMatrix(), DOMMatrixReadOnly::Is2D::No) };
+ 
+     // Flatten to 2d.
+     return { DOMMatrix::create({
+diff --git a/Source/WebCore/css/typedom/transform/CSSPerspective.cpp b/Source/WebCore/css/typedom/transform/CSSPerspective.cpp
+index 236052226f..0293ac8df9 100644
+--- a/Source/WebCore/css/typedom/transform/CSSPerspective.cpp
++++ b/Source/WebCore/css/typedom/transform/CSSPerspective.cpp
+@@ -147,7 +147,7 @@ void CSSPerspective::serialize(StringBuilder& builder) const
+ ExceptionOr<Ref<DOMMatrix>> CSSPerspective::toMatrix()
+ {
+     if (!std::holds_alternative<Ref<CSSNumericValue>>(m_length))
+-        return { DOMMatrix::create({ }, DOMMatrixReadOnly::Is2D::Yes) };
++        return { DOMMatrix::create({ }, DOMMatrixReadOnly::Is2D::No) };
+ 
+     RefPtr length = dynamicDowncast<CSSUnitValue>(std::get<Ref<CSSNumericValue>>(m_length));
+     if (!length)

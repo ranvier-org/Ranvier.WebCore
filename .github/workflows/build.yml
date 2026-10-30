@@ -430,6 +430,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/matrix_values.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify typed CSS transform components
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/css_transforms.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Build Windows UI Automation OS clients
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'
         run: >-
