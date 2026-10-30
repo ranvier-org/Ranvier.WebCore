@@ -59,6 +59,54 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_opted_in_nested_geometry_dictionary_preserves_defaults_and_input_layouts(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary DOMPointInit { unrestricted double x = 0; unrestricted double w = 1; };
+dictionary DOMQuadInit { DOMPointInit p1 = {}; DOMPointInit p2 = {}; };
+partial interface Node { undefined takeQuad(optional DOMQuadInit quad = {}); };
+''')
+        config = dict(self.world.config)
+        config['nestedDictionaries'] = ['DOMQuadInit']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        model = json.loads(generator.api_model())
+        functions = {item['function']: item for item in model['functions']}
+        self.assertIn('rv_dom_node_take_quad', functions)
+        self.assertEqual([field['ctype'] for field in model['dictionaries']['DOMQuadInit']],
+                         ['const RvDomDOMPointInit*', 'const RvDomDOMPointInit*'])
+        self.assertEqual([field['default'] for field in model['dictionaries']['DOMPointInit']], ['0', '1'])
+        self.assertIn('const char* label;', generator.header())
+        self.assertLess(generator.header().index('typedef struct RvDomDOMPointInit {'),
+                        generator.header().index('typedef struct RvDomDOMQuadInit {'))
+        glue = generator.glue()
+        self.assertIn('DOMQuadInit a0 { };', glue)
+        self.assertIn('const auto* nested_a0_p1 = quad->p1;', glue)
+        self.assertIn('offsetof(RvDomDOMPointInit, w)', glue)
+        self.assertIn('assignValue(a0.p1.w, nested_a0_p1->w)', glue)
+        self.assertIn('val mutable p1: nativeint', generator.fsharp())
+
+    def test_nested_dictionary_transport_rejects_presence_semantics_it_cannot_represent(self):
+        for member in ['DOMPointInit p1;', 'required DOMPointInit p1;', 'DOMPointInit? p1 = null;']:
+            with self.subTest(member=member):
+                fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+                fixture.write_text(IDL + '''
+dictionary DOMPointInit { unrestricted double w = 1; };
+dictionary DOMQuadInit { ''' + member + ''' };
+partial interface Node { undefined takeQuad(optional DOMQuadInit quad = {}); };
+''')
+                config = dict(self.world.config)
+                config['nestedDictionaries'] = ['DOMQuadInit']
+                generator = domgen.Generator(domgen.World(self.source, config))
+                generator.lock = {}
+                generator.lock_structs = {}
+                generator.run()
+                functions = [item['function'] for item in json.loads(generator.api_model())['functions']]
+                self.assertNotIn('rv_dom_node_take_quad', functions)
+                self.assertIn('requires an opted-in nonnullable empty default', generator.report())
+
     def test_selected_variadic_style_values_validate_reference_arms_before_webidl_coercion(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

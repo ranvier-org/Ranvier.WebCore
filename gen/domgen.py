@@ -356,7 +356,10 @@ class World:
                 mapped = self.map(member.type)
             except Unsupported as error:
                 raise Unsupported(f"dictionary {name}: member {member.name}: {error}")
-            if mapped.kind in ("dict", "object", "event") or mapped.interface == "EventTarget":
+            if mapped.kind == "dict" and (name not in self.config.get("nestedDictionaries", [])
+                                          or member.required or member.default != '{}' or mapped.nullable):
+                raise Unsupported(f"dictionary {name}: nested member {member.name} requires an opted-in nonnullable empty default")
+            if mapped.kind in ("object", "event") or mapped.interface == "EventTarget":
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
             found.append((member, mapped))
         return found
@@ -999,6 +1002,8 @@ class Generator(ComplexGeneratorMixin):
         for member, mapped in ordered:
             if mapped.kind == "enum":
                 self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
+            elif mapped.kind == "dict":
+                self.use_dictionary(mapped.interface)
             elif mapped.kind in ("union", "sequence"):
                 self.use_complex(mapped)
         self.dicts_used[name] = ordered
@@ -1013,6 +1018,8 @@ class Generator(ComplexGeneratorMixin):
             return "const char*"
         if mapped.kind == "node":
             return "RvNode*"
+        if mapped.kind == "dict":
+            return f"const {mapped.handle}*"
         if mapped.kind in ("union", "sequence"):
             return f"const {mapped.ctype}*"
         ctype = mapped.ctype
@@ -1055,6 +1062,14 @@ class Generator(ComplexGeneratorMixin):
                 lines.append("    if (!value)")
                 lines.append("        return RV_ERR_WRONG_INTERFACE;")
                 lines.append(f"    {target}.{cpp_field} = value.get();")
+            lines.append("}")
+        elif mapped.kind == "dict":
+            nested = 'nested_' + re.sub(r'\W', '_', f'{target}.{cpp_field}')
+            lines += [f"if ({covered} && {pointer}->{field}) {{",
+                      f"    const auto* {nested} = {pointer}->{field};"]
+            for child_member, child in self.use_dictionary(mapped.interface):
+                lines += ["    " + line for line in self.dictionary_field(
+                    nested, mapped.handle, f"{target}.{cpp_field}", child_member, child, mapped.interface)]
             lines.append("}")
         elif mapped.kind in ("union", "sequence"):
             lines += [f"if ({covered} && {pointer}->{field}) {{", "    int32_t status = RV_OK;",
