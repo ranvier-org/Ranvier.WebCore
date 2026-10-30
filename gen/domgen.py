@@ -409,10 +409,23 @@ class World:
             child = self.map(t.subtypes[0])
             element = self.resolve(t.subtypes[0])
             label = type_label(element)
+            if child.kind == 'pair':
+                label = child.ctype.removeprefix('RvDom')
             if element.nullable and element.name in self.config.get('complexNullableElements', []):
                 label += 'NullableElement'
             return Mapped("sequence", t.nullable, "RvDomSequence" + label + ("Nullable" if t.nullable else ""),
                           subtypes=[child], label=label + " sequence")
+        if t.name == 'pair' and len(t.subtypes) == 2:
+            children = [self.map(child) for child in t.subtypes]
+            labels = []
+            for value, child in zip(t.subtypes, children):
+                resolved = self.resolve(value)
+                labels.append(child.ctype.removeprefix('RvDom') if child.kind in ('union', 'sequence', 'pair')
+                              else type_label(resolved) + ('Nullable' if resolved.nullable else ''))
+                if child.kind == 'string':
+                    child.string_spans = True
+            label = 'And'.join(labels)
+            return Mapped('pair', False, 'RvDomPair' + label, subtypes=children, label=label + ' entry')
         if t.name in ("record", "Promise", "ObservableArray"):
             raise Unsupported(f"{t.name} type {t}")
         if t.name in self.dictionaries:
@@ -481,6 +494,8 @@ class Generator(ComplexGeneratorMixin):
             self.window_context(name, binding)
         for name, binding in self.world.config.get("staticBindings", {}).items():
             self.static_context(name, binding)
+        for name, binding in self.world.config.get('iterableBindings', {}).items():
+            self.iterable_snapshot(name, binding)
         self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
@@ -556,6 +571,25 @@ class Generator(ComplexGeneratorMixin):
                     raise SystemExit(f'{name}.{member.name}: {error}') from error
                 generated.append(function)
         self.namespace_features.append((binding['feature'], [function.conditional for function in generated if function.conditional]))
+
+    def iterable_snapshot(self, name, binding):
+        if name not in self.world.scope:
+            raise SystemExit(f'{name}: iterable snapshot requires a scoped interface')
+        members = [member for member in self.world.members(name) if member.kind == 'iterable']
+        if len(members) != 1 or members[0].type.subtypes[0].name != 'pair':
+            raise SystemExit(f'{name}: iterable snapshot requires one key/value iterable')
+        if self.world.config.get('objectContexts', {}).get(name) != 'Document':
+            raise SystemExit(f'{name}: iterable snapshot requires a checked Document context')
+        member = members[0]
+        mapped = self.world.map(member.type)
+        entry_type = self.transport_cpp(mapped.subtypes[0])
+        function = Function(name, member, 'iterator_snapshot', f'{snake(name)}_entries', [],
+                            f'{name}.entries: owned snapshot of the engine key/value iterable')
+        function.feature = binding['feature']
+        call = (f'([&]() {{ Vector<{entry_type}> entries; auto iterator = impl->createIterator(&{{call_with_bare}}); '
+                'while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })()')
+        self.finish(function, name, member, [], [], mapped, call, ['document'])
+        self.namespace_features.append((function.feature, []))
 
     def static_context(self, name, binding):
         if name not in self.world.scope:
@@ -1465,6 +1499,8 @@ class Generator(ComplexGeneratorMixin):
             if function.kind == 'static_operation':
                 functions[-1].update(receiver=function.receiver, feature=function.feature,
                                      binding='facade', stringInputs='utf8-lengths')
+            if function.kind == 'iterator_snapshot':
+                functions[-1].update(binding='facade', feature=function.feature, sourceKind='iterable')
             if function.kind in ('operation', 'setter') and getattr(function, 'string_spans', False):
                 functions[-1]['stringInputs'] = 'utf8-lengths'
             if getattr(function, 'context_receiver', None):
@@ -1839,6 +1875,7 @@ class Generator(ComplexGeneratorMixin):
             f"constructors {sum(f.kind == 'constructor' for f in self.functions)}, "
             f"namespace operations {sum(f.kind == 'namespace_operation' for f in self.functions)}, "
             f"static operations {sum(f.kind == 'static_operation' for f in self.functions)}, "
+            f"iterator snapshots {sum(f.kind == 'iterator_snapshot' for f in self.functions)}, "
             f"context operations {sum(f.kind == 'context_operation' for f in self.functions)}), handle types {len(self.handles)}, "
             f"constants {len(self.constants)}, enumerations {len(self.enums_used)}, dictionaries {len(self.dicts_used)}, "
             f"stubs {len(self.stubs)}, left out {len(self.excluded)}",

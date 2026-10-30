@@ -59,6 +59,43 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_configured_iterable_snapshot_owns_keys_and_nullable_value_arrays(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface CSSStyleValue {};
+interface StylePropertyMapReadOnly {
+    iterable<USVString, sequence<CSSStyleValue?>>;
+    readonly attribute unsigned long size;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['CSSStyleValue', 'StylePropertyMapReadOnly']
+        config['objectContexts'] = {'StylePropertyMapReadOnly': 'Document'}
+        config['complexNullableElements'] = ['CSSStyleValue']
+        config['iterableBindings'] = {'StylePropertyMapReadOnly': {'feature': 'dom-css-style-map-entries'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        function = next(item for item in generator.functions if item.name == 'style_property_map_read_only_entries')
+        self.assertEqual('iterator_snapshot', function.kind)
+        self.assertEqual([('RvStylePropertyMapReadOnly*', 'target'), ('RvNode*', 'context')], function.params[:2])
+        self.assertEqual('pair', function.returns.subtypes[0].kind)
+        pair = function.returns.subtypes[0]
+        self.assertTrue(pair.subtypes[0].string_spans)
+        self.assertTrue(pair.subtypes[1].subtypes[0].nullable)
+        glue = generator.glue()
+        self.assertTrue('impl->createIterator(&document.get())' in glue)
+        self.assertTrue('entries.append(WTF::move(*entry))' in glue)
+        self.assertTrue('value.key' in glue and 'value.value' in glue)
+        self.assertTrue('std::free(const_cast<uint8_t*>(value->key.data))' in glue)
+        self.assertTrue('clearRvDomSequenceCSSStyleValueNullableElement(&value->value)' in glue)
+        self.assertNotIn('abstract member entries', generator.interfaces())
+        model = json.loads(generator.api_model())
+        operation = next(item for item in model['functions'] if item['function'] == 'rv_dom_style_property_map_read_only_entries')
+        self.assertEqual('facade', operation['binding'])
+        self.assertEqual('iterable', operation['sourceKind'])
+
     def test_selected_nullable_sequence_elements_do_not_reuse_the_nonnullable_container(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

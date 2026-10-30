@@ -22,7 +22,7 @@ class ComplexGeneratorMixin:
         return f'{cpp} {{ }}'
 
     def use_complex(self, mapped, input=True):
-        if mapped.kind not in ('union', 'sequence'):
+        if mapped.kind not in ('union', 'sequence', 'pair'):
             if mapped.kind == 'dict':
                 self.use_dictionary(mapped.interface)
             elif mapped.kind in ('node', 'event', 'object'):
@@ -30,6 +30,8 @@ class ComplexGeneratorMixin:
             elif mapped.kind == 'enum':
                 self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
             return
+        if mapped.kind == 'pair':
+            self.headers.add('wtf/KeyValuePair.h')
         newly_input = input and mapped.ctype not in self.complex_inputs
         if input:
             self.complex_inputs.add(mapped.ctype)
@@ -51,7 +53,7 @@ class ComplexGeneratorMixin:
             return f'{mapped.handle}*'
         if mapped.kind == 'dict':
             return f'const {mapped.handle}*'
-        if mapped.kind in ('union', 'sequence'):
+        if mapped.kind in ('union', 'sequence', 'pair'):
             return mapped.ctype
         return mapped.ctype
 
@@ -71,6 +73,8 @@ class ComplexGeneratorMixin:
             return f'{"RefPtr" if mapped.nullable else "Ref"}<{mapped.cls}>'
         if kind == 'dict':
             return self.dictionary_cpp(mapped.interface)
+        if kind == 'pair':
+            return 'KeyValuePair<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
         if kind == 'union':
             value = 'Variant<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
         else:
@@ -103,6 +107,9 @@ class ComplexGeneratorMixin:
             lines += [f'struct {name} {{', '    int32_t present;']
             if mapped.kind == 'sequence':
                 lines += ['    int32_t count;', f'    {self.transport_ctype(mapped.subtypes[0])}* items;']
+            elif mapped.kind == 'pair':
+                lines += [f'    {self.transport_ctype(mapped.subtypes[0])} key;',
+                          f'    {self.transport_ctype(mapped.subtypes[1])} value;']
             else:
                 lines += ['    int32_t tag;']
                 for index, child in enumerate(mapped.subtypes):
@@ -118,7 +125,7 @@ class ComplexGeneratorMixin:
         kind = mapped.kind
         if kind == 'void':
             return [f'if ({expression} != 0) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}'], 'std::monostate { }'
-        if kind in ('union', 'sequence'):
+        if kind in ('union', 'sequence', 'pair'):
             return [f'auto {variable} = decode{mapped.ctype}(&{expression}, status);',
                     'if (status != RV_OK) return std::nullopt;'], f'std::move(*{variable})'
         if kind == 'string':
@@ -159,7 +166,7 @@ class ComplexGeneratorMixin:
         kind = mapped.kind
         if kind == 'void':
             return [f'{target} = 0;']
-        if kind in ('union', 'sequence'):
+        if kind in ('union', 'sequence', 'pair'):
             return [f'encode{mapped.ctype}({expression}, &{target});']
         if kind == 'string':
             if mapped.string_spans:
@@ -173,7 +180,7 @@ class ComplexGeneratorMixin:
         raise self.unsupported_type(f'{kind} result in a union or sequence')
 
     def clear_value(self, mapped, expression):
-        if mapped.kind in ('union', 'sequence'):
+        if mapped.kind in ('union', 'sequence', 'pair'):
             return [f'clear{mapped.ctype}(&{expression});']
         if mapped.kind == 'string':
             if mapped.string_spans:
@@ -229,6 +236,12 @@ class ComplexGeneratorMixin:
                 decoded, value = self.decode_value(element, 'source->items[i]', 'item')
                 lines += ['        ' + line for line in decoded] + [f'        result.append({value});', '    }',
                           f'    return {cpp} {{ std::move(result) }};', '}']
+            elif mapped.kind == 'pair':
+                for index, field in enumerate(['key', 'value']):
+                    decoded, value = self.decode_value(mapped.subtypes[index], f'source->{field}', field)
+                    lines += ['    ' + line for line in decoded]
+                    lines += [f'    auto decoded{index} = {value};']
+                lines += [f'    return {cpp} {{ std::move(decoded0), std::move(decoded1) }};', '}']
             else:
                 value_cpp = 'Variant<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
                 lines += ['    switch (source->tag) {']
@@ -244,6 +257,9 @@ class ComplexGeneratorMixin:
                 lines += ['    for (int32_t i = 0; i < value->count; ++i) {']
                 lines += ['        ' + line for line in self.clear_value(mapped.subtypes[0], 'value->items[i]')]
                 lines += ['    }', '    std::free(value->items);']
+            elif mapped.kind == 'pair':
+                for index, field in enumerate(['key', 'value']):
+                    lines += ['    ' + line for line in self.clear_value(mapped.subtypes[index], f'value->{field}')]
             else:
                 lines += ['    switch (value->tag) {']
                 for index, child in enumerate(mapped.subtypes):
@@ -275,6 +291,9 @@ class ComplexGeneratorMixin:
                           '    for (int32_t i = 0; i < result->count; ++i) {']
                 lines += ['        ' + line for line in self.encode_value(mapped.subtypes[0], 'value[i]', 'result->items[i]')]
                 lines += ['    }']
+            elif mapped.kind == 'pair':
+                for index, field in enumerate(['key', 'value']):
+                    lines += ['    ' + line for line in self.encode_value(mapped.subtypes[index], f'value.{field}', f'result->{field}')]
             else:
                 lines += ['    result->tag = static_cast<int32_t>(value.index()) + 1;', f'    encodeArms{name}(value, result);']
             lines += ['    return RV_OK;', '}']
@@ -299,6 +318,9 @@ class ComplexGeneratorMixin:
                       '[<Struct; StructLayout(LayoutKind.Sequential)>]', f'type {name} =', '    val mutable present: int']
             if mapped.kind == 'sequence':
                 lines += ['    val mutable count: int', '    val mutable items: nativeint']
+            elif mapped.kind == 'pair':
+                lines += [f'    val mutable key: {self.transport_ctype(mapped.subtypes[0])}',
+                          f'    val mutable value: {self.transport_ctype(mapped.subtypes[1])}']
             else:
                 lines += ['    val mutable tag: int']
                 for index, child in enumerate(mapped.subtypes):

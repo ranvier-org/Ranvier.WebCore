@@ -94,6 +94,8 @@ WEBCORE_EXPORT void ranvier_dom_union_shadow_root_or_get_composed_ranges_options
 WEBCORE_EXPORT void ranvier_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
+WEBCORE_EXPORT void ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
+WEBCORE_EXPORT void ranvier_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 WEBCORE_EXPORT int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_style_sheet_get_interface_name(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
@@ -1837,5 +1839,6 @@ WEBCORE_EXPORT int32_t ranvier_dom_css_register_property(RvNode* target, const R
 WEBCORE_EXPORT int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_value_parse(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvCSSStyleValue** result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result);
+WEBCORE_EXPORT int32_t ranvier_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result);
 
 }

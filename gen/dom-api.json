@@ -95933,6 +95933,126 @@
       "feature": "dom-css-style-values",
       "binding": "facade",
       "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "StylePropertyMapReadOnly",
+      "member": "entries",
+      "contractOwner": "StylePropertyMapReadOnly",
+      "kind": "iterator_snapshot",
+      "function": "rv_dom_style_property_map_read_only_entries",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvStylePropertyMapReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "pair",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "sequence",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "CSSStyleValue",
+                    "nullable": true,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "PairUSVStringAndSequenceCSSStyleValueNullableElement sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "pair",
+            "ctype": "RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringAndSequenceCSSStyleValueNullableElement entry",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "sequence",
+                "ctype": "RvDomSequenceCSSStyleValueNullableElement",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "CSSStyleValueNullableElement sequence",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "object",
+                    "ctype": null,
+                    "interface": "CSSStyleValue",
+                    "root": "CSSStyleValue",
+                    "class": "CSSStyleValue",
+                    "enum": null,
+                    "label": null,
+                    "nullable": true,
+                    "atom": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "binding": "facade",
+      "feature": "dom-css-style-map-entries",
+      "sourceKind": "iterable",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
     }
   ],
   "enumerations": {
@@ -97156,6 +97276,127 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_css_style_value_release"
+    },
+    {
+      "mapping": {
+        "kind": "pair",
+        "ctype": "RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringAndSequenceCSSStyleValueNullableElement entry",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceCSSStyleValueNullableElement",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSStyleValueNullableElement sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSStyleValue",
+                "root": "CSSStyleValue",
+                "class": "CSSStyleValue",
+                "enum": null,
+                "label": null,
+                "nullable": true,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "PairUSVStringAndSequenceCSSStyleValueNullableElement sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "pair",
+            "ctype": "RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringAndSequenceCSSStyleValueNullableElement entry",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "sequence",
+                "ctype": "RvDomSequenceCSSStyleValueNullableElement",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "CSSStyleValueNullableElement sequence",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "object",
+                    "ctype": null,
+                    "interface": "CSSStyleValue",
+                    "root": "CSSStyleValue",
+                    "class": "CSSStyleValue",
+                    "enum": null,
+                    "label": null,
+                    "nullable": true,
+                    "atom": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release"
     }
   ],
   "dictionaries": {

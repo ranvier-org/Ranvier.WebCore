@@ -169,6 +169,7 @@
 #include "UIEvent.h"
 #include "ValidityState.h"
 #include "WheelEvent.h"
+#include "wtf/KeyValuePair.h"
 #include "JSAriaNotifyOptions.h"
 #include "JSAriaNotifyOptions.h"
 #include "JSDocument.h"
@@ -1648,6 +1649,46 @@ template<typename V> int32_t encodeRvDomSequenceCSSStyleValue(V&& input, RvDomSe
     }
     return RV_OK;
 }
+
+void clearRvDomPairUSVStringAndSequenceCSSStyleValueNullableElement(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->key.data));
+    clearRvDomSequenceCSSStyleValueNullableElement(&value->value);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomPairUSVStringAndSequenceCSSStyleValueNullableElement(V&& input, RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->key = copyOwnedDomStringSpan(asString(value.key));
+    encodeRvDomSequenceCSSStyleValueNullableElement(value.value, &result->value);
+    return RV_OK;
+}
+
+void clearRvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomPairUSVStringAndSequenceCSSStyleValueNullableElement(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement(V&& input, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement*>(std::calloc(value.size(), sizeof(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomPairUSVStringAndSequenceCSSStyleValueNullableElement(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
 }
 
 using namespace WebCore;
@@ -1669,6 +1710,8 @@ int32_t ranvier_dom_has(const char* feature)
     if (!std::strcmp(feature, "dom-computed-style"))
         return 1;
     if (!std::strcmp(feature, "dom-css-style-values"))
+        return 1;
+    if (!std::strcmp(feature, "dom-css-style-map-entries"))
         return 1;
     return 0;
 }
@@ -1821,6 +1864,16 @@ void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
 {
     if (isMainThread()) clearRvDomSequenceCSSStyleValue(value);
+}
+
+void ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value)
+{
+    if (isMainThread()) clearRvDomPairUSVStringAndSequenceCSSStyleValueNullableElement(value);
+}
+
+void ranvier_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value)
+{
+    if (isMainThread()) clearRvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement(value);
 }
 
 void ranvier_dom_dom_implementation_release(RvDOMImplementation* handle)
@@ -26694,6 +26747,21 @@ int32_t ranvier_dom_css_style_value_parse_all(RvNode* target, const uint8_t* pro
     StringArg a1 { css_text, css_text_length };
     if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
     return deliver([&]() -> decltype(auto) { return CSSStyleValue::parseAll(document.get(), a0.atom(), a1.string()); }, [&](auto&& value) { return encodeRvDomSequenceCSSStyleValue(value, result); });
+}
+
+// StylePropertyMapReadOnly.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document for the operation; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result)
+{
+    if (!target || !context || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<StylePropertyMapReadOnly> impl = reinterpret_cast<StylePropertyMapReadOnly*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    return deliver([&]() -> decltype(auto) { return ([&]() { Vector<KeyValuePair<String, Vector<RefPtr<CSSStyleValue>>>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement(value, result); });
 }
 
 int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)

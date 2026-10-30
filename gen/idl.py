@@ -1,6 +1,6 @@
 """A lean Web IDL parser for WebKit's IDL files: the definitions gen/domgen.py reads (interfaces, interface mixins,
 partial interfaces, includes statements, typedefs, enums, dictionaries and callbacks), their members, types and
-extended attributes, namespaces and partial namespaces. It skips iterable and other unmodeled members by balancing braces.
+extended attributes, namespaces, partial namespaces and iterable declarations. Other unmodeled members are skipped.
 
 WebKit's IDL files hold a few `#if` blocks (Document.idl, DeviceOrientationEvent.idl); the parser keeps the
 `#else` branch of each and drops the `#if` branch, which matches a build with every such macro undefined.
@@ -276,6 +276,15 @@ class Parser:
 
     def member(self, owner):
         attrs = self.extended_attributes()
+        if self.accept('iterable'):
+            self.take('<')
+            children = [self.type()]
+            if self.accept(','):
+                children.append(self.type())
+            self.take('>')
+            self.take(';')
+            value = Type('pair', subtypes=children) if len(children) == 2 else children[0]
+            return Member('iterable', 'entries', Type('sequence', subtypes=[value]), attrs=attrs, file=self.file, owner=owner)
         if self.peek() in ("iterable", "maplike", "setlike", "async", "async_iterable"):
             self.skip_to_semicolon()
             return None

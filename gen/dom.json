@@ -433,6 +433,11 @@
             "stringInputs": "utf8-lengths"
         }
     },
+    "iterableBindings": {
+        "StylePropertyMapReadOnly": {
+            "feature": "dom-css-style-map-entries"
+        }
+    },
     "windowBindings": {
         "DOMWindow": {
             "receiver": "Document",

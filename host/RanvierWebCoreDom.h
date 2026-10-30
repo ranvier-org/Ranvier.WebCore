@@ -78,6 +78,8 @@ typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRo
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
+typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
+typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
 
 /* Constants of the interfaces. */
 enum {
@@ -362,6 +364,8 @@ typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRo
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
+typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
+typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
@@ -684,6 +688,22 @@ struct RvDomSequenceCSSStyleValue {
     int32_t count;
     RvCSSStyleValue** items;
 };
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement {
+    int32_t present;
+    RvDomUtf8StringSpan key;
+    RvDomSequenceCSSStyleValueNullableElement value;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement {
+    int32_t present;
+    int32_t count;
+    RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* items;
+};
 RV_EXPORT void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value);
@@ -714,6 +734,8 @@ RV_EXPORT void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(R
 RV_EXPORT void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
+RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
+RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 /* Releases a handle to a DOMImplementation. */
 RV_EXPORT void rv_dom_dom_implementation_release(RvDOMImplementation*);
 /* Adds a reference to a DOMImplementation and returns it. */
@@ -4877,6 +4899,11 @@ RV_EXPORT int32_t rv_dom_css_style_value_parse(RvNode* target, const uint8_t* pr
 /* CSSStyleValue.parseAll: static operation with checked Document context and UTF-8 byte lengths; *result owns its
  * contents; release with the matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_css_style_value_parse_all(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* css_text, int32_t css_text_length, RvDomSequenceCSSStyleValue* result);
+/* StylePropertyMapReadOnly */
+
+/* StylePropertyMapReadOnly.entries: owned snapshot of the engine key/value iterable; context is an explicit checked
+ * Document for the operation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result);
 
 #ifdef __cplusplus
 }

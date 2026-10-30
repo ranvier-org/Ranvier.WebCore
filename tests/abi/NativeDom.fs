@@ -683,6 +683,20 @@ type RvDomSequenceCSSStyleValue =
     val mutable count: int
     val mutable items: nativeint
 
+/// <summary>ABI transport for USVStringAndSequenceCSSStyleValueNullableElement entry; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement =
+    val mutable present: int
+    val mutable key: RvDomUtf8StringSpan
+    val mutable value: RvDomSequenceCSSStyleValueNullableElement
+
+/// <summary>ABI transport for PairUSVStringAndSequenceCSSStyleValueNullableElement sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 [<DllImport(Lib)>]
 extern void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString& value)
 
@@ -772,6 +786,12 @@ extern void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent& val
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_dom_implementation_release(nativeint handle)
@@ -6121,3 +6141,6 @@ extern int rv_dom_css_style_value_parse(nativeint target, byte[] property, int p
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_value_parse_all(nativeint target, byte[] property, int property_length, byte[] css_text, int css_text_length, RvDomSequenceCSSStyleValue& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_style_property_map_read_only_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement& result)
