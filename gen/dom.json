@@ -23,6 +23,15 @@
         }
     },
     "constructors": {
+        "CSSTransformValue": {"receiver": "Document", "factory": "CSSTransformValue::create", "passReceiver": false},
+        "CSSTranslate": {"receiver": "Document", "factory": "CSSTranslate::create", "passReceiver": false},
+        "CSSRotate": {"receiver": "Document", "factory": "CSSRotate::create", "passReceiver": false},
+        "CSSScale": {"receiver": "Document", "factory": "CSSScale::create", "passReceiver": false},
+        "CSSSkew": {"receiver": "Document", "factory": "CSSSkew::create", "passReceiver": false},
+        "CSSSkewX": {"receiver": "Document", "factory": "CSSSkewX::create", "passReceiver": false},
+        "CSSSkewY": {"receiver": "Document", "factory": "CSSSkewY::create", "passReceiver": false},
+        "CSSPerspective": {"receiver": "Document", "factory": "CSSPerspective::create", "passReceiver": false},
+        "CSSMatrixComponent": {"receiver": "Document", "factory": "CSSMatrixComponent::create", "passReceiver": false},
         "DOMMatrixReadOnly": {
             "receiver": "Document",
             "factory": "DOMMatrixReadOnly::create"
@@ -87,6 +96,33 @@
     "dictionaryCppTypes": {
         "CSSStyleSheetInit": "CSSStyleSheet::Init"
     },
+    "flattenUnionTypedefs": ["CSSPerspectiveValue"],
+    "finiteUnionInputs": ["DoubleOrCSSNumericValue"],
+    "browserMatrixFlagAdapters": [
+        "CSSTransformComponent.toMatrix",
+        "CSSTransformValue.toMatrix"
+    ],
+    "validatedReferenceUnions": [
+        "DoubleOrCSSNumericValue",
+        "CSSNumericValueOrDOMStringOrCSSOMKeywordValue"
+    ],
+    "setterValueChecks": {
+        "CSSTranslate.x": "css-length-or-percentage",
+        "CSSTranslate.y": "css-length-or-percentage",
+        "CSSScale.x": "css-numberish-number",
+        "CSSScale.y": "css-numberish-number",
+        "CSSScale.z": "css-numberish-number"
+    },
+    "constGetterBindings": {
+        "CSSTranslate.x": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
+        "CSSTranslate.y": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
+        "CSSTranslate.z": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
+        "CSSRotate.angle": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
+        "CSSSkew.ax": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
+        "CSSSkew.ay": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
+        "CSSSkewX.ax": {"interface": "CSSNumericValue", "root": "CSSStyleValue"},
+        "CSSSkewY.ay": {"interface": "CSSNumericValue", "root": "CSSStyleValue"}
+    },
     "nestedDictionaries": [
         "DOMQuadInit"
     ],
@@ -100,12 +136,14 @@
     },
     "stringifiers": [
         "CSSStyleValue",
-        "DOMMatrixReadOnly"
+        "DOMMatrixReadOnly",
+        "CSSTransformComponent"
     ],
     "complexStringSpans": [
         "USVStringOrCSSOMVariableReferenceValue",
         "CSSStyleValueOrUSVString",
-        "DOMStringOrSequenceOfUnrestrictedDouble"
+        "DOMStringOrSequenceOfUnrestrictedDouble",
+        "CSSNumericValueOrDOMStringOrCSSOMKeywordValue"
     ],
     "complexNullableElements": [
         "CSSStyleValue"
@@ -230,6 +268,16 @@
         "CSSPropertyRule",
         "CSSStyleValue",
         "CSSNumericValue",
+        "CSSTransformValue",
+        "CSSTransformComponent",
+        "CSSTranslate",
+        "CSSRotate",
+        "CSSScale",
+        "CSSSkew",
+        "CSSSkewX",
+        "CSSSkewY",
+        "CSSPerspective",
+        "CSSMatrixComponent",
         "CSSUnitValue",
         "CSSOMKeywordValue",
         "CSSStyleImageValue",
@@ -355,7 +403,8 @@
         "StylePropertyMapReadOnly",
         "DOMRectReadOnly",
         "DOMPointReadOnly",
-        "DOMMatrixReadOnly"
+        "DOMMatrixReadOnly",
+        "CSSTransformComponent"
     ],
     "nodeCastTags": {
         "HTMLModElement": [

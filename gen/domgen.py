@@ -131,6 +131,7 @@ class Mapped:
         self.subtypes = subtypes
         self.label = label
         self.string_spans = string_spans
+        self.finite_input = False
 
     @property
     def handle(self):
@@ -316,9 +317,24 @@ class World:
         return result
 
     def resolve(self, t: idl.Type) -> idl.Type:
+        flatten = False
         while t.name in self.typedefs:
+            flatten |= t.name in self.config.get('flattenUnionTypedefs', [])
             target = self.typedefs[t.name]
             t = idl.Type(target.name, t.nullable or target.nullable, target.subtypes, {**target.attrs, **t.attrs})
+        if flatten:
+            if t.name != 'union':
+                raise Unsupported('configured union flattening requires a union typedef')
+            def leaves(children):
+                for child in children:
+                    child = self.resolve(child)
+                    if child.name == 'union':
+                        if child.nullable:
+                            raise Unsupported('configured union flattening does not support nullable nested unions')
+                        yield from leaves(child.subtypes)
+                    else:
+                        yield child
+            t = idl.Type('union', t.nullable, list(leaves(t.subtypes)), t.attrs)
         return t
 
     def string_union(self, t: idl.Type):
@@ -403,6 +419,9 @@ class World:
                 return Mapped("string", t.nullable, atom=strings)
             children = [self.map(child) for child in t.subtypes]
             label = "Or".join(type_label(self.resolve(child)) for child in t.subtypes)
+            if label in self.config.get('finiteUnionInputs', []):
+                for source, child in zip(t.subtypes, children):
+                    child.finite_input = self.resolve(source).name in ('double', 'float')
             if label in self.config.get('complexStringSpans', []):
                 for child in children:
                     if child.kind == 'string':
@@ -479,6 +498,8 @@ class Generator(ComplexGeneratorMixin):
         self.complex_used = {}
         self.complex_inputs = set()
         self.namespace_features = []
+        self.const_getters_used = set()
+        self.setter_checks_used = set()
         self.tracked_roots = {}
         for root, concrete in world.config.get('trackedHandleRoots', {}).items():
             if root not in world.scope or concrete not in world.scope or world.chain(concrete) != [concrete, root]:
@@ -505,6 +526,12 @@ class Generator(ComplexGeneratorMixin):
             self.static_context(name, binding)
         for name, binding in self.world.config.get('iterableBindings', {}).items():
             self.iterable_snapshot(name, binding)
+        missing_const_getters = set(self.world.config.get('constGetterBindings', {})) - self.const_getters_used
+        if missing_const_getters:
+            raise SystemExit(f'configured const getters did not match selected object getters: {sorted(missing_const_getters)}')
+        missing_setter_checks = set(self.world.config.get('setterValueChecks', {})) - self.setter_checks_used
+        if missing_setter_checks:
+            raise SystemExit(f'configured setter checks did not match selected setters: {sorted(missing_setter_checks)}')
         self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
@@ -713,6 +740,7 @@ class Generator(ComplexGeneratorMixin):
 
     def interface(self, name):
         members = self.world.members(name)
+        overloaded_constructor = sum(member.kind == 'constructor' for member in members) > 1
         seen_constants = set()
         operations = {}
         for member in members:
@@ -724,7 +752,7 @@ class Generator(ComplexGeneratorMixin):
                 continue
             if member.kind == "constructor":
                 if name in self.world.config.get("constructors", {}):
-                    self.constructor(name, member)
+                    self.constructor(name, member, overloaded_constructor)
                 else:
                     self.skip(name, member, "constructor")
                 continue
@@ -1178,7 +1206,7 @@ class Generator(ComplexGeneratorMixin):
 
     # Operations.
 
-    def constructor(self, interface, member):
+    def constructor(self, interface, member, overloaded=False):
         configured = self.world.config["constructors"][interface]
         receiver = configured["receiver"]
         if receiver not in self.world.scope:
@@ -1194,6 +1222,10 @@ class Generator(ComplexGeneratorMixin):
                                 f"{interface}.constructor: target is the {receiver} of the constructed object")
             function.string_spans = configured.get('stringInputs') == 'utf8-lengths'
             self.finish(function, receiver, member, member.arguments, args, returns, call, [])
+            if overloaded:
+                locked = self.lock.get(function.name)
+                if not locked or function.params != [tuple(parameter) for parameter in locked['params']]:
+                    function.name += f'_{len(member.arguments)}'
         except Unsupported as error:
             self.skip(interface, member, f"constructor: {error}")
 
@@ -1368,6 +1400,7 @@ class Generator(ComplexGeneratorMixin):
                     return_value = (index, mapped)
             else:
                 raise Unsupported(f"{mapped.kind} argument")
+        prepare += self.setter_value_checks(function, mapped_args)
         # The result.
         sink = None
         if return_value is not None:
@@ -1403,8 +1436,17 @@ class Generator(ComplexGeneratorMixin):
             if returns.interface == "EventTarget":
                 sink = "storeNode(dynamicDowncast<Node>(rawPointer<EventTarget>(value)), result)"
             else:
-                sink = (f"storeTrackedHandle<{root}, {returns.cls}>(value, result)" if root in self.tracked_roots
-                        else f"storeHandle<{root}>(value, result)")
+                label = f'{function.interface}.{member.name}'
+                const_binding = self.world.config.get('constGetterBindings', {}).get(label)
+                if const_binding is not None:
+                    if (function.kind != 'getter' or returns.kind != 'object' or root in self.tracked_roots
+                            or const_binding.get('interface') != returns.interface or const_binding.get('root') != returns.root):
+                        raise SystemExit(f'{label}: const getter requires the exact declared interface/root of a polymorphic object getter')
+                    self.const_getters_used.add(label)
+                    sink = f'storeConstGetter<{root}, {returns.cls}>(value, result)'
+                else:
+                    sink = (f"storeTrackedHandle<{root}, {returns.cls}>(value, result)" if root in self.tracked_roots
+                            else f"storeHandle<{root}>(value, result)")
             notes.append("*result is a new reference" + (", or NULL" if returns.nullable or returns.interface == "EventTarget" else ""))
         elif returns.kind in ("union", "sequence"):
             if not self.transport_can_return(returns):
@@ -1477,6 +1519,31 @@ class Generator(ComplexGeneratorMixin):
         function.comment += "".join(f"; {note}" for note in notes)
         self.functions.append(function)
 
+    def setter_value_checks(self, function, mapped_args):
+        if function.kind != 'setter':
+            return []
+        label = f'{function.interface}.{function.member.name}'
+        kind = self.world.config.get('setterValueChecks', {}).get(label)
+        if kind is None:
+            return []
+        mapped = mapped_args[0]
+        if kind == 'css-length-or-percentage':
+            if mapped.kind != 'object' or mapped.interface != 'CSSNumericValue' or mapped.nullable:
+                raise SystemExit(f'{label}: setter check requires CSSNumericValue')
+            predicate = 'a0->type().matchesTypeOrPercentage<CSSNumericBaseType::Length>()'
+        elif kind == 'css-numberish-number':
+            if (mapped.kind != 'union' or mapped.nullable or len(mapped.subtypes) != 2
+                    or mapped.subtypes[0].kind != 'number' or mapped.subtypes[0].ctype != 'double'
+                    or mapped.subtypes[1].interface != 'CSSNumericValue'):
+                raise SystemExit(f'{label}: setter check requires a double/CSSNumericValue union')
+            predicate = ('WTF::switchOn(*a0, [](double) { return true; }, '
+                         '[](const Ref<CSSNumericValue>& numeric) { return numeric->type().matchesNumber(); })')
+        else:
+            raise SystemExit(f'{label}: unknown setter check {kind}')
+        self.setter_checks_used.add(label)
+        return [f'if (!({predicate}))',
+                '    return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A compatible numeric value is required."_s });']
+
     # Output.
 
     @staticmethod
@@ -1489,6 +1556,8 @@ class Generator(ComplexGeneratorMixin):
         }
         if mapped.kind == 'string' and mapped.string_spans:
             result['stringTransport'] = 'utf8-lengths'
+        if mapped.finite_input:
+            result['finiteInput'] = True
         return result
 
     def api_model(self):
@@ -1756,6 +1825,7 @@ class Generator(ComplexGeneratorMixin):
             lines.append(f'#include "JS{pathlib.PurePosixPath(file).stem}.h"')
         lines += ["", RUNTIME, ""]
         lines += self.tracked_handle_runtime()
+        lines += self.const_getter_runtime()
         for enum, (values, _, _) in sorted(self.enums_used.items()):
             quoted = ", ".join(f'"{v}"_s' for v in values)
             lines.append(f"static constexpr ASCIILiteral {enum_table(enum)}[] = {{ {quoted} }};")
@@ -1845,6 +1915,25 @@ class Generator(ComplexGeneratorMixin):
             lines += [f'    return copyString("{root}"_s, buffer, capacity, length);', "}", ""]
         lines += ["} // extern \"C\"", ""]
         return "\n".join(lines)
+
+    def const_getter_runtime(self):
+        if not self.const_getters_used:
+            return []
+        return [r'''
+namespace {
+template<typename Root, typename Declared, typename Handle, typename V>
+int32_t storeConstGetter(V&& value, Handle** result)
+{
+    static_assert(std::is_lvalue_reference_v<V> && std::is_const_v<std::remove_reference_t<V>>);
+    static_assert(std::is_same_v<std::remove_cvref_t<V>, Declared>);
+    static_assert(std::is_polymorphic_v<Root>);
+    auto* pointer = static_cast<Root*>(const_cast<Declared*>(&value));
+    pointer->ref();
+    *result = reinterpret_cast<Handle*>(pointer);
+    return RV_OK;
+}
+} // namespace
+''']
 
     def tracked_handle_runtime(self):
         if not self.tracked_roots:

@@ -5,19 +5,20 @@ as versioned native packages. `Ranvier.WebCore.Native` aggregates the five runti
 `Ranvier.WebCore` provides the canonical managed interop. Ranvier's WebCore view loads the native host
 through those declarations rather than copying them into its own sources.
 
-The current ABI 24 development batch includes typed DOM transports, namespace and document factories,
-shared .NET/Fable contracts, CSS support/registration, typed CSS values/maps, geometry values and native Windows UI Automation.
-The generator emits 1,875 DOM functions across 143 selected native interfaces, with zero stubs;
+The current ABI 25 development batch includes typed DOM transports, namespace and document factories,
+shared .NET/Fable contracts, CSS support/registration, typed CSS values/maps/transforms, geometry values and native Windows UI Automation.
+The generator emits 1,926 DOM functions across 153 selected native interfaces, with zero stubs;
 [the generator guide](docs/GENERATOR.md) records scope, ownership and omitted members.
 [Typed map delivery](docs/STYLE-PROPERTY-MAPS-PLAN.md) distinguishes private verification from remaining
 platform/public acceptance. [Geometry delivery](docs/GEOMETRY-VALUES-PLAN.md) records point, rectangle, quad and matrix
-producer verification and the remaining shared/platform/public gates. [Accessibility](docs/ACCESSIBILITY.md) lists the Windows bridge's supported
+producer verification and the remaining shared/platform/public gates. [Typed transforms](docs/CSS-TRANSFORMS-PLAN.md)
+tracks component bindings and matrix conversion. [Accessibility](docs/ACCESSIBILITY.md) lists the Windows bridge's supported
 patterns and limitations.
 
 The **slim** flavor cuts WebKit to what presentation needs: no network stack,
 crypto library, GPU code, browser storage, service workers, WebGPU, WebXR or inspector, and JavaScriptCore
 without its JIT tiers. The initial Windows measurement was 77.59 MB in 18 DLLs,
-against 125.84 MB in 31 for the **lean** reference build; this is not a fresh size measurement of ABI 24.
+against 125.84 MB in 31 for the **lean** reference build; this is not a fresh size measurement of ABI 25.
 
 | | |
 |---|---|

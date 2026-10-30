@@ -1,0 +1,180 @@
+{
+  "status": "private-windows-producer-batch-only",
+  "abiVersion": 25,
+  "rawAssertions": 6384,
+  "transformAssertions": 405,
+  "finalTeardownCases": 42,
+  "immediateTeardownQualification": "Some engine objects remain alive until collection; final expiry is the checked requirement.",
+  "sources": {
+    "gen/domgen.py": "5ab1226cc713d67de2861daf1010e3151265158d6840a7121e4d94bf4a4a8566",
+    "gen/domtypes.py": "b56938500b65a4840325052d34c12cb11a304ce2b2ede55c1cf86b57d22f175a",
+    "gen/interfaces.py": "1e2336a87da42d1550f5e3d8233d6da6444e94bd60f8094870fa7b568d7bf0e5",
+    "gen/dom.json": "9ac8a1abe68ec1cf6f82e70dc095657bd09dee98d4b238f911b8ac366f39cad6",
+    "gen/dom-api.json": "ab2487f3312c6d1e5afcda1ebb172f7acbbd6c7988fa7b06a59938a322a0408a",
+    "host/dom/RanvierDomGlue.cpp": "cc74045362b1660ad25dd23bcbdada719c53b032e435b34ca3d3d1ca017531c1",
+    "host/RanvierWebCoreDom.cpp": "301335df7346813825768ae7d30846b4a4df5f850905f08115b19c91d01cf726",
+    "host/RanvierWebCoreAbi.cpp": "e8d1e9d6a9af574940a6c30cef0c156b3f7ab0c242f4dd71f0d38dfb8237e27c",
+    "tests/abi/css_transforms.py": "54a7f9684fdd0dbe7fc0fe361abb337b156fa5933f2645bbcf65cd5cc1dc55ba",
+    "patches/0022-css-transform-matrix-conversion.patch": "6e83b1a338db2e7491d88a5b34c5a7caa548d009768cdf320ad956469f6e50ed"
+  },
+  "runtime": {
+    "WebCore.dll": "3b7d9a87f50940dcfeb7743970bbd503ef53f81d66166a9498fc944e2572741f",
+    "RanvierWebCoreHost.dll": "967722df6072f00263d13e3898d8f11e584cc4d27fa6c7ec5580a6fe7e06578c",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "probes": [
+    {
+      "probe": "css_supports",
+      "assertions": 72,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/css_supports.log",
+      "sha256": "a58b92257704d7103ee669098612f2db771da0ce70b1e2c08859e2f3b1ede2ee"
+    },
+    {
+      "probe": "computed_style",
+      "assertions": 93,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/computed_style.log",
+      "sha256": "fcf4e301cf0acf837ced3362b9d305640b46ce8351056fe769a483b88cacaf24"
+    },
+    {
+      "probe": "fragment_rectangles",
+      "assertions": 140,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/fragment_rectangles.log",
+      "sha256": "d39085368def0d7fdc5c4b627a7c340fcad0e868e1ce4445746765666561f2c7"
+    },
+    {
+      "probe": "table_surface",
+      "assertions": 44,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/table_surface.log",
+      "sha256": "20b155ae802897d9498a2f9f688d484c8ec0cc818e1dac5f4d8e444de1db9330"
+    },
+    {
+      "probe": "element_reflection",
+      "assertions": 269,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/element_reflection.log",
+      "sha256": "0a5727dbea0087c50bac611ca17724ef0c8b5ab093120df7ebf44b508002bbeb"
+    },
+    {
+      "probe": "area_surface",
+      "assertions": 117,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/area_surface.log",
+      "sha256": "40f8a9fe26de9ed5817a0e5157465d26fe0ca13756805dc3d71e9e718de35d2e"
+    },
+    {
+      "probe": "cssom_surface",
+      "assertions": 407,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/cssom_surface.log",
+      "sha256": "9c406b081be9ccfbafdf4ea22233cae5b366f3e72ba19b3094724f4ffd06b036"
+    },
+    {
+      "probe": "keyframe_rules",
+      "assertions": 93,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/keyframe_rules.log",
+      "sha256": "7f8810902d8d2c871a1c3c2739601f727219acb4a6ca1187730a3dcc923f8a65"
+    },
+    {
+      "probe": "counter_style_rules",
+      "assertions": 86,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/counter_style_rules.log",
+      "sha256": "eba668c7492fec715ba8dda6018fa3a39f9fe975387df2213936088752294d53"
+    },
+    {
+      "probe": "detached_cssom_context",
+      "assertions": 389,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/detached_cssom_context.log",
+      "sha256": "c65206ea3eb10fdd6339a9e776b6536d1b035782d84c50a24cf1b21cabfe08b0"
+    },
+    {
+      "probe": "svg_mathml_surface",
+      "assertions": 95,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/svg_mathml_surface.log",
+      "sha256": "7909d8ca88d13a5f5d685ad650fa5044c367b3c61a45fddb7456d301bb00342f"
+    },
+    {
+      "probe": "style_property_maps",
+      "assertions": 189,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/style_property_maps.log",
+      "sha256": "842bf48f79f1d6b345229ba6b2848766386aa564c48f5bf1e19a9c2ee897b101"
+    },
+    {
+      "probe": "declared_style_maps",
+      "assertions": 2069,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/declared_style_maps.log",
+      "sha256": "a0f871d1662a8874d4242baa9b6a88401377670d5e73a5a616fa971e93648361"
+    },
+    {
+      "probe": "style_map_entries",
+      "assertions": 144,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/style_map_entries.log",
+      "sha256": "35991fb9af099dd4195e00daf9d9379febb91494c88a689ad492dd8630f1d073"
+    },
+    {
+      "probe": "typed_style_values",
+      "assertions": 190,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/typed_style_values.log",
+      "sha256": "ad90626f02ac7000083dd96ffa1b66be1750a075bb509c2185ed7de6406dce19"
+    },
+    {
+      "probe": "custom_properties",
+      "assertions": 231,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/custom_properties.log",
+      "sha256": "a382967c2d75a4afef9646c9042d7bebf492965ce55bf6b388c36931b543652f"
+    },
+    {
+      "probe": "geometry_values",
+      "assertions": 260,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/geometry_values.log",
+      "sha256": "1dffd121ce5b04aa1604b066d9cb45d28013b323df6e11757247753222a24529"
+    },
+    {
+      "probe": "matrix_values",
+      "assertions": 1091,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/matrix_values.log",
+      "sha256": "eb4c585c486246c753fd823e38254003e17ecf09d940fceefb4dca3cf61565cc"
+    },
+    {
+      "probe": "css_transforms",
+      "assertions": 405,
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/css_transforms.log",
+      "sha256": "a1b5151b5ea5099e3fb0db3934fbcf6702bae87306a509b900e1b782346dfe93"
+    },
+    {
+      "probe": "frames",
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/frames.log",
+      "sha256": "e4a536838321ee0264caa5b81a2214ca8d775b985f1478199c20116101079e6e"
+    },
+    {
+      "probe": "teardown",
+      "exitCode": 0,
+      "log": "docs/css-transforms-evidence/teardown.log",
+      "sha256": "081e93fdb57f342fea5944436efe4d6f7890703e69d5e4e2e0cf0735fd3f62fb"
+    }
+  ],
+  "unverified": [
+    "shared Core/Views transform providers",
+    "Chromium parity",
+    "NativeAOT transform consumers",
+    "nonWindows native platforms",
+    "official packages",
+    "C16 acceptance"
+  ]
+}

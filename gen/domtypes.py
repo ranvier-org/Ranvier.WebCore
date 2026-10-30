@@ -144,7 +144,12 @@ class ComplexGeneratorMixin:
             checks = [] if mapped.nullable else [f'if (!{expression}) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}']
             return checks, f'String::fromUTF8({expression})'
         if kind in ('number', 'bool', 'enum'):
-            return [], f'static_cast<{cpp}>({expression})'
+            checks = []
+            if mapped.finite_input:
+                checks = [f'if (!std::isfinite({expression})) {{',
+                          '    status = Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });',
+                          '    return std::nullopt;', '}']
+            return checks, f'static_cast<{cpp}>({expression})'
         if kind in ('node', 'event', 'object'):
             if mapped.interface == 'EventTarget':
                 return [f'storeNode(dynamicDowncast<Node>(rawPointer<EventTarget>({expression})), &{target});']

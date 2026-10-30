@@ -1,12 +1,12 @@
 # The patch series
 
-`patches/series` lists twenty-two patches, applied in order over the WebKit commit in `pins.json` by
-`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012 and 0014 through 0021, changes nothing unless
+`patches/series` lists twenty-three patches, applied in order over the WebKit commit in `pins.json` by
+`scripts/patches.py apply`. Each patch carries one concern and, except 0000, 0010, 0012 and 0014 through 0022, changes nothing unless
 its CMake option is ON. Every option defaults to OFF, so the lean flavor, which sets none of them, compiles
 WebKit's feature implementations. 0010 changes which symbols WebCore exports and which members the host may override,
 and no behavior. 0012 adds the sources an embedder names to WebCore. 0013's option is set for macOS in every
 flavor, because the package always loads WebCore outside its framework bundle (`config/mac.cmake`).
-0014 through 0021 correct stylesheet mutation, typed lists and retained-object behavior in every flavor.
+0014 through 0022 correct stylesheet mutation, typed lists, retained-object behavior and typed transform conversion in every flavor.
 
 The patches add new files (under a `stub/` directory next to the code they stand in for) and CMake hunks.
 They edit upstream C++ in these places: 0003 changes `CryptoDigestWin.cpp`, `CryptoKeyEC.h` and
@@ -21,7 +21,8 @@ and also changes `PlatformCocoa.cmake`; 0011 changes `AXObjectCache.h`, `AXObjec
 0018 changes `css/parser/CSSParser.cpp` so an explicit custom-property CSSOM assignment can remove importance.
 0019 changes `css/typedom/DeclaredStylePropertyMap.cpp`. 0020 changes `css/CSSProperties.json`.
 0021 changes `css/typedom/DeclaredStylePropertyMap.cpp` and `dom/StyledElement.cpp`.
-The patches touch 91 files in all.
+0022 changes `css/typedom/transform/CSSMatrixComponent.cpp` and `CSSPerspective.cpp`.
+The patches touch 93 files in all.
 
 The sizes are the reduction each patch measured when it was added, on Windows x64, in the slim flavor at
 `/O2` (Ranvier's `evidence/ABI-EXPERIMENT.md`, gates 37 to 43).
@@ -328,6 +329,12 @@ The focused typed-map fixture checks image set/append ordering, all four backgro
 Explicit typed custom-property assignment replaces the declaration directly instead of using the parser cascade merge helper, which preserved an old important value. This applies to declared maps and the CSSValue overload of StyledElement's inline custom setter; the unrelated string overload is unchanged. The changed inline overload is only called by Typed OM in this source pin.
 
 `tests/abi/declared_style_maps.py` checks both changed-value and same-value importance removal in declared and inline maps, the complete cache-sharing copy and actual var-dependent geometry. The stylesheet parser's important-precedence semantics remain unchanged.
+
+## 0022-css-transform-matrix-conversion
+
+Typed transform conversion returns a new matrix whose is2D flag matches the component. A 3D matrix component now copies its internal transformation instead of exposing that internal mutable matrix, and forces the output's 3D flag even when the stored matrix is affine. A perspective-none component returns an identity matrix with a 3D flag, preserving that distinction when it appears inside a transform list.
+
+`tests/abi/css_transforms.py` checks repeated conversion identity, mutation isolation, forced-3D options and perspective-none component/list flags. The initial native probe reproduces all these failures before the repair.
 
 ## Working on the series
 

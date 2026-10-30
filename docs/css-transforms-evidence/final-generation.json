@@ -1,0 +1,13 @@
+{
+  "change": "Post-batch shared F# formatting only; emitted native sources and ABI model remain byte-identical to the executed batch.",
+  "originalBatch": "evidence.json",
+  "originalBatchSha256": "d4731b6d117396df3e527840958fa5800c80c2752aaa8fff1a80c459f6e53f20",
+  "finalSources": {
+    "gen/interfaces.py": "d322c680f27b57f3512ae61aaa79f75194baf6cbd98b0494866007d7aec8cc4f",
+    "gen/Ranvier.Dom.fs": "07a00eac135210b9c80cfe947612e9f7d3c9e697de8afda8ca517c4a6dd0b04b",
+    "tests/generator/test_domgen.py": "adcfbd10ec8ffc725fa3f9e6027d865baf135a0597e9f5ffc9a6ba9fdc1e0183"
+  },
+  "generatorTests": 64,
+  "regeneration": "exact",
+  "formattedSnapshotTextMatch": true
+}

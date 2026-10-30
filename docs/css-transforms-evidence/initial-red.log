@@ -1,0 +1,15 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-css-transforms\tests\abi\css_transforms.py", line 201, in <module>
+    verify(parser.parse_args().native_directory)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-css-transforms\tests\abi\css_transforms.py", line 193, in verify
+    raise AssertionError('\n'.join(failures))
+AssertionError: translate x rejects angle: engine exception status
+invalid translate setter preserves input
+scale x rejects length: engine exception status
+every 3D matrix conversion is independent
+forced 3D component produces 3D matrix
+mutating converted matrix preserves component
+perspective none matrix keeps component 3D flag
+perspective none list matrix stays 3D

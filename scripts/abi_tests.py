@@ -105,6 +105,7 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', tests / 'style_map_entries.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'geometry_values.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'matrix_values.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'css_transforms.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'detached_cssom_context.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'svg_mathml_surface.py', '--native-directory', out])
 print('abi tests passed', flush=True)
