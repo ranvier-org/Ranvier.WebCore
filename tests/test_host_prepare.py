@@ -1,13 +1,25 @@
 """Exercise host-file installation in a fresh isolated source tree."""
 import ast
+import os
 from pathlib import Path
 import shutil
 import tempfile
+import subprocess
 import types
 import unittest
 
 
 class HostPrepare(unittest.TestCase):
+    def test_refreshes_an_old_cached_embedder_source_list(self):
+        cmake=os.environ.get('RANVIER_CMAKE') or shutil.which('cmake')
+        if not cmake:self.skipTest('CMake is not available')
+        root=Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as temporary:
+            script=Path(temporary)/'cache.cmake'
+            script.write_text('set(RANVIER_RID win-x64)\nset(WebCore_EMBEDDER_SOURCES obsolete.cpp CACHE STRING "")\ninclude("'+(root/'config/common.cmake').as_posix()+'")\nlist(FIND WebCore_EMBEDDER_SOURCES "'+(root/'host/RanvierSvgViewGlue.cpp').as_posix()+'" selected)\nif(selected EQUAL -1)\nmessage(FATAL_ERROR "The cached list omitted the SVG view helper")\nendif()\n')
+            result=subprocess.run(['rtk','proxy',cmake,'-P',str(script)],cwd=temporary,capture_output=True)
+            self.assertEqual(result.returncode,0,result.stdout.decode()+result.stderr.decode())
+
     def test_installs_transitive_capability_includes(self):
         root=Path(__file__).resolve().parents[1]
         tree=ast.parse((root/'scripts/build.py').read_text())
