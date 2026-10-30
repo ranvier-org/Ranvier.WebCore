@@ -2682,6 +2682,8 @@ and [<AllowNullLiteral>] DOMPointReadOnly =
     abstract member z: float with get
     /// <summary>DOMPointReadOnly.w.</summary>
     abstract member w: float with get
+    /// <summary>DOMPointReadOnly.matrixTransform.</summary>
+    abstract member matrixTransform: ?matrix: DOMMatrixInit -> DOMPoint
 
 /// <summary>DOMPoint in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DOMPoint =
@@ -2707,6 +2709,159 @@ and [<AllowNullLiteral>] DOMQuad =
     abstract member p4: DOMPoint with get
     /// <summary>DOMQuad.getBounds.</summary>
     abstract member getBounds: unit -> DOMRect
+
+/// <summary>DOMMatrixReadOnly in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DOMMatrixReadOnly =
+    /// <summary>DOMMatrixReadOnly.a.</summary>
+    abstract member a: float with get
+    /// <summary>DOMMatrixReadOnly.b.</summary>
+    abstract member b: float with get
+    /// <summary>DOMMatrixReadOnly.c.</summary>
+    abstract member c: float with get
+    /// <summary>DOMMatrixReadOnly.d.</summary>
+    abstract member d: float with get
+    /// <summary>DOMMatrixReadOnly.e.</summary>
+    abstract member e: float with get
+    /// <summary>DOMMatrixReadOnly.f.</summary>
+    abstract member f: float with get
+    /// <summary>DOMMatrixReadOnly.m11.</summary>
+    abstract member m11: float with get
+    /// <summary>DOMMatrixReadOnly.m12.</summary>
+    abstract member m12: float with get
+    /// <summary>DOMMatrixReadOnly.m13.</summary>
+    abstract member m13: float with get
+    /// <summary>DOMMatrixReadOnly.m14.</summary>
+    abstract member m14: float with get
+    /// <summary>DOMMatrixReadOnly.m21.</summary>
+    abstract member m21: float with get
+    /// <summary>DOMMatrixReadOnly.m22.</summary>
+    abstract member m22: float with get
+    /// <summary>DOMMatrixReadOnly.m23.</summary>
+    abstract member m23: float with get
+    /// <summary>DOMMatrixReadOnly.m24.</summary>
+    abstract member m24: float with get
+    /// <summary>DOMMatrixReadOnly.m31.</summary>
+    abstract member m31: float with get
+    /// <summary>DOMMatrixReadOnly.m32.</summary>
+    abstract member m32: float with get
+    /// <summary>DOMMatrixReadOnly.m33.</summary>
+    abstract member m33: float with get
+    /// <summary>DOMMatrixReadOnly.m34.</summary>
+    abstract member m34: float with get
+    /// <summary>DOMMatrixReadOnly.m41.</summary>
+    abstract member m41: float with get
+    /// <summary>DOMMatrixReadOnly.m42.</summary>
+    abstract member m42: float with get
+    /// <summary>DOMMatrixReadOnly.m43.</summary>
+    abstract member m43: float with get
+    /// <summary>DOMMatrixReadOnly.m44.</summary>
+    abstract member m44: float with get
+    /// <summary>DOMMatrixReadOnly.is2D.</summary>
+    abstract member is2D: bool with get
+    /// <summary>DOMMatrixReadOnly.isIdentity.</summary>
+    abstract member isIdentity: bool with get
+    /// <summary>DOMMatrixReadOnly.translate.</summary>
+    abstract member translate: ?tx: float * ?ty: float * ?tz: float -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.scale.</summary>
+    abstract member scale: ?scaleX: float * ?scaleY: float * ?scaleZ: float * ?originX: float * ?originY: float * ?originZ: float -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.scale3d.</summary>
+    abstract member scale3d: ?scale: float * ?originX: float * ?originY: float * ?originZ: float -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.scaleNonUniform.</summary>
+    abstract member scaleNonUniform: ?scaleX: float * ?scaleY: float -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.rotate.</summary>
+    abstract member rotate: ?rotX: float * ?rotY: float * ?rotZ: float -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.rotateFromVector.</summary>
+    abstract member rotateFromVector: ?x: float * ?y: float -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.rotateAxisAngle.</summary>
+    abstract member rotateAxisAngle: ?x: float * ?y: float * ?z: float * ?angle: float -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.skewX.</summary>
+    abstract member skewX: ?sx: float -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.skewY.</summary>
+    abstract member skewY: ?sy: float -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.multiply.</summary>
+    abstract member multiply: ?other: DOMMatrixInit -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.flipX.</summary>
+    abstract member flipX: unit -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.flipY.</summary>
+    abstract member flipY: unit -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.inverse.</summary>
+    abstract member inverse: unit -> DOMMatrix
+    /// <summary>DOMMatrixReadOnly.transformPoint.</summary>
+    abstract member transformPoint: ?point: DOMPointInit -> DOMPoint
+    /// <summary>DOMMatrixReadOnly.toString.</summary>
+    abstract member toString: unit -> string
+
+/// <summary>DOMMatrix in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DOMMatrix =
+    inherit DOMMatrixReadOnly
+    /// <summary>DOMMatrix.a.</summary>
+    abstract member a: float with get, set
+    /// <summary>DOMMatrix.b.</summary>
+    abstract member b: float with get, set
+    /// <summary>DOMMatrix.c.</summary>
+    abstract member c: float with get, set
+    /// <summary>DOMMatrix.d.</summary>
+    abstract member d: float with get, set
+    /// <summary>DOMMatrix.e.</summary>
+    abstract member e: float with get, set
+    /// <summary>DOMMatrix.f.</summary>
+    abstract member f: float with get, set
+    /// <summary>DOMMatrix.m11.</summary>
+    abstract member m11: float with get, set
+    /// <summary>DOMMatrix.m12.</summary>
+    abstract member m12: float with get, set
+    /// <summary>DOMMatrix.m13.</summary>
+    abstract member m13: float with get, set
+    /// <summary>DOMMatrix.m14.</summary>
+    abstract member m14: float with get, set
+    /// <summary>DOMMatrix.m21.</summary>
+    abstract member m21: float with get, set
+    /// <summary>DOMMatrix.m22.</summary>
+    abstract member m22: float with get, set
+    /// <summary>DOMMatrix.m23.</summary>
+    abstract member m23: float with get, set
+    /// <summary>DOMMatrix.m24.</summary>
+    abstract member m24: float with get, set
+    /// <summary>DOMMatrix.m31.</summary>
+    abstract member m31: float with get, set
+    /// <summary>DOMMatrix.m32.</summary>
+    abstract member m32: float with get, set
+    /// <summary>DOMMatrix.m33.</summary>
+    abstract member m33: float with get, set
+    /// <summary>DOMMatrix.m34.</summary>
+    abstract member m34: float with get, set
+    /// <summary>DOMMatrix.m41.</summary>
+    abstract member m41: float with get, set
+    /// <summary>DOMMatrix.m42.</summary>
+    abstract member m42: float with get, set
+    /// <summary>DOMMatrix.m43.</summary>
+    abstract member m43: float with get, set
+    /// <summary>DOMMatrix.m44.</summary>
+    abstract member m44: float with get, set
+    /// <summary>DOMMatrix.multiplySelf.</summary>
+    abstract member multiplySelf: ?other: DOMMatrixInit -> DOMMatrix
+    /// <summary>DOMMatrix.preMultiplySelf.</summary>
+    abstract member preMultiplySelf: ?other: DOMMatrixInit -> DOMMatrix
+    /// <summary>DOMMatrix.translateSelf.</summary>
+    abstract member translateSelf: ?tx: float * ?ty: float * ?tz: float -> DOMMatrix
+    /// <summary>DOMMatrix.scaleSelf.</summary>
+    abstract member scaleSelf: ?scaleX: float * ?scaleY: float * ?scaleZ: float * ?originX: float * ?originY: float * ?originZ: float -> DOMMatrix
+    /// <summary>DOMMatrix.scale3dSelf.</summary>
+    abstract member scale3dSelf: ?scale: float * ?originX: float * ?originY: float * ?originZ: float -> DOMMatrix
+    /// <summary>DOMMatrix.rotateSelf.</summary>
+    abstract member rotateSelf: ?rotX: float * ?rotY: float * ?rotZ: float -> DOMMatrix
+    /// <summary>DOMMatrix.rotateFromVectorSelf.</summary>
+    abstract member rotateFromVectorSelf: ?x: float * ?y: float -> DOMMatrix
+    /// <summary>DOMMatrix.rotateAxisAngleSelf.</summary>
+    abstract member rotateAxisAngleSelf: ?x: float * ?y: float * ?z: float * ?angle: float -> DOMMatrix
+    /// <summary>DOMMatrix.skewXSelf.</summary>
+    abstract member skewXSelf: ?sx: float -> DOMMatrix
+    /// <summary>DOMMatrix.skewYSelf.</summary>
+    abstract member skewYSelf: ?sy: float -> DOMMatrix
+    /// <summary>DOMMatrix.invertSelf.</summary>
+    abstract member invertSelf: unit -> DOMMatrix
+    /// <summary>DOMMatrix.setMatrixValue.</summary>
+    abstract member setMatrixValue: transformList: string -> DOMMatrix
 
 /// <summary>NodeList in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] NodeList =
@@ -3752,6 +3907,39 @@ and [<AllowNullLiteral; DomDictionary>] AssignedNodesOptions() =
 /// <summary>GetComposedRangesOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetComposedRangesOptions() =
     member val shadowRoots: (ShadowRoot) array = [||] with get, set
+
+/// <summary>DOMMatrixInit in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] DOMMatrixInit() =
+    member val a: (float) option = None with get, set
+    member val b: (float) option = None with get, set
+    member val c: (float) option = None with get, set
+    member val d: (float) option = None with get, set
+    member val e: (float) option = None with get, set
+    member val f: (float) option = None with get, set
+    member val m11: (float) option = None with get, set
+    member val m12: (float) option = None with get, set
+    member val m21: (float) option = None with get, set
+    member val m22: (float) option = None with get, set
+    member val m41: (float) option = None with get, set
+    member val m42: (float) option = None with get, set
+    member val m13: float = 0 with get, set
+    member val m14: float = 0 with get, set
+    member val m23: float = 0 with get, set
+    member val m24: float = 0 with get, set
+    member val m31: float = 0 with get, set
+    member val m32: float = 0 with get, set
+    member val m33: float = 1 with get, set
+    member val m34: float = 0 with get, set
+    member val m43: float = 0 with get, set
+    member val m44: float = 1 with get, set
+    member val is2D: (bool) option = None with get, set
+
+/// <summary>DOMPointInit in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] DOMPointInit() =
+    member val x: float = 0 with get, set
+    member val y: float = 0 with get, set
+    member val z: float = 0 with get, set
+    member val w: float = 1 with get, set
 
 /// <summary>FocusOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =

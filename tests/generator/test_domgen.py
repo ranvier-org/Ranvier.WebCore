@@ -83,6 +83,7 @@ interface DOMMatrixReadOnly {
         self.assertIn('a0 = decodeRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(init, status0);', glue)
         self.assertIn('DOMMatrixReadOnly::create(*impl, std::move(a0))', glue)
         self.assertNotIn('DOMMatrixReadOnly::create(*impl, std::move(*a0))', glue)
+        self.assertIn('RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_UNRESTRICTED_DOUBLE_SEQUENCE_UNRESTRICTED_DOUBLE = 2', generator.header())
 
     def test_configured_geometry_factories_mutation_and_quad_copies_use_engine_operations(self):
         configured = json.loads((ROOT / 'gen/dom.json').read_text())
@@ -130,7 +131,8 @@ interface DOMQuad {
         config['interfaces'] = list(config['interfaces']) + selected
         config['constructors'] = {name: configured['constructors'][name] for name in selected}
         config['staticBindings'] = {name: configured['staticBindings'][name] for name in selected}
-        config['trackedHandleRoots'] = configured['trackedHandleRoots']
+        config['trackedHandleRoots'] = {root: concrete for root, concrete in configured['trackedHandleRoots'].items()
+                                        if root in selected}
         config['nestedDictionaries'] = configured['nestedDictionaries']
         config['runtimeTypeRoots'] = list(config['trackedHandleRoots'])
         generator = domgen.Generator(domgen.World(self.source, config))

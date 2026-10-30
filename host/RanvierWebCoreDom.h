@@ -47,6 +47,7 @@ typedef struct RvDOMRectReadOnly RvDOMRectReadOnly;
 typedef struct RvDOMRectList RvDOMRectList;
 typedef struct RvDOMPointReadOnly RvDOMPointReadOnly;
 typedef struct RvDOMQuad RvDOMQuad;
+typedef struct RvDOMMatrixReadOnly RvDOMMatrixReadOnly;
 typedef struct RvNodeList RvNodeList;
 typedef struct RvHTMLCollection RvHTMLCollection;
 typedef struct RvValidityState RvValidityState;
@@ -78,6 +79,8 @@ typedef struct RvDomUnionCSSStyleValueOrUSVString RvDomUnionCSSStyleValueOrUSVSt
 typedef struct RvDomSequenceCSSStyleValueOrUSVString RvDomSequenceCSSStyleValueOrUSVString;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
+typedef struct RvDomSequenceUnrestrictedDouble RvDomSequenceUnrestrictedDouble;
+typedef struct RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -320,6 +323,35 @@ typedef struct RvDomGetComposedRangesOptions {
     const RvDomSequenceShadowRoot* shadow_roots; /* sequence<ShadowRoot>, default [] */
 } RvDomGetComposedRangesOptions;
 
+/* The IDL dictionary DOMMatrixInit. size is sizeof(RvDomDOMMatrixInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomDOMMatrixInit {
+    uint32_t size;
+    const double* a; /* unrestricted double, NULL for absent */
+    const double* b; /* unrestricted double, NULL for absent */
+    const double* c; /* unrestricted double, NULL for absent */
+    const double* d; /* unrestricted double, NULL for absent */
+    const double* e; /* unrestricted double, NULL for absent */
+    const double* f; /* unrestricted double, NULL for absent */
+    const double* m11; /* unrestricted double, NULL for absent */
+    const double* m12; /* unrestricted double, NULL for absent */
+    const double* m21; /* unrestricted double, NULL for absent */
+    const double* m22; /* unrestricted double, NULL for absent */
+    const double* m41; /* unrestricted double, NULL for absent */
+    const double* m42; /* unrestricted double, NULL for absent */
+    double m13; /* unrestricted double, default 0 */
+    double m14; /* unrestricted double, default 0 */
+    double m23; /* unrestricted double, default 0 */
+    double m24; /* unrestricted double, default 0 */
+    double m31; /* unrestricted double, default 0 */
+    double m32; /* unrestricted double, default 0 */
+    double m33; /* unrestricted double, default 1 */
+    double m34; /* unrestricted double, default 0 */
+    double m43; /* unrestricted double, default 0 */
+    double m44; /* unrestricted double, default 1 */
+    const int32_t* is2_d; /* boolean, NULL for absent */
+} RvDomDOMMatrixInit;
+
 /* The IDL dictionary DOMPointInit. size is sizeof(RvDomDOMPointInit) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDOMPointInit {
@@ -394,6 +426,8 @@ typedef struct RvDomUnionCSSStyleValueOrUSVString RvDomUnionCSSStyleValueOrUSVSt
 typedef struct RvDomSequenceCSSStyleValueOrUSVString RvDomSequenceCSSStyleValueOrUSVString;
 typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRootOrGetComposedRangesOptions;
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
+typedef struct RvDomSequenceUnrestrictedDouble RvDomSequenceUnrestrictedDouble;
+typedef struct RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -707,6 +741,27 @@ struct RvDomSequenceStaticRange {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceUnrestrictedDouble {
+    int32_t present;
+    int32_t count;
+    double* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_UNRESTRICTED_DOUBLE_STRING = 1,
+    RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_UNRESTRICTED_DOUBLE_SEQUENCE_UNRESTRICTED_DOUBLE = 2,
+};
+struct RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble {
+    int32_t present;
+    int32_t tag;
+    RvDomUtf8StringSpan arm0;
+    RvDomSequenceUnrestrictedDouble arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequencePointerEvent {
     int32_t present;
     int32_t count;
@@ -764,6 +819,8 @@ RV_EXPORT void rv_dom_union_css_style_value_or_usv_string_release(RvDomUnionCSSS
 RV_EXPORT void rv_dom_sequence_css_style_value_or_usv_string_release(RvDomSequenceCSSStyleValueOrUSVString* value);
 RV_EXPORT void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDomUnionShadowRootOrGetComposedRangesOptions* value);
 RV_EXPORT void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
+RV_EXPORT void rv_dom_sequence_unrestricted_double_release(RvDomSequenceUnrestrictedDouble* value);
+RV_EXPORT void rv_dom_union_dom_string_or_sequence_of_unrestricted_double_release(RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* value);
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -844,6 +901,10 @@ RV_EXPORT RvDOMPointReadOnly* rv_dom_dom_point_read_only_retain(RvDOMPointReadOn
 RV_EXPORT void rv_dom_dom_quad_release(RvDOMQuad*);
 /* Adds a reference to a DOMQuad and returns it. */
 RV_EXPORT RvDOMQuad* rv_dom_dom_quad_retain(RvDOMQuad*);
+/* Releases a handle to a DOMMatrixReadOnly. */
+RV_EXPORT void rv_dom_dom_matrix_read_only_release(RvDOMMatrixReadOnly*);
+/* Adds a reference to a DOMMatrixReadOnly and returns it. */
+RV_EXPORT RvDOMMatrixReadOnly* rv_dom_dom_matrix_read_only_retain(RvDOMMatrixReadOnly*);
 /* Releases a handle to a NodeList. */
 RV_EXPORT void rv_dom_node_list_release(RvNodeList*);
 /* Adds a reference to a NodeList and returns it. */
@@ -870,6 +931,8 @@ RV_EXPORT int32_t rv_dom_style_property_map_read_only_get_interface_name(RvStyle
 RV_EXPORT int32_t rv_dom_dom_rect_read_only_get_interface_name(RvDOMRectReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a DOMPointReadOnly handle; borrows target. */
 RV_EXPORT int32_t rv_dom_dom_point_read_only_get_interface_name(RvDOMPointReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
+/* Concrete scoped interface name of a DOMMatrixReadOnly handle; borrows target. */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_interface_name(RvDOMMatrixReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
 
 /* Node */
 
@@ -4723,6 +4786,9 @@ RV_EXPORT int32_t rv_dom_dom_point_read_only_get_y(RvDOMPointReadOnly* target, d
 RV_EXPORT int32_t rv_dom_dom_point_read_only_get_z(RvDOMPointReadOnly* target, double* result);
 /* DOMPointReadOnly.w getter: readonly attribute unrestricted double w */
 RV_EXPORT int32_t rv_dom_dom_point_read_only_get_w(RvDOMPointReadOnly* target, double* result);
+/* DOMPointReadOnly.matrixTransform(optional DOMMatrixInit matrix = {}) -> DOMPoint; matrix defaults to {} in IDL;
+ * matrix may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_point_read_only_matrix_transform(RvDOMPointReadOnly* target, const RvDomDOMMatrixInit* matrix, RvDOMPointReadOnly** result);
 /* DOMPoint */
 
 /* DOMPoint.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults to 0 in
@@ -4760,6 +4826,244 @@ RV_EXPORT int32_t rv_dom_dom_quad_get_p3(RvDOMQuad* target, RvDOMPointReadOnly**
 RV_EXPORT int32_t rv_dom_dom_quad_get_p4(RvDOMQuad* target, RvDOMPointReadOnly** result);
 /* DOMQuad.getBounds() -> DOMRect; *result is a new reference */
 RV_EXPORT int32_t rv_dom_dom_quad_get_bounds(RvDOMQuad* target, RvDOMRectReadOnly** result);
+/* DOMMatrixReadOnly */
+
+/* DOMMatrixReadOnly.constructor: target is the Document of the constructed object; init may be NULL for an absent
+ * optional argument; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_create(RvNode* target, const RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* init, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.a getter: readonly attribute unrestricted double a */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_a(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.b getter: readonly attribute unrestricted double b */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_b(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.c getter: readonly attribute unrestricted double c */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_c(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.d getter: readonly attribute unrestricted double d */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_d(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.e getter: readonly attribute unrestricted double e */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_e(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.f getter: readonly attribute unrestricted double f */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_f(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m11 getter: readonly attribute unrestricted double m11 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m11(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m12 getter: readonly attribute unrestricted double m12 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m12(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m13 getter: readonly attribute unrestricted double m13 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m13(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m14 getter: readonly attribute unrestricted double m14 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m14(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m21 getter: readonly attribute unrestricted double m21 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m21(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m22 getter: readonly attribute unrestricted double m22 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m22(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m23 getter: readonly attribute unrestricted double m23 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m23(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m24 getter: readonly attribute unrestricted double m24 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m24(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m31 getter: readonly attribute unrestricted double m31 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m31(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m32 getter: readonly attribute unrestricted double m32 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m32(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m33 getter: readonly attribute unrestricted double m33 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m33(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m34 getter: readonly attribute unrestricted double m34 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m34(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m41 getter: readonly attribute unrestricted double m41 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m41(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m42 getter: readonly attribute unrestricted double m42 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m42(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m43 getter: readonly attribute unrestricted double m43 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m43(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.m44 getter: readonly attribute unrestricted double m44 */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_m44(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrixReadOnly.is2D getter: readonly attribute boolean is2D */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_is2_d(RvDOMMatrixReadOnly* target, int32_t* result);
+/* DOMMatrixReadOnly.isIdentity getter: readonly attribute boolean isIdentity */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_get_is_identity(RvDOMMatrixReadOnly* target, int32_t* result);
+/* DOMMatrixReadOnly.translate(optional unrestricted double tx = 0, optional unrestricted double ty = 0, optional
+ * unrestricted double tz = 0) -> DOMMatrix; tx defaults to 0 in IDL; ty defaults to 0 in IDL; tz defaults to 0 in
+ * IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_translate(RvDOMMatrixReadOnly* target, double tx, double ty, double tz, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.scale(optional unrestricted double scaleX = 1, optional unrestricted double scaleY, optional
+ * unrestricted double scaleZ = 1, optional unrestricted double originX = 0, optional unrestricted double originY = 0,
+ * optional unrestricted double originZ = 0) -> DOMMatrix; scale_x defaults to 1 in IDL; scale_y may be NULL (absent);
+ * scale_z defaults to 1 in IDL; origin_x defaults to 0 in IDL; origin_y defaults to 0 in IDL; origin_z defaults to 0
+ * in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_scale(RvDOMMatrixReadOnly* target, double scale_x, const double* scale_y, double scale_z, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.scale3d(optional unrestricted double scale = 1, optional unrestricted double originX = 0,
+ * optional unrestricted double originY = 0, optional unrestricted double originZ = 0) -> DOMMatrix; scale defaults to
+ * 1 in IDL; origin_x defaults to 0 in IDL; origin_y defaults to 0 in IDL; origin_z defaults to 0 in IDL; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_scale3d(RvDOMMatrixReadOnly* target, double scale, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.scaleNonUniform(optional unrestricted double scaleX = 1, optional unrestricted double scaleY = 1)
+ * -> DOMMatrix; scale_x defaults to 1 in IDL; scale_y defaults to 1 in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_scale_non_uniform(RvDOMMatrixReadOnly* target, double scale_x, double scale_y, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.rotate(optional unrestricted double rotX = 0, optional unrestricted double rotY, optional
+ * unrestricted double rotZ) -> DOMMatrix; rot_x defaults to 0 in IDL; rot_y may be NULL (absent); rot_z may be NULL
+ * (absent); *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_rotate(RvDOMMatrixReadOnly* target, double rot_x, const double* rot_y, const double* rot_z, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.rotateFromVector(optional unrestricted double x = 0, optional unrestricted double y = 0) ->
+ * DOMMatrix; x defaults to 0 in IDL; y defaults to 0 in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_rotate_from_vector(RvDOMMatrixReadOnly* target, double x, double y, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.rotateAxisAngle(optional unrestricted double x = 0, optional unrestricted double y = 0, optional
+ * unrestricted double z = 0, optional unrestricted double angle = 0) -> DOMMatrix; x defaults to 0 in IDL; y defaults
+ * to 0 in IDL; z defaults to 0 in IDL; angle defaults to 0 in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_rotate_axis_angle(RvDOMMatrixReadOnly* target, double x, double y, double z, double angle, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.skewX(optional unrestricted double sx = 0) -> DOMMatrix; sx defaults to 0 in IDL; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_skew_x(RvDOMMatrixReadOnly* target, double sx, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.skewY(optional unrestricted double sy = 0) -> DOMMatrix; sy defaults to 0 in IDL; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_skew_y(RvDOMMatrixReadOnly* target, double sy, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.multiply(optional DOMMatrixInit other = {}) -> DOMMatrix; other defaults to {} in IDL; other may
+ * be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_multiply(RvDOMMatrixReadOnly* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.flipX() -> DOMMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_flip_x(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.flipY() -> DOMMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_flip_y(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.inverse() -> DOMMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_inverse(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result);
+/* DOMMatrixReadOnly.transformPoint(optional DOMPointInit point = {}) -> DOMPoint; point defaults to {} in IDL; point
+ * may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_transform_point(RvDOMMatrixReadOnly* target, const RvDomDOMPointInit* point, RvDOMPointReadOnly** result);
+/* DOMMatrixReadOnly.toString() -> DOMString */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_to_string(RvDOMMatrixReadOnly* target, char* buffer, int32_t capacity, int32_t* length);
+/* DOMMatrix */
+
+/* DOMMatrix.constructor: target is the Document of the constructed object; init may be NULL for an absent optional
+ * argument; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_create(RvNode* target, const RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* init, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.a getter: attribute unrestricted double a */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_a(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.a setter: attribute unrestricted double a */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_a(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.b getter: attribute unrestricted double b */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_b(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.b setter: attribute unrestricted double b */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_b(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.c getter: attribute unrestricted double c */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_c(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.c setter: attribute unrestricted double c */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_c(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.d getter: attribute unrestricted double d */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_d(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.d setter: attribute unrestricted double d */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_d(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.e getter: attribute unrestricted double e */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_e(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.e setter: attribute unrestricted double e */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_e(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.f getter: attribute unrestricted double f */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_f(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.f setter: attribute unrestricted double f */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_f(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m11 getter: attribute unrestricted double m11 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m11(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m11 setter: attribute unrestricted double m11 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m11(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m12 getter: attribute unrestricted double m12 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m12(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m12 setter: attribute unrestricted double m12 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m12(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m13 getter: attribute unrestricted double m13 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m13(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m13 setter: attribute unrestricted double m13 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m13(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m14 getter: attribute unrestricted double m14 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m14(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m14 setter: attribute unrestricted double m14 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m14(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m21 getter: attribute unrestricted double m21 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m21(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m21 setter: attribute unrestricted double m21 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m21(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m22 getter: attribute unrestricted double m22 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m22(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m22 setter: attribute unrestricted double m22 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m22(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m23 getter: attribute unrestricted double m23 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m23(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m23 setter: attribute unrestricted double m23 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m23(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m24 getter: attribute unrestricted double m24 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m24(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m24 setter: attribute unrestricted double m24 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m24(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m31 getter: attribute unrestricted double m31 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m31(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m31 setter: attribute unrestricted double m31 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m31(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m32 getter: attribute unrestricted double m32 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m32(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m32 setter: attribute unrestricted double m32 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m32(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m33 getter: attribute unrestricted double m33 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m33(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m33 setter: attribute unrestricted double m33 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m33(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m34 getter: attribute unrestricted double m34 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m34(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m34 setter: attribute unrestricted double m34 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m34(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m41 getter: attribute unrestricted double m41 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m41(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m41 setter: attribute unrestricted double m41 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m41(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m42 getter: attribute unrestricted double m42 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m42(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m42 setter: attribute unrestricted double m42 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m42(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m43 getter: attribute unrestricted double m43 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m43(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m43 setter: attribute unrestricted double m43 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m43(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.m44 getter: attribute unrestricted double m44 */
+RV_EXPORT int32_t rv_dom_dom_matrix_get_m44(RvDOMMatrixReadOnly* target, double* result);
+/* DOMMatrix.m44 setter: attribute unrestricted double m44 */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_m44(RvDOMMatrixReadOnly* target, double value);
+/* DOMMatrix.multiplySelf(optional DOMMatrixInit other = {}) -> DOMMatrix; other defaults to {} in IDL; other may be
+ * NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_multiply_self(RvDOMMatrixReadOnly* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.preMultiplySelf(optional DOMMatrixInit other = {}) -> DOMMatrix; other defaults to {} in IDL; other may
+ * be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_pre_multiply_self(RvDOMMatrixReadOnly* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.translateSelf(optional unrestricted double tx = 0, optional unrestricted double ty = 0, optional
+ * unrestricted double tz = 0) -> DOMMatrix; tx defaults to 0 in IDL; ty defaults to 0 in IDL; tz defaults to 0 in
+ * IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_translate_self(RvDOMMatrixReadOnly* target, double tx, double ty, double tz, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.scaleSelf(optional unrestricted double scaleX = 1, optional unrestricted double scaleY, optional
+ * unrestricted double scaleZ = 1, optional unrestricted double originX = 0, optional unrestricted double originY = 0,
+ * optional unrestricted double originZ = 0) -> DOMMatrix; scale_x defaults to 1 in IDL; scale_y may be NULL (absent);
+ * scale_z defaults to 1 in IDL; origin_x defaults to 0 in IDL; origin_y defaults to 0 in IDL; origin_z defaults to 0
+ * in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_scale_self(RvDOMMatrixReadOnly* target, double scale_x, const double* scale_y, double scale_z, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.scale3dSelf(optional unrestricted double scale = 1, optional unrestricted double originX = 0, optional
+ * unrestricted double originY = 0, optional unrestricted double originZ = 0) -> DOMMatrix; scale defaults to 1 in
+ * IDL; origin_x defaults to 0 in IDL; origin_y defaults to 0 in IDL; origin_z defaults to 0 in IDL; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_scale3d_self(RvDOMMatrixReadOnly* target, double scale, double origin_x, double origin_y, double origin_z, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.rotateSelf(optional unrestricted double rotX = 0, optional unrestricted double rotY, optional
+ * unrestricted double rotZ) -> DOMMatrix; rot_x defaults to 0 in IDL; rot_y may be NULL (absent); rot_z may be NULL
+ * (absent); *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_rotate_self(RvDOMMatrixReadOnly* target, double rot_x, const double* rot_y, const double* rot_z, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.rotateFromVectorSelf(optional unrestricted double x = 0, optional unrestricted double y = 0) ->
+ * DOMMatrix; x defaults to 0 in IDL; y defaults to 0 in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_rotate_from_vector_self(RvDOMMatrixReadOnly* target, double x, double y, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.rotateAxisAngleSelf(optional unrestricted double x = 0, optional unrestricted double y = 0, optional
+ * unrestricted double z = 0, optional unrestricted double angle = 0) -> DOMMatrix; x defaults to 0 in IDL; y defaults
+ * to 0 in IDL; z defaults to 0 in IDL; angle defaults to 0 in IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_rotate_axis_angle_self(RvDOMMatrixReadOnly* target, double x, double y, double z, double angle, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.skewXSelf(optional unrestricted double sx = 0) -> DOMMatrix; sx defaults to 0 in IDL; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_skew_x_self(RvDOMMatrixReadOnly* target, double sx, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.skewYSelf(optional unrestricted double sy = 0) -> DOMMatrix; sy defaults to 0 in IDL; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_skew_y_self(RvDOMMatrixReadOnly* target, double sy, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.invertSelf() -> DOMMatrix; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_invert_self(RvDOMMatrixReadOnly* target, RvDOMMatrixReadOnly** result);
+/* DOMMatrix.setMatrixValue(DOMString transformList) -> DOMMatrix; context is an explicit checked Document for the
+ * operation; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_set_matrix_value(RvDOMMatrixReadOnly* target, RvNode* context, const uint8_t* transform_list, int32_t transform_list_length, RvDOMMatrixReadOnly** result);
 /* NodeList */
 
 /* NodeList.length getter: readonly attribute unsigned long length */
@@ -5009,6 +5313,16 @@ RV_EXPORT int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSS
 /* Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element
  * defaults to null in IDL; pseudo_element may be NULL (null); *result is a new reference */
 RV_EXPORT int32_t rv_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
+/* DOMMatrixReadOnly */
+
+/* DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults
+ * to {} in IDL; other may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
+/* DOMMatrix */
+
+/* DOMMatrix.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults to {}
+ * in IDL; other may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
 /* DOMRectReadOnly */
 
 /* DOMRectReadOnly.fromRect: static operation with checked Document context and UTF-8 byte lengths; other defaults to

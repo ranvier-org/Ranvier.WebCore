@@ -1,0 +1,171 @@
+{
+  "status": "private-windows-producer-batch-only",
+  "rawAssertions": 5979,
+  "geometryAssertions": 260,
+  "matrixAssertions": 1091,
+  "finalTeardownCases": 42,
+  "immediateTeardownQualification": "Some engine objects remain alive until collection; final expiry is the checked requirement.",
+  "sources": {
+    "gen/domgen.py": "a9399fd52da4a561315f9afe750cf239e70879b2f619cea7ff8e849d75df9c14",
+    "gen/domtypes.py": "899dd89b5d6fcc21057eb7b3dbb1b288f8ed08f82ba2cf74ea2ab565741d5aa8",
+    "gen/dom.json": "05a819f06edde3cadfa04a31d5c1fec12716aeb2685ef341cb5020ac5aca9ae6",
+    "gen/dom-api.json": "7043b2096c2f5f6ad4b60066840ba69b2d4691ddf725d3805d9eefd4b40997e7",
+    "host/dom/RanvierDomGlue.cpp": "ef287ee99d90e27e178e0e2ae5696ffd766967aa1da92198c70c342719c56391",
+    "host/RanvierWebCoreDom.cpp": "90e7838f847ccd8bf8cf751a783e6f0e5d2b21b166c14d4548b8563fbca1d81d",
+    "tests/abi/geometry_values.py": "df24fa7a320af87b83633332343e022970e08a204096243b85164de015962fbc",
+    "tests/abi/matrix_values.py": "f2572da2574bcb708790e88125cf7a338d4bfb54dd784c39c15475133c692988"
+  },
+  "runtime": {
+    "WebCore.dll": "e3e6a80e6f21ca785b37fbbc11cb9a16c28d27a32ba19099a7cc2ea5aeb99870",
+    "RanvierWebCoreHost.dll": "653d33249b896cea16b7c703f96b7633605e94976c084ff78e23805d8483a419",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "probes": [
+    {
+      "probe": "css_supports",
+      "assertions": 72,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/css_supports.log",
+      "sha256": "a58b92257704d7103ee669098612f2db771da0ce70b1e2c08859e2f3b1ede2ee"
+    },
+    {
+      "probe": "computed_style",
+      "assertions": 93,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/computed_style.log",
+      "sha256": "fcf4e301cf0acf837ced3362b9d305640b46ce8351056fe769a483b88cacaf24"
+    },
+    {
+      "probe": "fragment_rectangles",
+      "assertions": 140,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/fragment_rectangles.log",
+      "sha256": "d39085368def0d7fdc5c4b627a7c340fcad0e868e1ce4445746765666561f2c7"
+    },
+    {
+      "probe": "table_surface",
+      "assertions": 44,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/table_surface.log",
+      "sha256": "20b155ae802897d9498a2f9f688d484c8ec0cc818e1dac5f4d8e444de1db9330"
+    },
+    {
+      "probe": "element_reflection",
+      "assertions": 269,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/element_reflection.log",
+      "sha256": "0a5727dbea0087c50bac611ca17724ef0c8b5ab093120df7ebf44b508002bbeb"
+    },
+    {
+      "probe": "area_surface",
+      "assertions": 117,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/area_surface.log",
+      "sha256": "40f8a9fe26de9ed5817a0e5157465d26fe0ca13756805dc3d71e9e718de35d2e"
+    },
+    {
+      "probe": "cssom_surface",
+      "assertions": 407,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/cssom_surface.log",
+      "sha256": "9c406b081be9ccfbafdf4ea22233cae5b366f3e72ba19b3094724f4ffd06b036"
+    },
+    {
+      "probe": "keyframe_rules",
+      "assertions": 93,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/keyframe_rules.log",
+      "sha256": "7f8810902d8d2c871a1c3c2739601f727219acb4a6ca1187730a3dcc923f8a65"
+    },
+    {
+      "probe": "counter_style_rules",
+      "assertions": 86,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/counter_style_rules.log",
+      "sha256": "eba668c7492fec715ba8dda6018fa3a39f9fe975387df2213936088752294d53"
+    },
+    {
+      "probe": "detached_cssom_context",
+      "assertions": 389,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/detached_cssom_context.log",
+      "sha256": "c65206ea3eb10fdd6339a9e776b6536d1b035782d84c50a24cf1b21cabfe08b0"
+    },
+    {
+      "probe": "svg_mathml_surface",
+      "assertions": 95,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/svg_mathml_surface.log",
+      "sha256": "7909d8ca88d13a5f5d685ad650fa5044c367b3c61a45fddb7456d301bb00342f"
+    },
+    {
+      "probe": "style_property_maps",
+      "assertions": 189,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/style_property_maps.log",
+      "sha256": "842bf48f79f1d6b345229ba6b2848766386aa564c48f5bf1e19a9c2ee897b101"
+    },
+    {
+      "probe": "declared_style_maps",
+      "assertions": 2069,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/declared_style_maps.log",
+      "sha256": "a0f871d1662a8874d4242baa9b6a88401377670d5e73a5a616fa971e93648361"
+    },
+    {
+      "probe": "style_map_entries",
+      "assertions": 144,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/style_map_entries.log",
+      "sha256": "35991fb9af099dd4195e00daf9d9379febb91494c88a689ad492dd8630f1d073"
+    },
+    {
+      "probe": "typed_style_values",
+      "assertions": 190,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/typed_style_values.log",
+      "sha256": "ad90626f02ac7000083dd96ffa1b66be1750a075bb509c2185ed7de6406dce19"
+    },
+    {
+      "probe": "custom_properties",
+      "assertions": 231,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/custom_properties.log",
+      "sha256": "a382967c2d75a4afef9646c9042d7bebf492965ce55bf6b388c36931b543652f"
+    },
+    {
+      "probe": "geometry_values",
+      "assertions": 260,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/geometry_values.log",
+      "sha256": "1dffd121ce5b04aa1604b066d9cb45d28013b323df6e11757247753222a24529"
+    },
+    {
+      "probe": "matrix_values",
+      "assertions": 1091,
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/matrix_values.log",
+      "sha256": "eb4c585c486246c753fd823e38254003e17ecf09d940fceefb4dca3cf61565cc"
+    },
+    {
+      "probe": "frames",
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/frames.log",
+      "sha256": "89498f192496d785d4a14f781aa237fcf29e07b2bff76fc048e69173bb5f21bc"
+    },
+    {
+      "probe": "teardown",
+      "exitCode": 0,
+      "log": "docs/matrix-values-evidence/teardown.log",
+      "sha256": "c7265497fffb4b3d2a71c8ba574456edbb2ad0396ca0ba8be71c5a2138b0c084"
+    }
+  ],
+  "unverified": [
+    "shared Core/Views geometry and matrix providers",
+    "Chromium parity",
+    "NativeAOT geometry/matrix consumers",
+    "nonWindows native platforms",
+    "official packages",
+    "G07/G08 acceptance"
+  ]
+}

@@ -216,6 +216,33 @@
           "name": "length"
         }
       ]
+    },
+    {
+      "root": "DOMMatrixReadOnly",
+      "function": "rv_dom_dom_matrix_read_only_get_interface_name",
+      "feature": "dom-type-query:DOMMatrixReadOnly",
+      "interfaces": [
+        "DOMMatrix",
+        "DOMMatrixReadOnly"
+      ],
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
     }
   ],
   "interfaces": [
@@ -730,6 +757,14 @@
     {
       "name": "DOMQuad",
       "base": null
+    },
+    {
+      "name": "DOMMatrixReadOnly",
+      "base": null
+    },
+    {
+      "name": "DOMMatrix",
+      "base": "DOMMatrixReadOnly"
     },
     {
       "name": "NodeList",
@@ -2060,6 +2095,24 @@
       "mixin": false,
       "contractOnly": false,
       "source": "dom/DOMQuad.idl"
+    },
+    {
+      "name": "DOMMatrixReadOnly",
+      "idlName": "DOMMatrixReadOnly",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/DOMMatrixReadOnly.idl"
+    },
+    {
+      "name": "DOMMatrix",
+      "idlName": "DOMMatrix",
+      "base": "DOMMatrixReadOnly",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/DOMMatrix.idl"
     },
     {
       "name": "NodeList",
@@ -92346,6 +92399,71 @@
       }
     },
     {
+      "interface": "DOMPointReadOnly",
+      "member": "matrixTransform",
+      "contractOwner": "DOMPointReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_point_read_only_matrix_transform",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMPointReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMMatrixInit*",
+          "name": "matrix"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "matrix",
+          "idlType": "DOMMatrixInit",
+          "idl": {
+            "name": "DOMMatrixInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMMatrixInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMPoint",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPoint",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPoint",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMPoint",
       "member": "constructor",
       "contractOwner": "DOMPoint",
@@ -93214,6 +93332,5837 @@
         "atom": false,
         "subtypes": []
       }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "constructor",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "constructor",
+      "function": "rv_dom_dom_matrix_read_only_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble*",
+          "name": "init"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "init",
+          "idlType": "(DOMString or sequence<unrestricted double>)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "sequence",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "unrestricted double",
+                    "nullable": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DOMStringOrSequenceOfUnrestrictedDouble",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "sequence",
+                "ctype": "RvDomSequenceUnrestrictedDouble",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "UnrestrictedDouble sequence",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "number",
+                    "ctype": "double",
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrixReadOnly",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrixReadOnly",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrixReadOnly",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DOMMatrixReadOnly"
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "a",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_a",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "b",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_b",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "c",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_c",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "d",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_d",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "e",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_e",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "f",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_f",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m11",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m11",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m12",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m12",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m13",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m13",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m14",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m14",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m21",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m21",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m22",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m22",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m23",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m23",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m24",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m24",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m31",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m31",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m32",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m32",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m33",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m33",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m34",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m34",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m41",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m41",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m42",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m42",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m43",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m43",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "m44",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_m44",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "is2D",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_is2_d",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "isIdentity",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_read_only_get_is_identity",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "translate",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_translate",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "tx"
+        },
+        {
+          "ctype": "double",
+          "name": "ty"
+        },
+        {
+          "ctype": "double",
+          "name": "tz"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "tx",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "ty",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "tz",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "scale",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_scale",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "scale_x"
+        },
+        {
+          "ctype": "const double*",
+          "name": "scale_y"
+        },
+        {
+          "ctype": "double",
+          "name": "scale_z"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_x"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_y"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_z"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "scaleX",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "scaleY",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "scaleZ",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originX",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originY",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originZ",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "scale3d",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_scale3d",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "scale"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_x"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_y"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_z"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "scale",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originX",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originY",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originZ",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "scaleNonUniform",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_scale_non_uniform",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "scale_x"
+        },
+        {
+          "ctype": "double",
+          "name": "scale_y"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "scaleX",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "scaleY",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "rotate",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_rotate",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "rot_x"
+        },
+        {
+          "ctype": "const double*",
+          "name": "rot_y"
+        },
+        {
+          "ctype": "const double*",
+          "name": "rot_z"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "rotX",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "rotY",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "rotZ",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "rotateFromVector",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_rotate_from_vector",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "rotateAxisAngle",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_rotate_axis_angle",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "double",
+          "name": "z"
+        },
+        {
+          "ctype": "double",
+          "name": "angle"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "z",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "angle",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "skewX",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_skew_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "sx"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "sx",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "skewY",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_skew_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "sy"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "sy",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "multiply",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_multiply",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMMatrixInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMMatrixInit",
+          "idl": {
+            "name": "DOMMatrixInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMMatrixInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "flipX",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_flip_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "flipY",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_flip_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "inverse",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_inverse",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "transformPoint",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_transform_point",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMPointInit*",
+          "name": "point"
+        },
+        {
+          "ctype": "RvDOMPointReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "point",
+          "idlType": "DOMPointInit",
+          "idl": {
+            "name": "DOMPointInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMPointInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMPoint",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMPoint",
+        "root": "DOMPointReadOnly",
+        "class": "DOMPoint",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrixReadOnly",
+      "member": "toString",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_read_only_to_string",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "constructor",
+      "contractOwner": "DOMMatrix",
+      "kind": "constructor",
+      "function": "rv_dom_dom_matrix_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble*",
+          "name": "init"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "init",
+          "idlType": "(DOMString or sequence<unrestricted double>)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "sequence",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "unrestricted double",
+                    "nullable": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DOMStringOrSequenceOfUnrestrictedDouble",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "sequence",
+                "ctype": "RvDomSequenceUnrestrictedDouble",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "UnrestrictedDouble sequence",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "number",
+                    "ctype": "double",
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DOMMatrix",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "a",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_a",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "a",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_a",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "b",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_b",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "b",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_b",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "c",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_c",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "c",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_c",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "d",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_d",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "d",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_d",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "e",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_e",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "e",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_e",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "f",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_f",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "f",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_f",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m11",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m11",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m11",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m11",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m12",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m12",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m12",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m12",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m13",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m13",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m13",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m13",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m14",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m14",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m14",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m14",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m21",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m21",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m21",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m21",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m22",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m22",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m22",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m22",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m23",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m23",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m23",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m23",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m24",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m24",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m24",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m24",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m31",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m31",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m31",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m31",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m32",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m32",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m32",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m32",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m33",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m33",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m33",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m33",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m34",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m34",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m34",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m34",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m41",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m41",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m41",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m41",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m42",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m42",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m42",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m42",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m43",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m43",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m43",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m43",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m44",
+      "contractOwner": "DOMMatrix",
+      "kind": "getter",
+      "function": "rv_dom_dom_matrix_get_m44",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unrestricted double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "m44",
+      "contractOwner": "DOMMatrix",
+      "kind": "setter",
+      "function": "rv_dom_dom_matrix_set_m44",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "multiplySelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_multiply_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMMatrixInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMMatrixInit",
+          "idl": {
+            "name": "DOMMatrixInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMMatrixInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "preMultiplySelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_pre_multiply_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMMatrixInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMMatrixInit",
+          "idl": {
+            "name": "DOMMatrixInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMMatrixInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "translateSelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_translate_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "tx"
+        },
+        {
+          "ctype": "double",
+          "name": "ty"
+        },
+        {
+          "ctype": "double",
+          "name": "tz"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "tx",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "ty",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "tz",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "scaleSelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_scale_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "scale_x"
+        },
+        {
+          "ctype": "const double*",
+          "name": "scale_y"
+        },
+        {
+          "ctype": "double",
+          "name": "scale_z"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_x"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_y"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_z"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "scaleX",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "scaleY",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "scaleZ",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originX",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originY",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originZ",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "scale3dSelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_scale3d_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "scale"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_x"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_y"
+        },
+        {
+          "ctype": "double",
+          "name": "origin_z"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "scale",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "1",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originX",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originY",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "originZ",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "rotateSelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_rotate_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "rot_x"
+        },
+        {
+          "ctype": "const double*",
+          "name": "rot_y"
+        },
+        {
+          "ctype": "const double*",
+          "name": "rot_z"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "rotX",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "rotY",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "rotZ",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "rotateFromVectorSelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_rotate_from_vector_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "rotateAxisAngleSelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_rotate_axis_angle_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "double",
+          "name": "z"
+        },
+        {
+          "ctype": "double",
+          "name": "angle"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "z",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "angle",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "skewXSelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_skew_x_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "sx"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "sx",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "skewYSelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_skew_y_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "sy"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "sy",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "0",
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "invertSelf",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_invert_self",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "setMatrixValue",
+      "contractOwner": "DOMMatrix",
+      "kind": "operation",
+      "function": "rv_dom_dom_matrix_set_matrix_value",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMMatrixReadOnly*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "transform_list"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "transform_list_length"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "transformList",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
     },
     {
       "interface": "NodeList",
@@ -97654,6 +103603,144 @@
       "stringInputs": "utf8-lengths-nullable"
     },
     {
+      "interface": "DOMMatrixReadOnly",
+      "member": "fromMatrix",
+      "contractOwner": "DOMMatrixReadOnly",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_matrix_read_only_from_matrix",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMMatrixInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMMatrixInit",
+          "idl": {
+            "name": "DOMMatrixInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMMatrixInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrixReadOnly",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrixReadOnly",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrixReadOnly",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-matrix-readonly",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMMatrix",
+      "member": "fromMatrix",
+      "contractOwner": "DOMMatrix",
+      "kind": "static_operation",
+      "function": "rv_dom_dom_matrix_from_matrix",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDOMMatrixInit*",
+          "name": "other"
+        },
+        {
+          "ctype": "RvDOMMatrixReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "other",
+          "idlType": "DOMMatrixInit",
+          "idl": {
+            "name": "DOMMatrixInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DOMMatrixInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMMatrix",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMMatrix",
+        "root": "DOMMatrixReadOnly",
+        "class": "DOMMatrix",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-geometry-matrix",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "DOMRectReadOnly",
       "member": "fromRect",
       "contractOwner": "DOMRectReadOnly",
@@ -99586,6 +105673,88 @@
     {
       "mapping": {
         "kind": "sequence",
+        "ctype": "RvDomSequenceUnrestrictedDouble",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UnrestrictedDouble sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_unrestricted_double_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DOMStringOrSequenceOfUnrestrictedDouble",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceUnrestrictedDouble",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "UnrestrictedDouble sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_dom_string_or_sequence_of_unrestricted_double_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
         "ctype": "RvDomSequencePointerEvent",
         "interface": null,
         "root": null,
@@ -100447,6 +106616,445 @@
               "subtypes": []
             }
           ]
+        }
+      }
+    ],
+    "DOMMatrixInit": [
+      {
+        "name": "a",
+        "field": "a",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "b",
+        "field": "b",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "c",
+        "field": "c",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "d",
+        "field": "d",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "e",
+        "field": "e",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "f",
+        "field": "f",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m11",
+        "field": "m11",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m12",
+        "field": "m12",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m21",
+        "field": "m21",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m22",
+        "field": "m22",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m41",
+        "field": "m41",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m42",
+        "field": "m42",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m13",
+        "field": "m13",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m14",
+        "field": "m14",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m23",
+        "field": "m23",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m24",
+        "field": "m24",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m31",
+        "field": "m31",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m32",
+        "field": "m32",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m33",
+        "field": "m33",
+        "ctype": "double",
+        "required": false,
+        "default": "1",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m34",
+        "field": "m34",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m43",
+        "field": "m43",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "m44",
+        "field": "m44",
+        "ctype": "double",
+        "required": false,
+        "default": "1",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "is2D",
+        "field": "is2_d",
+        "ctype": "const int32_t*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
         }
       }
     ],

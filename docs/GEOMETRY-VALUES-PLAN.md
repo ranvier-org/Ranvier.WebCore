@@ -9,7 +9,7 @@ Expose the pinned engine's existing rectangle, point, quad and matrix operations
 - [x] Add opt-in nested dictionary input transport for DOMQuadInit, preserving field presence and defaults without changing prior dictionary layouts.
 - [x] Add checked concrete-type metadata for externally retained geometry handles. These engine roots have no virtual type query; never downcast an unknown read-only object to a mutable type. Keep existing opaque pointer identities and function signatures.
 - [x] Select rectangle factories/setters, point factories/setters and quad factories/points/bounds. Test input copies, live point mutation, negative extents, NaN/infinity and double precision in the private native producer.
-- [ ] Add matrix factories, dictionary aliases and six/sixteen-value sequence adapters, then immutable and self operations using the engine implementation. Test singular inversion, invalid-input preservation, exact alias equality, 2D/3D flags and homogeneous point transforms.
+- [x] Add matrix factories, dictionary aliases and six/sixteen-value sequence adapters, then immutable and self operations using the engine implementation. Test singular inversion, invalid-input preservation, exact alias equality, 2D/3D flags and homogeneous point transforms in the private native producer.
 - [ ] Generate shared contracts and implement browser/native providers. Run focused raw/native JIT/AOT/Chromium cases before a combined batch.
 - [ ] Review old ABI compatibility, retained-handle cleanup and public F# signatures, then stack the next unpublished package cohort behind Native15. Accept only after platform and official consumer evidence.
 
@@ -48,3 +48,15 @@ All 54 generator tests and four package contract tests pass. The generated ABI d
 The pinned matrix constructor takes an optional string-or-double-sequence variant. The previous generator decoded an absent pointer as a required value and dereferenced the decoded result. The regression first failed at the missing optional carrier. An omitted nonnullable compound argument with no explicit default now remains an empty std::optional; every present input still runs the strict decoder and error checks. Empty strings and empty sequences remain present values, allowing the engine to distinguish identity from a wrong-length sequence.
 
 All 55 generator tests pass and production generation remains unchanged. No previously selected argument had this optional compound shape. Independent review is clear. Matrix bindings and execution are not yet selected or verified at this checkpoint.
+
+## Private G08 producer checkpoint
+
+The combined geometry producer generates 143 interfaces, 1,875 functions, 23 handle roots and 20 dictionaries, with zero stubs. Matrix constructors preserve omission versus present empty values. Static factories use the existing checked Document receiver; pure operations reuse the engine implementation. Mutable matrix handles use the same trusted producer ledger. setMatrixValue takes an explicit checked Document and a length-delimited string. Point matrixTransform is now included.
+
+The first C++ build exposed a generated enum identifier containing the sequence's human-readable label. A regression requires the stable compound C type in both C and F# enum names. Tag values, layouts and prior records are unchanged. The repaired glue and host compile and link successfully.
+
+The native matrix fixture passes exactly 1,091 assertions: omitted/string/6-value/16-value initialization, literal matrix and matrix3d parsing, embedded NUL rejection, finite serialization roundtrip, nonfinite serialization errors, matrix replacement and failure preservation, exact aliases and defaults, ordered multiplication, inversion and singular NaNs, mutable and immutable transform families, optional rotation/scaling behavior, homogeneous point transforms, unrestricted doubles and thread/context checks.
+
+The combined private Windows batch passes 5,979 assertions across 18 raw probes, the complete ABI driver, and 42 final teardown cases. Some objects remain alive until collection; all final document/target weak references expire. SDK10 builds the generated ABI driver without warnings/errors; 55 generator tests and four package contract tests pass. All G07 checkpoint records remain equal: 1,775 functions, 19 dictionaries, 32 containers and seven runtime queries. Independent review verified the source/runtime/log hashes in matrix-values-evidence/evidence.json and the saved teardown results.
+
+These proofs apply to the private Windows producer. Shared Core/Views providers, Chromium parity, NativeAOT geometry/matrix consumers, other platforms and official packages remain open. No G07/G08 acceptance or public release is claimed.

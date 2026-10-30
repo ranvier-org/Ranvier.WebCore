@@ -23,6 +23,14 @@
         }
     },
     "constructors": {
+        "DOMMatrixReadOnly": {
+            "receiver": "Document",
+            "factory": "DOMMatrixReadOnly::create"
+        },
+        "DOMMatrix": {
+            "receiver": "Document",
+            "factory": "DOMMatrix::create"
+        },
         "DOMRectReadOnly": {
             "receiver": "Document",
             "factory": "DOMRectReadOnly::create",
@@ -84,17 +92,20 @@
     ],
     "trackedHandleRoots": {
         "DOMRectReadOnly": "DOMRect",
-        "DOMPointReadOnly": "DOMPoint"
+        "DOMPointReadOnly": "DOMPoint",
+        "DOMMatrixReadOnly": "DOMMatrix"
     },
     "dictionaryStringInputs": {
         "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence"
     },
     "stringifiers": [
-        "CSSStyleValue"
+        "CSSStyleValue",
+        "DOMMatrixReadOnly"
     ],
     "complexStringSpans": [
         "USVStringOrCSSOMVariableReferenceValue",
-        "CSSStyleValueOrUSVString"
+        "CSSStyleValueOrUSVString",
+        "DOMStringOrSequenceOfUnrestrictedDouble"
     ],
     "complexNullableElements": [
         "CSSStyleValue"
@@ -103,11 +114,13 @@
         "CSSOMKeywordValue": "utf8-lengths",
         "CSSOMVariableReferenceValue": "utf8-lengths",
         "StylePropertyMapReadOnly": "utf8-lengths",
-        "StylePropertyMap": "utf8-lengths"
+        "StylePropertyMap": "utf8-lengths",
+        "DOMMatrix": "utf8-lengths"
     },
     "objectContexts": {
         "StylePropertyMapReadOnly": "Document",
-        "StylePropertyMap": "Document"
+        "StylePropertyMap": "Document",
+        "DOMMatrix": "Document"
     },
     "finiteNumberInputs": [
         "CSSUnitValue"
@@ -241,6 +254,8 @@
         "DOMPointReadOnly",
         "DOMPoint",
         "DOMQuad",
+        "DOMMatrixReadOnly",
+        "DOMMatrix",
         "NodeList",
         "RadioNodeList",
         "HTMLCollection",
@@ -339,7 +354,8 @@
         "CSSStyleValue",
         "StylePropertyMapReadOnly",
         "DOMRectReadOnly",
-        "DOMPointReadOnly"
+        "DOMPointReadOnly",
+        "DOMMatrixReadOnly"
     ],
     "nodeCastTags": {
         "HTMLModElement": [
@@ -379,7 +395,6 @@
         "CSSNumericValue.toSum",
         "CSSNumericValue.type",
         "CSSNumericValue.parse",
-        "DOMPointReadOnly.matrixTransform",
         "ElementCreationOptions.customElementRegistry",
         "ImportNodeOptions.customElementRegistry",
         "AddEventListenerOptions.signal",
@@ -457,6 +472,18 @@
         }
     },
     "staticBindings": {
+        "DOMMatrixReadOnly": {
+            "receiver": "Document",
+            "members": ["fromMatrix"],
+            "feature": "dom-geometry-matrix-readonly",
+            "stringInputs": "utf8-lengths"
+        },
+        "DOMMatrix": {
+            "receiver": "Document",
+            "members": ["fromMatrix"],
+            "feature": "dom-geometry-matrix",
+            "stringInputs": "utf8-lengths"
+        },
         "DOMRectReadOnly": {
             "receiver": "Document",
             "members": ["fromRect"],

@@ -342,6 +342,34 @@ type RvDomGetComposedRangesOptions =
     val mutable size: uint32
     val mutable shadow_roots: nativeint
 
+/// <summary>The IDL dictionary DOMMatrixInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomDOMMatrixInit =
+    val mutable size: uint32
+    val mutable a: nativeint
+    val mutable b: nativeint
+    val mutable c: nativeint
+    val mutable d: nativeint
+    val mutable e: nativeint
+    val mutable f: nativeint
+    val mutable m11: nativeint
+    val mutable m12: nativeint
+    val mutable m21: nativeint
+    val mutable m22: nativeint
+    val mutable m41: nativeint
+    val mutable m42: nativeint
+    val mutable m13: float
+    val mutable m14: float
+    val mutable m23: float
+    val mutable m24: float
+    val mutable m31: float
+    val mutable m32: float
+    val mutable m33: float
+    val mutable m34: float
+    val mutable m43: float
+    val mutable m44: float
+    val mutable is2_d: nativeint
+
 /// <summary>The IDL dictionary DOMPointInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomDOMPointInit =
@@ -696,6 +724,27 @@ type RvDomSequenceStaticRange =
     val mutable count: int
     val mutable items: nativeint
 
+/// <summary>ABI transport for UnrestrictedDouble sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceUnrestrictedDouble =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_UNRESTRICTED_DOUBLE_STRING = 1
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_UNRESTRICTED_DOUBLE_SEQUENCE_UNRESTRICTED_DOUBLE = 2
+
+/// <summary>ABI transport for DOMStringOrSequenceOfUnrestrictedDouble; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: RvDomUtf8StringSpan
+    val mutable arm1: RvDomSequenceUnrestrictedDouble
+
 /// <summary>ABI transport for PointerEvent sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequencePointerEvent =
@@ -807,6 +856,12 @@ extern void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(RvDo
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_unrestricted_double_release(RvDomSequenceUnrestrictedDouble& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_dom_string_or_sequence_of_unrestricted_double_release(RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent& value)
@@ -935,6 +990,12 @@ extern void rv_dom_dom_quad_release(nativeint handle)
 extern nativeint rv_dom_dom_quad_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_dom_matrix_read_only_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_dom_matrix_read_only_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern void rv_dom_node_list_release(nativeint handle)
 
 [<DllImport(Lib)>]
@@ -972,6 +1033,9 @@ extern int rv_dom_dom_rect_read_only_get_interface_name(nativeint target, byte[]
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_point_read_only_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
@@ -5909,6 +5973,9 @@ extern int rv_dom_dom_point_read_only_get_z(nativeint target, float& result)
 extern int rv_dom_dom_point_read_only_get_w(nativeint target, float& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_dom_point_read_only_matrix_transform(nativeint target, [<In>] RvDomDOMMatrixInit[] matrix, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_dom_point_create(nativeint target, float x, float y, float z, float w, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -5952,6 +6019,297 @@ extern int rv_dom_dom_quad_get_p4(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_quad_get_bounds(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_create(nativeint target, [<In>] RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble[] init, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_a(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_b(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_c(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_d(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_e(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_f(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m11(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m12(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m13(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m14(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m21(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m22(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m23(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m24(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m31(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m32(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m33(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m34(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m41(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m42(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m43(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_m44(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_is2_d(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_get_is_identity(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_translate(nativeint target, float tx, float ty, float tz, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_scale(nativeint target, float scale_x, float[] scale_y, float scale_z, float origin_x, float origin_y, float origin_z, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_scale3d(nativeint target, float scale, float origin_x, float origin_y, float origin_z, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_scale_non_uniform(nativeint target, float scale_x, float scale_y, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_rotate(nativeint target, float rot_x, float[] rot_y, float[] rot_z, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_rotate_from_vector(nativeint target, float x, float y, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_rotate_axis_angle(nativeint target, float x, float y, float z, float angle, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_skew_x(nativeint target, float sx, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_skew_y(nativeint target, float sy, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_multiply(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_flip_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_flip_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_inverse(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_transform_point(nativeint target, [<In>] RvDomDOMPointInit[] point, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_to_string(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_create(nativeint target, [<In>] RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble[] init, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_a(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_a(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_b(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_b(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_c(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_c(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_d(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_d(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_e(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_e(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_f(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_f(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m11(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m11(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m12(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m12(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m13(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m13(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m14(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m14(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m21(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m21(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m22(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m22(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m23(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m23(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m24(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m24(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m31(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m31(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m32(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m32(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m33(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m33(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m34(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m34(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m41(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m41(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m42(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m42(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m43(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m43(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_get_m44(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_m44(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_multiply_self(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_pre_multiply_self(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_translate_self(nativeint target, float tx, float ty, float tz, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_scale_self(nativeint target, float scale_x, float[] scale_y, float scale_z, float origin_x, float origin_y, float origin_z, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_scale3d_self(nativeint target, float scale, float origin_x, float origin_y, float origin_z, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_rotate_self(nativeint target, float rot_x, float[] rot_y, float[] rot_z, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_rotate_from_vector_self(nativeint target, float x, float y, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_rotate_axis_angle_self(nativeint target, float x, float y, float z, float angle, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_skew_x_self(nativeint target, float sx, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_skew_y_self(nativeint target, float sy, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_invert_self(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_set_matrix_value(nativeint target, nativeint context, byte[] transform_list, int transform_list_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_list_get_length(nativeint target, uint32& result)
@@ -6270,6 +6628,12 @@ extern int rv_dom_css_register_property(nativeint target, [<In>] RvDomDOMCSSCust
 
 [<DllImport(Lib)>]
 extern int rv_dom_window_get_computed_style(nativeint target, nativeint element, byte[] pseudo_element, int pseudo_element_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_read_only_from_matrix(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_matrix_from_matrix(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_rect_read_only_from_rect(nativeint target, [<In>] RvDomDOMRectInit[] other, nativeint& result)
