@@ -372,6 +372,168 @@ let RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_REFLECT = 2
 let RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_REPEAT = 3
 
 [<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_NORMAL = 1
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_MULTIPLY = 2
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_SCREEN = 3
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_DARKEN = 4
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_LIGHTEN = 5
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_OVERLAY = 6
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_COLOR_DODGE = 7
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_COLOR_BURN = 8
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_HARD_LIGHT = 9
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_SOFT_LIGHT = 10
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_DIFFERENCE = 11
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_EXCLUSION = 12
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_HUE = 13
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_SATURATION = 14
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_COLOR = 15
+
+[<Literal>]
+let RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_LUMINOSITY = 16
+
+[<Literal>]
+let RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_MATRIX = 1
+
+[<Literal>]
+let RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_SATURATE = 2
+
+[<Literal>]
+let RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_HUEROTATE = 3
+
+[<Literal>]
+let RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA = 4
+
+[<Literal>]
+let RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_OVER = 1
+
+[<Literal>]
+let RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_IN = 2
+
+[<Literal>]
+let RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_OUT = 3
+
+[<Literal>]
+let RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_ATOP = 4
+
+[<Literal>]
+let RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_XOR = 5
+
+[<Literal>]
+let RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_ARITHMETIC = 6
+
+[<Literal>]
+let RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_LIGHTER = 7
+
+[<Literal>]
+let RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_R = 1
+
+[<Literal>]
+let RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_G = 2
+
+[<Literal>]
+let RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_B = 3
+
+[<Literal>]
+let RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_A = 4
+
+[<Literal>]
+let RV_DOM_SVGFE_GAUSSIAN_BLUR_ELEMENT_SVG_EDGEMODE_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVGFE_GAUSSIAN_BLUR_ELEMENT_SVG_EDGEMODE_DUPLICATE = 1
+
+[<Literal>]
+let RV_DOM_SVGFE_GAUSSIAN_BLUR_ELEMENT_SVG_EDGEMODE_WRAP = 2
+
+[<Literal>]
+let RV_DOM_SVGFE_GAUSSIAN_BLUR_ELEMENT_SVG_EDGEMODE_NONE = 3
+
+[<Literal>]
+let RV_DOM_SVGFE_MORPHOLOGY_ELEMENT_SVG_MORPHOLOGY_OPERATOR_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVGFE_MORPHOLOGY_ELEMENT_SVG_MORPHOLOGY_OPERATOR_ERODE = 1
+
+[<Literal>]
+let RV_DOM_SVGFE_MORPHOLOGY_ELEMENT_SVG_MORPHOLOGY_OPERATOR_DILATE = 2
+
+[<Literal>]
+let RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_TURBULENCE_TYPE_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_TURBULENCE_TYPE_FRACTALNOISE = 1
+
+[<Literal>]
+let RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_TURBULENCE_TYPE_TURBULENCE = 2
+
+[<Literal>]
+let RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_STITCHTYPE_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_STITCHTYPE_STITCH = 1
+
+[<Literal>]
+let RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_STITCHTYPE_NOSTITCH = 2
+
+[<Literal>]
+let RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_IDENTITY = 1
+
+[<Literal>]
+let RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_TABLE = 2
+
+[<Literal>]
+let RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_DISCRETE = 3
+
+[<Literal>]
+let RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_LINEAR = 4
+
+[<Literal>]
+let RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_GAMMA = 5
+
+[<Literal>]
 let RV_DOM_ARIA_NOTIFICATION_INTERRUPT_NONE = 0
 
 [<Literal>]
@@ -8184,6 +8346,501 @@ extern int rv_dom_svg_radial_gradient_element_get_fr(nativeint target, nativeint
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_stop_element_get_offset(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_blend_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_blend_element_get_in2(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_blend_element_get_mode(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_blend_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_blend_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_blend_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_blend_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_blend_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_color_matrix_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_color_matrix_element_get_type(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_color_matrix_element_get_values(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_color_matrix_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_color_matrix_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_color_matrix_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_color_matrix_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_color_matrix_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_component_transfer_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_component_transfer_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_component_transfer_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_component_transfer_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_component_transfer_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_component_transfer_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_in2(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_operator(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_k1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_k2(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_k3(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_k4(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_composite_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_surface_scale(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_diffuse_constant(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_kernel_unit_length_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_kernel_unit_length_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_diffuse_lighting_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_in2(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_scale(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_x_channel_selector(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_y_channel_selector(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_displacement_map_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_distant_light_element_get_azimuth(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_distant_light_element_get_elevation(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_dx(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_dy(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_std_deviation_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_std_deviation_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_drop_shadow_element_set_std_deviation(nativeint target, float32 std_deviation_x, float32 std_deviation_y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_flood_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_flood_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_flood_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_flood_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_flood_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_get_std_deviation_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_get_std_deviation_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_get_edge_mode(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_gaussian_blur_element_set_std_deviation(nativeint target, float32 std_deviation_x, float32 std_deviation_y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_image_element_get_preserve_aspect_ratio(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_image_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_image_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_image_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_image_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_image_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_image_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_merge_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_merge_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_merge_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_merge_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_merge_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_merge_node_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_morphology_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_morphology_element_get_operator(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_morphology_element_get_radius_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_morphology_element_get_radius_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_morphology_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_morphology_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_morphology_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_morphology_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_morphology_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_offset_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_offset_element_get_dx(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_offset_element_get_dy(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_offset_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_offset_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_offset_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_offset_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_offset_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_point_light_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_point_light_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_point_light_element_get_z(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_surface_scale(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_specular_constant(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_specular_exponent(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_kernel_unit_length_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_kernel_unit_length_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_specular_lighting_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_spot_light_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_spot_light_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_spot_light_element_get_z(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_spot_light_element_get_points_at_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_spot_light_element_get_points_at_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_spot_light_element_get_points_at_z(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_spot_light_element_get_specular_exponent(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_spot_light_element_get_limiting_cone_angle(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_tile_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_tile_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_tile_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_tile_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_tile_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_tile_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_base_frequency_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_base_frequency_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_num_octaves(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_seed(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_stitch_tiles(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_type(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_turbulence_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_filter_element_get_filter_units(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_filter_element_get_primitive_units(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_filter_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_filter_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_filter_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_filter_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_filter_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_component_transfer_function_element_get_type(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_component_transfer_function_element_get_table_values(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_component_transfer_function_element_get_slope(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_component_transfer_function_element_get_intercept(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_component_transfer_function_element_get_amplitude(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_component_transfer_function_element_get_exponent(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_component_transfer_function_element_get_offset(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)

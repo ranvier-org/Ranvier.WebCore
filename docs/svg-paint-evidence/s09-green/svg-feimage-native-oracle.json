@@ -1,0 +1,53 @@
+[
+  {
+    "phase": "initial",
+    "attribute": "xMidYMid meet",
+    "align": 6,
+    "corner": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "center": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "typedNone",
+    "attribute": "none meet",
+    "align": 1,
+    "corner": [
+      255,
+      0,
+      0,
+      255
+    ],
+    "center": [
+      255,
+      0,
+      0,
+      255
+    ]
+  },
+  {
+    "phase": "authoredNone",
+    "attribute": "none",
+    "align": 1,
+    "corner": [
+      255,
+      0,
+      0,
+      255
+    ],
+    "center": [
+      255,
+      0,
+      0,
+      255
+    ]
+  }
+]

@@ -1,0 +1,70 @@
+[
+  {
+    "phase": "initial",
+    "kernel": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "attribute": "0 0 0 0 1 0 0 0 0",
+    "bias": 0,
+    "divisor": 1
+  },
+  {
+    "phase": "typedKernel",
+    "kernel": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "attribute": "0 0 0 0 0 0 0 0 0",
+    "bias": 0,
+    "divisor": 1
+  },
+  {
+    "phase": "bias",
+    "kernel": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "attribute": "0 0 0 0 0 0 0 0 0",
+    "bias": 0.5,
+    "divisor": 1
+  },
+  {
+    "phase": "authoredKernel",
+    "kernel": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "attribute": "0 0 0 0 0 0 0 0 0",
+    "bias": 0.5,
+    "divisor": 1
+  }
+]

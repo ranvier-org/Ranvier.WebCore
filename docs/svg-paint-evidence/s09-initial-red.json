@@ -1,0 +1,15 @@
+{
+  "baseline": "Native19/ABI27 d5471ced",
+  "exitCode": 1,
+  "runtime": {
+    "RanvierWebCoreHost.dll": "9506e0e995769d85429a6d68ea98a4936000efbe554718f81c01f413ffc39848",
+    "WebCore.dll": "fd4cb94341812dd815c725c2a06aab31793bd8b3e01563d4c1919a295205cd57",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "files": {
+    "s09-initial-red-svg-filters.svg": "5dd7c698e3367bb74b8a15d6ba6e6d6f1cb12b263c8830f3b110c1b2422ce056",
+    "s09-initial-red-svg_filters.py": "451c69ca12ddd684d5481aa896e510f534828a132054b146b32ce5aac05a85eb",
+    "s09-initial-red-svg_paint_probe.py": "3b661b6d7cab7f13ecac1dfdbcf5d1789feea734d5f92c93d536985acd0c73c2",
+    "s09-initial-red.log": "43d50b74cfed85ded29d093d1b8c889929c47717dcb6111dde1a540d81b220ee"
+  }
+}

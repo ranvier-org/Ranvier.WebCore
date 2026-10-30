@@ -1,0 +1,35 @@
+{
+  "qualification": "unallocated235/2414 candidate, inheritedNative19ABI27; frozen51replacementobjects; liveSource mayinclude Native20patch27 but borrowedRootobject remainsNative19",
+  "runtime": {
+    "RanvierWebCoreHost.dll": "c5ccc7fb101107240624fb40d390f622547b079b874dd0bb7ac24662967fe902",
+    "WebCore.dll": "06b3fa3208d39434e627397c1998e1341215688c47839a38984a11fa7f19dfd2",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "exitCode": 1,
+  "files": {
+    "convolve-authoredKernel.png": "fd1168a29b428fae9425ffbc63b1b611b429bb43412eb92ad320a9c271ec16a1",
+    "convolve-bias.png": "fd1168a29b428fae9425ffbc63b1b611b429bb43412eb92ad320a9c271ec16a1",
+    "convolve-initial.png": "34aaa6a4f867dab64444f5321a2b1d34eb494bafb8129e04c2790e3ef10f61de",
+    "convolve-input-after.png": "76c0cbe80a179d664c6c7d459227f8cb33c00581a120324a2541ddbf6025d597",
+    "convolve-input-before.png": "961fcd45abd2683975bfa6e672736584eaab3dd87bc19267bdb73205c811a378",
+    "convolve-order-after.png": "f0945e56603d8cc812626b9815fd07a918453142e90cc43903812a2804698421",
+    "convolve-order-before.png": "961fcd45abd2683975bfa6e672736584eaab3dd87bc19267bdb73205c811a378",
+    "convolve-typedKernel.png": "a30bf70d4eb153f6b3c27f33725d6bb7eb872f30ce04d8586a678ae44c19795b",
+    "input-order-native-red.json": "75039a7938a448a11beef277b191bff705c074c451c3db559568c029b984f7d3",
+    "native-red.log": "f4dc31fee070f056af75e5c0256b4220a78c2a230d3cabf6c3c2ca27d07859c3",
+    "svg-convolve-cache-browser.json": "6c2aa33d9fc3cbb76988b171276d41fd1216d4a593efe19fa9024ff7c6809eb8",
+    "svg-convolve-cache-cases.mjs": "1a2b1183d2f67faae50e0d7b34de3fa071baafb77e89df6f19ed7622875457ab",
+    "svg-convolve-cache-cases.py": "ff8174fe1530d89ff4c53d6e423acc522adadb0213d8b2da715ce3aaf5364fad",
+    "svg-convolve-native-oracle.json": "6618898ef30f6fe7cf1db31c09aadeaeee85b3e2488b089d6f68a6a07af73141",
+    "svg-convolve-native-oracle.py": "d83ad1989ab25346a5b1f8a45810a5d56e845078b3e69d12df54e1c111b4c60d",
+    "svg-convolve-paint-oracle.json": "de2b1f9e1f690b853a0a01292656c1911fcecfb9c723c902432dd91348f204f7",
+    "svg-convolve-paint-oracle.mjs": "9749c89cb7ec693e84ce3394368de46fc602718e8ed5fea5cd017108418c07d1",
+    "svg-convolve-paint-pixels.json": "09d13f138e9fa4c3ad99374901c7e3cf81a59a7612fe38ab7c3ea3c1dec41920",
+    "svg-filter-member-oracle.json": "83c3b3b07d84035e99621b1ec0dfb5f475f2dfe82bbb9570c9c5896fb744cd7a",
+    "svg-filters.svg": "417e201a62124fc6fe1f0d11d69dac83957043ff905a2a29d1cc90214cf768da",
+    "svg_filters.py": "cce22e00b3168fb886dedea3d56799bb6ce3a47192ce314547ddb67205c2aaf5",
+    "svg_paint_probe.py": "5b1298774d637ce06b7fda73495a703f4a9f682ba821320420290c87f2766da1"
+  },
+  "executionLeaseQualification": "Historical short probes after08:11UTC ran after expiry; they are not claimed leased. Actual exit/source/runtime evidence remains preserved. Subsequent bounded probes use fresh leases.",
+  "additionalCacheCases": "old input graph edit already works; order edit remains stale and is a second actual RED"
+}

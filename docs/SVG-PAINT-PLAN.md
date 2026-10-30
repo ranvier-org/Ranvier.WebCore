@@ -140,6 +140,10 @@ The focused S08 receipt records 565 native assertions, 82 browser state assertio
 - [ ] Verify four component channels independently and real filter graph ordering/inheritance. Dispose returned wrappers/lists/children and prove final owner expiry.
 - [ ] Run complete S09 focused fixtures and commit with exact source and runtime proof, without promoting incidental Native19 Convolve exports to prior acceptance.
 
+S09 focused checkpoint: all 26 additional concrete/base filter classes compile, bringing the model to 235 interfaces/2414 functions, with 50 roots/22 dictionaries and zero stubs. The 8941-assertion fixture covers 201 real property routes, all four transfer children, actual paint for every primitive family and all three light types, error/atomicity, detached values and final owner expiry. Actual Chromium supplies 200 member mutation/attribute observations, 12 restricted-method errors and 27 paint phases with 36 pixel assertions. Blur edgeMode remains native-only. Zero specularConstant is transparent-over-white in native and opaque black in measured Chromium; both nonzero baselines paint blue.
+
+Root-owned patches 0028 and 0029 replace stale convolve structural and FEImage aspect-ratio cache updates with the existing filter-effect rebuild method. Exact pre-fix failures and repaired native/browser paint are retained. The private checkpoint still inherits ABI27 and the borrowed Native19 root object; final Native20 merge and coherent integrated proof remain required. Historical probes executed after lease expiry are explicitly qualified in the retained convolve RED receipt and execution ledger; subsequent bounded runs acquire fresh owned leases and release on actual termination.
+
 ## Task 4: S10 clipping, masks and markers
 
 **Files:** generator selection/output; `tests/abi/svg_clip_mask_marker.py`; `tests/fixtures/svg-clip-mask-marker.svg`; browser oracle.

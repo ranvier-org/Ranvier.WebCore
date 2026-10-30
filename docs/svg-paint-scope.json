@@ -10867,7 +10867,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -10951,7 +10953,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11035,7 +11039,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11122,7 +11128,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11209,7 +11217,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11296,7 +11306,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11383,7 +11395,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11467,7 +11481,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11551,7 +11567,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11635,7 +11653,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11722,7 +11742,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11809,7 +11831,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11896,7 +11920,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -11983,7 +12009,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12070,7 +12098,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12154,7 +12184,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12238,7 +12270,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12325,7 +12359,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12412,7 +12448,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12499,7 +12537,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12586,7 +12626,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12670,7 +12712,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12754,7 +12798,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12838,7 +12884,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -12924,7 +12972,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13008,7 +13058,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13092,7 +13144,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13176,7 +13230,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13260,7 +13316,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13347,7 +13405,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13434,7 +13494,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13521,7 +13583,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13608,7 +13672,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13692,7 +13758,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13778,7 +13846,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13864,7 +13934,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -13950,7 +14022,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14039,7 +14113,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14125,7 +14201,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14211,7 +14289,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14297,7 +14377,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14383,7 +14465,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14469,7 +14553,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14555,7 +14641,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14641,7 +14729,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14727,7 +14817,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14816,7 +14908,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14905,7 +14999,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -14994,7 +15090,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15083,7 +15181,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15169,7 +15269,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15253,7 +15355,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15337,7 +15441,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15421,7 +15527,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15505,7 +15613,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15589,7 +15699,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15676,7 +15788,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15763,7 +15877,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15850,7 +15966,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -15937,7 +16055,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16021,7 +16141,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16105,7 +16227,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16189,7 +16313,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16273,7 +16399,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16357,7 +16485,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16441,7 +16571,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16528,7 +16660,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16615,7 +16749,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16702,7 +16838,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16789,7 +16927,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16873,7 +17013,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -16957,7 +17099,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17041,7 +17185,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17125,7 +17271,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17209,7 +17357,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17293,7 +17443,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17377,7 +17529,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17461,7 +17615,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17624,7 +17780,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17711,7 +17869,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17798,7 +17958,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17885,7 +18047,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -17972,7 +18136,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18056,7 +18222,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18143,7 +18311,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18230,7 +18400,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18317,7 +18489,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18404,7 +18578,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18488,7 +18664,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18572,7 +18750,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18656,7 +18836,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18740,7 +18922,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18822,7 +19006,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -18985,7 +19171,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19072,7 +19260,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19159,7 +19349,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19246,7 +19438,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19333,7 +19527,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19417,7 +19613,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19503,7 +19701,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19590,7 +19790,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19677,7 +19879,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19764,7 +19968,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19851,7 +20057,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -19935,7 +20143,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20019,7 +20229,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20106,7 +20318,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20193,7 +20407,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20280,7 +20496,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20367,7 +20585,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20451,7 +20671,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20535,7 +20757,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20619,7 +20843,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20705,7 +20931,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20789,7 +21017,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20873,7 +21103,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -20960,7 +21192,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21047,7 +21281,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21134,7 +21370,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21221,7 +21459,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21305,7 +21545,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21389,7 +21631,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21473,7 +21717,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21557,7 +21803,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21644,7 +21892,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21731,7 +21981,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21818,7 +22070,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21905,7 +22159,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -21989,7 +22245,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22073,7 +22331,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22157,7 +22417,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22241,7 +22503,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22325,7 +22589,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22409,7 +22675,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22493,7 +22761,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22577,7 +22847,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22661,7 +22933,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22745,7 +23019,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22832,7 +23108,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -22919,7 +23197,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23006,7 +23286,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23093,7 +23375,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23177,7 +23461,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23261,7 +23547,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23345,7 +23633,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23429,7 +23719,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23513,7 +23805,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23597,7 +23891,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23681,7 +23977,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23765,7 +24063,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23849,7 +24149,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -23933,7 +24235,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24020,7 +24324,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24107,7 +24413,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24194,7 +24502,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24281,7 +24591,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24365,7 +24677,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24449,7 +24763,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24533,7 +24849,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24617,7 +24935,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24701,7 +25021,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24785,7 +25107,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24869,7 +25193,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -24956,7 +25282,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25043,7 +25371,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25130,7 +25460,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25217,7 +25549,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25301,7 +25635,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25385,7 +25721,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25469,7 +25807,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25556,7 +25896,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25643,7 +25985,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25730,7 +26074,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25817,7 +26163,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -25901,7 +26249,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -26566,7 +26916,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -27231,7 +27583,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -27896,7 +28250,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -28561,7 +28917,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -29223,7 +29581,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -29307,7 +29667,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -29394,7 +29756,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -29478,7 +29842,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -29562,7 +29928,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -29646,7 +30014,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -29730,7 +30100,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S09",
@@ -29814,7 +30186,9 @@
           "corresponding paint/resource effect or explicit source-backed nonvisual state",
           "ownership/teardown"
         ]
-      }
+      },
+      "nativeProof": "8941 complete typed/filter-effects fixture;201propertyroutes including4actualcomponentchildren,12nonfinite methods, weak-owner expiry and structural cache regressions",
+      "browserProof": "200available member mutation/attribute observations;27actualpaintphases/36pixel assertions; blur.edgeMode NotExposed"
     },
     {
       "group": "S10",
@@ -37922,19 +38296,24 @@
     ]
   },
   "currentImplementation": {
-    "phase": "S08 private focused checkpoint; remainder planning/implementation pending",
+    "phase": "S08/S09 focused checkpoints; S10/S11 pending",
     "counts": {
-      "interfaces": 209,
-      "functions": 2249,
+      "interfaces": 235,
+      "functions": 2414,
       "roots": 50,
       "dictionaries": 22,
       "stubs": 0
     },
-    "receipt": "svg-paint-evidence/s08-evidence.json"
+    "receipts": [
+      "svg-paint-evidence/s08-evidence.json",
+      "svg-paint-evidence/s09-green/receipt.json"
+    ]
   },
   "qualifications": [
     "Absent pattern viewBox: use actual authored attribute initialization before live field edits; raw absent\u2192typed-only behavior unchanged in both providers.",
     "Pattern SVGTests list state is exposed but mutations/authored strings do not suppress pattern paint in measured engines.",
-    "SVGImage.decode remains unbound native; H05 REQUIRED S11 acceptance blocker."
+    "SVGImage.decode remains unbound native; H05 REQUIRED S11 acceptance blocker.",
+    "Native specularConstant0 is transparent over white; measured Chromium is opaque black, both nonzero spot/specular outputs blue.",
+    "Convolve half-bias oneunitquantization native127/Chrome128; no filter math rewrite."
   ]
 }

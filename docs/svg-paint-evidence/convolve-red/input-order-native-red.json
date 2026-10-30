@@ -1,0 +1,54 @@
+[
+  {
+    "route": "input",
+    "before": [
+      255,
+      63,
+      63,
+      255
+    ],
+    "after": [
+      63,
+      63,
+      255,
+      255
+    ],
+    "attributes": {
+      "id": "convolve",
+      "in": "blue",
+      "order": "3",
+      "kernelMatrix": "0 0 0 0 1 0 0 0 0",
+      "divisor": "1",
+      "bias": "0.25",
+      "targetX": "1",
+      "targetY": "1",
+      "preserveAlpha": "true"
+    }
+  },
+  {
+    "route": "order",
+    "before": [
+      255,
+      63,
+      63,
+      255
+    ],
+    "after": [
+      255,
+      63,
+      63,
+      255
+    ],
+    "attributes": {
+      "id": "convolve",
+      "in": "SourceGraphic",
+      "order": "2, 3",
+      "kernelMatrix": "0 0 0 0 1 0 0 0 0",
+      "divisor": "1",
+      "bias": "0.25",
+      "targetX": "1",
+      "targetY": "1",
+      "preserveAlpha": "true"
+    }
+  }
+]

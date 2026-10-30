@@ -102,6 +102,15 @@ class SvgProbe:
     def attribute(self, target, name):
         return self.text('rv_dom_element_get_attribute', [self.pointer, ctypes.c_char_p], target, name.encode())
 
+    def attributes(self, target):
+        count = self.bind('rv_element_attribute_count', self.integer, [self.pointer])(target)
+        self.expect(count >= 0, 'real element attribute enumeration')
+        result = {}
+        for index in range(count):
+            name = self.text('rv_element_attribute_at', [self.pointer, self.integer, self.integer], target, index, 0)
+            result[name] = self.text('rv_element_attribute_at', [self.pointer, self.integer, self.integer], target, index, 1)
+        return result
+
     def update(self):
         self.expect(self.bind('rv_host_update', self.integer, [self.pointer])(self.host) >= 0, 'SVG paint update')
 

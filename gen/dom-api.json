@@ -1116,18 +1116,113 @@
     {
       "name": "SVGStopElement",
       "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEBlendElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEColorMatrixElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEComponentTransferElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFECompositeElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEDiffuseLightingElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEDisplacementMapElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEDistantLightElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEDropShadowElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEFloodElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEFuncAElement",
+      "base": "SVGComponentTransferFunctionElement"
+    },
+    {
+      "name": "SVGFEFuncBElement",
+      "base": "SVGComponentTransferFunctionElement"
+    },
+    {
+      "name": "SVGFEFuncGElement",
+      "base": "SVGComponentTransferFunctionElement"
+    },
+    {
+      "name": "SVGFEFuncRElement",
+      "base": "SVGComponentTransferFunctionElement"
+    },
+    {
+      "name": "SVGFEGaussianBlurElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEImageElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEMergeElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEMergeNodeElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEMorphologyElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEOffsetElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFEPointLightElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFESpecularLightingElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFESpotLightElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFETileElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFETurbulenceElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGFilterElement",
+      "base": "SVGElement"
+    },
+    {
+      "name": "SVGComponentTransferFunctionElement",
+      "base": "SVGElement"
     }
   ],
   "contractInterfaces": [
-    {
-      "name": "SVGComponentTransferFunctionElement",
-      "idlName": "SVGComponentTransferFunctionElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGComponentTransferFunctionElement.idl"
-    },
     {
       "name": "HTMLMediaElement",
       "idlName": "HTMLMediaElement",
@@ -3071,6 +3166,240 @@
       "source": "svg/SVGStopElement.idl"
     },
     {
+      "name": "SVGFEBlendElement",
+      "idlName": "SVGFEBlendElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEBlendElement.idl"
+    },
+    {
+      "name": "SVGFEColorMatrixElement",
+      "idlName": "SVGFEColorMatrixElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEColorMatrixElement.idl"
+    },
+    {
+      "name": "SVGFEComponentTransferElement",
+      "idlName": "SVGFEComponentTransferElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEComponentTransferElement.idl"
+    },
+    {
+      "name": "SVGFECompositeElement",
+      "idlName": "SVGFECompositeElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFECompositeElement.idl"
+    },
+    {
+      "name": "SVGFEDiffuseLightingElement",
+      "idlName": "SVGFEDiffuseLightingElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEDiffuseLightingElement.idl"
+    },
+    {
+      "name": "SVGFEDisplacementMapElement",
+      "idlName": "SVGFEDisplacementMapElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEDisplacementMapElement.idl"
+    },
+    {
+      "name": "SVGFEDistantLightElement",
+      "idlName": "SVGFEDistantLightElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEDistantLightElement.idl"
+    },
+    {
+      "name": "SVGFEDropShadowElement",
+      "idlName": "SVGFEDropShadowElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEDropShadowElement.idl"
+    },
+    {
+      "name": "SVGFEFloodElement",
+      "idlName": "SVGFEFloodElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEFloodElement.idl"
+    },
+    {
+      "name": "SVGFEFuncAElement",
+      "idlName": "SVGFEFuncAElement",
+      "base": "SVGComponentTransferFunctionElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEFuncAElement.idl"
+    },
+    {
+      "name": "SVGFEFuncBElement",
+      "idlName": "SVGFEFuncBElement",
+      "base": "SVGComponentTransferFunctionElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEFuncBElement.idl"
+    },
+    {
+      "name": "SVGFEFuncGElement",
+      "idlName": "SVGFEFuncGElement",
+      "base": "SVGComponentTransferFunctionElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEFuncGElement.idl"
+    },
+    {
+      "name": "SVGFEFuncRElement",
+      "idlName": "SVGFEFuncRElement",
+      "base": "SVGComponentTransferFunctionElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEFuncRElement.idl"
+    },
+    {
+      "name": "SVGFEGaussianBlurElement",
+      "idlName": "SVGFEGaussianBlurElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEGaussianBlurElement.idl"
+    },
+    {
+      "name": "SVGFEImageElement",
+      "idlName": "SVGFEImageElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEImageElement.idl"
+    },
+    {
+      "name": "SVGFEMergeElement",
+      "idlName": "SVGFEMergeElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEMergeElement.idl"
+    },
+    {
+      "name": "SVGFEMergeNodeElement",
+      "idlName": "SVGFEMergeNodeElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEMergeNodeElement.idl"
+    },
+    {
+      "name": "SVGFEMorphologyElement",
+      "idlName": "SVGFEMorphologyElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEMorphologyElement.idl"
+    },
+    {
+      "name": "SVGFEOffsetElement",
+      "idlName": "SVGFEOffsetElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEOffsetElement.idl"
+    },
+    {
+      "name": "SVGFEPointLightElement",
+      "idlName": "SVGFEPointLightElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFEPointLightElement.idl"
+    },
+    {
+      "name": "SVGFESpecularLightingElement",
+      "idlName": "SVGFESpecularLightingElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFESpecularLightingElement.idl"
+    },
+    {
+      "name": "SVGFESpotLightElement",
+      "idlName": "SVGFESpotLightElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFESpotLightElement.idl"
+    },
+    {
+      "name": "SVGFETileElement",
+      "idlName": "SVGFETileElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFETileElement.idl"
+    },
+    {
+      "name": "SVGFETurbulenceElement",
+      "idlName": "SVGFETurbulenceElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFETurbulenceElement.idl"
+    },
+    {
+      "name": "SVGFilterElement",
+      "idlName": "SVGFilterElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGFilterElement.idl"
+    },
+    {
+      "name": "SVGComponentTransferFunctionElement",
+      "idlName": "SVGComponentTransferFunctionElement",
+      "base": "SVGElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "svg/SVGComponentTransferFunctionElement.idl"
+    },
+    {
       "name": "HTMLUnknownElement",
       "idlName": "HTMLUnknownElement",
       "base": "HTMLElement",
@@ -3222,231 +3551,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "svg/SVGDescElement.idl"
-    },
-    {
-      "name": "SVGFEBlendElement",
-      "idlName": "SVGFEBlendElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEBlendElement.idl"
-    },
-    {
-      "name": "SVGFEColorMatrixElement",
-      "idlName": "SVGFEColorMatrixElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEColorMatrixElement.idl"
-    },
-    {
-      "name": "SVGFEComponentTransferElement",
-      "idlName": "SVGFEComponentTransferElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEComponentTransferElement.idl"
-    },
-    {
-      "name": "SVGFECompositeElement",
-      "idlName": "SVGFECompositeElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFECompositeElement.idl"
-    },
-    {
-      "name": "SVGFEDiffuseLightingElement",
-      "idlName": "SVGFEDiffuseLightingElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEDiffuseLightingElement.idl"
-    },
-    {
-      "name": "SVGFEDisplacementMapElement",
-      "idlName": "SVGFEDisplacementMapElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEDisplacementMapElement.idl"
-    },
-    {
-      "name": "SVGFEDistantLightElement",
-      "idlName": "SVGFEDistantLightElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEDistantLightElement.idl"
-    },
-    {
-      "name": "SVGFEDropShadowElement",
-      "idlName": "SVGFEDropShadowElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEDropShadowElement.idl"
-    },
-    {
-      "name": "SVGFEFloodElement",
-      "idlName": "SVGFEFloodElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEFloodElement.idl"
-    },
-    {
-      "name": "SVGFEFuncAElement",
-      "idlName": "SVGFEFuncAElement",
-      "base": "SVGComponentTransferFunctionElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEFuncAElement.idl"
-    },
-    {
-      "name": "SVGFEFuncBElement",
-      "idlName": "SVGFEFuncBElement",
-      "base": "SVGComponentTransferFunctionElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEFuncBElement.idl"
-    },
-    {
-      "name": "SVGFEFuncGElement",
-      "idlName": "SVGFEFuncGElement",
-      "base": "SVGComponentTransferFunctionElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEFuncGElement.idl"
-    },
-    {
-      "name": "SVGFEFuncRElement",
-      "idlName": "SVGFEFuncRElement",
-      "base": "SVGComponentTransferFunctionElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEFuncRElement.idl"
-    },
-    {
-      "name": "SVGFEGaussianBlurElement",
-      "idlName": "SVGFEGaussianBlurElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEGaussianBlurElement.idl"
-    },
-    {
-      "name": "SVGFEImageElement",
-      "idlName": "SVGFEImageElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEImageElement.idl"
-    },
-    {
-      "name": "SVGFEMergeElement",
-      "idlName": "SVGFEMergeElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEMergeElement.idl"
-    },
-    {
-      "name": "SVGFEMergeNodeElement",
-      "idlName": "SVGFEMergeNodeElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEMergeNodeElement.idl"
-    },
-    {
-      "name": "SVGFEMorphologyElement",
-      "idlName": "SVGFEMorphologyElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEMorphologyElement.idl"
-    },
-    {
-      "name": "SVGFEOffsetElement",
-      "idlName": "SVGFEOffsetElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEOffsetElement.idl"
-    },
-    {
-      "name": "SVGFEPointLightElement",
-      "idlName": "SVGFEPointLightElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFEPointLightElement.idl"
-    },
-    {
-      "name": "SVGFESpecularLightingElement",
-      "idlName": "SVGFESpecularLightingElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFESpecularLightingElement.idl"
-    },
-    {
-      "name": "SVGFESpotLightElement",
-      "idlName": "SVGFESpotLightElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFESpotLightElement.idl"
-    },
-    {
-      "name": "SVGFETileElement",
-      "idlName": "SVGFETileElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFETileElement.idl"
-    },
-    {
-      "name": "SVGFETurbulenceElement",
-      "idlName": "SVGFETurbulenceElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFETurbulenceElement.idl"
-    },
-    {
-      "name": "SVGFilterElement",
-      "idlName": "SVGFilterElement",
-      "base": "SVGElement",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "svg/SVGFilterElement.idl"
     },
     {
       "name": "SVGForeignObjectElement",
@@ -123081,6 +123185,6052 @@
       "contractOwner": "SVGStopElement",
       "kind": "getter",
       "function": "rv_dom_svg_stop_element_get_offset",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEBlendElement",
+      "member": "in1",
+      "contractOwner": "SVGFEBlendElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_blend_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEBlendElement",
+      "member": "in2",
+      "contractOwner": "SVGFEBlendElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_blend_element_get_in2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEBlendElement",
+      "member": "mode",
+      "contractOwner": "SVGFEBlendElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_blend_element_get_mode",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEBlendElement",
+      "member": "x",
+      "contractOwner": "SVGFEBlendElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_blend_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEBlendElement",
+      "member": "y",
+      "contractOwner": "SVGFEBlendElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_blend_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEBlendElement",
+      "member": "width",
+      "contractOwner": "SVGFEBlendElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_blend_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEBlendElement",
+      "member": "height",
+      "contractOwner": "SVGFEBlendElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_blend_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEBlendElement",
+      "member": "result",
+      "contractOwner": "SVGFEBlendElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_blend_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEColorMatrixElement",
+      "member": "in1",
+      "contractOwner": "SVGFEColorMatrixElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_color_matrix_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEColorMatrixElement",
+      "member": "type",
+      "contractOwner": "SVGFEColorMatrixElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_color_matrix_element_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEColorMatrixElement",
+      "member": "values",
+      "contractOwner": "SVGFEColorMatrixElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_color_matrix_element_get_values",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumberList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumberList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumberList",
+        "root": "SVGAnimatedNumberList",
+        "class": "SVGAnimatedNumberList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEColorMatrixElement",
+      "member": "x",
+      "contractOwner": "SVGFEColorMatrixElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_color_matrix_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEColorMatrixElement",
+      "member": "y",
+      "contractOwner": "SVGFEColorMatrixElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_color_matrix_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEColorMatrixElement",
+      "member": "width",
+      "contractOwner": "SVGFEColorMatrixElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_color_matrix_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEColorMatrixElement",
+      "member": "height",
+      "contractOwner": "SVGFEColorMatrixElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_color_matrix_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEColorMatrixElement",
+      "member": "result",
+      "contractOwner": "SVGFEColorMatrixElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_color_matrix_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEComponentTransferElement",
+      "member": "in1",
+      "contractOwner": "SVGFEComponentTransferElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_component_transfer_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEComponentTransferElement",
+      "member": "x",
+      "contractOwner": "SVGFEComponentTransferElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_component_transfer_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEComponentTransferElement",
+      "member": "y",
+      "contractOwner": "SVGFEComponentTransferElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_component_transfer_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEComponentTransferElement",
+      "member": "width",
+      "contractOwner": "SVGFEComponentTransferElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_component_transfer_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEComponentTransferElement",
+      "member": "height",
+      "contractOwner": "SVGFEComponentTransferElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_component_transfer_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEComponentTransferElement",
+      "member": "result",
+      "contractOwner": "SVGFEComponentTransferElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_component_transfer_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "in1",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "in2",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_in2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "operator",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_operator",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "k1",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_k1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "k2",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_k2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "k3",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_k3",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "k4",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_k4",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "x",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "y",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "width",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "height",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFECompositeElement",
+      "member": "result",
+      "contractOwner": "SVGFECompositeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_composite_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "in1",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "surfaceScale",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_surface_scale",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "diffuseConstant",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_diffuse_constant",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "kernelUnitLengthX",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_kernel_unit_length_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "kernelUnitLengthY",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_kernel_unit_length_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "x",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "y",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "width",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "height",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDiffuseLightingElement",
+      "member": "result",
+      "contractOwner": "SVGFEDiffuseLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_diffuse_lighting_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "in1",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "in2",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_in2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "scale",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_scale",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "xChannelSelector",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_x_channel_selector",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "yChannelSelector",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_y_channel_selector",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "x",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "y",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "width",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "height",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDisplacementMapElement",
+      "member": "result",
+      "contractOwner": "SVGFEDisplacementMapElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_displacement_map_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDistantLightElement",
+      "member": "azimuth",
+      "contractOwner": "SVGFEDistantLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_distant_light_element_get_azimuth",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDistantLightElement",
+      "member": "elevation",
+      "contractOwner": "SVGFEDistantLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_distant_light_element_get_elevation",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "in1",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "dx",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_dx",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "dy",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_dy",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "stdDeviationX",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_std_deviation_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "stdDeviationY",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_std_deviation_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "x",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "y",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "width",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "height",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "result",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_drop_shadow_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEDropShadowElement",
+      "member": "setStdDeviation",
+      "contractOwner": "SVGFEDropShadowElement",
+      "kind": "operation",
+      "function": "rv_dom_svgfe_drop_shadow_element_set_std_deviation",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "float",
+          "name": "std_deviation_x"
+        },
+        {
+          "ctype": "float",
+          "name": "std_deviation_y"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "stdDeviationX",
+          "idlType": "float",
+          "idl": {
+            "name": "float",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "float",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "stdDeviationY",
+          "idlType": "float",
+          "idl": {
+            "name": "float",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "float",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEFloodElement",
+      "member": "x",
+      "contractOwner": "SVGFEFloodElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_flood_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEFloodElement",
+      "member": "y",
+      "contractOwner": "SVGFEFloodElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_flood_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEFloodElement",
+      "member": "width",
+      "contractOwner": "SVGFEFloodElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_flood_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEFloodElement",
+      "member": "height",
+      "contractOwner": "SVGFEFloodElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_flood_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEFloodElement",
+      "member": "result",
+      "contractOwner": "SVGFEFloodElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_flood_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "in1",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_gaussian_blur_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "stdDeviationX",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_gaussian_blur_element_get_std_deviation_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "stdDeviationY",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_gaussian_blur_element_get_std_deviation_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "edgeMode",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_gaussian_blur_element_get_edge_mode",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "x",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_gaussian_blur_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "y",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_gaussian_blur_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "width",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_gaussian_blur_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "height",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_gaussian_blur_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "result",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_gaussian_blur_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEGaussianBlurElement",
+      "member": "setStdDeviation",
+      "contractOwner": "SVGFEGaussianBlurElement",
+      "kind": "operation",
+      "function": "rv_dom_svgfe_gaussian_blur_element_set_std_deviation",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "float",
+          "name": "std_deviation_x"
+        },
+        {
+          "ctype": "float",
+          "name": "std_deviation_y"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "stdDeviationX",
+          "idlType": "float",
+          "idl": {
+            "name": "float",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "float",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "stdDeviationY",
+          "idlType": "float",
+          "idl": {
+            "name": "float",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "float",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEImageElement",
+      "member": "preserveAspectRatio",
+      "contractOwner": "SVGFEImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_image_element_get_preserve_aspect_ratio",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedPreserveAspectRatio**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedPreserveAspectRatio",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedPreserveAspectRatio",
+        "root": "SVGAnimatedPreserveAspectRatio",
+        "class": "SVGAnimatedPreserveAspectRatio",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEImageElement",
+      "member": "x",
+      "contractOwner": "SVGFEImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_image_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEImageElement",
+      "member": "y",
+      "contractOwner": "SVGFEImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_image_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEImageElement",
+      "member": "width",
+      "contractOwner": "SVGFEImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_image_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEImageElement",
+      "member": "height",
+      "contractOwner": "SVGFEImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_image_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEImageElement",
+      "member": "result",
+      "contractOwner": "SVGFEImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_image_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEImageElement",
+      "member": "href",
+      "contractOwner": "SVGFEImageElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_image_element_get_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMergeElement",
+      "member": "x",
+      "contractOwner": "SVGFEMergeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_merge_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMergeElement",
+      "member": "y",
+      "contractOwner": "SVGFEMergeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_merge_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMergeElement",
+      "member": "width",
+      "contractOwner": "SVGFEMergeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_merge_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMergeElement",
+      "member": "height",
+      "contractOwner": "SVGFEMergeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_merge_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMergeElement",
+      "member": "result",
+      "contractOwner": "SVGFEMergeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_merge_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMergeNodeElement",
+      "member": "in1",
+      "contractOwner": "SVGFEMergeNodeElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_merge_node_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMorphologyElement",
+      "member": "in1",
+      "contractOwner": "SVGFEMorphologyElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_morphology_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMorphologyElement",
+      "member": "operator",
+      "contractOwner": "SVGFEMorphologyElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_morphology_element_get_operator",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMorphologyElement",
+      "member": "radiusX",
+      "contractOwner": "SVGFEMorphologyElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_morphology_element_get_radius_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMorphologyElement",
+      "member": "radiusY",
+      "contractOwner": "SVGFEMorphologyElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_morphology_element_get_radius_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMorphologyElement",
+      "member": "x",
+      "contractOwner": "SVGFEMorphologyElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_morphology_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMorphologyElement",
+      "member": "y",
+      "contractOwner": "SVGFEMorphologyElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_morphology_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMorphologyElement",
+      "member": "width",
+      "contractOwner": "SVGFEMorphologyElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_morphology_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMorphologyElement",
+      "member": "height",
+      "contractOwner": "SVGFEMorphologyElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_morphology_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEMorphologyElement",
+      "member": "result",
+      "contractOwner": "SVGFEMorphologyElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_morphology_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEOffsetElement",
+      "member": "in1",
+      "contractOwner": "SVGFEOffsetElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_offset_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEOffsetElement",
+      "member": "dx",
+      "contractOwner": "SVGFEOffsetElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_offset_element_get_dx",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEOffsetElement",
+      "member": "dy",
+      "contractOwner": "SVGFEOffsetElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_offset_element_get_dy",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEOffsetElement",
+      "member": "x",
+      "contractOwner": "SVGFEOffsetElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_offset_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEOffsetElement",
+      "member": "y",
+      "contractOwner": "SVGFEOffsetElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_offset_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEOffsetElement",
+      "member": "width",
+      "contractOwner": "SVGFEOffsetElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_offset_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEOffsetElement",
+      "member": "height",
+      "contractOwner": "SVGFEOffsetElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_offset_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEOffsetElement",
+      "member": "result",
+      "contractOwner": "SVGFEOffsetElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_offset_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEPointLightElement",
+      "member": "x",
+      "contractOwner": "SVGFEPointLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_point_light_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEPointLightElement",
+      "member": "y",
+      "contractOwner": "SVGFEPointLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_point_light_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFEPointLightElement",
+      "member": "z",
+      "contractOwner": "SVGFEPointLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_point_light_element_get_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "in1",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "surfaceScale",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_surface_scale",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "specularConstant",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_specular_constant",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "specularExponent",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_specular_exponent",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "kernelUnitLengthX",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_kernel_unit_length_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "kernelUnitLengthY",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_kernel_unit_length_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "x",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "y",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "width",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "height",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpecularLightingElement",
+      "member": "result",
+      "contractOwner": "SVGFESpecularLightingElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_specular_lighting_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpotLightElement",
+      "member": "x",
+      "contractOwner": "SVGFESpotLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_spot_light_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpotLightElement",
+      "member": "y",
+      "contractOwner": "SVGFESpotLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_spot_light_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpotLightElement",
+      "member": "z",
+      "contractOwner": "SVGFESpotLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_spot_light_element_get_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpotLightElement",
+      "member": "pointsAtX",
+      "contractOwner": "SVGFESpotLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_spot_light_element_get_points_at_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpotLightElement",
+      "member": "pointsAtY",
+      "contractOwner": "SVGFESpotLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_spot_light_element_get_points_at_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpotLightElement",
+      "member": "pointsAtZ",
+      "contractOwner": "SVGFESpotLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_spot_light_element_get_points_at_z",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpotLightElement",
+      "member": "specularExponent",
+      "contractOwner": "SVGFESpotLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_spot_light_element_get_specular_exponent",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFESpotLightElement",
+      "member": "limitingConeAngle",
+      "contractOwner": "SVGFESpotLightElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_spot_light_element_get_limiting_cone_angle",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETileElement",
+      "member": "in1",
+      "contractOwner": "SVGFETileElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_tile_element_get_in1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETileElement",
+      "member": "x",
+      "contractOwner": "SVGFETileElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_tile_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETileElement",
+      "member": "y",
+      "contractOwner": "SVGFETileElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_tile_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETileElement",
+      "member": "width",
+      "contractOwner": "SVGFETileElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_tile_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETileElement",
+      "member": "height",
+      "contractOwner": "SVGFETileElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_tile_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETileElement",
+      "member": "result",
+      "contractOwner": "SVGFETileElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_tile_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "baseFrequencyX",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_base_frequency_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "baseFrequencyY",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_base_frequency_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "numOctaves",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_num_octaves",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedInteger**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedInteger",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedInteger",
+        "root": "SVGAnimatedInteger",
+        "class": "SVGAnimatedInteger",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "seed",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_seed",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "stitchTiles",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_stitch_tiles",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "type",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "x",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "y",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "width",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "height",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFETurbulenceElement",
+      "member": "result",
+      "contractOwner": "SVGFETurbulenceElement",
+      "kind": "getter",
+      "function": "rv_dom_svgfe_turbulence_element_get_result",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFilterElement",
+      "member": "filterUnits",
+      "contractOwner": "SVGFilterElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_filter_element_get_filter_units",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFilterElement",
+      "member": "primitiveUnits",
+      "contractOwner": "SVGFilterElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_filter_element_get_primitive_units",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFilterElement",
+      "member": "x",
+      "contractOwner": "SVGFilterElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_filter_element_get_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFilterElement",
+      "member": "y",
+      "contractOwner": "SVGFilterElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_filter_element_get_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFilterElement",
+      "member": "width",
+      "contractOwner": "SVGFilterElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_filter_element_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFilterElement",
+      "member": "height",
+      "contractOwner": "SVGFilterElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_filter_element_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedLength**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedLength",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedLength",
+        "root": "SVGAnimatedLength",
+        "class": "SVGAnimatedLength",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGFilterElement",
+      "member": "href",
+      "contractOwner": "SVGFilterElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_filter_element_get_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedString**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedString",
+        "root": "SVGAnimatedString",
+        "class": "SVGAnimatedString",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "type",
+      "contractOwner": "SVGComponentTransferFunctionElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_component_transfer_function_element_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedEnumeration**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedEnumeration",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedEnumeration",
+        "root": "SVGAnimatedEnumeration",
+        "class": "SVGAnimatedEnumeration",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "tableValues",
+      "contractOwner": "SVGComponentTransferFunctionElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_component_transfer_function_element_get_table_values",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumberList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumberList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumberList",
+        "root": "SVGAnimatedNumberList",
+        "class": "SVGAnimatedNumberList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "slope",
+      "contractOwner": "SVGComponentTransferFunctionElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_component_transfer_function_element_get_slope",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "intercept",
+      "contractOwner": "SVGComponentTransferFunctionElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_component_transfer_function_element_get_intercept",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "amplitude",
+      "contractOwner": "SVGComponentTransferFunctionElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_component_transfer_function_element_get_amplitude",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "exponent",
+      "contractOwner": "SVGComponentTransferFunctionElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_component_transfer_function_element_get_exponent",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvSVGAnimatedNumber**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "SVGAnimatedNumber",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "SVGAnimatedNumber",
+        "root": "SVGAnimatedNumber",
+        "class": "SVGAnimatedNumber",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SVGComponentTransferFunctionElement",
+      "member": "offset",
+      "contractOwner": "SVGComponentTransferFunctionElement",
+      "kind": "getter",
+      "function": "rv_dom_svg_component_transfer_function_element_get_offset",
       "conditional": null,
       "parameters": [
         {

@@ -238,6 +238,60 @@ enum {
     RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_PAD = 1, /* SVGGradientElement.SVG_SPREADMETHOD_PAD */
     RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_REFLECT = 2, /* SVGGradientElement.SVG_SPREADMETHOD_REFLECT */
     RV_DOM_SVG_GRADIENT_ELEMENT_SVG_SPREADMETHOD_REPEAT = 3, /* SVGGradientElement.SVG_SPREADMETHOD_REPEAT */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_UNKNOWN = 0, /* SVGFEBlendElement.SVG_FEBLEND_MODE_UNKNOWN */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_NORMAL = 1, /* SVGFEBlendElement.SVG_FEBLEND_MODE_NORMAL */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_MULTIPLY = 2, /* SVGFEBlendElement.SVG_FEBLEND_MODE_MULTIPLY */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_SCREEN = 3, /* SVGFEBlendElement.SVG_FEBLEND_MODE_SCREEN */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_DARKEN = 4, /* SVGFEBlendElement.SVG_FEBLEND_MODE_DARKEN */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_LIGHTEN = 5, /* SVGFEBlendElement.SVG_FEBLEND_MODE_LIGHTEN */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_OVERLAY = 6, /* SVGFEBlendElement.SVG_FEBLEND_MODE_OVERLAY */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_COLOR_DODGE = 7, /* SVGFEBlendElement.SVG_FEBLEND_MODE_COLOR_DODGE */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_COLOR_BURN = 8, /* SVGFEBlendElement.SVG_FEBLEND_MODE_COLOR_BURN */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_HARD_LIGHT = 9, /* SVGFEBlendElement.SVG_FEBLEND_MODE_HARD_LIGHT */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_SOFT_LIGHT = 10, /* SVGFEBlendElement.SVG_FEBLEND_MODE_SOFT_LIGHT */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_DIFFERENCE = 11, /* SVGFEBlendElement.SVG_FEBLEND_MODE_DIFFERENCE */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_EXCLUSION = 12, /* SVGFEBlendElement.SVG_FEBLEND_MODE_EXCLUSION */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_HUE = 13, /* SVGFEBlendElement.SVG_FEBLEND_MODE_HUE */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_SATURATION = 14, /* SVGFEBlendElement.SVG_FEBLEND_MODE_SATURATION */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_COLOR = 15, /* SVGFEBlendElement.SVG_FEBLEND_MODE_COLOR */
+    RV_DOM_SVGFE_BLEND_ELEMENT_SVG_FEBLEND_MODE_LUMINOSITY = 16, /* SVGFEBlendElement.SVG_FEBLEND_MODE_LUMINOSITY */
+    RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_UNKNOWN = 0, /* SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_UNKNOWN */
+    RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_MATRIX = 1, /* SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_MATRIX */
+    RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_SATURATE = 2, /* SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_SATURATE */
+    RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_HUEROTATE = 3, /* SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_HUEROTATE */
+    RV_DOM_SVGFE_COLOR_MATRIX_ELEMENT_SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA = 4, /* SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA */
+    RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_UNKNOWN = 0, /* SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_UNKNOWN */
+    RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_OVER = 1, /* SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_OVER */
+    RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_IN = 2, /* SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_IN */
+    RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_OUT = 3, /* SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_OUT */
+    RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_ATOP = 4, /* SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_ATOP */
+    RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_XOR = 5, /* SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_XOR */
+    RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_ARITHMETIC = 6, /* SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_ARITHMETIC */
+    RV_DOM_SVGFE_COMPOSITE_ELEMENT_SVG_FECOMPOSITE_OPERATOR_LIGHTER = 7, /* SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_LIGHTER */
+    RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_UNKNOWN = 0, /* SVGFEDisplacementMapElement.SVG_CHANNEL_UNKNOWN */
+    RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_R = 1, /* SVGFEDisplacementMapElement.SVG_CHANNEL_R */
+    RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_G = 2, /* SVGFEDisplacementMapElement.SVG_CHANNEL_G */
+    RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_B = 3, /* SVGFEDisplacementMapElement.SVG_CHANNEL_B */
+    RV_DOM_SVGFE_DISPLACEMENT_MAP_ELEMENT_SVG_CHANNEL_A = 4, /* SVGFEDisplacementMapElement.SVG_CHANNEL_A */
+    RV_DOM_SVGFE_GAUSSIAN_BLUR_ELEMENT_SVG_EDGEMODE_UNKNOWN = 0, /* SVGFEGaussianBlurElement.SVG_EDGEMODE_UNKNOWN */
+    RV_DOM_SVGFE_GAUSSIAN_BLUR_ELEMENT_SVG_EDGEMODE_DUPLICATE = 1, /* SVGFEGaussianBlurElement.SVG_EDGEMODE_DUPLICATE */
+    RV_DOM_SVGFE_GAUSSIAN_BLUR_ELEMENT_SVG_EDGEMODE_WRAP = 2, /* SVGFEGaussianBlurElement.SVG_EDGEMODE_WRAP */
+    RV_DOM_SVGFE_GAUSSIAN_BLUR_ELEMENT_SVG_EDGEMODE_NONE = 3, /* SVGFEGaussianBlurElement.SVG_EDGEMODE_NONE */
+    RV_DOM_SVGFE_MORPHOLOGY_ELEMENT_SVG_MORPHOLOGY_OPERATOR_UNKNOWN = 0, /* SVGFEMorphologyElement.SVG_MORPHOLOGY_OPERATOR_UNKNOWN */
+    RV_DOM_SVGFE_MORPHOLOGY_ELEMENT_SVG_MORPHOLOGY_OPERATOR_ERODE = 1, /* SVGFEMorphologyElement.SVG_MORPHOLOGY_OPERATOR_ERODE */
+    RV_DOM_SVGFE_MORPHOLOGY_ELEMENT_SVG_MORPHOLOGY_OPERATOR_DILATE = 2, /* SVGFEMorphologyElement.SVG_MORPHOLOGY_OPERATOR_DILATE */
+    RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_TURBULENCE_TYPE_UNKNOWN = 0, /* SVGFETurbulenceElement.SVG_TURBULENCE_TYPE_UNKNOWN */
+    RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_TURBULENCE_TYPE_FRACTALNOISE = 1, /* SVGFETurbulenceElement.SVG_TURBULENCE_TYPE_FRACTALNOISE */
+    RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_TURBULENCE_TYPE_TURBULENCE = 2, /* SVGFETurbulenceElement.SVG_TURBULENCE_TYPE_TURBULENCE */
+    RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_STITCHTYPE_UNKNOWN = 0, /* SVGFETurbulenceElement.SVG_STITCHTYPE_UNKNOWN */
+    RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_STITCHTYPE_STITCH = 1, /* SVGFETurbulenceElement.SVG_STITCHTYPE_STITCH */
+    RV_DOM_SVGFE_TURBULENCE_ELEMENT_SVG_STITCHTYPE_NOSTITCH = 2, /* SVGFETurbulenceElement.SVG_STITCHTYPE_NOSTITCH */
+    RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_UNKNOWN = 0, /* SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_UNKNOWN */
+    RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_IDENTITY = 1, /* SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_IDENTITY */
+    RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_TABLE = 2, /* SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_TABLE */
+    RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_DISCRETE = 3, /* SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_DISCRETE */
+    RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_LINEAR = 4, /* SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_LINEAR */
+    RV_DOM_SVG_COMPONENT_TRANSFER_FUNCTION_ELEMENT_SVG_FECOMPONENTTRANSFER_TYPE_GAMMA = 5, /* SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_GAMMA */
 };
 
 /* The values of the IDL enumeration AriaNotificationInterrupt. */
@@ -6492,6 +6546,417 @@ RV_EXPORT int32_t rv_dom_svg_radial_gradient_element_get_fr(RvNode* target, RvSV
 
 /* SVGStopElement.offset getter: readonly attribute SVGAnimatedNumber offset; *result is a new reference */
 RV_EXPORT int32_t rv_dom_svg_stop_element_get_offset(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEBlendElement */
+
+/* SVGFEBlendElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_blend_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEBlendElement.in2 getter: readonly attribute SVGAnimatedString in2; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_blend_element_get_in2(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEBlendElement.mode getter: readonly attribute SVGAnimatedEnumeration mode; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_blend_element_get_mode(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFEBlendElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_blend_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEBlendElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_blend_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEBlendElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_blend_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEBlendElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_blend_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEBlendElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_blend_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEColorMatrixElement */
+
+/* SVGFEColorMatrixElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_color_matrix_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEColorMatrixElement.type getter: readonly attribute SVGAnimatedEnumeration type; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_color_matrix_element_get_type(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFEColorMatrixElement.values getter: readonly attribute SVGAnimatedNumberList values; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_color_matrix_element_get_values(RvNode* target, RvSVGAnimatedNumberList** result);
+/* SVGFEColorMatrixElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_color_matrix_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEColorMatrixElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_color_matrix_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEColorMatrixElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_color_matrix_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEColorMatrixElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_color_matrix_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEColorMatrixElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_color_matrix_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEComponentTransferElement */
+
+/* SVGFEComponentTransferElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_component_transfer_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEComponentTransferElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_component_transfer_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEComponentTransferElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_component_transfer_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEComponentTransferElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_component_transfer_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEComponentTransferElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_component_transfer_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEComponentTransferElement.result getter: readonly attribute SVGAnimatedString result; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_component_transfer_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFECompositeElement */
+
+/* SVGFECompositeElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFECompositeElement.in2 getter: readonly attribute SVGAnimatedString in2; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_in2(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFECompositeElement.operator getter: readonly attribute SVGAnimatedEnumeration operator; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_operator(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFECompositeElement.k1 getter: readonly attribute SVGAnimatedNumber k1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_k1(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFECompositeElement.k2 getter: readonly attribute SVGAnimatedNumber k2; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_k2(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFECompositeElement.k3 getter: readonly attribute SVGAnimatedNumber k3; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_k3(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFECompositeElement.k4 getter: readonly attribute SVGAnimatedNumber k4; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_k4(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFECompositeElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFECompositeElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFECompositeElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFECompositeElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFECompositeElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_composite_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEDiffuseLightingElement */
+
+/* SVGFEDiffuseLightingElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEDiffuseLightingElement.surfaceScale getter: readonly attribute SVGAnimatedNumber surfaceScale; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_surface_scale(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDiffuseLightingElement.diffuseConstant getter: readonly attribute SVGAnimatedNumber diffuseConstant; *result
+ * is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_diffuse_constant(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDiffuseLightingElement.kernelUnitLengthX getter: readonly attribute SVGAnimatedNumber kernelUnitLengthX;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_kernel_unit_length_x(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDiffuseLightingElement.kernelUnitLengthY getter: readonly attribute SVGAnimatedNumber kernelUnitLengthY;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_kernel_unit_length_y(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDiffuseLightingElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDiffuseLightingElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDiffuseLightingElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDiffuseLightingElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDiffuseLightingElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_diffuse_lighting_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEDisplacementMapElement */
+
+/* SVGFEDisplacementMapElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEDisplacementMapElement.in2 getter: readonly attribute SVGAnimatedString in2; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_in2(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEDisplacementMapElement.scale getter: readonly attribute SVGAnimatedNumber scale; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_scale(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDisplacementMapElement.xChannelSelector getter: readonly attribute SVGAnimatedEnumeration xChannelSelector;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_x_channel_selector(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFEDisplacementMapElement.yChannelSelector getter: readonly attribute SVGAnimatedEnumeration yChannelSelector;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_y_channel_selector(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFEDisplacementMapElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDisplacementMapElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDisplacementMapElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDisplacementMapElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDisplacementMapElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_displacement_map_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEDistantLightElement */
+
+/* SVGFEDistantLightElement.azimuth getter: readonly attribute SVGAnimatedNumber azimuth; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_distant_light_element_get_azimuth(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDistantLightElement.elevation getter: readonly attribute SVGAnimatedNumber elevation; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_distant_light_element_get_elevation(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDropShadowElement */
+
+/* SVGFEDropShadowElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEDropShadowElement.dx getter: readonly attribute SVGAnimatedNumber dx; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_dx(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDropShadowElement.dy getter: readonly attribute SVGAnimatedNumber dy; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_dy(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDropShadowElement.stdDeviationX getter: readonly attribute SVGAnimatedNumber stdDeviationX; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_std_deviation_x(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDropShadowElement.stdDeviationY getter: readonly attribute SVGAnimatedNumber stdDeviationY; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_std_deviation_y(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEDropShadowElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDropShadowElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDropShadowElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDropShadowElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEDropShadowElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEDropShadowElement.setStdDeviation(float stdDeviationX, float stdDeviationY) -> undefined */
+RV_EXPORT int32_t rv_dom_svgfe_drop_shadow_element_set_std_deviation(RvNode* target, float std_deviation_x, float std_deviation_y);
+/* SVGFEFloodElement */
+
+/* SVGFEFloodElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_flood_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEFloodElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_flood_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEFloodElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_flood_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEFloodElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_flood_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEFloodElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_flood_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEGaussianBlurElement */
+
+/* SVGFEGaussianBlurElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEGaussianBlurElement.stdDeviationX getter: readonly attribute SVGAnimatedNumber stdDeviationX; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_get_std_deviation_x(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEGaussianBlurElement.stdDeviationY getter: readonly attribute SVGAnimatedNumber stdDeviationY; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_get_std_deviation_y(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEGaussianBlurElement.edgeMode getter: readonly attribute SVGAnimatedEnumeration edgeMode; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_get_edge_mode(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFEGaussianBlurElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEGaussianBlurElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEGaussianBlurElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEGaussianBlurElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEGaussianBlurElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEGaussianBlurElement.setStdDeviation(float stdDeviationX, float stdDeviationY) -> undefined */
+RV_EXPORT int32_t rv_dom_svgfe_gaussian_blur_element_set_std_deviation(RvNode* target, float std_deviation_x, float std_deviation_y);
+/* SVGFEImageElement */
+
+/* SVGFEImageElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio
+ * preserveAspectRatio; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_image_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result);
+/* SVGFEImageElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_image_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEImageElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_image_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEImageElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_image_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEImageElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_image_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEImageElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_image_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEImageElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_image_element_get_href(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEMergeElement */
+
+/* SVGFEMergeElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_merge_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEMergeElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_merge_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEMergeElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_merge_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEMergeElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_merge_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEMergeElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_merge_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEMergeNodeElement */
+
+/* SVGFEMergeNodeElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_merge_node_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEMorphologyElement */
+
+/* SVGFEMorphologyElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_morphology_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEMorphologyElement.operator getter: readonly attribute SVGAnimatedEnumeration operator; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_morphology_element_get_operator(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFEMorphologyElement.radiusX getter: readonly attribute SVGAnimatedNumber radiusX; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_morphology_element_get_radius_x(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEMorphologyElement.radiusY getter: readonly attribute SVGAnimatedNumber radiusY; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_morphology_element_get_radius_y(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEMorphologyElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_morphology_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEMorphologyElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_morphology_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEMorphologyElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_morphology_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEMorphologyElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_morphology_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEMorphologyElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_morphology_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEOffsetElement */
+
+/* SVGFEOffsetElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_offset_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEOffsetElement.dx getter: readonly attribute SVGAnimatedNumber dx; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_offset_element_get_dx(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEOffsetElement.dy getter: readonly attribute SVGAnimatedNumber dy; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_offset_element_get_dy(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEOffsetElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_offset_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEOffsetElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_offset_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEOffsetElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_offset_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEOffsetElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_offset_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFEOffsetElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_offset_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFEPointLightElement */
+
+/* SVGFEPointLightElement.x getter: readonly attribute SVGAnimatedNumber x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_point_light_element_get_x(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEPointLightElement.y getter: readonly attribute SVGAnimatedNumber y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_point_light_element_get_y(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFEPointLightElement.z getter: readonly attribute SVGAnimatedNumber z; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_point_light_element_get_z(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpecularLightingElement */
+
+/* SVGFESpecularLightingElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFESpecularLightingElement.surfaceScale getter: readonly attribute SVGAnimatedNumber surfaceScale; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_surface_scale(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpecularLightingElement.specularConstant getter: readonly attribute SVGAnimatedNumber specularConstant;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_specular_constant(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpecularLightingElement.specularExponent getter: readonly attribute SVGAnimatedNumber specularExponent;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_specular_exponent(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpecularLightingElement.kernelUnitLengthX getter: readonly attribute SVGAnimatedNumber kernelUnitLengthX;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_kernel_unit_length_x(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpecularLightingElement.kernelUnitLengthY getter: readonly attribute SVGAnimatedNumber kernelUnitLengthY;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_kernel_unit_length_y(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpecularLightingElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFESpecularLightingElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFESpecularLightingElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFESpecularLightingElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFESpecularLightingElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_specular_lighting_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFESpotLightElement */
+
+/* SVGFESpotLightElement.x getter: readonly attribute SVGAnimatedNumber x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_spot_light_element_get_x(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpotLightElement.y getter: readonly attribute SVGAnimatedNumber y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_spot_light_element_get_y(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpotLightElement.z getter: readonly attribute SVGAnimatedNumber z; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_spot_light_element_get_z(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpotLightElement.pointsAtX getter: readonly attribute SVGAnimatedNumber pointsAtX; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_spot_light_element_get_points_at_x(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpotLightElement.pointsAtY getter: readonly attribute SVGAnimatedNumber pointsAtY; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_spot_light_element_get_points_at_y(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpotLightElement.pointsAtZ getter: readonly attribute SVGAnimatedNumber pointsAtZ; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_spot_light_element_get_points_at_z(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpotLightElement.specularExponent getter: readonly attribute SVGAnimatedNumber specularExponent; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_svgfe_spot_light_element_get_specular_exponent(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFESpotLightElement.limitingConeAngle getter: readonly attribute SVGAnimatedNumber limitingConeAngle; *result is
+ * a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_spot_light_element_get_limiting_cone_angle(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFETileElement */
+
+/* SVGFETileElement.in1 getter: readonly attribute SVGAnimatedString in1; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_tile_element_get_in1(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFETileElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_tile_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFETileElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_tile_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFETileElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_tile_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFETileElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_tile_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFETileElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_tile_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFETurbulenceElement */
+
+/* SVGFETurbulenceElement.baseFrequencyX getter: readonly attribute SVGAnimatedNumber baseFrequencyX; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_base_frequency_x(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFETurbulenceElement.baseFrequencyY getter: readonly attribute SVGAnimatedNumber baseFrequencyY; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_base_frequency_y(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFETurbulenceElement.numOctaves getter: readonly attribute SVGAnimatedInteger numOctaves; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_num_octaves(RvNode* target, RvSVGAnimatedInteger** result);
+/* SVGFETurbulenceElement.seed getter: readonly attribute SVGAnimatedNumber seed; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_seed(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGFETurbulenceElement.stitchTiles getter: readonly attribute SVGAnimatedEnumeration stitchTiles; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_stitch_tiles(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFETurbulenceElement.type getter: readonly attribute SVGAnimatedEnumeration type; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_type(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFETurbulenceElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFETurbulenceElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFETurbulenceElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFETurbulenceElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFETurbulenceElement.result getter: readonly attribute SVGAnimatedString result; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svgfe_turbulence_element_get_result(RvNode* target, RvSVGAnimatedString** result);
+/* SVGFilterElement */
+
+/* SVGFilterElement.filterUnits getter: readonly attribute SVGAnimatedEnumeration filterUnits; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_filter_element_get_filter_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFilterElement.primitiveUnits getter: readonly attribute SVGAnimatedEnumeration primitiveUnits; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_filter_element_get_primitive_units(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGFilterElement.x getter: readonly attribute SVGAnimatedLength x; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_filter_element_get_x(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFilterElement.y getter: readonly attribute SVGAnimatedLength y; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_filter_element_get_y(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFilterElement.width getter: readonly attribute SVGAnimatedLength width; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_filter_element_get_width(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFilterElement.height getter: readonly attribute SVGAnimatedLength height; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_filter_element_get_height(RvNode* target, RvSVGAnimatedLength** result);
+/* SVGFilterElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_filter_element_get_href(RvNode* target, RvSVGAnimatedString** result);
+/* SVGComponentTransferFunctionElement */
+
+/* SVGComponentTransferFunctionElement.type getter: readonly attribute SVGAnimatedEnumeration type; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_component_transfer_function_element_get_type(RvNode* target, RvSVGAnimatedEnumeration** result);
+/* SVGComponentTransferFunctionElement.tableValues getter: readonly attribute SVGAnimatedNumberList tableValues;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_svg_component_transfer_function_element_get_table_values(RvNode* target, RvSVGAnimatedNumberList** result);
+/* SVGComponentTransferFunctionElement.slope getter: readonly attribute SVGAnimatedNumber slope; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_component_transfer_function_element_get_slope(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGComponentTransferFunctionElement.intercept getter: readonly attribute SVGAnimatedNumber intercept; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_svg_component_transfer_function_element_get_intercept(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGComponentTransferFunctionElement.amplitude getter: readonly attribute SVGAnimatedNumber amplitude; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_svg_component_transfer_function_element_get_amplitude(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGComponentTransferFunctionElement.exponent getter: readonly attribute SVGAnimatedNumber exponent; *result is a
+ * new reference */
+RV_EXPORT int32_t rv_dom_svg_component_transfer_function_element_get_exponent(RvNode* target, RvSVGAnimatedNumber** result);
+/* SVGComponentTransferFunctionElement.offset getter: readonly attribute SVGAnimatedNumber offset; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_svg_component_transfer_function_element_get_offset(RvNode* target, RvSVGAnimatedNumber** result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
