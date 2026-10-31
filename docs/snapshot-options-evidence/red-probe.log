@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "C:\wk\native-snapshot-options\tests\abi\snapshot_options.py", line 354, in <module>
+    main()
+    ~~~~^^
+  File "C:\wk\native-snapshot-options\tests\abi\snapshot_options.py", line 347, in main
+    report = verify(args.native_directory)
+  File "C:\wk\native-snapshot-options\tests\abi\snapshot_options.py", line 105, in verify
+    expect(p.bind('rv_abi_has', I, [ctypes.c_char_p])(b'snapshot-options') == 1, 'snapshot-options advertised')
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-snapshot-options\tests\abi\svg_paint_probe.py", line 50, in expect
+    raise AssertionError(label)
+AssertionError: snapshot-options advertised
+exit 1
