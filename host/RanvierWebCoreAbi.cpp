@@ -502,6 +502,7 @@ static Ref<Page> createPage(IntSize viewportSize)
     page->settings().setDownloadAttributeEnabled(true);
     page->settings().setCSSFontFaceMetricOverrideDescriptorsEnabled(true);
     page->settings().setCSSAnchorPositioningEnabled(true);
+    page->settings().setPopoverHintEnabled(true);
 #if ENABLE(VIDEO)
     page->settings().setMediaEnabled(false);
 #endif
