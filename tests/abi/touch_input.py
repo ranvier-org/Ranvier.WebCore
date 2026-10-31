@@ -174,6 +174,10 @@ def verify(directory, evidence):
     pc = of(events, 'pointercancel')
     h.expect(len(pc) == 1 and pc[0]['pointerId'] == 2, 'pointercancel contact 0')
 
+    # Ended contacts leave the pointer state: mouse input dispatches pointer events again.
+    h.expect(h.mouse(h.host, 0, 60, 60, -1, 0, 0) in (0, 1), 'mouse after touch')
+    h.expect([e['pointerType'] for e in of(h.take(), 'pointermove')] == ['mouse'], 'mouse pointermove after touch ends')
+
     # A contact that starts on #u targets #u for its whole life, and the second frame's move keeps the original target.
     status, events = frame('start on u', contact(4, DOWN, 40, 160, 1, 1, 0, 0.5))
     h.expect(of(events, 'touchstart')[0]['target'] == 'u', 'touch on #u')

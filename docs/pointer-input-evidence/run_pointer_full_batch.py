@@ -86,6 +86,8 @@ def run(name, command, expected=None, environment=None, executed=None, timeout=3
         print((result.stdout + result.stderr).decode('utf-8', 'replace')[-4000:], flush=True)
         raise SystemExit(result.returncode)
     if expected is not None:
+        record['expected'] = expected
+        (out / 'results.json').write_text(json.dumps(records, indent=2))
         assert record.get('assertions') == expected, name + ' expected ' + str(expected) + ' got ' + str(record.get('assertions'))
 
 

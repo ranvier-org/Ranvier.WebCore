@@ -165,6 +165,7 @@
 #include <WebCore/PlatformKeyboardEvent.h>
 #include <WebCore/PlatformMouseEvent.h>
 #include <WebCore/Navigator.h>
+#include <WebCore/PointerCaptureController.h>
 #include <WebCore/PointerEvent.h>
 #include <WebCore/PointerEventTypeNames.h>
 #if ENABLE(POINTER_LOCK)
@@ -3511,8 +3512,15 @@ int32_t rv_host_pointer(RvHost* host, const RvPointerSample* samples, int32_t co
         return RV_ERR_UNSUPPORTED;
     RvPlatformTouchEvent event(samples, count, samples[0].modifiers);
     Ref frame = host->frame();
+    Ref page = host->page;
     return handleInput(*host, [&] {
         auto result = frame->eventHandler().handleTouchEvent(event);
+        // An ended contact leaves the pointer state, as a platform view reports after the touch: until then WebCore
+        // dispatches no pointer events for mouse or pen input.
+        for (int32_t index = 0; index < count; ++index) {
+            if (samples[index].action == RV_POINTER_UP || samples[index].action == RV_POINTER_CANCEL)
+                page->pointerCaptureController().touchWithIdentifierWasRemoved(mousePointerID + 1 + static_cast<PointerID>(samples[index].id));
+        }
         return result && *result;
     });
 #else

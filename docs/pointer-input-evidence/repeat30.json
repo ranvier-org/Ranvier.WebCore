@@ -1,0 +1,26 @@
+{
+  "runtime": "C:/wk/pointer-artifacts/pointer-candidate-3-frozen/runtimes/win-x64/native",
+  "probes": {
+    "touch_input": {
+      "runs": 30,
+      "passed": 30,
+      "counts": [
+        427
+      ]
+    },
+    "pen_input": {
+      "runs": 30,
+      "passed": 30,
+      "counts": [
+        80
+      ]
+    },
+    "pointer_lock": {
+      "runs": 30,
+      "passed": 30,
+      "counts": [
+        153
+      ]
+    }
+  }
+}
