@@ -59,6 +59,126 @@ interface DOMStringMap { getter DOMString (DOMString name); setter undefined (DO
 
 
 class GeneratorTests(unittest.TestCase):
+    def svg_matrix_generator(self, argument='optional DOMMatrix2DInit matrix = {}', configured=None):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary DOMMatrix2DInit { unrestricted double a; unrestricted double m11; };
+interface SVGTransform { undefined setMatrix(''' + argument + '''); };
+partial interface SVGSVGElement { SVGTransform createSVGTransformFromMatrix(''' + argument + '''); };
+interface SVGTransformList { SVGTransform createSVGTransformFromMatrix(''' + argument + '''); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(dict.fromkeys(list(config['interfaces']) + ['SVGSVGElement', 'SVGTransform', 'SVGTransformList']))
+        config['svgMatrixDictionaryBindings'] = configured if configured is not None else ['SVGSVGElement.createSVGTransformFromMatrix', 'SVGTransform.setMatrix', 'SVGTransformList.createSVGTransformFromMatrix']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        return generator
+
+    def test_svg_matrix_dictionary_bindings_reuse_engine_alias_validation(self):
+        generator = self.svg_matrix_generator()
+        generator.run()
+        glue = generator.glue()
+        self.assertEqual(glue.count('DOMMatrixReadOnly::validateAndFixup(a0)'), 3)
+        for short, alias in zip('abcdef', ['m11', 'm12', 'm21', 'm22', 'm41', 'm42']):
+            self.assertEqual(glue.count(f'a0.{short} = a0.{alias};'), 3)
+        self.assertIn('return Ranvier::recordException(matrixValidation0.releaseException());', glue)
+
+    def test_svg_matrix_dictionary_bindings_reject_unknown_member(self):
+        with self.assertRaisesRegex(SystemExit, 'unsupported SVG matrix dictionary binding'):
+            self.svg_matrix_generator(configured=['SVGTransform.other']).run()
+
+    def test_svg_matrix_dictionary_browser_adapters_create_genuine_svg_matrices(self):
+        generator = self.svg_matrix_generator()
+        generator.run()
+        shared = generator.interfaces()
+        self.assertEqual(shared.count('globalThis.DOMMatrix.fromMatrix(d??{})'), 3)
+        self.assertEqual(shared.count("globalThis.document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGMatrix()"), 3)
+        self.assertIn('return v.setMatrix(m);})($0,$1)', shared)
+        self.assertEqual(shared.count('return v.createSVGTransformFromMatrix(m);})($0,$1)'), 2)
+
+    def test_svg_matrix_dictionary_bindings_reject_wrong_argument_shape(self):
+        for argument in ['DOMString matrix', 'DOMMatrix2DInit other', 'DOMMatrix2DInit matrix, long extra', 'DOMMatrix2DInit? matrix']:
+            with self.subTest(argument=argument), self.assertRaisesRegex(SystemExit, 'one nonnullable DOMMatrix2DInit matrix argument'):
+                self.svg_matrix_generator(argument=argument).run()
+
+    def test_existing_atom_string_inputs_use_lookup_without_interning(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+partial interface Document {
+    Element? lookupExisting([RequiresExistingAtomString] DOMString name);
+    Element? lookupOrdinary(DOMString name);
+};
+''')
+        generator = domgen.Generator(domgen.World(self.source, dict(self.world.config)))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        self.assertTrue('impl->lookupExisting(StringView { a0.string() }.toExistingAtomString())' in glue)
+        self.assertTrue('impl->lookupOrdinary(a0.string())' in glue)
+
+    def test_svg_animated_getters_use_webkit_animated_accessors_after_implemented_as(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface SVGAnimatedNumber { attribute float baseVal; };
+partial interface SVGElement {
+    readonly attribute SVGAnimatedNumber count;
+    [ImplementedAs=alternate] readonly attribute SVGAnimatedNumber renamed;
+    readonly attribute float ordinary;
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(dict.fromkeys(list(config['interfaces']) + ['SVGElement', 'SVGAnimatedNumber']))
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        for expression in ['impl->countAnimated()', 'impl->alternateAnimated()', 'impl->ordinary()', 'impl->baseVal()']:
+            self.assertTrue(expression in glue, expression)
+
+    def test_svg_animated_string_setter_completes_its_cpp_variant_parameter(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '\ninterface SVGAnimatedString { attribute DOMString baseVal; };\n')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['SVGAnimatedString']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertTrue('#include "TrustedScriptURL.h"' in generator.glue())
+
+    def test_scoped_interface_header_override_uses_the_real_cpp_alias_declaration(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '\ninterface SVGAnimatedNumber { attribute float baseVal; };\n')
+        header = self.source / 'Source/WebCore/dom/AliasDeclarations.h'
+        header.write_text('// Test alias declaration header.\n')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['SVGAnimatedNumber']
+        config['interfaceHeaders'] = {'SVGAnimatedNumber': 'dom/AliasDeclarations.h'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        self.assertTrue('#include "dom/AliasDeclarations.h"' in glue)
+        self.assertTrue('#include "SVGAnimatedNumber.h"' not in glue)
+
+    def test_interface_header_override_rejects_unselected_missing_and_external_headers(self):
+        for name, header, error in [
+            ('NotSelected', 'dom/Fixture.h', 'selected interface'),
+            ('Node', 'dom/Missing.h', 'exist inside WebCore'),
+            ('Node', '../Outside.h', 'WebCore-relative header'),
+            ('Node', '/Absolute.h', 'WebCore-relative header'),
+            ('Node', 'C:/Absolute.h', 'WebCore-relative header'),
+        ]:
+            with self.subTest(name=name, header=header):
+                config = dict(self.world.config)
+                config['interfaceHeaders'] = {name: header}
+                with self.assertRaisesRegex(SystemExit, error):
+                    domgen.Generator(domgen.World(self.source, config))
+
     def test_selected_browser_transform_matrix_flags_copy_only_the_measured_false_flag_case(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

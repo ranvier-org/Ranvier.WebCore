@@ -16,33 +16,17 @@ type internal DomDictionaryAttribute() =
     inherit Attribute()
 #endif
 
-/// <summary>SVGTextContentElement in the scoped DOM interface model.</summary>
-[<AllowNullLiteral>]
-type SVGTextContentElement =
-    inherit SVGGraphicsElement
-
-/// <summary>SVGTextPositioningElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGTextPositioningElement =
-    inherit SVGTextContentElement
-
 /// <summary>SVGGradientElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGGradientElement =
+[<AllowNullLiteral>]
+type SVGGradientElement =
     inherit SVGElement
 
 /// <summary>SVGComponentTransferFunctionElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGComponentTransferFunctionElement =
     inherit SVGElement
 
-/// <summary>SVGGeometryElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGGeometryElement =
-    inherit SVGGraphicsElement
-
 /// <summary>SVGAnimationElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGAnimationElement =
-    inherit SVGElement
-
-/// <summary>SVGGraphicsElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGGraphicsElement =
     inherit SVGElement
 
 /// <summary>HTMLMediaElement in the scoped DOM interface model.</summary>
@@ -326,6 +310,8 @@ and [<AllowNullLiteral>] Document =
     abstract member visibilityState: VisibilityState with get
     /// <summary>Document.getSelection.</summary>
     abstract member getSelection: unit -> DOMSelection
+    /// <summary>Document.rootElement.</summary>
+    abstract member rootElement: SVGSVGElement with get
     /// <summary>Document.getElementById.</summary>
     abstract member getElementById: elementId: string -> Element
     /// <summary>Document.activeElement.</summary>
@@ -1740,6 +1726,10 @@ and [<AllowNullLiteral>] SVGElement =
     inherit GlobalEventHandlers
     inherit HTMLOrSVGElement
     inherit ElementCSSInlineStyle
+    /// <summary>SVGElement.className.</summary>
+    abstract member className: SVGAnimatedString with get
+    /// <summary>SVGElement.ownerSVGElement.</summary>
+    abstract member ownerSVGElement: SVGSVGElement with get
     /// <summary>SVGElement.viewportElement.</summary>
     abstract member viewportElement: SVGElement with get
 
@@ -3277,6 +3267,611 @@ and [<AllowNullLiteral>] CompositionEvent =
     /// <summary>CompositionEvent.data.</summary>
     abstract member data: string with get
 
+/// <summary>SVGGraphicsElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGGraphicsElement =
+    inherit SVGElement
+    /// <summary>SVGGraphicsElement.transform.</summary>
+    abstract member transform: SVGAnimatedTransformList with get
+    /// <summary>SVGGraphicsElement.getBBox.</summary>
+    abstract member getBBox: unit -> SVGRect
+    /// <summary>SVGGraphicsElement.getCTM.</summary>
+    abstract member getCTM: unit -> SVGMatrix
+    /// <summary>SVGGraphicsElement.getScreenCTM.</summary>
+    abstract member getScreenCTM: unit -> SVGMatrix
+    /// <summary>SVGGraphicsElement.requiredExtensions.</summary>
+    abstract member requiredExtensions: SVGStringList with get
+    /// <summary>SVGGraphicsElement.systemLanguage.</summary>
+    abstract member systemLanguage: SVGStringList with get
+
+/// <summary>SVGGeometryElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGGeometryElement =
+    inherit SVGGraphicsElement
+    /// <summary>SVGGeometryElement.pathLength.</summary>
+    abstract member pathLength: SVGAnimatedNumber with get
+    /// <summary>SVGGeometryElement.isPointInFill.</summary>
+    abstract member isPointInFill: ?point: DOMPointInit -> bool
+    /// <summary>SVGGeometryElement.isPointInStroke.</summary>
+    abstract member isPointInStroke: ?point: DOMPointInit -> bool
+    /// <summary>SVGGeometryElement.getTotalLength.</summary>
+    abstract member getTotalLength: unit -> float32
+    /// <summary>SVGGeometryElement.getPointAtLength.</summary>
+    abstract member getPointAtLength: distance: float32 -> SVGPoint
+
+/// <summary>SVGPolygonElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPolygonElement =
+    inherit SVGGeometryElement
+    /// <summary>SVGPolygonElement.points.</summary>
+    abstract member points: SVGPointList with get
+    /// <summary>SVGPolygonElement.animatedPoints.</summary>
+    abstract member animatedPoints: SVGPointList with get
+
+/// <summary>SVGPolylineElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPolylineElement =
+    inherit SVGGeometryElement
+    /// <summary>SVGPolylineElement.points.</summary>
+    abstract member points: SVGPointList with get
+    /// <summary>SVGPolylineElement.animatedPoints.</summary>
+    abstract member animatedPoints: SVGPointList with get
+
+/// <summary>SVGSVGElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGSVGElement =
+    inherit SVGGraphicsElement
+    /// <summary>SVGSVGElement.x.</summary>
+    abstract member x: SVGAnimatedLength with get
+    /// <summary>SVGSVGElement.y.</summary>
+    abstract member y: SVGAnimatedLength with get
+    /// <summary>SVGSVGElement.width.</summary>
+    abstract member width: SVGAnimatedLength with get
+    /// <summary>SVGSVGElement.height.</summary>
+    abstract member height: SVGAnimatedLength with get
+    /// <summary>SVGSVGElement.currentScale.</summary>
+    abstract member currentScale: float32 with get, set
+    /// <summary>SVGSVGElement.currentTranslate.</summary>
+    abstract member currentTranslate: SVGPoint with get
+    /// <summary>SVGSVGElement.useCurrentView.</summary>
+    abstract member useCurrentView: bool with get
+    /// <summary>SVGSVGElement.currentView.</summary>
+    abstract member currentView: SVGViewSpec with get
+    /// <summary>SVGSVGElement.getIntersectionList.</summary>
+    abstract member getIntersectionList: rect: SVGRect * referenceElement: SVGElement -> NodeList
+    /// <summary>SVGSVGElement.getEnclosureList.</summary>
+    abstract member getEnclosureList: rect: SVGRect * referenceElement: SVGElement -> NodeList
+    /// <summary>SVGSVGElement.checkIntersection.</summary>
+    abstract member checkIntersection: element: SVGElement * rect: SVGRect -> bool
+    /// <summary>SVGSVGElement.checkEnclosure.</summary>
+    abstract member checkEnclosure: element: SVGElement * rect: SVGRect -> bool
+    /// <summary>SVGSVGElement.deselectAll.</summary>
+    abstract member deselectAll: unit -> unit
+    /// <summary>SVGSVGElement.createSVGNumber.</summary>
+    abstract member createSVGNumber: unit -> SVGNumber
+    /// <summary>SVGSVGElement.createSVGLength.</summary>
+    abstract member createSVGLength: unit -> SVGLength
+    /// <summary>SVGSVGElement.createSVGAngle.</summary>
+    abstract member createSVGAngle: unit -> SVGAngle
+    /// <summary>SVGSVGElement.createSVGPoint.</summary>
+    abstract member createSVGPoint: unit -> SVGPoint
+    /// <summary>SVGSVGElement.createSVGMatrix.</summary>
+    abstract member createSVGMatrix: unit -> SVGMatrix
+    /// <summary>SVGSVGElement.createSVGRect.</summary>
+    abstract member createSVGRect: unit -> SVGRect
+    /// <summary>SVGSVGElement.createSVGTransform.</summary>
+    abstract member createSVGTransform: unit -> SVGTransform
+
+    /// <summary>SVGSVGElement.createSVGTransformFromMatrix.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((v,d)=>{const n=globalThis.DOMMatrix.fromMatrix(d??{});const m=globalThis.document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGMatrix();for(const k of ['a','b','c','d','e','f'])m[k]=n[k];return v.createSVGTransformFromMatrix(m);})($0,$1)")>]
+#endif
+    abstract member createSVGTransformFromMatrix: ?matrix: DOMMatrix2DInit -> SVGTransform
+
+    /// <summary>SVGSVGElement.getElementById.</summary>
+    abstract member getElementById: elementId: string -> Element
+    /// <summary>SVGSVGElement.pauseAnimations.</summary>
+    abstract member pauseAnimations: unit -> unit
+    /// <summary>SVGSVGElement.unpauseAnimations.</summary>
+    abstract member unpauseAnimations: unit -> unit
+    /// <summary>SVGSVGElement.animationsPaused.</summary>
+    abstract member animationsPaused: unit -> bool
+    /// <summary>SVGSVGElement.getCurrentTime.</summary>
+    abstract member getCurrentTime: unit -> float32
+    /// <summary>SVGSVGElement.setCurrentTime.</summary>
+    abstract member setCurrentTime: seconds: float32 -> unit
+    /// <summary>SVGSVGElement.suspendRedraw.</summary>
+    abstract member suspendRedraw: maxWaitMilliseconds: uint32 -> uint32
+    /// <summary>SVGSVGElement.unsuspendRedraw.</summary>
+    abstract member unsuspendRedraw: suspendHandleId: uint32 -> unit
+    /// <summary>SVGSVGElement.unsuspendRedrawAll.</summary>
+    abstract member unsuspendRedrawAll: unit -> unit
+    /// <summary>SVGSVGElement.forceRedraw.</summary>
+    abstract member forceRedraw: unit -> unit
+    /// <summary>SVGSVGElement.viewBox.</summary>
+    abstract member viewBox: SVGAnimatedRect with get
+    /// <summary>SVGSVGElement.preserveAspectRatio.</summary>
+    abstract member preserveAspectRatio: SVGAnimatedPreserveAspectRatio with get
+    /// <summary>SVGSVGElement.zoomAndPan.</summary>
+    abstract member zoomAndPan: uint16 with get, set
+
+/// <summary>SVGRect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGRect =
+    /// <summary>SVGRect.x.</summary>
+    abstract member x: float32 with get, set
+    /// <summary>SVGRect.y.</summary>
+    abstract member y: float32 with get, set
+    /// <summary>SVGRect.width.</summary>
+    abstract member width: float32 with get, set
+    /// <summary>SVGRect.height.</summary>
+    abstract member height: float32 with get, set
+
+/// <summary>SVGMatrix in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGMatrix =
+    /// <summary>SVGMatrix.a.</summary>
+    abstract member a: float with get, set
+    /// <summary>SVGMatrix.b.</summary>
+    abstract member b: float with get, set
+    /// <summary>SVGMatrix.c.</summary>
+    abstract member c: float with get, set
+    /// <summary>SVGMatrix.d.</summary>
+    abstract member d: float with get, set
+    /// <summary>SVGMatrix.e.</summary>
+    abstract member e: float with get, set
+    /// <summary>SVGMatrix.f.</summary>
+    abstract member f: float with get, set
+    /// <summary>SVGMatrix.multiply.</summary>
+    abstract member multiply: secondMatrix: SVGMatrix -> SVGMatrix
+    /// <summary>SVGMatrix.inverse.</summary>
+    abstract member inverse: unit -> SVGMatrix
+    /// <summary>SVGMatrix.translate.</summary>
+    abstract member translate: x: float32 * y: float32 -> SVGMatrix
+    /// <summary>SVGMatrix.scale.</summary>
+    abstract member scale: scaleFactor: float32 -> SVGMatrix
+    /// <summary>SVGMatrix.scaleNonUniform.</summary>
+    abstract member scaleNonUniform: scaleFactorX: float32 * scaleFactorY: float32 -> SVGMatrix
+    /// <summary>SVGMatrix.rotate.</summary>
+    abstract member rotate: angle: float32 -> SVGMatrix
+    /// <summary>SVGMatrix.rotateFromVector.</summary>
+    abstract member rotateFromVector: x: float32 * y: float32 -> SVGMatrix
+    /// <summary>SVGMatrix.flipX.</summary>
+    abstract member flipX: unit -> SVGMatrix
+    /// <summary>SVGMatrix.flipY.</summary>
+    abstract member flipY: unit -> SVGMatrix
+    /// <summary>SVGMatrix.skewX.</summary>
+    abstract member skewX: angle: float32 -> SVGMatrix
+    /// <summary>SVGMatrix.skewY.</summary>
+    abstract member skewY: angle: float32 -> SVGMatrix
+
+/// <summary>SVGPoint in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPoint =
+    /// <summary>SVGPoint.x.</summary>
+    abstract member x: float32 with get, set
+    /// <summary>SVGPoint.y.</summary>
+    abstract member y: float32 with get, set
+    /// <summary>SVGPoint.matrixTransform.</summary>
+    abstract member matrixTransform: matrix: SVGMatrix -> SVGPoint
+
+/// <summary>SVGAnimatedRect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedRect =
+    /// <summary>SVGAnimatedRect.baseVal.</summary>
+    abstract member baseVal: SVGRect with get
+    /// <summary>SVGAnimatedRect.animVal.</summary>
+    abstract member animVal: SVGRect with get
+
+/// <summary>SVGPreserveAspectRatio in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPreserveAspectRatio =
+    /// <summary>SVGPreserveAspectRatio.align.</summary>
+    abstract member align: uint16 with get, set
+    /// <summary>SVGPreserveAspectRatio.meetOrSlice.</summary>
+    abstract member meetOrSlice: uint16 with get, set
+
+/// <summary>SVGAnimatedPreserveAspectRatio in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedPreserveAspectRatio =
+    /// <summary>SVGAnimatedPreserveAspectRatio.baseVal.</summary>
+    abstract member baseVal: SVGPreserveAspectRatio with get
+    /// <summary>SVGAnimatedPreserveAspectRatio.animVal.</summary>
+    abstract member animVal: SVGPreserveAspectRatio with get
+
+/// <summary>SVGTransform in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTransform =
+    /// <summary>SVGTransform.type.</summary>
+    abstract member ``type``: uint16 with get
+    /// <summary>SVGTransform.matrix.</summary>
+    abstract member matrix: SVGMatrix with get
+    /// <summary>SVGTransform.angle.</summary>
+    abstract member angle: float32 with get
+
+    /// <summary>SVGTransform.setMatrix.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((v,d)=>{const n=globalThis.DOMMatrix.fromMatrix(d??{});const m=globalThis.document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGMatrix();for(const k of ['a','b','c','d','e','f'])m[k]=n[k];return v.setMatrix(m);})($0,$1)")>]
+#endif
+    abstract member setMatrix: ?matrix: DOMMatrix2DInit -> unit
+
+    /// <summary>SVGTransform.setTranslate.</summary>
+    abstract member setTranslate: tx: float32 * ty: float32 -> unit
+    /// <summary>SVGTransform.setScale.</summary>
+    abstract member setScale: sx: float32 * sy: float32 -> unit
+    /// <summary>SVGTransform.setRotate.</summary>
+    abstract member setRotate: angle: float32 * cx: float32 * cy: float32 -> unit
+    /// <summary>SVGTransform.setSkewX.</summary>
+    abstract member setSkewX: angle: float32 -> unit
+    /// <summary>SVGTransform.setSkewY.</summary>
+    abstract member setSkewY: angle: float32 -> unit
+
+/// <summary>SVGTransformList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTransformList =
+    /// <summary>SVGTransformList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>SVGTransformList.numberOfItems.</summary>
+    abstract member numberOfItems: uint32 with get
+    /// <summary>SVGTransformList.clear.</summary>
+    abstract member clear: unit -> unit
+    /// <summary>SVGTransformList.initialize.</summary>
+    abstract member initialize: newItem: SVGTransform -> SVGTransform
+    /// <summary>SVGTransformList.getItem.</summary>
+    abstract member getItem: index: uint32 -> SVGTransform
+    /// <summary>SVGTransformList.insertItemBefore.</summary>
+    abstract member insertItemBefore: newItem: SVGTransform * index: uint32 -> SVGTransform
+    /// <summary>SVGTransformList.replaceItem.</summary>
+    abstract member replaceItem: newItem: SVGTransform * index: uint32 -> SVGTransform
+    /// <summary>SVGTransformList.removeItem.</summary>
+    abstract member removeItem: index: uint32 -> SVGTransform
+    /// <summary>SVGTransformList.appendItem.</summary>
+    abstract member appendItem: newItem: SVGTransform -> SVGTransform
+
+    /// <summary>SVGTransformList.setItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1] = $2")>]
+#endif
+    abstract member setItem: index: uint32 * newItem: SVGTransform -> unit
+
+
+    /// <summary>SVGTransformList.createSVGTransformFromMatrix.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((v,d)=>{const n=globalThis.DOMMatrix.fromMatrix(d??{});const m=globalThis.document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGMatrix();for(const k of ['a','b','c','d','e','f'])m[k]=n[k];return v.createSVGTransformFromMatrix(m);})($0,$1)")>]
+#endif
+    abstract member createSVGTransformFromMatrix: ?matrix: DOMMatrix2DInit -> SVGTransform
+
+    /// <summary>SVGTransformList.consolidate.</summary>
+    abstract member consolidate: unit -> SVGTransform
+
+/// <summary>SVGAnimatedTransformList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedTransformList =
+    /// <summary>SVGAnimatedTransformList.baseVal.</summary>
+    abstract member baseVal: SVGTransformList with get
+    /// <summary>SVGAnimatedTransformList.animVal.</summary>
+    abstract member animVal: SVGTransformList with get
+
+/// <summary>SVGNumber in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGNumber =
+    /// <summary>SVGNumber.value.</summary>
+    abstract member value: float32 with get, set
+
+/// <summary>SVGLength in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGLength =
+    /// <summary>SVGLength.unitType.</summary>
+    abstract member unitType: uint16 with get
+    /// <summary>SVGLength.value.</summary>
+    abstract member value: float32 with get, set
+    /// <summary>SVGLength.valueInSpecifiedUnits.</summary>
+    abstract member valueInSpecifiedUnits: float32 with get, set
+    /// <summary>SVGLength.valueAsString.</summary>
+    abstract member valueAsString: string with get, set
+    /// <summary>SVGLength.newValueSpecifiedUnits.</summary>
+    abstract member newValueSpecifiedUnits: unitType: uint16 * valueInSpecifiedUnits: float32 -> unit
+    /// <summary>SVGLength.convertToSpecifiedUnits.</summary>
+    abstract member convertToSpecifiedUnits: unitType: uint16 -> unit
+
+/// <summary>SVGAngle in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAngle =
+    /// <summary>SVGAngle.unitType.</summary>
+    abstract member unitType: uint16 with get
+    /// <summary>SVGAngle.value.</summary>
+    abstract member value: float32 with get, set
+    /// <summary>SVGAngle.valueInSpecifiedUnits.</summary>
+    abstract member valueInSpecifiedUnits: float32 with get, set
+    /// <summary>SVGAngle.valueAsString.</summary>
+    abstract member valueAsString: string with get, set
+    /// <summary>SVGAngle.newValueSpecifiedUnits.</summary>
+    abstract member newValueSpecifiedUnits: unitType: uint16 * valueInSpecifiedUnits: float32 -> unit
+    /// <summary>SVGAngle.convertToSpecifiedUnits.</summary>
+    abstract member convertToSpecifiedUnits: unitType: uint16 -> unit
+
+/// <summary>SVGNumberList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGNumberList =
+    /// <summary>SVGNumberList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>SVGNumberList.numberOfItems.</summary>
+    abstract member numberOfItems: uint32 with get
+    /// <summary>SVGNumberList.clear.</summary>
+    abstract member clear: unit -> unit
+    /// <summary>SVGNumberList.initialize.</summary>
+    abstract member initialize: newItem: SVGNumber -> SVGNumber
+    /// <summary>SVGNumberList.getItem.</summary>
+    abstract member getItem: index: uint32 -> SVGNumber
+    /// <summary>SVGNumberList.insertItemBefore.</summary>
+    abstract member insertItemBefore: newItem: SVGNumber * index: uint32 -> SVGNumber
+    /// <summary>SVGNumberList.replaceItem.</summary>
+    abstract member replaceItem: newItem: SVGNumber * index: uint32 -> SVGNumber
+    /// <summary>SVGNumberList.removeItem.</summary>
+    abstract member removeItem: index: uint32 -> SVGNumber
+    /// <summary>SVGNumberList.appendItem.</summary>
+    abstract member appendItem: newItem: SVGNumber -> SVGNumber
+
+    /// <summary>SVGNumberList.setItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1] = $2")>]
+#endif
+    abstract member setItem: index: uint32 * newItem: SVGNumber -> unit
+
+
+/// <summary>SVGLengthList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGLengthList =
+    /// <summary>SVGLengthList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>SVGLengthList.numberOfItems.</summary>
+    abstract member numberOfItems: uint32 with get
+    /// <summary>SVGLengthList.clear.</summary>
+    abstract member clear: unit -> unit
+    /// <summary>SVGLengthList.initialize.</summary>
+    abstract member initialize: newItem: SVGLength -> SVGLength
+    /// <summary>SVGLengthList.getItem.</summary>
+    abstract member getItem: index: uint32 -> SVGLength
+    /// <summary>SVGLengthList.insertItemBefore.</summary>
+    abstract member insertItemBefore: newItem: SVGLength * index: uint32 -> SVGLength
+    /// <summary>SVGLengthList.replaceItem.</summary>
+    abstract member replaceItem: newItem: SVGLength * index: uint32 -> SVGLength
+    /// <summary>SVGLengthList.removeItem.</summary>
+    abstract member removeItem: index: uint32 -> SVGLength
+    /// <summary>SVGLengthList.appendItem.</summary>
+    abstract member appendItem: newItem: SVGLength -> SVGLength
+
+    /// <summary>SVGLengthList.setItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1] = $2")>]
+#endif
+    abstract member setItem: index: uint32 * newItem: SVGLength -> unit
+
+
+/// <summary>SVGPointList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPointList =
+    /// <summary>SVGPointList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>SVGPointList.numberOfItems.</summary>
+    abstract member numberOfItems: uint32 with get
+    /// <summary>SVGPointList.clear.</summary>
+    abstract member clear: unit -> unit
+    /// <summary>SVGPointList.initialize.</summary>
+    abstract member initialize: newItem: SVGPoint -> SVGPoint
+    /// <summary>SVGPointList.getItem.</summary>
+    abstract member getItem: index: uint32 -> SVGPoint
+    /// <summary>SVGPointList.insertItemBefore.</summary>
+    abstract member insertItemBefore: newItem: SVGPoint * index: uint32 -> SVGPoint
+    /// <summary>SVGPointList.replaceItem.</summary>
+    abstract member replaceItem: newItem: SVGPoint * index: uint32 -> SVGPoint
+    /// <summary>SVGPointList.removeItem.</summary>
+    abstract member removeItem: index: uint32 -> SVGPoint
+    /// <summary>SVGPointList.appendItem.</summary>
+    abstract member appendItem: newItem: SVGPoint -> SVGPoint
+
+    /// <summary>SVGPointList.setItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1] = $2")>]
+#endif
+    abstract member setItem: index: uint32 * newItem: SVGPoint -> unit
+
+
+/// <summary>SVGAnimatedNumber in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedNumber =
+    /// <summary>SVGAnimatedNumber.baseVal.</summary>
+    abstract member baseVal: float32 with get, set
+    /// <summary>SVGAnimatedNumber.animVal.</summary>
+    abstract member animVal: float32 with get
+
+/// <summary>SVGAnimatedLength in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedLength =
+    /// <summary>SVGAnimatedLength.baseVal.</summary>
+    abstract member baseVal: SVGLength with get
+    /// <summary>SVGAnimatedLength.animVal.</summary>
+    abstract member animVal: SVGLength with get
+
+/// <summary>SVGAnimatedLengthList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedLengthList =
+    /// <summary>SVGAnimatedLengthList.baseVal.</summary>
+    abstract member baseVal: SVGLengthList with get
+    /// <summary>SVGAnimatedLengthList.animVal.</summary>
+    abstract member animVal: SVGLengthList with get
+
+/// <summary>SVGAnimatedNumberList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedNumberList =
+    /// <summary>SVGAnimatedNumberList.baseVal.</summary>
+    abstract member baseVal: SVGNumberList with get
+    /// <summary>SVGAnimatedNumberList.animVal.</summary>
+    abstract member animVal: SVGNumberList with get
+
+/// <summary>SVGAnimatedEnumeration in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedEnumeration =
+    /// <summary>SVGAnimatedEnumeration.baseVal.</summary>
+    abstract member baseVal: uint16 with get, set
+    /// <summary>SVGAnimatedEnumeration.animVal.</summary>
+    abstract member animVal: uint16 with get
+
+/// <summary>SVGAnimatedString in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedString =
+    /// <summary>SVGAnimatedString.baseVal.</summary>
+    abstract member baseVal: string with get, set
+    /// <summary>SVGAnimatedString.animVal.</summary>
+    abstract member animVal: string with get
+
+/// <summary>SVGAnimatedBoolean in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedBoolean =
+    /// <summary>SVGAnimatedBoolean.baseVal.</summary>
+    abstract member baseVal: bool with get, set
+    /// <summary>SVGAnimatedBoolean.animVal.</summary>
+    abstract member animVal: bool with get
+
+/// <summary>SVGStringList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGStringList =
+    /// <summary>SVGStringList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>SVGStringList.numberOfItems.</summary>
+    abstract member numberOfItems: uint32 with get
+    /// <summary>SVGStringList.clear.</summary>
+    abstract member clear: unit -> unit
+    /// <summary>SVGStringList.initialize.</summary>
+    abstract member initialize: newItem: string -> string
+    /// <summary>SVGStringList.getItem.</summary>
+    abstract member getItem: index: uint32 -> string
+    /// <summary>SVGStringList.insertItemBefore.</summary>
+    abstract member insertItemBefore: newItem: string * index: uint32 -> string
+    /// <summary>SVGStringList.replaceItem.</summary>
+    abstract member replaceItem: newItem: string * index: uint32 -> string
+    /// <summary>SVGStringList.removeItem.</summary>
+    abstract member removeItem: index: uint32 -> string
+    /// <summary>SVGStringList.appendItem.</summary>
+    abstract member appendItem: newItem: string -> string
+
+    /// <summary>SVGStringList.setItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1] = $2")>]
+#endif
+    abstract member setItem: index: uint32 * newItem: string -> unit
+
+
+/// <summary>SVGViewSpec in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGViewSpec =
+    /// <summary>SVGViewSpec.transform.</summary>
+    abstract member transform: SVGTransformList with get
+    /// <summary>SVGViewSpec.viewBoxString.</summary>
+    abstract member viewBoxString: string with get
+    /// <summary>SVGViewSpec.preserveAspectRatioString.</summary>
+    abstract member preserveAspectRatioString: string with get
+    /// <summary>SVGViewSpec.transformString.</summary>
+    abstract member transformString: string with get
+    /// <summary>SVGViewSpec.viewBox.</summary>
+    abstract member viewBox: SVGAnimatedRect with get
+    /// <summary>SVGViewSpec.preserveAspectRatio.</summary>
+    abstract member preserveAspectRatio: SVGAnimatedPreserveAspectRatio with get
+    /// <summary>SVGViewSpec.zoomAndPan.</summary>
+    abstract member zoomAndPan: uint16 with get, set
+
+/// <summary>SVGAnimatedAngle in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGAnimatedAngle =
+    /// <summary>SVGAnimatedAngle.baseVal.</summary>
+    abstract member baseVal: SVGAngle with get
+    /// <summary>SVGAnimatedAngle.animVal.</summary>
+    abstract member animVal: SVGAngle with get
+
+/// <summary>SVGSymbolElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGSymbolElement =
+    inherit SVGGraphicsElement
+    /// <summary>SVGSymbolElement.viewBox.</summary>
+    abstract member viewBox: SVGAnimatedRect with get
+    /// <summary>SVGSymbolElement.preserveAspectRatio.</summary>
+    abstract member preserveAspectRatio: SVGAnimatedPreserveAspectRatio with get
+
+/// <summary>SVGViewElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGViewElement =
+    inherit SVGElement
+    /// <summary>SVGViewElement.viewBox.</summary>
+    abstract member viewBox: SVGAnimatedRect with get
+    /// <summary>SVGViewElement.preserveAspectRatio.</summary>
+    abstract member preserveAspectRatio: SVGAnimatedPreserveAspectRatio with get
+    /// <summary>SVGViewElement.zoomAndPan.</summary>
+    abstract member zoomAndPan: uint16 with get, set
+
+/// <summary>SVGMarkerElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGMarkerElement =
+    inherit SVGElement
+    /// <summary>SVGMarkerElement.refX.</summary>
+    abstract member refX: SVGAnimatedLength with get
+    /// <summary>SVGMarkerElement.refY.</summary>
+    abstract member refY: SVGAnimatedLength with get
+    /// <summary>SVGMarkerElement.markerUnits.</summary>
+    abstract member markerUnits: SVGAnimatedEnumeration with get
+    /// <summary>SVGMarkerElement.markerWidth.</summary>
+    abstract member markerWidth: SVGAnimatedLength with get
+    /// <summary>SVGMarkerElement.markerHeight.</summary>
+    abstract member markerHeight: SVGAnimatedLength with get
+    /// <summary>SVGMarkerElement.orientType.</summary>
+    abstract member orientType: SVGAnimatedEnumeration with get
+    /// <summary>SVGMarkerElement.orientAngle.</summary>
+    abstract member orientAngle: SVGAnimatedAngle with get
+    /// <summary>SVGMarkerElement.orient.</summary>
+    abstract member orient: string with get, set
+    /// <summary>SVGMarkerElement.setOrientToAuto.</summary>
+    abstract member setOrientToAuto: unit -> unit
+    /// <summary>SVGMarkerElement.setOrientToAngle.</summary>
+    abstract member setOrientToAngle: angle: SVGAngle -> unit
+    /// <summary>SVGMarkerElement.viewBox.</summary>
+    abstract member viewBox: SVGAnimatedRect with get
+    /// <summary>SVGMarkerElement.preserveAspectRatio.</summary>
+    abstract member preserveAspectRatio: SVGAnimatedPreserveAspectRatio with get
+
+/// <summary>SVGPatternElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGPatternElement =
+    inherit SVGElement
+    /// <summary>SVGPatternElement.patternUnits.</summary>
+    abstract member patternUnits: SVGAnimatedEnumeration with get
+    /// <summary>SVGPatternElement.patternContentUnits.</summary>
+    abstract member patternContentUnits: SVGAnimatedEnumeration with get
+    /// <summary>SVGPatternElement.patternTransform.</summary>
+    abstract member patternTransform: SVGAnimatedTransformList with get
+    /// <summary>SVGPatternElement.x.</summary>
+    abstract member x: SVGAnimatedLength with get
+    /// <summary>SVGPatternElement.y.</summary>
+    abstract member y: SVGAnimatedLength with get
+    /// <summary>SVGPatternElement.width.</summary>
+    abstract member width: SVGAnimatedLength with get
+    /// <summary>SVGPatternElement.height.</summary>
+    abstract member height: SVGAnimatedLength with get
+    /// <summary>SVGPatternElement.viewBox.</summary>
+    abstract member viewBox: SVGAnimatedRect with get
+    /// <summary>SVGPatternElement.preserveAspectRatio.</summary>
+    abstract member preserveAspectRatio: SVGAnimatedPreserveAspectRatio with get
+    /// <summary>SVGPatternElement.requiredExtensions.</summary>
+    abstract member requiredExtensions: SVGStringList with get
+    /// <summary>SVGPatternElement.systemLanguage.</summary>
+    abstract member systemLanguage: SVGStringList with get
+    /// <summary>SVGPatternElement.href.</summary>
+    abstract member href: SVGAnimatedString with get
+
+/// <summary>SVGTextContentElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTextContentElement =
+    inherit SVGGraphicsElement
+    /// <summary>SVGTextContentElement.textLength.</summary>
+    abstract member textLength: SVGAnimatedLength with get
+    /// <summary>SVGTextContentElement.lengthAdjust.</summary>
+    abstract member lengthAdjust: SVGAnimatedEnumeration with get
+    /// <summary>SVGTextContentElement.getNumberOfChars.</summary>
+    abstract member getNumberOfChars: unit -> int
+    /// <summary>SVGTextContentElement.getComputedTextLength.</summary>
+    abstract member getComputedTextLength: unit -> float32
+    /// <summary>SVGTextContentElement.getSubStringLength.</summary>
+    abstract member getSubStringLength: charnum: uint32 * nchars: uint32 -> float32
+    /// <summary>SVGTextContentElement.getStartPositionOfChar.</summary>
+    abstract member getStartPositionOfChar: charnum: uint32 -> SVGPoint
+    /// <summary>SVGTextContentElement.getEndPositionOfChar.</summary>
+    abstract member getEndPositionOfChar: charnum: uint32 -> SVGPoint
+    /// <summary>SVGTextContentElement.getExtentOfChar.</summary>
+    abstract member getExtentOfChar: charnum: uint32 -> SVGRect
+    /// <summary>SVGTextContentElement.getRotationOfChar.</summary>
+    abstract member getRotationOfChar: charnum: uint32 -> float32
+    /// <summary>SVGTextContentElement.getCharNumAtPosition.</summary>
+    abstract member getCharNumAtPosition: ?point: DOMPointInit -> int
+    /// <summary>SVGTextContentElement.selectSubString.</summary>
+    abstract member selectSubString: charnum: uint32 * nchars: uint32 -> unit
+
+/// <summary>SVGTextPositioningElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SVGTextPositioningElement =
+    inherit SVGTextContentElement
+    /// <summary>SVGTextPositioningElement.x.</summary>
+    abstract member x: SVGAnimatedLengthList with get
+    /// <summary>SVGTextPositioningElement.y.</summary>
+    abstract member y: SVGAnimatedLengthList with get
+    /// <summary>SVGTextPositioningElement.dx.</summary>
+    abstract member dx: SVGAnimatedLengthList with get
+    /// <summary>SVGTextPositioningElement.dy.</summary>
+    abstract member dy: SVGAnimatedLengthList with get
+    /// <summary>SVGTextPositioningElement.rotate.</summary>
+    abstract member rotate: SVGAnimatedNumberList with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -3493,10 +4088,6 @@ and [<AllowNullLiteral>] SVGLineElement =
 and [<AllowNullLiteral>] SVGLinearGradientElement =
     inherit SVGGradientElement
 
-/// <summary>SVGMarkerElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGMarkerElement =
-    inherit SVGElement
-
 /// <summary>SVGMaskElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGMaskElement =
     inherit SVGElement
@@ -3511,18 +4102,6 @@ and [<AllowNullLiteral>] SVGMPathElement =
 
 /// <summary>SVGPathElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGPathElement =
-    inherit SVGGeometryElement
-
-/// <summary>SVGPatternElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGPatternElement =
-    inherit SVGElement
-
-/// <summary>SVGPolygonElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGPolygonElement =
-    inherit SVGGeometryElement
-
-/// <summary>SVGPolylineElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGPolylineElement =
     inherit SVGGeometryElement
 
 /// <summary>SVGRadialGradientElement in the scoped DOM interface model.</summary>
@@ -3541,16 +4120,8 @@ and [<AllowNullLiteral>] SVGScriptElement =
 and [<AllowNullLiteral>] SVGStopElement =
     inherit SVGElement
 
-/// <summary>SVGSVGElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGSVGElement =
-    inherit SVGGraphicsElement
-
 /// <summary>SVGSwitchElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGSwitchElement =
-    inherit SVGGraphicsElement
-
-/// <summary>SVGSymbolElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGSymbolElement =
     inherit SVGGraphicsElement
 
 /// <summary>SVGTextElement in the scoped DOM interface model.</summary>
@@ -3572,10 +4143,6 @@ and [<AllowNullLiteral>] SVGTSpanElement =
 /// <summary>SVGUseElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGUseElement =
     inherit SVGGraphicsElement
-
-/// <summary>SVGViewElement in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SVGViewElement =
-    inherit SVGElement
 
 /// <summary>AnimationEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] AnimationEvent =
@@ -4119,6 +4686,21 @@ and [<AllowNullLiteral; DomDictionary>] DOMPointInit() =
     member val y: float = 0 with get, set
     member val z: float = 0 with get, set
     member val w: float = 1 with get, set
+
+/// <summary>DOMMatrix2DInit in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] DOMMatrix2DInit() =
+    member val a: (float) option = None with get, set
+    member val b: (float) option = None with get, set
+    member val c: (float) option = None with get, set
+    member val d: (float) option = None with get, set
+    member val e: (float) option = None with get, set
+    member val f: (float) option = None with get, set
+    member val m11: (float) option = None with get, set
+    member val m12: (float) option = None with get, set
+    member val m21: (float) option = None with get, set
+    member val m22: (float) option = None with get, set
+    member val m41: (float) option = None with get, set
+    member val m42: (float) option = None with get, set
 
 /// <summary>FocusOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =

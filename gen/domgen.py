@@ -489,6 +489,18 @@ class Generator(ComplexGeneratorMixin):
         self.enums_used = {}
         self.handles = []  # object handle roots
         self.headers = {"HTMLNames.h", "ElementInlines.h", "NodeInlines.h", "Exception.h", "ExceptionOr.h"}
+        self.interface_headers = {}
+        for name, header in world.config.get('interfaceHeaders', {}).items():
+            if name not in world.scope:
+                raise SystemExit(f'{name}: interface header override requires a selected interface')
+            if (not isinstance(header, str) or not header.endswith('.h') or '\\' in header
+                    or pathlib.PurePosixPath(header).is_absolute() or pathlib.PureWindowsPath(header).is_absolute()
+                    or '..' in pathlib.PurePosixPath(header).parts):
+                raise SystemExit(f'{name}: interface header must name a WebCore-relative header')
+            path = world.webcore / header
+            if not path.resolve().is_relative_to(world.webcore.resolve()) or not path.is_file():
+                raise SystemExit(f'{name}: interface header must exist inside WebCore: {header}')
+            self.interface_headers[f'{world.cpp_class(name)}.h'] = header
         excludes = world.config["exclude"]
         self.exclude = set(excludes)
         self.dicts_used = {}  # name -> [(member, Mapped)] in struct order
@@ -500,6 +512,12 @@ class Generator(ComplexGeneratorMixin):
         self.namespace_features = []
         self.const_getters_used = set()
         self.setter_checks_used = set()
+        self.svg_matrix_bindings = set(world.config.get('svgMatrixDictionaryBindings', []))
+        supported_svg_matrix_bindings = {'SVGSVGElement.createSVGTransformFromMatrix', 'SVGTransform.setMatrix', 'SVGTransformList.createSVGTransformFromMatrix'}
+        unsupported_svg_matrix_bindings = self.svg_matrix_bindings - supported_svg_matrix_bindings
+        if unsupported_svg_matrix_bindings:
+            raise SystemExit(f'unsupported SVG matrix dictionary binding: {sorted(unsupported_svg_matrix_bindings)}')
+        self.svg_matrix_bindings_used = set()
         self.tracked_roots = {}
         for root, concrete in world.config.get('trackedHandleRoots', {}).items():
             if root not in world.scope or concrete not in world.scope or world.chain(concrete) != [concrete, root]:
@@ -532,6 +550,9 @@ class Generator(ComplexGeneratorMixin):
         missing_setter_checks = set(self.world.config.get('setterValueChecks', {})) - self.setter_checks_used
         if missing_setter_checks:
             raise SystemExit(f'configured setter checks did not match selected setters: {sorted(missing_setter_checks)}')
+        missing_svg_matrix_bindings = self.svg_matrix_bindings - self.svg_matrix_bindings_used
+        if missing_svg_matrix_bindings:
+            raise SystemExit(f'configured SVG matrix dictionary bindings did not match selected operations: {sorted(missing_svg_matrix_bindings)}')
         self.add_stubs()
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
@@ -940,6 +961,8 @@ class Generator(ComplexGeneratorMixin):
             return bridge["getter"]
         attribute = self.reflect(member, False)
         name = member.attrs.get("ImplementedAs", member.name)
+        if mapped.kind == 'object' and self.world.resolve(member.type).name.startswith('SVGAnimated'):
+            name += 'Animated'
         if "CSSStyleDeclaration" in self.world.chain(interface) and "-" in name:
             name = name.split("-")[0] + "".join(part[:1].upper() + part[1:] for part in name.split("-")[1:])
         if not attribute:
@@ -1132,6 +1155,8 @@ class Generator(ComplexGeneratorMixin):
         bridge = self.world.config.get("attributeBridges", {}).get(f"{interface}.{member.name}")
         if bridge:
             return bridge["setter"].replace("{value}", value)
+        if interface == 'SVGAnimatedString' and member.name == 'baseVal':
+            self.headers.add('TrustedScriptURL.h')
         attribute = self.reflect(member, True)
         if not attribute:
             name = member.attrs.get("ImplementedAs", member.name)
@@ -1256,6 +1281,17 @@ class Generator(ComplexGeneratorMixin):
 
     def finish(self, function, interface, member, arguments, mapped_args, returns, call, call_with):
         """Fills in the function's C parameters and glue body, then records it."""
+        svg_matrix_key = f'{interface}.{member.name}'
+        svg_matrix_binding = svg_matrix_key in self.svg_matrix_bindings
+        if svg_matrix_binding:
+            expected_return = 'undefined' if svg_matrix_key == 'SVGTransform.setMatrix' else 'SVGTransform'
+            if (member.kind != 'operation' or len(arguments) != 1 or len(mapped_args) != 1
+                    or arguments[0].name != 'matrix' or mapped_args[0].kind != 'dict'
+                    or mapped_args[0].interface != 'DOMMatrix2DInit' or mapped_args[0].nullable
+                    or self.world.resolve(member.type).name != expected_return):
+                raise SystemExit(f'{svg_matrix_key}: requires one nonnullable DOMMatrix2DInit matrix argument and its SVG return type')
+            self.svg_matrix_bindings_used.add(svg_matrix_key)
+            self.headers.add('DOMMatrixReadOnly.h')
         if self.world.config.get('interfaceStringInputs', {}).get(function.interface) == 'utf8-lengths':
             function.string_spans = True
         self_type = self.self_param(interface)
@@ -1303,7 +1339,12 @@ class Generator(ComplexGeneratorMixin):
                     prepare.append(f"StringArg a{index} {{ {name} }};")
                 atom = ("AtomString" in argument.attrs or "AtomString" in argument.type.attrs or mapped.atom
                         or f"{interface}.{member.name}" in self.world.config["atomArguments"])
-                if optional_no_default:
+                existing_atom = ('RequiresExistingAtomString' in argument.attrs or 'RequiresExistingAtomString' in argument.type.attrs)
+                if existing_atom and optional_no_default:
+                    passed.append(f'a{index}.string().isNull() ? std::nullopt : std::optional<AtomString> {{ StringView {{ a{index}.string() }}.toExistingAtomString() }}')
+                elif existing_atom:
+                    passed.append(f'StringView {{ a{index}.string() }}.toExistingAtomString()')
+                elif optional_no_default:
                     passed.append(f"a{index}")
                 else:
                     passed.append(f"a{index}.atom()" if atom else f"a{index}.string()")
@@ -1348,6 +1389,12 @@ class Generator(ComplexGeneratorMixin):
                 for field_member, field_mapped in fields:
                     prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped, mapped.interface)]
                 prepare.append("}")
+                if svg_matrix_binding:
+                    prepare += [f'auto matrixValidation{index} = DOMMatrixReadOnly::validateAndFixup(a{index});',
+                                f'if (matrixValidation{index}.hasException())',
+                                f'    return Ranvier::recordException(matrixValidation{index}.releaseException());']
+                    prepare += [f'a{index}.{short} = a{index}.{alias};'
+                                for short, alias in zip('abcdef', ['m11', 'm12', 'm21', 'm22', 'm41', 'm42'])]
                 passed.append(f"std::move(a{index})")
             elif mapped.kind in ("union", "sequence"):
                 self.use_complex(mapped)
@@ -1820,7 +1867,7 @@ class Generator(ComplexGeneratorMixin):
             '#include "RanvierDomGlue.h"',
             "",
         ]
-        lines += [f'#include "{h}"' for h in sorted(self.headers)]
+        lines += [f'#include "{h}"' for h in sorted({self.interface_headers.get(header, header) for header in self.headers})]
         for enum, (_, _, file) in sorted(self.enums_used.items()):
             lines.append(f'#include "JS{pathlib.PurePosixPath(file).stem}.h"')
         lines += ["", RUNTIME, ""]

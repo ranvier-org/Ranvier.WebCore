@@ -1,0 +1,142 @@
+{
+  "status": "private-windows-ABI26-affected-proof-only",
+  "producerVersion": "0.1.0-preview.18",
+  "abiVersion": 26,
+  "svgAssertions": 639,
+  "affectedRawAssertions": 2816,
+  "fullAbiDriver": true,
+  "finalTeardownCases": 42,
+  "preservation": {
+    "baselineSource": "4091b07c5bff99d7acbe91c717165e7f94f40f81",
+    "functionRecords": 1926,
+    "exactNormalizedCppBodies": 1921,
+    "existingAtomLookupConversions": [
+      "ranvier_dom_document_fragment_get_element_by_id",
+      "ranvier_dom_document_get_element_by_id",
+      "ranvier_dom_html_form_element_named_item",
+      "ranvier_dom_html_select_element_named_item",
+      "ranvier_dom_html_collection_named_item"
+    ],
+    "lookupQualification": "These five exact lookup conversions were already exercised by the historical6850 batch and remain unchanged by the later SVG matrix/scalar repairs.",
+    "dictionaries": 21,
+    "containers": 37,
+    "runtimeTypeQueries": 9
+  },
+  "historicalReceipt": "evidence.json",
+  "historicalQualification": "The earlier 6850/466 ABI25 receipt and its logs remain historical. Exact old466 fixture bytes were not retained. The current639 fixture executes every prior case plus alias normalization, atomic errors and finite scalar boundaries; its exact executed snapshot is retained.",
+  "sources": {
+    "gen/domgen.py": "f9f80bb28b11f1f773a1d5174d79b3aab7c74a44ac059e1ba7f988e9185e88dd",
+    "gen/interfaces.py": "08dfffec29d614d5ead7223d3f256b3e01f1669f997b1776aa4c3b512393b823",
+    "gen/dom.json": "da5b7f151c5c7f8bd8604627e21a97d31477fdbe40e46013e8b723a727e69470",
+    "gen/dom-api.json": "9d1e8033542b743baa0b2748cddb8425606a9f2e3ab379085f4747c6ba7b14e5",
+    "gen/Ranvier.Dom.fs": "efe7714ae584b4bfb8246e66f6b496cb3431e31584acb07bca1f28ad316a5cc6",
+    "host/dom/RanvierDomGlue.cpp": "181a6a9390754f224b407f1fd549e89128e687700ed90c4417bcdfab2f54b78f",
+    "host/RanvierWebCoreDom.cpp": "510d9c90513df1e6efa33198b69452ee16e5a9143874e191a5b94ce4230b5872",
+    "host/RanvierWebCoreAbi.cpp": "1694039f84b0b98835e61b9929ecabbb61e1a0d04d82b40ea27de9df520c87f4",
+    "pins.json": "62d05865ff744c17c3651670911290118d23902de6230b6b96400f470c61ecf8",
+    "tests/abi/svg_geometry.py": "b357e1a83e97756d0a6d00038081320f0224927b61fa4cf5bc83b17586eb5be0",
+    "tests/abi/typed_style_values.py": "e369104201f6e719fca0998a4e4c955207b85379cd7e47c0c822d477065f5f32",
+    "tests/abi/custom_properties.py": "2805d0b384d4b79aef7e7207b091461b4909808487756ece0f73b1c2ccbe809e",
+    "tests/abi/Program.fs": "bb6e3965a9ba6a77d98a4b23d57272ed8b09fa98eb9fff876bdf45bb73ea60f8",
+    "scripts/abi_tests.py": "a5b826ead70a1af3352f16fb13270371702acf971329f6000b3e64549f912572"
+  },
+  "executedSvgSnapshot": {
+    "path": "docs/svg-geometry-evidence/svg_geometry.final-executed.py",
+    "sha256": "b357e1a83e97756d0a6d00038081320f0224927b61fa4cf5bc83b17586eb5be0"
+  },
+  "runtime": {
+    "RanvierWebCoreHost.dll": "d51313c20c8b089a29c5887929d0c22aabb2d8013f892f9361078848c4352298",
+    "WebCore.dll": "7346b167f5f484eb6447bc38ce489bd58d6fce00cdcf2cea920749574c9941fb",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "probes": [
+    {
+      "probe": "svg_geometry",
+      "assertions": 639,
+      "log": "docs/svg-geometry-evidence/final-svg_geometry.log",
+      "sha256": "afbaf63ce7abcc019b6818cfb3d203be77de8b71bf6055e1fd3c2c2758f32469",
+      "exitCode": 0
+    },
+    {
+      "probe": "css_transforms",
+      "assertions": 405,
+      "log": "docs/svg-geometry-evidence/final-css_transforms.log",
+      "sha256": "20349d6d499473d15eb25183b581642d77391ddd613ea7da1816157b39441b27",
+      "exitCode": 0
+    },
+    {
+      "probe": "custom_properties",
+      "assertions": 231,
+      "log": "docs/svg-geometry-evidence/final-custom_properties.log",
+      "sha256": "7e25c7f5ed95975f3fec3d89beea44304fc6e27dbbd62b5dbe563de56e8f7325",
+      "exitCode": 0
+    },
+    {
+      "probe": "typed_style_values",
+      "assertions": 190,
+      "log": "docs/svg-geometry-evidence/final-typed_style_values.log",
+      "sha256": "a50a7c426fa6e36bbc5a1ca4b2b47b31ce3a1e934409e017b952e2fdd5d88308",
+      "exitCode": 0
+    },
+    {
+      "probe": "matrix_values",
+      "assertions": 1091,
+      "log": "docs/svg-geometry-evidence/final-matrix_values.log",
+      "sha256": "8cc0373b46ca4afcf2182b2cd6e48ced9982e27cdf98f31dc284df42ea7bf707",
+      "exitCode": 0
+    },
+    {
+      "probe": "geometry_values",
+      "assertions": 260,
+      "log": "docs/svg-geometry-evidence/final-geometry_values.log",
+      "sha256": "adb39f338b0e4ea213f3e94320aa40c138e670a5cb29bacd470f939ed94d0d0e",
+      "exitCode": 0
+    },
+    {
+      "probe": "frames",
+      "log": "docs/svg-geometry-evidence/final-frames.log",
+      "sha256": "2f0b19644c7e65a879d9ce030eb3ceca4b21018c08c63ae732ded91df241f333",
+      "exitCode": 0
+    },
+    {
+      "probe": "teardown",
+      "log": "docs/svg-geometry-evidence/final-teardown.log",
+      "sha256": "ecfd3b6d0783739b1dc0159724941c2ed5693b44801216efcffbcb9e41c50256",
+      "exitCode": 0
+    }
+  ],
+  "browserQualification": "All three dictionary-to-SVGMatrix adapters require finite copied coefficients in measured Chromium156. Native DOMMatrix2DInit remains unrestricted and accepts NaN/Infinity; no global dictionary narrowing is applied. Actual browser SVGMatrix objects produced by overflow may contain Infinity, but the dictionary-copy adapter cannot create these coefficients through restricted property setters.",
+  "unverified": [
+    "shared SVG JIT/NativeAOT/browser fixture acceptance",
+    "nonWindows native platforms",
+    "official packages",
+    "S01/S02/S04 acceptance"
+  ],
+  "browserOracles": [
+    {
+      "path": "docs/svg-geometry-evidence/browser-nonfinite-oracle.json",
+      "sha256": "322a8e429c938902485d678187c414b0eea702c64e28a83570d733194458bd3e"
+    },
+    {
+      "path": "docs/svg-geometry-evidence/browser-matrix-realm-oracle.json",
+      "sha256": "fd1df034caceda0b06b54459d3aa8878f0168902f240a7b9d942c4747d2d0e98"
+    },
+    {
+      "path": "docs/svg-geometry-evidence/browser-matrix-input-oracle.json",
+      "sha256": "0dc42d3027ba47f4251a433bf8b92331ac02f73615bf9bc1d0abd97cc38942ef"
+    }
+  ],
+  "checks": {
+    "generatorTests": 73,
+    "repositoryPythonTests": 14,
+    "exactGeneration": {
+      "interfaces": 189,
+      "functions": 2182,
+      "handleRoots": 49,
+      "dictionaries": 22,
+      "stubs": 0
+    },
+    "pinnedFantomas": "8.0.5; content exact after documented native CRLF normalization"
+  },
+  "exitCodeProvenance": "Captured subprocess results asserted zero before the successful finalizer wrote this receipt; no rerun inferred."
+}

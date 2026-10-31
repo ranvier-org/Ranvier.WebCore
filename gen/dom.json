@@ -98,6 +98,11 @@
     },
     "flattenUnionTypedefs": ["CSSPerspectiveValue"],
     "finiteUnionInputs": ["DoubleOrCSSNumericValue"],
+    "svgMatrixDictionaryBindings": [
+        "SVGSVGElement.createSVGTransformFromMatrix",
+        "SVGTransform.setMatrix",
+        "SVGTransformList.createSVGTransformFromMatrix"
+    ],
     "browserMatrixFlagAdapters": [
         "CSSTransformComponent.toMatrix",
         "CSSTransformValue.toMatrix"
@@ -161,7 +166,17 @@
         "DOMMatrix": "Document"
     },
     "finiteNumberInputs": [
-        "CSSUnitValue"
+        "CSSUnitValue",
+        "SVGSVGElement",
+        "SVGGeometryElement",
+        "SVGRect",
+        "SVGMatrix",
+        "SVGPoint",
+        "SVGTransform",
+        "SVGNumber",
+        "SVGLength",
+        "SVGAngle",
+        "SVGAnimatedNumber"
     ],
     "interfaces": [
         "Node",
@@ -316,7 +331,43 @@
         "KeyboardEvent",
         "FocusEvent",
         "InputEvent",
-        "CompositionEvent"
+        "CompositionEvent",
+        "SVGGraphicsElement",
+        "SVGGeometryElement",
+        "SVGPolygonElement",
+        "SVGPolylineElement",
+        "SVGSVGElement",
+        "SVGRect",
+        "SVGMatrix",
+        "SVGPoint",
+        "SVGAnimatedRect",
+        "SVGPreserveAspectRatio",
+        "SVGAnimatedPreserveAspectRatio",
+        "SVGTransform",
+        "SVGTransformList",
+        "SVGAnimatedTransformList",
+        "SVGNumber",
+        "SVGLength",
+        "SVGAngle",
+        "SVGNumberList",
+        "SVGLengthList",
+        "SVGPointList",
+        "SVGAnimatedNumber",
+        "SVGAnimatedLength",
+        "SVGAnimatedLengthList",
+        "SVGAnimatedNumberList",
+        "SVGAnimatedEnumeration",
+        "SVGAnimatedString",
+        "SVGAnimatedBoolean",
+        "SVGStringList",
+        "SVGViewSpec",
+        "SVGAnimatedAngle",
+        "SVGSymbolElement",
+        "SVGViewElement",
+        "SVGMarkerElement",
+        "SVGPatternElement",
+        "SVGTextContentElement",
+        "SVGTextPositioningElement"
     ],
     "skipDirectories": [
         "Modules/",
@@ -406,6 +457,18 @@
         "DOMMatrixReadOnly",
         "CSSTransformComponent"
     ],
+    "interfaceHeaders": {
+        "SVGAnimatedBoolean": "svg/properties/SVGAnimatedPropertyImpl.h",
+        "SVGAnimatedNumber": "svg/properties/SVGAnimatedPropertyImpl.h",
+        "SVGAnimatedEnumeration": "svg/properties/SVGAnimatedPropertyImpl.h",
+        "SVGAnimatedAngle": "svg/properties/SVGAnimatedPropertyImpl.h",
+        "SVGAnimatedLength": "svg/properties/SVGAnimatedPropertyImpl.h",
+        "SVGAnimatedRect": "svg/properties/SVGAnimatedPropertyImpl.h",
+        "SVGAnimatedPreserveAspectRatio": "svg/properties/SVGAnimatedPropertyImpl.h",
+        "SVGAnimatedLengthList": "svg/properties/SVGAnimatedPropertyImpl.h",
+        "SVGAnimatedNumberList": "svg/properties/SVGAnimatedPropertyImpl.h",
+        "SVGAnimatedTransformList": "svg/properties/SVGAnimatedPropertyImpl.h"
+    },
     "nodeCastTags": {
         "HTMLModElement": [
             "del",

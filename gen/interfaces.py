@@ -39,6 +39,7 @@ class InterfaceEmitter:
         self.attribute_access = {}
         self.enums = set()
         self.matrix_flag_adapters_used = set()
+        self.svg_matrix_dictionary_adapters_used = set()
         self.sources = {self.world.public_name(name): name for name in self.world.contract_types}
         self.names = list(self.sources)
 
@@ -166,7 +167,7 @@ class InterfaceEmitter:
             return []
         needs_adapter = self.complex(member)
         matrix_adapter = f'{owner}.{member.name}'
-        lines = ([''] if needs_adapter or anonymous_property or matrix_adapter in self.world.config.get('browserMatrixFlagAdapters', []) else []) + [f'    /// <summary>{owner}.{member.name}.</summary>']
+        lines = ([''] if needs_adapter or anonymous_property or matrix_adapter in self.world.config.get('browserMatrixFlagAdapters', []) or matrix_adapter in self.generator.svg_matrix_bindings else []) + [f'    /// <summary>{owner}.{member.name}.</summary>']
         if member.kind == 'attribute':
             functions = self.supporting_functions(owner, member)
             getter = any(function.kind == 'getter' for function in functions)
@@ -203,6 +204,13 @@ class InterfaceEmitter:
             expression = self.browser_property_expression(owner, member)
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
         matrix_adapter = f'{owner}.{member.name}'
+        if matrix_adapter in self.generator.svg_matrix_bindings:
+            expression = ("((v,d)=>{const n=globalThis.DOMMatrix.fromMatrix(d??{});"
+                          "const m=globalThis.document.createElementNS('http://www.w3.org/2000/svg','svg').createSVGMatrix();"
+                          "for(const k of ['a','b','c','d','e','f'])m[k]=n[k];"
+                          f"return v.{member.name}(m);}})($0,$1)")
+            lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
+            self.svg_matrix_dictionary_adapters_used.add(matrix_adapter)
         if matrix_adapter in self.world.config.get('browserMatrixFlagAdapters', []):
             if member.kind != 'operation' or member.name != 'toMatrix' or needs_adapter or anonymous_property or member.arguments or self.world.resolve(member.type).name != 'DOMMatrix':
                 raise SystemExit(f'{matrix_adapter}: matrix flag adapter requires a plain zero-argument DOMMatrix operation')
@@ -225,7 +233,7 @@ class InterfaceEmitter:
         if needs_adapter:
             lines += ['#endif']
             self.adapters.append((owner, member))
-        if anonymous_property:
+        if anonymous_property or matrix_adapter in self.generator.svg_matrix_bindings:
             lines += ['']
         return lines
 
@@ -498,6 +506,9 @@ class InterfaceEmitter:
         missing_matrix_adapters = set(self.world.config.get('browserMatrixFlagAdapters', [])) - self.matrix_flag_adapters_used
         if missing_matrix_adapters:
             raise SystemExit(f'configured matrix flag adapters did not match selected operations: {sorted(missing_matrix_adapters)}')
+        missing_svg_matrix_adapters = self.generator.svg_matrix_bindings - self.svg_matrix_dictionary_adapters_used
+        if missing_svg_matrix_adapters:
+            raise SystemExit(f'configured SVG matrix dictionary adapters did not match selected operations: {sorted(missing_svg_matrix_adapters)}')
         return '\n'.join(lines) + '\n'
 
 

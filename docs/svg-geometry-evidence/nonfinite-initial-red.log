@@ -1,0 +1,20 @@
+rtk : [rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+At line:1 char:121
++ ... ite-red.py; rtk proxy C:/Python314/python.exe -I -X utf8 tests/abi/sv ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([rtk] /!\ No ho...c token savings:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Traceback (most recent call last):
+  File "C:\wk\native-svg-geometry\tests\abi\svg_geometry.py", line 345, in <module>
+    verify(parser.parse_args().native_directory)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-geometry\tests\abi\svg_geometry.py", line 164, in verify
+    exception('rv_dom_svg_' + kind + '_set_' + field, [pointer, scalar], [target, invalid], 'TypeError')
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-geometry\tests\abi\svg_geometry.py", line 138, in exception
+    expect(status == -3, name + ': engine exception ' + str(status))
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-geometry\tests\abi\svg_geometry.py", line 38, in expect
+    raise AssertionError(label)
+AssertionError: rv_dom_svg_number_set_value: engine exception 0

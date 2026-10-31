@@ -1,0 +1,661 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "matrixConstructor": "SVGMatrix",
+  "ctmConstructor": "SVGMatrix",
+  "pointConstructor": "SVGPoint",
+  "rows": [
+    {
+      "name": "empty",
+      "inputMode": "dictionary",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "empty",
+      "inputMode": "dictionary",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "empty",
+      "inputMode": "dictionary",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "empty",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "empty",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "empty",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "empty",
+      "inputMode": "SVGMatrix",
+      "operation": "rootFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "empty",
+      "inputMode": "SVGMatrix",
+      "operation": "setMatrix",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "empty",
+      "inputMode": "SVGMatrix",
+      "operation": "listFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "aliases",
+      "inputMode": "dictionary",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "aliases",
+      "inputMode": "dictionary",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "aliases",
+      "inputMode": "dictionary",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "aliases",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "aliases",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "aliases",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "aliases",
+      "inputMode": "SVGMatrix",
+      "operation": "rootFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "name": "aliases",
+      "inputMode": "SVGMatrix",
+      "operation": "setMatrix",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "name": "aliases",
+      "inputMode": "SVGMatrix",
+      "operation": "listFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "name": "short",
+      "inputMode": "dictionary",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "short",
+      "inputMode": "dictionary",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "short",
+      "inputMode": "dictionary",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "short",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "short",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "short",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "short",
+      "inputMode": "SVGMatrix",
+      "operation": "rootFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "name": "short",
+      "inputMode": "SVGMatrix",
+      "operation": "setMatrix",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "name": "short",
+      "inputMode": "SVGMatrix",
+      "operation": "listFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "name": "consistent",
+      "inputMode": "dictionary",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "consistent",
+      "inputMode": "dictionary",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "consistent",
+      "inputMode": "dictionary",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "consistent",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "consistent",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "consistent",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "consistent",
+      "inputMode": "SVGMatrix",
+      "operation": "rootFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        2,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "consistent",
+      "inputMode": "SVGMatrix",
+      "operation": "setMatrix",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        2,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "consistent",
+      "inputMode": "SVGMatrix",
+      "operation": "listFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        2,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "inconsistent",
+      "inputMode": "dictionary",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "inconsistent",
+      "inputMode": "dictionary",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "inconsistent",
+      "inputMode": "dictionary",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "inconsistent",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'fromMatrix' on 'DOMMatrix': Property mismatch on matrix initialization.",
+      "matrixAfter": null
+    },
+    {
+      "name": "inconsistent",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'fromMatrix' on 'DOMMatrix': Property mismatch on matrix initialization.",
+      "matrixAfter": null
+    },
+    {
+      "name": "inconsistent",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'fromMatrix' on 'DOMMatrix': Property mismatch on matrix initialization.",
+      "matrixAfter": null
+    },
+    {
+      "name": "inconsistent",
+      "inputMode": "SVGMatrix",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'fromMatrix' on 'DOMMatrix': Property mismatch on matrix initialization.",
+      "matrixAfter": null
+    },
+    {
+      "name": "inconsistent",
+      "inputMode": "SVGMatrix",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'fromMatrix' on 'DOMMatrix': Property mismatch on matrix initialization.",
+      "matrixAfter": null
+    },
+    {
+      "name": "inconsistent",
+      "inputMode": "SVGMatrix",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'fromMatrix' on 'DOMMatrix': Property mismatch on matrix initialization.",
+      "matrixAfter": null
+    },
+    {
+      "name": "null",
+      "inputMode": "dictionary",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "null",
+      "inputMode": "dictionary",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "null",
+      "inputMode": "dictionary",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "null",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "rootFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGSVGElement': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "null",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "setMatrix",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'setMatrix' on 'SVGTransform': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": [
+        1,
+        0,
+        0,
+        1,
+        11,
+        12
+      ]
+    },
+    {
+      "name": "null",
+      "inputMode": "DOMMatrix.fromMatrix",
+      "operation": "listFactory",
+      "status": "error",
+      "error": "TypeError",
+      "message": "Failed to execute 'createSVGTransformFromMatrix' on 'SVGTransformList': parameter 1 is not of type 'SVGMatrix'.",
+      "matrixAfter": null
+    },
+    {
+      "name": "null",
+      "inputMode": "SVGMatrix",
+      "operation": "rootFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "null",
+      "inputMode": "SVGMatrix",
+      "operation": "setMatrix",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "null",
+      "inputMode": "SVGMatrix",
+      "operation": "listFactory",
+      "status": "ok",
+      "type": 1,
+      "matrix": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}
