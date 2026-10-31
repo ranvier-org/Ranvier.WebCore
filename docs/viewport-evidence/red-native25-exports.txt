@@ -1,0 +1,9 @@
+runtime RanvierWebCoreHost.dll sha256 f4866506fb558e1cdae4f9c00110c6b0276b363d3eddf22dd158aa8c4de6e882
+rv_abi_version 33
+has viewport 0 has input-state 0
+rv_host_window_event_target ABSENT
+rv_host_window_metrics ABSENT
+rv_host_set_visible ABSENT
+rv_host_match_media ABSENT
+rv_media_query_matches ABSENT
+rv_media_query_media ABSENT
