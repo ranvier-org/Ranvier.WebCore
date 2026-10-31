@@ -1,0 +1,37 @@
+diff --git a/Source/WebCore/loader/FrameLoader.cpp b/Source/WebCore/loader/FrameLoader.cpp
+index 5433d2710e..6336245c19 100644
+--- a/Source/WebCore/loader/FrameLoader.cpp
++++ b/Source/WebCore/loader/FrameLoader.cpp
+@@ -578,6 +578,9 @@ void FrameLoader::submitForm(Ref<FormSubmission>&& submission)
+     if (!protect(document->contentSecurityPolicy())->allowFormAction(formAction, document->currentParserSourcePosition()))
+         return;
+ 
++    if (!m_client->shouldScheduleFormSubmission(submission.get()))
++        return;
++
+     RefPtr targetFrame = findFrameForNavigation(submission->target(), &submission->state()->sourceDocument());
+     if (!targetFrame) {
+         if (!LocalDOMWindow::allowPopUp(frame) && !UserGestureIndicator::processingUserGesture())
+diff --git a/Source/WebCore/loader/LocalFrameLoaderClient.h b/Source/WebCore/loader/LocalFrameLoaderClient.h
+index 8d1d5f840f..e332e60522 100644
+--- a/Source/WebCore/loader/LocalFrameLoaderClient.h
++++ b/Source/WebCore/loader/LocalFrameLoaderClient.h
+@@ -80,6 +80,7 @@ class DOMWindowExtension;
+ class DOMWrapperWorld;
+ class DocumentLoader;
+ class Element;
++class FormSubmission;
+ class FrameLoader;
+ class FrameNetworkingContext;
+ class HTMLFormElement;
+@@ -395,6 +396,10 @@ public:
+ 
+     virtual bool shouldSuppressLayoutMilestones() const { return false; }
+ 
++    // Returning false hands the submission to the client, and the frame loader skips scheduling it. The submit and formdata
++    // events and interactive validation have already run.
++    virtual bool shouldScheduleFormSubmission(FormSubmission&) { return true; }
++
+ protected:
+     explicit LocalFrameLoaderClient(FrameLoader&);
+ 

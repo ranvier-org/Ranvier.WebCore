@@ -1,0 +1,66 @@
+{
+  "patches": {
+    "0035-caret-position-text-control-shadow-roots.patch": {
+      "Source/WebCore/dom/Document.cpp": [
+        "-        if ((!anchorNode->isInShadowTree() && !options.shadowRoots.size()) || (anchorNode->isInShadowTree() && options.shadowRoots.contains(Ref(anchorNode->treeScope().rootNode()))))",
+        "+        if (!anchorNode->isInShadowTree() || options.shadowRoots.contains(Ref(anchorNode->treeScope().rootNode())))"
+      ]
+    },
+    "0037-frame-loader-client-form-submission-hook.patch": {
+      "Source/WebCore/loader/FrameLoader.cpp": [
+        "+    if (!m_client->shouldScheduleFormSubmission(submission.get()))",
+        "+        return;",
+        "+"
+      ],
+      "Source/WebCore/loader/LocalFrameLoaderClient.h": [
+        "+class FormSubmission;",
+        "+    // Returning false hands the submission to the client, and the frame loader skips scheduling it. The submit and formdata",
+        "+    // events and interactive validation have already run.",
+        "+    virtual bool shouldScheduleFormSubmission(FormSubmission&) { return true; }",
+        "+"
+      ]
+    }
+  },
+  "overlay": {},
+  "recompiledUnits": {
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-23.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/001-UnifiedSource-JSBindings-23.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-5.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/002-UnifiedSource-dom-5.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-7.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/003-UnifiedSource-dom-7.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-9.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/004-UnifiedSource-dom-9.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-history-1.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/005-UnifiedSource-history-1.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-10.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/006-UnifiedSource-html-10.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-12.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/007-UnifiedSource-html-12.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/008-UnifiedSource-html-16.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-19.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/009-UnifiedSource-html-19.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-35.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/010-UnifiedSource-html-35.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-4.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/011-UnifiedSource-html-4.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-6.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/012-UnifiedSource-html-6.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-8.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/013-UnifiedSource-html-8.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-1.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/014-UnifiedSource-loader-1.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-11.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/015-UnifiedSource-loader-11.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-13.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/016-UnifiedSource-loader-13.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-2.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/017-UnifiedSource-loader-2.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-3.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/018-UnifiedSource-loader-3.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-4.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/019-UnifiedSource-loader-4.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-5.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/020-UnifiedSource-loader-5.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-6.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/021-UnifiedSource-loader-6.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-7.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/022-UnifiedSource-loader-7.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-loader-9.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/023-UnifiedSource-loader-9.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-1.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/024-UnifiedSource-page-1.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-10.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/025-UnifiedSource-page-10.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-18.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/026-UnifiedSource-page-18.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-2.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/027-UnifiedSource-page-2.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-5.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/028-UnifiedSource-page-5.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-6.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/029-UnifiedSource-page-6.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-8.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/030-UnifiedSource-page-8.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-style-6.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/031-UnifiedSource-style-6.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/page/WebKitNamespace.cpp.obj": "C:/wk/native-formsubmit/artifacts/native34-candidate-10/032-WebKitNamespace.cpp.obj"
+  },
+  "dropped0036UnitsBorrowed": [
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-editing-9.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-24.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-page-9.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-14.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-svg-17.cpp.obj"
+  ]
+}

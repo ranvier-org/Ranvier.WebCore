@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "group": "D14 form submission",
+  "status": "green (private Windows x64 slim; not accepted)",
+  "issue": "https://github.com/ranvier-org/Ranvier.WebCore/issues/23",
+  "sourceHead": "7c92f3c7802a21dfe8c946062662cd0490f81a19",
+  "nativeVersion": "0.1.0-preview.34",
+  "abi": 42,
+  "stackedOn": "H13 3c7e8d4 (Native33/ABI41, U+0000 fix), G09 fb87eb0 / a215ef9, H11 6610b57",
+  "sourcePatches": {
+    "applied": [
+      "0035",
+      "0037"
+    ],
+    "unused": [
+      "0036"
+    ],
+    "receipt": "source-patches.json",
+    "recompiledUnits": 32
+  },
+  "runtime": {
+    "receipt": "runtime-receipt.json",
+    "sha256": {
+      "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+      "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+      "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+      "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+      "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+      "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+      "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+      "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+      "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+      "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+      "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+      "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+      "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+      "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+      "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+      "RanvierWebCoreHost.dll": "1b15eff6f291c1ad50eb786ae17a0e67a6333bfef1d3485a4728cd7956570a82",
+      "RanvierWebCoreHost.lib": "e145aa5ae09c99d2ee031293e2ea1c6342f372f63e04fd020873093e6f68f71b",
+      "RanvierWebCoreHost.pdb": "23d0d5174b6eafa0ff022a074141efd09f50f304c74ba51b86257ee73cd02cdf",
+      "WebCore.dll": "c33f413b560c2d71f38f691c7ac54f97819b45440027c3207cf1493075918dcb",
+      "WebCore.lib": "e3533fb13a6cd1621059268529bee64c2552e046dc6c2e647393624497d5f8d1",
+      "WebCore.pdb": "b9f6329079760702c3ad0e1b3f6c059c62a921cf888762c3a4ee9bfc1d8f2159",
+      "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+    }
+  },
+  "red": {
+    "record": "red-unload-candidate4.json",
+    "finding": "pagehide and unload fire on the first submission, and later submit and formdata events reach no listener"
+  },
+  "green": {
+    "record": "green-unload-candidate8.json",
+    "finding": "no unload events; both forms deliver their events"
+  },
+  "batch": {
+    "results": "batch-results.json",
+    "rawAssertions": 71139,
+    "teardownProbes": 84,
+    "probes": 49,
+    "allExit0": true,
+    "formSubmission": 418
+  },
+  "baselineComparison": {
+    "baseline": "C:\\wk\\native-url\\artifacts\\native33-batch-2",
+    "changes": [
+      {
+        "probe": "capabilities",
+        "assertions": [
+          null,
+          null
+        ],
+        "logLines": [
+          "CAPABILITIES_NATIVE_CHECKS=7480"
+        ]
+      },
+      {
+        "probe": "form_submission",
+        "change": "new",
+        "assertions": 418
+      },
+      {
+        "probe": "frames",
+        "assertions": [
+          null,
+          null
+        ],
+        "logLines": [
+          "RANVIER_FSHARP_PAINT {\"after1\":null,\"after2\":null,\"dirty1\":{\"Item1\":300,\"Item2\":200,\"Item3\":40,\"Item4\":40},\"dirty2\":{\"Item1\":300,\"Item2\":200,\"Item3\":40,\"Item4\":40},\"equal1\":true,\"equal2\":true,\"fullMs\":4.5759099999999995,\"rectMs\":0.026305000000000002,\"size2\":[2560,1440]}",
+          "RANVIER_FSHARP_ABI PASS {\"changed\":{\"frame0to1\":42728,\"frame1to2\":14835},\"events\":{\"afterRemoval\":[],\"cancellation\":{\"cancelable\":true,\"log\":[\"button:2\",\"panel-sees-prevented:True\",\"button:2\",\"panel-sees-prevented:False\"],\"notCancelable\":false},\"changedByReentry\":4263,\"checkbox\":{\"cancelledClick\":true,\"cancelledLog\":[\"checkbox-click:2\"],\"clicked\":true,\"clickedAfterRemoval\":false,\"clickedLog\":[\"checkbox-change:2\"],\"initial\":false},\"failure\":{\"log\":[\"panel-after-throw:3\"],\"raised\":[\"handler failure from F#\"]},\"handlerThreads\":[2],\"nestedFailure\":{\"log\":[\"outer:3\",\"caught-nested\"],\"outerSucceeded\":true},\"offThread\":{\"dispatchStatus\":-2,\"guardedLog\":[\"guarded:2\"],\"removeStatus\":-2},\"propagation\":{\"log\":[\"panel-capture:1\",\"button:2\",\"panel-bubble:3\",\"body-bubble:3\"],\"prevented\":false},\"reentry\":[\"outer-start:3\",\"inner-body:2\",\"outer-end\"],\"removalDuringDispatch\":{\"first\":[\"first:2\"],\"second\":[\"first:2\"]},\"stopPropagation\":[\"button:2\",\"button-second:2\"],\"vmGuardInHandlers\":[1]},\"frame2GreenPixels\":13838,\"managedPid\":76116,\"managedThread\":2,\"nativePid\":76116,\"opaque\":{\"frame0\":230400,\"frame1\":230400,\"frame2\":230400},\"os\":\"Microsoft Windows 10.0.26200\",\"pixel40_40\":{\"frame0\":[20,60,80],\"frame1\":[160,40,30]},\"runtime\":\".NET 10.0.14\",\"scriptsEnabled\":0,\"vmEntryDisallowed\":1,\"wrongThreadStatus\":-2}"
+        ]
+      },
+      {
+        "probe": "teardown",
+        "assertions": [
+          null,
+          null
+        ],
+        "logLines": [
+          "RANVIER_TEARDOWN_PROBES [{\"probe\":\"control\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"document title\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused textarea\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused button\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, value written\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, container removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input with a value attribute, container removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"unfocused input, container removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source, removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source, removed\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past document replacement\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"control\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"document title\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused textarea\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused button\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, value written\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, container removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input with a value attribute, container removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"unfocused input, container removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source, removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":0,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source, removed\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past host destroy\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past document replacement\",\"cycleBeforeDisposal\":\"single\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"control\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"document title\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused textarea\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused button\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, value written\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input, container removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input with a value attribute, container removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"unfocused input, container removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":0,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":0,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"focused input removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a data source, removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"image with a missing file source, removed\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past host destroy\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"SVG paint handles retained past document replacement\",\"cycleBeforeDisposal\":\"T\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, node released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, node released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, dataset released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, dataset released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, style map released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, style map released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, tree walker released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, tree walker released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":3,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, node iterator released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":2,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, node iterator released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":3,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, window target released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, window target released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, media query list released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, media query list released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, scrolled document released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":0,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, scrolled document released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":2,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, form controls collection released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, form controls collection released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, options collection released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, options collection released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, form data released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, form data released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, submit event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, submit event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, open modal dialog released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, open modal dialog released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, toggle event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, toggle event released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, blob slice released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, blob slice released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, caret position released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":0,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, caret position released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, url values released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, url values released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"div, url pattern result released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":-1,\"targetRefsAfterDisposal\":-1,\"documentRefsAfterCycle\":-1,\"targetRefsAfterCycle\":-1,\"documentRefsAfterLongCycle\":-1,\"targetRefsAfterLongCycle\":-1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1},{\"probe\":\"removed div, url pattern result released after host destroy\",\"cycleBeforeDisposal\":\"none\",\"documentRefsAfterDisposal\":1,\"targetRefsAfterDisposal\":1,\"documentRefsAfterCycle\":1,\"targetRefsAfterCycle\":1,\"documentRefsAfterLongCycle\":1,\"targetRefsAfterLongCycle\":1,\"documentRefsAfterCollection\":-1,\"targetRefsAfterCollection\":-1}]"
+        ]
+      }
+    ],
+    "catalogue": {
+      "description": "catalogue regenerated: +1 entries",
+      "entries": [
+        "form-submission"
+      ]
+    }
+  },
+  "characterSet": [
+    {
+      "runtime": "C:/wk/native-url/artifacts/native33-frozen-2/runtimes/win-x64/native",
+      "hostSha256": "de84b58c538ed8b26e09f6d052739318015a77cf13012469f5ec23d934beca27",
+      "characterSet": {
+        "none": "windows-1252",
+        "meta-utf-8": "windows-1252",
+        "meta-windows-1252": "windows-1252"
+      }
+    },
+    {
+      "runtime": "artifacts/native34-frozen-2/runtimes/win-x64/native",
+      "hostSha256": "1b15eff6f291c1ad50eb786ae17a0e67a6333bfef1d3485a4728cd7956570a82",
+      "characterSet": {
+        "none": "UTF-8",
+        "meta-utf-8": "UTF-8",
+        "meta-windows-1252": "UTF-8"
+      }
+    }
+  ],
+  "repeats": {
+    "log": "form-submission-repeats-native34.log",
+    "runs": 30,
+    "pass": 30,
+    "fail": 0
+  },
+  "qualified": [
+    {
+      "case": "submitter overrides",
+      "kind": "submissions",
+      "chromium": [
+        {
+          "method": "POST",
+          "url": "https://app.test/other?k=1",
+          "contentType": "text/plain",
+          "body": "q=a+b%26c%3Dd&cb=on&o=v&outside=o",
+          "newWindow": false
+        },
+        {
+          "method": "POST",
+          "url": "https://app.test/other?k=1",
+          "contentType": "text/plain",
+          "body": "q=a+b%26c%3Dd&cb=on&o=v&outside=o",
+          "newWindow": false
+        }
+      ],
+      "native": [
+        {
+          "method": "POST",
+          "url": "https://app.test/other?k=1",
+          "contentType": "text/plain",
+          "body": "q=a b&c=d\r\ncb=on\r\no=v\r\noutside=o\r\n",
+          "newWindow": false
+        },
+        {
+          "method": "POST",
+          "url": "https://app.test/other?k=1",
+          "contentType": "text/plain",
+          "body": "q=a b&c=d\r\ncb=on\r\no=v\r\noutside=o\r\n",
+          "newWindow": false
+        }
+      ],
+      "qualification": "HTML text/plain encoding: each entry is name=value followed by CRLF, with no percent-encoding. WebCore follows it. The Chromium 156 record shows the Playwright request body percent-encoded and joined with \"&\", so this difference is measured and qualified, not a WebCore defect."
+    }
+  ],
+  "abiConstantSweep": [
+    "host/RanvierWebCoreAbi.cpp:1248:int32_t rv_abi_version(void) { return 42; }",
+    "host/RanvierWebCoreAbi.h:2: * Ranvier native WebCore C ABI, version 42.",
+    "tests/abi/Program.fs:51:    require (rv_abi_version () = 42) \"ABI version 42\"",
+    "tests/abi/binary_values.py:20:ABI = 42",
+    "tests/abi/capabilities.py:67:        expect(number(host, 4, b'unknown-future-facility', ctypes.byref(sentinel)) == -9 and sentinel.value == 42, 'Capability assertion failed')",
+    "tests/abi/capabilities.py:71:        expect(length.value == 42 and buffer.value == b'untouched', 'Capability assertion failed')",
+    "tests/abi/capabilities.py:115:        expect(number(host, 1, b'compositing-mode', ctypes.byref(old)) == -9 and old.value == 42, 'Capability assertion failed')",
+    "tests/abi/capabilities.py:119:            expect(sentinel.value == 42, 'Capability assertion failed')",
+    "tests/abi/capabilities.py:152:        expect(fact(host,0,b'input',0,ctypes.byref(stale)) == -9 and stale.value == 42,'Destroyed host is rejected before dereference')",
+    "tests/abi/caret_hit.py:21:ABI = 42",
+    "tests/abi/computed_style.py:110:        expect(query(detached, element, None, -1, ctypes.byref(result)) == -9 and result.value == 42,",
+    "tests/abi/computed_style.py:121:            expect(status == expected and result.value == 42, f'invalid context/input preserves output: {status}')",
+    "tests/abi/css_supports.py:96:            expect(result.value == 42, 'condition error preserves output')",
+    "tests/abi/css_supports.py:110:            expect(result.value == 42, 'declaration error preserves output')",
+    "tests/abi/custom_properties.py:53:        expect(bind('rv_abi_version', unsigned, [])() == 42, 'Native34 ABI42 registration transport')",
+    "tests/abi/dialog_popover.py:19:ABI = 42",
+    "tests/abi/event_construction.py:59:    expect(bind('rv_abi_version', i32, [])() == 42, 'ABI version 42')",
+    "tests/abi/event_construction.py:131:        expect(screen_x(mouse, ctypes.byref(sx)) == OK and sx.value == 40, 'screenX')",
+    "tests/abi/event_construction.py:148:        expect(detail_json(base, None, 0, ctypes.byref(length)) == UNSUPPORTED and length.value == 42, 'non-custom detail unsupported, length untouched')",
+    "tests/abi/focus_input.py:59:    expect(bind('rv_abi_version', i32, [])() == 42, 'ABI version 42')",
+    "tests/abi/form_collections.py:18:ABI = 42",
+    "tests/abi/form_submission.py:19:ABI = 42",
+    "tests/abi/fragment_rectangles.py:123:        expect(element_rects(document, ctypes.byref(result)) == -11 and result.value == 42, 'wrong element receiver preserves output')",
+    "tests/abi/geometry_values.py:169:        expect(read('point', retained_pointer, 'y') == 42.25, 'point remains mutable after quad release')",
+    "tests/abi/svg_view_selection.py:41:        expect(select(host,b'zoom',ctypes.byref(sentinel)) == -9 and sentinel.value == 42,'HTML document rejected before mutation')",
+    "tests/abi/svg_view_selection.py:135:            expect(sentinel.value == 42,'Invalid input preserves selected output')",
+    "tests/abi/svg_view_selection.py:150:        expect(select(host,b'zoom',ctypes.byref(sentinel)) == -9 and sentinel.value == 42,'Queries use current document after replacement')",
+    "tests/abi/svg_view_selection.py:157:        expect(select(expired,b'zoom',ctypes.byref(sentinel)) == -9 and sentinel.value == 42,'Expired host rejects before dereference and preserves output')",
+    "tests/abi/typed_style_values.py:93:        expect(bind('rv_abi_version', unsigned, [])() == 42, 'Native34 ABI42 cohort')",
+    "tests/abi/url_values.py:17:ABI = 42",
+    "tests/abi/viewport_events.py:22:ABI = 42",
+    "tests/abi/viewport_scroll.py:20:ABI = 42"
+  ],
+  "measuredVariation": {
+    "record": "teardown-image-missing-file-reruns.json",
+    "finding": "the batch teardown run read references 0 and 1 after one cycle for \"image with a missing file source\"; six reruns of the same driver read -1 and -1, and every run reads -1 after collection"
+  },
+  "allocationAbsence": {
+    "record": "allocation-absence.json",
+    "sha256": "b334af6a95f1b40852f596396a56b40c2bfb7c20945a34cbeecd590a5dcc15c5"
+  }
+}
