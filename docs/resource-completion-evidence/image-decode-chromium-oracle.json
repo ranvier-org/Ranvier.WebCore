@@ -1,0 +1,25 @@
+{
+  "oracle": "Playwright Chromium 1248 headless (chrome-win64), file:///C:/wk/h05-private/oracle/oracle.html, identical PNG bytes to tests/abi/image_decode.py (b64.txt)",
+  "chromium": {
+    "HTMLImageElement.decode svg": "resolved 5x7",
+    "HTMLImageElement.decode png": "resolved 3x2",
+    "HTMLImageElement.decode corrupt png": "resolved 3x2",
+    "HTMLImageElement.decode no src": "rejected EncodingError",
+    "HTMLImageElement.decode src changed mid-flight": "rejected EncodingError",
+    "SVGImageElement.decode": "exists; svg source resolved, png source resolved"
+  },
+  "native": {
+    "bitmap png": "SUCCEEDED 3x2",
+    "corrupt png": "DECODE_FAILED on Windows and Linux; SUCCEEDED 3x2 on macOS",
+    "missing (load fail)": "LOAD_FAILED",
+    "no src": "LOAD_FAILED (deferred to a later cycle)",
+    "src/srcset/crossorigin change mid-flight": "INVALIDATED",
+    "SVG <image> png": "SUCCEEDED 3x2",
+    "SVG <image> svg": "SUCCEEDED 5x7"
+  },
+  "svgSemantics": "engine semantics: SVG images have no separate decode stage (WebKit ImageLoader::decode, ImageLoader.cpp:643-645); Chromium also resolves SVG-source decode for both HTMLImageElement and SVGImageElement",
+  "measuredDifferences": [
+    "Corrupt PNG with a valid IHDR: Chromium resolves decode() with 3x2; on Windows and Linux, WebKit's BitmapImage::decode reports DecodingStatus::Invalid and native reports DECODE_FAILED. On macOS, ImageIO decodes it and native reports SUCCEEDED 3x2, as Chromium does (CI run 41169062816, osx-arm64).",
+    "Native distinguishes LOAD_FAILED / DECODE_FAILED / INVALIDATED where Chromium reports a single EncodingError rejection."
+  ]
+}

@@ -457,6 +457,14 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/svg_resources.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify image decode readiness without JavaScript
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/image_decode.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify font readiness without JavaScript
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/font_load.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
+
       - name: Verify passive capability catalogue and live host observations
         run: python -I tests/abi/capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 

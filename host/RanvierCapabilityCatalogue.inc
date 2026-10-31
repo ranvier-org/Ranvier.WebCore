@@ -294,6 +294,8 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom-type-query:CSSTransformComponent",
     "capabilities",
     "svg-view-selection",
+    "image-decode",
+    "font-load",
     "accessibility-uia",
     "resize",
     "input",

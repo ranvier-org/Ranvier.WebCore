@@ -86,6 +86,10 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     """The F# parameter type, with its marshalling attribute, for the C parameter."""
     if ctype == "int32_t":
         return "int", ""
+    if ctype == "uint64_t":
+        return "uint64", ""
+    if ctype == "uint64_t*":
+        return "uint64&", ""
     if ctype == "float":
         return "float32", ""
     if ctype == "double":
@@ -136,6 +140,10 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvResourceHandler</c> of the header; <c>url</c> is a NUL-terminated UTF-8 string.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type ResourceHandler = delegate of context: nativeint * load: nativeint * url: nativeint -> unit",
+        "",
+        "/// <summary>The <c>RvResourceCompletion</c> of the header: one terminal outcome with an image's natural size.</summary>",
+        "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
+        "type ResourceCompletion = delegate of context: nativeint * outcome: int * width: int * height: int -> unit",
         "",
         "/// <summary>The <c>RvFrameCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",

@@ -1,0 +1,11 @@
+{
+  "feature": "font-load",
+  "enginePatchRequired": false,
+  "route": [
+    "FontFace::create(ScriptExecutionContext&, family, ArrayBuffer, Descriptors) builds the face from copied caller bytes without VM entry.",
+    "A binary-buffer face loads synchronously: FontFace.cpp:166-170 calls CSSFontFace::load() when the data does not require asynchronous loading and asserts a Success or Failure status.",
+    "CSSFontFace::addClient/removeClient and CSSFontFaceClient::fontStateChanged report the face's actual terminal state for any asynchronous case.",
+    "Document::fonts()->add/remove registers the face only after Success and removes it at release or document invalidation."
+  ],
+  "approvedBy": "coordinator, 2026-10-31: no 0033 RED required"
+}

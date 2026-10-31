@@ -32,3 +32,4 @@
 0030-svg-symbol-view-box-instances.patch
 0031-svg-href-attribute-synchronization.patch
 0032-svg-smil-first-interval-end.patch
+0033-image-loader-native-decode.patch
