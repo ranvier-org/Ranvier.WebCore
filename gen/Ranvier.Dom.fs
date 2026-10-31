@@ -5168,6 +5168,21 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     abstract member globalAlpha: float with get, set
     /// <summary>CanvasRenderingContext2D.globalCompositeOperation.</summary>
     abstract member globalCompositeOperation: string with get, set
+    /// <summary>CanvasRenderingContext2D.imageSmoothingEnabled.</summary>
+    abstract member imageSmoothingEnabled: bool with get, set
+    /// <summary>CanvasRenderingContext2D.imageSmoothingQuality.</summary>
+    abstract member imageSmoothingQuality: ImageSmoothingQuality with get, set
+
+    /// <summary>CanvasRenderingContext2D.strokeStyle.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.strokeStyle")>]
+    abstract member __ranvier_get_strokeStyle: unit -> obj
+
+    [<Fable.Core.Emit("$0.strokeStyle = $1")>]
+    abstract member __ranvier_set_strokeStyle: value: obj -> unit
+#else
+    abstract member strokeStyle: DOMStringOrCanvasGradientOrCanvasPattern with get, set
+#endif
 
     /// <summary>CanvasRenderingContext2D.fillStyle.</summary>
 #if FABLE_COMPILER
@@ -5179,6 +5194,32 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
 #else
     abstract member fillStyle: DOMStringOrCanvasGradientOrCanvasPattern with get, set
 #endif
+    /// <summary>CanvasRenderingContext2D.createLinearGradient.</summary>
+    abstract member createLinearGradient: x0: float * y0: float * x1: float * y1: float -> CanvasGradient
+    /// <summary>CanvasRenderingContext2D.createRadialGradient.</summary>
+    abstract member createRadialGradient: x0: float * y0: float * r0: float * x1: float * y1: float * r1: float -> CanvasGradient
+    /// <summary>CanvasRenderingContext2D.createConicGradient.</summary>
+    abstract member createConicGradient: angle: float * x: float * y: float -> CanvasGradient
+
+    /// <summary>CanvasRenderingContext2D.createPattern.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.createPattern($1, $2)")>]
+    abstract member __ranvier_createPattern: image: obj * repetition: string -> CanvasPattern
+#else
+    abstract member createPattern: image: HTMLImageElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: HTMLCanvasElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: SVGImageElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: ImageBitmap * repetition: string -> CanvasPattern
+    abstract member createPattern: image: CSSImageValue * repetition: string -> CanvasPattern
+#endif
+    /// <summary>CanvasRenderingContext2D.shadowOffsetX.</summary>
+    abstract member shadowOffsetX: float with get, set
+    /// <summary>CanvasRenderingContext2D.shadowOffsetY.</summary>
+    abstract member shadowOffsetY: float with get, set
+    /// <summary>CanvasRenderingContext2D.shadowBlur.</summary>
+    abstract member shadowBlur: float with get, set
+    /// <summary>CanvasRenderingContext2D.shadowColor.</summary>
+    abstract member shadowColor: string with get, set
     /// <summary>CanvasRenderingContext2D.filter.</summary>
     abstract member filter: string with get, set
     /// <summary>CanvasRenderingContext2D.clearRect.</summary>
@@ -5209,6 +5250,20 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     abstract member isPointInStroke: x: float * y: float -> bool
     /// <summary>CanvasRenderingContext2D.isPointInStroke.</summary>
     abstract member isPointInStroke: path: Path2D * x: float * y: float -> bool
+    /// <summary>CanvasRenderingContext2D.lineWidth.</summary>
+    abstract member lineWidth: float with get, set
+    /// <summary>CanvasRenderingContext2D.lineCap.</summary>
+    abstract member lineCap: CanvasLineCap with get, set
+    /// <summary>CanvasRenderingContext2D.lineJoin.</summary>
+    abstract member lineJoin: CanvasLineJoin with get, set
+    /// <summary>CanvasRenderingContext2D.miterLimit.</summary>
+    abstract member miterLimit: float with get, set
+    /// <summary>CanvasRenderingContext2D.setLineDash.</summary>
+    abstract member setLineDash: segments: (float) array -> unit
+    /// <summary>CanvasRenderingContext2D.getLineDash.</summary>
+    abstract member getLineDash: unit -> (float) array
+    /// <summary>CanvasRenderingContext2D.lineDashOffset.</summary>
+    abstract member lineDashOffset: float with get, set
     /// <summary>CanvasRenderingContext2D.closePath.</summary>
     abstract member closePath: unit -> unit
     /// <summary>CanvasRenderingContext2D.moveTo.</summary>
@@ -5249,10 +5304,14 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
         x: float * y: float * radiusX: float * radiusY: float * rotation: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
 
 /// <summary>CanvasGradient in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] CanvasGradient = interface end
+and [<AllowNullLiteral>] CanvasGradient =
+    /// <summary>CanvasGradient.addColorStop.</summary>
+    abstract member addColorStop: offset: float * color: string -> unit
 
 /// <summary>CanvasPattern in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] CanvasPattern = interface end
+and [<AllowNullLiteral>] CanvasPattern =
+    /// <summary>CanvasPattern.setTransform.</summary>
+    abstract member setTransform: ?transform: DOMMatrix2DInit -> unit
 
 /// <summary>Path2D in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] Path2D =
@@ -5296,6 +5355,9 @@ and [<AllowNullLiteral>] Path2D =
     /// <summary>Path2D.ellipse.</summary>
     abstract member ellipse:
         x: float * y: float * radiusX: float * radiusY: float * rotation: float * startAngle: float * endAngle: float * ?anticlockwise: bool -> unit
+
+/// <summary>ImageBitmap in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ImageBitmap = interface end
 
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
@@ -5748,6 +5810,14 @@ and [<RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
     | CanvasGradient of CanvasGradient
     | CanvasPattern of CanvasPattern
 
+/// <summary>HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue =
+    | HTMLImageElement of HTMLImageElement
+    | HTMLCanvasElement of HTMLCanvasElement
+    | SVGImageElement of SVGImageElement
+    | ImageBitmap of ImageBitmap
+    | CSSStyleImageValue of CSSImageValue
+
 /// <summary>UnrestrictedDoubleOrDOMPointInit in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMPointInit =
     | UnrestrictedDouble of float
@@ -5957,6 +6027,24 @@ and [<DomStringEnum; RequireQualifiedAccess>] VisibilityState =
 and [<DomStringEnum; RequireQualifiedAccess>] CanvasFillRule =
     | [<CompiledName("nonzero")>] Nonzero
     | [<CompiledName("evenodd")>] Evenodd
+
+/// <summary>CanvasLineCap in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineCap =
+    | [<CompiledName("butt")>] Butt
+    | [<CompiledName("round")>] Round
+    | [<CompiledName("square")>] Square
+
+/// <summary>CanvasLineJoin in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CanvasLineJoin =
+    | [<CompiledName("round")>] Round
+    | [<CompiledName("bevel")>] Bevel
+    | [<CompiledName("miter")>] Miter
+
+/// <summary>ImageSmoothingQuality in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] ImageSmoothingQuality =
+    | [<CompiledName("low")>] Low
+    | [<CompiledName("medium")>] Medium
+    | [<CompiledName("high")>] High
 
 /// <summary>HighlightType in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] HighlightType =
@@ -6230,6 +6318,16 @@ module BrowserUnionAdapters =
         | arm when isCanvasGradient arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient (unbox<CanvasGradient> arm)
         | arm when isCanvasPattern arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern (unbox<CanvasPattern> arm)
         | _ -> failwith "Unexpected DOM union result"
+
+    let private boxHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue
+        (value: HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue)
+        : obj =
+        match value with
+        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.HTMLImageElement value -> box value
+        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.HTMLCanvasElement value -> box value
+        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.SVGImageElement value -> box value
+        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.ImageBitmap value -> box value
+        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.CSSStyleImageValue value -> box value
 
     let private boxUnrestrictedDoubleOrDOMPointInit (value: UnrestrictedDoubleOrDOMPointInit) : obj =
         match value with
@@ -6514,12 +6612,34 @@ module BrowserUnionAdapters =
 
 
     type CanvasRenderingContext2D with
+        member this.strokeStyle
+            with get (): DOMStringOrCanvasGradientOrCanvasPattern =
+                let value = this.__ranvier_get_strokeStyle ()
+                unboxDOMStringOrCanvasGradientOrCanvasPattern value
+            and set (value: DOMStringOrCanvasGradientOrCanvasPattern) =
+                this.__ranvier_set_strokeStyle (boxDOMStringOrCanvasGradientOrCanvasPattern value)
+
         member this.fillStyle
             with get (): DOMStringOrCanvasGradientOrCanvasPattern =
                 let value = this.__ranvier_get_fillStyle ()
                 unboxDOMStringOrCanvasGradientOrCanvasPattern value
             and set (value: DOMStringOrCanvasGradientOrCanvasPattern) =
                 this.__ranvier_set_fillStyle (boxDOMStringOrCanvasGradientOrCanvasPattern value)
+
+        member this.createPattern(image: HTMLImageElement, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: HTMLCanvasElement, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: SVGImageElement, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: ImageBitmap, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
+
+        member this.createPattern(image: CSSImageValue, repetition: string) : CanvasPattern =
+            this.__ranvier_createPattern (box image, repetition)
 
         member this.roundRect(x: float, y: float, w: float, h: float, radii: (UnrestrictedDoubleOrDOMPointInit) array) : unit =
             this.__ranvier_roundRectList (x, y, w, h, box (Array.map boxUnrestrictedDoubleOrDOMPointInit radii))

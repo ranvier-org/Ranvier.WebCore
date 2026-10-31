@@ -1019,6 +1019,47 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if rv_diagnostic_live_count () <> live then
                     failwith "cascade snapshot leaked"
+        | "canvas gradient" ->
+            let canvas = rv_document_create_element (host, "canvas")
+            rv_node_append_child (div, canvas) |> check "append canvas"
+            rv_canvas_get_context (canvas, 1, 0n, &held.contents) |> check "getContext 2d"
+            rv_node_release canvas
+            let mutable gradient = 0n
+
+            rv_dom_canvas_rendering_context2_d_create_linear_gradient (held.Value, 0.0, 0.0, 10.0, 0.0, &gradient)
+            |> check "createLinearGradient"
+
+            rv_dom_canvas_gradient_add_color_stop (gradient, document, 0.0, utf8 "red", utf8Length "red")
+            |> check "addColorStop"
+
+            let mutable style = RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern()
+            style.present <- 1
+            style.tag <- 2
+            style.arm1 <- gradient
+
+            rv_dom_canvas_rendering_context2_d_set_stroke_style (held.Value, [| style |])
+            |> check "strokeStyle gradient"
+
+            let context = rv_node_retain document
+
+            fun () ->
+                let added =
+                    rv_dom_canvas_gradient_add_color_stop (gradient, context, 1.0, utf8 "blue", utf8Length "blue")
+
+                if added <> 0 && added <> -10 && added <> -11 then
+                    failwithf "addColorStop after destroy: %d" added
+
+                let mutable read = RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern()
+                let status = rv_dom_canvas_rendering_context2_d_get_stroke_style (held.Value, &read)
+
+                if status = 0 then
+                    rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release &read
+                elif status <> -10 then
+                    failwithf "strokeStyle after destroy: %d" status
+
+                rv_dom_canvas_gradient_release gradient
+                rv_dom_canvas_rendering_context2_d_release held.Value
+                rv_node_release context
         | "canvas path" ->
             let canvas = rv_document_create_element (host, "canvas")
             rv_node_append_child (div, canvas) |> check "append canvas"
@@ -1335,6 +1376,7 @@ let run (outDir: string) =
                     "aria relations"
                     "coordinate spaces"
                     "canvas path"
+                    "canvas gradient"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

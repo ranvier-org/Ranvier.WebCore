@@ -380,14 +380,22 @@
     "URLSearchParams",
     "URLPattern"
   ],
+  "unionArgumentConversions": [
+    "CanvasRenderingContext2D.createPattern"
+  ],
   "objectContexts": {
     "StylePropertyMapReadOnly": "Document",
     "StylePropertyMap": "Document",
     "DOMMatrix": "Document",
     "DOMFormData": "Document",
-    "URLSearchParams": "Document"
+    "URLSearchParams": "Document",
+    "CanvasGradient": "Document"
   },
   "finiteNumberInputs": [
+    "CanvasGradient.addColorStop",
+    "CanvasRenderingContext2D.createLinearGradient",
+    "CanvasRenderingContext2D.createRadialGradient",
+    "CanvasRenderingContext2D.createConicGradient",
     "CSSUnitValue",
     "SVGSVGElement",
     "SVGGeometryElement",
@@ -690,7 +698,8 @@
     "CanvasRenderingContext2D",
     "CanvasGradient",
     "CanvasPattern",
-    "Path2D"
+    "Path2D",
+    "ImageBitmap"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1190,12 +1199,36 @@
       "globalCompositeOperation",
       "filter",
       "beginLayer",
-      "endLayer"
+      "endLayer",
+      "strokeStyle",
+      "createLinearGradient",
+      "createRadialGradient",
+      "createConicGradient",
+      "createPattern",
+      "lineWidth",
+      "lineCap",
+      "lineJoin",
+      "miterLimit",
+      "setLineDash",
+      "getLineDash",
+      "lineDashOffset",
+      "shadowOffsetX",
+      "shadowOffsetY",
+      "shadowBlur",
+      "shadowColor",
+      "imageSmoothingEnabled",
+      "imageSmoothingQuality"
     ],
-    "CanvasGradient": [],
-    "CanvasPattern": []
+    "CanvasGradient": [
+      "addColorStop"
+    ],
+    "CanvasPattern": [
+      "setTransform"
+    ],
+    "ImageBitmap": []
   },
   "unionSetterOverloads": [
-    "CanvasRenderingContext2D.fillStyle"
+    "CanvasRenderingContext2D.fillStyle",
+    "CanvasRenderingContext2D.strokeStyle"
   ]
 }

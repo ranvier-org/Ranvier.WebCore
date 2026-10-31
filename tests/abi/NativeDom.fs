@@ -651,6 +651,24 @@ let RV_DOM_CANVAS_FILL_RULE_NONZERO = 0
 let RV_DOM_CANVAS_FILL_RULE_EVENODD = 1
 
 [<Literal>]
+let RV_DOM_CANVAS_LINE_CAP_BUTT = 0
+
+[<Literal>]
+let RV_DOM_CANVAS_LINE_CAP_ROUND = 1
+
+[<Literal>]
+let RV_DOM_CANVAS_LINE_CAP_SQUARE = 2
+
+[<Literal>]
+let RV_DOM_CANVAS_LINE_JOIN_ROUND = 0
+
+[<Literal>]
+let RV_DOM_CANVAS_LINE_JOIN_BEVEL = 1
+
+[<Literal>]
+let RV_DOM_CANVAS_LINE_JOIN_MITER = 2
+
+[<Literal>]
 let RV_DOM_DOCUMENT_READY_STATE_LOADING = 0
 
 [<Literal>]
@@ -673,6 +691,15 @@ let RV_DOM_HIGHLIGHT_TYPE_SPELLING_ERROR = 1
 
 [<Literal>]
 let RV_DOM_HIGHLIGHT_TYPE_GRAMMAR_ERROR = 2
+
+[<Literal>]
+let RV_DOM_IMAGE_SMOOTHING_QUALITY_LOW = 0
+
+[<Literal>]
+let RV_DOM_IMAGE_SMOOTHING_QUALITY_MEDIUM = 1
+
+[<Literal>]
+let RV_DOM_IMAGE_SMOOTHING_QUALITY_HIGH = 2
 
 [<Literal>]
 let RV_DOM_ORIENTATION_TYPE_PORTRAIT_PRIMARY = 0
@@ -1735,6 +1762,32 @@ type RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern =
     val mutable arm2: nativeint
 
 [<Literal>]
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_IMAGE_ELEMENT = 1
+
+[<Literal>]
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_CANVAS_ELEMENT = 2
+
+[<Literal>]
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_SVG_IMAGE_ELEMENT = 3
+
+[<Literal>]
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_IMAGE_BITMAP = 4
+
+[<Literal>]
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_CSS_STYLE_IMAGE_VALUE = 5
+
+/// <summary>ABI transport for HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: nativeint
+    val mutable arm1: nativeint
+    val mutable arm2: nativeint
+    val mutable arm3: nativeint
+    val mutable arm4: nativeint
+
+[<Literal>]
 let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_POINT_INIT_NUMBER = 1
 
 [<Literal>]
@@ -1962,6 +2015,9 @@ extern void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange& v
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionUnrestrictedDoubleOrDOMPointInit& value)
@@ -2394,6 +2450,12 @@ extern void rv_dom_path2_d_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_path2_d_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_image_bitmap_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_image_bitmap_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -10328,16 +10390,88 @@ extern int rv_dom_canvas_rendering_context2_d_get_global_composite_operation(nat
 extern int rv_dom_canvas_rendering_context2_d_set_global_composite_operation(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_image_smoothing_enabled(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_image_smoothing_enabled(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_image_smoothing_quality(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_image_smoothing_quality(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_stroke_style(nativeint target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_stroke_style(nativeint target, [<In>] RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern[] value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_get_fill_style(nativeint target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_set_fill_style(nativeint target, [<In>] RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern[] value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_shadow_offset_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_shadow_offset_x(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_shadow_offset_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_shadow_offset_y(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_shadow_blur(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_shadow_blur(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_shadow_color(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_shadow_color(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_get_filter(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_set_filter(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_line_width(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_line_width(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_line_cap(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_line_cap(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_line_join(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_line_join(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_miter_limit(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_miter_limit(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_line_dash_offset(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_line_dash_offset(nativeint target, float value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_save(nativeint target)
@@ -10377,6 +10511,18 @@ extern int rv_dom_canvas_rendering_context2_d_set_transform_1(nativeint target, 
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_reset_transform(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_create_linear_gradient(nativeint target, float x0, float y0, float x1, float y1, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_create_radial_gradient(nativeint target, float x0, float y0, float r0, float x1, float y1, float r1, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_create_conic_gradient(nativeint target, float angle, float x, float y, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_create_pattern(nativeint target, [<In>] RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue[] image, byte[] repetition, int repetition_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_clear_rect(nativeint target, float x, float y, float w, float h)
@@ -10421,6 +10567,12 @@ extern int rv_dom_canvas_rendering_context2_d_is_point_in_stroke_2(nativeint tar
 extern int rv_dom_canvas_rendering_context2_d_is_point_in_stroke_3(nativeint target, nativeint path, float x, float y, int& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_set_line_dash(nativeint target, [<In>] RvDomSequenceUnrestrictedDouble[] segments)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_line_dash(nativeint target, RvDomSequenceUnrestrictedDouble& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_close_path(nativeint target)
 
 [<DllImport(Lib)>]
@@ -10452,6 +10604,12 @@ extern int rv_dom_canvas_rendering_context2_d_arc(nativeint target, float x, flo
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_ellipse(nativeint target, float x, float y, float radius_x, float radius_y, float rotation, float start_angle, float end_angle, int anticlockwise)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_gradient_add_color_stop(nativeint target, nativeint context, float offset, byte[] color, int color_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_pattern_set_transform(nativeint target, [<In>] RvDomDOMMatrix2DInit[] transform)
 
 [<DllImport(Lib)>]
 extern int rv_dom_path2_d_create_0(nativeint target, nativeint& result)

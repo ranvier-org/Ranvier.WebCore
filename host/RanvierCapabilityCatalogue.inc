@@ -287,6 +287,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom:CanvasGradient",
     "dom:CanvasPattern",
     "dom:Path2D",
+    "dom:ImageBitmap",
     "dom-adopted-style-sheets",
     "dom-constructor:CSSStyleSheet",
     "dom-constructor:CSSTransformValue",

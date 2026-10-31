@@ -187,6 +187,7 @@
 #include "HashChangeEvent.h"
 #include "Highlight.h"
 #include "HighlightRegistry.h"
+#include "ImageBitmap.h"
 #include "ImportNodeOptions.h"
 #include "InputEvent.h"
 #include "JavaScriptCore/ArrayBuffer.h"
@@ -333,9 +334,12 @@
 #include "JSAriaNotifyOptions.h"
 #include "JSAriaNotifyOptions.h"
 #include "JSCanvasFillRule.h"
+#include "JSCanvasLineCap.h"
+#include "JSCanvasLineJoin.h"
 #include "JSDocument.h"
 #include "JSEndingType.h"
 #include "JSHighlight.h"
+#include "JSImageSmoothingQuality.h"
 #include "JSScreenOrientation.h"
 #include "JSScrollBehavior.h"
 #include "JSScrollLogicalPosition.h"
@@ -712,9 +716,12 @@ void copyTypedArrayView(JSC::ArrayBufferView& view, uint8_t* bytes)
 static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_s, "all"_s, "pending"_s };
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
 static constexpr ASCIILiteral enumerationCanvasFillRule[] = { "nonzero"_s, "evenodd"_s };
+static constexpr ASCIILiteral enumerationCanvasLineCap[] = { "butt"_s, "round"_s, "square"_s };
+static constexpr ASCIILiteral enumerationCanvasLineJoin[] = { "round"_s, "bevel"_s, "miter"_s };
 static constexpr ASCIILiteral enumerationDocumentReadyState[] = { "loading"_s, "interactive"_s, "complete"_s };
 static constexpr ASCIILiteral enumerationEndingType[] = { "transparent"_s, "native"_s };
 static constexpr ASCIILiteral enumerationHighlightType[] = { "highlight"_s, "spelling-error"_s, "grammar-error"_s };
+static constexpr ASCIILiteral enumerationImageSmoothingQuality[] = { "low"_s, "medium"_s, "high"_s };
 static constexpr ASCIILiteral enumerationOrientationType[] = { "portrait-primary"_s, "portrait-secondary"_s, "landscape-primary"_s, "landscape-secondary"_s };
 static constexpr ASCIILiteral enumerationScrollBehavior[] = { "auto"_s, "instant"_s, "smooth"_s };
 static constexpr ASCIILiteral enumerationScrollLogicalPosition[] = { "start"_s, "center"_s, "end"_s, "nearest"_s };
@@ -737,6 +744,11 @@ template<typename T> struct DomSequenceArgument {
     operator std::optional<Vector<T>>() && { return std::move(values); }
     // A span parameter borrows the values for the call, which the argument temporary outlives.
     operator std::span<const T>() && { return values.span(); }
+};
+// A decoded union passed to an engine variant with other arm order or arms: each arm converts on its own.
+template<typename V> struct DomUnionArgument {
+    V value;
+    template<typename T> operator T() && { return WTF::switchOn(std::move(value), [](auto&& arm) -> T { return T { std::move(arm) }; }); }
 };
 template<typename T> const T* resultField(const T& value) { return &value; }
 template<typename T> const T* resultField(const std::optional<T>& value) { return value ? &*value : nullptr; }
@@ -3088,6 +3100,98 @@ template<typename V> int32_t encodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPa
     return RV_OK;
 }
 
+std::optional<Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>>> decodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<HTMLImageElement> arm0 = source->arm0 ? dynamicDowncast<HTMLImageElement>(*reinterpret_cast<Node*>(source->arm0)) : nullptr;
+        if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<HTMLCanvasElement> arm1 = source->arm1 ? dynamicDowncast<HTMLCanvasElement>(*reinterpret_cast<Node*>(source->arm1)) : nullptr;
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+    }
+    case 3: {
+        if (!source->arm2) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<SVGImageElement> arm2 = source->arm2 ? dynamicDowncast<SVGImageElement>(*reinterpret_cast<Node*>(source->arm2)) : nullptr;
+        if (source->arm2 && !arm2) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<2>, Ref { *arm2 } } };
+    }
+    case 4: {
+        if (!source->arm3) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<ImageBitmap> arm3 = reinterpret_cast<ImageBitmap*>(source->arm3);
+        if (source->arm3 && !arm3) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<3>, Ref { *arm3 } } };
+    }
+    case 5: {
+        if (!source->arm4) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSStyleImageValue> arm4 = source->arm4 ? dynamicDowncast<CSSStyleImageValue>(*reinterpret_cast<CSSStyleValue*>(source->arm4)) : nullptr;
+        if (source->arm4 && !arm4) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<4>, Ref { *arm4 } } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<Node*>(value->arm0)->deref();
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<Node*>(value->arm1)->deref();
+        break;
+    case 3:
+        if (value->arm2) reinterpret_cast<Node*>(value->arm2)->deref();
+        break;
+    case 4:
+        if (value->arm3) reinterpret_cast<ImageBitmap*>(value->arm3)->deref();
+        break;
+    case 5:
+        if (value->arm4) reinterpret_cast<CSSStyleValue*>(value->arm4)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(V&& value, RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* result)
+{
+    if constexpr (I < 5) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<Node>(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                storeHandle<Node>(std::get<I>(value), &result->arm1);
+            }
+            else if constexpr (I == 2) {
+                storeHandle<Node>(std::get<I>(value), &result->arm2);
+            }
+            else if constexpr (I == 3) {
+                storeHandle<ImageBitmap>(std::get<I>(value), &result->arm3);
+            }
+            else if constexpr (I == 4) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm4);
+            }
+        } else encodeArmsRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(V&& input, RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(value, result);
+    return RV_OK;
+}
+
 std::optional<Variant<double, DOMPointInit>> decodeRvDomUnionUnrestrictedDoubleOrDOMPointInit(const RvDomUnionUnrestrictedDoubleOrDOMPointInit* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -3436,7 +3540,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom:Path2D", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom:Path2D", "dom:ImageBitmap", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -3750,6 +3854,11 @@ void ranvier_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* val
 void ranvier_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value)
 {
     if (isMainThread()) clearRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value);
+}
+
+void ranvier_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value)
+{
+    if (isMainThread()) clearRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(value);
 }
 
 void ranvier_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionUnrestrictedDoubleOrDOMPointInit* value)
@@ -4733,6 +4842,20 @@ RvPath2D* ranvier_dom_path2_d_retain(RvPath2D* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<Path2D*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_image_bitmap_release(RvImageBitmap* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<ImageBitmap*>(handle)->deref();
+}
+
+RvImageBitmap* ranvier_dom_image_bitmap_retain(RvImageBitmap* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<ImageBitmap*>(handle)->ref();
     return handle;
 }
 
@@ -42214,6 +42337,78 @@ int32_t ranvier_dom_canvas_rendering_context2_d_set_global_composite_operation(R
     return invoke([&]() -> decltype(auto) { return impl->setGlobalCompositeOperation(a0.string()); });
 }
 
+// CanvasRenderingContext2D.imageSmoothingEnabled getter: attribute boolean imageSmoothingEnabled
+int32_t ranvier_dom_canvas_rendering_context2_d_get_image_smoothing_enabled(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->imageSmoothingEnabled(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CanvasRenderingContext2D.imageSmoothingEnabled setter: attribute boolean imageSmoothingEnabled
+int32_t ranvier_dom_canvas_rendering_context2_d_set_image_smoothing_enabled(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setImageSmoothingEnabled(!!value); });
+}
+
+// CanvasRenderingContext2D.imageSmoothingQuality getter: attribute ImageSmoothingQuality imageSmoothingQuality
+int32_t ranvier_dom_canvas_rendering_context2_d_get_image_smoothing_quality(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->imageSmoothingQuality(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationImageSmoothingQuality); });
+}
+
+// CanvasRenderingContext2D.imageSmoothingQuality setter: attribute ImageSmoothingQuality imageSmoothingQuality
+int32_t ranvier_dom_canvas_rendering_context2_d_set_image_smoothing_quality(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->imageSmoothingQuality())>>(value, enumerationImageSmoothingQuality);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setImageSmoothingQuality(*a0); });
+}
+
+// CanvasRenderingContext2D.strokeStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) strokeStyle; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_canvas_rendering_context2_d_get_stroke_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->strokeStyle(); }, [&](auto&& value) { return encodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value, result); });
+}
+
+// CanvasRenderingContext2D.strokeStyle setter: attribute (DOMString or CanvasGradient or CanvasPattern) strokeStyle
+int32_t ranvier_dom_canvas_rendering_context2_d_set_stroke_style(RvCanvasRenderingContext2D* target, const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return WTF::switchOn(std::move(*a0), [&](auto&& arm) { if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) impl->setStrokeStyle(std::move(arm)); else impl->setStrokeStyle(RefPtr { std::move(arm) }); }); });
+}
+
 // CanvasRenderingContext2D.fillStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle; *result owns its contents; release with the matching rv_dom_*_release
 int32_t ranvier_dom_canvas_rendering_context2_d_get_fill_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result)
 {
@@ -42237,6 +42432,96 @@ int32_t ranvier_dom_canvas_rendering_context2_d_set_fill_style(RvCanvasRendering
     auto a0 = decodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value, status0);
     if (status0 != RV_OK) return status0;
     return invoke([&]() -> decltype(auto) { return WTF::switchOn(std::move(*a0), [&](auto&& arm) { if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) impl->setFillStyle(std::move(arm)); else impl->setFillStyle(RefPtr { std::move(arm) }); }); });
+}
+
+// CanvasRenderingContext2D.shadowOffsetX getter: attribute unrestricted double shadowOffsetX
+int32_t ranvier_dom_canvas_rendering_context2_d_get_shadow_offset_x(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->shadowOffsetX(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.shadowOffsetX setter: attribute unrestricted double shadowOffsetX
+int32_t ranvier_dom_canvas_rendering_context2_d_set_shadow_offset_x(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setShadowOffsetX(value); });
+}
+
+// CanvasRenderingContext2D.shadowOffsetY getter: attribute unrestricted double shadowOffsetY
+int32_t ranvier_dom_canvas_rendering_context2_d_get_shadow_offset_y(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->shadowOffsetY(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.shadowOffsetY setter: attribute unrestricted double shadowOffsetY
+int32_t ranvier_dom_canvas_rendering_context2_d_set_shadow_offset_y(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setShadowOffsetY(value); });
+}
+
+// CanvasRenderingContext2D.shadowBlur getter: attribute unrestricted double shadowBlur
+int32_t ranvier_dom_canvas_rendering_context2_d_get_shadow_blur(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->shadowBlur(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.shadowBlur setter: attribute unrestricted double shadowBlur
+int32_t ranvier_dom_canvas_rendering_context2_d_set_shadow_blur(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setShadowBlur(value); });
+}
+
+// CanvasRenderingContext2D.shadowColor getter: attribute DOMString shadowColor
+int32_t ranvier_dom_canvas_rendering_context2_d_get_shadow_color(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->shadowColor(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// CanvasRenderingContext2D.shadowColor setter: attribute DOMString shadowColor
+int32_t ranvier_dom_canvas_rendering_context2_d_set_shadow_color(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setShadowColor(a0.string()); });
 }
 
 // CanvasRenderingContext2D.filter getter: attribute DOMString filter; RV_ERR_UNSUPPORTED while the setting CanvasFiltersEnabled is off
@@ -42267,6 +42552,122 @@ int32_t ranvier_dom_canvas_rendering_context2_d_set_filter(RvCanvasRenderingCont
     StringArg a0 { value, value_length };
     if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
     return invoke([&]() -> decltype(auto) { return impl->setFilterString(a0.string()); });
+}
+
+// CanvasRenderingContext2D.lineWidth getter: attribute unrestricted double lineWidth
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_width(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->lineWidth(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.lineWidth setter: attribute unrestricted double lineWidth
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_width(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setLineWidth(value); });
+}
+
+// CanvasRenderingContext2D.lineCap getter: attribute CanvasLineCap lineCap
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_cap(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->lineCap(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationCanvasLineCap); });
+}
+
+// CanvasRenderingContext2D.lineCap setter: attribute CanvasLineCap lineCap
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_cap(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->lineCap())>>(value, enumerationCanvasLineCap);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setLineCap(*a0); });
+}
+
+// CanvasRenderingContext2D.lineJoin getter: attribute CanvasLineJoin lineJoin
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_join(RvCanvasRenderingContext2D* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->lineJoin(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationCanvasLineJoin); });
+}
+
+// CanvasRenderingContext2D.lineJoin setter: attribute CanvasLineJoin lineJoin
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_join(RvCanvasRenderingContext2D* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->lineJoin())>>(value, enumerationCanvasLineJoin);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setLineJoin(*a0); });
+}
+
+// CanvasRenderingContext2D.miterLimit getter: attribute unrestricted double miterLimit
+int32_t ranvier_dom_canvas_rendering_context2_d_get_miter_limit(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->miterLimit(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.miterLimit setter: attribute unrestricted double miterLimit
+int32_t ranvier_dom_canvas_rendering_context2_d_set_miter_limit(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setMiterLimit(value); });
+}
+
+// CanvasRenderingContext2D.lineDashOffset getter: attribute unrestricted double lineDashOffset
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_dash_offset(RvCanvasRenderingContext2D* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->lineDashOffset(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// CanvasRenderingContext2D.lineDashOffset setter: attribute unrestricted double lineDashOffset
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_dash_offset(RvCanvasRenderingContext2D* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setLineDashOffset(value); });
 }
 
 // CanvasRenderingContext2D.save() -> undefined
@@ -42443,6 +42844,81 @@ int32_t ranvier_dom_canvas_rendering_context2_d_reset_transform(RvCanvasRenderin
         return RV_ERR_WRONG_THREAD;
     RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
     return invoke([&]() -> decltype(auto) { return impl->resetTransform(); });
+}
+
+// CanvasRenderingContext2D.createLinearGradient(double x0, double y0, double x1, double y1) -> CanvasGradient; *result is a new reference
+int32_t ranvier_dom_canvas_rendering_context2_d_create_linear_gradient(RvCanvasRenderingContext2D* target, double x0, double y0, double x1, double y1, RvCanvasGradient** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    if (!std::isfinite(x0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(x1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->createLinearGradient(x0, y0, x1, y1); }, [&](auto&& value) { return storeHandle<CanvasGradient>(value, result); });
+}
+
+// CanvasRenderingContext2D.createRadialGradient(double x0, double y0, double r0, double x1, double y1, double r1) -> CanvasGradient; *result is a new reference
+int32_t ranvier_dom_canvas_rendering_context2_d_create_radial_gradient(RvCanvasRenderingContext2D* target, double x0, double y0, double r0, double x1, double y1, double r1, RvCanvasGradient** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    if (!std::isfinite(x0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(r0))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(x1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(r1))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->createRadialGradient(x0, y0, r0, x1, y1, r1); }, [&](auto&& value) { return storeHandle<CanvasGradient>(value, result); });
+}
+
+// CanvasRenderingContext2D.createConicGradient(double angle, double x, double y) -> CanvasGradient; *result is a new reference
+int32_t ranvier_dom_canvas_rendering_context2_d_create_conic_gradient(RvCanvasRenderingContext2D* target, double angle, double x, double y, RvCanvasGradient** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    if (!std::isfinite(angle))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(x))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    if (!std::isfinite(y))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    return deliver([&]() -> decltype(auto) { return impl->createConicGradient(angle, x, y); }, [&](auto&& value) { return storeHandle<CanvasGradient>(value, result); });
+}
+
+// CanvasRenderingContext2D.createPattern(CanvasImageSource image, DOMString repetition) -> CanvasPattern?; *result is a new reference, or NULL
+int32_t ranvier_dom_canvas_rendering_context2_d_create_pattern(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, const uint8_t* repetition, int32_t repetition_length, RvCanvasPattern** result)
+{
+    if (!target || !image || !(repetition_length >= 0 && (repetition_length <= 0 || repetition)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(image, status0);
+    if (status0 != RV_OK) return status0;
+    StringArg a1 { repetition, repetition_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->createPattern(DomUnionArgument<Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>>> { std::move(*a0) }, a1.string()); }, [&](auto&& value) { return storeHandle<CanvasPattern>(value, result); });
 }
 
 // CanvasRenderingContext2D.clearRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h) -> undefined
@@ -42622,6 +43098,31 @@ int32_t ranvier_dom_canvas_rendering_context2_d_is_point_in_stroke_3(RvCanvasRen
     return deliver([&]() -> decltype(auto) { return impl->isPointInStroke(HandleArg<Path2D> { a0.get() }, x, y); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// CanvasRenderingContext2D.setLineDash(sequence<unrestricted double> segments) -> undefined
+int32_t ranvier_dom_canvas_rendering_context2_d_set_line_dash(RvCanvasRenderingContext2D* target, const RvDomSequenceUnrestrictedDouble* segments)
+{
+    if (!target || !segments)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceUnrestrictedDouble(segments, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setLineDash(DomSequenceArgument<double> { std::move(*a0) }); });
+}
+
+// CanvasRenderingContext2D.getLineDash() -> sequence<unrestricted double>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_canvas_rendering_context2_d_get_line_dash(RvCanvasRenderingContext2D* target, RvDomSequenceUnrestrictedDouble* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getLineDash(); }, [&](auto&& value) { return encodeRvDomSequenceUnrestrictedDouble(value, result); });
+}
+
 // CanvasRenderingContext2D.closePath() -> undefined
 int32_t ranvier_dom_canvas_rendering_context2_d_close_path(RvCanvasRenderingContext2D* target)
 {
@@ -42748,6 +43249,63 @@ int32_t ranvier_dom_canvas_rendering_context2_d_ellipse(RvCanvasRenderingContext
         return RV_ERR_WRONG_THREAD;
     RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
     return invoke([&]() -> decltype(auto) { return impl->ellipse(x, y, radius_x, radius_y, rotation, start_angle, end_angle, !!anticlockwise); });
+}
+
+// CanvasGradient.addColorStop(double offset, DOMString color) -> undefined; context is an explicit checked Document for the operation
+int32_t ranvier_dom_canvas_gradient_add_color_stop(RvCanvasGradient* target, RvNode* context, double offset, const uint8_t* color, int32_t color_length)
+{
+    if (!target || !context || !(color_length >= 0 && (color_length <= 0 || color)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasGradient> impl = reinterpret_cast<CanvasGradient*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    if (!std::isfinite(offset))
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError, "A finite numeric value is required."_s });
+    StringArg a1 { color, color_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->addColorStop(document.get(), offset, a1.string()); });
+}
+
+// CanvasPattern.setTransform(optional DOMMatrix2DInit transform = {}) -> undefined; transform defaults to {} in IDL; transform may be NULL for the IDL default
+int32_t ranvier_dom_canvas_pattern_set_transform(RvCanvasPattern* target, const RvDomDOMMatrix2DInit* transform)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<CanvasPattern> impl = reinterpret_cast<CanvasPattern*>(target);
+    DOMMatrix2DInit a0 { };
+    if (transform) {
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, a) + sizeof(transform->a) && transform->a)
+            assignValue(a0.a, *transform->a);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, b) + sizeof(transform->b) && transform->b)
+            assignValue(a0.b, *transform->b);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, c) + sizeof(transform->c) && transform->c)
+            assignValue(a0.c, *transform->c);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, d) + sizeof(transform->d) && transform->d)
+            assignValue(a0.d, *transform->d);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, e) + sizeof(transform->e) && transform->e)
+            assignValue(a0.e, *transform->e);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, f) + sizeof(transform->f) && transform->f)
+            assignValue(a0.f, *transform->f);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m11) + sizeof(transform->m11) && transform->m11)
+            assignValue(a0.m11, *transform->m11);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m12) + sizeof(transform->m12) && transform->m12)
+            assignValue(a0.m12, *transform->m12);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m21) + sizeof(transform->m21) && transform->m21)
+            assignValue(a0.m21, *transform->m21);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m22) + sizeof(transform->m22) && transform->m22)
+            assignValue(a0.m22, *transform->m22);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m41) + sizeof(transform->m41) && transform->m41)
+            assignValue(a0.m41, *transform->m41);
+        if (transform->size >= offsetof(RvDomDOMMatrix2DInit, m42) + sizeof(transform->m42) && transform->m42)
+            assignValue(a0.m42, *transform->m42);
+    }
+    return invoke([&]() -> decltype(auto) { return impl->setTransform(std::move(a0)); });
 }
 
 // Path2D.constructor: target is the Document of the constructed object; *result is a new reference

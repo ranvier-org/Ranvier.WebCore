@@ -94,6 +94,7 @@ typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
 typedef struct RvCanvasGradient RvCanvasGradient;
 typedef struct RvCanvasPattern RvCanvasPattern;
 typedef struct RvPath2D RvPath2D;
+typedef struct RvImageBitmap RvImageBitmap;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -147,6 +148,7 @@ typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVString
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
+typedef struct RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue;
 typedef struct RvDomUnionUnrestrictedDoubleOrDOMPointInit RvDomUnionUnrestrictedDoubleOrDOMPointInit;
 typedef struct RvDomSequenceUnrestrictedDoubleOrDOMPointInit RvDomSequenceUnrestrictedDoubleOrDOMPointInit;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
@@ -387,6 +389,20 @@ enum {
     RV_DOM_CANVAS_FILL_RULE_EVENODD = 1, /* "evenodd" */
 };
 
+/* The values of the IDL enumeration CanvasLineCap. */
+enum {
+    RV_DOM_CANVAS_LINE_CAP_BUTT = 0, /* "butt" */
+    RV_DOM_CANVAS_LINE_CAP_ROUND = 1, /* "round" */
+    RV_DOM_CANVAS_LINE_CAP_SQUARE = 2, /* "square" */
+};
+
+/* The values of the IDL enumeration CanvasLineJoin. */
+enum {
+    RV_DOM_CANVAS_LINE_JOIN_ROUND = 0, /* "round" */
+    RV_DOM_CANVAS_LINE_JOIN_BEVEL = 1, /* "bevel" */
+    RV_DOM_CANVAS_LINE_JOIN_MITER = 2, /* "miter" */
+};
+
 /* The values of the IDL enumeration DocumentReadyState. */
 enum {
     RV_DOM_DOCUMENT_READY_STATE_LOADING = 0, /* "loading" */
@@ -405,6 +421,13 @@ enum {
     RV_DOM_HIGHLIGHT_TYPE_HIGHLIGHT = 0, /* "highlight" */
     RV_DOM_HIGHLIGHT_TYPE_SPELLING_ERROR = 1, /* "spelling-error" */
     RV_DOM_HIGHLIGHT_TYPE_GRAMMAR_ERROR = 2, /* "grammar-error" */
+};
+
+/* The values of the IDL enumeration ImageSmoothingQuality. */
+enum {
+    RV_DOM_IMAGE_SMOOTHING_QUALITY_LOW = 0, /* "low" */
+    RV_DOM_IMAGE_SMOOTHING_QUALITY_MEDIUM = 1, /* "medium" */
+    RV_DOM_IMAGE_SMOOTHING_QUALITY_HIGH = 2, /* "high" */
 };
 
 /* The values of the IDL enumeration OrientationType. */
@@ -975,6 +998,7 @@ typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVString
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
+typedef struct RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue;
 typedef struct RvDomUnionUnrestrictedDoubleOrDOMPointInit RvDomUnionUnrestrictedDoubleOrDOMPointInit;
 typedef struct RvDomSequenceUnrestrictedDoubleOrDOMPointInit RvDomSequenceUnrestrictedDoubleOrDOMPointInit;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
@@ -1557,6 +1581,25 @@ struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern {
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 enum {
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_IMAGE_ELEMENT = 1,
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_CANVAS_ELEMENT = 2,
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_SVG_IMAGE_ELEMENT = 3,
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_IMAGE_BITMAP = 4,
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_CSS_STYLE_IMAGE_VALUE = 5,
+};
+struct RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue {
+    int32_t present;
+    int32_t tag;
+    RvNode* arm0;
+    RvNode* arm1;
+    RvNode* arm2;
+    RvImageBitmap* arm3;
+    RvCSSStyleValue* arm4;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
     RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_POINT_INIT_NUMBER = 1,
     RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_POINT_INIT_DOM_POINT_INIT = 2,
 };
@@ -1683,6 +1726,7 @@ RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 RV_EXPORT void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
+RV_EXPORT void rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value);
 RV_EXPORT void rv_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionUnrestrictedDoubleOrDOMPointInit* value);
 RV_EXPORT void rv_dom_sequence_unrestricted_double_or_dom_point_init_release(RvDomSequenceUnrestrictedDoubleOrDOMPointInit* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
@@ -1962,6 +2006,10 @@ RV_EXPORT RvCanvasPattern* rv_dom_canvas_pattern_retain(RvCanvasPattern*);
 RV_EXPORT void rv_dom_path2_d_release(RvPath2D*);
 /* Adds a reference to a Path2D and returns it. */
 RV_EXPORT RvPath2D* rv_dom_path2_d_retain(RvPath2D*);
+/* Releases a handle to a ImageBitmap. */
+RV_EXPORT void rv_dom_image_bitmap_release(RvImageBitmap*);
+/* Adds a reference to a ImageBitmap and returns it. */
+RV_EXPORT RvImageBitmap* rv_dom_image_bitmap_retain(RvImageBitmap*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -8292,17 +8340,66 @@ RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_global_alpha(RvCanvasRe
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_global_composite_operation(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length);
 /* CanvasRenderingContext2D.globalCompositeOperation setter: attribute DOMString globalCompositeOperation */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_global_composite_operation(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length);
+/* CanvasRenderingContext2D.imageSmoothingEnabled getter: attribute boolean imageSmoothingEnabled */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_image_smoothing_enabled(RvCanvasRenderingContext2D* target, int32_t* result);
+/* CanvasRenderingContext2D.imageSmoothingEnabled setter: attribute boolean imageSmoothingEnabled */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_image_smoothing_enabled(RvCanvasRenderingContext2D* target, int32_t value);
+/* CanvasRenderingContext2D.imageSmoothingQuality getter: attribute ImageSmoothingQuality imageSmoothingQuality */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_image_smoothing_quality(RvCanvasRenderingContext2D* target, int32_t* result);
+/* CanvasRenderingContext2D.imageSmoothingQuality setter: attribute ImageSmoothingQuality imageSmoothingQuality */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_image_smoothing_quality(RvCanvasRenderingContext2D* target, int32_t value);
+/* CanvasRenderingContext2D.strokeStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) strokeStyle;
+ * *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_stroke_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result);
+/* CanvasRenderingContext2D.strokeStyle setter: attribute (DOMString or CanvasGradient or CanvasPattern) strokeStyle */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_stroke_style(RvCanvasRenderingContext2D* target, const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
 /* CanvasRenderingContext2D.fillStyle getter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle;
  * *result owns its contents; release with the matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_fill_style(RvCanvasRenderingContext2D* target, RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* result);
 /* CanvasRenderingContext2D.fillStyle setter: attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_fill_style(RvCanvasRenderingContext2D* target, const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
+/* CanvasRenderingContext2D.shadowOffsetX getter: attribute unrestricted double shadowOffsetX */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_shadow_offset_x(RvCanvasRenderingContext2D* target, double* result);
+/* CanvasRenderingContext2D.shadowOffsetX setter: attribute unrestricted double shadowOffsetX */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_shadow_offset_x(RvCanvasRenderingContext2D* target, double value);
+/* CanvasRenderingContext2D.shadowOffsetY getter: attribute unrestricted double shadowOffsetY */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_shadow_offset_y(RvCanvasRenderingContext2D* target, double* result);
+/* CanvasRenderingContext2D.shadowOffsetY setter: attribute unrestricted double shadowOffsetY */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_shadow_offset_y(RvCanvasRenderingContext2D* target, double value);
+/* CanvasRenderingContext2D.shadowBlur getter: attribute unrestricted double shadowBlur */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_shadow_blur(RvCanvasRenderingContext2D* target, double* result);
+/* CanvasRenderingContext2D.shadowBlur setter: attribute unrestricted double shadowBlur */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_shadow_blur(RvCanvasRenderingContext2D* target, double value);
+/* CanvasRenderingContext2D.shadowColor getter: attribute DOMString shadowColor */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_shadow_color(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length);
+/* CanvasRenderingContext2D.shadowColor setter: attribute DOMString shadowColor */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_shadow_color(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length);
 /* CanvasRenderingContext2D.filter getter: attribute DOMString filter; RV_ERR_UNSUPPORTED while the setting
  * CanvasFiltersEnabled is off */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_filter(RvCanvasRenderingContext2D* target, char* buffer, int32_t capacity, int32_t* length);
 /* CanvasRenderingContext2D.filter setter: attribute DOMString filter; RV_ERR_UNSUPPORTED while the setting
  * CanvasFiltersEnabled is off */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_filter(RvCanvasRenderingContext2D* target, const uint8_t* value, int32_t value_length);
+/* CanvasRenderingContext2D.lineWidth getter: attribute unrestricted double lineWidth */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_line_width(RvCanvasRenderingContext2D* target, double* result);
+/* CanvasRenderingContext2D.lineWidth setter: attribute unrestricted double lineWidth */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_line_width(RvCanvasRenderingContext2D* target, double value);
+/* CanvasRenderingContext2D.lineCap getter: attribute CanvasLineCap lineCap */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_line_cap(RvCanvasRenderingContext2D* target, int32_t* result);
+/* CanvasRenderingContext2D.lineCap setter: attribute CanvasLineCap lineCap */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_line_cap(RvCanvasRenderingContext2D* target, int32_t value);
+/* CanvasRenderingContext2D.lineJoin getter: attribute CanvasLineJoin lineJoin */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_line_join(RvCanvasRenderingContext2D* target, int32_t* result);
+/* CanvasRenderingContext2D.lineJoin setter: attribute CanvasLineJoin lineJoin */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_line_join(RvCanvasRenderingContext2D* target, int32_t value);
+/* CanvasRenderingContext2D.miterLimit getter: attribute unrestricted double miterLimit */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_miter_limit(RvCanvasRenderingContext2D* target, double* result);
+/* CanvasRenderingContext2D.miterLimit setter: attribute unrestricted double miterLimit */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_miter_limit(RvCanvasRenderingContext2D* target, double value);
+/* CanvasRenderingContext2D.lineDashOffset getter: attribute unrestricted double lineDashOffset */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_line_dash_offset(RvCanvasRenderingContext2D* target, double* result);
+/* CanvasRenderingContext2D.lineDashOffset setter: attribute unrestricted double lineDashOffset */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_line_dash_offset(RvCanvasRenderingContext2D* target, double value);
 /* CanvasRenderingContext2D.save() -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_save(RvCanvasRenderingContext2D* target);
 /* CanvasRenderingContext2D.restore() -> undefined */
@@ -8332,6 +8429,18 @@ RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_transform_6(RvCanvasRen
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_transform_1(RvCanvasRenderingContext2D* target, const RvDomDOMMatrix2DInit* transform);
 /* CanvasRenderingContext2D.resetTransform() -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_reset_transform(RvCanvasRenderingContext2D* target);
+/* CanvasRenderingContext2D.createLinearGradient(double x0, double y0, double x1, double y1) -> CanvasGradient;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_create_linear_gradient(RvCanvasRenderingContext2D* target, double x0, double y0, double x1, double y1, RvCanvasGradient** result);
+/* CanvasRenderingContext2D.createRadialGradient(double x0, double y0, double r0, double x1, double y1, double r1) ->
+ * CanvasGradient; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_create_radial_gradient(RvCanvasRenderingContext2D* target, double x0, double y0, double r0, double x1, double y1, double r1, RvCanvasGradient** result);
+/* CanvasRenderingContext2D.createConicGradient(double angle, double x, double y) -> CanvasGradient; *result is a new
+ * reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_create_conic_gradient(RvCanvasRenderingContext2D* target, double angle, double x, double y, RvCanvasGradient** result);
+/* CanvasRenderingContext2D.createPattern(CanvasImageSource image, DOMString repetition) -> CanvasPattern?; *result is
+ * a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_create_pattern(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, const uint8_t* repetition, int32_t repetition_length, RvCanvasPattern** result);
 /* CanvasRenderingContext2D.clearRect(unrestricted double x, unrestricted double y, unrestricted double w,
  * unrestricted double h) -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_clear_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
@@ -8369,6 +8478,11 @@ RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_path_4(RvCanvas
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_stroke_2(RvCanvasRenderingContext2D* target, double x, double y, int32_t* result);
 /* CanvasRenderingContext2D.isPointInStroke(Path2D path, unrestricted double x, unrestricted double y) -> boolean */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_is_point_in_stroke_3(RvCanvasRenderingContext2D* target, RvPath2D* path, double x, double y, int32_t* result);
+/* CanvasRenderingContext2D.setLineDash(sequence<unrestricted double> segments) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_line_dash(RvCanvasRenderingContext2D* target, const RvDomSequenceUnrestrictedDouble* segments);
+/* CanvasRenderingContext2D.getLineDash() -> sequence<unrestricted double>; *result owns its contents; release with
+ * the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_line_dash(RvCanvasRenderingContext2D* target, RvDomSequenceUnrestrictedDouble* result);
 /* CanvasRenderingContext2D.closePath() -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_close_path(RvCanvasRenderingContext2D* target);
 /* CanvasRenderingContext2D.moveTo(unrestricted double x, unrestricted double y) -> undefined */
@@ -8402,6 +8516,16 @@ RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_arc(RvCanvasRenderingContex
  * unrestricted double radiusY, unrestricted double rotation, unrestricted double startAngle, unrestricted double
  * endAngle, optional boolean anticlockwise = false) -> undefined; anticlockwise defaults to false in IDL */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_ellipse(RvCanvasRenderingContext2D* target, double x, double y, double radius_x, double radius_y, double rotation, double start_angle, double end_angle, int32_t anticlockwise);
+/* CanvasGradient */
+
+/* CanvasGradient.addColorStop(double offset, DOMString color) -> undefined; context is an explicit checked Document
+ * for the operation */
+RV_EXPORT int32_t rv_dom_canvas_gradient_add_color_stop(RvCanvasGradient* target, RvNode* context, double offset, const uint8_t* color, int32_t color_length);
+/* CanvasPattern */
+
+/* CanvasPattern.setTransform(optional DOMMatrix2DInit transform = {}) -> undefined; transform defaults to {} in IDL;
+ * transform may be NULL for the IDL default */
+RV_EXPORT int32_t rv_dom_canvas_pattern_set_transform(RvCanvasPattern* target, const RvDomDOMMatrix2DInit* transform);
 /* Path2D */
 
 /* Path2D.constructor: target is the Document of the constructed object; *result is a new reference */

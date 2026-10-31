@@ -357,7 +357,9 @@ class InterfaceEmitter:
             lines += [f'    [<Fable.Core.Emit("{predicate}")>]',
                       f'    let private is{name} (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         for name, children in self.unions.items():
-            lines += ['', f'    let private box{name} (value: {name}) : obj =']
+            head = f'    let private box{name} (value: {name}) : obj ='
+            # Fantomas puts the parameter and the return type on their own lines past the line length.
+            lines += ['', head] if len(head) <= 150 else ['', f'    let private box{name}', f'        (value: {name})', '        : obj =']
             if name in reference_unions:
                 lines += ['        if isNull (box value) then', '            nullArg "value"', '']
             lines += ['        match value with']

@@ -1791,6 +1791,9 @@ class Generator(ComplexGeneratorMixin):
                 prepare += [f"if (status{index} != RV_OK) return status{index};"]
                 if mapped.kind == "sequence" and not mapped.nullable:
                     passed.append(f"DomSequenceArgument<{self.transport_cpp(mapped.subtypes[0])}> {{ std::move(*a{index}) }}")
+                elif f"{function.interface}.{member.name}" in self.world.config.get("unionArgumentConversions", []):
+                    # The engine's variant orders or extends the arms differently, so each arm converts on its own.
+                    passed.append(f"DomUnionArgument<{self.transport_cpp(mapped)}> {{ std::move(*a{index}) }}")
                 else:
                     passed.append(f"std::move(*a{index})")
             elif mapped.kind == 'typedarray':

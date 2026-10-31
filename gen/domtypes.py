@@ -355,7 +355,11 @@ class ComplexGeneratorMixin:
                  '        return FixedVector<U> { std::move(converted) };', '    }',
                  '    operator std::optional<Vector<T>>() && { return std::move(values); }',
                  '    // A span parameter borrows the values for the call, which the argument temporary outlives.',
-                 '    operator std::span<const T>() && { return values.span(); }', '};']
+                 '    operator std::span<const T>() && { return values.span(); }', '};',
+                 '// A decoded union passed to an engine variant with other arm order or arms: each arm converts on its own.',
+                 'template<typename V> struct DomUnionArgument {', '    V value;',
+                 '    template<typename T> operator T() && { return WTF::switchOn(std::move(value), [](auto&& arm) -> T { return T { std::move(arm) }; }); }',
+                 '};']
         lines += dictionary_declarations
         if self.uses_complex_string_spans():
             lines += ['RvDomUtf8StringSpan copyOwnedDomStringSpan(const String& value)', '{',
