@@ -64,8 +64,11 @@ Recorded with numbers in `docs/dialog-popover-evidence/`.
   in both engines.
 - **toggle-before-close:** on the close-request path (Escape, light dismiss, `closedby`) WebKit fires `toggle`
   before `close`; Chromium fires `close` first. 3 of 3 dialogs in the case differ; `close()` orders both the same way.
-- **coalesced-dialog-toggles:** queued dialog toggles coalesce at task boundaries. In the modal case native delivers
-  8 events and Chromium 10.
+- **coalesced-toggles (unordered):** a pending toggle task absorbs the next toggle of the same element, so the toggle
+  count depends on when tasks run. The probe drains the run loop after every step and compares, per element, the
+  close count, the last `newState` and the `oldState`/`newState` chain, not the toggle count. With the drain the native
+  engine coalesces nothing in these cases. Chromium coalesces one open and close into a single `closed>closed` toggle.
+  The probe passes 30 of 30 repeated runs on Native30 candidate 1 and on caret1's Native32 candidate 2.
 - **hint-light-dismiss-order:** light dismiss closes the auto popover before the hint popover natively and the hint
   first in Chromium; 1 of 14 `beforetoggle` events is reordered. All hint values match, so the host enables
   `PopoverHintEnabled`.
