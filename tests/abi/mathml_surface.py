@@ -198,7 +198,7 @@ def verify(native_directory):
         p.bind('rv_dom_style_property_map_read_only_release', None, [p.pointer])(kept_map)
         p.collect()
         p.expect_expired()
-        print('MATHML_STATE ' + json.dumps(state, sort_keys=True, ensure_ascii=False), flush=True)
+        print('MATHML_STATE ' + json.dumps(state, sort_keys=True), flush=True)
         print(f'PASS MathML surface: {p.assertions} assertions', flush=True)
         return p.assertions
 
