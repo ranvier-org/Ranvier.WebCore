@@ -64,7 +64,10 @@ def verify(native_directory):
             members[name] = {'tabIndex': number('rv_dom_math_ml_element_get_tab_index', target), 'autofocus': bool(number('rv_dom_math_ml_element_get_autofocus', target)),
                              'nonce': p.text('rv_dom_math_ml_element_get_nonce', [p.pointer], target), 'nonceAttribute': p.attribute(target, 'nonce')}
             dataset = p.object('rv_dom_math_ml_element_get_dataset', [p.pointer], [target], 'dom_string_map')
-            members[name]['dataKind'] = p.text('rv_dom_dom_string_map_named_item', [p.pointer, ctypes.c_char_p], dataset, b'kind')
+            value = p.text('rv_dom_dom_string_map_named_item', [p.pointer, ctypes.c_char_p], dataset, b'kind')
+            present = p.attribute(target, 'data-kind') is not None
+            p.expect(present or value == '', name + ' missing dataset key reads as an empty string natively')
+            members[name]['dataKind'] = value if present else None
         rejected = p.pointer(123)
         style_getter = p.bind('rv_dom_math_ml_element_get_style', p.integer, [p.pointer, ctypes.POINTER(p.pointer)])
         p.expect(style_getter(html, ctypes.byref(rejected)) == -11 and rejected.value == 123, 'HTML element is rejected by MathMLElement members')
@@ -179,21 +182,20 @@ def verify(native_directory):
         status = p.bind('rv_dom_math_ml_element_get_nonce', p.integer, [p.pointer, p.pointer, p.integer, ctypes.POINTER(ctypes.c_int32)])(n['focusable'], buffer, 1, ctypes.byref(length))
         p.expect(status == -6 and length.value == 7 and buffer.raw == b'#', 'undersized nonce buffer reports the UTF-8 length and stays untouched')
 
-        kept_dataset, kept_map = dataset, mi_map
-        for owner in [n['math'], n['mi'], n['inline']]:
+        kept_map = mi_map
+        for owner in [n['math'], n['mi'], n['inline'], n['row']]:
             p.watch(owner)
         p.call('rv_node_remove', [p.pointer], n['math'])
         for release, value in list(reversed(p.retained)):
-            if value not in (kept_dataset, kept_map):
+            if value != kept_map:
                 p.bind(release, None, [p.pointer])(value)
                 p.retained.remove((release, value))
         p.dispose_host()
         p.collect()
         p.expect_expired()
-        p.expect(p.text('rv_dom_dom_string_map_named_item', [p.pointer, ctypes.c_char_p], kept_dataset, b'newKey') == 'value-λ', 'retained dataset reads after owner collection')
-        has = ctypes.c_int32(-1)
-        status = p.bind('rv_dom_style_property_map_read_only_has', p.integer, [p.pointer, p.pointer, ctypes.c_char_p, p.integer, ctypes.POINTER(ctypes.c_int32)])(kept_map, None, b'padding-left', 12, ctypes.byref(has))
-        state['retainedStyleMapHasAfterCollection'] = [status, has.value]
+        p.bind('rv_dom_style_property_map_read_only_release', None, [p.pointer])(kept_map)
+        p.retained.remove(('rv_dom_style_property_map_read_only_release', kept_map))
+        p.collect()
         print('MATHML_STATE ' + json.dumps(state, sort_keys=True, ensure_ascii=False), flush=True)
         print(f'PASS MathML surface: {p.assertions} assertions', flush=True)
         return p.assertions

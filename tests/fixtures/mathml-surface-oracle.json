@@ -222,5 +222,9 @@
     }
   },
   "nativeQualifications": {},
-  "qualificationNotes": {}
+  "qualificationNotes": {
+    "members.dataKind": "Not a native qualification: the shared contract (alpha.13 dataset missing-key semantics) normalises a missing key to \"\" on native and Fable; raw Chromium returns undefined. Presence is asserted through the data-* attribute.",
+    "MathMLMathElement": "NotExposed in measured Chromium 156 (no global interface); native exposes it as a typed model interface with capability dom:MathMLMathElement and no own members.",
+    "MathMLEnabled": "Host always enables MathML; generated members return RV_ERR_UNSUPPORTED when the setting is off, but the disabled-setting behaviour is unexercised."
+  }
 }

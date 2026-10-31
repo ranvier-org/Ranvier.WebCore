@@ -51,3 +51,9 @@ Out of scope, recorded explicitly:
 
 - Stack on H05's Native22 branch once it exists, or on PR132 now?
 - Is the `MathMLEnabled`-off state required evidence (a disabled-setting host), or out of scope, since the host only reads settings?
+
+## Checkpoint (focused, unallocated)
+
+Root approved the plan: stack on PR132; a MathMLEnabled-off host is out of scope. `MathMLMathElement` is selected (249 interfaces, 2455 functions, 50 roots, 22 dictionaries, 0 stubs) and listed in the capability catalogue. RED: the Native21 runtime lacks `dom:MathMLMathElement`. GREEN: `tests/abi/mathml_surface.py` passes 367 assertions on the private candidate built on `native21-candidate-0032`, matching Chromium 156 on identity and namespace for 13 elements, all 11 mixin members, layout and paint effects of inline and typed style, focus, Tab order, nonce, autofocus and tabIndex, with error and owner-expiry checks (`docs/mathml-evidence/receipt.json`).
+
+Qualifications: Chromium has no `MathMLMathElement` interface (NotExposed). The host always enables MathML, so disabled-setting behaviour is unexercised. The dataset missing-key `""` is the shared contract, not a native difference. A node held past host destruction keeps its subtree alive (pre-existing, reported). Native23 allocation, full batch and PR remain.

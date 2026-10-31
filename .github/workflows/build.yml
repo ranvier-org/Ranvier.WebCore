@@ -457,6 +457,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/svg_resources.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify typed MathML elements, styling and focus
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/mathml_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify passive capability catalogue and live host observations
         run: python -I tests/abi/capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
