@@ -485,6 +485,14 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/viewport_events.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify form collections, FormData and submit events against the Chromium oracle
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/form_collections.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify form submission keeps the host document
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/form_navigation.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify passive capability catalogue and live host observations
         run: python -I tests/abi/capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 

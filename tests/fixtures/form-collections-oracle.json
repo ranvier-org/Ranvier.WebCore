@@ -1,0 +1,1724 @@
+{
+  "browser": "chromium 156.0.8078.4",
+  "cases": [
+    {
+      "name": "elements-initial",
+      "steps": [
+        {
+          "op": "elementsList",
+          "result": [
+            "a1",
+            "a2",
+            "idonly",
+            "x",
+            "y",
+            "fs",
+            "inner",
+            "out",
+            "dis",
+            "cb",
+            "cb2",
+            "file",
+            "s",
+            "ta",
+            "b1",
+            "b2",
+            "b3",
+            "sub",
+            "outside"
+          ]
+        },
+        {
+          "op": "elementsLength",
+          "result": 19
+        },
+        {
+          "op": "elementsItem",
+          "result": "a1"
+        },
+        {
+          "op": "elementsItem",
+          "result": null
+        },
+        {
+          "op": "elementsList",
+          "result": [
+            "other"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "elements-named",
+      "steps": [
+        {
+          "op": "elementsNamed",
+          "result": {
+            "radioNodeList": [
+              "a1",
+              "a2",
+              "outside"
+            ]
+          }
+        },
+        {
+          "op": "elementsNamed",
+          "result": {
+            "element": "idonly"
+          }
+        },
+        {
+          "op": "elementsNamed",
+          "result": {
+            "element": "x"
+          }
+        },
+        {
+          "op": "elementsNamed",
+          "result": {
+            "radioNodeList": [
+              "x",
+              "y"
+            ]
+          }
+        },
+        {
+          "op": "elementsNamed",
+          "result": {
+            "element": "y"
+          }
+        },
+        {
+          "op": "elementsNamed",
+          "result": {
+            "element": "inner"
+          }
+        },
+        {
+          "op": "elementsNamed",
+          "result": null
+        },
+        {
+          "op": "elementsNamed",
+          "result": null
+        },
+        {
+          "op": "elementsNamed",
+          "result": null
+        }
+      ]
+    },
+    {
+      "name": "elements-removed-and-moved",
+      "steps": [
+        {
+          "op": "remove",
+          "result": null
+        },
+        {
+          "op": "elementsNamed",
+          "result": {
+            "radioNodeList": [
+              "a1",
+              "outside"
+            ]
+          }
+        },
+        {
+          "op": "remove",
+          "result": null
+        },
+        {
+          "op": "elementsNamed",
+          "result": {
+            "element": "a1"
+          }
+        },
+        {
+          "op": "append",
+          "result": null
+        },
+        {
+          "op": "elementsNamed",
+          "result": null
+        },
+        {
+          "op": "elementsList",
+          "result": [
+            "other",
+            "a1"
+          ]
+        },
+        {
+          "op": "append",
+          "result": null
+        },
+        {
+          "op": "elementsList",
+          "result": [
+            "idonly",
+            "x",
+            "y",
+            "fs",
+            "out",
+            "dis",
+            "cb",
+            "cb2",
+            "file",
+            "s",
+            "ta",
+            "b1",
+            "b2",
+            "b3",
+            "sub"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "elements-form-attribute",
+      "steps": [
+        {
+          "op": "setAttribute",
+          "result": null
+        },
+        {
+          "op": "setAttribute",
+          "result": null
+        },
+        {
+          "op": "elementsList",
+          "result": [
+            "a1",
+            "a2",
+            "x",
+            "y",
+            "fs",
+            "inner",
+            "out",
+            "dis",
+            "cb",
+            "cb2",
+            "file",
+            "s",
+            "ta",
+            "b1",
+            "b2",
+            "b3",
+            "sub"
+          ]
+        },
+        {
+          "op": "elementsList",
+          "result": [
+            "idonly",
+            "outside",
+            "other"
+          ]
+        },
+        {
+          "op": "elementsNamed",
+          "result": {
+            "element": "outside"
+          }
+        },
+        {
+          "op": "removeAttribute",
+          "result": null
+        },
+        {
+          "op": "elementsList",
+          "result": [
+            "idonly",
+            "other"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "options-initial",
+      "steps": [
+        {
+          "op": "optionsList",
+          "result": [
+            "o1",
+            "o2",
+            "o3"
+          ]
+        },
+        {
+          "op": "optionsLength",
+          "result": 3
+        },
+        {
+          "op": "selectedIndex",
+          "result": 2
+        },
+        {
+          "op": "optionsItem",
+          "result": "o2"
+        },
+        {
+          "op": "optionsItem",
+          "result": null
+        },
+        {
+          "op": "optionsNamed",
+          "result": "o2"
+        },
+        {
+          "op": "optionsNamed",
+          "result": "o1"
+        },
+        {
+          "op": "optionsNamed",
+          "result": null
+        },
+        {
+          "op": "optionsNamed",
+          "result": null
+        }
+      ]
+    },
+    {
+      "name": "options-add",
+      "steps": [
+        {
+          "op": "create",
+          "result": null
+        },
+        {
+          "op": "optionsAdd",
+          "result": {
+            "status": "NotFoundError",
+            "events": []
+          }
+        },
+        {
+          "op": "create",
+          "result": null
+        },
+        {
+          "op": "optionsAdd",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "create",
+          "result": null
+        },
+        {
+          "op": "optionsAdd",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "create",
+          "result": null
+        },
+        {
+          "op": "optionsAdd",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "create",
+          "result": null
+        },
+        {
+          "op": "optionsAdd",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "create",
+          "result": null
+        },
+        {
+          "op": "optionsAdd",
+          "result": {
+            "status": "NotFoundError",
+            "events": []
+          }
+        },
+        {
+          "op": "optionsList",
+          "result": [
+            "n2",
+            "o1",
+            "o2",
+            "o3",
+            "n3",
+            "n4"
+          ]
+        },
+        {
+          "op": "selectedIndex",
+          "result": 3
+        }
+      ]
+    },
+    {
+      "name": "options-remove-and-length",
+      "steps": [
+        {
+          "op": "optionsRemove",
+          "result": null
+        },
+        {
+          "op": "optionsRemove",
+          "result": null
+        },
+        {
+          "op": "optionsRemove",
+          "result": null
+        },
+        {
+          "op": "optionsList",
+          "result": [
+            "o2",
+            "o3"
+          ]
+        },
+        {
+          "op": "optionsSetLength",
+          "result": null
+        },
+        {
+          "op": "optionsList",
+          "result": [
+            "o2"
+          ]
+        },
+        {
+          "op": "optionsSetLength",
+          "result": null
+        },
+        {
+          "op": "optionsList",
+          "result": [
+            "o2",
+            "OPTION",
+            "OPTION"
+          ]
+        },
+        {
+          "op": "optionsLength",
+          "result": 3
+        },
+        {
+          "op": "selectedIndex",
+          "result": 0
+        }
+      ]
+    },
+    {
+      "name": "options-indexed-setter",
+      "steps": [
+        {
+          "op": "create",
+          "result": null
+        },
+        {
+          "op": "optionsSetItem",
+          "result": {
+            "status": "NotFoundError",
+            "events": []
+          }
+        },
+        {
+          "op": "create",
+          "result": null
+        },
+        {
+          "op": "optionsSetItem",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "optionsList",
+          "result": [
+            "o2",
+            "o3",
+            "OPTION",
+            "OPTION",
+            "OPTION",
+            "n2"
+          ]
+        },
+        {
+          "op": "optionsSetItem",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "optionsList",
+          "result": [
+            "o2",
+            "OPTION",
+            "OPTION",
+            "OPTION",
+            "n2"
+          ]
+        },
+        {
+          "op": "optionsLength",
+          "result": 5
+        }
+      ]
+    },
+    {
+      "name": "options-selected-index",
+      "steps": [
+        {
+          "op": "setSelectedIndex",
+          "result": null
+        },
+        {
+          "op": "selectedIndex",
+          "result": 0
+        },
+        {
+          "op": "setSelectedIndex",
+          "result": null
+        },
+        {
+          "op": "selectedIndex",
+          "result": -1
+        },
+        {
+          "op": "setSelectedIndex",
+          "result": null
+        },
+        {
+          "op": "selectedIndex",
+          "result": -1
+        },
+        {
+          "op": "setSelectedIndex",
+          "result": null
+        },
+        {
+          "op": "optionsNamed",
+          "result": "o2"
+        },
+        {
+          "op": "selectedIndex",
+          "result": 1
+        }
+      ]
+    },
+    {
+      "name": "request-submit-submitters",
+      "steps": [
+        {
+          "op": "listen",
+          "result": null
+        },
+        {
+          "op": "listen",
+          "result": null
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "submit",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": true,
+                "submitter": null
+              },
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "a",
+                    "1"
+                  ],
+                  [
+                    "a",
+                    "2"
+                  ],
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "text"
+                  ],
+                  [
+                    "a",
+                    "3"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "submit",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": true,
+                "submitter": "b1"
+              },
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "a",
+                    "1"
+                  ],
+                  [
+                    "a",
+                    "2"
+                  ],
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "text"
+                  ],
+                  [
+                    "go",
+                    "one"
+                  ],
+                  [
+                    "a",
+                    "3"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "submit",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": true,
+                "submitter": "sub"
+              },
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "a",
+                    "1"
+                  ],
+                  [
+                    "a",
+                    "2"
+                  ],
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "text"
+                  ],
+                  [
+                    "s2",
+                    "Send"
+                  ],
+                  [
+                    "a",
+                    "3"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "submit",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": true,
+                "submitter": "b1"
+              },
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "a",
+                    "1"
+                  ],
+                  [
+                    "a",
+                    "2"
+                  ],
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "text"
+                  ],
+                  [
+                    "go",
+                    "one"
+                  ],
+                  [
+                    "a",
+                    "3"
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "request-submit-prevented",
+      "steps": [
+        {
+          "op": "listen",
+          "result": null
+        },
+        {
+          "op": "listen",
+          "result": null
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "submit",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": true,
+                "submitter": "b1"
+              }
+            ]
+          }
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "submit",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": true,
+                "submitter": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "request-submit-errors",
+      "steps": [
+        {
+          "op": "listen",
+          "result": null
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "TypeError",
+            "events": []
+          }
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "TypeError",
+            "events": []
+          }
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "NotFoundError",
+            "events": []
+          }
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "TypeError",
+            "events": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "submit-fires-formdata-only",
+      "steps": [
+        {
+          "op": "listen",
+          "result": null
+        },
+        {
+          "op": "listen",
+          "result": null
+        },
+        {
+          "op": "submit",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "a",
+                    "1"
+                  ],
+                  [
+                    "a",
+                    "2"
+                  ],
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "text"
+                  ],
+                  [
+                    "a",
+                    "3"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "submit",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "a",
+                    "1"
+                  ],
+                  [
+                    "a",
+                    "2"
+                  ],
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "text"
+                  ],
+                  [
+                    "a",
+                    "3"
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "formdata-listener-edits",
+      "steps": [
+        {
+          "op": "listen",
+          "result": null
+        },
+        {
+          "op": "requestSubmit",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "T"
+                  ],
+                  [
+                    "go",
+                    "one"
+                  ],
+                  [
+                    "extra",
+                    "e"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "T"
+                  ],
+                  [
+                    "s2",
+                    "Send"
+                  ],
+                  [
+                    "extra",
+                    "e"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "formDataEntries",
+          "result": [
+            [
+              "y",
+              "xy"
+            ],
+            [
+              "z",
+              "yz"
+            ],
+            [
+              "inner",
+              "in"
+            ],
+            [
+              "cb",
+              "on"
+            ],
+            [
+              "upload",
+              {
+                "file": true
+              }
+            ],
+            [
+              "s",
+              "v3"
+            ],
+            [
+              "ta",
+              "T"
+            ],
+            [
+              "s2",
+              "Send"
+            ],
+            [
+              "extra",
+              "e"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "formdata-constructor",
+      "steps": [
+        {
+          "op": "listen",
+          "result": null
+        },
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "a",
+                    "1"
+                  ],
+                  [
+                    "a",
+                    "2"
+                  ],
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "text"
+                  ],
+                  [
+                    "a",
+                    "3"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "formDataEntries",
+          "result": [
+            [
+              "a",
+              "1"
+            ],
+            [
+              "a",
+              "2"
+            ],
+            [
+              "y",
+              "xy"
+            ],
+            [
+              "z",
+              "yz"
+            ],
+            [
+              "inner",
+              "in"
+            ],
+            [
+              "cb",
+              "on"
+            ],
+            [
+              "upload",
+              {
+                "file": true
+              }
+            ],
+            [
+              "s",
+              "v3"
+            ],
+            [
+              "ta",
+              "text"
+            ],
+            [
+              "a",
+              "3"
+            ]
+          ]
+        },
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": [
+              {
+                "type": "formdata",
+                "trusted": true,
+                "bubbles": true,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "a",
+                    "1"
+                  ],
+                  [
+                    "a",
+                    "2"
+                  ],
+                  [
+                    "y",
+                    "xy"
+                  ],
+                  [
+                    "z",
+                    "yz"
+                  ],
+                  [
+                    "inner",
+                    "in"
+                  ],
+                  [
+                    "cb",
+                    "on"
+                  ],
+                  [
+                    "upload",
+                    {
+                      "file": true
+                    }
+                  ],
+                  [
+                    "s",
+                    "v3"
+                  ],
+                  [
+                    "ta",
+                    "text"
+                  ],
+                  [
+                    "go",
+                    "one"
+                  ],
+                  [
+                    "a",
+                    "3"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "formDataEntries",
+          "result": [
+            [
+              "a",
+              "1"
+            ],
+            [
+              "a",
+              "2"
+            ],
+            [
+              "y",
+              "xy"
+            ],
+            [
+              "z",
+              "yz"
+            ],
+            [
+              "inner",
+              "in"
+            ],
+            [
+              "cb",
+              "on"
+            ],
+            [
+              "upload",
+              {
+                "file": true
+              }
+            ],
+            [
+              "s",
+              "v3"
+            ],
+            [
+              "ta",
+              "text"
+            ],
+            [
+              "go",
+              "one"
+            ],
+            [
+              "a",
+              "3"
+            ]
+          ]
+        },
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "TypeError",
+            "events": []
+          }
+        },
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "NotFoundError",
+            "events": []
+          }
+        },
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "formDataEntries",
+          "result": []
+        }
+      ]
+    },
+    {
+      "name": "formdata-disabled-and-removed",
+      "steps": [
+        {
+          "op": "remove",
+          "result": null
+        },
+        {
+          "op": "setAttribute",
+          "result": null
+        },
+        {
+          "op": "setAttribute",
+          "result": null
+        },
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "formDataEntries",
+          "result": [
+            [
+              "a",
+              "2"
+            ],
+            [
+              "y",
+              "xy"
+            ],
+            [
+              "z",
+              "yz"
+            ],
+            [
+              "cb",
+              "on"
+            ],
+            [
+              "upload",
+              {
+                "file": true
+              }
+            ],
+            [
+              "s",
+              "v3"
+            ],
+            [
+              "ta",
+              "text"
+            ],
+            [
+              "a",
+              "3"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "formdata-operations",
+      "steps": [
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "formDataAppend",
+          "result": null
+        },
+        {
+          "op": "formDataAppend",
+          "result": null
+        },
+        {
+          "op": "formDataAppend",
+          "result": null
+        },
+        {
+          "op": "formDataGet",
+          "result": "1"
+        },
+        {
+          "op": "formDataGetAll",
+          "result": [
+            "1",
+            "2"
+          ]
+        },
+        {
+          "op": "formDataHas",
+          "result": true
+        },
+        {
+          "op": "formDataGet",
+          "result": "ü\u0000x"
+        },
+        {
+          "op": "formDataSet",
+          "result": null
+        },
+        {
+          "op": "formDataEntries",
+          "result": [
+            [
+              "k",
+              "3"
+            ],
+            [
+              "café",
+              "ü\u0000x"
+            ]
+          ]
+        },
+        {
+          "op": "formDataDelete",
+          "result": null
+        },
+        {
+          "op": "formDataHas",
+          "result": false
+        },
+        {
+          "op": "formDataGet",
+          "result": null
+        },
+        {
+          "op": "formDataGetAll",
+          "result": []
+        },
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "formDataGet",
+          "result": {
+            "file": true
+          }
+        },
+        {
+          "op": "formDataGetAll",
+          "result": [
+            {
+              "file": true
+            }
+          ]
+        },
+        {
+          "op": "formDataAppend",
+          "result": null
+        },
+        {
+          "op": "formDataGetAll",
+          "result": [
+            {
+              "file": true
+            },
+            "text"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "constructed-events",
+      "steps": [
+        {
+          "op": "constructSubmitEvent",
+          "result": {
+            "status": "ok",
+            "value": {
+              "type": "submit",
+              "trusted": false,
+              "bubbles": false,
+              "cancelable": true,
+              "submitter": "b1"
+            },
+            "events": []
+          }
+        },
+        {
+          "op": "constructSubmitEvent",
+          "result": {
+            "status": "ok",
+            "value": {
+              "type": "custom",
+              "trusted": false,
+              "bubbles": true,
+              "cancelable": false,
+              "submitter": null
+            },
+            "events": []
+          }
+        },
+        {
+          "op": "constructSubmitEvent",
+          "result": {
+            "status": "ok",
+            "value": {
+              "type": "submit",
+              "trusted": false,
+              "bubbles": false,
+              "cancelable": false,
+              "submitter": "p"
+            },
+            "events": []
+          }
+        },
+        {
+          "op": "formDataNew",
+          "result": {
+            "status": "ok",
+            "value": null,
+            "events": []
+          }
+        },
+        {
+          "op": "formDataAppend",
+          "result": null
+        },
+        {
+          "op": "constructFormDataEvent",
+          "result": {
+            "sameFormData": true,
+            "event": {
+              "type": "formdata",
+              "trusted": false,
+              "bubbles": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "k",
+                  "v"
+                ]
+              ]
+            }
+          }
+        },
+        {
+          "op": "dispatchFormDataEvent",
+          "result": {
+            "status": "ok",
+            "value": {
+              "dispatched": true,
+              "event": {
+                "type": "formdata",
+                "trusted": false,
+                "bubbles": false,
+                "cancelable": false,
+                "entries": [
+                  [
+                    "k",
+                    "v"
+                  ]
+                ]
+              }
+            },
+            "events": []
+          }
+        }
+      ]
+    }
+  ]
+}

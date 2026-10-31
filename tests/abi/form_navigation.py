@@ -1,7 +1,6 @@
 """Records what HTMLFormElement.requestSubmit and submit do to the host's document: the submit and formdata events
 fired, and whether the document is replaced (identity, base URL, body child count, readiness) after the run loop
-has fired the navigation scheduler's timer. Prints one JSON object per case and, with --expect-kept, fails when any
-case replaced the document."""
+has fired the navigation scheduler's timer, and fails when a case fires other events or replaces the document."""
 
 import argparse
 import ctypes
@@ -93,20 +92,33 @@ def run(directory):
     return results
 
 
+QUALIFICATION = 'host documents never navigate on form submission; the policy client is not consulted'
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('native_directory')
+    parser.add_argument('--native-directory', required=True)
     parser.add_argument('--evidence')
-    parser.add_argument('--expect-kept', action='store_true')
     args = parser.parse_args()
     results = run(args.native_directory)
-    text = json.dumps({'directory': str(Path(args.native_directory).resolve()), 'cases': results}, indent=2)
-    print(text)
+    failures = []
+    for case in results:
+        wanted = ['submit', 'formdata'] if case['name'].startswith('requestSubmit') else ['formdata']
+        if case['status'] != 0 or case['events'] != wanted:
+            failures.append(case['name'] + ': status/events ' + str((case['status'], case['events'])))
+        for moment in ('immediately', 'afterRunLoop'):
+            state, before = case[moment], case['before']
+            kept = (state['sameDocument'] and state['markerConnected'] and state['bodyChildElements'] == before['bodyChildElements']
+                    and state['readyState'] == before['readyState'] and state['baseURI'] == before['baseURI'])
+            if not kept:
+                failures.append(case['name'] + ': navigated ' + moment)
+    text = json.dumps({'directory': str(Path(args.native_directory).resolve()), 'qualification': QUALIFICATION,
+                       'failures': failures, 'cases': results}, indent=2)
     if args.evidence:
         Path(args.evidence).write_text(text + '\n', encoding='utf-8')
-    replaced = [case['name'] for case in results if not case['afterRunLoop']['sameDocument']]
-    if args.expect_kept and replaced:
-        raise SystemExit('document replaced: ' + ', '.join(replaced))
+    if failures:
+        raise SystemExit('\n'.join(failures))
+    print(f'PASS form navigation: {len(results)} cases kept the document ({QUALIFICATION})')
 
 
 if __name__ == '__main__':

@@ -399,6 +399,45 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
 
                 if viewportCalls <> 0 then
                     failwithf "%s listener ran after host destroy" kind
+        | "form controls collection"
+        | "options collection"
+        | "form data"
+        | "submit event" ->
+            let form = rv_document_create_element (host, "form")
+            let select = rv_document_create_element (host, "select")
+            let button = rv_document_create_element (host, "button")
+            rv_node_append_child (form, select) |> check "append select"
+            rv_node_append_child (form, button) |> check "append button"
+            rv_node_append_child (div, form) |> check "append form"
+
+            let releaseHeld =
+                match kind with
+                | "form controls collection" ->
+                    rv_dom_html_form_element_get_elements (form, &held.contents) |> check "elements"
+                    fun () -> rv_dom_html_collection_release held.Value
+                | "options collection" ->
+                    rv_dom_html_select_element_get_options (select, &held.contents) |> check "options"
+                    fun () -> rv_dom_html_collection_release held.Value
+                | "form data" ->
+                    rv_dom_dom_form_data_create (document, form, button, &held.contents)
+                    |> check "FormData"
+
+                    fun () -> rv_dom_dom_form_data_release held.Value
+                | _ ->
+                    let mutable init = RvDomSubmitEventInit()
+                    init.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomSubmitEventInit>())
+                    init.submitter <- button
+                    let name = Text.Encoding.UTF8.GetBytes "submit"
+
+                    rv_dom_submit_event_create (document, name, name.Length, [| init |], &held.contents)
+                    |> check "SubmitEvent"
+
+                    fun () -> rv_event_release held.Value
+
+            rv_node_release button
+            rv_node_release select
+            rv_node_release form
+            releaseHeld
         | _ ->
             rv_dom_html_element_get_attribute_style_map (div, &held.contents)
             |> check "attributeStyleMap"
@@ -505,6 +544,10 @@ let run (outDir: string) =
                     "node iterator"
                     "window target"
                     "media query list"
+                    "form controls collection"
+                    "options collection"
+                    "form data"
+                    "submit event"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove
