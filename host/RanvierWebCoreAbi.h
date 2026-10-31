@@ -1436,6 +1436,9 @@ RV_EXPORT int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, i
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
 
+/* v44: "dom-crypto-random" for rv_abi_has: rv_dom_crypto_get_random_values and rv_dom_crypto_random_uuid
+ * (RanvierWebCoreDom.h) call the crypto object of a document's Window. */
+
 #ifdef __cplusplus
 }
 #endif

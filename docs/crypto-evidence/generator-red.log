@@ -1,0 +1,37 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+C:\wk\native-crypto\tests\generator\test_domgen.py:1354: SyntaxWarning: "\[" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\["? A raw string is also an option.
+  with self.assertRaisesRegex(SystemExit, 'Crypto.fill: typed array view argument without \[ReturnValue\]'):
+E<unknown>:2: SyntaxWarning: "\[" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\["? A raw string is also an option.
+<unknown>:1: SyntaxWarning: "\[" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\["? A raw string is also an option.
+FE
+======================================================================
+ERROR: test_return_value_typed_array_view_is_an_in_out_span_with_its_element_kind (__main__.GeneratorTests.test_return_value_typed_array_view_is_an_in_out_span_with_its_element_kind)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\wk\native-crypto\tests\generator\test_domgen.py", line 1326, in test_return_value_typed_array_view_is_an_in_out_span_with_its_element_kind
+    random = functions['rv_dom_crypto_get_random_values']
+             ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'rv_dom_crypto_get_random_values'
+
+======================================================================
+ERROR: test_window_object_binding_calls_the_member_through_the_window_accessor (__main__.GeneratorTests.test_window_object_binding_calls_the_member_through_the_window_accessor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\wk\native-crypto\tests\generator\test_domgen.py", line 1309, in test_window_object_binding_calls_the_member_through_the_window_accessor
+    uuid = functions['rv_dom_crypto_random_uuid']
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'rv_dom_crypto_random_uuid'
+
+======================================================================
+FAIL: test_typed_array_view_requires_a_top_level_return_value_argument (__main__.GeneratorTests.test_typed_array_view_requires_a_top_level_return_value_argument)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\wk\native-crypto\tests\generator\test_domgen.py", line 1354, in test_typed_array_view_requires_a_top_level_return_value_argument
+    with self.assertRaisesRegex(SystemExit, 'Crypto.fill: typed array view argument without \[ReturnValue\]'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: SystemExit not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.148s
+
+FAILED (failures=1, errors=2)

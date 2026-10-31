@@ -2779,6 +2779,8 @@ WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_to_1(RvNode* target, const RvDo
 WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_to_2(RvNode* target, double x, double y);
 WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_by_1(RvNode* target, const RvDomScrollToOptions* option);
 WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_by_2(RvNode* target, double x, double y);
+WEBCORE_EXPORT int32_t ranvier_dom_crypto_get_random_values(RvNode* target, int32_t array_kind, uint8_t* array, int32_t array_length);
+WEBCORE_EXPORT int32_t ranvier_dom_crypto_random_uuid(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result);
