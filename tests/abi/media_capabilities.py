@@ -89,7 +89,7 @@ def verify(native_directory):
         host_create = p.bind('rv_host_create', P, [I, I])
         host_destroy = p.bind('rv_host_destroy', None, [P])
         load_html_bytes = p.bind('rv_host_load_html', I, [P, ctypes.c_char_p, I])  # utf8 bytes and length (#145)
-    load_html = lambda host, html: load_html_bytes(host, html, len(html))  # utf8 length
+        load_html = lambda host, html: load_html_bytes(host, html, len(html))  # utf8 length
         p.load('<!doctype html><body>media', standalone=False)
         deliveries = {}
 
