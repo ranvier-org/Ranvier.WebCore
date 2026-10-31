@@ -8,7 +8,9 @@
 #include "FocusEvent.h"
 #include "JSValueInWrappedObjectInlines.h"
 #include "KeyboardEvent.h"
+#include "LocalDOMWindow.h"
 #include "MouseEvent.h"
+#include "Navigator.h"
 #include "Node.h"
 #include "UIEvent.h"
 #include <JavaScriptCore/JSLock.h>
@@ -222,4 +224,28 @@ void ranvier_event_glue_invalidate_document(RvNode* documentHandle)
 {
     auto* document = documentOf(documentHandle);
     roots().removeAllMatching([&](auto& root) { return !root.event || !root.document || root.document.get() == document; });
+}
+
+RvEventTarget* ranvier_window_event_target(RvNode* documentHandle)
+{
+    if (!isMainThread())
+        return nullptr;
+    auto* document = documentOf(documentHandle);
+    RefPtr window = document ? document->window() : nullptr;
+    if (!window)
+        return nullptr;
+    Ref<EventTarget> target = *window;
+    return reinterpret_cast<RvEventTarget*>(&target.leakRef());
+}
+
+int32_t ranvier_window_max_touch_points(RvNode* documentHandle, int32_t* value)
+{
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentOf(documentHandle);
+    RefPtr window = document ? document->window() : nullptr;
+    if (!window)
+        return RV_ERR_UNSUPPORTED;
+    *value = window->navigator().maxTouchPoints();
+    return RV_OK;
 }

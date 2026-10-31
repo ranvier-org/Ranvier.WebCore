@@ -1159,7 +1159,7 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 33; }
+int32_t rv_abi_version(void) { return 34; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1182,6 +1182,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "font-load"))
         return 1;
     if (!std::strcmp(feature, "event-construction"))
+        return 1;
+    if (!std::strcmp(feature, "input-state"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -2164,6 +2166,22 @@ RvEventTarget* rv_host_create_event_target(RvHost* host)
     return ranvier_event_target_create(reinterpret_cast<RvNode*>(&host->document()));
 }
 
+RvEventTarget* rv_host_window_event_target(RvHost* host)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    return ranvier_window_event_target(reinterpret_cast<RvNode*>(&host->document()));
+}
+
+int32_t rv_host_max_touch_points(RvHost* host, int32_t* value)
+{
+    if (!host || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_window_max_touch_points(reinterpret_cast<RvNode*>(&host->document()), value);
+}
+
 RvEventTarget* rv_event_target_retain(RvEventTarget* handle)
 {
     if (!handle || !onOwningThread())
@@ -2792,6 +2810,9 @@ int32_t rv_host_set_focused(RvHost* host, int32_t focused)
         return RV_ERR_WRONG_THREAD;
     auto& focus = host->page->focusController();
     return dispatchCountingFailures([&] {
+        // The first activation fires one window focus event when the main frame is focused while the page is unfocused.
+        if (!focus.focusedFrame())
+            focus.setFocusedFrame(&host->frame());
         focus.setActive(!!focused);
         focus.setFocused(!!focused);
     });
