@@ -393,7 +393,9 @@ let private viewportCallback =
 /// <c>remove</c> is set), destroys the host, then releases that handle. The document and the div must be destroyed
 /// after collection whatever the destroy order.
 let private releaseName (kind: string) (remove: bool) =
-    (if remove then "removed div, " else "div, ") + kind + " released after host destroy"
+    (if remove then "removed div, " else "div, ")
+    + kind
+    + " released after host destroy"
 
 let private runReleaseAfterDestroy (kind: string) (remove: bool) =
     let host = rv_host_create (64, 64)
@@ -487,6 +489,37 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if viewportCalls <> 0 then
                     failwith "scroll listener ran after host destroy"
+        | "coordinate spaces" ->
+            rv_element_set_style (div, "width", utf8 "40px", utf8Length "40px", 0) |> check "div width"
+            rv_element_set_style (div, "height", utf8 "20px", utf8Length "20px", 0) |> check "div height"
+
+            rv_element_set_style (div, "transform", utf8 "rotate(30deg)", utf8Length "rotate(30deg)", 0)
+            |> check "div transform"
+
+            held.Value <- rv_node_retain div
+            let points = [| 0.0; 0.0 |]
+
+            rv_node_convert_points (held.Value, 0, 0n, 1, &points[0], 1)
+            |> check "node to page before destroy"
+
+            let quad = Array.zeroCreate<float> 8
+
+            rv_node_box_quad (held.Value, 0, 0n, 3, &quad[0])
+            |> check "box quad before destroy"
+
+            fun () ->
+                let after = [| 1.0; 2.0 |]
+                let status = rv_node_convert_points (held.Value, 0, 0n, 1, &after[0], 1)
+
+                if status <> -10 || after <> [| 1.0; 2.0 |] then
+                    failwithf "rv_node_convert_points after destroy: %d" status
+
+                let quadStatus = rv_node_box_quad (held.Value, 0, 0n, 3, &quad[0])
+
+                if quadStatus <> -10 then
+                    failwithf "rv_node_box_quad after destroy: %d" quadStatus
+
+                rv_node_release held.Value
         | "aria relations" ->
             rv_element_set_attribute (div, "id", utf8 "label", utf8Length "label") |> check "label id"
             rv_dom_node_set_text_content (div, utf8 "Label", utf8Length "Label") |> check "label text"
@@ -881,7 +914,10 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
         | "screen" ->
             let metrics = Runtime.InteropServices.Marshal.AllocHGlobal 36
             let values = [| 36; 1080; 1920; 0; 40; 1080; 1880; 30; 0 |]
-            values |> Array.iteri (fun index value -> Runtime.InteropServices.Marshal.WriteInt32 (metrics, index * 4, value))
+
+            values
+            |> Array.iteri (fun index value -> Runtime.InteropServices.Marshal.WriteInt32(metrics, index * 4, value))
+
             rv_host_set_screen (host, metrics) |> check "rv_host_set_screen"
             Runtime.InteropServices.Marshal.FreeHGlobal metrics
             let mutable width = 0
@@ -894,14 +930,19 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
             fun () ->
                 let mutable kept = 0
-                rv_dom_screen_get_width (held.Value, &kept) |> check "screen.width after destroy"
+
+                rv_dom_screen_get_width (held.Value, &kept)
+                |> check "screen.width after destroy"
 
                 // The document has no frame after destroy, and WebKit's Screen reports 0 without one.
                 if kept <> 0 then
                     failwithf "screen.width after destroy %d" kept
 
                 let mutable kind = -1
-                rv_dom_screen_orientation_get_type (held.Value, &kind) |> check "orientation.type after destroy"
+
+                rv_dom_screen_orientation_get_type (held.Value, &kind)
+                |> check "orientation.type after destroy"
+
                 rv_node_release held.Value
         | "diagnostics" ->
             let live = rv_diagnostic_live_count ()
@@ -1228,6 +1269,7 @@ let run (outDir: string) =
                     "visual viewport"
                     "string results"
                     "aria relations"
+                    "coordinate spaces"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

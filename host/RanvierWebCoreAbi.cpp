@@ -1377,6 +1377,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "accessibility-relations"))
         return 1;
+    if (!std::strcmp(feature, "coordinate-spaces"))
+        return 1;
     if (!std::strcmp(feature, "page-scale"))
         return 1;
     if (!std::strcmp(feature, "obscured-insets"))
@@ -3832,6 +3834,24 @@ int32_t rv_element_rect(RvNode* target, double* x, double* y, double* width, dou
     *width = rect.width();
     *height = rect.height();
     return RV_OK;
+}
+
+int32_t rv_node_convert_points(RvNode* from, int32_t fromSpace, RvNode* to, int32_t toSpace, double* xy, int32_t count)
+{
+    if (!from)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_convert_points(from, fromSpace, to, toSpace, xy, count);
+}
+
+int32_t rv_node_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace, double* quad)
+{
+    if (!node || !quad)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_box_quad(node, box, to, toSpace, quad);
 }
 
 RvNode* rv_host_element_at(RvHost* host, int32_t x, int32_t y)

@@ -394,7 +394,8 @@ class Probe:
 
 def replay(native, transport, cases, oracle, check=True, qualified=None):
     """Runs every case and returns the cases whose value differs from the expected value: the oracle's, or the WebKit
-    value of a qualified difference, which must still differ from the oracle's. check asserts each case."""
+    value of a qualified difference, which must differ from the oracle's and from the input's prefix before U+0000.
+    check asserts each case."""
     probe = Probe(native, transport)
     differ = {}
     for entry in cases:
@@ -402,6 +403,8 @@ def replay(native, transport, cases, oracle, check=True, qualified=None):
         expected = oracle['values'][entry['id']]
         if qualified and entry['id'] in qualified:
             native.expect(qualified[entry['id']]['webkit'] != expected, f"{entry['id']}: qualified value equals the oracle")
+            native.expect(qualified[entry['id']]['webkit'] != entry['value'].split(NUL)[0],
+                          f"{entry['id']}: qualified value is the input's prefix before U+0000")
             expected = qualified[entry['id']]['webkit']
         if check:
             native.expect(observed == expected, f"{entry['id']} {entry['op']}: {observed!r} vs {expected!r}")

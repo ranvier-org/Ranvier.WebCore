@@ -366,6 +366,8 @@ module Calls =
             "rv_diagnostic_release"
             "rv_diagnostic_live_count"
             "rv_host_inspect_box_model"
+            "rv_node_convert_points"
+            "rv_node_box_quad"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1329,6 +1331,19 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_inspect_box_model(nativeint host, nativeint element, double& values)
+
+    [<DllImport(Lib)>]
+    extern int rv_node_convert_points(
+        nativeint from,
+        int fromSpace,
+        nativeint ``to``,
+        int toSpace,
+        double& xy,
+        int count
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_node_box_quad(nativeint node, int box, nativeint ``to``, int toSpace, double& quad)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -4387,6 +4402,35 @@ let rv_host_inspect_box_model (host: nativeint, element: nativeint, values: byre
         result
     else
         Raw.rv_host_inspect_box_model (host, element, &values)
+
+let rv_node_convert_points
+    (from: nativeint, fromSpace: int, ``to``: nativeint, toSpace: int, xy: byref<double>, count: int)
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_node_convert_points (from, fromSpace, ``to``, toSpace, &xy, count)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[236] <- Calls.Counts[236] + 1L
+        Calls.Ticks[236] <- Calls.Ticks[236] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_node_convert_points (from, fromSpace, ``to``, toSpace, &xy, count)
+
+let rv_node_box_quad (node: nativeint, box: int, ``to``: nativeint, toSpace: int, quad: byref<double>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_node_box_quad (node, box, ``to``, toSpace, &quad)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[237] <- Calls.Counts[237] + 1L
+        Calls.Ticks[237] <- Calls.Ticks[237] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_node_box_quad (node, box, ``to``, toSpace, &quad)
 
 // END GENERATED
 
