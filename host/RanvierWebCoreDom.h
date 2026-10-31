@@ -150,7 +150,6 @@ typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSeque
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
 typedef struct RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue;
-typedef struct RvDomUnionHTMLCanvasElement RvDomUnionHTMLCanvasElement;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -990,7 +989,6 @@ typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSeque
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
 typedef struct RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue;
-typedef struct RvDomUnionHTMLCanvasElement RvDomUnionHTMLCanvasElement;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1589,17 +1587,6 @@ struct RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitm
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
-enum {
-    RV_DOM_UNION_HTML_CANVAS_ELEMENT_HTML_CANVAS_ELEMENT = 1,
-};
-struct RvDomUnionHTMLCanvasElement {
-    int32_t present;
-    int32_t tag;
-    RvNode* arm0;
-};
-
-/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
- * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1707,7 +1694,6 @@ RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 RV_EXPORT void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
 RV_EXPORT void rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value);
-RV_EXPORT void rv_dom_union_html_canvas_element_release(RvDomUnionHTMLCanvasElement* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -8365,9 +8351,6 @@ RV_EXPORT int32_t rv_dom_image_bitmap_get_height(RvImageBitmap* target, uint32_t
 RV_EXPORT int32_t rv_dom_image_bitmap_close(RvImageBitmap* target);
 /* ImageBitmapRenderingContext */
 
-/* ImageBitmapRenderingContext.canvas getter: readonly attribute ImageBitmapCanvas canvas; *result owns its contents;
- * release with the matching rv_dom_*_release */
-RV_EXPORT int32_t rv_dom_image_bitmap_rendering_context_get_canvas(RvImageBitmapRenderingContext* target, RvDomUnionHTMLCanvasElement* result);
 /* ImageBitmapRenderingContext.transferFromImageBitmap(ImageBitmap? bitmap) -> undefined; bitmap may be NULL */
 RV_EXPORT int32_t rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap(RvImageBitmapRenderingContext* target, RvImageBitmap* bitmap);
 /* DOMCSSNamespace */

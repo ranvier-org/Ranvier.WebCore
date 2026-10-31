@@ -1169,7 +1169,6 @@
       "close"
     ],
     "ImageBitmapRenderingContext": [
-      "canvas",
       "transferFromImageBitmap"
     ],
     "ImageData": [

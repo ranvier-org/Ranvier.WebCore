@@ -1771,16 +1771,6 @@ type RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmap
     val mutable arm3: nativeint
     val mutable arm4: nativeint
 
-[<Literal>]
-let RV_DOM_UNION_HTML_CANVAS_ELEMENT_HTML_CANVAS_ELEMENT = 1
-
-/// <summary>ABI transport for HTMLCanvasElement; result contents are owned until the matching release call.</summary>
-[<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomUnionHTMLCanvasElement =
-    val mutable present: int
-    val mutable tag: int
-    val mutable arm0: nativeint
-
 /// <summary>ABI transport for CSSStyleValue sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceCSSStyleValue =
@@ -1991,9 +1981,6 @@ extern void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue& value)
-
-[<DllImport(Lib)>]
-extern void rv_dom_union_html_canvas_element_release(RvDomUnionHTMLCanvasElement& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
@@ -10403,9 +10390,6 @@ extern int rv_dom_image_bitmap_get_height(nativeint target, uint32& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_image_bitmap_close(nativeint target)
-
-[<DllImport(Lib)>]
-extern int rv_dom_image_bitmap_rendering_context_get_canvas(nativeint target, RvDomUnionHTMLCanvasElement& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap(nativeint target, nativeint bitmap)

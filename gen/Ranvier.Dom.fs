@@ -5224,14 +5224,6 @@ and [<AllowNullLiteral>] ImageBitmap =
 
 /// <summary>ImageBitmapRenderingContext in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ImageBitmapRenderingContext =
-
-    /// <summary>ImageBitmapRenderingContext.canvas.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.canvas")>]
-    abstract member __ranvier_get_canvas: unit -> obj
-#else
-    abstract member canvas: HTMLCanvasElement with get
-#endif
     /// <summary>ImageBitmapRenderingContext.transferFromImageBitmap.</summary>
     abstract member transferFromImageBitmap: bitmap: ImageBitmap -> unit
 
@@ -5694,10 +5686,6 @@ and [<RequireQualifiedAccess>] HTMLImageElementOrHTMLCanvasElementOrSVGImageElem
     | ImageBitmap of ImageBitmap
     | CSSStyleImageValue of CSSImageValue
 
-/// <summary>HTMLCanvasElement in the scoped DOM interface model.</summary>
-and [<RequireQualifiedAccess>] HTMLCanvasElement =
-    | HTMLCanvasElement of HTMLCanvasElement
-
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
@@ -5964,10 +5952,6 @@ module BrowserUnionAdapters =
     let private isFile (_: obj) : bool =
         Fable.Core.Util.jsNative
 
-    [<Fable.Core.Emit("Object.prototype.toString.call($0) === '[object HTMLCanvasElement]'")>]
-    let private isHTMLCanvasElement (_: obj) : bool =
-        Fable.Core.Util.jsNative
-
     [<Fable.Core.Emit("Object.prototype.toString.call($0) === '[object RadioNodeList]'")>]
     let private isRadioNodeList (_: obj) : bool =
         Fable.Core.Util.jsNative
@@ -6185,15 +6169,6 @@ module BrowserUnionAdapters =
         | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.SVGImageElement value -> box value
         | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.ImageBitmap value -> box value
         | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.CSSStyleImageValue value -> box value
-
-    let private boxHTMLCanvasElement (value: HTMLCanvasElement) : obj =
-        match value with
-        | HTMLCanvasElement.HTMLCanvasElement value -> box value
-
-    let private unboxHTMLCanvasElement (value: obj) : HTMLCanvasElement =
-        match value with
-        | arm when isHTMLCanvasElement arm -> HTMLCanvasElement.HTMLCanvasElement (unbox<HTMLCanvasElement> arm)
-        | _ -> failwith "Unexpected DOM union result"
 
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
         match value with
@@ -6524,12 +6499,6 @@ module BrowserUnionAdapters =
 
         member this.drawImage(image: CSSImageValue, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
             this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
-
-
-    type ImageBitmapRenderingContext with
-        member this.canvas: HTMLCanvasElement =
-            let value = this.__ranvier_get_canvas ()
-            unboxHTMLCanvasElement value
 
 
     type ChildNode with

@@ -48,9 +48,7 @@ result = {
                 'rv_image_bitmap_create', 'rv_image_bitmap_result', 'rv_image_bitmap_error', 'RvImageBitmapOptions',
                 'RV_IMAGE_BITMAP_SOURCE_*', 'RV_IMAGE_BITMAP_ORIENTATION_*', 'RV_IMAGE_BITMAP_PREMULTIPLY_*',
                 'RV_IMAGE_BITMAP_COLOR_SPACE_CONVERSION_*', 'RV_IMAGE_BITMAP_RESIZE_*', 'rv_dom_image_bitmap_get_width/height',
-                'rv_dom_image_bitmap_close', 'rv_dom_image_bitmap_rendering_context_get_canvas',
-                'rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap', 'rv_dom_image_bitmap_rendering_context_release/retain',
-                'rv_dom_union_html_canvas_element_release'],
+                'rv_dom_image_bitmap_close', 'rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap', 'rv_dom_image_bitmap_rendering_context_release/retain'],
     'engine': 'HTMLCanvasElement buffers, Blob and the bitmaprenderer context from host/RanvierCanvasExportGlue.cpp, encoding through '
               'Ranvier::Internal::encodeImage (R12), and ImageBitmap::createCompletionHandler as a resource operation in '
               'host/RanvierResourceGlue.cpp',
@@ -83,6 +81,8 @@ result = {
         'VideoFrame are outside slim (ENABLE_VIDEO, ENABLE_OFFSCREEN_CANVAS, ENABLE_WEB_CODECS OFF); CSSStyleImageValue is not a source kind.',
         'ImageBitmap transfer is transferFromImageBitmap, which detaches the source; postMessage transfer needs a script realm.',
         'ImageBitmap buffers are unaccelerated where canvases are (patch 0050); GPU work is paused.',
+        'ImageBitmapRenderingContext.canvas is not generated: its single-arm union typedef ImageBitmapCanvas would name a second '
+        'HTMLCanvasElement type in the F# model; the app holds the canvas it passed to rv_canvas_get_bitmap_context.',
     ],
 }
 files = sorted(p for p in evidence.iterdir() if p.is_file() and p.name != 'final-evidence.json' and p.suffix != '.pyc')

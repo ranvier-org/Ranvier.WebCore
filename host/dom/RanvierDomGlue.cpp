@@ -3183,36 +3183,6 @@ template<typename V> int32_t encodeRvDomUnionHTMLImageElementOrHTMLCanvasElement
     return RV_OK;
 }
 
-void clearRvDomUnionHTMLCanvasElement(RvDomUnionHTMLCanvasElement* value)
-{
-    if (!value) return;
-    switch (value->tag) {
-    case 1:
-        if (value->arm0) reinterpret_cast<Node*>(value->arm0)->deref();
-        break;
-    }
-    *value = { };
-}
-template<size_t I = 0, typename V> void encodeArmsRvDomUnionHTMLCanvasElement(V&& value, RvDomUnionHTMLCanvasElement* result)
-{
-    if constexpr (I < 1) {
-        if (value.index() == I) {
-            if constexpr (I == 0) {
-                storeHandle<Node>(std::get<I>(value), &result->arm0);
-            }
-        } else encodeArmsRvDomUnionHTMLCanvasElement<I + 1>(std::forward<V>(value), result);
-    }
-}
-template<typename V> int32_t encodeRvDomUnionHTMLCanvasElement(V&& input, RvDomUnionHTMLCanvasElement* result)
-{
-    *result = { };
-    auto&& value = input;
-    result->present = 1;
-    result->tag = static_cast<int32_t>(value.index()) + 1;
-    encodeArmsRvDomUnionHTMLCanvasElement(value, result);
-    return RV_OK;
-}
-
 void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
 {
     if (!value) return;
@@ -3814,11 +3784,6 @@ void ranvier_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(R
 void ranvier_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value)
 {
     if (isMainThread()) clearRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(value);
-}
-
-void ranvier_dom_union_html_canvas_element_release(RvDomUnionHTMLCanvasElement* value)
-{
-    if (isMainThread()) clearRvDomUnionHTMLCanvasElement(value);
 }
 
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
@@ -42461,17 +42426,6 @@ int32_t ranvier_dom_image_bitmap_close(RvImageBitmap* target)
         return RV_ERR_WRONG_THREAD;
     RefPtr<ImageBitmap> impl = reinterpret_cast<ImageBitmap*>(target);
     return invoke([&]() -> decltype(auto) { return impl->close(); });
-}
-
-// ImageBitmapRenderingContext.canvas getter: readonly attribute ImageBitmapCanvas canvas; *result owns its contents; release with the matching rv_dom_*_release
-int32_t ranvier_dom_image_bitmap_rendering_context_get_canvas(RvImageBitmapRenderingContext* target, RvDomUnionHTMLCanvasElement* result)
-{
-    if (!target || !result)
-        return RV_ERR_NULL_ARGUMENT;
-    if (!isMainThread())
-        return RV_ERR_WRONG_THREAD;
-    RefPtr<ImageBitmapRenderingContext> impl = reinterpret_cast<ImageBitmapRenderingContext*>(target);
-    return deliver([&]() -> decltype(auto) { return impl->canvas(); }, [&](auto&& value) { return encodeRvDomUnionHTMLCanvasElement(value, result); });
 }
 
 // ImageBitmapRenderingContext.transferFromImageBitmap(ImageBitmap? bitmap) -> undefined; bitmap may be NULL
