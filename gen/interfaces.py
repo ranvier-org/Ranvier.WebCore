@@ -197,7 +197,7 @@ class InterfaceEmitter:
                     return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif', signature, '']
                 if getter and not setter and self.world.resolve(member.type).name in WIDE_INTEGERS:
                     # A browser returns a JavaScript number; Fable represents int64 and uint64 as BigInt.
-                    return lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("BigInt($0.{member.name})")>]', '#endif', signature]
+                    return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("BigInt($0.{member.name})")>]', '#endif', signature, '']
                 if owner in ('Document', 'ShadowRoot', 'DocumentOrShadowRoot') and member.name == 'styleSheets' and getter:
                     expression = ("((r)=>{const s=r.styleSheets;if(r.nodeType===9){"
                                   "const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');"
@@ -244,7 +244,7 @@ class InterfaceEmitter:
             passed = [f"{n}===void 0?void 0:Number({n})" if i in wide else n for i, n in enumerate(names)]
             expression = (f"((o,{','.join(names)})=>o.{member.name}({','.join(passed)}))"
                           f"($0,{','.join(f'${i + 1}' for i in range(len(member.arguments)))})")
-            lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
+            lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
         if needs_adapter:
             raw_params = self.parameters(member.arguments, [a.type for a in member.arguments], raw=True)
             raw_result = 'obj' if self.union(member.type) else result
@@ -259,7 +259,7 @@ class InterfaceEmitter:
         if needs_adapter:
             lines += ['#endif']
             self.adapters.append((owner, member))
-        if anonymous_property or matrix_adapter in self.generator.svg_matrix_bindings:
+        if anonymous_property or matrix_adapter in self.generator.svg_matrix_bindings or (wide and not needs_adapter and lines[-1] != ''):
             lines += ['']
         return lines
 
