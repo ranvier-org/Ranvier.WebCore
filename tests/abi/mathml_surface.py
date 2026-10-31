@@ -7,6 +7,7 @@ import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 MATHML = 'http://www.w3.org/1998/Math/MathML'
@@ -64,7 +65,7 @@ def verify(native_directory):
             members[name] = {'tabIndex': number('rv_dom_math_ml_element_get_tab_index', target), 'autofocus': bool(number('rv_dom_math_ml_element_get_autofocus', target)),
                              'nonce': p.text('rv_dom_math_ml_element_get_nonce', [p.pointer], target), 'nonceAttribute': p.attribute(target, 'nonce')}
             dataset = p.object('rv_dom_math_ml_element_get_dataset', [p.pointer], [target], 'dom_string_map')
-            value = p.text('rv_dom_dom_string_map_named_item', [p.pointer, ctypes.c_char_p], dataset, b'kind')
+            value = p.text('rv_dom_dom_string_map_named_item', [p.pointer, Utf8], dataset, b'kind')
             present = p.attribute(target, 'data-kind') is not None
             p.expect(present or value == '', name + ' missing dataset key reads as an empty string natively')
             members[name]['dataKind'] = value if present else None
@@ -112,7 +113,7 @@ def verify(native_directory):
                                   p.read('css_unit_value', stored, 'value', p.double), p.text('rv_dom_css_unit_value_get_unit', [p.pointer], stored)]
         p.bind('rv_dom_union_undefined_or_css_style_value_release', None, [ctypes.POINTER(Maybe)])(ctypes.byref(maybe))
         math_style = p.object('rv_dom_math_ml_element_get_style', [p.pointer], [n['math']], 'css_style_declaration')
-        p.call('rv_dom_css_style_declaration_set_property', [p.pointer, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p], math_style, b'font-size', b'40px', b'')
+        p.call('rv_dom_css_style_declaration_set_property', [p.pointer, Utf8, Utf8, Utf8], math_style, b'font-size', b'40px', b'')
         p.update()
         mi2 = rect('mi')
         layout['fontScale'] = (mi2[2] - 10) / mi0[2]
@@ -120,11 +121,11 @@ def verify(native_directory):
         set_typed(style_map('frac'), 'background-color', text='rgb(0, 0, 255)')
         frac2 = rect('frac')
         layout['fracBackground'] = p.pixel(p.paint(), int(frac2[0] + 1), int(frac2[1] + 1))
-        p.call('rv_dom_css_style_declaration_set_property', [p.pointer, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p], math_style, b'math-style', b'compact', b'')
+        p.call('rv_dom_css_style_declaration_set_property', [p.pointer, Utf8, Utf8, Utf8], math_style, b'math-style', b'compact', b'')
         p.update()
         layout['compactShrinksFraction'] = rect('frac')[3] < frac2[3]
         computed = p.object('rv_dom_window_get_computed_style', [p.pointer, p.pointer, p.pointer, p.integer], [document, n['frac'], None, -1], 'css_style_declaration')
-        layout['mathStyle'] = p.text('rv_dom_css_style_declaration_get_property_value', [p.pointer, ctypes.c_char_p], computed, b'math-style')
+        layout['mathStyle'] = p.text('rv_dom_css_style_declaration_get_property_value', [p.pointer, Utf8], computed, b'math-style')
         state['layout'] = layout
 
         focus = {'initialActive': active()}
@@ -141,16 +142,16 @@ def verify(native_directory):
         p.call('rv_dom_math_ml_element_focus', [p.pointer, p.pointer], n['plain'], None)
         focus['afterTabIndexFocus'] = active()
         p.call('rv_dom_math_ml_element_blur', [p.pointer], n['plain'])
-        p.call('rv_dom_element_remove_attribute', [p.pointer, ctypes.c_char_p], n['plain'], b'tabindex')
+        p.call('rv_dom_element_remove_attribute', [p.pointer, Utf8], n['plain'], b'tabindex')
         p.call('rv_dom_math_ml_element_set_autofocus', [p.pointer, ctypes.c_int32], n['focusable'], 0)
         focus['autofocusAttribute'] = p.attribute(n['focusable'], 'autofocus')
-        p.call('rv_dom_math_ml_element_set_nonce', [p.pointer, ctypes.c_char_p], n['focusable'], b'changed')
+        p.call('rv_dom_math_ml_element_set_nonce', [p.pointer, Utf8], n['focusable'], b'changed')
         focus['nonceAfterSet'] = p.text('rv_dom_math_ml_element_get_nonce', [p.pointer], n['focusable'])
         focus['nonceAttributeAfterSet'] = p.attribute(n['focusable'], 'nonce')
         dataset = p.object('rv_dom_math_ml_element_get_dataset', [p.pointer], [n['math']], 'dom_string_map')
-        p.call('rv_dom_dom_string_map_set_named_item', [p.pointer, ctypes.c_char_p, ctypes.c_char_p], dataset, b'newKey', 'value-λ'.encode())
+        p.call('rv_dom_dom_string_map_set_named_item', [p.pointer, Utf8, Utf8], dataset, b'newKey', 'value-λ'.encode())
         focus['datasetAttribute'] = p.attribute(n['math'], 'data-new-key')
-        p.call('rv_dom_dom_string_map_delete_named_property', [p.pointer, ctypes.c_char_p], dataset, b'kind')
+        p.call('rv_dom_dom_string_map_delete_named_property', [p.pointer, Utf8], dataset, b'kind')
         focus['datasetDeleted'] = p.attribute(n['math'], 'data-kind')
         p.call('rv_dom_math_ml_element_focus', [p.pointer, p.pointer], n['focusable'], None)
         keyboard = p.bind('rv_host_key', p.integer, [p.pointer, p.integer, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, p.integer, p.integer])
@@ -193,7 +194,7 @@ def verify(native_directory):
         p.collect()
         alive = p.bind('rv_watch_alive', p.integer, [p.pointer])
         p.expect([alive(watch) for watch in watches] == [1, 1, 0, 1], 'a retained dataset keeps its removed MathML subtree alive after host disposal')
-        p.expect(p.text('rv_dom_dom_string_map_named_item', [p.pointer, ctypes.c_char_p], kept_dataset, b'newKey') == 'value-λ', 'retained dataset reads after host disposal')
+        p.expect(p.text('rv_dom_dom_string_map_named_item', [p.pointer, Utf8], kept_dataset, b'newKey') == 'value-λ', 'retained dataset reads after host disposal')
         p.bind('rv_dom_dom_string_map_release', None, [p.pointer])(kept_dataset)
         p.bind('rv_dom_style_property_map_read_only_release', None, [p.pointer])(kept_map)
         p.collect()

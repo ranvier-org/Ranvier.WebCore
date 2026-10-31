@@ -14,6 +14,9 @@
     "Window attribute (accessor) holds, called through the Window of a checked Document.",
     "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED.",
     "setlikeBindings and maplikeBindings bind an interface's setlike or maplike declaration through the adapter class of host/dom/<adapter>.h: size, has, values or get and entries (snapshot copies), and add or set, delete and clear unless readonly.",
+    "browserWellFormedUnions and browserWellFormedSetters list the unions and interfaces whose USVString inputs the",
+    "Fable browser provider converts to well-formed strings. Every generated string input is UTF-8 with an explicit byte",
+    "length; sequenceStringSpans only names the string sequences of its interfaces Utf8.",
     "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
   ],
   "attributeBridges": {
@@ -116,14 +119,12 @@
     "CSSOMKeywordValue": {
       "receiver": "Document",
       "factory": "CSSOMKeywordValue::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "CSSUnitValue": {
       "receiver": "Document",
       "factory": "CSSUnitValue::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "CSSUnparsedValue": {
       "receiver": "Document",
@@ -133,32 +134,27 @@
     "CSSOMVariableReferenceValue": {
       "receiver": "Document",
       "factory": "CSSOMVariableReferenceValue::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "SubmitEvent": {
       "receiver": "Document",
       "factory": "SubmitEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "FormDataEvent": {
       "receiver": "Document",
       "factory": "FormDataEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "ToggleEvent": {
       "receiver": "Document",
       "factory": "ToggleEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "CommandEvent": {
       "receiver": "Document",
       "factory": "CommandEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "DOMFormData": {
       "receiver": "Document",
@@ -170,94 +166,79 @@
     },
     "File": {
       "receiver": "Document",
-      "factory": "File::create",
-      "stringInputs": "utf8-lengths"
+      "factory": "File::create"
     },
     "DOMURL": {
       "receiver": "Document",
       "factory": "DOMURL::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "URLSearchParams": {
       "receiver": "Document",
       "factory": "URLSearchParams::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "URLPattern": {
       "receiver": "Document",
       "factory": "URLPattern::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "ErrorEvent": {
       "receiver": "Document",
       "factory": "ErrorEvent::create",
       "passReceiver": false,
-      "stringInputs": "utf8-lengths",
       "globalObject": true
     },
     "ProgressEvent": {
       "receiver": "Document",
       "factory": "ProgressEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "CSSAnimationEvent": {
       "receiver": "Document",
       "factory": "CSSAnimationEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "CSSTransitionEvent": {
       "receiver": "Document",
       "factory": "CSSTransitionEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "ContentVisibilityAutoStateChangeEvent": {
       "receiver": "Document",
       "factory": "ContentVisibilityAutoStateChangeEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "AnimationPlaybackEvent": {
       "receiver": "Document",
       "factory": "AnimationPlaybackEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "PageTransitionEvent": {
       "receiver": "Document",
       "factory": "PageTransitionEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "HashChangeEvent": {
       "receiver": "Document",
       "factory": "HashChangeEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "MediaQueryListEvent": {
       "receiver": "Document",
       "factory": "MediaQueryListEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "PopStateEvent": {
       "receiver": "Document",
       "factory": "PopStateEvent::create",
       "passReceiver": false,
-      "stringInputs": "utf8-lengths",
       "globalObject": true
     },
     "CompositionEvent": {
       "receiver": "Document",
       "factory": "CompositionEvent::create",
-      "passReceiver": false,
-      "stringInputs": "utf8-lengths"
+      "passReceiver": false
     },
     "Highlight": {
       "receiver": "Document",
@@ -358,19 +339,13 @@
     "DOMPointReadOnly": "DOMPoint",
     "DOMMatrixReadOnly": "DOMMatrix"
   },
-  "dictionaryStringInputs": {
-    "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence",
-    "URLPatternInit": "utf8-lengths-presence",
-    "URLPatternResult": "utf8-lengths-presence",
-    "URLPatternComponentResult": "utf8-lengths-presence"
-  },
   "stringifiers": [
     "CSSStyleValue",
     "DOMMatrixReadOnly",
     "CSSTransformComponent",
     "URLSearchParams"
   ],
-  "complexStringSpans": [
+  "browserWellFormedUnions": [
     "USVStringOrCSSOMVariableReferenceValue",
     "CSSStyleValueOrUSVString",
     "DOMStringOrSequenceOfUnrestrictedDouble",
@@ -384,18 +359,18 @@
   "complexNullableElements": [
     "CSSStyleValue"
   ],
-  "interfaceStringInputs": {
-    "CSSOMKeywordValue": "utf8-lengths",
-    "CSSOMVariableReferenceValue": "utf8-lengths",
-    "StylePropertyMapReadOnly": "utf8-lengths",
-    "StylePropertyMap": "utf8-lengths",
-    "DOMMatrix": "utf8-lengths",
-    "DOMFormData": "utf8-lengths",
-    "Blob": "utf8-lengths",
-    "DOMURL": "utf8-lengths",
-    "URLSearchParams": "utf8-lengths",
-    "URLPattern": "utf8-lengths"
-  },
+  "browserWellFormedSetters": [
+    "CSSOMKeywordValue",
+    "CSSOMVariableReferenceValue",
+    "StylePropertyMapReadOnly",
+    "StylePropertyMap",
+    "DOMMatrix",
+    "DOMFormData",
+    "Blob",
+    "DOMURL",
+    "URLSearchParams",
+    "URLPattern"
+  ],
   "objectContexts": {
     "StylePropertyMapReadOnly": "Document",
     "StylePropertyMap": "Document",
@@ -945,8 +920,7 @@
       "memberFeatures": {
         "registerProperty": "dom-css-register-property",
         "highlights": "dom-custom-highlights"
-      },
-      "stringInputs": "utf8-lengths"
+      }
     }
   },
   "staticBindings": {
@@ -955,48 +929,42 @@
       "members": [
         "fromMatrix"
       ],
-      "feature": "dom-geometry-matrix-readonly",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-matrix-readonly"
     },
     "DOMMatrix": {
       "receiver": "Document",
       "members": [
         "fromMatrix"
       ],
-      "feature": "dom-geometry-matrix",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-matrix"
     },
     "DOMRectReadOnly": {
       "receiver": "Document",
       "members": [
         "fromRect"
       ],
-      "feature": "dom-geometry-rect-readonly",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-rect-readonly"
     },
     "DOMRect": {
       "receiver": "Document",
       "members": [
         "fromRect"
       ],
-      "feature": "dom-geometry-rect",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-rect"
     },
     "DOMPointReadOnly": {
       "receiver": "Document",
       "members": [
         "fromPoint"
       ],
-      "feature": "dom-geometry-point-readonly",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-point-readonly"
     },
     "DOMPoint": {
       "receiver": "Document",
       "members": [
         "fromPoint"
       ],
-      "feature": "dom-geometry-point",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-point"
     },
     "DOMQuad": {
       "receiver": "Document",
@@ -1004,8 +972,7 @@
         "fromRect",
         "fromQuad"
       ],
-      "feature": "dom-geometry-quad",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-geometry-quad"
     },
     "CSSStyleValue": {
       "receiver": "Document",
@@ -1013,8 +980,7 @@
         "parse",
         "parseAll"
       ],
-      "feature": "dom-css-style-values",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-css-style-values"
     },
     "DOMURL": {
       "receiver": "Document",
@@ -1022,8 +988,7 @@
         "parse",
         "canParse"
       ],
-      "feature": "dom-url-static",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-url-static"
     }
   },
   "iterableBindings": {
@@ -1044,8 +1009,7 @@
         "members": [
           "getComputedStyle"
         ],
-        "feature": "dom-computed-style",
-        "stringInputs": "utf8-lengths"
+        "feature": "dom-computed-style"
       },
       {
         "receiver": "Document",
@@ -1056,16 +1020,14 @@
           "scrollTo",
           "scrollBy"
         ],
-        "feature": "dom-window-scrolling",
-        "stringInputs": "utf8-lengths"
+        "feature": "dom-window-scrolling"
       },
       {
         "receiver": "Document",
         "members": [
           "visualViewport"
         ],
-        "feature": "visual-viewport",
-        "stringInputs": "utf8-lengths"
+        "feature": "visual-viewport"
       }
     ]
   },
@@ -1096,8 +1058,7 @@
         "getRandomValues",
         "randomUUID"
       ],
-      "feature": "dom-crypto-random",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-crypto-random"
     },
     "Screen": {
       "receiver": "Document",
@@ -1112,8 +1073,7 @@
         "colorDepth",
         "pixelDepth"
       ],
-      "feature": "dom-screen",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-screen"
     },
     "ScreenOrientation": {
       "receiver": "Document",
@@ -1122,8 +1082,7 @@
         "type",
         "angle"
       ],
-      "feature": "dom-screen-orientation",
-      "stringInputs": "utf8-lengths"
+      "feature": "dom-screen-orientation"
     }
   },
   "creationGatedInterfaces": {
@@ -1162,8 +1121,7 @@
   },
   "maplikeBindings": {
     "HighlightRegistry": {
-      "adapter": "RanvierCollectionLike",
-      "stringInputs": "utf8-lengths"
+      "adapter": "RanvierCollectionLike"
     }
   }
 }

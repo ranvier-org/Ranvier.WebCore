@@ -8,6 +8,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION = 0, -1, -2, -3
 MOUSE_MOVE, MOUSE_DOWN, MOUSE_UP = 0, 1, 2
 BUTTON_NONE, BUTTON_LEFT = -1, 0
@@ -52,9 +55,7 @@ def verify(directory, evidence):
     callback_type = ctypes.CFUNCTYPE(i32, p, p)
 
     def bind(name, returns, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = returns, arguments
-        return function
+        return bind_utf8(library, name, returns, arguments)
 
     expect(bind('rv_abi_version', i32, [])() == 54, 'ABI version 54')
     expect(bind('rv_abi_has', i32, [ctypes.c_char_p])(b'input-state') == 1, 'input-state advertised')
@@ -70,7 +71,7 @@ def verify(directory, evidence):
     key = bind('rv_host_key', i32, [p, i32, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, i32, i32])
     set_focused = bind('rv_host_set_focused', i32, [p, i32])
     has_focus = bind('rv_dom_document_has_focus', i32, [p, ctypes.POINTER(i32)])
-    matches = bind('rv_dom_element_matches', i32, [p, ctypes.c_char_p, ctypes.POINTER(i32)])
+    matches = bind('rv_dom_element_matches', i32, [p, Utf8, ctypes.POINTER(i32)])
     element_rect = bind('rv_element_rect', i32, [p, ctypes.POINTER(f64), ctypes.POINTER(f64), ctypes.POINTER(f64), ctypes.POINTER(f64)])
     focus_element = bind('rv_element_focus', i32, [p])
     set_capture = bind('rv_dom_element_set_pointer_capture', i32, [p, i32])

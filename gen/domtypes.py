@@ -118,12 +118,8 @@ class ComplexGeneratorMixin:
                 ctype = self.field_ctype(member, mapped, name)
                 encode += [f'    if (auto* field = resultField(value.{cpp_field})) {{']
                 if mapped.kind == 'string':
-                    if ctype == 'RvDomUtf8StringInput':
-                        encode += [f'        result->{field} = copyOwnedDomStringInput(asString(*field));']
-                        release += [f'    std::free(const_cast<uint8_t*>(value->{field}.data));']
-                    else:
-                        encode += [f'        result->{field} = copyOwnedDomString(asString(*field));']
-                        release += [f'    std::free(const_cast<char*>(value->{field}));']
+                    encode += [f'        result->{field} = copyOwnedDomStringInput(asString(*field));']
+                    release += [f'    std::free(const_cast<uint8_t*>(value->{field}.data));']
                 elif mapped.kind == 'dict':
                     child = self.result_dicts[mapped.interface]
                     encode += [f'        result->{field} = encodeDict{child}(*field);']
@@ -150,7 +146,9 @@ class ComplexGeneratorMixin:
         if mapped.kind == 'void':
             return 'int32_t'
         if mapped.kind == 'string':
-            return 'RvDomUtf8StringSpan' if mapped.string_spans else 'const char*'
+            if not mapped.string_spans:
+                raise SystemExit('a string inside a union or sequence must carry its byte length')
+            return 'RvDomUtf8StringSpan'
         if mapped.kind in ('node', 'event', 'object'):
             return f'{mapped.handle}*'
         if mapped.kind == 'opaque':
@@ -264,14 +262,11 @@ class ComplexGeneratorMixin:
             return [f'auto {variable} = decode{mapped.ctype}(&{expression}, status);',
                     'if (status != RV_OK) return std::nullopt;'], f'std::move(*{variable})'
         if kind == 'string':
-            if mapped.string_spans:
-                minimum = -1 if mapped.nullable else 0
-                lines = [f'if ({expression}.length < {minimum} || ({expression}.length > 0 && !{expression}.data)) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}',
-                         f'String {variable} = {expression}.length < 0 ? String() : {expression}.length ? String::fromUTF8(std::span<const uint8_t> {{ {expression}.data, static_cast<size_t>({expression}.length) }}) : emptyString();',
-                         f'if ({expression}.length >= 0 && {variable}.isNull()) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}']
-                return lines, variable
-            checks = [] if mapped.nullable else [f'if (!{expression}) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}']
-            return checks, f'String::fromUTF8({expression})'
+            minimum = -1 if mapped.nullable else 0
+            lines = [f'if ({expression}.length < {minimum} || ({expression}.length > 0 && !{expression}.data)) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}',
+                     f'String {variable} = {expression}.length < 0 ? String() : {expression}.length ? String::fromUTF8(std::span<const uint8_t> {{ {expression}.data, static_cast<size_t>({expression}.length) }}) : emptyString();',
+                     f'if ({expression}.length >= 0 && {variable}.isNull()) {{ status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }}']
+            return lines, variable
         if kind in ('number', 'bool', 'enum'):
             checks = []
             if mapped.finite_input:
@@ -318,9 +313,7 @@ class ComplexGeneratorMixin:
         if kind == 'dict':
             return [f'{target} = encodeDict{self.result_dicts[mapped.interface]}({expression});']
         if kind == 'string':
-            if mapped.string_spans:
-                return [f'{target} = copyOwnedDomStringSpan(asString({expression}));']
-            return [f'{target} = copyOwnedDomString(asString({expression}));']
+            return [f'{target} = copyOwnedDomStringSpan(asString({expression}));']
         if kind in ('number', 'bool', 'enum'):
             return [f'{target} = static_cast<{self.transport_ctype(mapped)}>({expression});']
         if kind == 'opaque':
@@ -339,9 +332,7 @@ class ComplexGeneratorMixin:
             struct = self.result_dicts[mapped.interface]
             return [f'releaseDict{struct}(const_cast<{struct}*>({expression}));']
         if mapped.kind == 'string':
-            if mapped.string_spans:
-                return [f'std::free(const_cast<uint8_t*>({expression}.data));']
-            return [f'std::free(const_cast<char*>({expression}));']
+            return [f'std::free(const_cast<uint8_t*>({expression}.data));']
         if mapped.kind in ('node', 'event', 'object'):
             root = {'node': 'Node', 'event': 'Event'}.get(mapped.kind) or self.world.cpp_class(mapped.root)
             if root in self.tracked_roots:
@@ -354,11 +345,6 @@ class ComplexGeneratorMixin:
             return []
         dictionary_declarations, dictionary_definitions = self.result_dictionary_runtime()
         lines = ['namespace {',
-                 'char* copyOwnedDomString(const String& value)', '{',
-                 '    if (value.isNull()) return nullptr;',
-                 '    auto utf8 = value.utf8();', '    auto* result = static_cast<char*>(std::malloc(utf8.length() + 1));',
-                 '    RELEASE_ASSERT(result);', '    std::memcpy(result, utf8.data(), utf8.length());',
-                 '    result[utf8.length()] = 0;', '    return result;', '}',
                  'template<typename T> struct DomSequenceArgument {', '    Vector<T> values;',
                  '    operator Vector<T>() && { return std::move(values); }',
                  '    template<typename U> operator FixedVector<U>() && {',
