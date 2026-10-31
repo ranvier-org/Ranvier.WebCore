@@ -3385,6 +3385,108 @@ and [<AllowNullLiteral>] CommandEvent =
     /// <summary>CommandEvent.command.</summary>
     abstract member command: string with get
 
+/// <summary>ErrorEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ErrorEvent =
+    inherit Event
+    /// <summary>ErrorEvent.message.</summary>
+    abstract member message: string with get
+    /// <summary>ErrorEvent.filename.</summary>
+    abstract member filename: string with get
+    /// <summary>ErrorEvent.lineno.</summary>
+    abstract member lineno: uint32 with get
+    /// <summary>ErrorEvent.colno.</summary>
+    abstract member colno: uint32 with get
+
+/// <summary>ProgressEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ProgressEvent =
+    inherit Event
+    /// <summary>ProgressEvent.lengthComputable.</summary>
+    abstract member lengthComputable: bool with get
+    /// <summary>ProgressEvent.loaded.</summary>
+    abstract member loaded: float with get
+    /// <summary>ProgressEvent.total.</summary>
+    abstract member total: float with get
+
+/// <summary>AnimationEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] AnimationEvent =
+    inherit Event
+    /// <summary>AnimationEvent.animationName.</summary>
+    abstract member animationName: string with get
+    /// <summary>AnimationEvent.elapsedTime.</summary>
+    abstract member elapsedTime: float with get
+    /// <summary>AnimationEvent.pseudoElement.</summary>
+    abstract member pseudoElement: string with get
+
+/// <summary>TransitionEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TransitionEvent =
+    inherit Event
+    /// <summary>TransitionEvent.propertyName.</summary>
+    abstract member propertyName: string with get
+    /// <summary>TransitionEvent.elapsedTime.</summary>
+    abstract member elapsedTime: float with get
+    /// <summary>TransitionEvent.pseudoElement.</summary>
+    abstract member pseudoElement: string with get
+
+/// <summary>ContentVisibilityAutoStateChangeEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ContentVisibilityAutoStateChangeEvent =
+    inherit Event
+    /// <summary>ContentVisibilityAutoStateChangeEvent.skipped.</summary>
+    abstract member skipped: bool with get
+
+/// <summary>AnimationPlaybackEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] AnimationPlaybackEvent =
+    inherit Event
+
+    /// <summary>AnimationPlaybackEvent.currentTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.currentTime")>]
+    abstract member __ranvier_get_currentTime: unit -> obj
+#else
+    abstract member currentTime: (DoubleOrCSSNumericValue) option with get
+#endif
+
+    /// <summary>AnimationPlaybackEvent.timelineTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.timelineTime")>]
+    abstract member __ranvier_get_timelineTime: unit -> obj
+#else
+    abstract member timelineTime: (DoubleOrCSSNumericValue) option with get
+#endif
+
+/// <summary>PageTransitionEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PageTransitionEvent =
+    inherit Event
+    /// <summary>PageTransitionEvent.persisted.</summary>
+    abstract member persisted: bool with get
+
+/// <summary>HashChangeEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HashChangeEvent =
+    inherit Event
+    /// <summary>HashChangeEvent.oldURL.</summary>
+    abstract member oldURL: string with get
+    /// <summary>HashChangeEvent.newURL.</summary>
+    abstract member newURL: string with get
+
+/// <summary>MediaQueryListEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MediaQueryListEvent =
+    inherit Event
+    /// <summary>MediaQueryListEvent.media.</summary>
+    abstract member media: string with get
+    /// <summary>MediaQueryListEvent.matches.</summary>
+    abstract member matches: bool with get
+
+/// <summary>PopStateEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PopStateEvent =
+    inherit Event
+    /// <summary>PopStateEvent.hasUAVisualTransition.</summary>
+    abstract member hasUAVisualTransition: bool with get
+
+/// <summary>BeforeUnloadEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] BeforeUnloadEvent =
+    inherit Event
+    /// <summary>BeforeUnloadEvent.returnValue.</summary>
+    abstract member returnValue: string with get, set
+
 /// <summary>SVGGraphicsElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGGraphicsElement =
     inherit SVGElement
@@ -4998,108 +5100,6 @@ and [<AllowNullLiteral>] VisualViewport =
     /// <summary>VisualViewport.scale.</summary>
     abstract member scale: float with get
 
-/// <summary>ErrorEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ErrorEvent =
-    inherit Event
-    /// <summary>ErrorEvent.message.</summary>
-    abstract member message: string with get
-    /// <summary>ErrorEvent.filename.</summary>
-    abstract member filename: string with get
-    /// <summary>ErrorEvent.lineno.</summary>
-    abstract member lineno: uint32 with get
-    /// <summary>ErrorEvent.colno.</summary>
-    abstract member colno: uint32 with get
-
-/// <summary>ProgressEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ProgressEvent =
-    inherit Event
-    /// <summary>ProgressEvent.lengthComputable.</summary>
-    abstract member lengthComputable: bool with get
-    /// <summary>ProgressEvent.loaded.</summary>
-    abstract member loaded: float with get
-    /// <summary>ProgressEvent.total.</summary>
-    abstract member total: float with get
-
-/// <summary>AnimationEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] AnimationEvent =
-    inherit Event
-    /// <summary>AnimationEvent.animationName.</summary>
-    abstract member animationName: string with get
-    /// <summary>AnimationEvent.elapsedTime.</summary>
-    abstract member elapsedTime: float with get
-    /// <summary>AnimationEvent.pseudoElement.</summary>
-    abstract member pseudoElement: string with get
-
-/// <summary>TransitionEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] TransitionEvent =
-    inherit Event
-    /// <summary>TransitionEvent.propertyName.</summary>
-    abstract member propertyName: string with get
-    /// <summary>TransitionEvent.elapsedTime.</summary>
-    abstract member elapsedTime: float with get
-    /// <summary>TransitionEvent.pseudoElement.</summary>
-    abstract member pseudoElement: string with get
-
-/// <summary>ContentVisibilityAutoStateChangeEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ContentVisibilityAutoStateChangeEvent =
-    inherit Event
-    /// <summary>ContentVisibilityAutoStateChangeEvent.skipped.</summary>
-    abstract member skipped: bool with get
-
-/// <summary>AnimationPlaybackEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] AnimationPlaybackEvent =
-    inherit Event
-
-    /// <summary>AnimationPlaybackEvent.currentTime.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.currentTime")>]
-    abstract member __ranvier_get_currentTime: unit -> obj
-#else
-    abstract member currentTime: (DoubleOrCSSNumericValue) option with get
-#endif
-
-    /// <summary>AnimationPlaybackEvent.timelineTime.</summary>
-#if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.timelineTime")>]
-    abstract member __ranvier_get_timelineTime: unit -> obj
-#else
-    abstract member timelineTime: (DoubleOrCSSNumericValue) option with get
-#endif
-
-/// <summary>PageTransitionEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] PageTransitionEvent =
-    inherit Event
-    /// <summary>PageTransitionEvent.persisted.</summary>
-    abstract member persisted: bool with get
-
-/// <summary>HashChangeEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HashChangeEvent =
-    inherit Event
-    /// <summary>HashChangeEvent.oldURL.</summary>
-    abstract member oldURL: string with get
-    /// <summary>HashChangeEvent.newURL.</summary>
-    abstract member newURL: string with get
-
-/// <summary>MediaQueryListEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] MediaQueryListEvent =
-    inherit Event
-    /// <summary>MediaQueryListEvent.media.</summary>
-    abstract member media: string with get
-    /// <summary>MediaQueryListEvent.matches.</summary>
-    abstract member matches: bool with get
-
-/// <summary>PopStateEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] PopStateEvent =
-    inherit Event
-    /// <summary>PopStateEvent.hasUAVisualTransition.</summary>
-    abstract member hasUAVisualTransition: bool with get
-
-/// <summary>BeforeUnloadEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] BeforeUnloadEvent =
-    inherit Event
-    /// <summary>BeforeUnloadEvent.returnValue.</summary>
-    abstract member returnValue: string with get, set
-
 /// <summary>Highlight in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] Highlight =
     /// <summary>Highlight.priority.</summary>
@@ -6245,17 +6245,6 @@ module BrowserUnionAdapters =
                 Some (unboxFileOrUSVString value)
 
 
-    type URLPattern with
-        member this.test() : bool =
-            this.__ranvier_test (?input = None, ?baseURL = None)
-
-        member this.test(input: string, ?baseURL: string) : bool =
-            this.__ranvier_test (?input = Some (box (normalizeUSVString input)), ?baseURL = baseURL)
-
-        member this.test(input: URLPatternInit, ?baseURL: string) : bool =
-            this.__ranvier_test (?input = Some (box input), ?baseURL = baseURL)
-
-
     type AnimationPlaybackEvent with
         member this.currentTime: (DoubleOrCSSNumericValue) option =
             let value = this.__ranvier_get_currentTime ()
@@ -6272,6 +6261,17 @@ module BrowserUnionAdapters =
                 None
             else
                 Some (unboxDoubleOrCSSNumericValue value)
+
+
+    type URLPattern with
+        member this.test() : bool =
+            this.__ranvier_test (?input = None, ?baseURL = None)
+
+        member this.test(input: string, ?baseURL: string) : bool =
+            this.__ranvier_test (?input = Some (box (normalizeUSVString input)), ?baseURL = baseURL)
+
+        member this.test(input: URLPatternInit, ?baseURL: string) : bool =
+            this.__ranvier_test (?input = Some (box input), ?baseURL = baseURL)
 
 
     type ChildNode with

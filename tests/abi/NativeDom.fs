@@ -930,81 +930,6 @@ type RvDomCommandEventInit =
     [<MarshalAs(UnmanagedType.LPUTF8Str)>]
     val mutable command: string
 
-/// <summary>The IDL dictionary DOMMatrix2DInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
-[<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomDOMMatrix2DInit =
-    val mutable size: uint32
-    val mutable a: nativeint
-    val mutable b: nativeint
-    val mutable c: nativeint
-    val mutable d: nativeint
-    val mutable e: nativeint
-    val mutable f: nativeint
-    val mutable m11: nativeint
-    val mutable m12: nativeint
-    val mutable m21: nativeint
-    val mutable m22: nativeint
-    val mutable m41: nativeint
-    val mutable m42: nativeint
-
-/// <summary>The IDL dictionary BlobPropertyBag; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
-[<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomBlobPropertyBag =
-    val mutable size: uint32
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable ``type``: string
-    val mutable endings: int
-
-/// <summary>The IDL dictionary FilePropertyBag; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
-[<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomFilePropertyBag =
-    val mutable size: uint32
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable ``type``: string
-    val mutable endings: int
-    val mutable last_modified: nativeint
-
-/// <summary>The IDL dictionary URLPatternInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
-[<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomURLPatternInit =
-    val mutable size: uint32
-    val mutable protocol: RvDomUtf8StringInput
-    val mutable username: RvDomUtf8StringInput
-    val mutable password: RvDomUtf8StringInput
-    val mutable hostname: RvDomUtf8StringInput
-    val mutable port: RvDomUtf8StringInput
-    val mutable pathname: RvDomUtf8StringInput
-    val mutable search: RvDomUtf8StringInput
-    val mutable hash: RvDomUtf8StringInput
-    val mutable base_url: RvDomUtf8StringInput
-
-/// <summary>The IDL dictionary URLPatternOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
-[<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomURLPatternOptions =
-    val mutable size: uint32
-    val mutable ignore_case: int
-
-/// <summary>The IDL dictionary URLPatternComponentResult; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
-[<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomURLPatternComponentResult =
-    val mutable size: uint32
-    val mutable input: RvDomUtf8StringInput
-    val mutable groups: nativeint
-
-/// <summary>The IDL dictionary URLPatternResult; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
-[<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomURLPatternResult =
-    val mutable size: uint32
-    val mutable inputs: nativeint
-    val mutable protocol: nativeint
-    val mutable username: nativeint
-    val mutable password: nativeint
-    val mutable hostname: nativeint
-    val mutable port: nativeint
-    val mutable pathname: nativeint
-    val mutable search: nativeint
-    val mutable hash: nativeint
-
 /// <summary>The IDL dictionary ErrorEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomErrorEventInit =
@@ -1115,6 +1040,81 @@ type RvDomPopStateEventInit =
     val mutable cancelable: int
     val mutable composed: int
     val mutable has_ua_visual_transition: int
+
+/// <summary>The IDL dictionary DOMMatrix2DInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomDOMMatrix2DInit =
+    val mutable size: uint32
+    val mutable a: nativeint
+    val mutable b: nativeint
+    val mutable c: nativeint
+    val mutable d: nativeint
+    val mutable e: nativeint
+    val mutable f: nativeint
+    val mutable m11: nativeint
+    val mutable m12: nativeint
+    val mutable m21: nativeint
+    val mutable m22: nativeint
+    val mutable m41: nativeint
+    val mutable m42: nativeint
+
+/// <summary>The IDL dictionary BlobPropertyBag; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomBlobPropertyBag =
+    val mutable size: uint32
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable ``type``: string
+    val mutable endings: int
+
+/// <summary>The IDL dictionary FilePropertyBag; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomFilePropertyBag =
+    val mutable size: uint32
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable ``type``: string
+    val mutable endings: int
+    val mutable last_modified: nativeint
+
+/// <summary>The IDL dictionary URLPatternInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomURLPatternInit =
+    val mutable size: uint32
+    val mutable protocol: RvDomUtf8StringInput
+    val mutable username: RvDomUtf8StringInput
+    val mutable password: RvDomUtf8StringInput
+    val mutable hostname: RvDomUtf8StringInput
+    val mutable port: RvDomUtf8StringInput
+    val mutable pathname: RvDomUtf8StringInput
+    val mutable search: RvDomUtf8StringInput
+    val mutable hash: RvDomUtf8StringInput
+    val mutable base_url: RvDomUtf8StringInput
+
+/// <summary>The IDL dictionary URLPatternOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomURLPatternOptions =
+    val mutable size: uint32
+    val mutable ignore_case: int
+
+/// <summary>The IDL dictionary URLPatternComponentResult; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomURLPatternComponentResult =
+    val mutable size: uint32
+    val mutable input: RvDomUtf8StringInput
+    val mutable groups: nativeint
+
+/// <summary>The IDL dictionary URLPatternResult; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomURLPatternResult =
+    val mutable size: uint32
+    val mutable inputs: nativeint
+    val mutable protocol: nativeint
+    val mutable username: nativeint
+    val mutable password: nativeint
+    val mutable hostname: nativeint
+    val mutable port: nativeint
+    val mutable pathname: nativeint
+    val mutable search: nativeint
+    val mutable hash: nativeint
 
 /// <summary>The IDL dictionary DOMCSSCustomPropertyDescriptor; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1570,6 +1570,20 @@ type RvDomSequencePointerEvent =
     val mutable items: nativeint
 
 [<Literal>]
+let RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_CSS_NUMERIC_VALUE = 2
+
+/// <summary>ABI transport for DoubleOrCSSNumericValue; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionDoubleOrCSSNumericValueNullable =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
+    val mutable arm1: nativeint
+
+[<Literal>]
 let RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BUFFER_SOURCE = 1
 
 [<Literal>]
@@ -1688,20 +1702,6 @@ type RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString =
     val mutable present: int
     val mutable count: int
     val mutable items: nativeint
-
-[<Literal>]
-let RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_NUMBER = 1
-
-[<Literal>]
-let RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_CSS_NUMERIC_VALUE = 2
-
-/// <summary>ABI transport for DoubleOrCSSNumericValue; result contents are owned until the matching release call.</summary>
-[<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomUnionDoubleOrCSSNumericValueNullable =
-    val mutable present: int
-    val mutable tag: int
-    val mutable arm0: float
-    val mutable arm1: nativeint
 
 /// <summary>ABI transport for AbstractRange sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1871,6 +1871,9 @@ extern void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVStr
 extern void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_union_double_or_css_numeric_value_nullable_release(RvDomUnionDoubleOrCSSNumericValueNullable& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionBufferSourceOrBlobOrUSVString& value)
 
 [<DllImport(Lib)>]
@@ -1905,9 +1908,6 @@ extern void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvD
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString& value)
-
-[<DllImport(Lib)>]
-extern void rv_dom_union_double_or_css_numeric_value_nullable_release(RvDomUnionDoubleOrCSSNumericValueNullable& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange& value)
@@ -8204,6 +8204,108 @@ extern int rv_dom_command_event_get_source(nativeint target, nativeint& result)
 extern int rv_dom_command_event_get_command(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
+extern int rv_dom_error_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomErrorEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_error_event_get_message(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_error_event_get_filename(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_error_event_get_lineno(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_error_event_get_colno(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_progress_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomProgressEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_progress_event_get_length_computable(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_progress_event_get_loaded(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_progress_event_get_total(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomAnimationEventInit[] animation_event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_event_get_animation_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_event_get_elapsed_time(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_event_get_pseudo_element(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomTransitionEventInit[] transition_event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_event_get_property_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_event_get_elapsed_time(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_event_get_pseudo_element(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_content_visibility_auto_state_change_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomContentVisibilityAutoStateChangeEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_content_visibility_auto_state_change_event_get_skipped(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_playback_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomAnimationPlaybackEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_playback_event_get_current_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_playback_event_get_timeline_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_page_transition_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomPageTransitionEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_page_transition_event_get_persisted(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_hash_change_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomHashChangeEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_hash_change_event_get_old_url(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_hash_change_event_get_new_url(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_media_query_list_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomMediaQueryListEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_media_query_list_event_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_media_query_list_event_get_matches(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_pop_state_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomPopStateEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_pop_state_event_get_has_ua_visual_transition(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_before_unload_event_get_return_value(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_before_unload_event_set_return_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_svg_graphics_element_get_transform(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -10038,108 +10140,6 @@ extern int rv_dom_visual_viewport_get_height(nativeint target, float& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_visual_viewport_get_scale(nativeint target, float& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_error_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomErrorEventInit[] event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_error_event_get_message(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_error_event_get_filename(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_error_event_get_lineno(nativeint target, uint32& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_error_event_get_colno(nativeint target, uint32& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_progress_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomProgressEventInit[] event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_progress_event_get_length_computable(nativeint target, int& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_progress_event_get_loaded(nativeint target, float& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_progress_event_get_total(nativeint target, float& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_css_animation_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomAnimationEventInit[] animation_event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_css_animation_event_get_animation_name(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_css_animation_event_get_elapsed_time(nativeint target, float& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_css_animation_event_get_pseudo_element(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_css_transition_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomTransitionEventInit[] transition_event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_css_transition_event_get_property_name(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_css_transition_event_get_elapsed_time(nativeint target, float& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_css_transition_event_get_pseudo_element(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_content_visibility_auto_state_change_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomContentVisibilityAutoStateChangeEventInit[] event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_content_visibility_auto_state_change_event_get_skipped(nativeint target, int& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_animation_playback_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomAnimationPlaybackEventInit[] event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_animation_playback_event_get_current_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_animation_playback_event_get_timeline_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_page_transition_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomPageTransitionEventInit[] event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_page_transition_event_get_persisted(nativeint target, int& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_hash_change_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomHashChangeEventInit[] event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_hash_change_event_get_old_url(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_hash_change_event_get_new_url(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_media_query_list_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomMediaQueryListEventInit[] event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_media_query_list_event_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_media_query_list_event_get_matches(nativeint target, int& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_pop_state_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomPopStateEventInit[] event_init_dict, nativeint& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_pop_state_event_get_has_ua_visual_transition(nativeint target, int& result)
-
-[<DllImport(Lib)>]
-extern int rv_dom_before_unload_event_get_return_value(nativeint target, byte[] buffer, int capacity, int[] length)
-
-[<DllImport(Lib)>]
-extern int rv_dom_before_unload_event_set_return_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_highlight_create(nativeint target, [<In>] RvDomSequenceAbstractRange[] initial_ranges, nativeint& result)

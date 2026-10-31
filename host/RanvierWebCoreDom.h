@@ -126,6 +126,7 @@ typedef struct RvDomUnionFileOrUSVStringNullable RvDomUnionFileOrUSVStringNullab
 typedef struct RvDomUnionFileOrUSVString RvDomUnionFileOrUSVString;
 typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
+typedef struct RvDomUnionDoubleOrCSSNumericValueNullable RvDomUnionDoubleOrCSSNumericValueNullable;
 typedef struct RvDomUnionBufferSourceOrBlobOrUSVString RvDomUnionBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceBufferSourceOrBlobOrUSVString RvDomSequenceBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceUSVStringUtf8 RvDomSequenceUSVStringUtf8;
@@ -138,7 +139,6 @@ typedef struct RvDomSequenceUSVStringOrURLPatternInit RvDomSequenceUSVStringOrUR
 typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
-typedef struct RvDomUnionDoubleOrCSSNumericValueNullable RvDomUnionDoubleOrCSSNumericValueNullable;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -667,89 +667,6 @@ typedef struct RvDomCommandEventInit {
     const char* command; /* DOMString, default "" */
 } RvDomCommandEventInit;
 
-/* The IDL dictionary DOMMatrix2DInit. size is sizeof(RvDomDOMMatrix2DInit) as the caller compiles it; a field past
- * size takes its IDL default, so fields can be added at the end. */
-typedef struct RvDomDOMMatrix2DInit {
-    uint32_t size;
-    const double* a; /* unrestricted double, NULL for absent */
-    const double* b; /* unrestricted double, NULL for absent */
-    const double* c; /* unrestricted double, NULL for absent */
-    const double* d; /* unrestricted double, NULL for absent */
-    const double* e; /* unrestricted double, NULL for absent */
-    const double* f; /* unrestricted double, NULL for absent */
-    const double* m11; /* unrestricted double, NULL for absent */
-    const double* m12; /* unrestricted double, NULL for absent */
-    const double* m21; /* unrestricted double, NULL for absent */
-    const double* m22; /* unrestricted double, NULL for absent */
-    const double* m41; /* unrestricted double, NULL for absent */
-    const double* m42; /* unrestricted double, NULL for absent */
-} RvDomDOMMatrix2DInit;
-
-/* The IDL dictionary BlobPropertyBag. size is sizeof(RvDomBlobPropertyBag) as the caller compiles it; a field past
- * size takes its IDL default, so fields can be added at the end. */
-typedef struct RvDomBlobPropertyBag {
-    uint32_t size;
-    const char* type; /* DOMString, default "" */
-    int32_t endings; /* EndingType, default "transparent", RV_DOM_ENDING_TYPE_* */
-} RvDomBlobPropertyBag;
-
-/* The IDL dictionary FilePropertyBag. size is sizeof(RvDomFilePropertyBag) as the caller compiles it; a field past
- * size takes its IDL default, so fields can be added at the end. */
-typedef struct RvDomFilePropertyBag {
-    uint32_t size;
-    const char* type; /* DOMString, default "" */
-    int32_t endings; /* EndingType, default "transparent", RV_DOM_ENDING_TYPE_* */
-    const int64_t* last_modified; /* long long, NULL for absent */
-} RvDomFilePropertyBag;
-
-/* The IDL dictionary URLPatternInit. size is sizeof(RvDomURLPatternInit) as the caller compiles it; a field past
- * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
- * sets size, owns every field and nested value, and rv_dom_url_pattern_init_release frees it. */
-typedef struct RvDomURLPatternInit {
-    uint32_t size;
-    RvDomUtf8StringInput protocol; /* USVString */
-    RvDomUtf8StringInput username; /* USVString */
-    RvDomUtf8StringInput password; /* USVString */
-    RvDomUtf8StringInput hostname; /* USVString */
-    RvDomUtf8StringInput port; /* USVString */
-    RvDomUtf8StringInput pathname; /* USVString */
-    RvDomUtf8StringInput search; /* USVString */
-    RvDomUtf8StringInput hash; /* USVString */
-    RvDomUtf8StringInput base_url; /* USVString */
-} RvDomURLPatternInit;
-
-/* The IDL dictionary URLPatternOptions. size is sizeof(RvDomURLPatternOptions) as the caller compiles it; a field past
- * size takes its IDL default, so fields can be added at the end. */
-typedef struct RvDomURLPatternOptions {
-    uint32_t size;
-    int32_t ignore_case; /* boolean, default false */
-} RvDomURLPatternOptions;
-
-/* The IDL dictionary URLPatternComponentResult. size is sizeof(RvDomURLPatternComponentResult) as the caller compiles it; a field past
- * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
- * sets size, owns every field and nested value, and rv_dom_url_pattern_component_result_release frees it. */
-typedef struct RvDomURLPatternComponentResult {
-    uint32_t size;
-    RvDomUtf8StringInput input; /* USVString */
-    const RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* groups; /* record<USVString, (undefined or USVString)>, NULL for absent */
-} RvDomURLPatternComponentResult;
-
-/* The IDL dictionary URLPatternResult. size is sizeof(RvDomURLPatternResult) as the caller compiles it; a field past
- * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
- * sets size, owns every field and nested value, and rv_dom_url_pattern_result_release frees it. */
-typedef struct RvDomURLPatternResult {
-    uint32_t size;
-    const RvDomSequenceUSVStringOrURLPatternInit* inputs; /* sequence<URLPatternInput>, NULL for absent */
-    const RvDomURLPatternComponentResult* protocol; /* URLPatternComponentResult, NULL for absent */
-    const RvDomURLPatternComponentResult* username; /* URLPatternComponentResult, NULL for absent */
-    const RvDomURLPatternComponentResult* password; /* URLPatternComponentResult, NULL for absent */
-    const RvDomURLPatternComponentResult* hostname; /* URLPatternComponentResult, NULL for absent */
-    const RvDomURLPatternComponentResult* port; /* URLPatternComponentResult, NULL for absent */
-    const RvDomURLPatternComponentResult* pathname; /* URLPatternComponentResult, NULL for absent */
-    const RvDomURLPatternComponentResult* search; /* URLPatternComponentResult, NULL for absent */
-    const RvDomURLPatternComponentResult* hash; /* URLPatternComponentResult, NULL for absent */
-} RvDomURLPatternResult;
-
 /* The IDL dictionary ErrorEventInit. size is sizeof(RvDomErrorEventInit) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomErrorEventInit {
@@ -862,6 +779,89 @@ typedef struct RvDomPopStateEventInit {
     int32_t has_ua_visual_transition; /* boolean, default false */
 } RvDomPopStateEventInit;
 
+/* The IDL dictionary DOMMatrix2DInit. size is sizeof(RvDomDOMMatrix2DInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomDOMMatrix2DInit {
+    uint32_t size;
+    const double* a; /* unrestricted double, NULL for absent */
+    const double* b; /* unrestricted double, NULL for absent */
+    const double* c; /* unrestricted double, NULL for absent */
+    const double* d; /* unrestricted double, NULL for absent */
+    const double* e; /* unrestricted double, NULL for absent */
+    const double* f; /* unrestricted double, NULL for absent */
+    const double* m11; /* unrestricted double, NULL for absent */
+    const double* m12; /* unrestricted double, NULL for absent */
+    const double* m21; /* unrestricted double, NULL for absent */
+    const double* m22; /* unrestricted double, NULL for absent */
+    const double* m41; /* unrestricted double, NULL for absent */
+    const double* m42; /* unrestricted double, NULL for absent */
+} RvDomDOMMatrix2DInit;
+
+/* The IDL dictionary BlobPropertyBag. size is sizeof(RvDomBlobPropertyBag) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomBlobPropertyBag {
+    uint32_t size;
+    const char* type; /* DOMString, default "" */
+    int32_t endings; /* EndingType, default "transparent", RV_DOM_ENDING_TYPE_* */
+} RvDomBlobPropertyBag;
+
+/* The IDL dictionary FilePropertyBag. size is sizeof(RvDomFilePropertyBag) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomFilePropertyBag {
+    uint32_t size;
+    const char* type; /* DOMString, default "" */
+    int32_t endings; /* EndingType, default "transparent", RV_DOM_ENDING_TYPE_* */
+    const int64_t* last_modified; /* long long, NULL for absent */
+} RvDomFilePropertyBag;
+
+/* The IDL dictionary URLPatternInit. size is sizeof(RvDomURLPatternInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_url_pattern_init_release frees it. */
+typedef struct RvDomURLPatternInit {
+    uint32_t size;
+    RvDomUtf8StringInput protocol; /* USVString */
+    RvDomUtf8StringInput username; /* USVString */
+    RvDomUtf8StringInput password; /* USVString */
+    RvDomUtf8StringInput hostname; /* USVString */
+    RvDomUtf8StringInput port; /* USVString */
+    RvDomUtf8StringInput pathname; /* USVString */
+    RvDomUtf8StringInput search; /* USVString */
+    RvDomUtf8StringInput hash; /* USVString */
+    RvDomUtf8StringInput base_url; /* USVString */
+} RvDomURLPatternInit;
+
+/* The IDL dictionary URLPatternOptions. size is sizeof(RvDomURLPatternOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomURLPatternOptions {
+    uint32_t size;
+    int32_t ignore_case; /* boolean, default false */
+} RvDomURLPatternOptions;
+
+/* The IDL dictionary URLPatternComponentResult. size is sizeof(RvDomURLPatternComponentResult) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_url_pattern_component_result_release frees it. */
+typedef struct RvDomURLPatternComponentResult {
+    uint32_t size;
+    RvDomUtf8StringInput input; /* USVString */
+    const RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* groups; /* record<USVString, (undefined or USVString)>, NULL for absent */
+} RvDomURLPatternComponentResult;
+
+/* The IDL dictionary URLPatternResult. size is sizeof(RvDomURLPatternResult) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_url_pattern_result_release frees it. */
+typedef struct RvDomURLPatternResult {
+    uint32_t size;
+    const RvDomSequenceUSVStringOrURLPatternInit* inputs; /* sequence<URLPatternInput>, NULL for absent */
+    const RvDomURLPatternComponentResult* protocol; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* username; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* password; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* hostname; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* port; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* pathname; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* search; /* URLPatternComponentResult, NULL for absent */
+    const RvDomURLPatternComponentResult* hash; /* URLPatternComponentResult, NULL for absent */
+} RvDomURLPatternResult;
+
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDOMCSSCustomPropertyDescriptor {
@@ -941,6 +941,7 @@ typedef struct RvDomUnionFileOrUSVStringNullable RvDomUnionFileOrUSVStringNullab
 typedef struct RvDomUnionFileOrUSVString RvDomUnionFileOrUSVString;
 typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
+typedef struct RvDomUnionDoubleOrCSSNumericValueNullable RvDomUnionDoubleOrCSSNumericValueNullable;
 typedef struct RvDomUnionBufferSourceOrBlobOrUSVString RvDomUnionBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceBufferSourceOrBlobOrUSVString RvDomSequenceBufferSourceOrBlobOrUSVString;
 typedef struct RvDomSequenceUSVStringUtf8 RvDomSequenceUSVStringUtf8;
@@ -953,7 +954,6 @@ typedef struct RvDomSequenceUSVStringOrURLPatternInit RvDomSequenceUSVStringOrUR
 typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
-typedef struct RvDomUnionDoubleOrCSSNumericValueNullable RvDomUnionDoubleOrCSSNumericValueNullable;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1371,6 +1371,19 @@ struct RvDomSequencePointerEvent {
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 enum {
+    RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_NUMBER = 1,
+    RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_CSS_NUMERIC_VALUE = 2,
+};
+struct RvDomUnionDoubleOrCSSNumericValueNullable {
+    int32_t present;
+    int32_t tag;
+    double arm0;
+    RvCSSStyleValue* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
     RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BUFFER_SOURCE = 1,
     RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BLOB = 2,
     RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_STRING = 3,
@@ -1490,19 +1503,6 @@ struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
-enum {
-    RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_NUMBER = 1,
-    RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_CSS_NUMERIC_VALUE = 2,
-};
-struct RvDomUnionDoubleOrCSSNumericValueNullable {
-    int32_t present;
-    int32_t tag;
-    double arm0;
-    RvCSSStyleValue* arm1;
-};
-
-/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
- * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceAbstractRange {
     int32_t present;
     int32_t count;
@@ -1601,6 +1601,7 @@ RV_EXPORT void rv_dom_union_file_or_usv_string_nullable_release(RvDomUnionFileOr
 RV_EXPORT void rv_dom_union_file_or_usv_string_release(RvDomUnionFileOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
+RV_EXPORT void rv_dom_union_double_or_css_numeric_value_nullable_release(RvDomUnionDoubleOrCSSNumericValueNullable* value);
 RV_EXPORT void rv_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionBufferSourceOrBlobOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_buffer_source_or_blob_or_usv_string_release(RvDomSequenceBufferSourceOrBlobOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_usv_string_utf8_release(RvDomSequenceUSVStringUtf8* value);
@@ -1613,7 +1614,6 @@ RV_EXPORT void rv_dom_sequence_usv_string_or_url_pattern_init_release(RvDomSeque
 RV_EXPORT void rv_dom_union_undefined_or_usv_string_release(RvDomUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomPairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
-RV_EXPORT void rv_dom_union_double_or_css_numeric_value_nullable_release(RvDomUnionDoubleOrCSSNumericValueNullable* value);
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -6506,6 +6506,110 @@ RV_EXPORT int32_t rv_dom_command_event_create(RvNode* target, const uint8_t* typ
 RV_EXPORT int32_t rv_dom_command_event_get_source(RvEvent* target, RvNode** result);
 /* CommandEvent.command getter: readonly attribute DOMString command */
 RV_EXPORT int32_t rv_dom_command_event_get_command(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* ErrorEvent */
+
+/* ErrorEvent.constructor: target is the Document of the constructed object; RV_ERR_DOM_EXCEPTION (InvalidStateError)
+ * for a document without a browsing context; event_init_dict defaults to {} in IDL; event_init_dict may be NULL for
+ * the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_error_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomErrorEventInit* event_init_dict, RvEvent** result);
+/* ErrorEvent.message getter: readonly attribute DOMString message */
+RV_EXPORT int32_t rv_dom_error_event_get_message(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* ErrorEvent.filename getter: readonly attribute USVString filename */
+RV_EXPORT int32_t rv_dom_error_event_get_filename(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* ErrorEvent.lineno getter: readonly attribute unsigned long lineno */
+RV_EXPORT int32_t rv_dom_error_event_get_lineno(RvEvent* target, uint32_t* result);
+/* ErrorEvent.colno getter: readonly attribute unsigned long colno */
+RV_EXPORT int32_t rv_dom_error_event_get_colno(RvEvent* target, uint32_t* result);
+/* ProgressEvent */
+
+/* ProgressEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;
+ * event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_progress_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomProgressEventInit* event_init_dict, RvEvent** result);
+/* ProgressEvent.lengthComputable getter: readonly attribute boolean lengthComputable */
+RV_EXPORT int32_t rv_dom_progress_event_get_length_computable(RvEvent* target, int32_t* result);
+/* ProgressEvent.loaded getter: readonly attribute double loaded */
+RV_EXPORT int32_t rv_dom_progress_event_get_loaded(RvEvent* target, double* result);
+/* ProgressEvent.total getter: readonly attribute double total */
+RV_EXPORT int32_t rv_dom_progress_event_get_total(RvEvent* target, double* result);
+/* CSSAnimationEvent */
+
+/* CSSAnimationEvent.constructor: target is the Document of the constructed object; animation_event_init_dict defaults
+ * to {} in IDL; animation_event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_animation_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomAnimationEventInit* animation_event_init_dict, RvEvent** result);
+/* CSSAnimationEvent.animationName getter: readonly attribute DOMString animationName */
+RV_EXPORT int32_t rv_dom_css_animation_event_get_animation_name(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSAnimationEvent.elapsedTime getter: readonly attribute double elapsedTime */
+RV_EXPORT int32_t rv_dom_css_animation_event_get_elapsed_time(RvEvent* target, double* result);
+/* CSSAnimationEvent.pseudoElement getter: readonly attribute DOMString pseudoElement */
+RV_EXPORT int32_t rv_dom_css_animation_event_get_pseudo_element(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSTransitionEvent */
+
+/* CSSTransitionEvent.constructor: target is the Document of the constructed object; transition_event_init_dict
+ * defaults to {} in IDL; transition_event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_transition_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomTransitionEventInit* transition_event_init_dict, RvEvent** result);
+/* CSSTransitionEvent.propertyName getter: readonly attribute DOMString propertyName */
+RV_EXPORT int32_t rv_dom_css_transition_event_get_property_name(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSTransitionEvent.elapsedTime getter: readonly attribute double elapsedTime */
+RV_EXPORT int32_t rv_dom_css_transition_event_get_elapsed_time(RvEvent* target, double* result);
+/* CSSTransitionEvent.pseudoElement getter: readonly attribute DOMString pseudoElement */
+RV_EXPORT int32_t rv_dom_css_transition_event_get_pseudo_element(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* ContentVisibilityAutoStateChangeEvent */
+
+/* ContentVisibilityAutoStateChangeEvent.constructor: target is the Document of the constructed object;
+ * event_init_dict defaults to {} in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_content_visibility_auto_state_change_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomContentVisibilityAutoStateChangeEventInit* event_init_dict, RvEvent** result);
+/* ContentVisibilityAutoStateChangeEvent.skipped getter: readonly attribute boolean skipped */
+RV_EXPORT int32_t rv_dom_content_visibility_auto_state_change_event_get_skipped(RvEvent* target, int32_t* result);
+/* AnimationPlaybackEvent */
+
+/* AnimationPlaybackEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to
+ * {} in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_animation_playback_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomAnimationPlaybackEventInit* event_init_dict, RvEvent** result);
+/* AnimationPlaybackEvent.currentTime getter: readonly attribute CSSNumberish? currentTime; *result owns its contents;
+ * release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_animation_playback_event_get_current_time(RvEvent* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
+/* AnimationPlaybackEvent.timelineTime getter: readonly attribute CSSNumberish? timelineTime; *result owns its
+ * contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_animation_playback_event_get_timeline_time(RvEvent* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
+/* PageTransitionEvent */
+
+/* PageTransitionEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {}
+ * in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_page_transition_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomPageTransitionEventInit* event_init_dict, RvEvent** result);
+/* PageTransitionEvent.persisted getter: readonly attribute boolean persisted */
+RV_EXPORT int32_t rv_dom_page_transition_event_get_persisted(RvEvent* target, int32_t* result);
+/* HashChangeEvent */
+
+/* HashChangeEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in
+ * IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_hash_change_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomHashChangeEventInit* event_init_dict, RvEvent** result);
+/* HashChangeEvent.oldURL getter: readonly attribute USVString oldURL */
+RV_EXPORT int32_t rv_dom_hash_change_event_get_old_url(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* HashChangeEvent.newURL getter: readonly attribute USVString newURL */
+RV_EXPORT int32_t rv_dom_hash_change_event_get_new_url(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* MediaQueryListEvent */
+
+/* MediaQueryListEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {}
+ * in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_media_query_list_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomMediaQueryListEventInit* event_init_dict, RvEvent** result);
+/* MediaQueryListEvent.media getter: readonly attribute DOMString media */
+RV_EXPORT int32_t rv_dom_media_query_list_event_get_media(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* MediaQueryListEvent.matches getter: readonly attribute boolean matches */
+RV_EXPORT int32_t rv_dom_media_query_list_event_get_matches(RvEvent* target, int32_t* result);
+/* PopStateEvent */
+
+/* PopStateEvent.constructor: target is the Document of the constructed object; RV_ERR_DOM_EXCEPTION
+ * (InvalidStateError) for a document without a browsing context; event_init_dict defaults to {} in IDL;
+ * event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_pop_state_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomPopStateEventInit* event_init_dict, RvEvent** result);
+/* PopStateEvent.hasUAVisualTransition getter: readonly attribute boolean hasUAVisualTransition */
+RV_EXPORT int32_t rv_dom_pop_state_event_get_has_ua_visual_transition(RvEvent* target, int32_t* result);
+/* BeforeUnloadEvent */
+
+/* BeforeUnloadEvent.returnValue getter: attribute DOMString returnValue */
+RV_EXPORT int32_t rv_dom_before_unload_event_get_return_value(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* BeforeUnloadEvent.returnValue setter: attribute DOMString returnValue */
+RV_EXPORT int32_t rv_dom_before_unload_event_set_return_value(RvEvent* target, const char* value);
 /* SVGGraphicsElement */
 
 /* SVGGraphicsElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new
@@ -8013,110 +8117,6 @@ RV_EXPORT int32_t rv_dom_visual_viewport_get_width(RvEventTarget* target, double
 RV_EXPORT int32_t rv_dom_visual_viewport_get_height(RvEventTarget* target, double* result);
 /* VisualViewport.scale getter: readonly attribute double scale; RV_ERR_DETACHED once the object's window has no frame */
 RV_EXPORT int32_t rv_dom_visual_viewport_get_scale(RvEventTarget* target, double* result);
-/* ErrorEvent */
-
-/* ErrorEvent.constructor: target is the Document of the constructed object; RV_ERR_DOM_EXCEPTION (InvalidStateError)
- * for a document without a browsing context; event_init_dict defaults to {} in IDL; event_init_dict may be NULL for
- * the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_error_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomErrorEventInit* event_init_dict, RvEvent** result);
-/* ErrorEvent.message getter: readonly attribute DOMString message */
-RV_EXPORT int32_t rv_dom_error_event_get_message(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* ErrorEvent.filename getter: readonly attribute USVString filename */
-RV_EXPORT int32_t rv_dom_error_event_get_filename(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* ErrorEvent.lineno getter: readonly attribute unsigned long lineno */
-RV_EXPORT int32_t rv_dom_error_event_get_lineno(RvEvent* target, uint32_t* result);
-/* ErrorEvent.colno getter: readonly attribute unsigned long colno */
-RV_EXPORT int32_t rv_dom_error_event_get_colno(RvEvent* target, uint32_t* result);
-/* ProgressEvent */
-
-/* ProgressEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;
- * event_init_dict may be NULL for the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_progress_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomProgressEventInit* event_init_dict, RvEvent** result);
-/* ProgressEvent.lengthComputable getter: readonly attribute boolean lengthComputable */
-RV_EXPORT int32_t rv_dom_progress_event_get_length_computable(RvEvent* target, int32_t* result);
-/* ProgressEvent.loaded getter: readonly attribute double loaded */
-RV_EXPORT int32_t rv_dom_progress_event_get_loaded(RvEvent* target, double* result);
-/* ProgressEvent.total getter: readonly attribute double total */
-RV_EXPORT int32_t rv_dom_progress_event_get_total(RvEvent* target, double* result);
-/* CSSAnimationEvent */
-
-/* CSSAnimationEvent.constructor: target is the Document of the constructed object; animation_event_init_dict defaults
- * to {} in IDL; animation_event_init_dict may be NULL for the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_css_animation_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomAnimationEventInit* animation_event_init_dict, RvEvent** result);
-/* CSSAnimationEvent.animationName getter: readonly attribute DOMString animationName */
-RV_EXPORT int32_t rv_dom_css_animation_event_get_animation_name(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* CSSAnimationEvent.elapsedTime getter: readonly attribute double elapsedTime */
-RV_EXPORT int32_t rv_dom_css_animation_event_get_elapsed_time(RvEvent* target, double* result);
-/* CSSAnimationEvent.pseudoElement getter: readonly attribute DOMString pseudoElement */
-RV_EXPORT int32_t rv_dom_css_animation_event_get_pseudo_element(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* CSSTransitionEvent */
-
-/* CSSTransitionEvent.constructor: target is the Document of the constructed object; transition_event_init_dict
- * defaults to {} in IDL; transition_event_init_dict may be NULL for the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_css_transition_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomTransitionEventInit* transition_event_init_dict, RvEvent** result);
-/* CSSTransitionEvent.propertyName getter: readonly attribute DOMString propertyName */
-RV_EXPORT int32_t rv_dom_css_transition_event_get_property_name(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* CSSTransitionEvent.elapsedTime getter: readonly attribute double elapsedTime */
-RV_EXPORT int32_t rv_dom_css_transition_event_get_elapsed_time(RvEvent* target, double* result);
-/* CSSTransitionEvent.pseudoElement getter: readonly attribute DOMString pseudoElement */
-RV_EXPORT int32_t rv_dom_css_transition_event_get_pseudo_element(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* ContentVisibilityAutoStateChangeEvent */
-
-/* ContentVisibilityAutoStateChangeEvent.constructor: target is the Document of the constructed object;
- * event_init_dict defaults to {} in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_content_visibility_auto_state_change_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomContentVisibilityAutoStateChangeEventInit* event_init_dict, RvEvent** result);
-/* ContentVisibilityAutoStateChangeEvent.skipped getter: readonly attribute boolean skipped */
-RV_EXPORT int32_t rv_dom_content_visibility_auto_state_change_event_get_skipped(RvEvent* target, int32_t* result);
-/* AnimationPlaybackEvent */
-
-/* AnimationPlaybackEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to
- * {} in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_animation_playback_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomAnimationPlaybackEventInit* event_init_dict, RvEvent** result);
-/* AnimationPlaybackEvent.currentTime getter: readonly attribute CSSNumberish? currentTime; *result owns its contents;
- * release with the matching rv_dom_*_release */
-RV_EXPORT int32_t rv_dom_animation_playback_event_get_current_time(RvEvent* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
-/* AnimationPlaybackEvent.timelineTime getter: readonly attribute CSSNumberish? timelineTime; *result owns its
- * contents; release with the matching rv_dom_*_release */
-RV_EXPORT int32_t rv_dom_animation_playback_event_get_timeline_time(RvEvent* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
-/* PageTransitionEvent */
-
-/* PageTransitionEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {}
- * in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_page_transition_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomPageTransitionEventInit* event_init_dict, RvEvent** result);
-/* PageTransitionEvent.persisted getter: readonly attribute boolean persisted */
-RV_EXPORT int32_t rv_dom_page_transition_event_get_persisted(RvEvent* target, int32_t* result);
-/* HashChangeEvent */
-
-/* HashChangeEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in
- * IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_hash_change_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomHashChangeEventInit* event_init_dict, RvEvent** result);
-/* HashChangeEvent.oldURL getter: readonly attribute USVString oldURL */
-RV_EXPORT int32_t rv_dom_hash_change_event_get_old_url(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* HashChangeEvent.newURL getter: readonly attribute USVString newURL */
-RV_EXPORT int32_t rv_dom_hash_change_event_get_new_url(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* MediaQueryListEvent */
-
-/* MediaQueryListEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {}
- * in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_media_query_list_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomMediaQueryListEventInit* event_init_dict, RvEvent** result);
-/* MediaQueryListEvent.media getter: readonly attribute DOMString media */
-RV_EXPORT int32_t rv_dom_media_query_list_event_get_media(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* MediaQueryListEvent.matches getter: readonly attribute boolean matches */
-RV_EXPORT int32_t rv_dom_media_query_list_event_get_matches(RvEvent* target, int32_t* result);
-/* PopStateEvent */
-
-/* PopStateEvent.constructor: target is the Document of the constructed object; RV_ERR_DOM_EXCEPTION
- * (InvalidStateError) for a document without a browsing context; event_init_dict defaults to {} in IDL;
- * event_init_dict may be NULL for the IDL default; *result is a new reference */
-RV_EXPORT int32_t rv_dom_pop_state_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomPopStateEventInit* event_init_dict, RvEvent** result);
-/* PopStateEvent.hasUAVisualTransition getter: readonly attribute boolean hasUAVisualTransition */
-RV_EXPORT int32_t rv_dom_pop_state_event_get_has_ua_visual_transition(RvEvent* target, int32_t* result);
-/* BeforeUnloadEvent */
-
-/* BeforeUnloadEvent.returnValue getter: attribute DOMString returnValue */
-RV_EXPORT int32_t rv_dom_before_unload_event_get_return_value(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
-/* BeforeUnloadEvent.returnValue setter: attribute DOMString returnValue */
-RV_EXPORT int32_t rv_dom_before_unload_event_set_return_value(RvEvent* target, const char* value);
 /* Highlight */
 
 /* Highlight.constructor: target is the Document of the constructed object; *result is a new reference */

@@ -165,6 +165,17 @@ Functions per interface:
   FormDataEvent: 2
   ToggleEvent: 4
   CommandEvent: 3
+  ErrorEvent: 5
+  ProgressEvent: 4
+  CSSAnimationEvent: 4
+  CSSTransitionEvent: 4
+  ContentVisibilityAutoStateChangeEvent: 2
+  AnimationPlaybackEvent: 3
+  PageTransitionEvent: 2
+  HashChangeEvent: 3
+  MediaQueryListEvent: 3
+  PopStateEvent: 2
+  BeforeUnloadEvent: 2
   SVGGraphicsElement: 6
   SVGGeometryElement: 5
   SVGPolygonElement: 2
@@ -271,17 +282,6 @@ Functions per interface:
   URLSearchParams: 11
   URLPattern: 13
   VisualViewport: 7
-  ErrorEvent: 5
-  ProgressEvent: 4
-  CSSAnimationEvent: 4
-  CSSTransitionEvent: 4
-  ContentVisibilityAutoStateChangeEvent: 2
-  AnimationPlaybackEvent: 3
-  PageTransitionEvent: 2
-  HashChangeEvent: 3
-  MediaQueryListEvent: 3
-  PopStateEvent: 2
-  BeforeUnloadEvent: 2
   Highlight: 11
   HighlightRegistry: 7
   namespace DOMCSSNamespace: 4
