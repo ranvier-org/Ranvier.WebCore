@@ -721,6 +721,31 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                     failwith "ToggleEvent.newState changed after destroy"
 
                 rv_event_release held.Value
+        | "screen" ->
+            let metrics = Runtime.InteropServices.Marshal.AllocHGlobal 36
+            let values = [| 36; 1080; 1920; 0; 40; 1080; 1880; 30; 0 |]
+            values |> Array.iteri (fun index value -> Runtime.InteropServices.Marshal.WriteInt32 (metrics, index * 4, value))
+            rv_host_set_screen (host, metrics) |> check "rv_host_set_screen"
+            Runtime.InteropServices.Marshal.FreeHGlobal metrics
+            let mutable width = 0
+            rv_dom_screen_get_width (document, &width) |> check "screen.width"
+
+            if width <> 1080 then
+                failwithf "screen.width %d" width
+
+            held.Value <- rv_node_retain document
+
+            fun () ->
+                let mutable kept = 0
+                rv_dom_screen_get_width (held.Value, &kept) |> check "screen.width after destroy"
+
+                // The document has no frame after destroy, and WebKit's Screen reports 0 without one.
+                if kept <> 0 then
+                    failwithf "screen.width after destroy %d" kept
+
+                let mutable kind = -1
+                rv_dom_screen_orientation_get_type (held.Value, &kind) |> check "orientation.type after destroy"
+                rv_node_release held.Value
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -907,6 +932,7 @@ let run (outDir: string) =
                     "blob slice"
                     "caret position"
                     "crypto"
+                    "screen"
                     "url values"
                     "url pattern result"
                     "visual viewport"

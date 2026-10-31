@@ -36,3 +36,4 @@
 0034-svg-string-list-null-attribute.patch
 0035-caret-position-text-control-shadow-roots.patch
 0037-frame-loader-client-form-submission-hook.patch
+0038-platform-screen-win-embedder-screen-data.patch

@@ -141168,6 +141168,416 @@
       "stringInputs": "utf8-lengths-nullable"
     },
     {
+      "interface": "Screen",
+      "member": "height",
+      "contractOwner": "Screen",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Screen",
+      "member": "width",
+      "contractOwner": "Screen",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Screen",
+      "member": "colorDepth",
+      "contractOwner": "Screen",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_get_color_depth",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Screen",
+      "member": "pixelDepth",
+      "contractOwner": "Screen",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_get_pixel_depth",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Screen",
+      "member": "availLeft",
+      "contractOwner": "Screen",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_get_avail_left",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Screen",
+      "member": "availTop",
+      "contractOwner": "Screen",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_get_avail_top",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Screen",
+      "member": "availHeight",
+      "contractOwner": "Screen",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_get_avail_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "Screen",
+      "member": "availWidth",
+      "contractOwner": "Screen",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_get_avail_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "ScreenOrientation",
+      "member": "type",
+      "contractOwner": "ScreenOrientation",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_orientation_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "OrientationType",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "OrientationType",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen-orientation",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "ScreenOrientation",
+      "member": "angle",
+      "contractOwner": "ScreenOrientation",
+      "kind": "context_operation",
+      "function": "rv_dom_screen_orientation_get_angle",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint16_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned short",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint16_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-screen-orientation",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
       "interface": "DOMMatrixReadOnly",
       "member": "fromMatrix",
       "contractOwner": "DOMMatrixReadOnly",
@@ -142597,6 +143007,18 @@
       ],
       {},
       "fileapi/EndingType.idl"
+    ],
+    "OrientationType": [
+      [
+        "portrait-primary",
+        "portrait-secondary",
+        "landscape-primary",
+        "landscape-secondary"
+      ],
+      {
+        "ImplementedAs": "ScreenOrientationType"
+      },
+      "page/ScreenOrientation.idl"
     ]
   },
   "containers": [

@@ -377,6 +377,14 @@ enum {
     RV_DOM_ENDING_TYPE_NATIVE = 1, /* "native" */
 };
 
+/* The values of the IDL enumeration OrientationType. */
+enum {
+    RV_DOM_ORIENTATION_TYPE_PORTRAIT_PRIMARY = 0, /* "portrait-primary" */
+    RV_DOM_ORIENTATION_TYPE_PORTRAIT_SECONDARY = 1, /* "portrait-secondary" */
+    RV_DOM_ORIENTATION_TYPE_LANDSCAPE_PRIMARY = 2, /* "landscape-primary" */
+    RV_DOM_ORIENTATION_TYPE_LANDSCAPE_SECONDARY = 3, /* "landscape-secondary" */
+};
+
 /* The values of the IDL enumeration ScrollBehavior. */
 enum {
     RV_DOM_SCROLL_BEHAVIOR_AUTO = 0, /* "auto" */
@@ -7901,6 +7909,32 @@ RV_EXPORT int32_t rv_dom_window_get_visual_viewport(RvNode* target, RvEventTarge
 RV_EXPORT int32_t rv_dom_crypto_get_random_values(RvNode* target, int32_t array_kind, uint8_t* array, int32_t array_length);
 /* Window.crypto.randomUUID: checked Document context */
 RV_EXPORT int32_t rv_dom_crypto_random_uuid(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
+/* Screen */
+
+/* Window.screen.height getter: checked Document context */
+RV_EXPORT int32_t rv_dom_screen_get_height(RvNode* target, int32_t* result);
+/* Window.screen.width getter: checked Document context */
+RV_EXPORT int32_t rv_dom_screen_get_width(RvNode* target, int32_t* result);
+/* Window.screen.colorDepth getter: checked Document context */
+RV_EXPORT int32_t rv_dom_screen_get_color_depth(RvNode* target, uint32_t* result);
+/* Window.screen.pixelDepth getter: checked Document context */
+RV_EXPORT int32_t rv_dom_screen_get_pixel_depth(RvNode* target, uint32_t* result);
+/* Window.screen.availLeft getter: checked Document context */
+RV_EXPORT int32_t rv_dom_screen_get_avail_left(RvNode* target, int32_t* result);
+/* Window.screen.availTop getter: checked Document context */
+RV_EXPORT int32_t rv_dom_screen_get_avail_top(RvNode* target, int32_t* result);
+/* Window.screen.availHeight getter: checked Document context */
+RV_EXPORT int32_t rv_dom_screen_get_avail_height(RvNode* target, int32_t* result);
+/* Window.screen.availWidth getter: checked Document context */
+RV_EXPORT int32_t rv_dom_screen_get_avail_width(RvNode* target, int32_t* result);
+/* ScreenOrientation */
+
+/* Window.screen.orientation.type getter: checked Document context; RV_ERR_UNSUPPORTED while the setting
+ * ScreenOrientationAPIEnabled is off */
+RV_EXPORT int32_t rv_dom_screen_orientation_get_type(RvNode* target, int32_t* result);
+/* Window.screen.orientation.angle getter: checked Document context; RV_ERR_UNSUPPORTED while the setting
+ * ScreenOrientationAPIEnabled is off */
+RV_EXPORT int32_t rv_dom_screen_orientation_get_angle(RvNode* target, uint16_t* result);
 /* DOMMatrixReadOnly */
 
 /* DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults

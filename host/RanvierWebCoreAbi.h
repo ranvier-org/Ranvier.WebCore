@@ -1474,6 +1474,34 @@ RV_EXPORT int32_t rv_host_set_obscured_insets(RvHost*, double top, double right,
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
 
+/* v46: "screen" for rv_abi_has: the app's display integration sets the screen a host's document reports through Screen,
+ * ScreenOrientation and the device-width, device-height and color media features. Until the first call the screen is
+ * the host's size in CSS pixels, all of it available, 24 bits deep, landscape-primary unless taller than wide; it
+ * then follows rv_host_resize. orientation is an RV_SCREEN_* value; ScreenOrientation.angle follows from it on the
+ * natural landscape orientation (landscape-primary 0, portrait-primary 90, landscape-secondary 180,
+ * portrait-secondary 270). A change of orientation fires the engine's change event. Orientation locking is not
+ * supported. Set size to sizeof(RvScreenMetrics). Returns RV_ERR_UNSUPPORTED, and changes nothing, for a size
+ * below this layout, a width or height of 0 or less, a negative available extent, a color depth outside 1-64 or
+ * an unknown orientation. A document kept past rv_host_destroy has no frame, and its Screen reports 0. */
+enum {
+    RV_SCREEN_PORTRAIT_PRIMARY = 0,
+    RV_SCREEN_PORTRAIT_SECONDARY = 1,
+    RV_SCREEN_LANDSCAPE_PRIMARY = 2,
+    RV_SCREEN_LANDSCAPE_SECONDARY = 3,
+};
+typedef struct RvScreenMetrics {
+    uint32_t size;
+    int32_t width;
+    int32_t height;
+    int32_t avail_left;
+    int32_t avail_top;
+    int32_t avail_width;
+    int32_t avail_height;
+    int32_t color_depth;
+    int32_t orientation;
+} RvScreenMetrics;
+RV_EXPORT int32_t rv_host_set_screen(RvHost*, const RvScreenMetrics* metrics);
+
 /* v44: "dom-crypto-random" for rv_abi_has: rv_dom_crypto_get_random_values and rv_dom_crypto_random_uuid
  * (RanvierWebCoreDom.h) call the crypto object of a document's Window. */
 

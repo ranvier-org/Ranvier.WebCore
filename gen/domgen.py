@@ -739,35 +739,64 @@ class Generator(ComplexGeneratorMixin):
         self.namespace_features.append((binding['feature'], [function.conditional for function in generated if function.conditional]))
 
     def window_object_context(self, name, binding):
-        """The operations of the object a readonly Window attribute holds, such as Window.crypto, called through
-        the Window of a checked Document."""
+        """The operations and readonly attributes of the object a chain of readonly attributes from the Window holds,
+        such as Window.crypto or Window.screen.orientation, called through the Window of a checked Document."""
         if binding.get('receiver') != 'Document' or 'Document' not in self.world.scope:
             raise SystemExit(f'{name}: Window object bindings require a scoped Document receiver')
         if binding.get('stringInputs') != 'utf8-lengths':
             raise SystemExit(f'{name}: Window object string inputs require explicit UTF-8 lengths')
         if name not in self.world.interfaces or 'DOMWindow' not in self.world.interfaces:
             raise SystemExit(f'{name}: configured Window object interface was not found')
-        accessor = binding.get('accessor')
-        holders = [member for member in self.world.members('DOMWindow')
-                   if member.kind == 'attribute' and member.readonly and member.name == accessor
-                   and self.world.resolve(member.type).name == name]
-        if len(holders) != 1:
-            raise SystemExit(f'{name}: Window object bindings require a readonly Window attribute of the interface')
-        self.headers.update({'LocalDOMWindow.h', f'{self.world.cpp_class(name)}.h'})
+        accessor = binding.get('accessor') or ''
+        holder, steps, gates = 'DOMWindow', [], []
+        for index, step in enumerate(accessor.split('.')):
+            target = name if index == len(accessor.split('.')) - 1 else None
+            found = [member for member in self.world.members(holder)
+                     if member.kind == 'attribute' and member.readonly and member.name == step
+                     and self.world.resolve(member.type).name in self.world.interfaces
+                     and (target is None or self.world.resolve(member.type).name == target)]
+            if len(found) != 1 or found[0].attrs.get('ImplementedBy') or found[0].attrs.get('CallWith'):
+                raise SystemExit(f'{name}: Window object bindings require a readonly Window attribute chain to the interface')
+            gates.append(found[0].attrs)
+            steps.append(found[0].attrs.get('ImplementedAs', step))
+            holder = self.world.resolve(found[0].type).name
+            self.headers.add(f'{self.world.cpp_class(holder)}.h')
+        self.headers.add('LocalDOMWindow.h')
+        path = 'impl->window()->' + '().'.join(steps) + '()'
         selected = set(binding['members'])
         operations = {}
+        attributes = {}
         for member in self.world.members(name):
             if member.name not in selected:
                 continue
+            member = self.scoped_member(member, *[{key: attrs[key] for key in ('EnabledBySetting', 'Conditional')
+                                                    if key in attrs and attrs[key] != member.attrs.get(key)} for attrs in gates])
             reason = self.member_reason(name, member)
-            if reason or member.kind != 'operation':
-                raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not an operation"}')
-            if member.attrs.get('CallWith') or member.attrs.get('ImplementedBy'):
+            readonly_attribute = member.kind == 'attribute' and member.readonly
+            if reason or (member.kind != 'operation' and not readonly_attribute):
+                raise SystemExit(f'{name}.{member.name}: {reason or "configured member is not an operation or a readonly attribute"}')
+            if member.attrs.get('CallWith') or member.attrs.get('ImplementedBy') or member.attrs.get('GetterCallWith'):
                 raise SystemExit(f'{name}.{member.name}: Window object bindings require a direct instance member')
-            operations.setdefault(member.name, []).append(member)
-        if selected != set(operations):
-            raise SystemExit(f'{name}: missing configured Window object operations {sorted(selected - set(operations))}')
+            if readonly_attribute:
+                attributes[member.name] = member
+            else:
+                operations.setdefault(member.name, []).append(member)
+        if selected != set(operations) | set(attributes):
+            raise SystemExit(f'{name}: missing configured Window object members {sorted(selected - set(operations) - set(attributes))}')
         generated = []
+        for attribute, member in attributes.items():
+            function = Function(name, member, 'context_operation', f'{snake(name)}_get_{snake(attribute)}', [],
+                                f'Window.{accessor}.{attribute} getter: checked Document context')
+            function.receiver = 'Document'
+            function.context_owner = name
+            function.feature = binding['feature']
+            function.context_checks = ['if (!impl->window())', '    return RV_ERR_UNSUPPORTED;']
+            try:
+                result = self.world.map(member.type)
+                self.finish(function, 'Document', member, [], [], result, f'{path}.{member.attrs.get("ImplementedAs", attribute)}()', [])
+            except Unsupported as error:
+                raise SystemExit(f'{name}.{member.name}: {error}') from error
+            generated.append(function)
         for operation, overloads in operations.items():
             for member in overloads:
                 suffix = '' if len(overloads) == 1 else f'_{len(member.arguments)}'
@@ -782,7 +811,7 @@ class Generator(ComplexGeneratorMixin):
                     args = [self.world.map(argument.type) for argument in member.arguments]
                     result = self.world.map(member.type)
                     placeholders = ', '.join(f'{{arg{i}}}' for i in range(len(args)))
-                    call = f'impl->window()->{accessor}().{member.attrs.get("ImplementedAs", member.name)}({placeholders})'
+                    call = f'{path}.{member.attrs.get("ImplementedAs", member.name)}({placeholders})'
                     self.finish(function, 'Document', member, member.arguments, args, result, call, [])
                 except Unsupported as error:
                     raise SystemExit(f'{name}.{member.name}: {error}') from error

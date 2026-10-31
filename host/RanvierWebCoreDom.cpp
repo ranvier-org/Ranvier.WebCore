@@ -2784,6 +2784,16 @@ int32_t rv_dom_window_scroll_by_2(RvNode* target, double x, double y) { return r
 int32_t rv_dom_window_get_visual_viewport(RvNode* target, RvEventTarget** result) { return ranvier_dom_window_get_visual_viewport(target, result); }
 int32_t rv_dom_crypto_get_random_values(RvNode* target, int32_t array_kind, uint8_t* array, int32_t array_length) { return ranvier_dom_crypto_get_random_values(target, array_kind, array, array_length); }
 int32_t rv_dom_crypto_random_uuid(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_crypto_random_uuid(target, buffer, capacity, length); }
+int32_t rv_dom_screen_get_height(RvNode* target, int32_t* result) { return ranvier_dom_screen_get_height(target, result); }
+int32_t rv_dom_screen_get_width(RvNode* target, int32_t* result) { return ranvier_dom_screen_get_width(target, result); }
+int32_t rv_dom_screen_get_color_depth(RvNode* target, uint32_t* result) { return ranvier_dom_screen_get_color_depth(target, result); }
+int32_t rv_dom_screen_get_pixel_depth(RvNode* target, uint32_t* result) { return ranvier_dom_screen_get_pixel_depth(target, result); }
+int32_t rv_dom_screen_get_avail_left(RvNode* target, int32_t* result) { return ranvier_dom_screen_get_avail_left(target, result); }
+int32_t rv_dom_screen_get_avail_top(RvNode* target, int32_t* result) { return ranvier_dom_screen_get_avail_top(target, result); }
+int32_t rv_dom_screen_get_avail_height(RvNode* target, int32_t* result) { return ranvier_dom_screen_get_avail_height(target, result); }
+int32_t rv_dom_screen_get_avail_width(RvNode* target, int32_t* result) { return ranvier_dom_screen_get_avail_width(target, result); }
+int32_t rv_dom_screen_orientation_get_type(RvNode* target, int32_t* result) { return ranvier_dom_screen_orientation_get_type(target, result); }
+int32_t rv_dom_screen_orientation_get_angle(RvNode* target, uint16_t* result) { return ranvier_dom_screen_orientation_get_angle(target, result); }
 int32_t rv_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_read_only_from_matrix(target, other, result); }
 int32_t rv_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result) { return ranvier_dom_dom_matrix_from_matrix(target, other, result); }
 int32_t rv_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result) { return ranvier_dom_dom_rect_read_only_from_rect(target, other, result); }

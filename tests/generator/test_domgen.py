@@ -1396,6 +1396,59 @@ partial interface mixin WindowOrWorkerGlobalScope { [SameObject] readonly attrib
         self.assertIn('(array_length >= 0 && (array_length == 0 || array))', glue)
         self.assertIn('byte[] array', generator.fsharp())
 
+    SCREEN = '''
+[Exposed=Window] interface Screen {
+    readonly attribute long width;
+    readonly attribute unsigned long colorDepth;
+    [ImplementedAs=colorDepth] readonly attribute unsigned long pixelDepth;
+    [SameObject, EnabledBySetting=ScreenOrientationAPIEnabled] readonly attribute ScreenOrientation orientation;
+};
+enum OrientationType { "portrait-primary", "portrait-secondary", "landscape-primary", "landscape-secondary" };
+[Exposed=Window, EnabledBySetting=ScreenOrientationAPIEnabled] interface ScreenOrientation : EventTarget {
+    readonly attribute OrientationType type;
+    readonly attribute unsigned short angle;
+};
+partial interface mixin WindowOrWorkerGlobalScope { [SameObject] readonly attribute Screen screen; };
+'''
+
+    def screen_generator(self, **overrides):
+        return self.window_object_generator(self.CRYPTO + self.SCREEN, **{'windowObjectBindings': {
+            'Screen': {'receiver': 'Document', 'accessor': 'screen', 'members': ['width', 'colorDepth', 'pixelDepth'],
+                       'feature': 'dom-screen', 'stringInputs': 'utf8-lengths'},
+            'ScreenOrientation': {'receiver': 'Document', 'accessor': 'screen.orientation', 'members': ['type', 'angle'],
+                                  'feature': 'dom-screen-orientation', 'stringInputs': 'utf8-lengths'}}, **overrides})
+
+    def test_window_object_bindings_read_readonly_attributes_through_the_accessor(self):
+        generator = self.screen_generator()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        width = functions['rv_dom_screen_get_width']
+        self.assertEqual('context_operation', width['kind'])
+        self.assertEqual('Screen', width['contractOwner'])
+        self.assertEqual('dom-screen', width['feature'])
+        self.assertEqual([{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'int32_t*', 'name': 'result'}], width['parameters'])
+        glue = generator.glue()
+        self.assertIn('impl->window()->screen().width()', glue)
+        self.assertEqual(2, glue.count('impl->window()->screen().colorDepth()'))
+        self.assertIn('rv_dom_screen_get_pixel_depth', functions)
+
+    def test_a_dotted_accessor_reaches_a_nested_object_and_keeps_its_setting_gate(self):
+        generator = self.screen_generator()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        kind = functions['rv_dom_screen_orientation_get_type']
+        self.assertEqual('ScreenOrientation', kind['contractOwner'])
+        self.assertEqual([{'ctype': 'RvNode*', 'name': 'target'}, {'ctype': 'int32_t*', 'name': 'result'}], kind['parameters'])
+        glue = generator.glue()
+        self.assertIn('impl->window()->screen().orientation().type()', glue)
+        self.assertIn('impl->window()->screen().orientation().angle()', glue)
+        self.assertIn('ScreenOrientationAPIEnabled', glue)
+        self.assertIn('RV_DOM_ORIENTATION_TYPE_LANDSCAPE_PRIMARY', generator.header())
+
+    def test_a_dotted_accessor_requires_each_step_to_be_a_readonly_attribute_of_the_next_interface(self):
+        with self.assertRaisesRegex(SystemExit, 'Window object bindings require a readonly Window attribute'):
+            self.screen_generator(windowObjectBindings={'ScreenOrientation': {
+                'receiver': 'Document', 'accessor': 'screen.missing', 'members': ['type'], 'feature': 'f',
+                'stringInputs': 'utf8-lengths'}})
+
     def test_typed_array_view_requires_a_top_level_return_value_argument(self):
         generator = self.window_object_generator('''
 [Exposed=Window] interface Crypto {

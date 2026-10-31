@@ -7,6 +7,8 @@
 #include "LocalDOMWindow.h"
 #include "MediaQueryList.h"
 #include "Node.h"
+#include "DocumentPage.h"
+#include "Page.h"
 #include <cstring>
 
 using namespace WebCore;
@@ -56,6 +58,14 @@ RvEventTarget* ranvier_match_media(RvNode* documentHandle, const char* query)
     EventTarget& target = *list;
     target.ref();
     return reinterpret_cast<RvEventTarget*>(&target);
+}
+
+void ranvier_page_set_display(RvNode* documentHandle, uint32_t displayID)
+{
+    RefPtr document = dynamicDowncast<Document>(reinterpret_cast<Node*>(documentHandle));
+    if (!document || !document->page())
+        return;
+    document->page()->windowScreenDidChange(displayID, std::nullopt);
 }
 
 int32_t ranvier_media_query_matches(RvEventTarget* handle, int32_t* matches)
