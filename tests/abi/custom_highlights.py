@@ -176,20 +176,30 @@ class Fixture:
         p.load(page(webkit_source), standalone=False)
         self.document = p.bind('rv_host_document', P, [P])(p.host)
         self.cycle = p.bind('rv_run_loop_cycle', I, [I])
+        # The wait reads through uncounted calls, so the assertion count is independent of the font load time.
+        probe = p.node('w')
+        update = p.bind('rv_host_update', I, [P])
         deadline = time.monotonic() + 10
-        while self.width('w') != 160:
+        while self.width(probe) != 160:
             if time.monotonic() > deadline:
-                raise AssertionError('pinned Ahem was not applied: width ' + str(self.width('w')))
+                raise AssertionError('pinned Ahem was not applied: width ' + str(self.width(probe)))
             self.cycle(10)
-            p.update()
+            update(p.host)
+        p.update()
+        p.expect(self.width(probe) == 160, 'pinned Ahem applied')
         paragraph = p.node('t')
         self.text = p.object('rv_dom_node_get_first_child', [P], [paragraph], 'node')
         self.selection = p.object('rv_dom_document_get_selection', [P], [self.document], 'dom_selection')
 
-    def width(self, identifier):
+    def width(self, element):
         p = self.p
-        rect = p.object('rv_dom_element_get_bounding_client_rect', [p.pointer], [p.node(identifier)], 'dom_rect_read_only')
-        return p.read('dom_rect_read_only', rect, 'width', p.double)
+        rect, width = p.pointer(), p.double()
+        status = p.bind('rv_dom_element_get_bounding_client_rect', p.integer, [p.pointer, ctypes.POINTER(p.pointer)])(element, ctypes.byref(rect))
+        if status != OK or not rect.value:
+            return None
+        p.bind('rv_dom_dom_rect_read_only_get_width', p.integer, [p.pointer, ctypes.POINTER(p.double)])(rect.value, ctypes.byref(width))
+        p.bind('rv_dom_dom_rect_read_only_release', None, [p.pointer])(rect.value)
+        return width.value
 
     def range(self, start, end):
         p = self.p
