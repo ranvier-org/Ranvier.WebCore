@@ -2799,5 +2799,98 @@ interface PointerProbe : Event { constructor(DOMString type, optional PointerPro
         self.assertIn('PointerProbe::Init a1 { };' + chr(10) + '    a1.pointerId = 0;' + chr(10) + '    a1.pointerType = emptyString();'
                       + chr(10) + '    a1.isPrimary = false;' + chr(10) + '    if (init) {', glue)
 
+    def image_source_world(self, other=''):
+        """A world where two files define ImageSourceProbe with other arm orders, and other is a third file."""
+        canvas = self.source / 'Source/WebCore/html/canvas'
+        canvas.mkdir(parents=True)
+        (canvas / 'DrawProbe.idl').write_text('''
+typedef (ImageAProbe or ImageBProbe or ImageCProbe) ImageSourceProbe;
+interface mixin DrawProbe { undefined drawImage(ImageSourceProbe image); };
+''')
+        page = self.source / 'Source/WebCore/page'
+        page.mkdir()
+        (page / 'GlobalProbe.idl').write_text('''
+typedef (ImageAProbe or ImageCProbe or ImageBProbe) ImageSourceProbe;
+typedef (ImageSourceProbe or Blob) BitmapSourceProbe;
+interface GlobalProbe { undefined consume(ImageSourceProbe image); undefined bitmap(BitmapSourceProbe source); };
+''')
+        (self.source / 'Source/WebCore/dom/Fixture.idl').write_text(IDL + '''
+interface ImageAProbe {};
+interface ImageBProbe {};
+interface ImageCProbe {};
+interface Blob {};
+interface ContextProbe {};
+ContextProbe includes DrawProbe;
+''' + other)
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['ImageAProbe', 'ImageBProbe', 'ImageCProbe', 'Blob', 'ContextProbe', 'GlobalProbe']
+        return domgen.World(self.source, config)
+
+    def argument_label(self, world, interface, member):
+        found = next(m for m in world.members(interface) if m.name == member)
+        return world.map(found.arguments[0].type).label
+
+    def test_typedef_defined_in_several_files_resolves_in_the_file_of_each_reference(self):
+        world = self.image_source_world()
+        self.assertEqual(self.argument_label(world, 'ContextProbe', 'drawImage'), 'ImageAProbeOrImageBProbeOrImageCProbe')
+        self.assertEqual(self.argument_label(world, 'GlobalProbe', 'consume'), 'ImageAProbeOrImageCProbeOrImageBProbe')
+        # A typedef body resolves in its own file: the nested union keeps GlobalProbe.idl's arm order.
+        nested = next(m for m in world.members('GlobalProbe') if m.name == 'bitmap')
+        self.assertEqual(world.map(nested.arguments[0].type).subtypes[0].label, 'ImageAProbeOrImageCProbeOrImageBProbe')
+        generator = domgen.Generator(world)
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        self.assertIn('Variant<Ref<ImageAProbe>, Ref<ImageBProbe>, Ref<ImageCProbe>>', glue)
+        self.assertIn('Variant<Ref<ImageAProbe>, Ref<ImageCProbe>, Ref<ImageBProbe>>', glue)
+
+    def test_typedef_defined_differently_fails_for_a_reference_from_a_file_without_a_definition(self):
+        world = self.image_source_world('interface OtherProbe { undefined use(ImageSourceProbe image); };\n')
+        world.scope.append('OtherProbe')
+        with self.assertRaisesRegex(SystemExit, r'typedef ImageSourceProbe is defined differently in '
+                                                r'html/canvas/DrawProbe.idl, page/GlobalProbe.idl; dom/Fixture.idl references it'):
+            self.argument_label(world, 'OtherProbe', 'use')
+
+    def test_typedef_defined_equivalently_in_several_files_resolves_for_a_reference_from_any_file(self):
+        (self.source / 'Source/WebCore/dom/Shared.idl').write_text('typedef (ImageAProbe or ImageBProbe) PairProbe;\n')
+        (self.source / 'Source/WebCore/dom/Twin.idl').write_text('typedef (ImageAProbe or ImageBProbe) PairProbe;\n')
+        (self.source / 'Source/WebCore/dom/Fixture.idl').write_text(IDL + '''
+interface ImageAProbe {};
+interface ImageBProbe {};
+interface PairUserProbe { undefined use(PairProbe pair); };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['ImageAProbe', 'ImageBProbe', 'PairUserProbe']
+        world = domgen.World(self.source, config)
+        self.assertEqual(self.argument_label(world, 'PairUserProbe', 'use'), 'ImageAProbeOrImageBProbe')
+
+    def test_single_arm_union_is_its_arm_type_in_the_shared_model(self):
+        (self.source / 'Source/WebCore/dom/Fixture.idl').write_text(IDL + '''
+typedef (HTMLCanvasElement) BitmapCanvasProbe;
+interface HTMLCanvasElement : HTMLElement {};
+interface BitmapContextProbe {
+    readonly attribute BitmapCanvasProbe canvas;
+    attribute BitmapCanvasProbe? target;
+    undefined draw(BitmapCanvasProbe canvas);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['HTMLElement', 'HTMLCanvasElement', 'BitmapContextProbe']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        shared = generator.interfaces()
+        self.assertEqual(len(re.findall(r'^and \[<[A-Za-z]+>\] HTMLCanvasElement =', shared, re.M)), 1)
+        self.assertNotIn('| HTMLCanvasElement of HTMLCanvasElement', shared)
+        self.assertIn('abstract member canvas: HTMLCanvasElement with get', shared)
+        self.assertIn('abstract member target: HTMLCanvasElement with get, set', shared)
+        self.assertIn('abstract member draw: canvas: HTMLCanvasElement -> unit', shared)
+        self.assertNotIn('__ranvier_get_canvas', shared)
+        # The C ABI keeps the union transport of the engine's Variant.
+        self.assertIn('rv_dom_bitmap_context_probe_get_canvas(RvBitmapContextProbe* target, RvDomUnionHTMLCanvasElement* result)',
+                      generator.header())
+
 if __name__ == '__main__':
     unittest.main()

@@ -21,7 +21,6 @@ TWO_D = 1
 RGBA8, PNG, JPEG, WEBP = 0, 1, 2, 3
 SOURCE_NODE, SOURCE_BITMAP, SOURCE_IMAGE_DATA, SOURCE_BLOB = 0, 1, 2, 3
 SUCCEEDED, DECODE_FAILED, CANCELLED = 0, 2, 3
-CANVAS = 2
 BITMAP_ARM = 4
 CLEAR, RED, LIME, BLUE = [0, 0, 0, 0], [255, 0, 0, 255], [0, 255, 0, 255], [0, 0, 255, 255]
 PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10]
@@ -69,6 +68,10 @@ class Parts(ctypes.Structure):
     _fields_ = [('present', ctypes.c_int32), ('count', ctypes.c_int32), ('items', ctypes.POINTER(Part))]
 
 
+# red-chromium.json bitmapRenderer.canvas.
+CHROMIUM_RENDERER_CANVAS = True
+
+
 class CanvasUnion(ctypes.Structure):
     _fields_ = [('present', ctypes.c_int32), ('tag', ctypes.c_int32), ('arm0', ctypes.c_void_p)]
 
@@ -107,6 +110,8 @@ def verify(directory, evidence_json=None):
         to_blob = p.bind('rv_canvas_to_blob', I, [P, I, ctypes.c_double, ctypes.POINTER(P)])
         bitmap_context = p.bind('rv_canvas_get_bitmap_context', I, [P, ctypes.POINTER(P)])
         release_bitmap_context = p.bind('rv_dom_image_bitmap_rendering_context_release', None, [P])
+        context_canvas = p.bind('rv_dom_image_bitmap_rendering_context_get_canvas', I, [P, ctypes.POINTER(CanvasUnion)])
+        release_canvas_union = p.bind('rv_dom_union_html_canvas_element_release', None, [ctypes.POINTER(CanvasUnion)])
         transfer = p.bind('rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap', I, [P, P])
         Completion = ctypes.CFUNCTYPE(None, P, I, I, I)
         create = p.bind('rv_image_bitmap_create', I, [P, I, P, ctypes.POINTER(Options), Completion, P, ctypes.POINTER(ctypes.c_uint64)])
@@ -379,6 +384,12 @@ def verify(directory, evidence_json=None):
         status_is(bitmap_context(c, ctypes.byref(other)), OK, 'bitmaprenderer on a 2D canvas')
         expect(other.value is None, 'a 2D canvas has no bitmaprenderer context')
         status_is(bitmap_context(n, ctypes.byref(other)), WRONG_INTERFACE, 'bitmaprenderer on a <div>')
+        owner = CanvasUnion()
+        status_is(context_canvas(bctx.value, ctypes.byref(owner)), OK, 'ImageBitmapRenderingContext.canvas')
+        report['rendererCanvas'] = owner.present == 1 and owner.tag == 1 and owner.arm0 == b
+        # Chromium: red-chromium.json bitmapRenderer.canvas is true (bctx.canvas === the canvas).
+        expect(report['rendererCanvas'] == CHROMIUM_RENDERER_CANVAS, 'the context names its canvas, as in Chromium')
+        release_canvas_union(ctypes.byref(owner))
         moving = bitmap_of(SOURCE_NODE, c, tag=10)
         status_is(transfer(bctx.value, moving), OK, 'transferFromImageBitmap')
         report['transfer'] = {'sourceAfter': size(moving), 'canvasData': url_of(b, PNG) == url}

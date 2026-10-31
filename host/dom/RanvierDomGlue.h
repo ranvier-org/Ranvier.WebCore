@@ -242,9 +242,10 @@ WEBCORE_EXPORT void ranvier_dom_union_dom_string_or_array_buffer_or_array_buffer
 WEBCORE_EXPORT void ranvier_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDomUnionUnsignedLongOrAnimationFrameRatePreset* value);
 WEBCORE_EXPORT void ranvier_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* value);
 WEBCORE_EXPORT void ranvier_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
-WEBCORE_EXPORT void ranvier_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value);
+WEBCORE_EXPORT void ranvier_dom_union_html_image_element_or_svg_image_element_or_html_canvas_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* value);
 WEBCORE_EXPORT void ranvier_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionUnrestrictedDoubleOrDOMPointInit* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_unrestricted_double_or_dom_point_init_release(RvDomSequenceUnrestrictedDoubleOrDOMPointInit* value);
+WEBCORE_EXPORT void ranvier_dom_union_html_canvas_element_release(RvDomUnionHTMLCanvasElement* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 WEBCORE_EXPORT void ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -3088,7 +3089,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_reset_transform(R
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_create_linear_gradient(RvCanvasRenderingContext2D* target, double x0, double y0, double x1, double y1, RvCanvasGradient** result);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_create_radial_gradient(RvCanvasRenderingContext2D* target, double x0, double y0, double r0, double x1, double y1, double r1, RvCanvasGradient** result);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_create_conic_gradient(RvCanvasRenderingContext2D* target, double angle, double x, double y, RvCanvasGradient** result);
-WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_create_pattern(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, const uint8_t* repetition, int32_t repetition_length, RvCanvasPattern** result);
+WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_create_pattern(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* image, const uint8_t* repetition, int32_t repetition_length, RvCanvasPattern** result);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_clear_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_fill_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_stroke_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
@@ -3106,9 +3107,9 @@ WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_is_point_in_strok
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_fill_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, double x, double y, const double* max_width);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_stroke_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, double x, double y, const double* max_width);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_measure_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, RvTextMetrics** result);
-WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_3(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy);
-WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_5(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy, double dw, double dh);
-WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_9(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double sx, double sy, double sw, double sh, double dx, double dy, double dw, double dh);
+WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_3(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy);
+WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_5(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy, double dw, double dh);
+WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_9(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* image, double sx, double sy, double sw, double sh, double dx, double dy, double dw, double dh);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_create_image_data_3(RvCanvasRenderingContext2D* target, int32_t sw, int32_t sh, const RvDomImageDataSettings* settings, RvImageData** result);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_create_image_data_1(RvCanvasRenderingContext2D* target, RvImageData* imagedata, RvImageData** result);
 WEBCORE_EXPORT int32_t ranvier_dom_canvas_rendering_context2_d_get_image_data(RvCanvasRenderingContext2D* target, int32_t sx, int32_t sy, int32_t sw, int32_t sh, const RvDomImageDataSettings* settings, RvImageData** result);
@@ -3149,6 +3150,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_path2_d_ellipse(RvPath2D* target, double x, d
 WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_get_width(RvImageBitmap* target, uint32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_get_height(RvImageBitmap* target, uint32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_close(RvImageBitmap* target);
+WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_rendering_context_get_canvas(RvImageBitmapRenderingContext* target, RvDomUnionHTMLCanvasElement* result);
 WEBCORE_EXPORT int32_t ranvier_dom_image_bitmap_rendering_context_transfer_from_image_bitmap(RvImageBitmapRenderingContext* target, RvImageBitmap* bitmap);
 WEBCORE_EXPORT int32_t ranvier_dom_text_metrics_get_width(RvTextMetrics* target, double* result);
 WEBCORE_EXPORT int32_t ranvier_dom_text_metrics_get_actual_bounding_box_left(RvTextMetrics* target, double* result);

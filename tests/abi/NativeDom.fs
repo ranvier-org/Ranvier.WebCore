@@ -2177,23 +2177,23 @@ type RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern =
     val mutable arm2: nativeint
 
 [<Literal>]
-let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_IMAGE_ELEMENT = 1
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_IMAGE_ELEMENT = 1
 
 [<Literal>]
-let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_CANVAS_ELEMENT = 2
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_SVG_IMAGE_ELEMENT = 2
 
 [<Literal>]
-let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_SVG_IMAGE_ELEMENT = 3
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_CANVAS_ELEMENT = 3
 
 [<Literal>]
-let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_IMAGE_BITMAP = 4
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_IMAGE_BITMAP = 4
 
 [<Literal>]
-let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_CSS_STYLE_IMAGE_VALUE = 5
+let RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_CSS_STYLE_IMAGE_VALUE = 5
 
-/// <summary>ABI transport for HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue; result contents are owned until the matching release call.</summary>
+/// <summary>ABI transport for HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
-type RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue =
+type RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue =
     val mutable present: int
     val mutable tag: int
     val mutable arm0: nativeint
@@ -2222,6 +2222,16 @@ type RvDomSequenceUnrestrictedDoubleOrDOMPointInit =
     val mutable present: int
     val mutable count: int
     val mutable items: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_HTML_CANVAS_ELEMENT_HTML_CANVAS_ELEMENT = 1
+
+/// <summary>ABI transport for HTMLCanvasElement; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionHTMLCanvasElement =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: nativeint
 
 /// <summary>ABI transport for CSSStyleValue sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -2466,13 +2476,16 @@ extern void rv_dom_union_unrestricted_double_or_keyframe_effect_options_release(
 extern void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& value)
 
 [<DllImport(Lib)>]
-extern void rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue& value)
+extern void rv_dom_union_html_image_element_or_svg_image_element_or_html_canvas_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionUnrestrictedDoubleOrDOMPointInit& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_unrestricted_double_or_dom_point_init_release(RvDomSequenceUnrestrictedDoubleOrDOMPointInit& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_html_canvas_element_release(RvDomUnionHTMLCanvasElement& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
@@ -11472,7 +11485,7 @@ extern int rv_dom_canvas_rendering_context2_d_create_radial_gradient(nativeint t
 extern int rv_dom_canvas_rendering_context2_d_create_conic_gradient(nativeint target, float angle, float x, float y, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_canvas_rendering_context2_d_create_pattern(nativeint target, [<In>] RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue[] image, byte[] repetition, int repetition_length, nativeint& result)
+extern int rv_dom_canvas_rendering_context2_d_create_pattern(nativeint target, [<In>] RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue[] image, byte[] repetition, int repetition_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_clear_rect(nativeint target, float x, float y, float w, float h)
@@ -11526,13 +11539,13 @@ extern int rv_dom_canvas_rendering_context2_d_stroke_text(nativeint target, byte
 extern int rv_dom_canvas_rendering_context2_d_measure_text(nativeint target, byte[] text, int text_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_canvas_rendering_context2_d_draw_image_3(nativeint target, [<In>] RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue[] image, float dx, float dy)
+extern int rv_dom_canvas_rendering_context2_d_draw_image_3(nativeint target, [<In>] RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue[] image, float dx, float dy)
 
 [<DllImport(Lib)>]
-extern int rv_dom_canvas_rendering_context2_d_draw_image_5(nativeint target, [<In>] RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue[] image, float dx, float dy, float dw, float dh)
+extern int rv_dom_canvas_rendering_context2_d_draw_image_5(nativeint target, [<In>] RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue[] image, float dx, float dy, float dw, float dh)
 
 [<DllImport(Lib)>]
-extern int rv_dom_canvas_rendering_context2_d_draw_image_9(nativeint target, [<In>] RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue[] image, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh)
+extern int rv_dom_canvas_rendering_context2_d_draw_image_9(nativeint target, [<In>] RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue[] image, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh)
 
 [<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_create_image_data_3(nativeint target, int sw, int sh, [<In>] RvDomImageDataSettings[] settings, nativeint& result)
@@ -11653,6 +11666,9 @@ extern int rv_dom_image_bitmap_get_height(nativeint target, uint32& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_image_bitmap_close(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_image_bitmap_rendering_context_get_canvas(nativeint target, RvDomUnionHTMLCanvasElement& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap(nativeint target, nativeint bitmap)

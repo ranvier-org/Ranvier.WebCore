@@ -158745,7 +158745,7 @@
           "name": "target"
         },
         {
-          "ctype": "const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue*",
+          "ctype": "const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue*",
           "name": "image"
         },
         {
@@ -158775,12 +158775,12 @@
                 "subtypes": []
               },
               {
-                "name": "HTMLCanvasElement",
+                "name": "SVGImageElement",
                 "nullable": false,
                 "subtypes": []
               },
               {
-                "name": "SVGImageElement",
+                "name": "HTMLCanvasElement",
                 "nullable": false,
                 "subtypes": []
               },
@@ -158801,12 +158801,12 @@
           "variadic": false,
           "mapping": {
             "kind": "union",
-            "ctype": "RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "ctype": "RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
             "interface": null,
             "root": null,
             "class": null,
             "enum": null,
-            "label": "HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "label": "HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
             "nullable": false,
             "atom": false,
             "subtypes": [
@@ -158825,9 +158825,9 @@
               {
                 "kind": "node",
                 "ctype": null,
-                "interface": "HTMLCanvasElement",
+                "interface": "SVGImageElement",
                 "root": null,
-                "class": "HTMLCanvasElement",
+                "class": "SVGImageElement",
                 "enum": null,
                 "label": null,
                 "nullable": false,
@@ -158837,9 +158837,9 @@
               {
                 "kind": "node",
                 "ctype": null,
-                "interface": "SVGImageElement",
+                "interface": "HTMLCanvasElement",
                 "root": null,
-                "class": "SVGImageElement",
+                "class": "HTMLCanvasElement",
                 "enum": null,
                 "label": null,
                 "nullable": false,
@@ -160659,7 +160659,7 @@
           "name": "target"
         },
         {
-          "ctype": "const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue*",
+          "ctype": "const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue*",
           "name": "image"
         },
         {
@@ -160685,12 +160685,12 @@
                 "subtypes": []
               },
               {
-                "name": "HTMLCanvasElement",
+                "name": "SVGImageElement",
                 "nullable": false,
                 "subtypes": []
               },
               {
-                "name": "SVGImageElement",
+                "name": "HTMLCanvasElement",
                 "nullable": false,
                 "subtypes": []
               },
@@ -160711,12 +160711,12 @@
           "variadic": false,
           "mapping": {
             "kind": "union",
-            "ctype": "RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "ctype": "RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
             "interface": null,
             "root": null,
             "class": null,
             "enum": null,
-            "label": "HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "label": "HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
             "nullable": false,
             "atom": false,
             "subtypes": [
@@ -160735,9 +160735,9 @@
               {
                 "kind": "node",
                 "ctype": null,
-                "interface": "HTMLCanvasElement",
+                "interface": "SVGImageElement",
                 "root": null,
-                "class": "HTMLCanvasElement",
+                "class": "SVGImageElement",
                 "enum": null,
                 "label": null,
                 "nullable": false,
@@ -160747,9 +160747,9 @@
               {
                 "kind": "node",
                 "ctype": null,
-                "interface": "SVGImageElement",
+                "interface": "HTMLCanvasElement",
                 "root": null,
-                "class": "SVGImageElement",
+                "class": "HTMLCanvasElement",
                 "enum": null,
                 "label": null,
                 "nullable": false,
@@ -160864,7 +160864,7 @@
           "name": "target"
         },
         {
-          "ctype": "const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue*",
+          "ctype": "const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue*",
           "name": "image"
         },
         {
@@ -160898,12 +160898,12 @@
                 "subtypes": []
               },
               {
-                "name": "HTMLCanvasElement",
+                "name": "SVGImageElement",
                 "nullable": false,
                 "subtypes": []
               },
               {
-                "name": "SVGImageElement",
+                "name": "HTMLCanvasElement",
                 "nullable": false,
                 "subtypes": []
               },
@@ -160924,12 +160924,12 @@
           "variadic": false,
           "mapping": {
             "kind": "union",
-            "ctype": "RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "ctype": "RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
             "interface": null,
             "root": null,
             "class": null,
             "enum": null,
-            "label": "HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "label": "HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
             "nullable": false,
             "atom": false,
             "subtypes": [
@@ -160948,9 +160948,9 @@
               {
                 "kind": "node",
                 "ctype": null,
-                "interface": "HTMLCanvasElement",
+                "interface": "SVGImageElement",
                 "root": null,
-                "class": "HTMLCanvasElement",
+                "class": "SVGImageElement",
                 "enum": null,
                 "label": null,
                 "nullable": false,
@@ -160960,9 +160960,9 @@
               {
                 "kind": "node",
                 "ctype": null,
-                "interface": "SVGImageElement",
+                "interface": "HTMLCanvasElement",
                 "root": null,
-                "class": "SVGImageElement",
+                "class": "HTMLCanvasElement",
                 "enum": null,
                 "label": null,
                 "nullable": false,
@@ -161125,7 +161125,7 @@
           "name": "target"
         },
         {
-          "ctype": "const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue*",
+          "ctype": "const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue*",
           "name": "image"
         },
         {
@@ -161175,12 +161175,12 @@
                 "subtypes": []
               },
               {
-                "name": "HTMLCanvasElement",
+                "name": "SVGImageElement",
                 "nullable": false,
                 "subtypes": []
               },
               {
-                "name": "SVGImageElement",
+                "name": "HTMLCanvasElement",
                 "nullable": false,
                 "subtypes": []
               },
@@ -161201,12 +161201,12 @@
           "variadic": false,
           "mapping": {
             "kind": "union",
-            "ctype": "RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "ctype": "RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
             "interface": null,
             "root": null,
             "class": null,
             "enum": null,
-            "label": "HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "label": "HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
             "nullable": false,
             "atom": false,
             "subtypes": [
@@ -161225,9 +161225,9 @@
               {
                 "kind": "node",
                 "ctype": null,
-                "interface": "HTMLCanvasElement",
+                "interface": "SVGImageElement",
                 "root": null,
-                "class": "HTMLCanvasElement",
+                "class": "SVGImageElement",
                 "enum": null,
                 "label": null,
                 "nullable": false,
@@ -161237,9 +161237,9 @@
               {
                 "kind": "node",
                 "ctype": null,
-                "interface": "SVGImageElement",
+                "interface": "HTMLCanvasElement",
                 "root": null,
-                "class": "SVGImageElement",
+                "class": "HTMLCanvasElement",
                 "enum": null,
                 "label": null,
                 "nullable": false,
@@ -166503,6 +166503,61 @@
         "subtypes": []
       },
       "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ImageBitmapRenderingContext",
+      "member": "canvas",
+      "contractOwner": "ImageBitmapRenderingContext",
+      "kind": "getter",
+      "function": "rv_dom_image_bitmap_rendering_context_get_canvas",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvImageBitmapRenderingContext*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionHTMLCanvasElement*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "HTMLCanvasElement",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionHTMLCanvasElement",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "HTMLCanvasElement",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLCanvasElement",
+            "root": null,
+            "class": "HTMLCanvasElement",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
     },
     {
       "interface": "ImageBitmapRenderingContext",
@@ -174149,12 +174204,12 @@
     {
       "mapping": {
         "kind": "union",
-        "ctype": "RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+        "ctype": "RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
         "interface": null,
         "root": null,
         "class": null,
         "enum": null,
-        "label": "HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+        "label": "HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue",
         "nullable": false,
         "atom": false,
         "subtypes": [
@@ -174173,9 +174228,9 @@
           {
             "kind": "node",
             "ctype": null,
-            "interface": "HTMLCanvasElement",
+            "interface": "SVGImageElement",
             "root": null,
-            "class": "HTMLCanvasElement",
+            "class": "SVGImageElement",
             "enum": null,
             "label": null,
             "nullable": false,
@@ -174185,9 +174240,9 @@
           {
             "kind": "node",
             "ctype": null,
-            "interface": "SVGImageElement",
+            "interface": "HTMLCanvasElement",
             "root": null,
-            "class": "SVGImageElement",
+            "class": "HTMLCanvasElement",
             "enum": null,
             "label": null,
             "nullable": false,
@@ -174220,7 +174275,7 @@
           }
         ]
       },
-      "releaseFunction": "rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release"
+      "releaseFunction": "rv_dom_union_html_image_element_or_svg_image_element_or_html_canvas_element_or_image_bitmap_or_css_style_image_value_release"
     },
     {
       "mapping": {
@@ -174314,6 +174369,34 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_unrestricted_double_or_dom_point_init_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionHTMLCanvasElement",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "HTMLCanvasElement",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLCanvasElement",
+            "root": null,
+            "class": "HTMLCanvasElement",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_html_canvas_element_release"
     },
     {
       "mapping": {

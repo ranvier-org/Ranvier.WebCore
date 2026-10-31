@@ -1383,6 +1383,7 @@
       "close"
     ],
     "ImageBitmapRenderingContext": [
+      "canvas",
       "transferFromImageBitmap"
     ],
     "ImageData": [
@@ -1466,7 +1467,6 @@
     "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
   },
   "unionArgumentConversions": [
-    "CanvasImageSource",
-    "CanvasRenderingContext2D.createPattern"
+    "CanvasImageSource"
   ]
 }

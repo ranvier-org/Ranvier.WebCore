@@ -5488,8 +5488,8 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     abstract member __ranvier_createPattern: image: obj * repetition: string -> CanvasPattern
 #else
     abstract member createPattern: image: HTMLImageElement * repetition: string -> CanvasPattern
-    abstract member createPattern: image: HTMLCanvasElement * repetition: string -> CanvasPattern
     abstract member createPattern: image: SVGImageElement * repetition: string -> CanvasPattern
+    abstract member createPattern: image: HTMLCanvasElement * repetition: string -> CanvasPattern
     abstract member createPattern: image: ImageBitmap * repetition: string -> CanvasPattern
     abstract member createPattern: image: CSSImageValue * repetition: string -> CanvasPattern
 #endif
@@ -5544,8 +5544,8 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     abstract member __ranvier_drawImage: image: obj * dx: float * dy: float -> unit
 #else
     abstract member drawImage: image: HTMLImageElement * dx: float * dy: float -> unit
-    abstract member drawImage: image: HTMLCanvasElement * dx: float * dy: float -> unit
     abstract member drawImage: image: SVGImageElement * dx: float * dy: float -> unit
+    abstract member drawImage: image: HTMLCanvasElement * dx: float * dy: float -> unit
     abstract member drawImage: image: ImageBitmap * dx: float * dy: float -> unit
     abstract member drawImage: image: CSSImageValue * dx: float * dy: float -> unit
 #endif
@@ -5556,8 +5556,8 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     abstract member __ranvier_drawImage: image: obj * dx: float * dy: float * dw: float * dh: float -> unit
 #else
     abstract member drawImage: image: HTMLImageElement * dx: float * dy: float * dw: float * dh: float -> unit
-    abstract member drawImage: image: HTMLCanvasElement * dx: float * dy: float * dw: float * dh: float -> unit
     abstract member drawImage: image: SVGImageElement * dx: float * dy: float * dw: float * dh: float -> unit
+    abstract member drawImage: image: HTMLCanvasElement * dx: float * dy: float * dw: float * dh: float -> unit
     abstract member drawImage: image: ImageBitmap * dx: float * dy: float * dw: float * dh: float -> unit
     abstract member drawImage: image: CSSImageValue * dx: float * dy: float * dw: float * dh: float -> unit
 #endif
@@ -5572,10 +5572,10 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
         image: HTMLImageElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
 
     abstract member drawImage:
-        image: HTMLCanvasElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+        image: SVGImageElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
 
     abstract member drawImage:
-        image: SVGImageElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
+        image: HTMLCanvasElement * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
 
     abstract member drawImage:
         image: ImageBitmap * sx: float * sy: float * sw: float * sh: float * dx: float * dy: float * dw: float * dh: float -> unit
@@ -5729,6 +5729,8 @@ and [<AllowNullLiteral>] ImageBitmap =
 
 /// <summary>ImageBitmapRenderingContext in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ImageBitmapRenderingContext =
+    /// <summary>ImageBitmapRenderingContext.canvas.</summary>
+    abstract member canvas: HTMLCanvasElement with get
     /// <summary>ImageBitmapRenderingContext.transferFromImageBitmap.</summary>
     abstract member transferFromImageBitmap: bitmap: ImageBitmap -> unit
 
@@ -6209,11 +6211,11 @@ and [<RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
     | CanvasGradient of CanvasGradient
     | CanvasPattern of CanvasPattern
 
-/// <summary>HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue in the scoped DOM interface model.</summary>
-and [<RequireQualifiedAccess>] HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue =
+/// <summary>HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue =
     | HTMLImageElement of HTMLImageElement
-    | HTMLCanvasElement of HTMLCanvasElement
     | SVGImageElement of SVGImageElement
+    | HTMLCanvasElement of HTMLCanvasElement
     | ImageBitmap of ImageBitmap
     | CSSStyleImageValue of CSSImageValue
 
@@ -6862,15 +6864,15 @@ module BrowserUnionAdapters =
         | arm when isCanvasPattern arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern (unbox<CanvasPattern> arm)
         | _ -> failwith "Unexpected DOM union result"
 
-    let private boxHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue
-        (value: HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue)
+    let private boxHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue
+        (value: HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue)
         : obj =
         match value with
-        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.HTMLImageElement value -> box value
-        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.HTMLCanvasElement value -> box value
-        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.SVGImageElement value -> box value
-        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.ImageBitmap value -> box value
-        | HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue.CSSStyleImageValue value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.HTMLImageElement value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.SVGImageElement value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.HTMLCanvasElement value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.ImageBitmap value -> box value
+        | HTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue.CSSStyleImageValue value -> box value
 
     let private boxUnrestrictedDoubleOrDOMPointInit (value: UnrestrictedDoubleOrDOMPointInit) : obj =
         match value with
@@ -7231,10 +7233,10 @@ module BrowserUnionAdapters =
         member this.createPattern(image: HTMLImageElement, repetition: string) : CanvasPattern =
             this.__ranvier_createPattern (box image, repetition)
 
-        member this.createPattern(image: HTMLCanvasElement, repetition: string) : CanvasPattern =
+        member this.createPattern(image: SVGImageElement, repetition: string) : CanvasPattern =
             this.__ranvier_createPattern (box image, repetition)
 
-        member this.createPattern(image: SVGImageElement, repetition: string) : CanvasPattern =
+        member this.createPattern(image: HTMLCanvasElement, repetition: string) : CanvasPattern =
             this.__ranvier_createPattern (box image, repetition)
 
         member this.createPattern(image: ImageBitmap, repetition: string) : CanvasPattern =
@@ -7246,10 +7248,10 @@ module BrowserUnionAdapters =
         member this.drawImage(image: HTMLImageElement, dx: float, dy: float) : unit =
             this.__ranvier_drawImage (box image, dx, dy)
 
-        member this.drawImage(image: HTMLCanvasElement, dx: float, dy: float) : unit =
+        member this.drawImage(image: SVGImageElement, dx: float, dy: float) : unit =
             this.__ranvier_drawImage (box image, dx, dy)
 
-        member this.drawImage(image: SVGImageElement, dx: float, dy: float) : unit =
+        member this.drawImage(image: HTMLCanvasElement, dx: float, dy: float) : unit =
             this.__ranvier_drawImage (box image, dx, dy)
 
         member this.drawImage(image: ImageBitmap, dx: float, dy: float) : unit =
@@ -7261,10 +7263,10 @@ module BrowserUnionAdapters =
         member this.drawImage(image: HTMLImageElement, dx: float, dy: float, dw: float, dh: float) : unit =
             this.__ranvier_drawImage (box image, dx, dy, dw, dh)
 
-        member this.drawImage(image: HTMLCanvasElement, dx: float, dy: float, dw: float, dh: float) : unit =
+        member this.drawImage(image: SVGImageElement, dx: float, dy: float, dw: float, dh: float) : unit =
             this.__ranvier_drawImage (box image, dx, dy, dw, dh)
 
-        member this.drawImage(image: SVGImageElement, dx: float, dy: float, dw: float, dh: float) : unit =
+        member this.drawImage(image: HTMLCanvasElement, dx: float, dy: float, dw: float, dh: float) : unit =
             this.__ranvier_drawImage (box image, dx, dy, dw, dh)
 
         member this.drawImage(image: ImageBitmap, dx: float, dy: float, dw: float, dh: float) : unit =
@@ -7278,12 +7280,12 @@ module BrowserUnionAdapters =
             : unit =
             this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
 
+        member this.drawImage(image: SVGImageElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
+            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
+
         member this.drawImage
             (image: HTMLCanvasElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float)
             : unit =
-            this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
-
-        member this.drawImage(image: SVGImageElement, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =
             this.__ranvier_drawImage (box image, sx, sy, sw, sh, dx, dy, dw, dh)
 
         member this.drawImage(image: ImageBitmap, sx: float, sy: float, sw: float, sh: float, dx: float, dy: float, dw: float, dh: float) : unit =

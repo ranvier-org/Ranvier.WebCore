@@ -798,11 +798,6 @@ template<typename T> struct DomSequenceArgument {
     // A span parameter borrows the values for the call, which the argument temporary outlives.
     operator std::span<const T>() && { return values.span(); }
 };
-// A decoded union passed to an engine variant with other arm order or arms: each arm converts on its own.
-template<typename V> struct DomUnionArgument {
-    V value;
-    template<typename T> operator T() && { return WTF::switchOn(std::move(value), [](auto&& arm) -> T { return T { std::move(arm) }; }); }
-};
 template<typename T> const T* resultField(const T& value) { return &value; }
 template<typename T> const T* resultField(const std::optional<T>& value) { return value ? &*value : nullptr; }
 template<typename V, typename S, typename E> int32_t storeOptionalDictionary(V&& value, S** result, E&& encode)
@@ -3658,7 +3653,7 @@ template<typename V> int32_t encodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPa
     return RV_OK;
 }
 
-std::optional<Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>>> decodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* source, int32_t& status)
+std::optional<Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>>> decodeRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
     switch (source->tag) {
@@ -3666,37 +3661,37 @@ std::optional<Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImag
         if (!source->arm0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
         RefPtr<HTMLImageElement> arm0 = source->arm0 ? dynamicDowncast<HTMLImageElement>(*reinterpret_cast<Node*>(source->arm0)) : nullptr;
         if (source->arm0 && !arm0) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
-        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
+        return Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<0>, Ref { *arm0 } } };
     }
     case 2: {
         if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
-        RefPtr<HTMLCanvasElement> arm1 = source->arm1 ? dynamicDowncast<HTMLCanvasElement>(*reinterpret_cast<Node*>(source->arm1)) : nullptr;
+        RefPtr<SVGImageElement> arm1 = source->arm1 ? dynamicDowncast<SVGImageElement>(*reinterpret_cast<Node*>(source->arm1)) : nullptr;
         if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
-        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+        return Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
     }
     case 3: {
         if (!source->arm2) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
-        RefPtr<SVGImageElement> arm2 = source->arm2 ? dynamicDowncast<SVGImageElement>(*reinterpret_cast<Node*>(source->arm2)) : nullptr;
+        RefPtr<HTMLCanvasElement> arm2 = source->arm2 ? dynamicDowncast<HTMLCanvasElement>(*reinterpret_cast<Node*>(source->arm2)) : nullptr;
         if (source->arm2 && !arm2) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
-        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<2>, Ref { *arm2 } } };
+        return Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<2>, Ref { *arm2 } } };
     }
     case 4: {
         if (!source->arm3) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
         RefPtr<ImageBitmap> arm3 = reinterpret_cast<ImageBitmap*>(source->arm3);
         if (source->arm3 && !arm3) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
-        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<3>, Ref { *arm3 } } };
+        return Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<3>, Ref { *arm3 } } };
     }
     case 5: {
         if (!source->arm4) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
         RefPtr<CSSStyleImageValue> arm4 = source->arm4 ? dynamicDowncast<CSSStyleImageValue>(*reinterpret_cast<CSSStyleValue*>(source->arm4)) : nullptr;
         if (source->arm4 && !arm4) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
-        return Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<4>, Ref { *arm4 } } };
+        return Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { Variant<Ref<HTMLImageElement>, Ref<SVGImageElement>, Ref<HTMLCanvasElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>> { WTF::InPlaceIndex<4>, Ref { *arm4 } } };
     }
     default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
     }
 }
 
-void clearRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value)
+void clearRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* value)
 {
     if (!value) return;
     switch (value->tag) {
@@ -3718,7 +3713,7 @@ void clearRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageB
     }
     *value = { };
 }
-template<size_t I = 0, typename V> void encodeArmsRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(V&& value, RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* result)
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(V&& value, RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* result)
 {
     if constexpr (I < 5) {
         if (value.index() == I) {
@@ -3737,16 +3732,16 @@ template<size_t I = 0, typename V> void encodeArmsRvDomUnionHTMLImageElementOrHT
             else if constexpr (I == 4) {
                 storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm4);
             }
-        } else encodeArmsRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue<I + 1>(std::forward<V>(value), result);
+        } else encodeArmsRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue<I + 1>(std::forward<V>(value), result);
     }
 }
-template<typename V> int32_t encodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(V&& input, RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* result)
+template<typename V> int32_t encodeRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(V&& input, RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* result)
 {
     *result = { };
     auto&& value = input;
     result->present = 1;
     result->tag = static_cast<int32_t>(value.index()) + 1;
-    encodeArmsRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(value, result);
+    encodeArmsRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(value, result);
     return RV_OK;
 }
 
@@ -3814,6 +3809,36 @@ void clearRvDomSequenceUnrestrictedDoubleOrDOMPointInit(RvDomSequenceUnrestricte
     }
     std::free(value->items);
     *value = { };
+}
+
+void clearRvDomUnionHTMLCanvasElement(RvDomUnionHTMLCanvasElement* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        if (value->arm0) reinterpret_cast<Node*>(value->arm0)->deref();
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionHTMLCanvasElement(V&& value, RvDomUnionHTMLCanvasElement* result)
+{
+    if constexpr (I < 1) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                storeHandle<Node>(std::get<I>(value), &result->arm0);
+            }
+        } else encodeArmsRvDomUnionHTMLCanvasElement<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionHTMLCanvasElement(V&& input, RvDomUnionHTMLCanvasElement* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionHTMLCanvasElement(value, result);
+    return RV_OK;
 }
 
 void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
@@ -4486,9 +4511,9 @@ void ranvier_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(R
     if (isMainThread()) clearRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value);
 }
 
-void ranvier_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value)
+void ranvier_dom_union_html_image_element_or_svg_image_element_or_html_canvas_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* value)
 {
-    if (isMainThread()) clearRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(value);
+    if (isMainThread()) clearRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(value);
 }
 
 void ranvier_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionUnrestrictedDoubleOrDOMPointInit* value)
@@ -4499,6 +4524,11 @@ void ranvier_dom_union_unrestricted_double_or_dom_point_init_release(RvDomUnionU
 void ranvier_dom_sequence_unrestricted_double_or_dom_point_init_release(RvDomSequenceUnrestrictedDoubleOrDOMPointInit* value)
 {
     if (isMainThread()) clearRvDomSequenceUnrestrictedDoubleOrDOMPointInit(value);
+}
+
+void ranvier_dom_union_html_canvas_element_release(RvDomUnionHTMLCanvasElement* value)
+{
+    if (isMainThread()) clearRvDomUnionHTMLCanvasElement(value);
 }
 
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
@@ -46078,7 +46108,7 @@ int32_t ranvier_dom_canvas_rendering_context2_d_create_conic_gradient(RvCanvasRe
 }
 
 // CanvasRenderingContext2D.createPattern(CanvasImageSource image, DOMString repetition) -> CanvasPattern?; *result is a new reference, or NULL
-int32_t ranvier_dom_canvas_rendering_context2_d_create_pattern(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, const uint8_t* repetition, int32_t repetition_length, RvCanvasPattern** result)
+int32_t ranvier_dom_canvas_rendering_context2_d_create_pattern(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* image, const uint8_t* repetition, int32_t repetition_length, RvCanvasPattern** result)
 {
     if (!target || !image || !(repetition_length >= 0 && (repetition_length <= 0 || repetition)) || !result)
         return RV_ERR_NULL_ARGUMENT;
@@ -46086,11 +46116,11 @@ int32_t ranvier_dom_canvas_rendering_context2_d_create_pattern(RvCanvasRendering
         return RV_ERR_WRONG_THREAD;
     RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
     int32_t status0 = RV_OK;
-    auto a0 = decodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(image, status0);
+    auto a0 = decodeRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(image, status0);
     if (status0 != RV_OK) return status0;
     StringArg a1 { repetition, repetition_length };
     if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
-    return deliver([&]() -> decltype(auto) { return impl->createPattern(DomUnionArgument<Variant<Ref<HTMLImageElement>, Ref<HTMLCanvasElement>, Ref<SVGImageElement>, Ref<ImageBitmap>, Ref<CSSStyleImageValue>>> { std::move(*a0) }, a1.string()); }, [&](auto&& value) { return storeHandle<CanvasPattern>(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->createPattern(WTF::switchOn(std::move(*a0), [](auto&& arm) -> CanvasImageSource { return CanvasImageSource { std::move(arm) }; }), a1.string()); }, [&](auto&& value) { return storeHandle<CanvasPattern>(value, result); });
 }
 
 // CanvasRenderingContext2D.clearRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h) -> undefined
@@ -46310,7 +46340,7 @@ int32_t ranvier_dom_canvas_rendering_context2_d_measure_text(RvCanvasRenderingCo
 }
 
 // CanvasRenderingContext2D.drawImage(CanvasImageSource image, unrestricted double dx, unrestricted double dy) -> undefined
-int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_3(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy)
+int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_3(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy)
 {
     if (!target || !image)
         return RV_ERR_NULL_ARGUMENT;
@@ -46318,13 +46348,13 @@ int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_3(RvCanvasRenderingCo
         return RV_ERR_WRONG_THREAD;
     RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
     int32_t status0 = RV_OK;
-    auto a0 = decodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(image, status0);
+    auto a0 = decodeRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(image, status0);
     if (status0 != RV_OK) return status0;
     return invoke([&]() -> decltype(auto) { return impl->drawImage(WTF::switchOn(std::move(*a0), [](auto&& arm) -> CanvasImageSource { return CanvasImageSource { std::move(arm) }; }), dx, dy); });
 }
 
 // CanvasRenderingContext2D.drawImage(CanvasImageSource image, unrestricted double dx, unrestricted double dy, unrestricted double dw, unrestricted double dh) -> undefined
-int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_5(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy, double dw, double dh)
+int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_5(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy, double dw, double dh)
 {
     if (!target || !image)
         return RV_ERR_NULL_ARGUMENT;
@@ -46332,13 +46362,13 @@ int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_5(RvCanvasRenderingCo
         return RV_ERR_WRONG_THREAD;
     RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
     int32_t status0 = RV_OK;
-    auto a0 = decodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(image, status0);
+    auto a0 = decodeRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(image, status0);
     if (status0 != RV_OK) return status0;
     return invoke([&]() -> decltype(auto) { return impl->drawImage(WTF::switchOn(std::move(*a0), [](auto&& arm) -> CanvasImageSource { return CanvasImageSource { std::move(arm) }; }), dx, dy, dw, dh); });
 }
 
 // CanvasRenderingContext2D.drawImage(CanvasImageSource image, unrestricted double sx, unrestricted double sy, unrestricted double sw, unrestricted double sh, unrestricted double dx, unrestricted double dy, unrestricted double dw, unrestricted double dh) -> undefined
-int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_9(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double sx, double sy, double sw, double sh, double dx, double dy, double dw, double dh)
+int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_9(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue* image, double sx, double sy, double sw, double sh, double dx, double dy, double dw, double dh)
 {
     if (!target || !image)
         return RV_ERR_NULL_ARGUMENT;
@@ -46346,7 +46376,7 @@ int32_t ranvier_dom_canvas_rendering_context2_d_draw_image_9(RvCanvasRenderingCo
         return RV_ERR_WRONG_THREAD;
     RefPtr<CanvasRenderingContext2D> impl = reinterpret_cast<CanvasRenderingContext2D*>(target);
     int32_t status0 = RV_OK;
-    auto a0 = decodeRvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue(image, status0);
+    auto a0 = decodeRvDomUnionHTMLImageElementOrSVGImageElementOrHTMLCanvasElementOrImageBitmapOrCSSStyleImageValue(image, status0);
     if (status0 != RV_OK) return status0;
     return invoke([&]() -> decltype(auto) { return impl->drawImage(WTF::switchOn(std::move(*a0), [](auto&& arm) -> CanvasImageSource { return CanvasImageSource { std::move(arm) }; }), sx, sy, sw, sh, dx, dy, dw, dh); });
 }
@@ -46887,6 +46917,17 @@ int32_t ranvier_dom_image_bitmap_close(RvImageBitmap* target)
         return RV_ERR_WRONG_THREAD;
     RefPtr<ImageBitmap> impl = reinterpret_cast<ImageBitmap*>(target);
     return invoke([&]() -> decltype(auto) { return impl->close(); });
+}
+
+// ImageBitmapRenderingContext.canvas getter: readonly attribute ImageBitmapCanvas canvas; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_image_bitmap_rendering_context_get_canvas(RvImageBitmapRenderingContext* target, RvDomUnionHTMLCanvasElement* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<ImageBitmapRenderingContext> impl = reinterpret_cast<ImageBitmapRenderingContext*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->canvas(); }, [&](auto&& value) { return encodeRvDomUnionHTMLCanvasElement(value, result); });
 }
 
 // ImageBitmapRenderingContext.transferFromImageBitmap(ImageBitmap? bitmap) -> undefined; bitmap may be NULL
