@@ -1,0 +1,115 @@
+{
+  "browser": "156.0.8078.4",
+  "fixtureSha256": "edbf228a9aca1e9423816dcd886c904ad8ad3ecf05815535fcc3869b9dd2b683",
+  "scope": "Actual Chromium fragment navigation/rendering oracle; native provider does not claim URL/history/:target behavior.",
+  "stages": [
+    {
+      "name": "baseline",
+      "hash": "",
+      "useCurrentViewPresent": false,
+      "currentViewPresent": false,
+      "rootViewBox": "0 0 100 100",
+      "namedViewBox": "0 0 50 100",
+      "ctm": [
+        2,
+        0,
+        0,
+        1.2,
+        0,
+        0
+      ],
+      "pngPath": "artifacts/h07/svg-view-browser-baseline.png",
+      "pngSha256": "55f53a5159174567f6465dc14310dab946ef3a41296d9b46cd86ab18b1b966b2"
+    },
+    {
+      "name": "named",
+      "hash": "#zoom",
+      "useCurrentViewPresent": false,
+      "currentViewPresent": false,
+      "rootViewBox": "0 0 100 100",
+      "namedViewBox": "0 0 50 100",
+      "ctm": [
+        4,
+        0,
+        0,
+        1.2,
+        0,
+        0
+      ],
+      "pngPath": "artifacts/h07/svg-view-browser-named.png",
+      "pngSha256": "ce28657680908e1fff6d1ef31a3080de0cc669024eaa6118a867da53eab9f6de"
+    },
+    {
+      "name": "active-edit",
+      "hash": "#zoom",
+      "useCurrentViewPresent": false,
+      "currentViewPresent": false,
+      "rootViewBox": "0 0 100 100",
+      "namedViewBox": "20 20 20 20",
+      "ctm": [
+        4,
+        0,
+        0,
+        1.2,
+        0,
+        0
+      ],
+      "pngPath": "artifacts/h07/svg-view-browser-active-edit.png",
+      "pngSha256": "ce28657680908e1fff6d1ef31a3080de0cc669024eaa6118a867da53eab9f6de"
+    },
+    {
+      "name": "clear",
+      "hash": "",
+      "useCurrentViewPresent": false,
+      "currentViewPresent": false,
+      "rootViewBox": "0 0 100 100",
+      "namedViewBox": "20 20 20 20",
+      "ctm": [
+        2,
+        0,
+        0,
+        1.2,
+        0,
+        0
+      ],
+      "pngPath": "artifacts/h07/svg-view-browser-clear.png",
+      "pngSha256": "55f53a5159174567f6465dc14310dab946ef3a41296d9b46cd86ab18b1b966b2"
+    },
+    {
+      "name": "former-edit",
+      "hash": "",
+      "useCurrentViewPresent": false,
+      "currentViewPresent": false,
+      "rootViewBox": "0 0 100 100",
+      "namedViewBox": "40 40 10 10",
+      "ctm": [
+        2,
+        0,
+        0,
+        1.2,
+        0,
+        0
+      ],
+      "pngPath": "artifacts/h07/svg-view-browser-former-edit.png",
+      "pngSha256": "55f53a5159174567f6465dc14310dab946ef3a41296d9b46cd86ab18b1b966b2"
+    },
+    {
+      "name": "explicit",
+      "hash": "#svgView(viewBox(10,20,30,40))",
+      "useCurrentViewPresent": false,
+      "currentViewPresent": false,
+      "rootViewBox": "0 0 100 100",
+      "namedViewBox": "40 40 10 10",
+      "ctm": [
+        6.666666666666667,
+        0,
+        0,
+        3,
+        -66.66666666666667,
+        -60
+      ],
+      "pngPath": "artifacts/h07/svg-view-browser-explicit.png",
+      "pngSha256": "473c86f19312573833ee6de4896fd3c852fea5065d46b4ab95d321686b205fe6"
+    }
+  ]
+}

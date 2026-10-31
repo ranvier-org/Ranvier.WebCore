@@ -1,0 +1,16 @@
+diff --git a/Source/WebCore/svg/SVGSVGElement.cpp b/Source/WebCore/svg/SVGSVGElement.cpp
+index aeecd49..f1264eb 100644
+--- a/Source/WebCore/svg/SVGSVGElement.cpp
++++ b/Source/WebCore/svg/SVGSVGElement.cpp
+@@ -847,6 +847,11 @@ void SVGSVGElement::resetScrollAnchor()
+         }
+     }
+ 
++    if (RefPtr currentViewElement = m_currentViewElement) {
++        currentViewElement->resetTargetElement();
++        m_currentViewElement = nullptr;
++    }
++
+     m_useCurrentView = false;
+ 
+     CheckedPtr renderer = this->renderer();

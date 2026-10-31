@@ -26,3 +26,4 @@
 0024-svg-current-translate-owner.patch
 0025-svg-screen-ctm-pan.patch
 0026-svg-text-length-query-transforms.patch
+0027-svg-view-reset-target.patch

@@ -1,0 +1,3 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+lld-link: warning: vcpkg_installed\x64-windows-webkit\lib\libxml2.lib: skipping imported DllMain symbol [importeddllmain]
+NOTE: this might be a mistake when the DLL/library was produced.

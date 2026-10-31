@@ -33,7 +33,10 @@ jobs:
       - run: python -I tests/test_package_contract.py
       - run: python -I tests/test_release.py
       - run: python -I tests/test_publish_gate.py
+      - run: python -I tests/test_host_prepare.py
       - run: python -I tests/generator/test_domgen.py
+      - run: python -I scripts/capability_catalogue.py --check
+      - run: python -I tests/abi/generate_native.py check
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -438,6 +441,12 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/svg_surfaces.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
 
+      - name: Verify passive capability catalogue and live host observations
+        run: python -I tests/abi/capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify explicit current SVG document view selection
+        run: python -I tests/abi/svg_view_selection.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify SVG document parsing, guards and transitions
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/svg_documents.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
@@ -449,6 +458,30 @@ jobs:
       - name: Verify concrete SVG animation effects
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/svg_animation_variants.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify table element surfaces
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/table_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify reflected element attributes
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/element_reflection.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify area element surfaces
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/area_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify CSSOM rule surfaces
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/cssom_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify SVG geometry and value bindings
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/svg_geometry.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify shared SVG/MathML members
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/svg_mathml_surface.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
       - name: Build Windows UI Automation OS clients
         if: matrix.rid == 'win-x64' && env.FLAVOR == 'slim'

@@ -1,0 +1,14 @@
+{
+  "parent": "d5471ced80c72a32e39eba210f89312703a2161a",
+  "retainedDeclarations": 182,
+  "additiveDeclarations": [
+    "rv_capability_count",
+    "rv_capability_name_at",
+    "rv_host_capability_fact",
+    "rv_host_capability_value_kind",
+    "rv_host_capability_value_number",
+    "rv_host_capability_value_text",
+    "rv_host_select_svg_view"
+  ],
+  "canonicalDomChanged": false
+}
