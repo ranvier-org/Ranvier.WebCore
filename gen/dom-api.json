@@ -134219,6 +134219,568 @@
       "stringInputs": "utf8-lengths-nullable"
     },
     {
+      "interface": "DOMWindow",
+      "member": "scrollX",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_get_scroll_x",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-window-scrolling",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "DOMWindow",
+      "member": "scrollY",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_get_scroll_y",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-window-scrolling",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "DOMWindow",
+      "member": "scroll",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_scroll_1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomScrollToOptions*",
+          "name": "options"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "options",
+          "idlType": "ScrollToOptions",
+          "idl": {
+            "name": "ScrollToOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ScrollToOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-window-scrolling",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "DOMWindow",
+      "member": "scroll",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_scroll_2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-window-scrolling",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "DOMWindow",
+      "member": "scrollTo",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_scroll_to_1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomScrollToOptions*",
+          "name": "options"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "options",
+          "idlType": "ScrollToOptions",
+          "idl": {
+            "name": "ScrollToOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ScrollToOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-window-scrolling",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "DOMWindow",
+      "member": "scrollTo",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_scroll_to_2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-window-scrolling",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "DOMWindow",
+      "member": "scrollBy",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_scroll_by_1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomScrollToOptions*",
+          "name": "option"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "option",
+          "idlType": "ScrollToOptions",
+          "idl": {
+            "name": "ScrollToOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ScrollToOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-window-scrolling",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
+      "interface": "DOMWindow",
+      "member": "scrollBy",
+      "contractOwner": "Window",
+      "kind": "context_operation",
+      "function": "rv_dom_window_scroll_by_2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "context": "Window",
+      "feature": "dom-window-scrolling",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths-nullable"
+    },
+    {
       "interface": "DOMMatrixReadOnly",
       "member": "fromMatrix",
       "contractOwner": "DOMMatrixReadOnly",

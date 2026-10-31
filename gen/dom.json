@@ -834,14 +834,28 @@
     }
   },
   "windowBindings": {
-    "DOMWindow": {
-      "receiver": "Document",
-      "members": [
-        "getComputedStyle"
-      ],
-      "feature": "dom-computed-style",
-      "stringInputs": "utf8-lengths"
-    }
+    "DOMWindow": [
+      {
+        "receiver": "Document",
+        "members": [
+          "getComputedStyle"
+        ],
+        "feature": "dom-computed-style",
+        "stringInputs": "utf8-lengths"
+      },
+      {
+        "receiver": "Document",
+        "members": [
+          "scrollX",
+          "scrollY",
+          "scroll",
+          "scrollTo",
+          "scrollBy"
+        ],
+        "feature": "dom-window-scrolling",
+        "stringInputs": "utf8-lengths"
+      }
+    ]
   },
   "callbackObjectRoots": {
     "NodeFilter": {

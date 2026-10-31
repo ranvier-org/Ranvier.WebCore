@@ -2673,6 +2673,14 @@ WEBCORE_EXPORT int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t*
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor);
 WEBCORE_EXPORT int32_t ranvier_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
+WEBCORE_EXPORT int32_t ranvier_dom_window_get_scroll_x(RvNode* target, double* result);
+WEBCORE_EXPORT int32_t ranvier_dom_window_get_scroll_y(RvNode* target, double* result);
+WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_1(RvNode* target, const RvDomScrollToOptions* options);
+WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_2(RvNode* target, double x, double y);
+WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_to_1(RvNode* target, const RvDomScrollToOptions* options);
+WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_to_2(RvNode* target, double x, double y);
+WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_by_1(RvNode* target, const RvDomScrollToOptions* option);
+WEBCORE_EXPORT int32_t ranvier_dom_window_scroll_by_2(RvNode* target, double x, double y);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_matrix_read_only_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_matrix_from_matrix(RvNode* target, const RvDomDOMMatrixInit* other, RvDOMMatrixReadOnly** result);
 WEBCORE_EXPORT int32_t ranvier_dom_dom_rect_read_only_from_rect(RvNode* target, const RvDomDOMRectInit* other, RvDOMRectReadOnly** result);

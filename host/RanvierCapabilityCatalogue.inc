@@ -286,6 +286,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom-css-supports",
     "dom-css-register-property",
     "dom-computed-style",
+    "dom-window-scrolling",
     "dom-geometry-matrix-readonly",
     "dom-geometry-matrix",
     "dom-geometry-rect-readonly",

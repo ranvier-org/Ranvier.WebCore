@@ -399,6 +399,38 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
 
                 if viewportCalls <> 0 then
                     failwithf "%s listener ran after host destroy" kind
+        | "scrolled document" ->
+            held.Value <- rv_node_retain document
+            let window = rv_host_window_event_target host
+            let listener = rv_event_target_add_listener (window, "scroll", 0, viewportCallback, 0n)
+
+            if listener = 0n then
+                failwith "no scroll listener"
+
+            rv_dom_window_scroll_to_2 (held.Value, 0.0, 10.5) |> check "Window.scrollTo"
+            let mutable y = -1.0
+            rv_dom_window_get_scroll_y (held.Value, &y) |> check "Window.scrollY"
+
+            if y <> 10.0 then
+                failwithf "scrollY %f before destroy" y
+
+            fun () ->
+                let status = rv_dom_window_get_scroll_y (held.Value, &y)
+
+                if not (status = -9 || (status = 0 && y = 0.0)) then
+                    failwithf "Window.scrollY after destroy: %d %f" status y
+
+                let scrolled = rv_dom_window_scroll_by_2 (held.Value, 0.0, 5.5)
+
+                if scrolled <> 0 && scrolled <> -9 then
+                    failwithf "Window.scrollBy after destroy: %d" scrolled
+
+                rv_listener_remove listener |> check "scroll listener removal after destroy"
+                rv_event_target_release window
+                rv_node_release held.Value
+
+                if viewportCalls <> 0 then
+                    failwith "scroll listener ran after host destroy"
         | "form controls collection"
         | "options collection"
         | "form data"
@@ -544,6 +576,7 @@ let run (outDir: string) =
                     "node iterator"
                     "window target"
                     "media query list"
+                    "scrolled document"
                     "form controls collection"
                     "options collection"
                     "form data"
