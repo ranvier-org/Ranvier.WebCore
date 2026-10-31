@@ -32,9 +32,14 @@ let private invokeFilter (context: nativeint) (node: nativeint) =
 let private releaseFilter (context: nativeint) = GCHandle.FromIntPtr(context).Free()
 
 let private filterCallback = NodeFilterCallback invokeFilter
-let private filterCallbackPointer = Marshal.GetFunctionPointerForDelegate<_> filterCallback
+
+let private filterCallbackPointer =
+    Marshal.GetFunctionPointerForDelegate<_> filterCallback
+
 let private filterRelease = NodeFilterRelease releaseFilter
-let private filterReleasePointer = Marshal.GetFunctionPointerForDelegate<_> filterRelease
+
+let private filterReleasePointer =
+    Marshal.GetFunctionPointerForDelegate<_> filterRelease
 
 /// <summary>
 /// Runs a traversal call. An exception thrown by a filter during the call is rethrown, with its original stack,
@@ -63,7 +68,9 @@ type NodeFilter(handle: nativeint) =
     /// Creates a filter in the document of target.
     static member Create(target: nativeint, filter: nativeint -> FilterResult) =
         let context = GCHandle.Alloc filter
-        let handle = rv_node_filter_create (target, filterCallbackPointer, GCHandle.ToIntPtr context, filterReleasePointer)
+
+        let handle =
+            rv_node_filter_create (target, filterCallbackPointer, GCHandle.ToIntPtr context, filterReleasePointer)
 
         if handle = 0n then
             context.Free()

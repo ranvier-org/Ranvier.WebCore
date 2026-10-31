@@ -32,6 +32,9 @@ def verify(native_directory):
     failures, qualified = [], []
     with SvgProbe(native_directory, 100, 100) as p:
         P, I = p.pointer, p.integer
+        has = p.bind('rv_abi_has', I, [ctypes.c_char_p])
+        for capability in [b'dom:TreeWalker', b'dom:NodeIterator', b'dom:NodeFilter']:
+            p.expect(has(capability) == 1, 'rv_abi_has ' + capability.decode())
         released = {}
         releases_by_context = {}
 
