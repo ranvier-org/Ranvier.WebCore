@@ -11,7 +11,8 @@
     "contract's function type, and resultEnum the integer enumeration it returns.",
     "typedArrayViewTypes lists the IDL types passed as an in/out typed array: an element kind, a writable buffer and its",
     "byte length; only a [ReturnValue] argument maps. windowObjectBindings binds the operations of the object a readonly",
-    "Window attribute (accessor) holds, called through the Window of a checked Document."
+    "Window attribute (accessor) holds, called through the Window of a checked Document.",
+    "setlikeBindings and maplikeBindings bind an interface's setlike or maplike declaration through the adapter class of host/dom/<adapter>.h: size, has, values or get and entries (snapshot copies), and add or set, delete and clear unless readonly."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -187,6 +188,11 @@
       "factory": "URLPattern::create",
       "passReceiver": false,
       "stringInputs": "utf8-lengths"
+    },
+    "Highlight": {
+      "receiver": "Document",
+      "factory": "RanvierCollectionLike::createHighlight",
+      "passReceiver": false
     }
   },
   "dictionaryCppTypes": {
@@ -600,7 +606,9 @@
     "CaretPosition",
     "DOMURL",
     "URLSearchParams",
-    "URLPattern"
+    "URLPattern",
+    "Highlight",
+    "HighlightRegistry"
   ],
   "skipDirectories": [
     "Modules/",
@@ -812,11 +820,13 @@
       "receiver": "Document",
       "members": [
         "supports",
-        "registerProperty"
+        "registerProperty",
+        "highlights"
       ],
       "feature": "dom-css-supports",
       "memberFeatures": {
-        "registerProperty": "dom-css-register-property"
+        "registerProperty": "dom-css-register-property",
+        "highlights": "dom-custom-highlights"
       },
       "stringInputs": "utf8-lengths"
     }
@@ -974,5 +984,16 @@
   ],
   "sequenceStringSpans": [
     "URLSearchParams"
-  ]
+  ],
+  "setlikeBindings": {
+    "Highlight": {
+      "adapter": "RanvierCollectionLike"
+    }
+  },
+  "maplikeBindings": {
+    "HighlightRegistry": {
+      "adapter": "RanvierCollectionLike",
+      "stringInputs": "utf8-lengths"
+    }
+  }
 }

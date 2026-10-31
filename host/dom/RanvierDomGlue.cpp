@@ -170,6 +170,8 @@
 #include "HTMLTimeElement.h"
 #include "HTMLTitleElement.h"
 #include "HTMLUListElement.h"
+#include "Highlight.h"
+#include "HighlightRegistry.h"
 #include "ImportNodeOptions.h"
 #include "InputEvent.h"
 #include "JavaScriptCore/ArrayBuffer.h"
@@ -192,6 +194,7 @@
 #include "PointerEvent.h"
 #include "RadioNodeList.h"
 #include "Range.h"
+#include "RanvierCollectionLike.h"
 #include "SVGAElement.h"
 #include "SVGAngle.h"
 #include "SVGAnimateElement.h"
@@ -308,6 +311,7 @@
 #include "JSAriaNotifyOptions.h"
 #include "JSDocument.h"
 #include "JSEndingType.h"
+#include "JSHighlight.h"
 #include "JSScrollBehavior.h"
 #include "JSScrollLogicalPosition.h"
 #include "JSShadowRootMode.h"
@@ -697,6 +701,7 @@ static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
 static constexpr ASCIILiteral enumerationDocumentReadyState[] = { "loading"_s, "interactive"_s, "complete"_s };
 static constexpr ASCIILiteral enumerationEndingType[] = { "transparent"_s, "native"_s };
+static constexpr ASCIILiteral enumerationHighlightType[] = { "highlight"_s, "spelling-error"_s, "grammar-error"_s };
 static constexpr ASCIILiteral enumerationScrollBehavior[] = { "auto"_s, "instant"_s, "smooth"_s };
 static constexpr ASCIILiteral enumerationScrollLogicalPosition[] = { "start"_s, "center"_s, "end"_s, "nearest"_s };
 static constexpr ASCIILiteral enumerationShadowRootMode[] = { "user-agent"_s, "closed"_s, "open"_s };
@@ -2858,6 +2863,44 @@ template<typename V> int32_t encodeRvDomSequencePairUSVStringAndUnionUndefinedOr
     return RV_OK;
 }
 
+std::optional<Vector<Ref<AbstractRange>>> decodeRvDomSequenceAbstractRange(const RvDomSequenceAbstractRange* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Ref<AbstractRange>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<AbstractRange> item = reinterpret_cast<AbstractRange*>(source->items[i]);
+        if (source->items[i] && !item) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        result.append(Ref { *item });
+    }
+    return Vector<Ref<AbstractRange>> { std::move(result) };
+}
+
+void clearRvDomSequenceAbstractRange(RvDomSequenceAbstractRange* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<AbstractRange*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceAbstractRange(V&& input, RvDomSequenceAbstractRange* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvAbstractRange**>(std::calloc(value.size(), sizeof(RvAbstractRange*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<AbstractRange>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
 void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
 {
     if (!value) return;
@@ -2957,6 +3000,46 @@ template<typename V> int32_t encodeRvDomSequencePairUSVStringAndUnionFileOrUSVSt
     RELEASE_ASSERT(!value.size() || result->items);
     for (int32_t i = 0; i < result->count; ++i) {
         encodeRvDomPairUSVStringAndUnionFileOrUSVString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+void clearRvDomPairDOMStringAndHighlight(RvDomPairDOMStringAndHighlight* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->key.data));
+    if (value->value) reinterpret_cast<Highlight*>(value->value)->deref();
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomPairDOMStringAndHighlight(V&& input, RvDomPairDOMStringAndHighlight* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->key = copyOwnedDomStringSpan(asString(value.key));
+    storeHandle<Highlight>(value.value, &result->value);
+    return RV_OK;
+}
+
+void clearRvDomSequencePairDOMStringAndHighlight(RvDomSequencePairDOMStringAndHighlight* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomPairDOMStringAndHighlight(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequencePairDOMStringAndHighlight(V&& input, RvDomSequencePairDOMStringAndHighlight* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomPairDOMStringAndHighlight*>(std::calloc(value.size(), sizeof(RvDomPairDOMStringAndHighlight))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomPairDOMStringAndHighlight(value[i], &result->items[i]);
     }
     return RV_OK;
 }
@@ -3100,11 +3183,13 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:Highlight", "dom:HighlightRegistry", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
     if (!std::strcmp(feature, "dom-css-supports"))
+        return 1;
+    if (!std::strcmp(feature, "dom-custom-highlights"))
         return 1;
     if (!std::strcmp(feature, "dom-css-register-property"))
         return 1;
@@ -3386,6 +3471,11 @@ void ranvier_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_rele
     if (isMainThread()) clearRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(value);
 }
 
+void ranvier_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value)
+{
+    if (isMainThread()) clearRvDomSequenceAbstractRange(value);
+}
+
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
 {
     if (isMainThread()) clearRvDomSequenceCSSStyleValue(value);
@@ -3409,6 +3499,16 @@ void ranvier_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairU
 void ranvier_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value)
 {
     if (isMainThread()) clearRvDomSequencePairUSVStringAndUnionFileOrUSVString(value);
+}
+
+void ranvier_dom_pair_dom_string_and_highlight_release(RvDomPairDOMStringAndHighlight* value)
+{
+    if (isMainThread()) clearRvDomPairDOMStringAndHighlight(value);
+}
+
+void ranvier_dom_sequence_pair_dom_string_and_highlight_release(RvDomSequencePairDOMStringAndHighlight* value)
+{
+    if (isMainThread()) clearRvDomSequencePairDOMStringAndHighlight(value);
 }
 
 void ranvier_dom_url_pattern_result_release(RvDomURLPatternResult* value)
@@ -4263,6 +4363,34 @@ RvURLPattern* ranvier_dom_url_pattern_retain(RvURLPattern* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<URLPattern*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_highlight_release(RvHighlight* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<Highlight*>(handle)->deref();
+}
+
+RvHighlight* ranvier_dom_highlight_retain(RvHighlight* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<Highlight*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_highlight_registry_release(RvHighlightRegistry* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<HighlightRegistry*>(handle)->deref();
+}
+
+RvHighlightRegistry* ranvier_dom_highlight_registry_retain(RvHighlightRegistry* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<HighlightRegistry*>(handle)->ref();
     return handle;
 }
 
@@ -39790,6 +39918,69 @@ int32_t ranvier_dom_url_pattern_exec(RvURLPattern* target, const RvDomUnionUSVSt
     return deliver([&]() -> decltype(auto) { return impl->exec(std::move(*a0), a1); }, [&](auto&& value) { return storeOptionalDictionary(value, result, [](const auto& item) { return encodeDictRvDomURLPatternResult(item); }); });
 }
 
+// Highlight.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_highlight_create(RvNode* target, const RvDomSequenceAbstractRange* initial_ranges, RvHighlight** result)
+{
+    if (!target || !initial_ranges || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceAbstractRange(initial_ranges, status0);
+    if (status0 != RV_OK) return status0;
+    return deliver([&]() -> decltype(auto) { return RanvierCollectionLike::createHighlight(DomSequenceArgument<Ref<AbstractRange>> { std::move(*a0) }); }, [&](auto&& value) { return storeHandle<Highlight>(value, result); });
+}
+
+// Highlight.priority getter: attribute long priority
+int32_t ranvier_dom_highlight_get_priority(RvHighlight* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->priority(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Highlight.priority setter: attribute long priority
+int32_t ranvier_dom_highlight_set_priority(RvHighlight* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->setPriority(value); });
+}
+
+// Highlight.type getter: attribute HighlightType type
+int32_t ranvier_dom_highlight_get_type(RvHighlight* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationHighlightType); });
+}
+
+// Highlight.type setter: attribute HighlightType type
+int32_t ranvier_dom_highlight_set_type(RvHighlight* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->type())>>(value, enumerationHighlightType);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setType(*a0); });
+}
+
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
 int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result)
 {
@@ -39822,6 +40013,20 @@ int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text
     StringArg a0 { condition_text, condition_text_length };
     if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
     return deliver([&]() -> decltype(auto) { return DOMCSSNamespace::supports(document.get(), a0.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// CSS.highlights: namespace attribute getter with Document context; *result is a new reference
+int32_t ranvier_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    return deliver([&]() -> decltype(auto) { return DOMCSSNamespace::highlights(document.get()); }, [&](auto&& value) { return storeHandle<HighlightRegistry>(value, result); });
 }
 
 // CSS.registerProperty: namespace operation with Document context and explicit UTF-8 byte lengths
@@ -40500,6 +40705,161 @@ int32_t ranvier_dom_url_search_params_entries(RvURLSearchParams* target, RvNode*
         return RV_ERR_WRONG_INTERFACE;
     Ref document = contextDocument.releaseNonNull();
     return deliver([&]() -> decltype(auto) { return ([&]() { Vector<KeyValuePair<String, String>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequencePairUSVStringAndUSVString(value, result); });
+}
+
+// Highlight.size: setlike<AbstractRange>
+int32_t ranvier_dom_highlight_size(RvHighlight* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    return deliver([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::size(*impl); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// Highlight.has: setlike<AbstractRange>
+int32_t ranvier_dom_highlight_has(RvHighlight* target, RvAbstractRange* value, int32_t* result)
+{
+    if (!target || !value || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    RefPtr<AbstractRange> a0 = reinterpret_cast<AbstractRange*>(value);
+    return deliver([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::has(*impl, HandleArg<AbstractRange> { a0.get() }); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Highlight.values: setlike<AbstractRange>; *result is a snapshot copy in iteration order, unchanged by later mutation; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_highlight_values(RvHighlight* target, RvDomSequenceAbstractRange* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    return deliver([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::values(*impl); }, [&](auto&& value) { return encodeRvDomSequenceAbstractRange(value, result); });
+}
+
+// Highlight.add: setlike<AbstractRange>
+int32_t ranvier_dom_highlight_add(RvHighlight* target, RvAbstractRange* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    RefPtr<AbstractRange> a0 = reinterpret_cast<AbstractRange*>(value);
+    return invoke([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::add(*impl, HandleArg<AbstractRange> { a0.get() }); });
+}
+
+// Highlight.delete: setlike<AbstractRange>
+int32_t ranvier_dom_highlight_delete(RvHighlight* target, RvAbstractRange* value, int32_t* result)
+{
+    if (!target || !value || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    RefPtr<AbstractRange> a0 = reinterpret_cast<AbstractRange*>(value);
+    return deliver([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::remove(*impl, HandleArg<AbstractRange> { a0.get() }); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// Highlight.clear: setlike<AbstractRange>
+int32_t ranvier_dom_highlight_clear(RvHighlight* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Highlight> impl = reinterpret_cast<Highlight*>(target);
+    return invoke([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::clear(*impl); });
+}
+
+// HighlightRegistry.size: maplike<DOMString, Highlight>
+int32_t ranvier_dom_highlight_registry_size(RvHighlightRegistry* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<HighlightRegistry> impl = reinterpret_cast<HighlightRegistry*>(target);
+    return deliver([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::size(*impl); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HighlightRegistry.has: maplike<DOMString, Highlight>
+int32_t ranvier_dom_highlight_registry_has(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, int32_t* result)
+{
+    if (!target || !(key_length >= 0 && (key_length <= 0 || key)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<HighlightRegistry> impl = reinterpret_cast<HighlightRegistry*>(target);
+    StringArg a0 { key, key_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::has(*impl, a0.atom()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HighlightRegistry.get: maplike<DOMString, Highlight>; *result is a new reference, or NULL
+int32_t ranvier_dom_highlight_registry_get(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, RvHighlight** result)
+{
+    if (!target || !(key_length >= 0 && (key_length <= 0 || key)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<HighlightRegistry> impl = reinterpret_cast<HighlightRegistry*>(target);
+    StringArg a0 { key, key_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::get(*impl, a0.atom()); }, [&](auto&& value) { return storeHandle<Highlight>(value, result); });
+}
+
+// HighlightRegistry.entries: maplike<DOMString, Highlight>; *result is a snapshot copy in iteration order, unchanged by later mutation; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_highlight_registry_entries(RvHighlightRegistry* target, RvDomSequencePairDOMStringAndHighlight* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<HighlightRegistry> impl = reinterpret_cast<HighlightRegistry*>(target);
+    return deliver([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::entries(*impl); }, [&](auto&& value) { return encodeRvDomSequencePairDOMStringAndHighlight(value, result); });
+}
+
+// HighlightRegistry.set: maplike<DOMString, Highlight>
+int32_t ranvier_dom_highlight_registry_set(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, RvHighlight* value)
+{
+    if (!target || !(key_length >= 0 && (key_length <= 0 || key)) || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<HighlightRegistry> impl = reinterpret_cast<HighlightRegistry*>(target);
+    StringArg a0 { key, key_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    RefPtr<Highlight> a1 = reinterpret_cast<Highlight*>(value);
+    return invoke([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::set(*impl, a0.atom(), HandleArg<Highlight> { a1.get() }); });
+}
+
+// HighlightRegistry.delete: maplike<DOMString, Highlight>
+int32_t ranvier_dom_highlight_registry_delete(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, int32_t* result)
+{
+    if (!target || !(key_length >= 0 && (key_length <= 0 || key)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<HighlightRegistry> impl = reinterpret_cast<HighlightRegistry*>(target);
+    StringArg a0 { key, key_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::remove(*impl, a0.atom()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HighlightRegistry.clear: maplike<DOMString, Highlight>
+int32_t ranvier_dom_highlight_registry_clear(RvHighlightRegistry* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<HighlightRegistry> impl = reinterpret_cast<HighlightRegistry*>(target);
+    return invoke([&]() -> decltype(auto) { return WebCore::RanvierCollectionLike::clear(*impl); });
 }
 
 int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)
