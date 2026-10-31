@@ -81,7 +81,7 @@ probes = [('css_supports', 72), ('computed_style', 93), ('fragment_rectangles', 
           ('typed_style_values', 190), ('custom_properties', 231), ('geometry_values', 260), ('matrix_values', 1091), ('css_transforms', 405),
           ('svg_geometry', 639), ('svg_surfaces', 1594), ('svg_documents', 78), ('svg_view_controls', 318), ('svg_animation_variants', 70),
           ('capabilities', None), ('svg_view_selection', None),
-          ('svg_paint_servers', 565), ('svg_filters', None), ('svg_clip_mask_marker', 565), ('svg_resources', 454)]
+          ('svg_paint_servers', 565), ('svg_filters', 5946), ('svg_clip_mask_marker', 565), ('svg_resources', 454)]
 for name, expected in probes:
     arguments = ['C:/Python314/python.exe', '-I', '-X', 'utf8', str(repo / 'tests/abi' / (name + '.py')), '--native-directory', str(runtime)]
     if name == 'svg_surfaces':
@@ -103,6 +103,6 @@ for name in ['frames', 'teardown']:
     assets = [p for p in driver.rglob('*') if p.is_file() and p.suffix.lower() in ['.dll', '.exe', '.json']]
     run(name, ['dotnet', str(driver / 'RanvierWebCoreAbi.Driver.dll')], environment=env, executed=assets, timeout=900)
 teardown = json.loads((out / 'teardown/teardown-probes.json').read_text())
-assert len(teardown) == 42 and all(item['documentRefsAfterCollection'] == -1 and item['targetRefsAfterCollection'] == -1 for item in teardown)
+assert len(teardown) == 48 and all(item['documentRefsAfterCollection'] == -1 and item['targetRefsAfterCollection'] == -1 for item in teardown)
 (out / 'results.json').write_text(json.dumps(records, indent=2))
-print('NATIVE21_FULL_BATCH=' + str(sum(item.get('assertions', 0) for item in records)) + ' RAW +42 TEARDOWN', flush=True)
+print('NATIVE21_FULL_BATCH=' + str(sum(item.get('assertions', 0) for item in records)) + ' RAW +48 TEARDOWN', flush=True)

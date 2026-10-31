@@ -103,12 +103,20 @@ class SvgProbe:
         return self.text('rv_dom_element_get_attribute', [self.pointer, ctypes.c_char_p], target, name.encode())
 
     def attributes(self, target):
+        # One counted check per enumeration: lazy SVG attribute synchronization can vary the entry count.
         count = self.bind('rv_element_attribute_count', self.integer, [self.pointer])(target)
-        self.expect(count >= 0, 'real element attribute enumeration')
-        result = {}
-        for index in range(count):
-            name = self.text('rv_element_attribute_at', [self.pointer, self.integer, self.integer], target, index, 0)
-            result[name] = self.text('rv_element_attribute_at', [self.pointer, self.integer, self.integer], target, index, 1)
+        entry = self.bind('rv_element_attribute_at', self.integer, [self.pointer, self.integer, self.integer, self.pointer, self.integer, ctypes.POINTER(self.integer)])
+        result, failures = {}, []
+        for index in range(max(count, 0)):
+            parts = []
+            for part in (0, 1):
+                buffer, length = ctypes.create_string_buffer(8192), self.integer()
+                status = entry(target, index, part, buffer, len(buffer), ctypes.byref(length))
+                if status:
+                    failures.append((index, part, status))
+                parts.append(None if length.value < 0 else buffer.value.decode())
+            result[parts[0]] = parts[1]
+        self.expect(count >= 0 and not failures, 'real element attribute enumeration: ' + str(failures))
         return result
 
     def update(self):

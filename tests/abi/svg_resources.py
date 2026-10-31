@@ -241,11 +241,10 @@ def verify(native_directory):
         p.set_length(foreign['y'], 30)
         state['foreignObject']['movedPaint'] = [p.pixel(p.paint(), 202, 10), p.pixel(p.paint(), 202, 40)]
 
-        pending_source = oracle.get('pendingSourceFix', {})
         for key, want in oracle['state'].items():
             got = json.loads(json.dumps(state[key]))
             for field, value in want.items():
-                if key + '.' + field in pending_source or key + '.' + field in oracle.get('nativeQualifications', {}):
+                if key + '.' + field in oracle.get('nativeQualifications', {}):
                     continue
                 p.expect(got.get(field) == value, key + '.' + field + ' matches measured browser: native ' + repr(got.get(field)) + ' browser ' + repr(value))
         for key, native_only in oracle.get('nativeQualifications', {}).items():
@@ -281,9 +280,6 @@ def verify(native_directory):
         set_base(kept, 'https://fixture.test/after')
         p.expect(base(kept) == 'https://fixture.test/after', 'retained animated href stays safely mutable after owner collection')
         print('SVG_RESOURCES_STATE ' + json.dumps(state, sort_keys=True), flush=True)
-        for key in pending_source:
-            section, field = key.split('.')
-            p.expect(json.loads(json.dumps(state[section][field])) == oracle['state'][section][field], key + ' matches measured browser after the pending Source fix: native ' + repr(state[section][field]))
         print(f'PASS SVG resources: {p.assertions} assertions', flush=True)
         return p.assertions
 
