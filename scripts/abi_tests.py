@@ -126,5 +126,6 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', tests / 'viewport_events.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'form_collections.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'viewport_scroll.py', '--native-directory', out])
+    run([sys.executable, '-I', '-X', 'utf8', tests / 'dialog_popover.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'form_navigation.py', '--native-directory', out])
 print('abi tests passed', flush=True)
