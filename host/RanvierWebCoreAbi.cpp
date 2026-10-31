@@ -524,8 +524,10 @@ public:
         if (orientation == m_orientation)
             return;
         m_orientation = orientation;
-        for (Ref observer : copyToVector(m_observers))
-            observer->screenOrientationDidChange(orientation);
+        for (auto& weakObserver : copyToVector(m_observers)) {
+            if (RefPtr observer = weakObserver.get())
+                observer->screenOrientationDidChange(orientation);
+        }
     }
 
 private:
