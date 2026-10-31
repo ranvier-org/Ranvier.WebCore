@@ -110,5 +110,5 @@ try {
 } finally {
   await browser.close();
 }
-writeFileSync(new URL('../fixtures/web-animations-oracle.json', import.meta.url), JSON.stringify(out, null, 1) + '\n');
+writeFileSync(process.env.ORACLE_OUT || new URL('../fixtures/web-animations-oracle.json', import.meta.url), JSON.stringify(out, null, 1) + '\n');
 console.log(`oracle: ${out.cases.length} cases, ${out.errors.length} error cases`);

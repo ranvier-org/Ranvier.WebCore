@@ -2599,6 +2599,12 @@ extern int rv_dom_css_transform_component_get_interface_name(nativeint target, b
 extern int rv_dom_event_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
+extern int rv_dom_animation_effect_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_timeline_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
 
 [<DllImport(Lib)>]

@@ -547,6 +547,14 @@ class InterfaceEmitter:
                     value = '[||]'
                 elif t.name in self.world.enums and default is not None:
                     value = f'{t.name}.{case_name(default.strip(chr(34)))}'
+                elif default is not None and self.union(member.type):
+                    # A union default names the arm of its literal: a string arm for "auto", else the number arm.
+                    quoted = default.startswith('"')
+                    arm = next(child for child in t.subtypes
+                               if (self.world.resolve(child).name in STRINGS) == quoted
+                               and (quoted or self.world.resolve(child).name in NUMBERS))
+                    literal = default if quoted or '.' in default else default + '.0'
+                    value = f'{ftype}.{label(arm)} {literal}'
                 elif default is not None:
                     suffix = {'sbyte': 'y', 'byte': 'uy', 'int16': 's', 'uint16': 'us', 'uint32': 'u', 'int64': 'L', 'uint64': 'UL', 'float32': 'f'}.get(ftype, '')
                     value = default + suffix

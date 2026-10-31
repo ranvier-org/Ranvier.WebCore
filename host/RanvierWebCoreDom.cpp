@@ -211,6 +211,8 @@ int32_t rv_dom_dom_point_read_only_get_interface_name(RvDOMPointReadOnly* target
 int32_t rv_dom_dom_matrix_read_only_get_interface_name(RvDOMMatrixReadOnly* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_dom_matrix_read_only_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_css_transform_component_get_interface_name(RvCSSTransformComponent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_css_transform_component_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_event_get_interface_name(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_event_get_interface_name(target, buffer, capacity, length); }
+int32_t rv_dom_animation_effect_get_interface_name(RvAnimationEffect* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_animation_effect_get_interface_name(target, buffer, capacity, length); }
+int32_t rv_dom_animation_timeline_get_interface_name(RvAnimationTimeline* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_animation_timeline_get_interface_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_node_type(RvNode* target, uint16_t* result) { return ranvier_dom_node_get_node_type(target, result); }
 int32_t rv_dom_node_get_node_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_node_name(target, buffer, capacity, length); }
 int32_t rv_dom_node_get_base_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_node_get_base_uri(target, buffer, capacity, length); }

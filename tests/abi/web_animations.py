@@ -422,6 +422,8 @@ def contract_errors(native, page):
     expect(native.call('rv_dom_web_animation_pause', [P], other) == WRONG_INTERFACE, 'pause on a plain event target')
     native.bind('rv_event_target_release', None, [P])(other)
     timeline = page.timeline()
+    expect(native.text('rv_dom_animation_effect_get_interface_name', [P], effect) == 'KeyframeEffect', 'effect runtime type KeyframeEffect')
+    expect(native.text('rv_dom_animation_timeline_get_interface_name', [P], timeline) == 'DocumentTimeline', 'timeline runtime type DocumentTimeline')
     created = P()
     expect(native.call('rv_dom_keyframe_effect_create_1', [P, P, ctypes.POINTER(P)], page.document, None, ctypes.byref(created)) == NULL_ARGUMENT,
            'copy constructor NULL source')

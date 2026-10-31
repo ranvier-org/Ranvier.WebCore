@@ -367,6 +367,8 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom-type-query:DOMMatrixReadOnly",
     "dom-type-query:CSSTransformComponent",
     "dom-type-query:Event",
+    "dom-type-query:AnimationEffect",
+    "dom-type-query:AnimationTimeline",
     "screen",
     "capabilities",
     "svg-view-selection",

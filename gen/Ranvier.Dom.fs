@@ -484,7 +484,7 @@ and [<AllowNullLiteral>] Element =
 
     /// <summary>Element.animate.</summary>
 #if FABLE_COMPILER
-    [<Fable.Core.Emit("$0.animate(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))($1), $2)")>]
+    [<Fable.Core.Emit("$0.animate(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))($1), ((o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;})($2))")>]
     abstract member __ranvier_animate: keyframes: (Keyframe) array * ?options: obj -> WebAnimation
 #else
     abstract member animate: keyframes: (Keyframe) array -> WebAnimation
@@ -5608,6 +5608,12 @@ and [<AllowNullLiteral>] Slottable =
     /// <summary>Slottable.assignedSlot.</summary>
     abstract member assignedSlot: HTMLSlotElement with get
 
+/// <summary>UnrestrictedDoubleOrCSSNumericValueOrDOMString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+    | UnrestrictedDouble of float
+    | CSSNumericValue of CSSNumericValue
+    | DOMString of string
+
 /// <summary>DOMStringOrElementCreationOptions in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] DOMStringOrElementCreationOptions =
     | DOMString of string
@@ -5622,12 +5628,6 @@ and [<RequireQualifiedAccess>] BooleanOrImportNodeOptions =
 and [<RequireQualifiedAccess>] BooleanOrScrollIntoViewOptions =
     | Boolean of bool
     | ScrollIntoViewOptions of ScrollIntoViewOptions
-
-/// <summary>UnrestrictedDoubleOrCSSNumericValueOrDOMString in the scoped DOM interface model.</summary>
-and [<RequireQualifiedAccess>] UnrestrictedDoubleOrCSSNumericValueOrDOMString =
-    | UnrestrictedDouble of float
-    | CSSNumericValue of CSSNumericValue
-    | DOMString of string
 
 /// <summary>UnrestrictedDoubleOrKeyframeAnimationOptions in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] UnrestrictedDoubleOrKeyframeAnimationOptions =
@@ -5722,6 +5722,24 @@ and [<AllowNullLiteral; DomDictionary>] AddEventListenerOptions() =
     member val passive: (bool) option = None with get, set
     member val once: bool = false with get, set
 
+/// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString = UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
+    member val composite: CompositeOperation = CompositeOperation.Replace with get, set
+    member val pseudoElement: string = null with get, set
+
+/// <summary>DocumentTimelineOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] DocumentTimelineOptions() =
+    member val originTime: float = 0 with get, set
+
 /// <summary>GetRootNodeOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetRootNodeOptions() =
     member val composed: bool = false with get, set
@@ -5794,7 +5812,7 @@ and [<AllowNullLiteral; DomDictionary>] KeyframeAnimationOptions() =
     member val fill: FillMode = FillMode.Auto with get, set
     member val iterationStart: float = 0.0 with get, set
     member val iterations: float = 1.0 with get, set
-    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString = "auto" with get, set
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString = UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
     member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
     member val easing: string = "linear" with get, set
     member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
@@ -6037,6 +6055,12 @@ module BrowserUnionAdapters =
         Fable.Core.Util.jsNative
 
 
+    let private boxUnrestrictedDoubleOrCSSNumericValueOrDOMString (value: UnrestrictedDoubleOrCSSNumericValueOrDOMString) : obj =
+        match value with
+        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.CSSNumericValue value -> box value
+        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString value -> box value
+
     let private boxDOMStringOrElementCreationOptions (value: DOMStringOrElementCreationOptions) : obj =
         match value with
         | DOMStringOrElementCreationOptions.DOMString value -> box value
@@ -6051,12 +6075,6 @@ module BrowserUnionAdapters =
         match value with
         | BooleanOrScrollIntoViewOptions.Boolean value -> box value
         | BooleanOrScrollIntoViewOptions.ScrollIntoViewOptions value -> box value
-
-    let private boxUnrestrictedDoubleOrCSSNumericValueOrDOMString (value: UnrestrictedDoubleOrCSSNumericValueOrDOMString) : obj =
-        match value with
-        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.UnrestrictedDouble value -> box value
-        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.CSSNumericValue value -> box value
-        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString value -> box value
 
     let private boxUnrestrictedDoubleOrKeyframeAnimationOptions (value: UnrestrictedDoubleOrKeyframeAnimationOptions) : obj =
         match value with

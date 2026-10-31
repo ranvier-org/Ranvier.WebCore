@@ -743,7 +743,9 @@
     "svgTags": "svg/svgtags.in",
     "dictionaries": [
       "EventListenerOptions",
-      "AddEventListenerOptions"
+      "AddEventListenerOptions",
+      "KeyframeEffectOptions",
+      "DocumentTimelineOptions"
     ],
     "interfaces": [
       "SVGElement",
@@ -815,7 +817,9 @@
     "DOMPointReadOnly",
     "DOMMatrixReadOnly",
     "CSSTransformComponent",
-    "Event"
+    "Event",
+    "AnimationEffect",
+    "AnimationTimeline"
   ],
   "interfaceHeaders": {
     "SVGAnimatedInteger": "svg/properties/SVGAnimatedPropertyImpl.h",
@@ -1237,6 +1241,7 @@
   "browserArgumentConversions": {
     "Animatable.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "Element.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
-    "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})"
+    "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
+    "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
   }
 }

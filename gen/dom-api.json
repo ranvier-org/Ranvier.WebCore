@@ -438,6 +438,70 @@
           "name": "length"
         }
       ]
+    },
+    {
+      "root": "AnimationEffect",
+      "function": "rv_dom_animation_effect_get_interface_name",
+      "feature": "dom-type-query:AnimationEffect",
+      "interfaces": [
+        "KeyframeEffect",
+        "AnimationEffect"
+      ],
+      "names": [
+        "KeyframeEffect",
+        "AnimationEffect"
+      ],
+      "extras": [],
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    },
+    {
+      "root": "AnimationTimeline",
+      "function": "rv_dom_animation_timeline_get_interface_name",
+      "feature": "dom-type-query:AnimationTimeline",
+      "interfaces": [
+        "DocumentTimeline",
+        "AnimationTimeline"
+      ],
+      "names": [
+        "DocumentTimeline",
+        "AnimationTimeline"
+      ],
+      "extras": [],
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
     }
   ],
   "interfaces": [
@@ -6062,6 +6126,338 @@
           "mapping": {
             "kind": "bool",
             "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ]
+    },
+    "KeyframeEffectOptions": {
+      "base": "EffectTiming",
+      "contractOnly": false,
+      "omittedFields": [],
+      "fields": [
+        {
+          "name": "delay",
+          "required": false,
+          "default": "0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "endDelay",
+          "required": false,
+          "default": "0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "fill",
+          "required": false,
+          "default": "\"auto\"",
+          "idl": {
+            "name": "FillMode",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "FillMode",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "iterationStart",
+          "required": false,
+          "default": "0.0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "iterations",
+          "required": false,
+          "default": "1.0",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "duration",
+          "required": false,
+          "default": "\"auto\"",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "unrestricted double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "UnrestrictedDoubleOrCSSNumericValueOrDOMString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        },
+        {
+          "name": "direction",
+          "required": false,
+          "default": "\"normal\"",
+          "idl": {
+            "name": "PlaybackDirection",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "PlaybackDirection",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "easing",
+          "required": false,
+          "default": "\"linear\"",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "iterationComposite",
+          "required": false,
+          "default": "\"replace\"",
+          "idl": {
+            "name": "IterationCompositeOperation",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "IterationCompositeOperation",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "composite",
+          "required": false,
+          "default": "\"replace\"",
+          "idl": {
+            "name": "CompositeOperation",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "CompositeOperation",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "pseudoElement",
+          "required": false,
+          "default": "null",
+          "idl": {
+            "name": "USVString",
+            "nullable": true,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ]
+    },
+    "DocumentTimelineOptions": {
+      "base": null,
+      "contractOnly": false,
+      "omittedFields": [],
+      "fields": [
+        {
+          "name": "originTime",
+          "required": false,
+          "default": "0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
             "interface": null,
             "root": null,
             "class": null,
