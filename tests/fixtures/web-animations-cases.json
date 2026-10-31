@@ -1,0 +1,865 @@
+{
+ "comment": "A01 Web Animations creation. Each case creates an animation, pauses it and seeks it; values come from getComputedStyle and the rendered pixels. Keyframes are the native keyframe-sequence form: props maps IDL attribute names to string values. An options number is a duration; \"NaN\" stands for NaN.",
+ "markup": "<!doctype html><html><head><style>html,body{margin:0;background:white}.box{position:absolute;width:40px;height:40px;background:rgb(0,0,255)}#a{left:0;top:0}#b{left:50px;top:0}#c{left:100px;top:0;transform:translateX(10px)}#d{left:0;top:50px}#e{left:50px;top:50px;opacity:0.5}#f{left:100px;top:100px}</style><script>document.title=\"script ran\"</script></head><body><div id=a class=box></div><div id=b class=box></div><div id=c class=box></div><div id=d class=box></div><div id=e class=box></div><div id=f class=box></div></body></html>",
+ "cases": [
+  {
+   "name": "opacity fill both",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both"
+   },
+   "times": [
+    0,
+    500,
+    1000
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "opacity fill none",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "0.5"
+     }
+    }
+   ],
+   "options": 1000,
+   "times": [
+    0,
+    500,
+    1000
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "transform",
+   "el": "b",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "transform": "translateX(0px)"
+     }
+    },
+    {
+     "props": {
+      "transform": "translateX(100px)"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both"
+   },
+   "times": [
+    0,
+    500,
+    1000
+   ],
+   "props": [
+    "transform"
+   ]
+  },
+  {
+   "name": "delay no fill",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "delay": 500
+   },
+   "times": [
+    0,
+    250,
+    500,
+    1000,
+    1500
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "delay fill backwards",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0.2"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "delay": 500,
+    "fill": "backwards"
+   },
+   "times": [
+    0,
+    250,
+    1000
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "direction reverse",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "direction": "reverse",
+    "fill": "both"
+   },
+   "times": [
+    0,
+    250,
+    1000
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "direction alternate x2",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "iterations": 2,
+    "direction": "alternate",
+    "fill": "both"
+   },
+   "times": [
+    250,
+    1250,
+    2000
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "direction alternate-reverse x2",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "iterations": 2,
+    "direction": "alternate-reverse",
+    "fill": "both"
+   },
+   "times": [
+    250,
+    1250
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "composite add transform",
+   "el": "c",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "transform": "translateX(0px)"
+     }
+    },
+    {
+     "props": {
+      "transform": "translateX(100px)"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "composite": "add",
+    "fill": "both"
+   },
+   "times": [
+    0,
+    500,
+    1000
+   ],
+   "props": [
+    "transform"
+   ]
+  },
+  {
+   "name": "composite accumulate transform",
+   "el": "c",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "transform": "translateX(0px)"
+     }
+    },
+    {
+     "props": {
+      "transform": "translateX(100px)"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "composite": "accumulate",
+    "fill": "both"
+   },
+   "times": [
+    500
+   ],
+   "props": [
+    "transform"
+   ]
+  },
+  {
+   "name": "composite replace transform",
+   "el": "c",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "transform": "translateX(0px)"
+     }
+    },
+    {
+     "props": {
+      "transform": "translateX(100px)"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "composite": "replace",
+    "fill": "both"
+   },
+   "times": [
+    500
+   ],
+   "props": [
+    "transform"
+   ]
+  },
+  {
+   "name": "keyframe composite add opacity",
+   "el": "e",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     },
+     "composite": "add"
+    },
+    {
+     "props": {
+      "opacity": "0.25"
+     },
+     "composite": "add"
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both"
+   },
+   "times": [
+    0,
+    500,
+    1000
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "offsets",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "0.8"
+     },
+     "offset": 0.8
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both"
+   },
+   "times": [
+    400,
+    800,
+    900
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "keyframe easing step-end",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     },
+     "easing": "step-end"
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both"
+   },
+   "times": [
+    500,
+    1000
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "timing easing steps",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both",
+    "easing": "steps(4, end)"
+   },
+   "times": [
+    300,
+    600
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "two properties and id",
+   "el": "d",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0",
+      "transform": "scale(1)"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1",
+      "transform": "scale(2)"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both",
+    "id": "two"
+   },
+   "times": [
+    500
+   ],
+   "props": [
+    "opacity",
+    "transform"
+   ]
+  },
+  {
+   "name": "camelCase property",
+   "el": "f",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "backgroundColor": "rgb(0, 0, 255)"
+     }
+    },
+    {
+     "props": {
+      "backgroundColor": "rgb(255, 0, 0)"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both"
+   },
+   "times": [
+    500
+   ],
+   "props": [
+    "background-color"
+   ]
+  },
+  {
+   "name": "implicit from keyframe",
+   "el": "e",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both"
+   },
+   "times": [
+    0,
+    500
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "KeyframeEffect and Animation on document.timeline",
+   "el": "b",
+   "kind": "construct",
+   "keyframes": [
+    {
+     "props": {
+      "transform": "translateX(0px)"
+     }
+    },
+    {
+     "props": {
+      "transform": "translateX(40px)"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "forwards"
+   },
+   "times": [
+    500,
+    1000
+   ],
+   "props": [
+    "transform"
+   ]
+  },
+  {
+   "name": "KeyframeEffect and Animation on the default timeline",
+   "el": "b",
+   "kind": "construct-default",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both"
+   },
+   "times": [
+    500
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "KeyframeEffect copy",
+   "el": "b",
+   "kind": "copy",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 2000,
+    "fill": "both"
+   },
+   "times": [
+    500
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "number options",
+   "el": "a",
+   "kind": "animate",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": 2000,
+   "times": [
+    500
+   ],
+   "props": [
+    "opacity"
+   ]
+  },
+  {
+   "name": "timeline option document.timeline",
+   "el": "a",
+   "kind": "animate-timeline",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "fill": "both"
+   },
+   "times": [
+    500
+   ],
+   "props": [
+    "opacity"
+   ]
+  }
+ ],
+ "errors": [
+  {
+   "name": "unsorted offsets",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     },
+     "offset": 0.8
+    },
+    {
+     "props": {
+      "opacity": "1"
+     },
+     "offset": 0.2
+    }
+   ],
+   "options": 1000
+  },
+  {
+   "name": "offset above one",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     },
+     "offset": 1.5
+    }
+   ],
+   "options": 1000
+  },
+  {
+   "name": "offset NaN",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     },
+     "offset": "NaN"
+    }
+   ],
+   "options": 1000
+  },
+  {
+   "name": "invalid keyframe easing",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     },
+     "easing": "bogus"
+    }
+   ],
+   "options": 1000
+  },
+  {
+   "name": "invalid keyframe composite",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     },
+     "composite": "bogus"
+    }
+   ],
+   "options": 1000
+  },
+  {
+   "name": "invalid timing easing",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1000,
+    "easing": "bogus"
+   }
+  },
+  {
+   "name": "negative duration",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    }
+   ],
+   "options": -1
+  },
+  {
+   "name": "NaN duration",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    }
+   ],
+   "options": "NaN"
+  },
+  {
+   "name": "negative iterations",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    }
+   ],
+   "options": {
+    "duration": 1,
+    "iterations": -1
+   }
+  },
+  {
+   "name": "null keyframes",
+   "keyframes": null,
+   "options": 1000
+  },
+  {
+   "name": "empty keyframes",
+   "keyframes": [],
+   "options": 1000
+  },
+  {
+   "name": "unknown property ignored",
+   "keyframes": [
+    {
+     "props": {
+      "bogusProperty": "1"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": 1000
+  },
+  {
+   "name": "invalid value kept",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "red"
+     }
+    },
+    {
+     "props": {
+      "opacity": "1"
+     }
+    }
+   ],
+   "options": 1000
+  },
+  {
+   "name": "invalid pseudo",
+   "keyframes": [],
+   "options": {
+    "duration": 1,
+    "pseudoElement": "bogus"
+   },
+   "kind": "effect"
+  },
+  {
+   "name": "KeyframeEffect null target",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    }
+   ],
+   "options": 1000,
+   "kind": "effect-null-target"
+  },
+  {
+   "name": "Animation without effect",
+   "keyframes": null,
+   "options": null,
+   "kind": "animation-empty"
+  },
+  {
+   "name": "Animation null timeline",
+   "keyframes": [
+    {
+     "props": {
+      "opacity": "0"
+     }
+    }
+   ],
+   "options": 1000,
+   "kind": "animation-null-timeline"
+  }
+ ]
+}

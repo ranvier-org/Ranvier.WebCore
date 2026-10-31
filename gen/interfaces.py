@@ -254,8 +254,19 @@ class InterfaceEmitter:
                           f'new m.constructor([{fields}]):m;}})($0)')
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
             self.matrix_flag_adapters_used.add(matrix_adapter)
+        # browserArgumentConversions maps Interface.member.argument to a JavaScript function of the F# value that gives
+        # the browser's argument: a keyframe sequence becomes the browser's keyframe objects.
+        conversions = {i: self.world.config.get('browserArgumentConversions', {}).get(f'{self.sources.get(owner, owner)}.{member.name}.{a.name}')
+                       for i, a in enumerate(member.arguments)}
+        conversions = {i: c for i, c in conversions.items() if c}
+        if conversions and not needs_adapter and not anonymous_property:
+            names = [f'a{i}' for i in range(len(member.arguments))]
+            passed = [f'({conversions[i]})({n})' if i in conversions else n for i, n in enumerate(names)]
+            expression = (f"((o,{','.join(names)})=>o.{member.name}({','.join(passed)}))"
+                          f"($0,{','.join(f'${i + 1}' for i in range(len(member.arguments)))})")
+            lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
         wide = [i for i, a in enumerate(member.arguments) if self.world.resolve(a.type).name in WIDE_INTEGERS]
-        if wide and not needs_adapter and not anonymous_property and not member.arguments[-1].variadic:
+        if wide and not conversions and not needs_adapter and not anonymous_property and not member.arguments[-1].variadic:
             # Fable passes int64 arguments as BigInt, which a browser's number conversion rejects.
             names = [f'a{i}' for i in range(len(member.arguments))]
             passed = [f"{n}===void 0?void 0:Number({n})" if i in wide else n for i, n in enumerate(names)]
@@ -265,7 +276,8 @@ class InterfaceEmitter:
         if needs_adapter:
             raw_params = self.parameters(member.arguments, [a.type for a in member.arguments], raw=True)
             raw_result = 'obj' if self.union(member.type) else result
-            arg_expressions = [('...' if a.variadic else '') + f'${i + 1}' for i, a in enumerate(member.arguments)]
+            arg_expressions = [('...' if a.variadic else '') + (f'({conversions[i]})(${i + 1})' if i in conversions else f'${i + 1}')
+                               for i, a in enumerate(member.arguments)]
             expression = f'$0.{member.name}(' + ', '.join(arg_expressions) + ')'
             if anonymous_property:
                 expression = self.browser_property_expression(owner, member)
@@ -541,12 +553,26 @@ class InterfaceEmitter:
                     value = '[||]'
                 elif t.name in self.world.enums and default is not None:
                     value = f'{t.name}.{case_name(default.strip(chr(34)))}'
+                elif default is not None and self.union(member.type):
+                    # A union default names the arm of its literal: a string arm for "auto", else the number arm.
+                    quoted = default.startswith('"')
+                    arm = next(child for child in t.subtypes
+                               if (self.world.resolve(child).name in STRINGS) == quoted
+                               and (quoted or self.world.resolve(child).name in NUMBERS))
+                    literal = default if quoted or '.' in default else default + '.0'
+                    value = f'{ftype}.{label(arm)} {literal}'
                 elif default is not None:
                     suffix = {'sbyte': 'y', 'byte': 'uy', 'int16': 's', 'uint16': 'us', 'uint32': 'u', 'int64': 'L', 'uint64': 'UL', 'float32': 'f'}.get(ftype, '')
                     value = default + suffix
                 else:
                     value = 'Unchecked.defaultof<_>'
-                body += [f'    member val {identifier(member.name)}: {ftype} = {value} with get, set']
+                line = f'    member val {identifier(member.name)}: {ftype} = {value} with get, set'
+                if len(line) > 120:
+                    # Fantomas breaks a long field after the equals sign, with blank lines around it.
+                    body += ([] if not body or body[-1] == '' else ['']) + [
+                        f'    member val {identifier(member.name)}: {ftype} =', f'        {value} with get, set', '']
+                else:
+                    body.append(line)
             declarations.append((name + '()', '[<AllowNullLiteral; DomDictionary>]', body or ['    class end']))
         for name in sorted(self.callbacks):
             if name == 'EventListener':

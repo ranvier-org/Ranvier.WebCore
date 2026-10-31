@@ -379,6 +379,38 @@ for an interface it needs.
    member to `atomArguments` or `exclude`, or teach the generator the case.
 4. Test it in `tests/abi/Dom.fs`.
 
+## JavaScript object arguments and custom constructors (Web Animations)
+
+Keyframes are an `object` in WebIDL, read by WebKit's own keyframe processing from a JavaScript object. Six
+`gen/dom.json` keys give the generated functions those members without new C++ in WebKit:
+
+- `syntheticIdl` names repository IDL files of dictionaries only. `gen/RanvierKeyframes.idl` defines `Keyframe`
+  (`offset`, `easing`, `composite`, `properties`) and `KeyframeProperty` (`name`, `value`), the keyframe-sequence form
+  a script writes: `[{ offset: 0.5, easing: "ease-in", opacity: "0" }, ...]`. Every string is a UTF-8 span with a byte
+  length; `offset` is `const double*`, NULL for a null offset.
+- `argumentTypes` retypes `Animatable.animate.keyframes`, `KeyframeEffect.constructor.keyframes` and
+  `KeyframeEffect.setKeyframes.keyframes` to `sequence<Keyframe>?`; a NULL sequence, or `present` 0, is null keyframes.
+- `argumentAdapters` converts the decoded sequence with `Ranvier::KeyframesArgument` (`host/dom/RanvierKeyframes.h`):
+  under the JavaScript lock, an array of plain objects in the document's global object, one per keyframe, each
+  property a string. WebKit's processing of an unmodified array takes its fast path, so the call never enters the VM
+  and the host's `DisallowVMEntry` holds; the argument clears any exception the processing left on the VM, and the
+  member's `ExceptionOr` reports it as `RV_ERR_DOM_EXCEPTION` with the WebIDL name (TypeError for unsorted or
+  out-of-range offsets and bad easing or composite strings).
+- `globalObjectMembers` supplies `[CallWith=CurrentGlobalObject]` to the listed operations from the target's
+  document (`Element.animate`) or the checked `context` Document (`KeyframeEffect.setKeyframes`). A document without
+  a global object fails with InvalidStateError.
+- `customConstructors` replaces WebAnimation's `[Custom]` constructor with the signature its binding implements,
+  `constructor(optional AnimationEffect? effect = null, optional AnimationTimeline? timeline)`. `presenceArguments`
+  gives `timeline` a `timeline_present` flag: 0 is absent (the document timeline), 1 with NULL is no timeline.
+- `optionalObjectMembers` passes `KeyframeAnimationOptions.timeline` as `RvAnimationTimeline* const*`: NULL absent, a
+  pointer to NULL null. `setterExpressions`, like `getterExpressions`, converts `Animation.startTime` and `currentTime`
+  between `CSSNumberish` milliseconds and `WebAnimationTime`. `constructors` `overloads` gives KeyframeEffect's copy
+  constructor its own factory settings.
+
+The Animation handle is an `RvEventTarget` (`eventTargetObjects`): `finish`, `cancel` and `remove` events reach
+`rv_event_target_add_listener`, and `rv_animation_as_event_target` maps the hand-written CSS-animation handle to it.
+`tests/abi/web_animations.py` replays `tests/fixtures/web-animations-cases.json` against the Chromium oracle.
+
 ## Known gaps
 
 - `[CEReactions]`: the glue does not open a custom element reaction scope. The host runs no page script, so no

@@ -4911,6 +4911,13 @@ RvNode* rv_animation_target(RvAnimation* handle)
     return handleOrNull(effect ? effect->target() : nullptr);
 }
 
+RvEventTarget* rv_animation_as_event_target(RvAnimation* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(static_cast<EventTarget*>(animation(handle)));
+}
+
 RvNode* rv_node_retain(RvNode* target)
 {
     if (!target || !onOwningThread())

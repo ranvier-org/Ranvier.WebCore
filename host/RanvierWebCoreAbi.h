@@ -1573,6 +1573,10 @@ RV_EXPORT RvEventTarget* rv_node_as_event_target(RvNode*);
 RV_EXPORT RvNode* rv_event_target_as_node(RvEventTarget*);
 /* 1 when both handles refer to the same target, else 0. */
 RV_EXPORT int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* right);
+/* A new reference to the animation as the RvEventTarget the generated rv_dom_web_animation_* functions take, or NULL
+ * off the owning thread. It equals (rv_event_target_equals) the handle rv_dom_element_get_animations returns for the
+ * same animation; release it with rv_event_target_release. */
+RV_EXPORT RvEventTarget* rv_animation_as_event_target(RvAnimation*);
 /* rv_node_add_event_listener for any EventTarget; remove the listener with rv_listener_remove. */
 RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const uint8_t* type, int32_t type_length, int32_t flags, RvEventCallback callback, void* context);
 /* rv_node_dispatch for any EventTarget. */
