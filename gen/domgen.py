@@ -367,6 +367,13 @@ class World:
         self.contract_dictionary_fields = {name: self.dictionary_fields(name)
                                            for name in self.contract_config.get("dictionaries", [])}
 
+    def event_target_object(self, name):
+        """An interface whose handle is an RvEventTarget: an eventTargetObjects interface or a scoped subtype of one."""
+        chain = self.chain(name)
+        objects = self.config.get("eventTargetObjects", {})
+        return (chain[-1] == "EventTarget" and any(item in objects for item in chain[:-1])
+                and all(item in self.scope for item in chain[:-1]))
+
     def public_name(self, name):
         return self.contract_aliases.get(name, name)
 
@@ -568,7 +575,7 @@ class World:
                     raise Unsupported(f"interface {t.name} outside gen/dom.json")
                 return Mapped("event", t.nullable, interface=t.name, cls=self.cpp_class(t.name))
             root = chain[-1]
-            if root not in self.scope and not (root == "EventTarget" and t.name in self.config.get("eventTargetObjects", {})):
+            if root not in self.scope and not (root == "EventTarget" and self.event_target_object(t.name)):
                 raise Unsupported(f"interface {t.name} outside gen/dom.json")
             return Mapped("object", t.nullable, interface=t.name, root=root, cls=self.cpp_class(t.name))
         if t.name == "union":
@@ -700,10 +707,14 @@ class Generator(ComplexGeneratorMixin):
             chain = self.world.chain(name)
             if "Node" not in chain and "Event" not in chain:
                 root = chain[-1]
-                if root == "EventTarget" and name in self.world.config.get("eventTargetObjects", {}):
-                    # An event target handle is the RvEventTarget of the hand-written event ABI.
-                    if chain != [name, root]:
-                        raise SystemExit(f"{name}: an event target object must derive directly from EventTarget")
+                if root == "EventTarget" and self.world.event_target_object(name):
+                    # An event target handle is the RvEventTarget of the hand-written event ABI. A subtype of an
+                    # eventTargetObjects interface (CSSAnimation of WebAnimation) casts through it (castVia).
+                    objects = self.world.config.get("eventTargetObjects", {})
+                    if name not in objects and self.world.config.get("castVia", {}).get(name) not in objects:
+                        raise SystemExit(f"{name}: a subtype of an event target object needs castVia to it")
+                elif root == "EventTarget" and name in self.world.config.get("eventTargetObjects", {}):
+                    raise SystemExit(f"{name}: an event target object must derive directly from EventTarget")
                 elif root not in self.world.scope:
                     raise SystemExit(f"{name}: gen/dom.json lists an interface without its base {root}, which names the handle")
                 if root == name:
@@ -747,7 +758,8 @@ class Generator(ComplexGeneratorMixin):
         self.runtime_queries = []
         for root in self.world.config.get("runtimeTypeRoots", []):
             # An Event root reads an RvEvent handle; every other root is a scoped object handle.
-            if root not in self.handles and root != "Event":
+            event_target = root in self.world.config.get("eventTargetObjects", {})
+            if root not in self.handles and root != "Event" and not event_target:
                 raise SystemExit(f"{root}: runtime type query requires a scoped object-handle root")
             # Extras are interfaces outside the scope that the query still names, such as CustomEvent.
             extras = self.world.config.get("runtimeTypeExtras", {}).get(root, [])
@@ -767,7 +779,7 @@ class Generator(ComplexGeneratorMixin):
                 "interfaces": interfaces + [root],
                 "names": [self.world.public_name(name) if public else name for name in interfaces + [root]],
                 "extras": extras,
-                "parameters": [{"ctype": f"Rv{root}*", "name": "target"}, {"ctype": "char*", "name": "buffer"},
+                "parameters": [{"ctype": "RvEventTarget*" if event_target else f"Rv{root}*", "name": "target"}, {"ctype": "char*", "name": "buffer"},
                                {"ctype": "int32_t", "name": "capacity"}, {"ctype": "int32_t*", "name": "length"}],
             })
 
@@ -1302,7 +1314,7 @@ class Generator(ComplexGeneratorMixin):
             return (f"([&]() -> {cls}* {{ auto& event = {value}; return event.interfaceType() == EventInterfaceType::{cls} "
                     f"? static_cast<{cls}*>(&event) : nullptr; }}())")
         via = self.world.config.get("castVia", {}).get(cls)
-        if via:
+        if via and via != root:
             self.headers.add(f"{via}.h")
             return (f"([&]() -> {cls}* {{ auto* base = dynamicDowncast<{via}>({value}); "
                     f"return base ? dynamicDowncast<{cls}>(*base) : nullptr; }}())")
@@ -2510,6 +2522,10 @@ class Generator(ComplexGeneratorMixin):
                       "    if (!target || !length)", "        return RV_ERR_NULL_ARGUMENT;",
                       "    if (!isMainThread())", "        return RV_ERR_WRONG_THREAD;",
                       f"    auto* impl = reinterpret_cast<{self.world.cpp_class(root)}*>(target);"]
+            if root in self.world.config.get("eventTargetObjects", {}):
+                # An event target of another interface is not this root: RV_ERR_WRONG_INTERFACE.
+                lines[-1] = f"    RefPtr impl = dynamicDowncast<{self.world.cpp_class(root)}>(*reinterpret_cast<EventTarget*>(target));"
+                lines += ["    if (!impl)", "        return RV_ERR_WRONG_INTERFACE;"]
             for interface, exposed in zip(query['interfaces'][:-1], query['names']):
                 conditional = self.conditional(self.world.interfaces[interface])
                 if conditional:

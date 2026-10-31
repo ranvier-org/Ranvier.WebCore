@@ -239,6 +239,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_css_transform_component_get_interface_name(Rv
 WEBCORE_EXPORT int32_t ranvier_dom_event_get_interface_name(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_animation_effect_get_interface_name(RvAnimationEffect* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_animation_timeline_get_interface_name(RvAnimationTimeline* target, char* buffer, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_dom_web_animation_get_interface_name(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_node_get_node_type(RvNode* target, uint16_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_node_get_node_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_node_get_base_uri(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -2912,6 +2913,8 @@ WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffe
 WEBCORE_EXPORT int32_t ranvier_dom_animation_timeline_get_current_time(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
 WEBCORE_EXPORT int32_t ranvier_dom_animation_timeline_get_duration(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_timeline_create(RvNode* target, const RvDomDocumentTimelineOptions* options, RvAnimationTimeline** result);
+WEBCORE_EXPORT int32_t ranvier_dom_css_animation_get_animation_name(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length);
+WEBCORE_EXPORT int32_t ranvier_dom_css_transition_get_transition_property(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result);

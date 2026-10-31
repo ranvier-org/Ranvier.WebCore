@@ -5274,6 +5274,18 @@ and [<AllowNullLiteral>] AnimationTimeline =
 and [<AllowNullLiteral>] DocumentTimeline =
     inherit AnimationTimeline
 
+/// <summary>CSSAnimation in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSAnimation =
+    inherit WebAnimation
+    /// <summary>CSSAnimation.animationName.</summary>
+    abstract member animationName: string with get
+
+/// <summary>CSSTransition in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CSSTransition =
+    inherit WebAnimation
+    /// <summary>CSSTransition.transitionProperty.</summary>
+    abstract member transitionProperty: string with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement

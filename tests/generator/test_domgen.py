@@ -1290,6 +1290,41 @@ partial interface Element {
         self.assertIn('storeHandle<EventTarget>(value, result)', glue)
         self.assertNotIn('settings.viewportApi', glue.split('ranvier_dom_viewport_get_width', 1)[1].split(chr(10) + '}', 1)[0])
 
+    def test_event_target_object_subtypes_cast_through_their_base_and_answer_a_type_query(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface Motion : EventTarget { readonly attribute DOMString label; };
+interface CssMotion : Motion { readonly attribute DOMString motionName; };
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Motion', 'CssMotion']
+        config['eventTargetObjects'] = {'Motion': {}}
+        config['runtimeTypeRoots'] = ['Motion']
+        missing = dict(config)
+        with self.assertRaisesRegex(SystemExit, 'CssMotion: a subtype of an event target object needs castVia'):
+            generator = domgen.Generator(domgen.World(self.source, missing))
+            generator.lock, generator.lock_structs = {}, {}
+            generator.run()
+        config['castVia'] = dict(config.get('castVia', {}), CssMotion='Motion')
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertEqual(functions['rv_dom_css_motion_get_motion_name']['parameters'][0], {'ctype': 'RvEventTarget*', 'name': 'target'})
+        self.assertNotIn('CssMotion', generator.handles)
+        self.assertNotIn('Motion', generator.handles)
+        glue = generator.glue()
+        self.assertIn('auto* base = dynamicDowncast<Motion>(*reinterpret_cast<EventTarget*>(target)); '
+                      'return base ? dynamicDowncast<CssMotion>(*base) : nullptr;', glue)
+        query = glue.split('int32_t ranvier_dom_motion_get_interface_name', 1)[1].split(chr(10) + '}', 1)[0]
+        self.assertIn('RefPtr impl = dynamicDowncast<Motion>(*reinterpret_cast<EventTarget*>(target));', query)
+        self.assertIn('if (!impl)' + chr(10) + '        return RV_ERR_WRONG_INTERFACE;', query)
+        self.assertIn('return copyString("CssMotion"_s, buffer, capacity, length);', query)
+        self.assertIn('return copyString("Motion"_s, buffer, capacity, length);', query)
+        self.assertIn('RV_EXPORT int32_t rv_dom_motion_get_interface_name(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length);',
+                      generator.header())
+
     def test_window_bindings_list_reads_readonly_attributes_and_overloads_per_feature(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

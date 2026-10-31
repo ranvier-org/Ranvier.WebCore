@@ -724,7 +724,9 @@
     "AnimationEffect",
     "KeyframeEffect",
     "AnimationTimeline",
-    "DocumentTimeline"
+    "DocumentTimeline",
+    "CSSAnimation",
+    "CSSTransition"
   ],
   "skipDirectories": [
     "Modules/",
@@ -825,7 +827,8 @@
     "CSSTransformComponent",
     "Event",
     "AnimationEffect",
-    "AnimationTimeline"
+    "AnimationTimeline",
+    "WebAnimation"
   ],
   "interfaceHeaders": {
     "SVGAnimatedInteger": "svg/properties/SVGAnimatedPropertyImpl.h",
@@ -868,7 +871,9 @@
   "castVia": {
     "SVGAnimationElement": "SVGElement",
     "RadioNodeList": "LiveNodeList",
-    "CSSConditionRule": "CSSGroupingRule"
+    "CSSConditionRule": "CSSGroupingRule",
+    "CSSAnimation": "WebAnimation",
+    "CSSTransition": "WebAnimation"
   },
   "atomArguments": [
     "StyleSheetList.namedItem",

@@ -502,6 +502,40 @@
           "name": "length"
         }
       ]
+    },
+    {
+      "root": "WebAnimation",
+      "function": "rv_dom_web_animation_get_interface_name",
+      "feature": "dom-type-query:WebAnimation",
+      "interfaces": [
+        "CSSAnimation",
+        "CSSTransition",
+        "WebAnimation"
+      ],
+      "names": [
+        "CSSAnimation",
+        "CSSTransition",
+        "WebAnimation"
+      ],
+      "extras": [],
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
     }
   ],
   "interfaces": [
@@ -1648,6 +1682,14 @@
     {
       "name": "DocumentTimeline",
       "base": "AnimationTimeline"
+    },
+    {
+      "name": "CSSAnimation",
+      "base": "WebAnimation"
+    },
+    {
+      "name": "CSSTransition",
+      "base": "WebAnimation"
     }
   ],
   "contractInterfaces": [
@@ -4285,6 +4327,24 @@
       "mixin": false,
       "contractOnly": false,
       "source": "animation/DocumentTimeline.idl"
+    },
+    {
+      "name": "CSSAnimation",
+      "idlName": "CSSAnimation",
+      "base": "WebAnimation",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/CSSAnimation.idl"
+    },
+    {
+      "name": "CSSTransition",
+      "idlName": "CSSTransition",
+      "base": "WebAnimation",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/CSSTransition.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -149875,6 +149935,94 @@
       "receiver": "Document",
       "feature": "dom-constructor:DocumentTimeline",
       "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CSSAnimation",
+      "member": "animationName",
+      "contractOwner": "CSSAnimation",
+      "kind": "getter",
+      "function": "rv_dom_css_animation_get_animation_name",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CSSTransition",
+      "member": "transitionProperty",
+      "contractOwner": "CSSTransition",
+      "kind": "getter",
+      "function": "rv_dom_css_transition_get_transition_property",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
     },
     {
       "interface": "DOMCSSNamespace",

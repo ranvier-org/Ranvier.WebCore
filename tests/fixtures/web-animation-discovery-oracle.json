@@ -1,0 +1,178 @@
+{
+ "browser": "Chromium 156.0.8078.4",
+ "steps": [
+  {
+   "name": "document",
+   "value": [
+    {
+     "type": "CSSTransition",
+     "id": "",
+     "animationName": null,
+     "transitionProperty": "opacity",
+     "target": "tr",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    },
+    {
+     "type": "CSSAnimation",
+     "id": "",
+     "animationName": "fade",
+     "transitionProperty": null,
+     "target": "css",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    },
+    {
+     "type": "CSSAnimation",
+     "id": "",
+     "animationName": "spin",
+     "transitionProperty": null,
+     "target": "c2",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    },
+    {
+     "type": "Animation",
+     "id": "scripted",
+     "animationName": null,
+     "transitionProperty": null,
+     "target": "c1",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    },
+    {
+     "type": "Animation",
+     "id": "second",
+     "animationName": null,
+     "transitionProperty": null,
+     "target": "css",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    }
+   ]
+  },
+  {
+   "name": "tree",
+   "value": []
+  },
+  {
+   "name": "tree subtree",
+   "value": [
+    {
+     "type": "CSSAnimation",
+     "id": "",
+     "animationName": "spin",
+     "transitionProperty": null,
+     "target": "c2",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    },
+    {
+     "type": "Animation",
+     "id": "scripted",
+     "animationName": null,
+     "transitionProperty": null,
+     "target": "c1",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    }
+   ]
+  },
+  {
+   "name": "css element",
+   "value": [
+    {
+     "type": "CSSAnimation",
+     "id": "",
+     "animationName": "fade",
+     "transitionProperty": null,
+     "target": "css",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    },
+    {
+     "type": "Animation",
+     "id": "second",
+     "animationName": null,
+     "transitionProperty": null,
+     "target": "css",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    }
+   ]
+  },
+  {
+   "name": "transition element",
+   "value": [
+    {
+     "type": "CSSTransition",
+     "id": "",
+     "animationName": null,
+     "transitionProperty": "opacity",
+     "target": "tr",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    }
+   ]
+  },
+  {
+   "name": "identity",
+   "value": {
+    "documentAgain": true,
+    "elementInDocument": true,
+    "scriptedInDocument": true,
+    "subtreeInDocument": true,
+    "effectsDistinct": true
+   }
+  },
+  {
+   "name": "css cancelled",
+   "value": {
+    "playState": "idle",
+    "remaining": [
+     {
+      "type": "Animation",
+      "id": "second",
+      "animationName": null,
+      "transitionProperty": null,
+      "target": "css",
+      "timelineIsDocument": true,
+      "keyframeEffect": true
+     }
+    ]
+   }
+  },
+  {
+   "name": "scripted cancelled",
+   "value": {
+    "playState": "idle",
+    "tree": [
+     {
+      "type": "CSSAnimation",
+      "id": "",
+      "animationName": "spin",
+      "transitionProperty": null,
+      "target": "c2",
+      "timelineIsDocument": true,
+      "keyframeEffect": true
+     }
+    ],
+    "document": 3
+   }
+  },
+  {
+   "name": "after all cancelled",
+   "value": [
+    {
+     "type": "CSSAnimation",
+     "id": "",
+     "animationName": "spin",
+     "transitionProperty": null,
+     "target": "c2",
+     "timelineIsDocument": true,
+     "keyframeEffect": true
+    }
+   ]
+  }
+ ]
+}

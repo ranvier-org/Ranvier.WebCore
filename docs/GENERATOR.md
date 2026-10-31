@@ -416,6 +416,11 @@ A02 adds five more keys:
 - Result dictionaries may hold enumerations (as the index) and `CSSNumberish` unions.
 - `resultValueOverloads` converts the `WebAnimationTime` fields of EffectTiming and ComputedEffectTiming.
 
+A05 makes CSSAnimation and CSSTransition subtypes of an `eventTargetObjects` interface: their functions take the same
+`RvEventTarget` and cast through WebAnimation (`castVia`), and `runtimeTypeRoots` names WebAnimation, so
+`rv_dom_web_animation_get_interface_name` reports WebAnimation, CSSAnimation or CSSTransition. It returns
+`RV_ERR_WRONG_INTERFACE` for an event target that is not an animation.
+
 The Animation handle is an `RvEventTarget` (`eventTargetObjects`): `finish`, `cancel` and `remove` events reach
 `rv_event_target_add_listener`, and `rv_animation_as_event_target` maps the hand-written CSS-animation handle to it.
 `tests/abi/web_animations.py` replays `tests/fixtures/web-animations-cases.json` against the Chromium oracle.

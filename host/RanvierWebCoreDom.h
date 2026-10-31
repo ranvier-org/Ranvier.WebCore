@@ -2242,6 +2242,8 @@ RV_EXPORT int32_t rv_dom_event_get_interface_name(RvEvent* target, char* buffer,
 RV_EXPORT int32_t rv_dom_animation_effect_get_interface_name(RvAnimationEffect* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a AnimationTimeline handle; borrows target. */
 RV_EXPORT int32_t rv_dom_animation_timeline_get_interface_name(RvAnimationTimeline* target, char* buffer, int32_t capacity, int32_t* length);
+/* Concrete scoped interface name of a WebAnimation handle; borrows target. */
+RV_EXPORT int32_t rv_dom_web_animation_get_interface_name(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length);
 
 /* Node */
 
@@ -8663,6 +8665,14 @@ RV_EXPORT int32_t rv_dom_animation_timeline_get_duration(RvAnimationTimeline* ta
 /* DocumentTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL;
  * options may be NULL for the IDL default; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_timeline_create(RvNode* target, const RvDomDocumentTimelineOptions* options, RvAnimationTimeline** result);
+/* CSSAnimation */
+
+/* CSSAnimation.animationName getter: readonly attribute CSSOMString animationName */
+RV_EXPORT int32_t rv_dom_css_animation_get_animation_name(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length);
+/* CSSTransition */
+
+/* CSSTransition.transitionProperty getter: readonly attribute CSSOMString transitionProperty */
+RV_EXPORT int32_t rv_dom_css_transition_get_transition_property(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

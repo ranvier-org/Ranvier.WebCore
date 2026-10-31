@@ -2698,6 +2698,9 @@ extern int rv_dom_animation_effect_get_interface_name(nativeint target, byte[] b
 extern int rv_dom_animation_timeline_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
 
 [<DllImport(Lib)>]
@@ -10715,6 +10718,12 @@ extern int rv_dom_animation_timeline_get_duration(nativeint target, RvDomUnionDo
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_timeline_create(nativeint target, [<In>] RvDomDocumentTimelineOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_get_animation_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_get_transition_property(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
