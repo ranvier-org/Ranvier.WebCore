@@ -36,6 +36,7 @@ class InterfaceEmitter:
         self.dictionaries = {}
         self.callbacks = set()
         self.adapters = []
+        self.shadowed = set()
         self.attribute_access = {}
         self.enums = set()
         self.matrix_flag_adapters_used = set()
@@ -171,7 +172,7 @@ class InterfaceEmitter:
                 self.type(argument.type)
         except self.generator.unsupported_type:
             return []
-        needs_adapter = self.complex(member)
+        needs_adapter = self.complex(member) or (owner, member.kind, member.name, len(member.arguments)) in self.shadowed
         matrix_adapter = f'{owner}.{member.name}'
         lines = ([''] if needs_adapter or anonymous_property or matrix_adapter in self.world.config.get('browserMatrixFlagAdapters', []) or matrix_adapter in self.generator.svg_matrix_bindings else []) + [f'    /// <summary>{owner}.{member.name}.</summary>']
         if member.kind == 'attribute':
@@ -421,9 +422,29 @@ class InterfaceEmitter:
                     lines += ['']
         return lines + ['#endif']
 
+    def shadowed_members(self):
+        """Inherited members redeclared by a descendant's browser adapter. F# prefers an intrinsic member to any
+        extension, so under Fable such an inherited member is also an extension, which the descendant's overrides."""
+        found = set()
+        for name in self.names:
+            source = self.sources[name]
+            if source not in self.world.interfaces or self.world.interfaces[source].mixin:
+                continue
+            for member in self.world.members(source):
+                if member.kind != 'operation' or not self.complex(member) or self.world.contract_owner(source, member) != name:
+                    continue
+                for ancestor in self.world.chain(source)[1:]:
+                    for candidate in self.world.members(ancestor):
+                        if candidate.kind == 'operation' and candidate.name == member.name and len(candidate.arguments) == len(member.arguments):
+                            owner = self.world.contract_owner(ancestor, candidate)
+                            if owner in self.names:
+                                found.add((owner, candidate.kind, candidate.name, len(candidate.arguments)))
+        return found
+
     def emit(self):
         for name in self.world.contract_dictionary_fields:
             self.type(idl.Type(name))
+        self.shadowed = self.shadowed_members()
         bodies = []
         for name in self.names:
             members = []

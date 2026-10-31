@@ -3040,8 +3040,14 @@ and [<AllowNullLiteral>] HTMLCollection =
     abstract member length: uint32 with get
     /// <summary>HTMLCollection.item.</summary>
     abstract member item: index: uint32 -> Element
+
     /// <summary>HTMLCollection.namedItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.namedItem($1)")>]
+    abstract member __ranvier_namedItem: name: string -> Element
+#else
     abstract member namedItem: name: string -> Element
+#endif
 
 /// <summary>HTMLFormControlsCollection in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLFormControlsCollection =
@@ -5821,6 +5827,11 @@ module BrowserUnionAdapters =
 
         member this.getComposedRanges(options: GetComposedRangesOptions, [<System.ParamArray>] shadowRoots: ShadowRoot array) : (StaticRange) array =
             this.__ranvier_getComposedRanges (?options = Some (box options), shadowRoots = shadowRoots)
+
+
+    type HTMLCollection with
+        member this.namedItem(name: string) : Element =
+            this.__ranvier_namedItem (name)
 
 
     type HTMLFormControlsCollection with

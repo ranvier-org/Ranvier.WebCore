@@ -1,5 +1,6 @@
 import json
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
@@ -1905,6 +1906,49 @@ SVGStyleElement includes LinkStyle;
                 case = lines[index + 1].strip()
                 self.assertFalse(case.startswith('|') and '=' in case, line)
         self.assertIn('and NodeFilterResult =', lines)
+
+    def test_fable_adapters_are_not_shadowed_by_inherited_intrinsic_members(self):
+        # F# prefers an intrinsic member to an extension, so a Fable adapter extension on an interface is unreachable
+        # while an ancestor declares an intrinsic member of the same name.
+        fable, keep, stack = [], True, []
+        for line in (ROOT / 'gen' / 'Ranvier.Dom.fs').read_text(encoding='utf-8').splitlines():
+            directive = line.strip()
+            if directive == '#if FABLE_COMPILER':
+                stack.append(keep)
+            elif directive.startswith('#if '):
+                stack.append(keep)
+                keep = keep and directive != '#if !FABLE_COMPILER'
+            elif directive == '#else':
+                keep = stack[-1] and not keep
+            elif directive == '#endif':
+                keep = stack.pop()
+            elif keep:
+                fable.append(line)
+        bases, intrinsic, extensions, current = {}, {}, {}, None
+        for line in fable:
+            declared = re.match(r'(?:type|and) (?:\[<[^>]*>\] )*(\w+) =$', line)
+            extended = re.match(r'    type (\w+) with$', line)
+            if declared:
+                current = ('interface', declared.group(1))
+                bases.setdefault(current[1], [])
+            elif extended:
+                current = ('extension', extended.group(1))
+            elif current and current[0] == 'interface' and (match := re.match(r'    inherit (\w+)$', line)):
+                bases[current[1]].append(match.group(1))
+            elif current and current[0] == 'interface' and (match := re.match(r'    abstract member (\w+)', line)):
+                intrinsic.setdefault(current[1], set()).add(match.group(1))
+            elif current and current[0] == 'extension' and (match := re.match(r'        member this\.(\w+)', line)):
+                extensions.setdefault(current[1], set()).add(match.group(1))
+
+        def ancestors(name):
+            for base in bases.get(name, []):
+                yield base
+                yield from ancestors(base)
+
+        shadowed = sorted((owner, member, ancestor) for owner, members in extensions.items() for member in members
+                          for ancestor in ancestors(owner) if member in intrinsic.get(ancestor, set()))
+        self.assertEqual([], shadowed)
+        self.assertIn('namedItem', extensions['HTMLFormControlsCollection'])
 
 if __name__ == '__main__':
     unittest.main()
