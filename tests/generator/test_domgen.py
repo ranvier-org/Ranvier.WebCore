@@ -2488,6 +2488,8 @@ partial interface Element {
         self.assertIn('if (*field)', glue)
         self.assertIn('storeHandle<DOMStringMap>(*field, &result->offset);', glue)
         self.assertIn('if (value->offset) reinterpret_cast<DOMStringMap*>(value->offset)->deref();', glue)
+        # Fable: the dictionary arm of the result union is told apart from the string arm by a plain-object predicate.
+        self.assertIn('let private isRangeOffset (_: obj) : bool =', generator.interfaces())
         config['exclude'] = [name for name in config['exclude'] if name != 'Element.placeNullable']
         config['absentObjectMembers'] = ['RangeOffset.offset', 'NullableOffset.offset']
         generator = domgen.Generator(domgen.World(self.source, config))

@@ -6098,6 +6098,10 @@ module BrowserUnionAdapters =
     let private normalizeUSVString (_: string) : string =
         Fable.Core.Util.jsNative
 
+    [<Fable.Core.Emit("((v)=>{if(v==null||typeof v!=='object'||v.nodeType!==undefined)return false;try{globalThis.CSSStyleValue.prototype.toString.call(v);return false;}catch{return true;}})($0)")>]
+    let private isTimelineRangeOffset (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
     [<Fable.Core.Emit("((v)=>{if(v==null)return false;try{globalThis.CSSNumericValue.prototype.type.call(v);return true;}catch{return false;}})($0)")>]
     let private isCSSNumericValue (_: obj) : bool =
         Fable.Core.Util.jsNative
