@@ -1401,6 +1401,52 @@ RV_EXPORT int32_t rv_blob_read_bytes(RvBlob* blob, uint8_t* buffer, int64_t capa
  * Returns RV_ERR_WRONG_INTERFACE for an item that is a Blob and not a File. */
 RV_EXPORT int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** result);
 
+/* v52: "blob-urls" for rv_abi_has. URL.createObjectURL and URL.revokeObjectURL are the generated
+ * rv_dom_domurl_create_object_url and rv_dom_domurl_revoke_object_url, and FileReader is the generated
+ * rv_dom_file_reader_* family over an RvEventTarget. The document's blob: loads, such as an <img> source or a
+ * stylesheet, are served by the engine from its blob registry and never reach the host's resource handler. A URL
+ * stops loading once revoked, and once its document is replaced or its host destroyed. */
+enum {
+    RV_BLOB_READ_TEXT = 0,
+    RV_BLOB_READ_BYTES = 1,
+};
+/* Blob.text() (RV_BLOB_READ_TEXT: the bytes decoded as UTF-8 with replacement, a leading BOM removed, delivered as
+ * UTF-8) or Blob.arrayBuffer() and Blob.bytes() (RV_BLOB_READ_BYTES), read asynchronously by the engine's blob loader
+ * in the host's current document, also for a file-backed blob. The operation follows rv_image_decode's delivery,
+ * rv_resource_cancel and rv_resource_release: SUCCEEDED with the result available from rv_blob_read_result, or
+ * LOAD_FAILED with the DOMException name from rv_blob_read_error, such as "NotFoundError" for a missing file.
+ * width and height are 0. A new document or rv_host_destroy delivers INVALIDATED to a read in flight. */
+RV_EXPORT int32_t rv_blob_read(RvHost*, RvBlob* blob, int32_t mode, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* Reads the bytes of the blob a blob: URL refers to, as a native read of the URL in the host's current document; it is
+ * not fetch(). url is length bytes of UTF-8; a fragment is ignored. LOAD_FAILED for a revoked or unknown URL. Delivery
+ * follows rv_blob_read; rv_blob_read_type writes the blob's type. Returns RV_ERR_UNSUPPORTED for a URL that does not
+ * parse or whose scheme is not blob. */
+RV_EXPORT int32_t rv_blob_url_read(RvHost*, const uint8_t* url, int32_t length, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* Copies a SUCCEEDED read's result into buffer and writes its byte count to *length, until rv_resource_release.
+ * Capacity, NULL buffer and RV_ERR_BUFFER_TOO_SMALL follow rv_blob_read_bytes. RV_ERR_UNSUPPORTED for another
+ * operation or outcome. */
+RV_EXPORT int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
+/* The blob's type of a SUCCEEDED read, NUL-terminated UTF-8; capacity counts the NUL. */
+RV_EXPORT int32_t rv_blob_read_type(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
+/* The DOMException name of a LOAD_FAILED read, NUL-terminated; RV_ERR_UNSUPPORTED for another outcome. */
+RV_EXPORT int32_t rv_blob_read_error(uint64_t operation, char* buffer, int32_t capacity, int32_t* length);
+/* A new File backed by the file at path, which the app supplies and trusts: length bytes of UTF-8 naming an absolute
+ * path, or RV_ERR_UNSUPPORTED for a relative one. The file is not opened: name and type come from the path, and a file
+ * missing or deleted when read fails the read with "NotFoundError". rv_blob_read_bytes returns RV_ERR_UNSUPPORTED for
+ * it; read it with rv_blob_read, FileReader or an object URL. */
+RV_EXPORT int32_t rv_file_create_from_path(RvHost*, const uint8_t* path, int32_t length, RvBlob** result);
+
+enum {
+    RV_FILE_READER_RESULT_NULL = 0,
+    RV_FILE_READER_RESULT_STRING = 1,
+    RV_FILE_READER_RESULT_BYTES = 2,
+};
+/* FileReader.result: writes its kind, and copies a string as UTF-8 or an ArrayBuffer's bytes into buffer with their
+ * count in *length (0 for NULL). Capacity follows rv_blob_read_bytes. RV_ERR_WRONG_INTERFACE for another target. */
+RV_EXPORT int32_t rv_file_reader_result(RvEventTarget* reader, int32_t* kind, uint8_t* buffer, int64_t capacity, int64_t* length);
+/* FileReader.error: the DOMException name, NUL-terminated, or *length = -1 for a null error. */
+RV_EXPORT int32_t rv_file_reader_error(RvEventTarget* reader, char* buffer, int32_t capacity, int32_t* length);
+
 /* "text-segmentation" for rv_abi_has: graphemes, words, sentences and line-break opportunities of UTF-16 text,
  * with the engine's ICU. Graphemes and lines use WebKit's caret and line iterators (line-break normal; CSS loose,
  * strict and anywhere are out of scope); words and sentences use ICU's iterators for the locale. Every word,

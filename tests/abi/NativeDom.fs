@@ -582,6 +582,15 @@ let RV_DOM_NODE_FILTER_SHOW_DOCUMENT_FRAGMENT = 1024
 let RV_DOM_NODE_FILTER_SHOW_NOTATION = 2048
 
 [<Literal>]
+let RV_DOM_FILE_READER_EMPTY = 0
+
+[<Literal>]
+let RV_DOM_FILE_READER_LOADING = 1
+
+[<Literal>]
+let RV_DOM_FILE_READER_DONE = 2
+
+[<Literal>]
 let RV_DOM_ARRAY_BUFFER_VIEW_INT8 = 0
 
 [<Literal>]
@@ -10157,6 +10166,27 @@ extern int rv_dom_highlight_get_type(nativeint target, int& result)
 extern int rv_dom_highlight_set_type(nativeint target, int value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_file_reader_create(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_reader_get_ready_state(nativeint target, uint16& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_reader_read_as_array_buffer(nativeint target, nativeint blob)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_reader_read_as_binary_string(nativeint target, nativeint blob)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_reader_read_as_text(nativeint target, nativeint blob, byte[] encoding, int encoding_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_reader_read_as_data_url(nativeint target, nativeint blob)
+
+[<DllImport(Lib)>]
+extern int rv_dom_file_reader_abort(nativeint target)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
@@ -10269,6 +10299,12 @@ extern int rv_dom_domurl_parse(nativeint target, byte[] url, int url_length, byt
 
 [<DllImport(Lib)>]
 extern int rv_dom_domurl_can_parse(nativeint target, byte[] url, int url_length, byte[] ``base``, int base_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_create_object_url(nativeint target, nativeint blob, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_revoke_object_url(nativeint target, byte[] url, int url_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_style_property_map_read_only_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement& result)
