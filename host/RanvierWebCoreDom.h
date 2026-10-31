@@ -7443,8 +7443,9 @@ RV_EXPORT int32_t rv_dom_tree_walker_previous_node(RvTreeWalker* target, RvNode*
 RV_EXPORT int32_t rv_dom_tree_walker_next_node(RvTreeWalker* target, RvNode** result);
 /* Blob */
 
-/* Blob.constructor: target is the Document of the constructed object; blob_parts may be NULL for an absent optional
- * argument; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference */
+/* Blob.constructor: target is the Document of the constructed object; a string part of blob_parts is UTF-8, and
+ * invalid UTF-8 returns RV_ERR_NULL_ARGUMENT; blob_parts may be NULL for an absent optional argument; options
+ * defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference */
 RV_EXPORT int32_t rv_dom_blob_create(RvNode* target, const RvDomSequenceBufferSourceOrBlobOrUSVString* blob_parts, const RvDomBlobPropertyBag* options, RvBlob** result);
 /* Blob.size getter: readonly attribute unsigned long long size */
 RV_EXPORT int32_t rv_dom_blob_get_size(RvBlob* target, uint64_t* result);
@@ -7456,8 +7457,9 @@ RV_EXPORT int32_t rv_dom_blob_get_type(RvBlob* target, char* buffer, int32_t cap
 RV_EXPORT int32_t rv_dom_blob_slice(RvBlob* target, int64_t start, int64_t end, const uint8_t* content_type, int32_t content_type_length, RvBlob** result);
 /* File */
 
-/* File.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be
- * NULL for the IDL default; *result is a new reference */
+/* File.constructor: target is the Document of the constructed object; a string part of file_bits is UTF-8, and
+ * invalid UTF-8 returns RV_ERR_NULL_ARGUMENT; options defaults to {} in IDL; options may be NULL for the IDL default;
+ * *result is a new reference */
 RV_EXPORT int32_t rv_dom_file_create(RvNode* target, const RvDomSequenceBufferSourceOrBlobOrUSVString* file_bits, const uint8_t* file_name, int32_t file_name_length, const RvDomFilePropertyBag* options, RvBlob** result);
 /* File.name getter: readonly attribute DOMString name */
 RV_EXPORT int32_t rv_dom_file_get_name(RvBlob* target, char* buffer, int32_t capacity, int32_t* length);
