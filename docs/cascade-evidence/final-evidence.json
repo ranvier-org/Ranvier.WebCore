@@ -1,0 +1,419 @@
+{
+  "group": [
+    "C25 #45"
+  ],
+  "status": "green (private Windows x64 slim; not accepted)",
+  "native": "0.1.0-preview.46",
+  "abi": 54,
+  "features": [
+    "cascade-diagnostics",
+    "capability facility cascade-diagnostics"
+  ],
+  "members": [
+    "rv_host_inspect_cascade",
+    "RV_DIAGNOSTIC_CASCADE",
+    "RV_RULE_ORIGIN_PRESENTATIONAL_HINT",
+    "RV_CASCADE_* fields"
+  ],
+  "engine": "Style::ElementRuleCollector (ResolvingStyle) MatchResult and Style::PropertyCascade selection, from RanvierInspectGlue (compiled into WebCore); layer names, conditions and positions from the active CSSStyleSheet rule trees; no source patch",
+  "glueInspectorSymbols": [],
+  "sourceHeadOfBatch": "9754d9961befd6d22731a0fc6d6bb58f6911c218",
+  "batchRunHead": "9754d99",
+  "stackedOn": "H08 acf26e3 > #142 3e6639d > #144 f0eb376 > G14 0d36787 (parent C:/wk/native-coords/artifacts/coords-candidate-5)",
+  "red": {
+    "file": "red-native42.log",
+    "native42": "the probe fails on its first absent binding, rv_host_inspect_cascade"
+  },
+  "green": {
+    "cascadeDiagnosticsAssertions": 5287,
+    "fixtureCases": 35,
+    "tieBreaks": [
+      "conditions",
+      "importance",
+      "importance across layers",
+      "importance across origins",
+      "inheritance",
+      "inline style",
+      "layer order",
+      "logical pair",
+      "origin",
+      "presentational hint",
+      "shorthand expansion",
+      "source order",
+      "specificity",
+      "variables"
+    ],
+    "repeats": 30,
+    "repeatsDistinct": [
+      "cascade diagnostics PASS: 5287 assertions, 35 conformance cases with Chromium computed values, 114 snapshots held past destroy, 1 run(s)"
+    ],
+    "probes": 61,
+    "allExitZero": true,
+    "rawAssertions": 89337,
+    "baselineRawAssertions": 84050,
+    "baselineProbesUnchanged": true,
+    "baselineProbesPresent": true,
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "form_submission",
+        "exitCode": 0,
+        "assertions": 418
+      },
+      {
+        "name": "text_segmentation",
+        "exitCode": 0,
+        "assertions": 812
+      },
+      {
+        "name": "crypto_random",
+        "exitCode": 0,
+        "assertions": 275
+      },
+      {
+        "name": "visual_viewport",
+        "exitCode": 0,
+        "assertions": 987
+      },
+      {
+        "name": "screen_metrics",
+        "exitCode": 0,
+        "assertions": 222
+      },
+      {
+        "name": "custom_highlights",
+        "exitCode": 0,
+        "assertions": 378
+      },
+      {
+        "name": "abi_layouts",
+        "exitCode": 0,
+        "assertions": 15
+      },
+      {
+        "name": "event_details",
+        "exitCode": 0,
+        "assertions": 391
+      },
+      {
+        "name": "aria_relations",
+        "exitCode": 0,
+        "assertions": 1210
+      },
+      {
+        "name": "inspector_diagnostics",
+        "exitCode": 0,
+        "assertions": 929
+      },
+      {
+        "name": "string_nul",
+        "exitCode": 0,
+        "assertions": 192
+      },
+      {
+        "name": "native_types",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "blob_urls",
+        "exitCode": 0,
+        "assertions": 697
+      },
+      {
+        "name": "coordinate_spaces",
+        "exitCode": 0,
+        "assertions": 6803
+      },
+      {
+        "name": "cascade_diagnostics",
+        "exitCode": 0,
+        "assertions": 5287
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null
+      }
+    ],
+    "teardownCases": 104,
+    "cascadeTeardownCases": 2,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "cases": 35,
+    "allMatchFixture": true,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "e4aab67f1f2acd0d5f42893dbb3465dd02b18e7ae2d58ee757110ea73c0b4eae"
+    ],
+    "unsupported": {
+      "cascade": "no web API lists the declarations contributing to a property, their origin, layer or position, or the winner"
+    }
+  },
+  "measured": {
+    "winner": "RV_CASCADE_WINNER comes from PropertyCascade's selected value; in every case the winner's value equals the native computed value (or, for inherit, unset and var(), the deeper winner does) and the Chromium computed value equals the fixture",
+    "noSideEffects": "computed values and element rects of every case are unchanged across all queries; a class change reverted before the next update leaves no transition after a cascade query in between (0), and starts one after a computed-style read in between (control, >= 1), with a steps(2, jump-start) transition",
+    "pending": "a pending class change, a pending <style> insertion and a pending @property registration are read as the DOM holds them; the result equals the query after the update",
+    "stability": "entries, including sheet, rule and declaration indices, are equal across two queries and after an unrelated insertion and attribute change",
+    "sharedBlocks": "rules with identical declaration blocks (WebKit shares the StyleProperties) keep their own selector and position",
+    "teardown": "snapshots stay readable after disabling and rv_host_destroy; every snapshot is released"
+  },
+  "declaredLimits": [
+    "a winning revert or revert-layer is reported as that keyword (no rollback trace)",
+    ":visited declarations, @starting-style rules and animations are absent",
+    "RV_CASCADE_VALUE is the declared value; var() resolution is rv_element_computed_style's",
+    "container conditions use the last layout, logical pairs the last computed writing mode"
+  ],
+  "files": {
+    "absence_c25.py": "16fbf36b601f32fe0d801e4eb361bff86312f940ae73b9e987fd14d94a6276dc",
+    "allocation-absence.json": "b036e42659a12eaf72b55f63e97aa9052ec14b8710c0730730519cc6a4ecbc1a",
+    "batch-green.json": "ea782b4c0f600c2581e8a31b59548fd11d5b9243c7cd44acbd61f9dc2d0f7e9f",
+    "build_native46_candidate.py": "118ec7b0ef43219445ade99fd8df48df960a0e2510792fa5998a2982463dd507",
+    "cascade-diagnostics-probe.log": "e973b12f755e27dbfb2cafe3b8cd4a3cf905099d7fedffe29b0ee1500e3fac26",
+    "cascade-diagnostics-repeat30.txt": "663555765659fbd404fb43cc39da1c67e31a2521bda4a9898c839bf6a40068df",
+    "make_native46_evidence.py": "3152001595e1bcbbb54c330fb50f1512092e33c99fe34e465333168ff002cb83",
+    "oracle-repeat30.txt": "fbbdc391f178828d833bbbd1cefb7eef2b0099f177a159813dea232fe3706ee7",
+    "red-native42.log": "6a265e1052f2ab33ded814efeb0ce1dc73022b64c304dbcbf69ff9a84c08c8cc",
+    "repeat30.sh": "bbbebb00c722ecf1409a129239d6e28df5a1c170dae3c195a02ad1c7e7089412",
+    "run_native46_full_batch.py": "378050fe0b0680748fbc49c667930bc924f084d7c2bdb1be4b5486e1637ebfef",
+    "runtime-receipt.json": "05f44425879622810e0c323b0a05023a658ca159e39a5ea7fa7d0b600e86cb1a",
+    "source-patches.json": "08d939201e8a1d0edb4787913343481f19c64f9cfa4d9e000de028b5e5f9c5e3",
+    "teardown-probes.json": "5483c939d925c8cc0f30c1cba7ddaad63258da92a314e64be68ea35fcde86432"
+  }
+}
