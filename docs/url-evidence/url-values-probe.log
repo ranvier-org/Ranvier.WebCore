@@ -1,0 +1,4 @@
+url_values: 3522 assertions, 6 qualified differences
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

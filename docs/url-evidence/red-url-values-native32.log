@@ -1,0 +1,12 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-url\tests\abi\url_values.py", line 468, in <module>
+    verify(arguments.native_directory, arguments.record_differences)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-url\tests\abi\url_values.py", line 156, in verify
+    expect(bind('rv_abi_version', [], integer)() == ABI, f'ABI version {ABI}')
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-url\tests\abi\url_values.py", line 110, in expect
+    raise AssertionError(label)
+AssertionError: ABI version 41
+EXIT_CODE=1
