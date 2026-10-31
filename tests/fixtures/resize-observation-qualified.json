@@ -1,0 +1,13 @@
+{
+  "comment": "Differences between Chromium 156 and the native engine that tests/abi/resize_observation.py records instead of failing. Approved by root for #55 (G10).",
+  "differences": {
+    "devicePixel.statuses": "The engine has no device-pixel-content-box (webkit.org/b/219005, Ranvier.WebCore#146): rv_observer_observe_box returns RV_ERR_UNSUPPORTED and every entry has hasDevicePixel 0; Chromium observes it and reports devicePixelContentBoxSize.",
+    "devicePixel.log": "As devicePixel.statuses: the unsupported observations deliver nothing natively.",
+    "devicePixel.entries": "As devicePixel.statuses: no native entries.",
+    "observerOrder.log": "WebKit delivers observers in the order of their first observe; Chromium, as the specification, in the order of their construction. Every other scenario observes in construction order.",
+    "observerOrder.entries": "As observerOrder.log.",
+    "contentBox.entries.z.rect": "zoom: 2: WebKit reports contentRect's x and y, the padding offset, in zoomed pixels (4, 20); Chromium in the element's CSS pixels (2, 10). Its width, height and box sizes agree.",
+    "borderBox.entries.z.rect": "As contentBox.entries.z.rect.",
+    "depth.log": "The loop error reaches the window's error event at the same point, but the native ErrorEvent message is the sanitized 'Script error.'; Chromium's is 'ResizeObserver loop completed with undelivered notifications.'."
+  }
+}
