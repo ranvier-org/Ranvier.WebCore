@@ -116,7 +116,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     if ctype == "int32_t*":
         # A string getter's length is passed as a one-element array, as readString passes it.
         return ("int[]", "") if name == "length" else ("int&", "")
-    if ctype in ("const RvScreenMetrics*", "const RvMediaPreferences*", "const RvPointerSample*"):
+    if ctype in ("const RvScreenMetrics*", "const RvMediaPreferences*", "const RvPointerSample*",
+                 "const RvMediaVideoConfiguration*", "const RvMediaAudioConfiguration*", "const RvSnapshotOptions*"):
         return "nativeint", ""
     if ctype == "const RvCanvas2DSettings*":
         return "nativeint", ""

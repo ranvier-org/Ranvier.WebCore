@@ -2,6 +2,7 @@
 #include "RanvierWebCoreAbi.h"
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
+#include "RanvierImageEncoding.h"
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
 #include "RanvierTransferGlue.h"
@@ -1445,6 +1446,9 @@ static_assert(sizeof(RvResizeEntry) == 96 && offsetof(RvResizeEntry, target) == 
 static_assert(sizeof(void*) != 8 || (sizeof(RvNotificationOptions) == 64 && offsetof(RvNotificationOptions, reserved) == 28
     && offsetof(RvNotificationOptions, body) == 32 && offsetof(RvNotificationOptions, icon) == 56));
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
+static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoConfiguration, bitrate) == 32 && offsetof(RvMediaVideoConfiguration, transfer_function) == 60);
+static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
+static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
 int32_t rv_abi_version(void) { return 56; }
 
@@ -1516,6 +1520,10 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "notifications"))
         return 1;
+    if (!std::strcmp(feature, "media-capabilities"))
+        return 1;
+    if (!std::strcmp(feature, "snapshot-options"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1546,6 +1554,16 @@ int32_t rv_abi_has(const char* feature)
         return 1;
 #endif
     return 0;
+}
+
+// Whether rv_host_snapshot accepts RV_SNAPSHOT_DISPLAY_P3.
+static constexpr bool snapshotDisplayP3()
+{
+#if ENABLE(DESTINATION_COLOR_SPACE_DISPLAY_P3)
+    return true;
+#else
+    return false;
+#endif
 }
 
 #include "RanvierCapabilities.inc"
@@ -4392,6 +4410,35 @@ int32_t rv_blob_url_read(RvHost* host, const uint8_t* url, int32_t url_length, R
     return ranvier_blob_url_read(reinterpret_cast<RvNode*>(&host->document()), url, url_length, completion, context, operation);
 }
 
+int32_t rv_media_decoding_info(RvHost* host, int32_t type, const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_media_capabilities_query(reinterpret_cast<RvNode*>(&host->document()), 0, type, video, audio, completion, context, operation);
+}
+
+int32_t rv_media_encoding_info(RvHost* host, int32_t type, const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_media_capabilities_query(reinterpret_cast<RvNode*>(&host->document()), 1, type, video, audio, completion, context, operation);
+}
+
+int32_t rv_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient)
+{
+    return ranvier_media_capabilities_info(operation, supported, smooth, power_efficient);
+}
+
 int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
 {
     return ranvier_blob_read_result(operation, buffer, capacity, length);
@@ -5339,6 +5386,122 @@ int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32
         return RV_ERR_BUFFER_TOO_SMALL;
     std::memcpy(rgba, pixels->bytes().data(), required);
     return RV_OK;
+}
+
+// Paints the subject's area, or the viewport's for a null subject, at scale into a new buffer in colorSpace.
+// rect is the painted area in CSS pixels: the element's paint bounds or the viewport, intersected with the crop.
+static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const RvSnapshotOptions& options, float scale,
+    const DestinationColorSpace& colorSpace, int32_t& status)
+{
+    status = RV_ERR_PAINT_FAILED;
+    host.document().updateLayoutIgnorePendingStylesheets();
+    RefPtr view = host.frame().view();
+    if (!view)
+        return nullptr;
+    view->updateLayoutAndStyleIfNeededRecursive();
+    IntRect rect { { }, host.size };
+    if (subject) {
+        CheckedPtr renderer = subject->renderer();
+        if (!renderer)
+            return nullptr;
+        LayoutRect elementRect;
+        rect = snappedIntRect(renderer->subtreePaintRootRect(elementRect, RenderObject::RespectTransforms::Yes));
+    }
+    if (options.crop) {
+        auto area = enclosingIntRect(FloatRect { static_cast<float>(options.x), static_cast<float>(options.y),
+            static_cast<float>(options.width), static_cast<float>(options.height) });
+        area.moveBy(rect.location());
+        rect.intersect(area);
+    }
+    if (rect.isEmpty()) {
+        status = RV_ERR_UNSUPPORTED;
+        return nullptr;
+    }
+    auto buffer = ImageBuffer::create(FloatSize { rect.size() }, RenderingMode::Unaccelerated, RenderingPurpose::Snapshot, scale,
+        colorSpace, PixelFormat::BGRA8);
+    if (!buffer)
+        return nullptr;
+    buffer->context().translate(-rect.x(), -rect.y());
+    host.inFrame = true;
+    auto behavior = view->paintBehavior();
+    if (subject) {
+        // As rv_element_snapshot paints it: the subtree alone, over a transparent base background.
+        auto background = view->baseBackgroundColor();
+        view->setBaseBackgroundColor(Color::transparentBlack);
+        view->paintContentsForSnapshot(buffer->context(), rect, subject, LocalFrameView::IncludeSelection, LocalFrameView::DocumentCoordinates);
+        view->setBaseBackgroundColor(background);
+    } else {
+        // As rv_host_paint_rgba's CPU path paints the viewport.
+        view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
+        view->paint(buffer->context(), rect);
+    }
+    view->setPaintBehavior(behavior);
+    host.inFrame = false;
+    if (host.updateWanted)
+        host.requestFrame();
+    buffer->flushDrawingContext();
+    status = RV_OK;
+    return buffer;
+}
+
+int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation)
+{
+    if (!host || !options || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || options->size != static_cast<int32_t>(sizeof(RvSnapshotOptions)))
+        return RV_ERR_UNSUPPORTED;
+    float scale = options->scale == 0 ? host->deviceScale : static_cast<float>(options->scale);
+    if (!(scale >= 0.25f && scale <= 8))
+        return RV_ERR_UNSUPPORTED;
+    if (options->crop != 0 && options->crop != 1)
+        return RV_ERR_UNSUPPORTED;
+    if (options->crop && !(std::isfinite(options->x) && std::isfinite(options->y) && options->width > 0 && options->height > 0
+        && std::isfinite(options->width) && std::isfinite(options->height)))
+        return RV_ERR_UNSUPPORTED;
+    const DestinationColorSpace* colorSpace = nullptr;
+    if (options->color_space == RV_SNAPSHOT_SRGB)
+        colorSpace = &DestinationColorSpace::SRGB();
+#if ENABLE(DESTINATION_COLOR_SPACE_DISPLAY_P3)
+    else if (options->color_space == RV_SNAPSHOT_DISPLAY_P3)
+        colorSpace = &DestinationColorSpace::DisplayP3();
+#endif
+    if (!colorSpace || !Ranvier::Internal::imageEncodingSupported(options->encoding))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<Node> subject;
+    if (element) {
+        subject = node(element);
+        if (&subject->document() != &host->document())
+            return RV_ERR_WRONG_HOST;
+    }
+    int32_t status = RV_OK;
+    auto buffer = captureSnapshot(*host, subject.get(), *options, scale, *colorSpace, status);
+    if (!buffer)
+        return status;
+    Vector<uint8_t> bytes;
+    IntSize pixelSize;
+    if (options->encoding == RV_IMAGE_ENCODING_RGBA8) {
+        PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, *colorSpace };
+        auto pixels = buffer->getPixelBuffer(format, IntRect { { }, buffer->truncatedLogicalSize() });
+        if (!pixels)
+            return RV_ERR_PAINT_FAILED;
+        pixelSize = pixels->size();
+        bytes.append(pixels->bytes());
+    } else {
+        pixelSize = buffer->backendSize();
+        bytes = Ranvier::Internal::encodeImage(WTF::move(buffer), options->encoding, options->quality);
+        if (bytes.isEmpty())
+            return RV_ERR_PAINT_FAILED;
+    }
+    return ranvier_resource_settled_bytes(reinterpret_cast<RvNode*>(&host->document()), bytes.span().data(),
+        static_cast<int64_t>(bytes.size()), pixelSize.width(), pixelSize.height(), completion, context, operation);
+}
+
+int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    return ranvier_resource_bytes(operation, buffer, capacity, length);
 }
 
 int32_t rv_host_set_popup_handler(RvHost* host, RvPopupCallback callback, void* context)

@@ -46,3 +46,15 @@ reported separately from private Windows source/runtime proof.
 
 S06 view selection is a separately scoped host operation in the same producer
 cohort. Capability discovery never invokes it or changes SVG state.
+
+B06 adds three facilities. "media-capabilities" is implemented when rv_abi_has reports the
+rv_media_decoding_info family. "media-decoding-provider" and "media-encoding-provider" are implemented
+and available when a media engine configuration provider answers MediaCapabilities queries. No current
+flavor has one (the engine's providers are Cocoa and GStreamer only), so every valid query answers
+unsupported, not smooth and not power efficient. Neither facility enables playback, a codec or a setting.
+
+R12 adds "snapshot-options" (implemented when rv_abi_has reports rv_host_snapshot), "snapshot-display-p3"
+(implemented and available when the engine compiles the DisplayP3 destination color space, which slim does not)
+and "image-encoding-png", "image-encoding-jpeg" and "image-encoding-webp" (the engine's encoders for
+MIMETypeRegistry::isSupportedImageMIMETypeForEncoding). A snapshot never substitutes another color space or
+encoding for one the flavor lacks.

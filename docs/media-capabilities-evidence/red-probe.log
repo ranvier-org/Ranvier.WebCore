@@ -1,0 +1,14 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-media-caps\tests\abi\media_capabilities.py", line 300, in <module>
+    main()
+    ~~~~^^
+  File "C:\wk\native-media-caps\tests\abi\media_capabilities.py", line 292, in main
+    report = verify(args.native_directory)
+  File "C:\wk\native-media-caps\tests\abi\media_capabilities.py", line 80, in verify
+    expect(p.bind('rv_abi_has', I, [ctypes.c_char_p])(b'media-capabilities') == 1, 'media-capabilities advertised')
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-media-caps\tests\abi\svg_paint_probe.py", line 50, in expect
+    raise AssertionError(label)
+AssertionError: media-capabilities advertised
+exit 1

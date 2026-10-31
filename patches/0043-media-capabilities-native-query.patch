@@ -1,0 +1,91 @@
+diff --git a/Source/WebCore/Modules/mediacapabilities/MediaCapabilities.cpp b/Source/WebCore/Modules/mediacapabilities/MediaCapabilities.cpp
+index 0bbfe6f..9737bbe 100644
+--- a/Source/WebCore/Modules/mediacapabilities/MediaCapabilities.cpp
++++ b/Source/WebCore/Modules/mediacapabilities/MediaCapabilities.cpp
+@@ -36,6 +36,7 @@
+ #include "Logging.h"
+ #include "MediaCapabilitiesDecodingInfo.h"
+ #include "MediaCapabilitiesEncodingInfo.h"
++#include "MediaCapabilitiesNativeQuery.h"
+ #include "MediaDecodingConfiguration.h"
+ #include "MediaEncodingConfiguration.h"
+ #include "NavigatorBase.h"
+@@ -339,4 +340,26 @@ void MediaCapabilities::encodingInfo(ScriptExecutionContext& context, MediaEncod
+     });
+ }
+ 
++void queryMediaDecodingInfo(Document& document, MediaDecodingConfiguration&& configuration, Function<void(ExceptionOr<PlatformMediaCapabilitiesDecodingInfo>&&)>&& completion)
++{
++    if (!isValidMediaConfiguration(configuration)) {
++        completion(Exception { ExceptionCode::TypeError });
++        return;
++    }
++    gatherDecodingInfo(document, toPlatform(WTF::move(configuration)), [completion = WTF::move(completion)](PlatformMediaCapabilitiesDecodingInfo&& info) mutable {
++        completion(WTF::move(info));
++    });
++}
++
++void queryMediaEncodingInfo(Document& document, MediaEncodingConfiguration&& configuration, Function<void(ExceptionOr<PlatformMediaCapabilitiesEncodingInfo>&&)>&& completion)
++{
++    if (!isValidMediaConfiguration(configuration)) {
++        completion(Exception { ExceptionCode::TypeError });
++        return;
++    }
++    gatherEncodingInfo(document, toPlatform(WTF::move(configuration)), [completion = WTF::move(completion)](PlatformMediaCapabilitiesEncodingInfo&& info) mutable {
++        completion(WTF::move(info));
++    });
++}
++
+ }
+diff --git a/Source/WebCore/Modules/mediacapabilities/MediaCapabilitiesNativeQuery.h b/Source/WebCore/Modules/mediacapabilities/MediaCapabilitiesNativeQuery.h
+new file mode 100644
+index 0000000..35e72ec
+--- /dev/null
++++ b/Source/WebCore/Modules/mediacapabilities/MediaCapabilitiesNativeQuery.h
+@@ -0,0 +1,46 @@
++/*
++ * Copyright (C) 2026 Ranvier contributors. All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
++ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS
++ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
++ * THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#pragma once
++
++#include "ExceptionOr.h"
++#include "PlatformMediaCapabilitiesDecodingInfo.h"
++#include "PlatformMediaCapabilitiesEncodingInfo.h"
++#include <wtf/Function.h>
++
++namespace WebCore {
++
++class Document;
++struct MediaDecodingConfiguration;
++struct MediaEncodingConfiguration;
++
++// MediaCapabilities.decodingInfo() and encodingInfo() for an embedder, without JavaScript or a promise.
++// An invalid configuration completes with TypeError before the call returns. A valid one completes with the
++// answer of the document's media engine configuration factories, from their callback, which can run before
++// the call returns.
++WEBCORE_EXPORT void queryMediaDecodingInfo(Document&, MediaDecodingConfiguration&&, Function<void(ExceptionOr<PlatformMediaCapabilitiesDecodingInfo>&&)>&&);
++WEBCORE_EXPORT void queryMediaEncodingInfo(Document&, MediaEncodingConfiguration&&, Function<void(ExceptionOr<PlatformMediaCapabilitiesEncodingInfo>&&)>&&);
++
++} // namespace WebCore

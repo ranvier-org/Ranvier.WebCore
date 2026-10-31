@@ -1739,6 +1739,127 @@ RV_EXPORT int32_t rv_blob_read_error(uint64_t operation, char* buffer, int32_t c
  * it; read it with rv_blob_read, FileReader or an object URL. */
 RV_EXPORT int32_t rv_file_create_from_path(RvHost*, const uint8_t* path, int32_t path_length, RvBlob** result);
 
+/* "media-capabilities" for rv_abi_has: MediaCapabilities.decodingInfo() and encodingInfo(), without JavaScript or a
+ * promise. The answers come from the engine's media engine configuration providers, which the capability facilities
+ * "media-decoding-provider" and "media-encoding-provider" report; with neither, every valid configuration is
+ * unsupported. A query enables no playback, codec, capture or setting. */
+enum {
+    RV_MEDIA_DECODING_FILE = 0,
+    RV_MEDIA_DECODING_MEDIA_SOURCE = 1,
+    RV_MEDIA_DECODING_WEBRTC = 2,
+};
+enum {
+    RV_MEDIA_ENCODING_RECORD = 0,
+    RV_MEDIA_ENCODING_WEBRTC = 1,
+};
+enum {
+    RV_MEDIA_HDR_SMPTE_ST2086 = 0,
+    RV_MEDIA_HDR_SMPTE_ST2094_10 = 1,
+    RV_MEDIA_HDR_SMPTE_ST2094_40 = 2,
+};
+enum {
+    RV_MEDIA_GAMUT_SRGB = 0,
+    RV_MEDIA_GAMUT_P3 = 1,
+    RV_MEDIA_GAMUT_REC2020 = 2,
+};
+enum {
+    RV_MEDIA_TRANSFER_SRGB = 0,
+    RV_MEDIA_TRANSFER_PQ = 1,
+    RV_MEDIA_TRANSFER_HLG = 2,
+};
+/* VideoConfiguration. size is sizeof(RvMediaVideoConfiguration). content_type is content_type_length bytes of UTF-8,
+ * and may be NULL when the length is 0. alpha_channel is 0 or 1, and it and the enum members are -1 when absent. */
+typedef struct RvMediaVideoConfiguration {
+    int32_t size;
+    const uint8_t* content_type;
+    int32_t content_type_length;
+    uint32_t width;
+    uint32_t height;
+    uint64_t bitrate;
+    double framerate;
+    int32_t alpha_channel;
+    int32_t hdr_metadata_type;
+    int32_t color_gamut;
+    int32_t transfer_function;
+} RvMediaVideoConfiguration;
+/* AudioConfiguration. size is sizeof(RvMediaAudioConfiguration). channels is channels_length bytes of UTF-8, or absent
+ * when NULL. bitrate and samplerate are absent when negative; samplerate is at most UINT32_MAX. spatial_rendering is
+ * 0 or 1, or -1 when absent. */
+typedef struct RvMediaAudioConfiguration {
+    int32_t size;
+    const uint8_t* content_type;
+    int32_t content_type_length;
+    const uint8_t* channels;
+    int32_t channels_length;
+    int64_t bitrate;
+    int64_t samplerate;
+    int32_t spatial_rendering;
+} RvMediaAudioConfiguration;
+/* Queries a MediaDecodingConfiguration of type RV_MEDIA_DECODING_* in the host's current document; video and audio
+ * are absent when NULL. A configuration the engine rejects, including one with neither, returns RV_ERR_DOM_EXCEPTION
+ * with "TypeError" in rv_last_exception and leaves *operation untouched. A type, size, length, optional member or
+ * UTF-8 input out of range returns RV_ERR_UNSUPPORTED. Otherwise writes an operation token: the operation follows
+ * rv_image_decode's delivery, rv_resource_cancel and rv_resource_release, and is SUCCEEDED, with width and height 0,
+ * once the engine answers, never before the call returns. An answer the providers give inside the call is reached then
+ * and delivered on a later rv_run_loop_cycle; rv_resource_cancel, rv_resource_release, a new document and rv_host_destroy
+ * keep it, as they keep any reached outcome. A new document or rv_host_destroy delivers INVALIDATED to a query whose
+ * provider has not answered. */
+RV_EXPORT int32_t rv_media_decoding_info(RvHost*, int32_t type, const RvMediaVideoConfiguration* video,
+    const RvMediaAudioConfiguration* audio, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* rv_media_decoding_info for a MediaEncodingConfiguration of type RV_MEDIA_ENCODING_*. */
+RV_EXPORT int32_t rv_media_encoding_info(RvHost*, int32_t type, const RvMediaVideoConfiguration* video,
+    const RvMediaAudioConfiguration* audio, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* The MediaCapabilitiesInfo of a SUCCEEDED query, each member 0 or 1, until rv_resource_release. RV_ERR_UNSUPPORTED
+ * for another operation or outcome, with the outputs untouched. */
+RV_EXPORT int32_t rv_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient);
+
+/* Image encodings, shared by snapshots and canvas export. RGBA8 is unpremultiplied RGBA8 rows, width * 4 bytes each,
+ * in the image's color space. PNG ignores quality. JPEG and WEBP take quality from 0 to 1; NaN or a value outside
+ * [0, 1] selects the engine encoder's default, as HTMLCanvasElement.toBlob does, and WEBP at exactly 1 is lossless.
+ * The facilities "image-encoding-png", "image-encoding-jpeg" and "image-encoding-webp" report the engine's encoders. */
+enum {
+    RV_IMAGE_ENCODING_RGBA8 = 0,
+    RV_IMAGE_ENCODING_PNG = 1,
+    RV_IMAGE_ENCODING_JPEG = 2,
+    RV_IMAGE_ENCODING_WEBP = 3,
+};
+/* "snapshot-options" for rv_abi_has: snapshots of the viewport or an element with scale, crop, color space and encoding,
+ * delivered as an operation. */
+enum {
+    RV_SNAPSHOT_SRGB = 0,
+    /* Only where the "snapshot-display-p3" facility is implemented; RV_ERR_UNSUPPORTED elsewhere. */
+    RV_SNAPSHOT_DISPLAY_P3 = 1,
+};
+/* size is sizeof(RvSnapshotOptions). scale is device pixels per CSS pixel, from 0.25 to 8, or 0 for the host's device
+ * scale. crop 1 paints only x, y, width, height, in CSS pixels from the subject's top left, expanded to whole CSS
+ * pixels and intersected with the subject; width and height are positive. encoding is RV_IMAGE_ENCODING_*. */
+typedef struct RvSnapshotOptions {
+    int32_t size;
+    int32_t color_space;
+    double scale;
+    int32_t crop;
+    int32_t encoding;
+    double x;
+    double y;
+    double width;
+    double height;
+    double quality;
+} RvSnapshotOptions;
+/* Paints element, which must be in the host's current document, as rv_element_snapshot does (its subtree alone over a
+ * transparent background), or the viewport as rv_host_paint_rgba's CPU path does when element is NULL, then reads or
+ * encodes the image, all during the call, and writes an operation token. The operation follows rv_image_decode's
+ * delivery, rv_resource_cancel and rv_resource_release: it is SUCCEEDED with the image's size in pixels as width and
+ * height, delivered on a later rv_run_loop_cycle and never inside the call, and a new document or rv_host_destroy keeps
+ * it. RV_ERR_UNSUPPORTED for an option out of range, an encoding or color space this flavor lacks (never a substitute)
+ * or a crop outside the subject; RV_ERR_WRONG_HOST for an element of another document; RV_ERR_PAINT_FAILED for an
+ * element without a box. */
+RV_EXPORT int32_t rv_host_snapshot(RvHost*, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation);
+/* Copies a delivered snapshot's bytes and writes their count to *length, until rv_resource_release. A capacity below
+ * the count returns RV_ERR_BUFFER_TOO_SMALL with *length written and buffer untouched; capacity 0 with a NULL buffer
+ * queries the count. RV_ERR_UNSUPPORTED before delivery and for another operation. */
+RV_EXPORT int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length);
+
 enum {
     RV_FILE_READER_RESULT_NULL = 0,
     RV_FILE_READER_RESULT_STRING = 1,
