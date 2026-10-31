@@ -75,7 +75,7 @@ def verify(native_directory):
         element_options = {op: p.bind('rv_dom_element_' + op + '_1', I, [P, ctypes.POINTER(ScrollToOptions)]) for op in ['scroll', 'scroll_to', 'scroll_by']}
         host_position = p.bind('rv_host_scroll_position', I, [P, ctypes.POINTER(I), ctypes.POINTER(I)])
         cycle = p.bind('rv_run_loop_cycle', I, [I])
-        add = p.bind('rv_event_target_add_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])
+        add = p.bind('rv_event_target_add_listener', P, [P, Utf8, I, CALLBACK, P])
         remove = p.bind('rv_listener_remove', I, [P])
         event_type = p.bind('rv_event_type', I, [P, P, I, ctypes.POINTER(I)])
         target_release = p.bind('rv_event_target_release', None, [P])

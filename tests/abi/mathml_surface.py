@@ -154,7 +154,7 @@ def verify(native_directory):
         p.call('rv_dom_dom_string_map_delete_named_property', [p.pointer, Utf8], dataset, b'kind')
         focus['datasetDeleted'] = p.attribute(n['math'], 'data-kind')
         p.call('rv_dom_math_ml_element_focus', [p.pointer, p.pointer], n['focusable'], None)
-        keyboard = p.bind('rv_host_key', p.integer, [p.pointer, p.integer, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, p.integer, p.integer])
+        keyboard = p.bind('rv_host_key', p.integer, [p.pointer, p.integer, ctypes.c_char_p, ctypes.c_char_p, Utf8, p.integer, p.integer])
         p.expect(keyboard(p.host, 0, b'Tab', b'Tab', b'', 0, 0) == 1, 'Tab handled by native focus traversal')
         focus['afterTab'] = active()
         state['focus'] = focus

@@ -82,14 +82,15 @@ Document* documentOf(RvNode* handle)
 
 }
 
-RvEvent* ranvier_event_construct(RvNode* documentHandle, int32_t kind, const char* type, const RvEventInit* init)
+RvEvent* ranvier_event_construct(RvNode* documentHandle, int32_t kind, const uint8_t* type, int32_t typeLength, const RvEventInit* init)
 {
-    if (!isMainThread() || !type || !init || init->size != static_cast<int32_t>(sizeof(RvEventInit)))
+    if (!isMainThread() || typeLength < 0 || (!type && typeLength) || !init || init->size != static_cast<int32_t>(sizeof(RvEventInit)))
         return nullptr;
     auto* document = documentOf(documentHandle);
-    if (!document || !validUtf8(type) || !validUtf8(init->key) || !validUtf8(init->code) || !validUtf8(init->customDetailJson))
+    auto typeName = typeLength ? String::fromUTF8(std::span<const uint8_t> { type, static_cast<size_t>(typeLength) }) : emptyString();
+    if (!document || typeName.isNull() || !validUtf8(init->key) || !validUtf8(init->code) || !validUtf8(init->customDetailJson))
         return nullptr;
-    auto name = AtomString::fromUTF8(type);
+    auto name = AtomString { typeName };
     RefPtr<Event> result;
     switch (kind) {
     case RV_CONSTRUCT_EVENT: {

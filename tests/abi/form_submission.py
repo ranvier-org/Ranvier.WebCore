@@ -180,7 +180,7 @@ def lifecycle(p):
     """Window capture listeners for the unload events; returns the list they append to and their callbacks."""
     fired, callbacks = [], []
     window = p.bind('rv_host_window_event_target', P, [P])(p.host)
-    add = p.bind('rv_event_target_add_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])
+    add = p.bind('rv_event_target_add_listener', P, [P, Utf8, I, CALLBACK, P])
     for kind in ['beforeunload', 'pagehide', 'unload']:
         callback = CALLBACK(lambda context, event, kind=kind: fired.append(kind) or 0)
         callbacks.append(callback)

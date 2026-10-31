@@ -92,7 +92,7 @@ let main _ =
     let mutable wrongThreadStatus = 0
 
     let worker =
-        Thread(fun () -> wrongThreadStatus <- rv_node_set_text_content (text.Handle, "from another thread"))
+        Thread(fun () -> wrongThreadStatus <- rv_node_set_text_content (text.Handle, utf8 "from another thread", utf8Length "from another thread"))
 
     worker.Start()
     worker.Join()
@@ -310,7 +310,7 @@ let main _ =
             let removeStatus = rv_listener_remove guarded.Handle
 
             let dispatchStatus =
-                rv_node_dispatch_event (button.Handle, "guarded", 1, 1, &prevented)
+                rv_node_dispatch_event (button.Handle, utf8 "guarded", utf8Length "guarded", 1, 1, &prevented)
 
             offThread.Value <- (removeStatus, dispatchStatus))
 

@@ -9,6 +9,9 @@ import sys
 import threading
 import zlib
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def png(width, height, corrupt=False):
     def chunk(kind, data):
@@ -40,18 +43,16 @@ def verify(directory, evidence_json=None):
             raise AssertionError(message)
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     has = bind('rv_abi_has', integer, [ctypes.c_char_p])
     expect(has(b'image-decode') == 1, 'image-decode feature')
     create = bind('rv_host_create', pointer, [integer, integer])
     destroy = bind('rv_host_destroy', None, [pointer])
-    load_html = bind('rv_host_load_html', integer, [pointer, ctypes.c_char_p])
-    load_svg = bind('rv_host_load_svg', integer, [pointer, ctypes.c_char_p])
-    by_id = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])
-    set_attribute = bind('rv_element_set_attribute', integer, [pointer, ctypes.c_char_p, ctypes.c_char_p])
+    load_html = bind('rv_host_load_html', integer, [pointer, Utf8])
+    load_svg = bind('rv_host_load_svg', integer, [pointer, Utf8])
+    by_id = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
+    set_attribute = bind('rv_element_set_attribute', integer, [pointer, ctypes.c_char_p, Utf8])
     release_node = bind('rv_node_release', None, [pointer])
     remove_node = bind('rv_node_remove', integer, [pointer])
     ref_count = bind('rv_node_ref_count', integer, [pointer])

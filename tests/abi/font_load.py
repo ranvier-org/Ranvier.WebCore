@@ -7,6 +7,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(directory, webkit_source, evidence_json=None):
     directory = Path(directory).resolve()
@@ -27,9 +30,7 @@ def verify(directory, webkit_source, evidence_json=None):
             raise AssertionError(message)
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     font = (Path(webkit_source) / 'Tools/TestWebKitAPI/Resources/cocoa/Ahem.ttf').read_bytes()
     expect(hashlib.sha256(font).hexdigest() == '63d2abd0041c3e3b4b52ad8d382353b53c51c6785e76ce56ed9dacad2d2e31c4', 'Pinned Ahem fixture')
@@ -37,8 +38,8 @@ def verify(directory, webkit_source, evidence_json=None):
     expect(has(b'font-load') == 1, 'font-load feature')
     create = bind('rv_host_create', pointer, [integer, integer])
     destroy = bind('rv_host_destroy', None, [pointer])
-    load_html = bind('rv_host_load_html', integer, [pointer, ctypes.c_char_p])
-    by_id = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])
+    load_html = bind('rv_host_load_html', integer, [pointer, Utf8])
+    by_id = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
     release_node = bind('rv_node_release', None, [pointer])
     rect = bind('rv_element_rect', integer, [pointer, ctypes.POINTER(double), ctypes.POINTER(double), ctypes.POINTER(double), ctypes.POINTER(double)])
     update = bind('rv_host_update', integer, [pointer])

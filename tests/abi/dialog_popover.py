@@ -81,7 +81,7 @@ class Runner:
         return {'status': 'native:' + str(status), 'value': None}
 
     def node(self, ident):
-        result = self.p.bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p])(self.p.host, ident.encode())
+        result = self.p.bind('rv_document_get_element_by_id', P, [P, Utf8])(self.p.host, ident.encode())
         self.p.expect(bool(result), 'element ' + ident)
         self.keep.append(result)
         return result
@@ -91,7 +91,7 @@ class Runner:
         self.document = self.p.bind('rv_host_document', P, [P])(self.p.host)
         self.p.expect(bool(self.document), 'document')
         self.p.call('rv_host_set_focused', [P, I], self.p.host, 1)
-        add = self.p.bind('rv_node_add_event_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])
+        add = self.p.bind('rv_node_add_event_listener', P, [P, Utf8, I, CALLBACK, P])
         for kind in types:
             callback = CALLBACK(self.record)
             self.keep.append(callback)
@@ -279,7 +279,7 @@ class Runner:
         if op == 'click':
             return self.outcome(p.bind('rv_dom_html_element_click', I, [P])(target))
         if op == 'press':
-            key = p.bind('rv_host_key', I, [P, I, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, I, I])
+            key = p.bind('rv_host_key', I, [P, I, ctypes.c_char_p, ctypes.c_char_p, Utf8, I, I])
             name = s['key'].encode()
             down, up = key(p.host, 0, name, name, None, 0, 0), key(p.host, 1, name, name, None, 0, 0)
             return {'status': 'ok' if down >= 0 and up >= 0 else 'native:' + str((down, up)), 'value': None}

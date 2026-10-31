@@ -82,10 +82,10 @@ class SvgProbe:
         self.expect(self.text('rv_last_exception', [self.integer], 0) == expected, name + ': exception ' + expected)
 
     def load(self, markup, standalone=True):
-        self.call('rv_host_load_svg' if standalone else 'rv_host_load_html', [self.pointer, ctypes.c_char_p], self.host, markup.encode() if isinstance(markup, str) else markup)
+        self.call('rv_host_load_svg' if standalone else 'rv_host_load_html', [self.pointer, Utf8], self.host, markup.encode() if isinstance(markup, str) else markup)
 
     def node(self, identifier):
-        result = self.bind('rv_document_get_element_by_id', self.pointer, [self.pointer, ctypes.c_char_p])(self.host, identifier.encode())
+        result = self.bind('rv_document_get_element_by_id', self.pointer, [self.pointer, Utf8])(self.host, identifier.encode())
         self.expect(bool(result), 'real SVG node ' + identifier)
         self.retained.append(('rv_node_release', result))
         return result

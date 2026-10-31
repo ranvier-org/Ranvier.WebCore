@@ -10,6 +10,9 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+// A string literal's UTF-8 bytes and byte count, for a length-delimited string input.
+#define RV_TEXT(literal) reinterpret_cast<const uint8_t*>(literal), static_cast<int32_t>(sizeof(literal) - 1)
 using Microsoft::WRL::ComPtr;
 static void require(bool value, const char* reason) { if (!value) throw std::runtime_error(reason); }
 static void hr(HRESULT result, const char* reason) { require(SUCCEEDED(result), reason); }
@@ -50,7 +53,7 @@ int main(int argc, char** argv) try {
     auto swapchain = static_cast<IDXGISwapChain1*>(SDL_GetPointerProperty(properties, "SDL.renderer.d3d11.swap_chain", nullptr));
     require(device && swapchain, "SDL D3D11 properties");
     auto host = rv_host_create(64, 64); require(host, "host creation");
-    require(rv_host_load_html(host, "<style>html,body{margin:0;width:100%;height:100%;background:red}div{position:absolute;left:0;top:0;width:50%;height:50%;background:#00ff00;transform:translateZ(0)}</style><div id='green'></div>") == RV_OK, "load content");
+    require(rv_host_load_html(host, RV_TEXT("<style>html,body{margin:0;width:100%;height:100%;background:red}div{position:absolute;left:0;top:0;width:50%;height:50%;background:#00ff00;transform:translateZ(0)}</style><div id='green'></div>")) == RV_OK, "load content");
     RvGpuFrame* frame = reinterpret_cast<RvGpuFrame*>(1);
     require(rv_host_acquire_d3d11_frame(host, nullptr, &frame) == RV_ERR_NULL_ARGUMENT && !frame, "failed acquire output clearing");
     require(rv_host_set_accelerated_compositing(host, RV_COMPOSITING_ALWAYS) == RV_OK, "enable compositor");

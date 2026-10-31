@@ -249,7 +249,7 @@ def verify(native_directory):
         expect(affine(parsed_matrix) == (2, 0, 0, 3, 10, 20), 'parsed CSS transform exposes structured list')
         markup = b'<style>#paint {position:absolute;left:0;top:0;width:10px;height:10px;transform-origin:0 0}</style><div id="paint"></div>'
         call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
-        painted = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])(host, b'paint')
+        painted = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])(host, b'paint')
         expect(bool(painted), 'find rendering fixture element', True)
         retained.append(('rv_node_release', painted))
         style_map = handle('rv_dom_html_element_get_attribute_style_map', [pointer], [painted], 'rv_dom_style_property_map_read_only_release')

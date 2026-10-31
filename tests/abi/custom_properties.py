@@ -140,7 +140,7 @@ def verify(native_directory):
             <div id="registered-priority"></div><div id="plain-priority"></div>
             <div id="registered-cascade"></div><div id="plain-cascade"></div>'''
         call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
-        find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
+        find = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
 
         def node(name):
             result = find(host, name)
