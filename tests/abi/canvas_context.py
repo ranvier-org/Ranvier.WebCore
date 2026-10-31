@@ -124,6 +124,7 @@ def verify(directory, evidence_json=None):
         expect(again == ctx, 'getContext returns the same context')
         ignored = context(c, requested=settings(willReadFrequently=1))
         expect(ignored == ctx and read_attributes(ctx)['willReadFrequently'] == 0, 'later settings are ignored')
+        expect(context(c, requested=settings(alpha=0), status=UNSUPPORTED) is None, 'unsupported settings fail on an existing context')
         back = P()
         expect(get_canvas(ctx, ctypes.byref(back)) == OK and back.value == c, 'context.canvas is the canvas')
         node_release(back.value)

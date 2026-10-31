@@ -1846,9 +1846,10 @@ typedef struct RvCanvas2DSettings {
  * one 2D context: the first call creates it with settings (NULL for the defaults), and every later call returns the same
  * object and ignores settings. The context keeps its canvas alive. RV_OK with *context NULL means the canvas already has
  * a context of another type.
- * Every other type returns RV_ERR_UNSUPPORTED: this ABI creates 2D contexts only. A 2D request the engine cannot honour
- * also returns RV_ERR_UNSUPPORTED: alpha 0, display-p3, float16, a flag other than 0 or 1, or size below
- * sizeof(RvCanvas2DSettings). An unsupported call leaves *context NULL and the canvas without a context.
+ * Every other type returns RV_ERR_UNSUPPORTED: this ABI creates 2D contexts only. Settings the engine cannot honour
+ * also return RV_ERR_UNSUPPORTED, whether or not the canvas has a context: alpha 0, display-p3, float16, a flag other
+ * than 0 or 1, or size below sizeof(RvCanvas2DSettings). An unsupported call leaves *context NULL and the canvas as it
+ * was.
  * Returns RV_ERR_WRONG_INTERFACE for a node that is not a <canvas>. */
 RV_EXPORT int32_t rv_canvas_get_context(RvNode* canvas, int32_t type, const RvCanvas2DSettings* settings, RvCanvasRenderingContext2D** context);
 /* CanvasRenderingContext2D.getContextAttributes: the settings the context applies. Returns RV_ERR_UNSUPPORTED, with

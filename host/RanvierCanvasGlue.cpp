@@ -45,6 +45,9 @@ int32_t ranvier_canvas_get_context(RvNode* handle, int32_t type, const RvCanvas2
         return RV_ERR_WRONG_INTERFACE;
     if (type != RV_CANVAS_CONTEXT_2D)
         return RV_ERR_UNSUPPORTED;
+    auto settings = engineSettings(requested);
+    if (!settings)
+        return RV_ERR_UNSUPPORTED;
     if (auto* existing = canvas->renderingContext()) {
         if (existing->isPlaceholder())
             return RV_ERR_UNSUPPORTED;
@@ -54,9 +57,6 @@ int32_t ranvier_canvas_get_context(RvNode* handle, int32_t type, const RvCanvas2
         }
         return RV_OK;
     }
-    auto settings = engineSettings(requested);
-    if (!settings)
-        return RV_ERR_UNSUPPORTED;
     auto* created = canvas->getContext2d("2d"_s, WTF::move(*settings));
     if (!created)
         return RV_ERR_UNSUPPORTED;
