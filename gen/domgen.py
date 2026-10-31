@@ -229,7 +229,9 @@ class World:
         self.interfaces = {}  # name -> Interface (the non-partial definition)
         self.partials = {}  # name -> [Interface]
         self.includes = {}  # target -> [(mixin, attrs)]
-        self.typedefs = {}
+        self.typedefs = {}  # name -> the last definition read; typedef() selects the definition a reference resolves to
+        self.file_typedefs = {}  # (file, name) -> the definition in that file
+        self.typedef_files = {}  # name -> [file], each file that defines the typedef
         self.enums = {}  # name -> (values, attrs, file)
         self.dictionaries = {}  # name -> idl.Dictionary, with its partials' members
         self.callbacks = set()
@@ -258,7 +260,7 @@ class World:
                     self.interfaces[interface.name] = interface
             for target, mixin, attrs in document.includes:
                 self.includes.setdefault(target, []).append((mixin, attrs, relative))
-            self.typedefs.update(document.typedefs)
+            self.add_typedefs(relative, document.typedefs)
             for name, (values, attrs) in document.enums.items():
                 self.enums[name] = (values, attrs, relative)
             for name, dictionary in document.dictionaries.items():
@@ -278,7 +280,7 @@ class World:
                 if name in self.dictionaries:
                     raise SystemExit(f"{relative}: dictionary {name} already exists in WebKit's IDL")
                 self.dictionaries[name] = dictionary
-            self.typedefs.update(document.typedefs)
+            self.add_typedefs(pathlib.PurePosixPath(relative).name, document.typedefs)
         # customConstructors replaces a [Custom] IDL constructor with the signature its custom binding implements.
         for name, custom in config.get("customConstructors", {}).items():
             interface = self.interfaces[name]
@@ -428,12 +430,34 @@ class World:
         result.attrs = attrs
         return result
 
+    def add_typedefs(self, file, typedefs):
+        for name, definition in typedefs.items():
+            self.typedefs[name] = definition
+            self.file_typedefs[(file, name)] = definition
+            self.typedef_files.setdefault(name, []).append(file)
+
+    def typedef(self, t: idl.Type) -> idl.Type:
+        """The definition a reference to typedef t.name resolves to, as WebKit's bindings generator resolves it.
+
+        A file that defines the typedef resolves its own references to that definition. A reference from any other
+        file resolves to the one shared definition, and fails the run when the files define the typedef differently.
+        """
+        local = self.file_typedefs.get((t.file, t.name))
+        if local is not None:
+            return local
+        files = self.typedef_files[t.name]
+        if len({repr(self.file_typedefs[(file, t.name)]) for file in files}) > 1:
+            raise SystemExit(f"typedef {t.name} is defined differently in {', '.join(files)}; "
+                             f"{t.file or 'a type outside the IDL files'} references it without a definition of its own")
+        return self.typedefs[t.name]
+
     def resolve(self, t: idl.Type) -> idl.Type:
         flatten = False
         while t.name in self.typedefs:
             flatten |= t.name in self.config.get('flattenUnionTypedefs', [])
-            target = self.typedefs[t.name]
-            t = idl.Type(target.name, t.nullable or target.nullable, target.subtypes, {**target.attrs, **t.attrs})
+            target = self.typedef(t)
+            t = idl.Type(target.name, t.nullable or target.nullable, target.subtypes, {**target.attrs, **t.attrs},
+                         target.file)
         if flatten:
             if t.name != 'union':
                 raise Unsupported('configured union flattening requires a union typedef')
@@ -510,7 +534,7 @@ class World:
     def map(self, t: idl.Type, nested=False) -> Mapped:
         if t.name in self.config.get('byteSpanTypes', []) and t.name in self.typedefs:
             # A byte-span typedef, such as BinaryData, maps to bytes before its union resolves.
-            if t.nullable or self.typedefs[t.name].nullable:
+            if t.nullable or self.typedef(t).nullable:
                 raise Unsupported(f'nullable byte span {t.name}')
             if not nested:
                 raise Unsupported(f'byte span {t.name} outside a union or sequence input')
