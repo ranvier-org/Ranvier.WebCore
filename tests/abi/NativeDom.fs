@@ -817,6 +817,17 @@ type RvDomDOMPointInit =
     val mutable z: float
     val mutable w: float
 
+/// <summary>The IDL dictionary CompositionEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomCompositionEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable detail: int
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable data: string
+
 /// <summary>The IDL dictionary SubmitEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSubmitEventInit =
@@ -858,6 +869,117 @@ type RvDomCommandEventInit =
     val mutable source: nativeint
     [<MarshalAs(UnmanagedType.LPUTF8Str)>]
     val mutable command: string
+
+/// <summary>The IDL dictionary ErrorEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomErrorEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable message: string
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable filename: string
+    val mutable lineno: uint32
+    val mutable colno: uint32
+
+/// <summary>The IDL dictionary ProgressEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomProgressEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable length_computable: int
+    val mutable loaded: float
+    val mutable total: float
+
+/// <summary>The IDL dictionary AnimationEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomAnimationEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable animation_name: string
+    val mutable elapsed_time: float
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable pseudo_element: string
+
+/// <summary>The IDL dictionary TransitionEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomTransitionEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable property_name: string
+    val mutable elapsed_time: float
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable pseudo_element: string
+
+/// <summary>The IDL dictionary ContentVisibilityAutoStateChangeEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomContentVisibilityAutoStateChangeEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable skipped: int
+
+/// <summary>The IDL dictionary AnimationPlaybackEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomAnimationPlaybackEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable current_time: nativeint
+    val mutable timeline_time: nativeint
+
+/// <summary>The IDL dictionary PageTransitionEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomPageTransitionEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable persisted: int
+
+/// <summary>The IDL dictionary HashChangeEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomHashChangeEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable old_url: string
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable new_url: string
+
+/// <summary>The IDL dictionary MediaQueryListEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomMediaQueryListEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
+    val mutable media: string
+    val mutable matches: int
+
+/// <summary>The IDL dictionary PopStateEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomPopStateEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable has_ua_visual_transition: int
 
 /// <summary>The IDL dictionary DOMMatrix2DInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1388,6 +1510,20 @@ type RvDomSequencePointerEvent =
     val mutable items: nativeint
 
 [<Literal>]
+let RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_DOUBLE_OR_CSS_NUMERIC_VALUE_NULLABLE_CSS_NUMERIC_VALUE = 2
+
+/// <summary>ABI transport for DoubleOrCSSNumericValue; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionDoubleOrCSSNumericValueNullable =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
+    val mutable arm1: nativeint
+
+[<Literal>]
 let RV_DOM_UNION_BUFFER_SOURCE_OR_BLOB_OR_USV_STRING_BUFFER_SOURCE = 1
 
 [<Literal>]
@@ -1652,6 +1788,9 @@ extern void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVStr
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_double_or_css_numeric_value_nullable_release(RvDomUnionDoubleOrCSSNumericValueNullable& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionBufferSourceOrBlobOrUSVString& value)
@@ -2099,6 +2238,9 @@ extern int rv_dom_dom_matrix_read_only_get_interface_name(nativeint target, byte
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_transform_component_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_event_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
@@ -7921,6 +8063,9 @@ extern int rv_dom_input_event_get_is_composing(nativeint target, int& result)
 extern int rv_dom_input_event_get_target_ranges(nativeint target, RvDomSequenceStaticRange& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_composition_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomCompositionEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_composition_event_get_data(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
@@ -7955,6 +8100,108 @@ extern int rv_dom_command_event_get_source(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_command_event_get_command(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_error_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomErrorEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_error_event_get_message(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_error_event_get_filename(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_error_event_get_lineno(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_error_event_get_colno(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_progress_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomProgressEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_progress_event_get_length_computable(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_progress_event_get_loaded(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_progress_event_get_total(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomAnimationEventInit[] animation_event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_event_get_animation_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_event_get_elapsed_time(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_animation_event_get_pseudo_element(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomTransitionEventInit[] transition_event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_event_get_property_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_event_get_elapsed_time(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_transition_event_get_pseudo_element(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_content_visibility_auto_state_change_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomContentVisibilityAutoStateChangeEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_content_visibility_auto_state_change_event_get_skipped(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_playback_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomAnimationPlaybackEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_playback_event_get_current_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_playback_event_get_timeline_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_page_transition_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomPageTransitionEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_page_transition_event_get_persisted(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_hash_change_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomHashChangeEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_hash_change_event_get_old_url(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_hash_change_event_get_new_url(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_media_query_list_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomMediaQueryListEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_media_query_list_event_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_media_query_list_event_get_matches(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_pop_state_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomPopStateEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_pop_state_event_get_has_ua_visual_transition(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_before_unload_event_get_return_value(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_before_unload_event_set_return_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_graphics_element_get_transform(nativeint target, nativeint& result)

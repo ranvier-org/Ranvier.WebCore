@@ -667,6 +667,33 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                     failwith "ToggleEvent.newState changed after destroy"
 
                 rv_event_release held.Value
+        | "error event" ->
+            let mutable init = RvDomErrorEventInit()
+            init.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomErrorEventInit>())
+            init.message <- "boom"
+            init.lineno <- 3u
+            let name = Text.Encoding.UTF8.GetBytes "error"
+
+            rv_dom_error_event_create (document, name, name.Length, [| init |], &held.contents)
+            |> check "ErrorEvent"
+
+            fun () ->
+                let buffer = Array.zeroCreate<byte> 32
+                let length = [| 0 |]
+
+                rv_dom_error_event_get_message (held.Value, buffer, buffer.Length, length)
+                |> check "ErrorEvent.message after destroy"
+
+                if Text.Encoding.UTF8.GetString(buffer, 0, length[0]) <> "boom" then
+                    failwith "ErrorEvent.message changed after destroy"
+
+                rv_dom_event_get_interface_name (held.Value, buffer, buffer.Length, length)
+                |> check "Event interface name after destroy"
+
+                if Text.Encoding.UTF8.GetString(buffer, 0, length[0]) <> "ErrorEvent" then
+                    failwith "ErrorEvent interface name changed after destroy"
+
+                rv_event_release held.Value
         | "caret position" ->
             rv_dom_node_set_text_content (span, "AAAA") |> check "caret text"
             rv_dom_document_caret_position_from_point (document, 2.0, 2.0, null, &held.contents)
@@ -819,6 +846,7 @@ let run (outDir: string) =
                     "submit event"
                     "open modal dialog"
                     "toggle event"
+                    "error event"
                     "blob slice"
                     "caret position"
                     "url values"
