@@ -5100,6 +5100,16 @@ and [<AllowNullLiteral>] VisualViewport =
     /// <summary>VisualViewport.scale.</summary>
     abstract member scale: float with get
 
+/// <summary>Highlight in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Highlight =
+    /// <summary>Highlight.priority.</summary>
+    abstract member priority: int with get, set
+    /// <summary>Highlight.type.</summary>
+    abstract member ``type``: HighlightType with get, set
+
+/// <summary>HighlightRegistry in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HighlightRegistry = interface end
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -5748,6 +5758,12 @@ and [<DomStringEnum; RequireQualifiedAccess>] SlotAssignmentMode =
 and [<DomStringEnum; RequireQualifiedAccess>] VisibilityState =
     | [<CompiledName("hidden")>] Hidden
     | [<CompiledName("visible")>] Visible
+
+/// <summary>HighlightType in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] HighlightType =
+    | [<CompiledName("highlight")>] Highlight
+    | [<CompiledName("spelling-error")>] SpellingError
+    | [<CompiledName("grammar-error")>] GrammarError
 
 /// <summary>ScrollBehavior in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] ScrollBehavior =

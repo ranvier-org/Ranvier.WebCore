@@ -1,0 +1,8 @@
+custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps
+  highlight.iterationLive: native null chromium ["r1", "s1", "r4"]
+  paint.redReplaced: native "kwkwBRBRYGYGYGYw" chromium "kwkwBRBRBRBGYGYw"
+  paint.redSetAgain: native "kwkwBRBRYGYGYGYw" chromium "kwkwBRBRBRBGYGYw"
+  registry.iterationLive: native null chromium ["a", "b", "d"]
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

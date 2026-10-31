@@ -15,6 +15,14 @@ def union_arm_name(mapped):
     return mapped.interface or mapped.enum or mapped.label or mapped.kind
 
 
+def fsharp_field(ctype):
+    """The F# type of a transport field: a pointer is a nativeint, a C scalar its F# scalar."""
+    scalar = {'int32_t': 'int', 'uint32_t': 'uint32', 'int16_t': 'int16', 'uint16_t': 'uint16',
+              'int8_t': 'sbyte', 'uint8_t': 'byte', 'int64_t': 'int64', 'uint64_t': 'uint64',
+              'double': 'float', 'float': 'float32'}
+    return 'nativeint' if ctype.endswith('*') else scalar.get(ctype, ctype)
+
+
 class ComplexGeneratorMixin:
     def complex_default(self, mapped, value):
         cpp = self.transport_cpp(mapped)
@@ -478,16 +486,12 @@ class ComplexGeneratorMixin:
             if mapped.kind == 'sequence':
                 lines += ['    val mutable count: int', '    val mutable items: nativeint']
             elif mapped.kind == 'pair':
-                lines += [f'    val mutable key: {self.transport_ctype(mapped.subtypes[0])}',
-                          f'    val mutable value: {self.transport_ctype(mapped.subtypes[1])}']
+                lines += [f'    val mutable key: {fsharp_field(self.transport_ctype(mapped.subtypes[0]))}',
+                          f'    val mutable value: {fsharp_field(self.transport_ctype(mapped.subtypes[1]))}']
             else:
                 lines += ['    val mutable tag: int']
                 for index, child in enumerate(mapped.subtypes):
-                    ctype = self.transport_ctype(child)
-                    scalar = {'int32_t': 'int', 'uint32_t': 'uint32', 'int16_t': 'int16', 'uint16_t': 'uint16',
-                              'int8_t': 'sbyte', 'uint8_t': 'byte', 'int64_t': 'int64', 'uint64_t': 'uint64',
-                              'double': 'float', 'float': 'float32'}
-                    lines += [f'    val mutable arm{index}: {"nativeint" if ctype.endswith("*") else scalar.get(ctype, ctype)}']
+                    lines += [f'    val mutable arm{index}: {fsharp_field(self.transport_ctype(child))}']
         for name in self.complex_used:
             lines += ['', '[<DllImport(Lib)>]', f'extern void rv_dom_{token(name)}_release({name}& value)']
         return lines

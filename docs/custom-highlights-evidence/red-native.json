@@ -1,0 +1,23 @@
+{
+ "runtime": "C:/wk/native-segment/artifacts/native35-frozen-2",
+ "sha256": {
+  "WebCore.dll": "5a2d53c5203a8a7c083b20bd8e361227fe14d2e5a5066c205fe48841d9ad172d",
+  "RanvierWebCoreHost.dll": "11fd3eaf6c3744bab34d7f1eb68f44dbe1c2ff8a16e508a18498c60f23826f77"
+ },
+ "hostExportsMatchingHighlight": [],
+ "webcoreStrings": {
+  "HighlightRegistry": 5,
+  "spelling-error": 4,
+  "::highlight": 1,
+  "highlightsFromPoint": 0
+ },
+ "source": {
+  "Highlight.idl": "constructor(AbstractRange...), setlike<AbstractRange>, priority, type; no EnabledBySetting/Conditional",
+  "HighlightRegistry.idl": "maplike<[AtomString] DOMString, Highlight>; no highlightsFromPoint",
+  "DOMCSSNamespace.idl": "[CallWith=CurrentDocument] readonly attribute HighlightRegistry highlights",
+  "settings": "no HighlightAPIEnabled preference in pinned UnifiedWebPreferences.yaml (shipped, ungated)",
+  "unit": "UnifiedSource-Modules-6 (Highlight.cpp, HighlightRegistry.cpp) compiled in build-win-slim; MarkedText.cpp paints document.highlightRegistryIfExists() ungated",
+  "cppOrder": "Highlight::addToSetLike moves an existing range to the end (JS Set keeps position); Highlight ctor keeps duplicates; registry order = highlightNames()"
+ },
+ "generator": "gen/idl.py skips setlike/maplike members; no binding exists"
+}

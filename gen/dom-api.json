@@ -1552,6 +1552,14 @@
     {
       "name": "VisualViewport",
       "base": "EventTarget"
+    },
+    {
+      "name": "Highlight",
+      "base": null
+    },
+    {
+      "name": "HighlightRegistry",
+      "base": null
     }
   ],
   "contractInterfaces": [
@@ -4117,6 +4125,24 @@
       "mixin": false,
       "contractOnly": false,
       "source": "page/VisualViewport.idl"
+    },
+    {
+      "name": "Highlight",
+      "idlName": "Highlight",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "Modules/highlight/Highlight.idl"
+    },
+    {
+      "name": "HighlightRegistry",
+      "idlName": "HighlightRegistry",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "Modules/highlight/HighlightRegistry.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -142468,6 +142494,280 @@
       }
     },
     {
+      "interface": "Highlight",
+      "member": "constructor",
+      "contractOwner": "Highlight",
+      "kind": "constructor",
+      "function": "rv_dom_highlight_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceAbstractRange*",
+          "name": "initial_ranges"
+        },
+        {
+          "ctype": "RvHighlight**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "initialRanges",
+          "idlType": "AbstractRange",
+          "idl": {
+            "name": "AbstractRange",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": true,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceAbstractRange",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "AbstractRange sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "AbstractRange",
+                "root": "AbstractRange",
+                "class": "AbstractRange",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "Highlight",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "Highlight",
+        "root": "Highlight",
+        "class": "Highlight",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:Highlight"
+    },
+    {
+      "interface": "Highlight",
+      "member": "priority",
+      "contractOwner": "Highlight",
+      "kind": "getter",
+      "function": "rv_dom_highlight_get_priority",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Highlight",
+      "member": "priority",
+      "contractOwner": "Highlight",
+      "kind": "setter",
+      "function": "rv_dom_highlight_set_priority",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Highlight",
+      "member": "type",
+      "contractOwner": "Highlight",
+      "kind": "getter",
+      "function": "rv_dom_highlight_get_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "HighlightType",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "HighlightType",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Highlight",
+      "member": "type",
+      "contractOwner": "Highlight",
+      "kind": "setter",
+      "function": "rv_dom_highlight_set_type",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "HighlightType",
+          "idl": {
+            "name": "HighlightType",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "HighlightType",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -142644,6 +142944,47 @@
       "receiver": "Document",
       "namespace": "CSS",
       "feature": "dom-css-supports",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMCSSNamespace",
+      "member": "highlights",
+      "contractOwner": "CSS",
+      "kind": "namespace_operation",
+      "function": "rv_dom_css_get_highlights",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvHighlightRegistry**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "HighlightRegistry",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "HighlightRegistry",
+        "root": "HighlightRegistry",
+        "class": "HighlightRegistry",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "namespace": "CSS",
+      "feature": "dom-custom-highlights",
       "binding": "facade",
       "stringInputs": "utf8-lengths"
     },
@@ -145301,6 +145642,787 @@
       "sourceKind": "iterable",
       "contextReceiver": "Document",
       "contextParameter": "context"
+    },
+    {
+      "interface": "Highlight",
+      "member": "size",
+      "contractOwner": "Highlight",
+      "kind": "operation",
+      "function": "rv_dom_highlight_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Highlight",
+      "member": "has",
+      "contractOwner": "Highlight",
+      "kind": "operation",
+      "function": "rv_dom_highlight_has",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAbstractRange*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "AbstractRange",
+          "idl": {
+            "name": "AbstractRange",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "AbstractRange",
+            "root": "AbstractRange",
+            "class": "AbstractRange",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Highlight",
+      "member": "values",
+      "contractOwner": "Highlight",
+      "kind": "operation",
+      "function": "rv_dom_highlight_values",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceAbstractRange*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "AbstractRange",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceAbstractRange",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "AbstractRange sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "AbstractRange",
+            "root": "AbstractRange",
+            "class": "AbstractRange",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "Highlight",
+      "member": "add",
+      "contractOwner": "Highlight",
+      "kind": "operation",
+      "function": "rv_dom_highlight_add",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAbstractRange*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "AbstractRange",
+          "idl": {
+            "name": "AbstractRange",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "AbstractRange",
+            "root": "AbstractRange",
+            "class": "AbstractRange",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Highlight",
+      "member": "delete",
+      "contractOwner": "Highlight",
+      "kind": "operation",
+      "function": "rv_dom_highlight_delete",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAbstractRange*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "AbstractRange",
+          "idl": {
+            "name": "AbstractRange",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "AbstractRange",
+            "root": "AbstractRange",
+            "class": "AbstractRange",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Highlight",
+      "member": "clear",
+      "contractOwner": "Highlight",
+      "kind": "operation",
+      "function": "rv_dom_highlight_clear",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlight*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HighlightRegistry",
+      "member": "size",
+      "contractOwner": "HighlightRegistry",
+      "kind": "operation",
+      "function": "rv_dom_highlight_registry_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlightRegistry*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "HighlightRegistry",
+      "member": "has",
+      "contractOwner": "HighlightRegistry",
+      "kind": "operation",
+      "function": "rv_dom_highlight_registry_has",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlightRegistry*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "key"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "key_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "key",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "HighlightRegistry",
+      "member": "get",
+      "contractOwner": "HighlightRegistry",
+      "kind": "operation",
+      "function": "rv_dom_highlight_registry_get",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlightRegistry*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "key"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "key_length"
+        },
+        {
+          "ctype": "RvHighlight**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "key",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "Highlight",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "Highlight",
+        "root": "Highlight",
+        "class": "Highlight",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "HighlightRegistry",
+      "member": "entries",
+      "contractOwner": "HighlightRegistry",
+      "kind": "operation",
+      "function": "rv_dom_highlight_registry_entries",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlightRegistry*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequencePairDOMStringAndHighlight*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "pair",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "Highlight",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequencePairDOMStringAndHighlight",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "PairDOMStringAndHighlight sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "pair",
+            "ctype": "RvDomPairDOMStringAndHighlight",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DOMStringAndHighlight entry",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "Highlight",
+                "root": "Highlight",
+                "class": "Highlight",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "HighlightRegistry",
+      "member": "set",
+      "contractOwner": "HighlightRegistry",
+      "kind": "operation",
+      "function": "rv_dom_highlight_registry_set",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlightRegistry*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "key"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "key_length"
+        },
+        {
+          "ctype": "RvHighlight*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "key",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "value",
+          "idlType": "Highlight",
+          "idl": {
+            "name": "Highlight",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Highlight",
+            "root": "Highlight",
+            "class": "Highlight",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "HighlightRegistry",
+      "member": "delete",
+      "contractOwner": "HighlightRegistry",
+      "kind": "operation",
+      "function": "rv_dom_highlight_registry_delete",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlightRegistry*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "key"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "key_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "key",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "HighlightRegistry",
+      "member": "clear",
+      "contractOwner": "HighlightRegistry",
+      "kind": "operation",
+      "function": "rv_dom_highlight_registry_clear",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHighlightRegistry*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
     }
   ],
   "enumerations": {
@@ -145381,6 +146503,15 @@
       ],
       {},
       "fileapi/EndingType.idl"
+    ],
+    "HighlightType": [
+      [
+        "highlight",
+        "spelling-error",
+        "grammar-error"
+      ],
+      {},
+      "Modules/highlight/Highlight.idl"
     ],
     "OrientationType": [
       [
@@ -147619,6 +148750,34 @@
     {
       "mapping": {
         "kind": "sequence",
+        "ctype": "RvDomSequenceAbstractRange",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "AbstractRange sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "AbstractRange",
+            "root": "AbstractRange",
+            "class": "AbstractRange",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_abstract_range_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
         "ctype": "RvDomSequenceCSSStyleValue",
         "interface": null,
         "root": null,
@@ -147911,6 +149070,101 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "pair",
+        "ctype": "RvDomPairDOMStringAndHighlight",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DOMStringAndHighlight entry",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Highlight",
+            "root": "Highlight",
+            "class": "Highlight",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_pair_dom_string_and_highlight_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequencePairDOMStringAndHighlight",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "PairDOMStringAndHighlight sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "pair",
+            "ctype": "RvDomPairDOMStringAndHighlight",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DOMStringAndHighlight entry",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "Highlight",
+                "root": "Highlight",
+                "class": "Highlight",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_pair_dom_string_and_highlight_release"
     }
   ],
   "resultDictionaries": {

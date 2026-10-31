@@ -13,6 +13,7 @@
     "byte length; only a [ReturnValue] argument maps. windowObjectBindings binds the operations of the object a readonly",
     "Window attribute (accessor) holds, called through the Window of a checked Document.",
     "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED.",
+    "setlikeBindings and maplikeBindings bind an interface's setlike or maplike declaration through the adapter class of host/dom/<adapter>.h: size, has, values or get and entries (snapshot copies), and add or set, delete and clear unless readonly.",
     "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
   ],
   "attributeBridges": {
@@ -257,6 +258,11 @@
       "factory": "CompositionEvent::create",
       "passReceiver": false,
       "stringInputs": "utf8-lengths"
+    },
+    "Highlight": {
+      "receiver": "Document",
+      "factory": "RanvierCollectionLike::createHighlight",
+      "passReceiver": false
     }
   },
   "dictionaryCppTypes": {
@@ -692,7 +698,9 @@
     "DOMURL",
     "URLSearchParams",
     "URLPattern",
-    "VisualViewport"
+    "VisualViewport",
+    "Highlight",
+    "HighlightRegistry"
   ],
   "skipDirectories": [
     "Modules/",
@@ -930,11 +938,13 @@
       "receiver": "Document",
       "members": [
         "supports",
-        "registerProperty"
+        "registerProperty",
+        "highlights"
       ],
       "feature": "dom-css-supports",
       "memberFeatures": {
-        "registerProperty": "dom-css-register-property"
+        "registerProperty": "dom-css-register-property",
+        "highlights": "dom-custom-highlights"
       },
       "stringInputs": "utf8-lengths"
     }
@@ -1144,5 +1154,16 @@
   "getterExpressions": {
     "AnimationPlaybackEvent.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
     "AnimationPlaybackEvent.timelineTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->timelineTime()) return CSSNumberish { *time }; return std::nullopt; }()"
+  },
+  "setlikeBindings": {
+    "Highlight": {
+      "adapter": "RanvierCollectionLike"
+    }
+  },
+  "maplikeBindings": {
+    "HighlightRegistry": {
+      "adapter": "RanvierCollectionLike",
+      "stringInputs": "utf8-lengths"
+    }
   }
 }
