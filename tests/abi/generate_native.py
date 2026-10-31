@@ -36,7 +36,7 @@ KEYWORDS = set(
 )
 
 # The parameter name for an unnamed handle, by its pointee type.
-HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax"}
+HANDLE_NAMES = {"RvHost": "host", "RvNode": "node", "RvEvent": "event", "RvWatch": "watch", "RvListener": "listener", "RvAnimation": "animation", "RvAxNode": "ax", "RvEventTarget": "target"}
 
 
 def strip_comments(text: str) -> str:
