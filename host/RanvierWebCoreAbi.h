@@ -1410,6 +1410,51 @@ RV_EXPORT RvEventTarget* rv_host_match_media(RvHost*, const char* query);
 RV_EXPORT int32_t rv_media_query_matches(RvEventTarget*, int32_t* matches);
 RV_EXPORT int32_t rv_media_query_media(RvEventTarget*, char* buffer, int32_t capacity, int32_t* length);
 
+/* v54: "media-preferences" for rv_abi_has. The user preferences and input devices the host supplies to media query
+ * evaluation. Every field's RV_MEDIA_DEFAULT (0) keeps the engine's own value: light, no motion or contrast
+ * preference, no pointing device, no hover, and text at its page size. */
+enum {
+    RV_MEDIA_DEFAULT = 0,
+    /* color_scheme: prefers-color-scheme. */
+    RV_MEDIA_LIGHT = 1,
+    RV_MEDIA_DARK = 2,
+    /* reduced_motion and contrast: no-preference, or the preference itself (reduce, more). */
+    RV_MEDIA_NO_PREFERENCE = 1,
+    RV_MEDIA_PREFERENCE = 2,
+    /* pointer and any_pointer: none, coarse or fine; any_pointer also takes both. */
+    RV_MEDIA_POINTER_NONE = 1,
+    RV_MEDIA_POINTER_COARSE = 2,
+    RV_MEDIA_POINTER_FINE = 3,
+    RV_MEDIA_POINTER_COARSE_AND_FINE = 4,
+    /* hover and any_hover. */
+    RV_MEDIA_HOVER_NONE = 1,
+    RV_MEDIA_HOVER = 2,
+};
+typedef struct RvMediaPreferences {
+    uint32_t size;
+    int32_t color_scheme;
+    int32_t reduced_motion;
+    int32_t contrast;
+    /* The primary pointing device, for pointer and hover. */
+    int32_t pointer;
+    int32_t hover;
+    /* Every available pointing device, for any-pointer and any-hover. */
+    int32_t any_pointer;
+    int32_t any_hover;
+    /* The platform's text scale: laid-out text is this many times its font size, from 0.25 to 8; 0 for 1. The
+     * computed font-size and media queries do not read it. */
+    float text_scale;
+} RvMediaPreferences;
+/* Supplies the host's media preferences, all fields at once. Style, layout and every MediaQueryList of the host's
+ * document see them at the next rv_host_update, which fires each list's change event once when its matches changed,
+ * in the order the lists were created. forced-colors stays none, prefers-contrast less and custom never match, and
+ * scripting reports the build: the engine has no input for them. Returns RV_ERR_UNSUPPORTED, applying nothing, for a
+ * size smaller than RvMediaPreferences or a value out of range. */
+RV_EXPORT int32_t rv_host_set_media_preferences(RvHost*, const RvMediaPreferences* preferences);
+/* Writes the preferences last supplied, RV_MEDIA_DEFAULT for each field never supplied. Returns RV_ERR_UNSUPPORTED
+ * when preferences->size is smaller than RvMediaPreferences. */
+RV_EXPORT int32_t rv_host_media_preferences(RvHost*, RvMediaPreferences* preferences);
+
 /* v39: "dom-binary-values" for rv_abi_has. RvBlob is the generated handle of Blob and File, and RvFileList of
  * FileList (RanvierWebCoreDom.h). The host's blob registry holds the bytes of every Blob and File it creates in
  * memory, so reading them completes during the call. */

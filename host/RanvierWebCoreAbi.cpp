@@ -230,6 +230,11 @@ private:
     void setCursor(const Cursor&) final;
     void mouseDidMoveOverElement(const HitTestResult&, OptionSet<PlatformEventModifier>, const String& toolTip, TextDirection) final;
     RefPtr<PopupMenu> createPopupMenu(PopupMenuClient&) const final;
+    // The pointing devices of rv_host_set_media_preferences.
+    bool hoverSupportedByPrimaryPointingDevice() const final;
+    bool hoverSupportedByAnyAvailablePointingDevice() const final;
+    std::optional<PointerCharacteristics> pointerCharacteristicsOfPrimaryPointingDevice() const final;
+    OptionSet<PointerCharacteristics> pointerCharacteristicsOfAllAvailablePointingDevices() const final;
 #if USE(AX_EMBEDDER_NOTIFICATIONS)
     void postAccessibilityNotification(AccessibilityObject&, AXNotification) final;
 #endif
@@ -750,6 +755,8 @@ struct RvHost {
     bool accessibility { false };
     // rv_host_set_diagnostics: the rv_host_inspect_* calls read the document only while set.
     bool diagnostics { false };
+    // rv_host_set_media_preferences: the preferences last supplied.
+    RvMediaPreferences mediaPreferences { sizeof(RvMediaPreferences) };
     RvAxCallback axCallback { nullptr };
     void* axContext { nullptr };
     // Accessibility events posted since the last delivery, and whether a delivery is scheduled.
@@ -1367,6 +1374,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
         return 1;
+    if (!std::strcmp(feature, "media-preferences"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1457,6 +1466,87 @@ int32_t rv_host_set_screen(RvHost* host, const RvScreenMetrics* metrics)
     publishScreens();
     host->page->screenPropertiesDidChange();
     host->orientation->setOrientation(static_cast<ScreenOrientationType>(metrics->orientation));
+    return RV_OK;
+}
+
+bool RvChromeClient::hoverSupportedByPrimaryPointingDevice() const
+{
+    return host && host->mediaPreferences.hover == RV_MEDIA_HOVER;
+}
+
+bool RvChromeClient::hoverSupportedByAnyAvailablePointingDevice() const
+{
+    return host && host->mediaPreferences.any_hover == RV_MEDIA_HOVER;
+}
+
+std::optional<PointerCharacteristics> RvChromeClient::pointerCharacteristicsOfPrimaryPointingDevice() const
+{
+    auto pointer = host ? host->mediaPreferences.pointer : RV_MEDIA_DEFAULT;
+    if (pointer == RV_MEDIA_POINTER_COARSE)
+        return PointerCharacteristics::Coarse;
+    if (pointer == RV_MEDIA_POINTER_FINE)
+        return PointerCharacteristics::Fine;
+    return std::nullopt;
+}
+
+OptionSet<PointerCharacteristics> RvChromeClient::pointerCharacteristicsOfAllAvailablePointingDevices() const
+{
+    switch (host ? host->mediaPreferences.any_pointer : RV_MEDIA_DEFAULT) {
+    case RV_MEDIA_POINTER_COARSE: return PointerCharacteristics::Coarse;
+    case RV_MEDIA_POINTER_FINE: return PointerCharacteristics::Fine;
+    case RV_MEDIA_POINTER_COARSE_AND_FINE: return { PointerCharacteristics::Coarse, PointerCharacteristics::Fine };
+    default: return { };
+    }
+}
+
+static ForcedAccessibilityValue forcedAccessibilityValue(int32_t preference)
+{
+    return preference == RV_MEDIA_PREFERENCE ? ForcedAccessibilityValue::On
+        : preference == RV_MEDIA_NO_PREFERENCE ? ForcedAccessibilityValue::Off : ForcedAccessibilityValue::System;
+}
+
+int32_t rv_host_set_media_preferences(RvHost* host, const RvMediaPreferences* preferences)
+{
+    if (!host || !preferences)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    auto within = [](int32_t value, int32_t last) { return value >= RV_MEDIA_DEFAULT && value <= last; };
+    auto scale = preferences->text_scale;
+    if (preferences->size < sizeof(RvMediaPreferences) || !within(preferences->color_scheme, RV_MEDIA_DARK)
+        || !within(preferences->reduced_motion, RV_MEDIA_PREFERENCE) || !within(preferences->contrast, RV_MEDIA_PREFERENCE)
+        || !within(preferences->pointer, RV_MEDIA_POINTER_FINE) || !within(preferences->hover, RV_MEDIA_HOVER)
+        || !within(preferences->any_pointer, RV_MEDIA_POINTER_COARSE_AND_FINE) || !within(preferences->any_hover, RV_MEDIA_HOVER)
+        || !(scale == 0 || (scale >= 0.25f && scale <= 8)))
+        return RV_ERR_UNSUPPORTED;
+    auto previous = host->mediaPreferences;
+    host->mediaPreferences = *preferences;
+    host->mediaPreferences.size = sizeof(RvMediaPreferences);
+    auto& page = host->page.get();
+    if (previous.color_scheme != preferences->color_scheme)
+        page.setUseColorAppearance(preferences->color_scheme == RV_MEDIA_DARK, page.useElevatedUserInterfaceLevel());
+    if (previous.reduced_motion != preferences->reduced_motion || previous.contrast != preferences->contrast) {
+        page.settings().setForcedPrefersReducedMotionAccessibilityValue(forcedAccessibilityValue(preferences->reduced_motion));
+        page.settings().setForcedPrefersContrastAccessibilityValue(forcedAccessibilityValue(preferences->contrast));
+        page.accessibilitySettingsDidChange();
+    }
+    if (previous.pointer != preferences->pointer || previous.hover != preferences->hover
+        || previous.any_pointer != preferences->any_pointer || previous.any_hover != preferences->any_hover)
+        page.updateStyleAfterChangeInEnvironment();
+    if (previous.text_scale != scale)
+        host->frame().setTextZoomFactor(scale ? scale : 1);
+    return RV_OK;
+}
+
+int32_t rv_host_media_preferences(RvHost* host, RvMediaPreferences* preferences)
+{
+    if (!host || !preferences)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (preferences->size < sizeof(RvMediaPreferences))
+        return RV_ERR_UNSUPPORTED;
+    *preferences = host->mediaPreferences;
     return RV_OK;
 }
 
