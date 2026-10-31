@@ -150,7 +150,9 @@ typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVString
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionUnsignedLongOrAnimationFrameRatePreset RvDomUnionUnsignedLongOrAnimationFrameRatePreset;
+typedef struct RvDomUnionUnrestrictedDoubleOrDOMString RvDomUnionUnrestrictedDoubleOrDOMString;
 typedef struct RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions;
+typedef struct RvDomSequenceComputedKeyframe RvDomSequenceComputedKeyframe;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -589,7 +591,8 @@ typedef struct RvDomScrollToOptions {
 } RvDomScrollToOptions;
 
 /* The IDL dictionary KeyframeProperty. size is sizeof(RvDomKeyframeProperty) as the caller compiles it; a field past
- * size takes its IDL default, so fields can be added at the end. */
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_keyframe_property_release frees it. */
 typedef struct RvDomKeyframeProperty {
     uint32_t size;
     RvDomUtf8StringInput name; /* DOMString, required */
@@ -973,6 +976,55 @@ typedef struct RvDomURLPatternResult {
     const RvDomURLPatternComponentResult* hash; /* URLPatternComponentResult, NULL for absent */
 } RvDomURLPatternResult;
 
+/* The IDL dictionary EffectTiming. size is sizeof(RvDomEffectTiming) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_effect_timing_release frees it. */
+typedef struct RvDomEffectTiming {
+    uint32_t size;
+    double delay; /* double, default 0 */
+    double end_delay; /* double, default 0 */
+    int32_t fill; /* FillMode, default "auto", RV_DOM_FILL_MODE_* */
+    double iteration_start; /* double, default 0.0 */
+    double iterations; /* unrestricted double, default 1.0 */
+    const RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* duration; /* (unrestricted double or CSSNumericValue or DOMString), default "auto" */
+    int32_t direction; /* PlaybackDirection, default "normal", RV_DOM_PLAYBACK_DIRECTION_* */
+    RvDomUtf8StringInput easing; /* DOMString, default "linear" */
+} RvDomEffectTiming;
+
+/* The IDL dictionary ComputedEffectTiming. size is sizeof(RvDomComputedEffectTiming) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_computed_effect_timing_release frees it. */
+typedef struct RvDomComputedEffectTiming {
+    uint32_t size;
+    double delay; /* double, default 0 */
+    double end_delay; /* double, default 0 */
+    int32_t fill; /* FillMode, default "auto", RV_DOM_FILL_MODE_* */
+    double iteration_start; /* double, default 0.0 */
+    double iterations; /* unrestricted double, default 1.0 */
+    const RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* duration; /* (unrestricted double or CSSNumericValue or DOMString), default "auto" */
+    int32_t direction; /* PlaybackDirection, default "normal", RV_DOM_PLAYBACK_DIRECTION_* */
+    RvDomUtf8StringInput easing; /* DOMString, default "linear" */
+    const RvDomUnionDoubleOrCSSNumericValue* end_time; /* CSSNumberish, NULL for absent */
+    const RvDomUnionDoubleOrCSSNumericValue* active_duration; /* CSSNumberish, NULL for absent */
+    const RvDomUnionDoubleOrCSSNumericValueNullable* local_time; /* CSSNumberish?, default null */
+    const double* progress; /* double?, default null */
+    const double* current_iteration; /* unrestricted double?, default null */
+} RvDomComputedEffectTiming;
+
+/* The IDL dictionary OptionalEffectTiming. size is sizeof(RvDomOptionalEffectTiming) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomOptionalEffectTiming {
+    uint32_t size;
+    const double* delay; /* double, NULL for absent */
+    const double* end_delay; /* double, NULL for absent */
+    const int32_t* fill; /* FillMode, NULL for absent, RV_DOM_FILL_MODE_* */
+    const double* iteration_start; /* double, NULL for absent */
+    const double* iterations; /* unrestricted double, NULL for absent */
+    const RvDomUnionUnrestrictedDoubleOrDOMString* duration; /* (unrestricted double or DOMString), NULL for absent */
+    const int32_t* direction; /* PlaybackDirection, NULL for absent, RV_DOM_PLAYBACK_DIRECTION_* */
+    RvDomUtf8StringInput easing; /* DOMString */
+} RvDomOptionalEffectTiming;
+
 /* The IDL dictionary KeyframeEffectOptions. size is sizeof(RvDomKeyframeEffectOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomKeyframeEffectOptions {
@@ -989,6 +1041,18 @@ typedef struct RvDomKeyframeEffectOptions {
     int32_t composite; /* CompositeOperation, default "replace", RV_DOM_COMPOSITE_OPERATION_* */
     RvDomUtf8StringInput pseudo_element; /* CSSOMString?, default null */
 } RvDomKeyframeEffectOptions;
+
+/* The IDL dictionary ComputedKeyframe. size is sizeof(RvDomComputedKeyframe) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_computed_keyframe_release frees it. */
+typedef struct RvDomComputedKeyframe {
+    uint32_t size;
+    const double* offset; /* double?, default null */
+    double computed_offset; /* double, required */
+    RvDomUtf8StringInput easing; /* DOMString, required */
+    RvDomUtf8StringInput composite; /* DOMString, required */
+    const RvDomSequenceKeyframeProperty* properties; /* sequence<KeyframeProperty>, default [] */
+} RvDomComputedKeyframe;
 
 /* The IDL dictionary DocumentTimelineOptions. size is sizeof(RvDomDocumentTimelineOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -1097,7 +1161,9 @@ typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVString
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionUnsignedLongOrAnimationFrameRatePreset RvDomUnionUnsignedLongOrAnimationFrameRatePreset;
+typedef struct RvDomUnionUnrestrictedDoubleOrDOMString RvDomUnionUnrestrictedDoubleOrDOMString;
 typedef struct RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions;
+typedef struct RvDomSequenceComputedKeyframe RvDomSequenceComputedKeyframe;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1728,6 +1794,19 @@ struct RvDomUnionUnsignedLongOrAnimationFrameRatePreset {
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 enum {
+    RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_STRING_NUMBER = 1,
+    RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_DOM_STRING_STRING = 2,
+};
+struct RvDomUnionUnrestrictedDoubleOrDOMString {
+    int32_t present;
+    int32_t tag;
+    double arm0;
+    RvDomUtf8StringSpan arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
     RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_KEYFRAME_EFFECT_OPTIONS_NUMBER = 1,
     RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_KEYFRAME_EFFECT_OPTIONS_KEYFRAME_EFFECT_OPTIONS = 2,
 };
@@ -1736,6 +1815,14 @@ struct RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions {
     int32_t tag;
     double arm0;
     const RvDomKeyframeEffectOptions* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceComputedKeyframe {
+    int32_t present;
+    int32_t count;
+    const RvDomComputedKeyframe** items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1851,7 +1938,9 @@ RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 RV_EXPORT void rv_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDomUnionUnsignedLongOrAnimationFrameRatePreset* value);
+RV_EXPORT void rv_dom_union_unrestricted_double_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrDOMString* value);
 RV_EXPORT void rv_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* value);
+RV_EXPORT void rv_dom_sequence_computed_keyframe_release(RvDomSequenceComputedKeyframe* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -1865,6 +1954,14 @@ RV_EXPORT void rv_dom_url_pattern_result_release(RvDomURLPatternResult* value);
 RV_EXPORT void rv_dom_url_pattern_init_release(RvDomURLPatternInit* value);
 /* Releases an owned URLPatternComponentResult result, its strings and nested values, and the struct. */
 RV_EXPORT void rv_dom_url_pattern_component_result_release(RvDomURLPatternComponentResult* value);
+/* Releases an owned EffectTiming result, its strings and nested values, and the struct. */
+RV_EXPORT void rv_dom_effect_timing_release(RvDomEffectTiming* value);
+/* Releases an owned ComputedEffectTiming result, its strings and nested values, and the struct. */
+RV_EXPORT void rv_dom_computed_effect_timing_release(RvDomComputedEffectTiming* value);
+/* Releases an owned ComputedKeyframe result, its strings and nested values, and the struct. */
+RV_EXPORT void rv_dom_computed_keyframe_release(RvDomComputedKeyframe* value);
+/* Releases an owned KeyframeProperty result, its strings and nested values, and the struct. */
+RV_EXPORT void rv_dom_keyframe_property_release(RvDomKeyframeProperty* value);
 /* Releases a handle to a DOMImplementation. */
 RV_EXPORT void rv_dom_dom_implementation_release(RvDOMImplementation*);
 /* Adds a reference to a DOMImplementation and returns it. */
@@ -8508,6 +8605,17 @@ RV_EXPORT int32_t rv_dom_web_animation_reverse(RvEventTarget* target);
 RV_EXPORT int32_t rv_dom_web_animation_persist(RvEventTarget* target);
 /* WebAnimation.commitStyles() -> undefined */
 RV_EXPORT int32_t rv_dom_web_animation_commit_styles(RvEventTarget* target);
+/* AnimationEffect */
+
+/* AnimationEffect.getTiming() -> EffectTiming; *result is owned; release it with rv_dom_effect_timing_release */
+RV_EXPORT int32_t rv_dom_animation_effect_get_timing(RvAnimationEffect* target, RvDomEffectTiming** result);
+/* AnimationEffect.getComputedTiming() -> ComputedEffectTiming; *result is owned; release it with
+ * rv_dom_computed_effect_timing_release */
+RV_EXPORT int32_t rv_dom_animation_effect_get_computed_timing(RvAnimationEffect* target, RvDomComputedEffectTiming** result);
+/* AnimationEffect.updateTiming(optional OptionalEffectTiming timing = {}) -> undefined; context is an explicit
+ * checked Document for the operation; timing defaults to {} in IDL; timing may be NULL for the IDL default;
+ * RV_ERR_WRONG_HOST for a context other than the object's document */
+RV_EXPORT int32_t rv_dom_animation_effect_update_timing(RvAnimationEffect* target, RvNode* context, const RvDomOptionalEffectTiming* timing);
 /* KeyframeEffect */
 
 /* KeyframeEffect.constructor: target is the Document of the constructed object; target_ may be NULL; options defaults
@@ -8533,10 +8641,14 @@ RV_EXPORT int32_t rv_dom_keyframe_effect_set_iteration_composite(RvAnimationEffe
 RV_EXPORT int32_t rv_dom_keyframe_effect_get_composite(RvAnimationEffect* target, int32_t* result);
 /* KeyframeEffect.composite setter: attribute CompositeOperation composite */
 RV_EXPORT int32_t rv_dom_keyframe_effect_set_composite(RvAnimationEffect* target, int32_t value);
+/* KeyframeEffect.getKeyframes() -> sequence<ComputedKeyframe>; *result owns its contents; release with the matching
+ * rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_keyframe_effect_get_keyframes(RvAnimationEffect* target, RvDomSequenceComputedKeyframe* result);
 /* KeyframeEffect.setKeyframes(sequence<Keyframe>? keyframes) -> undefined; context is an explicit checked Document
  * for the operation; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of
- * objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; RV_ERR_DOM_EXCEPTION
- * (InvalidStateError) for a document without a global object */
+ * objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; RV_ERR_WRONG_HOST for
+ * a context other than the object's document; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a
+ * global object */
 RV_EXPORT int32_t rv_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvNode* context, const RvDomSequenceKeyframeNullable* keyframes);
 /* AnimationTimeline */
 

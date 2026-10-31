@@ -5203,7 +5203,13 @@ and [<AllowNullLiteral>] WebAnimation =
     abstract member commitStyles: unit -> unit
 
 /// <summary>AnimationEffect in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] AnimationEffect = interface end
+and [<AllowNullLiteral>] AnimationEffect =
+    /// <summary>AnimationEffect.getTiming.</summary>
+    abstract member getTiming: unit -> EffectTiming
+    /// <summary>AnimationEffect.getComputedTiming.</summary>
+    abstract member getComputedTiming: unit -> ComputedEffectTiming
+    /// <summary>AnimationEffect.updateTiming.</summary>
+    abstract member updateTiming: ?timing: OptionalEffectTiming -> unit
 
 /// <summary>KeyframeEffect in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] KeyframeEffect =
@@ -5216,6 +5222,8 @@ and [<AllowNullLiteral>] KeyframeEffect =
     abstract member iterationComposite: IterationCompositeOperation with get, set
     /// <summary>KeyframeEffect.composite.</summary>
     abstract member composite: CompositeOperation with get, set
+    /// <summary>KeyframeEffect.getKeyframes.</summary>
+    abstract member getKeyframes: unit -> (ComputedKeyframe) array
 
     /// <summary>KeyframeEffect.setKeyframes.</summary>
 #if FABLE_COMPILER
@@ -5706,6 +5714,11 @@ and [<RequireQualifiedAccess>] USVStringOrURLPatternInit =
     | USVString of string
     | URLPatternInit of URLPatternInit
 
+/// <summary>UnrestrictedDoubleOrDOMString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMString =
+    | UnrestrictedDouble of float
+    | DOMString of string
+
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
@@ -5724,17 +5737,7 @@ and [<AllowNullLiteral; DomDictionary>] AddEventListenerOptions() =
 
 /// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
-    member val delay: float = 0 with get, set
-    member val endDelay: float = 0 with get, set
-    member val fill: FillMode = FillMode.Auto with get, set
-    member val iterationStart: float = 0.0 with get, set
-    member val iterations: float = 1.0 with get, set
-
-    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
-        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
-
-    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
-    member val easing: string = "linear" with get, set
+    inherit EffectTiming()
     member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
     member val composite: CompositeOperation = CompositeOperation.Replace with get, set
     member val pseudoElement: string = null with get, set
@@ -5907,6 +5910,58 @@ and [<AllowNullLiteral; DomDictionary>] URLPatternInit() =
     member val search: (string) option = None with get, set
     member val hash: (string) option = None with get, set
     member val baseURL: (string) option = None with get, set
+
+/// <summary>EffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] EffectTiming() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+
+/// <summary>ComputedEffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] ComputedEffectTiming() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val endTime: (DoubleOrCSSNumericValue) option = None with get, set
+    member val activeDuration: (DoubleOrCSSNumericValue) option = None with get, set
+    member val localTime: (DoubleOrCSSNumericValue) option = None with get, set
+    member val progress: (float) option = None with get, set
+    member val currentIteration: (float) option = None with get, set
+
+/// <summary>OptionalEffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] OptionalEffectTiming() =
+    member val delay: (float) option = None with get, set
+    member val endDelay: (float) option = None with get, set
+    member val fill: (FillMode) option = None with get, set
+    member val iterationStart: (float) option = None with get, set
+    member val iterations: (float) option = None with get, set
+    member val duration: (UnrestrictedDoubleOrDOMString) option = None with get, set
+    member val direction: (PlaybackDirection) option = None with get, set
+    member val easing: (string) option = None with get, set
+
+/// <summary>ComputedKeyframe in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] ComputedKeyframe() =
+    member val offset: (float) option = None with get, set
+    member val computedOffset: float = Unchecked.defaultof<_> with get, set
+    member val easing: string = Unchecked.defaultof<_> with get, set
+    member val composite: string = Unchecked.defaultof<_> with get, set
+    member val properties: (KeyframeProperty) array = [||] with get, set
 
 /// <summary>FocusOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
@@ -6263,6 +6318,11 @@ module BrowserUnionAdapters =
         match value with
         | USVStringOrURLPatternInit.USVString value -> box (normalizeUSVString value)
         | USVStringOrURLPatternInit.URLPatternInit value -> box value
+
+    let private boxUnrestrictedDoubleOrDOMString (value: UnrestrictedDoubleOrDOMString) : obj =
+        match value with
+        | UnrestrictedDoubleOrDOMString.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrDOMString.DOMString value -> box value
 
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
         match value with

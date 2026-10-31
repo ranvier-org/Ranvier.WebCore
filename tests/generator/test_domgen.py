@@ -1996,7 +1996,7 @@ interface Matcher {
                      'result->size = sizeof(RvDomMatchResult);',
                      'result->part = encodeDictRvDomPartResult(*field);',
                      'releaseDictRvDomPartResult(const_cast<RvDomPartResult*>(value->part));',
-                     'encodeRvDomSequenceUSVStringOrPartInit(*field, container);',
+                     'encodeRvDomSequenceUSVStringOrPartInit(resultValue(*field), container);',
                      'clearRvDomSequenceUSVStringOrPartInit(const_cast<RvDomSequenceUSVStringOrPartInit*>(value->inputs));',
                      'result->input = copyOwnedDomStringInput(asString(*field));',
                      'std::free(const_cast<uint8_t*>(value->input.data));',

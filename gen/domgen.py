@@ -270,6 +270,7 @@ class World:
             self.callbacks |= document.callbacks
         # syntheticIdl names repository IDL files that define dictionaries only: native transports of a JavaScript
         # object argument, such as the keyframe sequence of Element.animate. They merge after WebKit's files.
+        synthetic = set()
         for relative in config.get("syntheticIdl", []):
             document = idl.parse((ROOT / relative).read_text(encoding="utf-8"), pathlib.PurePosixPath(relative).name)
             if document.interfaces or document.namespaces or document.includes or document.enums or document.callbacks:
@@ -278,7 +279,10 @@ class World:
                 if name in self.dictionaries:
                     raise SystemExit(f"{relative}: dictionary {name} already exists in WebKit's IDL")
                 self.dictionaries[name] = dictionary
+                synthetic.add(name)
             self.typedefs.update(document.typedefs)
+        if synthetic != set(config.get("syntheticDictionaries", [])):
+            raise SystemExit(f"syntheticDictionaries must list exactly the dictionaries of syntheticIdl: {sorted(synthetic)}")
         # customConstructors replaces a [Custom] IDL constructor with the signature its custom binding implements.
         for name, custom in config.get("customConstructors", {}).items():
             interface = self.interfaces[name]
@@ -290,6 +294,20 @@ class World:
                      if member.kind == "constructor" and "Custom" in member.attrs]
             if len(found) != 1:
                 raise SystemExit(f"customConstructors: {name} has no single [Custom] constructor")
+            replacement.file = interface.file
+            interface.members[found[0]] = replacement
+        # customOperations replaces a [Custom] IDL operation with the signature its native binding implements; its
+        # callExpressions entry names the C++ that computes the result.
+        for key, custom in config.get("customOperations", {}).items():
+            name, operation = key.split(".")
+            interface = self.interfaces[name]
+            replacement = idl.Parser(custom["idl"], interface.file).member(name)
+            if replacement is None or replacement.kind != "operation" or replacement.name != operation:
+                raise SystemExit(f"customOperations: {key} needs an operation declaration of that name")
+            found = [index for index, member in enumerate(interface.members)
+                     if member.kind == "operation" and member.name == operation and "Custom" in member.attrs]
+            if len(found) != 1:
+                raise SystemExit(f"customOperations: {key} has no single [Custom] operation")
             replacement.file = interface.file
             interface.members[found[0]] = replacement
         # argumentTypes retypes an argument, keyed Interface.member.argument by the declaring interface or mixin:
@@ -1677,7 +1695,10 @@ class Generator(ComplexGeneratorMixin):
         name = member.attrs.get("ImplementedAs", member.name)
         implemented_by = member.attrs.get("ImplementedBy")
         placeholders = ", ".join(f"{{arg{i}}}" for i in range(len(args)))
-        if implemented_by:
+        expression = self.world.config.get("callExpressions", {}).get(f"{interface}.{member.name}")
+        if expression:
+            call = expression
+        elif implemented_by:
             self.headers.add(f"{implemented_by}.h")
             call = f"WebCore::{implemented_by}::{name}(*impl{{call_with}}{', ' if placeholders else ''}{placeholders})"
         else:
@@ -2016,6 +2037,11 @@ class Generator(ComplexGeneratorMixin):
                 body += ['RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));',
                          'if (!contextDocument)', '    return RV_ERR_WRONG_INTERFACE;',
                          'Ref document = contextDocument.releaseNonNull();']
+                # contextDocuments names the object's own document: a context of another document is the wrong host.
+                own = self.world.config.get("contextDocuments", {}).get(interface)
+                if own:
+                    body += [f'if (auto* own = {own}; own && own != document.ptr())', '    return RV_ERR_WRONG_HOST;']
+                    notes.append("RV_ERR_WRONG_HOST for a context other than the object's document")
             else:
                 body.append("Ref document = impl->document();")
             if "global" in call_with:
@@ -2835,6 +2861,7 @@ template<typename E, size_t N> std::optional<E> enumerationFromIndex(int32_t ind
 
 template<typename T> struct Unwrapped { using Type = T; };
 template<typename T> struct Unwrapped<std::optional<T>> { using Type = T; };
+template<typename T, typename Traits> struct Unwrapped<Markable<T, Traits>> { using Type = T; };
 
 // Copies a dictionary field into the C++ dictionary's member, which may be optional.
 template<typename T, typename V> void assignValue(T& field, V value)

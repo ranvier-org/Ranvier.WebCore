@@ -210,7 +210,9 @@ WEBCORE_EXPORT void ranvier_dom_pair_usv_string_and_union_undefined_or_usv_strin
 WEBCORE_EXPORT void ranvier_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 WEBCORE_EXPORT void ranvier_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDomUnionUnsignedLongOrAnimationFrameRatePreset* value);
+WEBCORE_EXPORT void ranvier_dom_union_unrestricted_double_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrDOMString* value);
 WEBCORE_EXPORT void ranvier_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* value);
+WEBCORE_EXPORT void ranvier_dom_sequence_computed_keyframe_release(RvDomSequenceComputedKeyframe* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 WEBCORE_EXPORT void ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -221,6 +223,10 @@ WEBCORE_EXPORT void ranvier_dom_sequence_pair_dom_string_and_highlight_release(R
 WEBCORE_EXPORT void ranvier_dom_url_pattern_result_release(RvDomURLPatternResult* value);
 WEBCORE_EXPORT void ranvier_dom_url_pattern_init_release(RvDomURLPatternInit* value);
 WEBCORE_EXPORT void ranvier_dom_url_pattern_component_result_release(RvDomURLPatternComponentResult* value);
+WEBCORE_EXPORT void ranvier_dom_effect_timing_release(RvDomEffectTiming* value);
+WEBCORE_EXPORT void ranvier_dom_computed_effect_timing_release(RvDomComputedEffectTiming* value);
+WEBCORE_EXPORT void ranvier_dom_computed_keyframe_release(RvDomComputedKeyframe* value);
+WEBCORE_EXPORT void ranvier_dom_keyframe_property_release(RvDomKeyframeProperty* value);
 WEBCORE_EXPORT int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_style_sheet_get_interface_name(RvStyleSheet* target, char* buffer, int32_t capacity, int32_t* length);
 WEBCORE_EXPORT int32_t ranvier_dom_css_style_declaration_get_interface_name(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
@@ -2888,6 +2894,9 @@ WEBCORE_EXPORT int32_t ranvier_dom_web_animation_update_playback_rate(RvEventTar
 WEBCORE_EXPORT int32_t ranvier_dom_web_animation_reverse(RvEventTarget* target);
 WEBCORE_EXPORT int32_t ranvier_dom_web_animation_persist(RvEventTarget* target);
 WEBCORE_EXPORT int32_t ranvier_dom_web_animation_commit_styles(RvEventTarget* target);
+WEBCORE_EXPORT int32_t ranvier_dom_animation_effect_get_timing(RvAnimationEffect* target, RvDomEffectTiming** result);
+WEBCORE_EXPORT int32_t ranvier_dom_animation_effect_get_computed_timing(RvAnimationEffect* target, RvDomComputedEffectTiming** result);
+WEBCORE_EXPORT int32_t ranvier_dom_animation_effect_update_timing(RvAnimationEffect* target, RvNode* context, const RvDomOptionalEffectTiming* timing);
 WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_create_3(RvNode* target, RvNode* target_, const RvDomSequenceKeyframeNullable* keyframes, const RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* options, RvAnimationEffect** result);
 WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_create_1(RvNode* target, RvAnimationEffect* source, RvAnimationEffect** result);
 WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_get_target(RvAnimationEffect* target, RvNode** result);
@@ -2898,6 +2907,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_get_iteration_composite(RvAni
 WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_set_iteration_composite(RvAnimationEffect* target, int32_t value);
 WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_get_composite(RvAnimationEffect* target, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_set_composite(RvAnimationEffect* target, int32_t value);
+WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_get_keyframes(RvAnimationEffect* target, RvDomSequenceComputedKeyframe* result);
 WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvNode* context, const RvDomSequenceKeyframeNullable* keyframes);
 WEBCORE_EXPORT int32_t ranvier_dom_animation_timeline_get_current_time(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
 WEBCORE_EXPORT int32_t ranvier_dom_animation_timeline_get_duration(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);

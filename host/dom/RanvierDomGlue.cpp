@@ -70,6 +70,7 @@
 #include "CommandEvent.h"
 #include "Comment.h"
 #include "CompositionEvent.h"
+#include "ComputedEffectTiming.h"
 #include "ContentVisibilityAutoStateChangeEvent.h"
 #include "ContextDestructionObserverInlines.h"
 #include "Crypto.h"
@@ -103,6 +104,7 @@
 #include "DocumentSettingsValues.h"
 #include "DocumentTimeline.h"
 #include "DocumentTimelineOptions.h"
+#include "EffectTiming.h"
 #include "Element.h"
 #include "ElementCreationOptions.h"
 #include "ElementInlines.h"
@@ -211,6 +213,7 @@
 #include "NodeInlines.h"
 #include "NodeIterator.h"
 #include "NodeList.h"
+#include "OptionalEffectTiming.h"
 #include "PageTransitionEvent.h"
 #include "PointerEvent.h"
 #include "PopStateEvent.h"
@@ -499,6 +502,7 @@ template<typename E, size_t N> std::optional<E> enumerationFromIndex(int32_t ind
 
 template<typename T> struct Unwrapped { using Type = T; };
 template<typename T> struct Unwrapped<std::optional<T>> { using Type = T; };
+template<typename T, typename Traits> struct Unwrapped<Markable<T, Traits>> { using Type = T; };
 
 // Copies a dictionary field into the C++ dictionary's member, which may be optional.
 template<typename T, typename V> void assignValue(T& field, V value)
@@ -755,6 +759,10 @@ template<typename T> struct DomSequenceArgument {
 };
 template<typename T> const T* resultField(const T& value) { return &value; }
 template<typename T> const T* resultField(const std::optional<T>& value) { return value ? &*value : nullptr; }
+template<typename T, typename Traits> const T* resultField(const Markable<T, Traits>& value) { return value ? &*value : nullptr; }
+// A field whose C++ type differs from its IDL type converts through a resultValueOverloads overload.
+template<typename T> const T& resultValue(const T& value) { return value; }
+CSSNumberish resultValue(const WebAnimationTime& value) { return value; }
 template<typename V, typename S, typename E> int32_t storeOptionalDictionary(V&& value, S** result, E&& encode)
 {
     *result = value ? encode(*value) : nullptr;
@@ -776,6 +784,14 @@ RvDomURLPatternInit* encodeDictRvDomURLPatternInit(const URLPatternInit& value);
 void releaseDictRvDomURLPatternInit(RvDomURLPatternInit* value);
 RvDomURLPatternComponentResult* encodeDictRvDomURLPatternComponentResult(const URLPatternComponentResult& value);
 void releaseDictRvDomURLPatternComponentResult(RvDomURLPatternComponentResult* value);
+RvDomEffectTiming* encodeDictRvDomEffectTiming(const EffectTiming& value);
+void releaseDictRvDomEffectTiming(RvDomEffectTiming* value);
+RvDomComputedEffectTiming* encodeDictRvDomComputedEffectTiming(const ComputedEffectTiming& value);
+void releaseDictRvDomComputedEffectTiming(RvDomComputedEffectTiming* value);
+RvDomComputedKeyframe* encodeDictRvDomComputedKeyframe(const Ranvier::ComputedKeyframe& value);
+void releaseDictRvDomComputedKeyframe(RvDomComputedKeyframe* value);
+RvDomKeyframeProperty* encodeDictRvDomKeyframeProperty(const Ranvier::KeyframeProperty& value);
+void releaseDictRvDomKeyframeProperty(RvDomKeyframeProperty* value);
 RvDomUtf8StringSpan copyOwnedDomStringSpan(const String& value)
 {
     if (value.isNull()) return { nullptr, -1 };
@@ -1249,9 +1265,23 @@ void clearRvDomSequenceKeyframeProperty(RvDomSequenceKeyframeProperty* value)
 {
     if (!value) return;
     for (int32_t i = 0; i < value->count; ++i) {
+        releaseDictRvDomKeyframeProperty(const_cast<RvDomKeyframeProperty*>(value->items[i]));
     }
     std::free(value->items);
     *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceKeyframeProperty(V&& input, RvDomSequenceKeyframeProperty* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<const RvDomKeyframeProperty**>(std::calloc(value.size(), sizeof(const RvDomKeyframeProperty*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        result->items[i] = encodeDictRvDomKeyframeProperty(value[i]);
+    }
+    return RV_OK;
 }
 
 std::optional<std::optional<Vector<Ranvier::Keyframe>>> decodeRvDomSequenceKeyframeNullable(const RvDomSequenceKeyframeNullable* source, int32_t& status)
@@ -3376,6 +3406,59 @@ template<typename V> int32_t encodeRvDomUnionUnsignedLongOrAnimationFrameRatePre
     return RV_OK;
 }
 
+std::optional<Variant<double, String>> decodeRvDomUnionUnrestrictedDoubleOrDOMString(const RvDomUnionUnrestrictedDoubleOrDOMString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, String> { Variant<double, String> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        if (source->arm1.length < 0 || (source->arm1.length > 0 && !source->arm1.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm1 = source->arm1.length < 0 ? String() : source->arm1.length ? String::fromUTF8(std::span<const uint8_t> { source->arm1.data, static_cast<size_t>(source->arm1.length) }) : emptyString();
+        if (source->arm1.length >= 0 && arm1.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<double, String> { Variant<double, String> { WTF::InPlaceIndex<1>, arm1 } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrDOMString(RvDomUnionUnrestrictedDoubleOrDOMString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        std::free(const_cast<uint8_t*>(value->arm1.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUnrestrictedDoubleOrDOMString(V&& value, RvDomUnionUnrestrictedDoubleOrDOMString* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = static_cast<double>(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionUnrestrictedDoubleOrDOMString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUnrestrictedDoubleOrDOMString(V&& input, RvDomUnionUnrestrictedDoubleOrDOMString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUnrestrictedDoubleOrDOMString(value, result);
+    return RV_OK;
+}
+
 std::optional<Variant<double, KeyframeEffectOptions>> decodeRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(const RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -3450,6 +3533,29 @@ void clearRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(RvDomUnionUnrestri
         break;
     }
     *value = { };
+}
+
+void clearRvDomSequenceComputedKeyframe(RvDomSequenceComputedKeyframe* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        releaseDictRvDomComputedKeyframe(const_cast<RvDomComputedKeyframe*>(value->items[i]));
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceComputedKeyframe(V&& input, RvDomSequenceComputedKeyframe* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<const RvDomComputedKeyframe**>(std::calloc(value.size(), sizeof(const RvDomComputedKeyframe*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        result->items[i] = encodeDictRvDomComputedKeyframe(value[i]);
+    }
+    return RV_OK;
 }
 
 void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
@@ -3603,7 +3709,7 @@ RvDomURLPatternResult* encodeDictRvDomURLPatternResult(const URLPatternResult& v
     if (auto* field = resultField(value.inputs)) {
         auto* container = static_cast<RvDomSequenceUSVStringOrURLPatternInit*>(std::calloc(1, sizeof(RvDomSequenceUSVStringOrURLPatternInit)));
         RELEASE_ASSERT(container);
-        encodeRvDomSequenceUSVStringOrURLPatternInit(*field, container);
+        encodeRvDomSequenceUSVStringOrURLPatternInit(resultValue(*field), container);
         result->inputs = container;
     }
     if (auto* field = resultField(value.protocol)) {
@@ -3710,7 +3816,7 @@ RvDomURLPatternComponentResult* encodeDictRvDomURLPatternComponentResult(const U
     if (auto* field = resultField(value.groups)) {
         auto* container = static_cast<RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*>(std::calloc(1, sizeof(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString)));
         RELEASE_ASSERT(container);
-        encodeRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(*field, container);
+        encodeRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(resultValue(*field), container);
         result->groups = container;
     }
     return result;
@@ -3722,6 +3828,194 @@ void releaseDictRvDomURLPatternComponentResult(RvDomURLPatternComponentResult* v
     std::free(const_cast<uint8_t*>(value->input.data));
     clearRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(const_cast<RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*>(value->groups));
     std::free(const_cast<RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*>(value->groups));
+    std::free(value);
+}
+
+RvDomEffectTiming* encodeDictRvDomEffectTiming(const EffectTiming& value)
+{
+    auto* result = static_cast<RvDomEffectTiming*>(std::calloc(1, sizeof(RvDomEffectTiming)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomEffectTiming);
+    if (auto* field = resultField(value.delay)) {
+        result->delay = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.endDelay)) {
+        result->end_delay = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.fill)) {
+        storeEnumeration(*field, &result->fill, enumerationFillMode);
+    }
+    if (auto* field = resultField(value.iterationStart)) {
+        result->iteration_start = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.iterations)) {
+        result->iterations = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.duration)) {
+        auto* container = static_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(std::calloc(1, sizeof(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(resultValue(*field), container);
+        result->duration = container;
+    }
+    if (auto* field = resultField(value.direction)) {
+        storeEnumeration(*field, &result->direction, enumerationPlaybackDirection);
+    }
+    if (auto* field = resultField(value.easing)) {
+        result->easing = copyOwnedDomStringInput(asString(*field));
+    }
+    return result;
+}
+
+void releaseDictRvDomEffectTiming(RvDomEffectTiming* value)
+{
+    if (!value) return;
+    clearRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(const_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(value->duration));
+    std::free(const_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(value->duration));
+    std::free(const_cast<uint8_t*>(value->easing.data));
+    std::free(value);
+}
+
+RvDomComputedEffectTiming* encodeDictRvDomComputedEffectTiming(const ComputedEffectTiming& value)
+{
+    auto* result = static_cast<RvDomComputedEffectTiming*>(std::calloc(1, sizeof(RvDomComputedEffectTiming)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomComputedEffectTiming);
+    if (auto* field = resultField(value.delay)) {
+        result->delay = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.endDelay)) {
+        result->end_delay = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.fill)) {
+        storeEnumeration(*field, &result->fill, enumerationFillMode);
+    }
+    if (auto* field = resultField(value.iterationStart)) {
+        result->iteration_start = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.iterations)) {
+        result->iterations = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.duration)) {
+        auto* container = static_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(std::calloc(1, sizeof(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(resultValue(*field), container);
+        result->duration = container;
+    }
+    if (auto* field = resultField(value.direction)) {
+        storeEnumeration(*field, &result->direction, enumerationPlaybackDirection);
+    }
+    if (auto* field = resultField(value.easing)) {
+        result->easing = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.endTime)) {
+        auto* container = static_cast<RvDomUnionDoubleOrCSSNumericValue*>(std::calloc(1, sizeof(RvDomUnionDoubleOrCSSNumericValue)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionDoubleOrCSSNumericValue(resultValue(*field), container);
+        result->end_time = container;
+    }
+    if (auto* field = resultField(value.activeDuration)) {
+        auto* container = static_cast<RvDomUnionDoubleOrCSSNumericValue*>(std::calloc(1, sizeof(RvDomUnionDoubleOrCSSNumericValue)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionDoubleOrCSSNumericValue(resultValue(*field), container);
+        result->active_duration = container;
+    }
+    if (auto* field = resultField(value.localTime)) {
+        auto* container = static_cast<RvDomUnionDoubleOrCSSNumericValueNullable*>(std::calloc(1, sizeof(RvDomUnionDoubleOrCSSNumericValueNullable)));
+        RELEASE_ASSERT(container);
+        encodeRvDomUnionDoubleOrCSSNumericValueNullable(std::make_optional(resultValue(*field)), container);
+        result->local_time = container;
+    }
+    if (auto* field = resultField(value.progress)) {
+        auto* scalar = static_cast<double*>(std::malloc(sizeof(double)));
+        RELEASE_ASSERT(scalar);
+        *scalar = static_cast<double>(*field);
+        result->progress = scalar;
+    }
+    if (auto* field = resultField(value.currentIteration)) {
+        auto* scalar = static_cast<double*>(std::malloc(sizeof(double)));
+        RELEASE_ASSERT(scalar);
+        *scalar = static_cast<double>(*field);
+        result->current_iteration = scalar;
+    }
+    return result;
+}
+
+void releaseDictRvDomComputedEffectTiming(RvDomComputedEffectTiming* value)
+{
+    if (!value) return;
+    clearRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(const_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(value->duration));
+    std::free(const_cast<RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*>(value->duration));
+    std::free(const_cast<uint8_t*>(value->easing.data));
+    clearRvDomUnionDoubleOrCSSNumericValue(const_cast<RvDomUnionDoubleOrCSSNumericValue*>(value->end_time));
+    std::free(const_cast<RvDomUnionDoubleOrCSSNumericValue*>(value->end_time));
+    clearRvDomUnionDoubleOrCSSNumericValue(const_cast<RvDomUnionDoubleOrCSSNumericValue*>(value->active_duration));
+    std::free(const_cast<RvDomUnionDoubleOrCSSNumericValue*>(value->active_duration));
+    clearRvDomUnionDoubleOrCSSNumericValueNullable(const_cast<RvDomUnionDoubleOrCSSNumericValueNullable*>(value->local_time));
+    std::free(const_cast<RvDomUnionDoubleOrCSSNumericValueNullable*>(value->local_time));
+    std::free(const_cast<double*>(value->progress));
+    std::free(const_cast<double*>(value->current_iteration));
+    std::free(value);
+}
+
+RvDomComputedKeyframe* encodeDictRvDomComputedKeyframe(const Ranvier::ComputedKeyframe& value)
+{
+    auto* result = static_cast<RvDomComputedKeyframe*>(std::calloc(1, sizeof(RvDomComputedKeyframe)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomComputedKeyframe);
+    if (auto* field = resultField(value.offset)) {
+        auto* scalar = static_cast<double*>(std::malloc(sizeof(double)));
+        RELEASE_ASSERT(scalar);
+        *scalar = static_cast<double>(*field);
+        result->offset = scalar;
+    }
+    if (auto* field = resultField(value.computedOffset)) {
+        result->computed_offset = static_cast<double>(*field);
+    }
+    if (auto* field = resultField(value.easing)) {
+        result->easing = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.composite)) {
+        result->composite = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.properties)) {
+        auto* container = static_cast<RvDomSequenceKeyframeProperty*>(std::calloc(1, sizeof(RvDomSequenceKeyframeProperty)));
+        RELEASE_ASSERT(container);
+        encodeRvDomSequenceKeyframeProperty(resultValue(*field), container);
+        result->properties = container;
+    }
+    return result;
+}
+
+void releaseDictRvDomComputedKeyframe(RvDomComputedKeyframe* value)
+{
+    if (!value) return;
+    std::free(const_cast<double*>(value->offset));
+    std::free(const_cast<uint8_t*>(value->easing.data));
+    std::free(const_cast<uint8_t*>(value->composite.data));
+    clearRvDomSequenceKeyframeProperty(const_cast<RvDomSequenceKeyframeProperty*>(value->properties));
+    std::free(const_cast<RvDomSequenceKeyframeProperty*>(value->properties));
+    std::free(value);
+}
+
+RvDomKeyframeProperty* encodeDictRvDomKeyframeProperty(const Ranvier::KeyframeProperty& value)
+{
+    auto* result = static_cast<RvDomKeyframeProperty*>(std::calloc(1, sizeof(RvDomKeyframeProperty)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomKeyframeProperty);
+    if (auto* field = resultField(value.name)) {
+        result->name = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.value)) {
+        result->value = copyOwnedDomStringInput(asString(*field));
+    }
+    return result;
+}
+
+void releaseDictRvDomKeyframeProperty(RvDomKeyframeProperty* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->name.data));
+    std::free(const_cast<uint8_t*>(value->value.data));
     std::free(value);
 }
 }
@@ -4075,9 +4369,19 @@ void ranvier_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDo
     if (isMainThread()) clearRvDomUnionUnsignedLongOrAnimationFrameRatePreset(value);
 }
 
+void ranvier_dom_union_unrestricted_double_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrDOMString* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrDOMString(value);
+}
+
 void ranvier_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* value)
 {
     if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(value);
+}
+
+void ranvier_dom_sequence_computed_keyframe_release(RvDomSequenceComputedKeyframe* value)
+{
+    if (isMainThread()) clearRvDomSequenceComputedKeyframe(value);
 }
 
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
@@ -4128,6 +4432,26 @@ void ranvier_dom_url_pattern_init_release(RvDomURLPatternInit* value)
 void ranvier_dom_url_pattern_component_result_release(RvDomURLPatternComponentResult* value)
 {
     if (isMainThread()) releaseDictRvDomURLPatternComponentResult(value);
+}
+
+void ranvier_dom_effect_timing_release(RvDomEffectTiming* value)
+{
+    if (isMainThread()) releaseDictRvDomEffectTiming(value);
+}
+
+void ranvier_dom_computed_effect_timing_release(RvDomComputedEffectTiming* value)
+{
+    if (isMainThread()) releaseDictRvDomComputedEffectTiming(value);
+}
+
+void ranvier_dom_computed_keyframe_release(RvDomComputedKeyframe* value)
+{
+    if (isMainThread()) releaseDictRvDomComputedKeyframe(value);
+}
+
+void ranvier_dom_keyframe_property_release(RvDomKeyframeProperty* value)
+{
+    if (isMainThread()) releaseDictRvDomKeyframeProperty(value);
 }
 
 void ranvier_dom_dom_implementation_release(RvDOMImplementation* handle)
@@ -42813,6 +43137,76 @@ int32_t ranvier_dom_web_animation_commit_styles(RvEventTarget* target)
     return invoke([&]() -> decltype(auto) { return impl->commitStyles(); });
 }
 
+// AnimationEffect.getTiming() -> EffectTiming; *result is owned; release it with rv_dom_effect_timing_release
+int32_t ranvier_dom_animation_effect_get_timing(RvAnimationEffect* target, RvDomEffectTiming** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<AnimationEffect> impl = reinterpret_cast<AnimationEffect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getBindingsTiming(); }, [&](auto&& value) { return (*result = encodeDictRvDomEffectTiming(value), RV_OK); });
+}
+
+// AnimationEffect.getComputedTiming() -> ComputedEffectTiming; *result is owned; release it with rv_dom_computed_effect_timing_release
+int32_t ranvier_dom_animation_effect_get_computed_timing(RvAnimationEffect* target, RvDomComputedEffectTiming** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<AnimationEffect> impl = reinterpret_cast<AnimationEffect*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getBindingsComputedTiming(); }, [&](auto&& value) { return (*result = encodeDictRvDomComputedEffectTiming(value), RV_OK); });
+}
+
+// AnimationEffect.updateTiming(optional OptionalEffectTiming timing = {}) -> undefined; context is an explicit checked Document for the operation; timing defaults to {} in IDL; timing may be NULL for the IDL default; RV_ERR_WRONG_HOST for a context other than the object's document
+int32_t ranvier_dom_animation_effect_update_timing(RvAnimationEffect* target, RvNode* context, const RvDomOptionalEffectTiming* timing)
+{
+    if (!target || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<AnimationEffect> impl = reinterpret_cast<AnimationEffect*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    if (auto* own = [&]() -> Document* { auto* effect = dynamicDowncast<KeyframeEffect>(impl.get()); return effect ? effect->document() : nullptr; }(); own && own != document.ptr())
+        return RV_ERR_WRONG_HOST;
+    OptionalEffectTiming a0 { };
+    if (timing) {
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, delay) + sizeof(timing->delay) && timing->delay)
+            assignValue(a0.delay, *timing->delay);
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, end_delay) + sizeof(timing->end_delay) && timing->end_delay)
+            assignValue(a0.endDelay, *timing->end_delay);
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, fill) + sizeof(timing->fill) && timing->fill && !assignEnumeration(a0.fill, *timing->fill, enumerationFillMode))
+            return RV_ERR_UNSUPPORTED;
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, iteration_start) + sizeof(timing->iteration_start) && timing->iteration_start)
+            assignValue(a0.iterationStart, *timing->iteration_start);
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, iterations) + sizeof(timing->iterations) && timing->iterations)
+            assignValue(a0.iterations, *timing->iterations);
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, duration) + sizeof(timing->duration) && timing->duration) {
+            int32_t status = RV_OK;
+            auto value = decodeRvDomUnionUnrestrictedDoubleOrDOMString(timing->duration, status);
+            if (status != RV_OK) return status;
+            a0.duration = std::move(*value);
+        }
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, direction) + sizeof(timing->direction) && timing->direction && !assignEnumeration(a0.direction, *timing->direction, enumerationPlaybackDirection))
+            return RV_ERR_UNSUPPORTED;
+        if (timing->size >= offsetof(RvDomOptionalEffectTiming, easing) + sizeof(timing->easing)) {
+            if (timing->easing.present != 0 && timing->easing.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (timing->easing.present) {
+                if (timing->easing.length < 0 || (timing->easing.length > 0 && !timing->easing.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a0.easing, timing->easing.data, timing->easing.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+    }
+    return invoke([&]() -> decltype(auto) { return impl->bindingsUpdateTiming(document.get(), std::move(a0)); });
+}
+
 // KeyframeEffect.constructor: target is the Document of the constructed object; target_ may be NULL; options defaults to {} in IDL; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; *result is a new reference; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object
 int32_t ranvier_dom_keyframe_effect_create_3(RvNode* target, RvNode* target_, const RvDomSequenceKeyframeNullable* keyframes, const RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* options, RvAnimationEffect** result)
 {
@@ -42971,7 +43365,20 @@ int32_t ranvier_dom_keyframe_effect_set_composite(RvAnimationEffect* target, int
     return invoke([&]() -> decltype(auto) { return impl->setBindingsComposite(*a0); });
 }
 
-// KeyframeEffect.setKeyframes(sequence<Keyframe>? keyframes) -> undefined; context is an explicit checked Document for the operation; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object
+// KeyframeEffect.getKeyframes() -> sequence<ComputedKeyframe>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_keyframe_effect_get_keyframes(RvAnimationEffect* target, RvDomSequenceComputedKeyframe* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return Ranvier::computedKeyframes(*impl); }, [&](auto&& value) { return encodeRvDomSequenceComputedKeyframe(value, result); });
+}
+
+// KeyframeEffect.setKeyframes(sequence<Keyframe>? keyframes) -> undefined; context is an explicit checked Document for the operation; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; RV_ERR_WRONG_HOST for a context other than the object's document; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object
 int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvNode* context, const RvDomSequenceKeyframeNullable* keyframes)
 {
     if (!target || !context)
@@ -42985,6 +43392,8 @@ int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvN
     if (!contextDocument)
         return RV_ERR_WRONG_INTERFACE;
     Ref document = contextDocument.releaseNonNull();
+    if (auto* own = impl->document(); own && own != document.ptr())
+        return RV_ERR_WRONG_HOST;
     auto* global = document->globalObject();
     if (!global)
         return Ranvier::recordException(Exception { ExceptionCode::InvalidStateError, "The document has no global object."_s });
