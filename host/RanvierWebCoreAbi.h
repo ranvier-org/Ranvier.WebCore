@@ -717,7 +717,7 @@ RV_EXPORT int32_t rv_observer_unobserve(RvObserver*, RvNode* element);
 /* Disconnects the observer and frees it, before rv_host_destroy. Its callback will not run after this returns. */
 RV_EXPORT void rv_observer_release(RvObserver*);
 
-/* v56: "resize-entries" for rv_abi_has. A ResizeObserver delivering ResizeObserverEntry data: the content rectangle and
+/* v55: "resize-entries" for rv_abi_has. A ResizeObserver delivering ResizeObserverEntry data: the content rectangle and
  * the logical content and border box sizes. */
 typedef struct RvResizeEntry {
     /* sizeof(RvResizeEntry). */
@@ -770,7 +770,7 @@ RV_EXPORT int32_t rv_observer_observe_box(RvObserver*, RvNode* element, int32_t 
  * notifications. The observer stays valid, observes again, and is freed with rv_observer_release. */
 RV_EXPORT int32_t rv_observer_disconnect(RvObserver*);
 
-/* v57: "intersection-entries" for rv_abi_has. An IntersectionObserver with a viewport, document or element root,
+/* v55: "intersection-entries" for rv_abi_has. An IntersectionObserver with a viewport, document or element root,
  * root and scroll margins, delivering IntersectionObserverEntry data, and its queued records. */
 typedef struct RvIntersectionEntry {
     /* sizeof(RvIntersectionEntry). */
@@ -1537,7 +1537,7 @@ RV_EXPORT RvEventTarget* rv_host_match_media(RvHost*, const char* query);
 RV_EXPORT int32_t rv_media_query_matches(RvEventTarget*, int32_t* matches);
 RV_EXPORT int32_t rv_media_query_media(RvEventTarget*, char* buffer, int32_t capacity, int32_t* length);
 
-/* v54: "media-preferences" for rv_abi_has. The user preferences and input devices the host supplies to media query
+/* v55: "media-preferences" for rv_abi_has. The user preferences and input devices the host supplies to media query
  * evaluation. Every field's RV_MEDIA_DEFAULT (0) keeps the engine's own value: light, no motion or contrast
  * preference, no pointing device, no hover, and text at its page size. */
 enum {
