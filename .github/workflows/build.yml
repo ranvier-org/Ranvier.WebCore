@@ -6,6 +6,7 @@ on:
     branches: [main]
     tags: ['v*']
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
     inputs:
       flavor:
@@ -92,6 +93,8 @@ jobs:
         shell: python
         env:
           RIDS: ${{ inputs.rids }}
+          HEAD_REF: ${{ github.head_ref }}
+          FULL_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'full-matrix') }}
           FLAVOR: ${{ inputs.flavor || 'slim' }}
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -109,6 +112,10 @@ jobs:
               dict(rid='osx-arm64', runner='macos-26', work='/Users/runner/rw'),
           ]
           wanted = [r.strip() for r in os.environ.get('RIDS', '').split(',') if r.strip()]
+          # A pull request builds win-x64 only, unless it is a batch branch or carries the full-matrix label.
+          if os.environ['GITHUB_EVENT_NAME'] == 'pull_request' and not os.environ['HEAD_REF'].startswith('codex/batch-') \
+                  and os.environ['FULL_LABEL'] != 'true':
+              wanted = ['win-x64']
           include = [r for r in runtimes if not wanted or r['rid'] in wanted]
           if not include:
               raise SystemExit(f'no runtime matches {wanted}')
