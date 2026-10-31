@@ -28,7 +28,7 @@ for repo in ['ranvier-org/Ranvier.WebCore', 'ranvier-org/Ranvier', 'ranvier-org/
     gh.append({'repository': repo, 'matchingTags': [t for t in tags if any(m in t for m in marks)], 'openPullRequests': prs})
 import glob
 local = {w: subprocess.run(['git','grep','-n','return 53;','--','host/RanvierWebCoreAbi.cpp'], cwd=w, capture_output=True, text=True).stdout.strip() for w in sorted(glob.glob('C:/wk/native-*')) if Path(w, 'host/RanvierWebCoreAbi.cpp').is_file()}
-STACKED = '5eee88a (I11 Native41/ABI49 final; H08, #142 strings, #144 blob precede G14 and are merged before the evidence run; ABI50-52 belong to them)'
+STACKED = 'ac4cec1 (merges H08 acf26e3 Native42/ABI50, #142 3e6639d Native43/ABI51, #144 f0eb376 Native44/ABI52 onto I11 5eee88a Native41/ABI49)'
 abi = subprocess.run(['git','grep','-n','return 53;','--','host/RanvierWebCoreAbi.cpp'], cwd='C:/wk/native-coords', capture_output=True, text=True).stdout
 receipt = {'checkedAtUtc': datetime.datetime.now(datetime.UTC).isoformat(), 'purpose': 'G14 coordinate-space conversion Native45/ABI53, DOM alpha.48, Views 0.1.38, WebCore backend alpha.38 reservation (ABI50-52 belong to H08, #142 and #144)', 'abi': 53, 'stackedOn': STACKED, 'abiNumberInUse': abi.strip(), 'localWorktreesReturning53': {k: v for k, v in local.items() if v}, 'packages': rows, 'github': gh}
 Path('C:/wk/native-coords/docs/coordinate-evidence/allocation-absence.json').write_text(json.dumps(receipt, indent=2))
