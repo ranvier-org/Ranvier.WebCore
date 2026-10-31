@@ -465,6 +465,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/listener_signal_removal.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify screen wake locks
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/wake_locks.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify font readiness without JavaScript
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/font_load.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"

@@ -389,6 +389,13 @@ let private viewportDelegate =
 let private viewportCallback =
     System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate viewportDelegate
 
+type private WakeLockPolicy = delegate of context: nativeint * host: nativeint * kind: int -> int
+
+let private grantDelegate = WakeLockPolicy(fun _ _ _ -> 1)
+
+let private grantPolicy =
+    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate grantDelegate
+
 /// Appends a div with a child span, takes one extra handle of the kind from the div (removing the div first when
 /// <c>remove</c> is set), destroys the host, then releases that handle. The document and the div must be destroyed
 /// after collection whatever the destroy order.
@@ -489,6 +496,34 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if viewportCalls <> 0 then
                     failwith "scroll listener ran after host destroy"
+        | "wake lock sentinel" ->
+            rv_host_set_wake_lock_policy (host, grantPolicy, 0n) |> check "wake lock policy"
+            let sentinel = [| 0n |]
+            rv_wake_lock_request (host, 0, sentinel) |> check "wake lock request"
+            held.Value <- sentinel[0]
+
+            let listener =
+                rv_event_target_add_listener (held.Value, utf8 "release", utf8Length "release", 0, viewportCallback, 0n)
+
+            if listener = 0n then
+                failwith "no release listener"
+
+            fun () ->
+                let mutable released = -1
+                let mutable wakeType = -1
+
+                rv_wake_lock_state (held.Value, &released, &wakeType)
+                |> check "wake lock state after destroy"
+
+                if released <> 1 then
+                    failwithf "wake lock released %d after destroy" released
+
+                rv_wake_lock_release held.Value |> check "wake lock release after destroy"
+                rv_listener_remove listener |> check "release listener removal after destroy"
+                rv_event_target_release held.Value
+
+                if viewportCalls <> 0 then
+                    failwith "release listener ran after host destroy"
         | "coordinate spaces" ->
             rv_element_set_style (div, "width", utf8 "40px", utf8Length "40px", 0) |> check "div width"
             rv_element_set_style (div, "height", utf8 "20px", utf8Length "20px", 0) |> check "div height"
@@ -1379,6 +1414,7 @@ let run (outDir: string) =
                     "string results"
                     "aria relations"
                     "coordinate spaces"
+                    "wake lock sentinel"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

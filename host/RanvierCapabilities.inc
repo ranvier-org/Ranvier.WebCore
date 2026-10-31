@@ -22,7 +22,8 @@ static constexpr const char* capabilityFacilityNames[] = {
     "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications", "diagnostics",
     "inspector-frontend", "cascade-diagnostics", "media-preferences", "media-color-scheme", "media-reduced-motion",
     "media-contrast", "media-pointer", "media-hover", "media-text-scale", "media-forced-colors", "media-contrast-less",
-    "media-reduced-transparency", "media-reduced-data"
+    "media-reduced-transparency", "media-reduced-data",
+    "screen-wake-lock", "sleep-disabler-callback"
 };
 
 static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
@@ -252,6 +253,9 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     // reduced-data feature.
     else if (!std::strcmp(name, "media-forced-colors") || !std::strcmp(name, "media-contrast-less")
         || !std::strcmp(name, "media-reduced-transparency") || !std::strcmp(name, "media-reduced-data")) result.facts[1] = 0;
+    // Granted only by an application policy; the display stays awake only through a sleep disabler callback.
+    else if (!std::strcmp(name, "screen-wake-lock")) { result.facts[1] = 1; result.boolean(!!host.wakeLockPolicy); }
+    else if (!std::strcmp(name, "sleep-disabler-callback")) { result.facts[1] = 1; result.boolean(sleepDisablerCallbackSet); }
     // No flavor ships a developer-tools frontend (WebInspectorUI) or connects one to the page's inspector controller.
     else if (!std::strcmp(name, "inspector-frontend")) { result.facts[1] = 0; result.facts[4] = 0; }
     else if (capabilityContains(capabilityHostFacilityNames, name)) result.facts[1] = 1;

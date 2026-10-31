@@ -2072,6 +2072,41 @@ RV_EXPORT int32_t rv_canvas_get_context(RvNode* canvas, int32_t type, const RvCa
  * settings unchanged, when settings->size is below sizeof(RvCanvas2DSettings). */
 RV_EXPORT int32_t rv_canvas_context_2d_attributes(RvCanvasRenderingContext2D* context, RvCanvas2DSettings* settings);
 
+/* Screen wake locks, where rv_abi_has("wake-locks") is 1. A sentinel is a WakeLockSentinel EventTarget: its
+ * "release" event (not bubbling, not cancelable, trusted) runs listeners added with rv_event_target_add_listener. */
+enum {
+    RV_WAKE_LOCK_SCREEN = 0,
+};
+
+/* Decides a host's wake lock request: 1 grants it, any other value denies it. Runs inside rv_wake_lock_request, after
+ * the document checks pass; it must not destroy the host. */
+typedef int32_t (*RvWakeLockPolicy)(void* context, RvHost* host, int32_t type);
+/* Sets the application policy for the host's requests. A host without a policy denies every request. */
+RV_EXPORT int32_t rv_host_set_wake_lock_policy(RvHost*, RvWakeLockPolicy policy, void* context);
+/* WakeLock.request(type) for the host's current document, synchronously. On success *sentinel is a new EventTarget
+ * reference to an unreleased sentinel, which the caller releases with rv_event_target_release. An unknown type returns
+ * RV_ERR_DOM_EXCEPTION with TypeError. A document that is not fully active or is hidden, the screen-wake-lock
+ * permissions policy feature disabled, or a denied policy return RV_ERR_DOM_EXCEPTION with NotAllowedError. */
+RV_EXPORT int32_t rv_wake_lock_request(RvHost*, int32_t type, RvEventTarget** sentinel);
+/* WakeLockSentinel.release(): releases the lock and dispatches "release" before returning. A released sentinel stays
+ * released and dispatches nothing. Valid after the document is replaced or destroyed. RV_ERR_WRONG_INTERFACE for
+ * another target. */
+RV_EXPORT int32_t rv_wake_lock_release(RvEventTarget* sentinel);
+/* The sentinel's released flag (1 or 0) and its RV_WAKE_LOCK_* type. */
+RV_EXPORT int32_t rv_wake_lock_state(RvEventTarget* sentinel, int32_t* released, int32_t* type);
+/* Releases every lock of the host's current document, in acquisition order, each with its "release" event. Hiding the
+ * page (rv_host_set_visible) does the same. Replacing or destroying the document releases its locks with no event. */
+RV_EXPORT int32_t rv_host_release_wake_locks(RvHost*);
+
+/* Reports WebCore's display and system sleep disablers: held is 1 when the disabler identified by id starts and 0
+ * when it ends. A screen wake lock holds one display disabler per document while any of its locks is held, with the
+ * reason "Screen Wake Lock"; media playback holds others. display is 1 for a display disabler, 0 for a system one. */
+typedef void (*RvSleepDisablerCallback)(void* context, uint64_t id, int32_t display, const char* reason, int32_t held);
+/* Sets the process's sleep disabler callback, or with NULL removes it; disablers that start without a callback are
+ * never reported. Without a callback no platform service keeps the display awake. Returns RV_ERR_WRONG_THREAD off
+ * the owning thread or before the first rv_host_create. */
+RV_EXPORT int32_t rv_set_sleep_disabler_callback(RvSleepDisablerCallback callback, void* context);
+
 #ifdef __cplusplus
 }
 #endif

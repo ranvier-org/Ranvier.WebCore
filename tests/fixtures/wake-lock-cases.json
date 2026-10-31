@@ -1,0 +1,25 @@
+{
+  "description": "Screen Wake Lock outcomes (B10, WebCore #118). Chromium values come from tests/abi/wake_lock_browser.mjs; native values from tests/abi/wake_locks.py. A qualified case records where the engines differ and why.",
+  "cases": {
+    "ungranted-request": {"chromium": "NotAllowedError", "native": "NotAllowedError", "note": "Chromium without the screen-wake-lock permission; native with a host policy that denies"},
+    "unknown-type": {"chromium": "TypeError", "native": "TypeError"},
+    "default-type": {"chromium": "screen", "native": "screen"},
+    "distinct-sentinels": {"chromium": true, "native": true},
+    "release-log": {
+      "chromium": [["a-on", "release", false, false, true, true], ["a-listener"], ["after-release-call", true], ["after-await", true], ["second-release", true], ["b-listener"]],
+      "native": [["a-on", "release", false, false, true, true], ["a-listener"], ["after-release-call", true], ["after-await", true], ["second-release", true], ["b-listener"]]
+    },
+    "detached-request": {"chromium": "NotAllowedError", "native": null, "qualification": "A native host has one document and no frames, so no detached document can request; a destroyed host is not a valid argument."},
+    "document-teardown": {
+      "chromium": {"released": false, "events": []},
+      "native": {"released": true, "events": []},
+      "qualification": "WebKit releases every lock when the document stops (Document::stopActiveDOMObjects) and fires no release event in a stopped context; Chromium leaves released false on the detached sentinel. Neither engine fires an event."
+    },
+    "permissions-policy-none": {"chromium": "NotAllowedError", "native": null,
+      "qualification": "A native host document has no response headers or iframes; rv_wake_lock_request still evaluates the screen-wake-lock policy feature, which a top-level native document allows."},
+    "permissions-policy-header": {"chromium": "NotAllowedError", "native": null, "qualification": "As permissions-policy-none."},
+    "hidden-release": {"chromium": null, "native": [["a", "release"], ["b", "release"]],
+      "qualification": "Automated Chromium keeps every page visible (headless and headed, minimized or behind another tab), so the hidden-document release is native-only evidence."},
+    "hidden-request": {"chromium": null, "native": "NotAllowedError", "qualification": "As hidden-release."}
+  }
+}
