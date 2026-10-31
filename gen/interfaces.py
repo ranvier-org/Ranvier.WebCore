@@ -560,7 +560,13 @@ class InterfaceEmitter:
                     value = default + suffix
                 else:
                     value = 'Unchecked.defaultof<_>'
-                body += [f'    member val {identifier(member.name)}: {ftype} = {value} with get, set']
+                line = f'    member val {identifier(member.name)}: {ftype} = {value} with get, set'
+                if len(line) > 120:
+                    # Fantomas breaks a long field after the equals sign, with blank lines around it.
+                    body += ([] if not body or body[-1] == '' else ['']) + [
+                        f'    member val {identifier(member.name)}: {ftype} =', f'        {value} with get, set', '']
+                else:
+                    body.append(line)
             declarations.append((name + '()', '[<AllowNullLiteral; DomDictionary>]', body or ['    class end']))
         for name in sorted(self.callbacks):
             if name == 'EventListener':

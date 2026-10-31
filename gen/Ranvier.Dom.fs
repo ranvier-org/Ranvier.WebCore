@@ -5729,7 +5729,10 @@ and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
     member val fill: FillMode = FillMode.Auto with get, set
     member val iterationStart: float = 0.0 with get, set
     member val iterations: float = 1.0 with get, set
-    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString = UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
     member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
     member val easing: string = "linear" with get, set
     member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
@@ -5812,7 +5815,10 @@ and [<AllowNullLiteral; DomDictionary>] KeyframeAnimationOptions() =
     member val fill: FillMode = FillMode.Auto with get, set
     member val iterationStart: float = 0.0 with get, set
     member val iterations: float = 1.0 with get, set
-    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString = UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
     member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
     member val easing: string = "linear" with get, set
     member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
