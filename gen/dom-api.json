@@ -570,6 +570,10 @@
       "base": "Element"
     },
     {
+      "name": "MathMLMathElement",
+      "base": "MathMLElement"
+    },
+    {
       "name": "HTMLStyleElement",
       "base": "HTMLElement"
     },
@@ -1977,6 +1981,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "mathml/MathMLElement.idl"
+    },
+    {
+      "name": "MathMLMathElement",
+      "idlName": "MathMLMathElement",
+      "base": "MathMLElement",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "mathml/MathMLMathElement.idl"
     },
     {
       "name": "HTMLStyleElement",

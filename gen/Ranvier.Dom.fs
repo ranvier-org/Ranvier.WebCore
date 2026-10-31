@@ -1728,6 +1728,10 @@ and [<AllowNullLiteral>] MathMLElement =
     inherit HTMLOrSVGElement
     inherit ElementCSSInlineStyle
 
+/// <summary>MathMLMathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MathMLMathElement =
+    inherit MathMLElement
+
 /// <summary>HTMLStyleElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLStyleElement =
     inherit HTMLElement
