@@ -1,0 +1,3 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+MSVC 14.50.35717 - tested: 14.50.35717
+MATHML H05 CANDIDATE READY: C:\wk\native-mathml\artifacts\mathml-candidate-23-h05\runtime {'WebCore.dll': 'cc7982f6', 'RanvierWebCoreHost.dll': 'b011acf3', 'JavaScriptCore.dll': '95149cdc'}

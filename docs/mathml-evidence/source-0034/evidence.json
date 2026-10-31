@@ -1,0 +1,126 @@
+{
+  "status": "private-win-x64-producer-verified (Native23/ABI31 + Source 0034, unpublished)",
+  "sourcePatch": {
+    "name": "0034-svg-string-list-null-attribute.patch",
+    "sha256": "efa6924f47906ed0c8d2e0620947945b73218ead6030c182d68438a2522242ee",
+    "files": [
+      "Source/WebCore/svg/SVGStringList.cpp"
+    ]
+  },
+  "compiledScope": "UnifiedSource-svg-14 (SVGStringList.cpp), RanvierDomGlue and four host units against the pre-H05 header overlay; the other 55 replacement objects are borrowed read-only from native21-candidate-0032",
+  "headerOverlay": {
+    "svg14IncludesImageLoaderOrImageElements": false,
+    "includeCount": 1446
+  },
+  "runtime": {
+    "RanvierWebCoreHost.dll": "513c77c6ad6c0ee500eb635166115cc924d590aa7d32f91b9a6d77f75e544830",
+    "WebCore.dll": "1bffd0854e2cbe410a05cac9731db884a49f839f930e1a8306d3a99077466786",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "red": {
+    "runtime": "artifacts/mathml-candidate-23 (Native23 frozen)",
+    "failures": [
+      "requiredExtensions.removed.items: native 1, Chromium 0",
+      "requiredExtensions.removedAgain.items: native 1, Chromium 0",
+      "requiredExtensions.reinserted.items: native 1, Chromium 0",
+      "requiredExtensions.reinserted.paint: native [255, 255, 255, 255], Chromium [0, 255, 0, 255]",
+      "systemLanguage.removed.items: native 1, Chromium 0",
+      "systemLanguage.removedAgain.items: native 1, Chromium 0",
+      "systemLanguage.reinserted.items: native 1, Chromium 0",
+      "systemLanguage.reinserted.paint: native [255, 255, 255, 255], Chromium [0, 255, 0, 255]",
+      "switch.reinserted: native [0, 0, 255, 255], Chromium [0, 255, 0, 255]"
+    ]
+  },
+  "green": {
+    "runtime": "artifacts/mathml-candidate-23-0034b",
+    "failures": [],
+    "qualified": [
+      {
+        "field": "requiredExtensions",
+        "step": "empty",
+        "key": "items",
+        "native": 1,
+        "chromium": 0
+      },
+      {
+        "field": "requiredExtensions",
+        "step": "cleared",
+        "key": "attribute",
+        "native": "",
+        "chromium": null
+      },
+      {
+        "field": "systemLanguage",
+        "step": "cleared",
+        "key": "attribute",
+        "native": "",
+        "chromium": null
+      },
+      {
+        "field": "systemLanguage",
+        "step": "appended",
+        "key": "attribute",
+        "native": "zz, zz",
+        "chromium": "zz,zz"
+      }
+    ]
+  },
+  "oracle": {
+    "file": "tests/fixtures/svg-tests-lists-oracle.json",
+    "sha256": "b46f34881eeadd7f01f65fb3d1961a499644d058d8389f3c5f89ef099300c31e",
+    "browser": "156.0.8078.4"
+  },
+  "affectedBatch": {
+    "assertions": {
+      "svg_tests_lists": 191,
+      "svg_geometry": 639,
+      "svg_surfaces": 1594,
+      "svg_mathml_surface": 95,
+      "svg_paint_servers": 565,
+      "svg_clip_mask_marker": 565,
+      "svg_resources": 454,
+      "mathml_surface": 371,
+      "capabilities": 6948
+    },
+    "total": 11422,
+    "exitCodes": {
+      "svg_tests_lists": 0,
+      "svg_geometry": 0,
+      "svg_surfaces": 0,
+      "svg_mathml_surface": 0,
+      "svg_paint_servers": 0,
+      "svg_clip_mask_marker": 0,
+      "svg_resources": 0,
+      "mathml_surface": 0,
+      "capabilities": 0
+    }
+  },
+  "qualifications": [
+    "SVGStringList.clear() leaves the requiredExtensions/systemLanguage attribute \"\" natively; Chromium 156 removes it (null). Both report numberOfItems 0 and a valid SVGTests element. The earlier \"systemLanguage \\\"\\\" after clear\" qualification therefore remains, now confined to the attribute value.",
+    "systemLanguage serialises with \", \" natively (\"zz, zz\"); Chromium 156 serialises \"zz,zz\".",
+    "requiredExtensions=\"\" holds one empty item natively; Chromium 156 reports numberOfItems 0.",
+    "Chromium 156 repaints a conditional element only when its renderer is rebuilt; SVGTests validity is compared after re-appending the element (and the switch)."
+  ],
+  "files": {
+    "batch/capabilities.log": "a6101bcd2fd662c1d2818f115cd3b44a1286a6fe11d708d8f3c0dc2e8d7fd960",
+    "batch/mathml_surface.log": "56d48519e6426f8dd3b9ce30e425e4bcdb8706a31bad44a061392e1d903d4ac5",
+    "batch/results.json": "e841afa12e8279cbc8b60d3e4dc75dd6cca5f09f1cf53b58ab9ef812e56be4db",
+    "batch/svg_clip_mask_marker.log": "e16f521e717f252b4f1ea93688bded2b355b95918481a3fe4c93e1c1770a0b55",
+    "batch/svg_geometry.log": "2fe8049b46ffce2bd4b349dfdd7066caeda689ee3ec0dcdb9f86861c58ed76cb",
+    "batch/svg_mathml_surface.log": "6221d6c18fff05c9aa0010b9b3c6edc3a4752fa82b16782d2182769e16c7e036",
+    "batch/svg_paint_servers.log": "4fee53f7e062bb018ebea3b6218dfca73e4fe5cf6a563e36e925c18650dc3731",
+    "batch/svg_resources.log": "a205f7e30a24e5a88f3d18a06349efafde93d4c2217bf46e5655bf2df54683ce",
+    "batch/svg_surfaces.log": "836c19207512a19d33faf26d61626eddb6f8dcca8d5f1c2b3b9551d69cc68a74",
+    "batch/svg_tests_lists.log": "acf281005da2802259647ade5f0a0d4ee2599f3d9012e65ccadad5643e3f7d4e",
+    "build_mathml_0034_candidate.py": "4d4be1a59804e28b18dbcbf994eb06c1777cf15d460e55177a9499406d5a63f4",
+    "mathml-build-23-0034b.log": "48132a2458c135c0b1678a1d7253762cbac7c7171f54a1d7cb9725708fc6610b",
+    "patch-chain.log": "e282d4abd2068b245e1f6e7a45da18a8137683a05e8ab7de898a99d10c5cbfd8",
+    "replacement-objects.json": "273f831a8c601076752d24f9afcc27c2900a339f5e45b30f44d8568ced24e035",
+    "run_native23_0034_batch.py": "840e5d1a981662d3f1f069eaa6b9f2129486c066045874237176b98fb31c489c",
+    "runtime-receipt.json": "08587463f9779e80a9d1fe607181d46d93bf3d0ea069982499cd677e4194631f",
+    "runtime-sha256.json": "8d043dbb368a3c758939fa0e0469f897492d5aa99fccff06318b766ada337be7",
+    "svg-14-includes.txt": "4a2e4707b727eba49de0fcf28ca8f73e4882d16911a591d94f5d3a538bfa0a9d",
+    "svg-tests-lists-green.log": "b8aa2ce79f137f4e019ddd5da9eb604beac1ed43328ae64d5bfa2d51148b5eeb",
+    "svg-tests-lists-red.log": "e919a563ecb08834a62079bad734d6a0868218ab89c3efe6f11fbf23133f21e7"
+  }
+}

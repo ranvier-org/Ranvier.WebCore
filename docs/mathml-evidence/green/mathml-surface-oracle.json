@@ -1,0 +1,230 @@
+{
+  "source": "tests/abi/mathml_surface_browser.mjs",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "browserOnly": {
+    "instanceofMathMLElement": {
+      "math": true,
+      "row": true,
+      "mi": true,
+      "mo": true,
+      "frac": true,
+      "num": true,
+      "den": true,
+      "sqrt": true,
+      "rad": true,
+      "inline": true,
+      "focusable": true,
+      "second": true,
+      "plain": true
+    },
+    "MathMLMathElementExposed": false,
+    "instanceofHTMLElement": {
+      "math": false,
+      "row": false,
+      "mi": false,
+      "mo": false,
+      "frac": false,
+      "num": false,
+      "den": false,
+      "sqrt": false,
+      "rad": false,
+      "inline": false,
+      "focusable": false,
+      "second": false,
+      "plain": false
+    }
+  },
+  "state": {
+    "identity": {
+      "math": {
+        "localName": "math",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "row": {
+        "localName": "mrow",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "mi": {
+        "localName": "mi",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "mo": {
+        "localName": "mo",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "frac": {
+        "localName": "mfrac",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "num": {
+        "localName": "mn",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "den": {
+        "localName": "mn",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "sqrt": {
+        "localName": "msqrt",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "rad": {
+        "localName": "mi",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "inline": {
+        "localName": "math",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "focusable": {
+        "localName": "mi",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "second": {
+        "localName": "mo",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      },
+      "plain": {
+        "localName": "mn",
+        "namespace": "http://www.w3.org/1998/Math/MathML"
+      }
+    },
+    "members": {
+      "math": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": "display"
+      },
+      "row": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "mi": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "mo": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "frac": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "num": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "den": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "sqrt": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "rad": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "inline": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "focusable": {
+        "tabIndex": 0,
+        "autofocus": true,
+        "nonce": "abc",
+        "nonceAttribute": "abc",
+        "dataKind": null
+      },
+      "second": {
+        "tabIndex": 0,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      },
+      "plain": {
+        "tabIndex": -1,
+        "autofocus": false,
+        "nonce": "",
+        "nonceAttribute": null,
+        "dataKind": null
+      }
+    },
+    "layout": {
+      "initial": {
+        "numAboveDen": true,
+        "fracTallerThanMi": true,
+        "sqrtWiderThanRadicand": true,
+        "moRightOfMi": true
+      },
+      "paddingShift": 5,
+      "paddingTyped": [
+        "CSSUnitValue",
+        10,
+        "px"
+      ],
+      "fontScale": 1.998533724340176,
+      "fontScaleRange": true,
+      "fracBackground": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "compactShrinksFraction": true,
+      "mathStyle": "compact"
+    },
+    "focus": {
+      "initialActive": "",
+      "afterFocus": "focusable",
+      "afterUnfocusable": "focusable",
+      "afterBlur": "",
+      "plainTabIndex": "0",
+      "afterTabIndexFocus": "plain",
+      "autofocusAttribute": null,
+      "nonceAfterSet": "changed",
+      "nonceAttributeAfterSet": "abc",
+      "datasetAttribute": "value-λ",
+      "datasetDeleted": null,
+      "afterTab": "second"
+    }
+  },
+  "nativeQualifications": {},
+  "qualificationNotes": {
+    "members.dataKind": "Not a native qualification: the shared contract (alpha.13 dataset missing-key semantics) normalises a missing key to \"\" on native and Fable; raw Chromium returns undefined. Presence is asserted through the data-* attribute.",
+    "MathMLMathElement": "NotExposed in measured Chromium 156 (no global interface); native exposes it as a typed model interface with capability dom:MathMLMathElement and no own members.",
+    "MathMLEnabled": "Host always enables MathML; generated members return RV_ERR_UNSUPPORTED when the setting is off, but the disabled-setting behaviour is unexercised."
+  }
+}

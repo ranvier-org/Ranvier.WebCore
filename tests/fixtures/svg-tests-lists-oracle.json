@@ -1,0 +1,206 @@
+{
+  "browser": "156.0.8078.4",
+  "markup": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"60\">\n<rect id=\"requiredExtensions\" x=\"0\" y=\"0\" width=\"40\" height=\"40\" fill=\"lime\" requiredExtensions=\"urn:x\"/>\n<rect id=\"systemLanguage\" x=\"50\" y=\"0\" width=\"40\" height=\"40\" fill=\"lime\" systemLanguage=\"zz\"/>\n<switch><rect id=\"first\" x=\"100\" y=\"0\" width=\"40\" height=\"40\" fill=\"lime\" systemLanguage=\"zz\"/><rect x=\"100\" y=\"0\" width=\"40\" height=\"40\" fill=\"blue\"/></switch>\n</svg>",
+  "result": {
+    "requiredExtensions": {
+      "initial": {
+        "items": 1,
+        "attribute": "urn:x",
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "removed": {
+        "items": 0,
+        "attribute": null,
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "empty": {
+        "items": 0,
+        "attribute": "",
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "restored": {
+        "items": 1,
+        "attribute": "urn:x",
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "cleared": {
+        "items": 0,
+        "attribute": null,
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "appended": {
+        "items": 2,
+        "attribute": "urn:x urn:x",
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "removedAgain": {
+        "items": 0,
+        "attribute": null,
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "reinserted": {
+        "items": 0,
+        "attribute": null,
+        "sameList": true,
+        "paint": [
+          0,
+          255,
+          0,
+          255
+        ]
+      }
+    },
+    "systemLanguage": {
+      "initial": {
+        "items": 1,
+        "attribute": "zz",
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "removed": {
+        "items": 0,
+        "attribute": null,
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "empty": {
+        "items": 1,
+        "attribute": "",
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "restored": {
+        "items": 1,
+        "attribute": "zz",
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "cleared": {
+        "items": 0,
+        "attribute": null,
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "appended": {
+        "items": 2,
+        "attribute": "zz,zz",
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "removedAgain": {
+        "items": 0,
+        "attribute": null,
+        "sameList": true,
+        "paint": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "reinserted": {
+        "items": 0,
+        "attribute": null,
+        "sameList": true,
+        "paint": [
+          0,
+          255,
+          0,
+          255
+        ]
+      }
+    },
+    "switch": {
+      "initial": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "removed": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "reinserted": [
+        0,
+        255,
+        0,
+        255
+      ]
+    }
+  }
+}

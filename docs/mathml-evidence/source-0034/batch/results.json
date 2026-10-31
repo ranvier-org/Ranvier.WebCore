@@ -1,0 +1,118 @@
+[
+  {
+    "name": "svg_tests_lists",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-batch\\svg_tests_lists.log",
+    "logSha256": "acf281005da2802259647ade5f0a0d4ee2599f3d9012e65ccadad5643e3f7d4e",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_tests_lists.py": "2ce6eb3ac5f10ca2f9a3e9ba8a5285912b05172acc0b51823008e294dd308b6f",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 191
+  },
+  {
+    "name": "svg_geometry",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-batch\\svg_geometry.log",
+    "logSha256": "2fe8049b46ffce2bd4b349dfdd7066caeda689ee3ec0dcdb9f86861c58ed76cb",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_geometry.py": "b357e1a83e97756d0a6d00038081320f0224927b61fa4cf5bc83b17586eb5be0",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 639
+  },
+  {
+    "name": "svg_surfaces",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-batch\\svg_surfaces.log",
+    "logSha256": "836c19207512a19d33faf26d61626eddb6f8dcca8d5f1c2b3b9551d69cc68a74",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_surfaces.py": "55b205b6aed085a4578b9eb7bf5460a57824071b803bd8a627e1f1a95acaf4d4",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 1594
+  },
+  {
+    "name": "svg_mathml_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-batch\\svg_mathml_surface.log",
+    "logSha256": "6221d6c18fff05c9aa0010b9b3c6edc3a4752fa82b16782d2182769e16c7e036",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_mathml_surface.py": "5d992a8a0c923080685915368ff537ceaec2c0927558cd04717df06fdf24e9a9",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 95
+  },
+  {
+    "name": "svg_paint_servers",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-batch\\svg_paint_servers.log",
+    "logSha256": "4fee53f7e062bb018ebea3b6218dfca73e4fe5cf6a563e36e925c18650dc3731",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_servers.py": "8a31036ef0907f0fa47424c49b925d4d7686f0501c22390329b6dad95c342296",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 565
+  },
+  {
+    "name": "svg_clip_mask_marker",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-batch\\svg_clip_mask_marker.log",
+    "logSha256": "e16f521e717f252b4f1ea93688bded2b355b95918481a3fe4c93e1c1770a0b55",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_clip_mask_marker.py": "cdc9c9e75b8d96f26a18f5b6741c1fc3fc1509e74ecc84f9cecc47e363af176c",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 565
+  },
+  {
+    "name": "svg_resources",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-batch\\svg_resources.log",
+    "logSha256": "a205f7e30a24e5a88f3d18a06349efafde93d4c2217bf46e5655bf2df54683ce",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_resources.py": "2e592c28b1ae5f396a24a262147bd283d16b16dd13f5d0ebc9040234c1dc43c4",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 454
+  },
+  {
+    "name": "mathml_surface",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-batch\\mathml_surface.log",
+    "logSha256": "56d48519e6426f8dd3b9ce30e425e4bcdb8706a31bad44a061392e1d903d4ac5",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\mathml_surface.py": "e69e7c5fdbabae76ea5c0836883dcccfbde1dd19efb3161dd21bbfba8d0d22f2",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json",
+    "assertions": 371
+  },
+  {
+    "name": "capabilities",
+    "exitCode": 0,
+    "log": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-batch\\capabilities.log",
+    "logSha256": "a6101bcd2fd662c1d2818f115cd3b44a1286a6fe11d708d8f3c0dc2e8d7fd960",
+    "executedSources": {
+      "C:\\wk\\native-mathml\\tests\\abi\\capabilities.py": "af1faf6f7db4cee0714ae046629c73ca1b6859e9cff9c7e93cc8f84b9f36a793",
+      "C:\\wk\\native-mathml\\tests\\abi\\svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647"
+    },
+    "executedAssets": {},
+    "runtimeReceipt": "C:\\wk\\native-mathml\\artifacts\\native23-0034b-frozen\\runtime-receipt.json"
+  }
+]

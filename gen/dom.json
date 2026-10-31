@@ -318,6 +318,7 @@
     "HTMLTitleElement",
     "SVGElement",
     "MathMLElement",
+    "MathMLMathElement",
     "HTMLStyleElement",
     "SVGStyleElement",
     "HTMLLinkElement",

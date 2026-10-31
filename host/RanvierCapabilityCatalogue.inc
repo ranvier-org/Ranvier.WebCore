@@ -73,6 +73,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom:HTMLTitleElement",
     "dom:SVGElement",
     "dom:MathMLElement",
+    "dom:MathMLMathElement",
     "dom:HTMLStyleElement",
     "dom:SVGStyleElement",
     "dom:HTMLLinkElement",
