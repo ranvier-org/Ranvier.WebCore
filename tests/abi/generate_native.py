@@ -118,6 +118,10 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
         return ("int[]", "") if name == "length" else ("int&", "")
     if ctype == "const RvEventInit*":
         return "EventInit&", ""
+    if ctype == "const uint16_t*":
+        return "uint16[]", "[<In>] "
+    if ctype == "RvTextSegments*":
+        return "TextSegments&", ""
     if ctype == "void**":
         return "nativeint&", ""
     if ctype == "RvGpuFrame**":
@@ -167,6 +171,14 @@ def generated(header: str) -> str:
         "    val mutable isComposing: int",
         "    val mutable relatedTarget: nativeint",
         "    val mutable customDetailJson: nativeint",
+        "",
+        "/// <summary>The <c>RvTextSegments</c> of the header: owned until <c>rv_text_segments_release</c>.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type TextSegments =",
+        "    val mutable count: int",
+        "    val mutable starts: nativeint",
+        "    val mutable word_like: nativeint",
+        "    val mutable locale: nativeint",
         "",
         "/// <summary>The <c>RvResourceHandler</c> of the header; <c>url</c> is a NUL-terminated UTF-8 string.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",

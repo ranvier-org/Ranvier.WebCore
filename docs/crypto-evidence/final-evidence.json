@@ -1,0 +1,415 @@
+{
+  "group": [
+    "B22 #119"
+  ],
+  "native": "0.1.0-preview.36",
+  "abi": 44,
+  "features": [
+    "dom-crypto-random"
+  ],
+  "members": [
+    "Crypto.getRandomValues (rv_dom_crypto_get_random_values: element kind, in/out bytes, byte length)",
+    "Crypto.randomUUID (rv_dom_crypto_random_uuid)"
+  ],
+  "excluded": [
+    "SubtleCrypto (promise-only; digest comes from System.Security.Cryptography on .NET and crypto.subtle on Chromium; keys, import, export, sign, verify, encrypt and derive are a follow-up group)"
+  ],
+  "sourceHeadOfBatch": "d44a601e8797e28069139f6029910e39c6780add",
+  "webCrypto": {
+    "pin": "WebKit b95c91b1c0: SubtleCrypto compiles on every port; the backend registers the algorithms",
+    "win-x64/win-arm64": "slim patch 0003 USE_CRYPTO_STUB: SHA-1/256/384/512 only (WebCore imports CryptCreateHash, no libcrypto)",
+    "linux-x64/linux-arm64": "WPE USE_GCRYPT: libgcrypt.so.20 + libtasn1.so.6 NEEDED; AES-CBC/CTR/GCM/KW, ECDH, ECDSA, Ed25519, X25519, HKDF, HMAC, PBKDF2, RSASSA-PKCS1-v1_5, RSA-OAEP, RSA-PSS, SHA-*",
+    "osx-arm64": "Cocoa CommonCrypto: the WPE set plus AES-CFB",
+    "checkedBinaries": "preview.15 and preview.19 shipped RID packages; config/slim.cmake, wpe.cmake, mac.cmake and patch 0003 unchanged since (last change 63ddf43, unrelated)"
+  },
+  "red": {
+    "runtime": "C:/wk/native-binary/artifacts/native31-frozen/runtimes/win-x64/native",
+    "abiVersion": 39,
+    "exportsPresent": 0,
+    "exportsChecked": 6,
+    "features": {
+      "dom-crypto-random": 0,
+      "dom:Crypto": 0,
+      "dom:SubtleCrypto": 0,
+      "dom-crypto-subtle": 0
+    },
+    "probe": "crypto_random.py fails on Native32: dom-crypto-random advertised",
+    "generator": "three generator tests failed before windowObjectBindings and typedArrayViewTypes",
+    "files": [
+      "red-native31.json",
+      "red-probe-native32.log",
+      "generator-red.log",
+      "chromium-red.json"
+    ]
+  },
+  "green": {
+    "cryptoRandomAssertions": 275,
+    "repeat30": "crypto_random repeat30 on native36-frozen-4 (candidate-4, head d44a601): 30/30 PASS 275 assertions",
+    "probes": 49,
+    "allExitZero": true,
+    "rawAssertions": 72226,
+    "batchParsedNote": "the batch runner parses \"PASS ... N assertions\" and \"<probe>: N assertions\" lines",
+    "newProbes": [
+      "crypto_random"
+    ],
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "form_submission",
+        "exitCode": 0,
+        "assertions": 418,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "text_segmentation",
+        "exitCode": 0,
+        "assertions": 812,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "crypto_random",
+        "exitCode": 0,
+        "assertions": 275,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null,
+        "runtimeReceipt": "C:\\wk\\native-crypto\\artifacts\\native36-frozen-4\\runtime-receipt.json"
+      }
+    ],
+    "teardownCases": 86,
+    "teardownCasesAdded": 2,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "origin": "http://localhost (secure context)",
+    "fixture": "tests/fixtures/crypto-random-oracle.json",
+    "insecureContext": {
+      "isSecureContext": false,
+      "randomUUID": "undefined",
+      "subtle": "undefined",
+      "getRandomValues": "function"
+    }
+  },
+  "qualifications": [
+    {
+      "name": "secure context",
+      "reason": "the native host exposes no page script, so randomUUID is available without [SecureContext]; a Fable provider in an insecure context reads randomUUID and digest as Unsupported"
+    },
+    {
+      "name": "copied ranges",
+      "reason": "the glue fills a copy of the caller bytes and copies it back, so a range needs no element alignment; a byte length that is not a multiple of the element size raises RangeError"
+    },
+    {
+      "name": "after host destroy",
+      "reason": "a retained document keeps its Window and crypto object, as a detached browser window does; both functions keep working (probe afterDestroy, teardown case \"crypto\")"
+    },
+    {
+      "name": "random properties",
+      "reason": "no random value is asserted: lengths, kinds, v4 format, version/variant bits, neighbour bytes untouched and two fills differing (probability 2^-128 of a false failure)"
+    }
+  ],
+  "files": {
+    "absence_b22.py": "99b30b687c3c63fd7bf3e5ee9ad28ab45447c54a4f0940e69b1263c8831fedee",
+    "allocation-absence.json": "b1ff75c8d12ebc6ad646b34bf8053037d7aaae79f6ea3210d473419e265e4ee6",
+    "batch-green.json": "9d0f4e1b0bc24aa978f77a2e6c868766ebf7c3c0405298c2cda550babf5d9ff5",
+    "build_native36_candidate.py": "4a365d1b9a2974eea9315d5555ff7d11ded31492488c9f966f68c4120948b10e",
+    "chromium-red.json": "abdff8245c4f0107c290f183aa63b08b069ebd8f20b800ca4164f78ac8b74312",
+    "crypto-random-probe.log": "b549b9452ef007aaf65a3bf92a62d3118c2dee6e52e144619d2e0eaadfb154fd",
+    "crypto-random-repeat30.txt": "f966cde654db90189dc40a6c494b67fd5ae20bdcbd04af856dcd6c45c25fa3e3",
+    "crypto-red-browser.mjs": "dd688f4043223a2b37dbcc0d32cdee6a1f895189b0879b5aba1963bc89d8c42d",
+    "generator-red.log": "6a2aa3384d02ff0a89cacc2f1a34e834c5a327b54b30635fdf0647a39a1b1a6c",
+    "make_native36_evidence.py": "49dcc874019b9544cf88a75893bba9119729adae8422f1b10580c985201e1614",
+    "measure_crypto_red.py": "b7ceed6695d193aa44577bfb7810e623435544b19b032c2e6a0432ea1660ee15",
+    "red-native31.json": "4aafcef897f7faafd40cfb3efb8175cccd5d859deddd5a2af618b27c905ef0f1",
+    "red-probe-native32.log": "6f8601d623ea196a2b5effcacbc83f5d87b0354726b2a7af872df63f0d09d2f6",
+    "run_native36_full_batch.py": "a0b9a2eb6c102ea3e650ff53074b8006c620bbe3809fb103d238117823591e8d",
+    "runtime-receipt.json": "57d64eeb4e0008f930043b7c36d55cc6a8bcff967533517b7d213332b74de680",
+    "source-patches.json": "d9f153b16d3a1698bd5d88976531cd463f90298b65faac9e8fef73392cfeba1e",
+    "teardown-probes.json": "95d36a087322068091b0a9a5ad4e983f25115bbfec3fa50e3ea9694bcef535fb"
+  }
+}

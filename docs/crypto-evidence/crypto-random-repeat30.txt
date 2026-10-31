@@ -1,0 +1,1 @@
+crypto_random repeat30 on native36-frozen-4 (candidate-4, head d44a601): 30/30 PASS 275 assertions
