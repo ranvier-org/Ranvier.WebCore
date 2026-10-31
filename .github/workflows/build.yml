@@ -481,6 +481,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/focus_input.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify window metrics, visibility, media queries and viewport event order
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/viewport_events.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify passive capability catalogue and live host observations
         run: python -I tests/abi/capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 

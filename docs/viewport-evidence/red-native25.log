@@ -1,0 +1,12 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-viewport\tests\abi\viewport_events.py", line 301, in <module>
+    assertions, report = verify(args.native_directory)
+                         ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-viewport\tests\abi\viewport_events.py", line 40, in verify
+    p.expect(p.bind('rv_abi_version', I, [])() == ABI, 'ABI version ' + str(ABI))
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-viewport\tests\abi\svg_paint_probe.py", line 49, in expect
+    raise AssertionError(label)
+AssertionError: ABI version 35
+EXIT_CODE=1

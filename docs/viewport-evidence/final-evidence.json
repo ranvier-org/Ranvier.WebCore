@@ -1,0 +1,48 @@
+{
+  "group": [
+    "G02 #47",
+    "G12 #57"
+  ],
+  "native": "0.1.0-preview.27",
+  "abi": 35,
+  "feature": "viewport",
+  "sourceHeadOfBatch": "7668176140673a074d3755d4a92bc12329e9488a",
+  "candidate": "artifacts/native27-candidate-6 (native25-candidate-3 objects, I12 RanvierEventGlue object, 5 native22 v2 replacement objects, RanvierViewportGlue and host units compiled from this tree)",
+  "red": {
+    "runtime": "native25-candidate-3",
+    "abiVersion": 33,
+    "result": "AssertionError ABI version 35; six exports absent",
+    "logs": [
+      "red-native25.log",
+      "red-native25-exports.txt"
+    ]
+  },
+  "green": {
+    "viewportEventsAssertions": 364,
+    "probes": 40,
+    "allExitZero": true,
+    "rawAssertions": 43241,
+    "teardownCases": 62
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "fixture": "tests/fixtures/viewport-events-oracle.json"
+  },
+  "qualifications": [
+    "Native paint size truncates (floor(css*scale)); Chromium rounds at fractional products: 333x221@1.5 gives 499x331 native, 500x332 Chromium.",
+    "A scale-only change reports the resolution media query change in the next rv_host_update; Chromium device-metrics emulation defers it to the next resize.",
+    "Headless Chromium cannot change visibilityState; visibility is a native-only assertion against the spec order: visibilitychange at the document with document.hidden matching, resize deferred while hidden.",
+    "outerWidth/outerHeight report the host viewport: EmptyChromeClient::windowRect is final and returns an empty rectangle."
+  ],
+  "files": {
+    "allocation-absence.json": "02151823f302bd54533c46a52975cd498ec3849b7dbdf2b6e4aa9cf6872dd48f",
+    "batch-green.json": "721f6f7e413e3783cbec4856808668aa31bc4e74854cdfe6b3d8ad8fcee56edb",
+    "build_viewport_candidate.py": "a2397ff0d939727ee9a32c9f5510b15b8d3e1c29e8b8834bc907774511b44ff3",
+    "red-native25-exports.txt": "6d61bffc673130ada51617c42f369d2918a0820419bfe692350fd3284aa9e3ed",
+    "red-native25.log": "f72bde44e2e5f1d890a3728a3012c2c16624eac3b8e19edf18836da11fa4b573",
+    "run_native27_batch.py": "0ed97997e8f3c2e42fe2e0eb7ecf7e3ae541d6ebcc19f9e1d8c357724e84134f",
+    "runtime-receipt.json": "ad96191ba418fbc5ace629868f319f5a251be6637bbf21de7bacc77f65bff3c8",
+    "teardown-probes.json": "652492e152e6f34fc63ea51d54b2b2f3ad3909298ec98a2270043a37c6e7f09d",
+    "viewport-events-report.json": "69b5cedfd4e4836c538de7856072ec49b2284f0d67ca7933c83504a25ec94aa6"
+  }
+}

@@ -123,4 +123,5 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', tests / 'mathml_surface.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'event_construction.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'focus_input.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'viewport_events.py', '--native-directory', out])
 print('abi tests passed', flush=True)

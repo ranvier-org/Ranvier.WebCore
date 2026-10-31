@@ -305,6 +305,11 @@ module Calls =
             "rv_event_get_related_target"
             "rv_host_window_event_target"
             "rv_host_max_touch_points"
+            "rv_host_window_metrics"
+            "rv_host_set_visible"
+            "rv_host_match_media"
+            "rv_media_query_matches"
+            "rv_media_query_media"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1122,6 +1127,21 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_max_touch_points(nativeint host, int& value)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_window_metrics(nativeint host, nativeint metrics)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_visible(nativeint host, int visible)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_host_match_media(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string query)
+
+    [<DllImport(Lib)>]
+    extern int rv_media_query_matches(nativeint target, int& matches)
+
+    [<DllImport(Lib)>]
+    extern int rv_media_query_media(nativeint target, byte[] buffer, int capacity, int[] length)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -3728,6 +3748,66 @@ let rv_host_max_touch_points (host: nativeint, value: byref<int>) : int =
         result
     else
         Raw.rv_host_max_touch_points (host, &value)
+
+let rv_host_window_metrics (host: nativeint, metrics: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_window_metrics (host, metrics)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[209] <- Calls.Counts[209] + 1L
+        Calls.Ticks[209] <- Calls.Ticks[209] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_window_metrics (host, metrics)
+
+let rv_host_set_visible (host: nativeint, visible: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_visible (host, visible)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[210] <- Calls.Counts[210] + 1L
+        Calls.Ticks[210] <- Calls.Ticks[210] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_visible (host, visible)
+
+let rv_host_match_media (host: nativeint, query: string) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_match_media (host, query)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[211] <- Calls.Counts[211] + 1L
+        Calls.Ticks[211] <- Calls.Ticks[211] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_match_media (host, query)
+
+let rv_media_query_matches (target: nativeint, matches: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_media_query_matches (target, &matches)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[212] <- Calls.Counts[212] + 1L
+        Calls.Ticks[212] <- Calls.Ticks[212] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_media_query_matches (target, &matches)
+
+let rv_media_query_media (target: nativeint, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_media_query_media (target, buffer, capacity, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[213] <- Calls.Counts[213] + 1L
+        Calls.Ticks[213] <- Calls.Ticks[213] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_media_query_media (target, buffer, capacity, length)
 
 // END GENERATED
 
