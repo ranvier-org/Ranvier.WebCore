@@ -18,7 +18,7 @@ from svg_paint_probe import SvgProbe
 from caret_hit_support import CaretPage, FIXTURES, coordinate, same_rect
 
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE = 0, -1, -2, -3, -11
-ABI = 38
+ABI = 40
 # FreeType scales each 20px Ahem advance in 16.16 fixed point on Linux; four glyphs may lose 4/65536 px.
 RECT_TOLERANCE = 0.01
 
@@ -248,7 +248,7 @@ def run(native_directory, webkit_source, measure=None):
         extra = [a for a in actual if a not in expected]
         missing = [e for e in expected if e not in actual]
         raise AssertionError('caret differences changed: unqualified ' + json.dumps(extra[:8]) + ' missing ' + json.dumps(missing[:8]))
-    print(f'caret hit testing passed: {checked} oracle checks, {len(differences)} qualified differences, {assertions} assertions', flush=True)
+    print(f'caret hit testing PASS: {checked} oracle checks, {len(differences)} qualified differences, {assertions} assertions', flush=True)
 
 
 if __name__ == '__main__':
