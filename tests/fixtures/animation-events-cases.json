@@ -1,0 +1,17 @@
+{
+ "comment": "A10 engine animation and transition events. Each case adds className to the element el (after one rendered frame, so a transition has a before-change style), and, with cancel, sets cancel as its class after the first event of the case; the probe and the oracle record every listed event type at the document, in dispatch order, with its interface, target, name, elapsedTime and pseudoElement. elapsedTime of a cancel event depends on frame timing and is recorded as presence only. The playback cases use Element.animate on el.",
+ "markup": "<!doctype html><html><head><style>html,body{margin:0;background:white}div{width:20px;height:20px;background:blue}@keyframes spin{from{opacity:0}to{opacity:1}}#css.on{animation:spin 80ms 2}#pse::before{content:'x'}#pse.on::before{animation:spin 80ms}#cc.on{animation:spin 2000ms}#cc.off{animation:none}#tr{transition:opacity 80ms;opacity:1}#tr.on{opacity:0}#trp::after{content:'y';transition:opacity 80ms;opacity:1}#trp.on::after{opacity:0}#tc{transition:opacity 2000ms;opacity:1}#tc.on{opacity:0}#tc.off{transition:none;opacity:1}</style></head><body><div id=\"css\"></div><div id=\"pse\"></div><div id=\"cc\"></div><div id=\"tr\"></div><div id=\"trp\"></div><div id=\"tc\"></div><div id=\"pb\"></div></body></html>",
+ "types": ["animationstart", "animationiteration", "animationend", "animationcancel", "transitionrun", "transitionstart", "transitionend", "transitioncancel"],
+ "cases": [
+  {"name": "animation iterations", "el": "css", "className": "on", "last": "animationend"},
+  {"name": "animation ::before", "el": "pse", "className": "on", "last": "animationend"},
+  {"name": "animation cancel", "el": "cc", "className": "on", "cancel": "off", "last": "animationcancel"},
+  {"name": "transition", "el": "tr", "className": "on", "last": "transitionend"},
+  {"name": "transition ::after", "el": "trp", "className": "on", "last": "transitionend"},
+  {"name": "transition cancel", "el": "tc", "className": "on", "cancel": "off", "after": "transitionstart", "last": "transitioncancel"}
+ ],
+ "playback": [
+  {"name": "playback finish", "el": "pb", "duration": 80, "last": "finish"},
+  {"name": "playback cancel", "el": "pb", "duration": 2000, "cancel": true, "last": "cancel"}
+ ]
+}

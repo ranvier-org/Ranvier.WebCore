@@ -389,6 +389,17 @@ bitmaps. The change is inside `ImageBitmap.cpp` and recompiles one unified sourc
 
 Without the patch every `createImageBitmap` on the slim Windows build creates an accelerated Skia buffer, whose
 Ganesh stub aborts the process: `docs/canvas-export-evidence/red-patch-0050.log` (`red_bitmap_buffer.py`).
+## 0051-web-animation-promise-observer
+
+`WebAnimationPromiseObserver.h` declares `setWebAnimationPromiseObserver`, a process-wide function pointer that
+`WebAnimation.cpp` calls each time a ready or finished promise settles: with no code when it resolves, and with
+`AbortError` when `cancel()` or a reset of the pending tasks schedules its rejection. The engine rejects those promises
+in a microtask, which a host that disallows VM entry never runs, so the observer reports the rejection when it is
+scheduled. The pointer is a file static: no class layout changes, `WebAnimation.h` is untouched, and an unset observer
+leaves the engine's behaviour unchanged. `Headers.cmake` lists the header among the private framework headers.
+
+`tests/abi/animation_lifecycle.py` checks `rv_animation_ready` and `rv_animation_finished` against the Chromium 156
+oracle `tests/fixtures/animation-lifecycle-oracle.json`. Evidence: `docs/animation-lifecycle-evidence/native-evidence.json`.
 
 ## Working on the series
 

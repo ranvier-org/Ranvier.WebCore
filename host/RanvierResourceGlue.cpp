@@ -10,6 +10,8 @@
 #include "ContextDestructionObserverInlines.h"
 #include "DOMException.h"
 #include "DOMPromiseProxy.h"
+#include "JSDOMConvertInterface.h"
+#include "JSWebAnimation.h"
 #include "Document.h"
 #include "EventListener.h"
 #include "EventNames.h"
@@ -39,6 +41,8 @@
 #include "SVGImageElement.h"
 #include "SecurityOrigin.h"
 #include "ThreadableBlobRegistry.h"
+#include "WebAnimation.h"
+#include "WebAnimationPromiseObserver.h"
 #include "SVGElementTypeHelpers.h"
 #include "dom/RanvierDomGlue.h"
 #include <JavaScriptCore/ArrayBuffer.h>
@@ -80,6 +84,7 @@ int32_t outcomeFor(ImageDecodeResult result)
     return RV_RESOURCE_LOAD_FAILED;
 }
 
+class AnimationPromiseOperation;
 class BlobReadOperation;
 class MediaQueryOperation;
 class BytesOperation;
@@ -151,6 +156,7 @@ public:
     virtual MediaQueryOperation* asMediaQuery() { return nullptr; }
     virtual BytesOperation* asBytes() { return nullptr; }
     virtual ImageBitmapOperation* asImageBitmap() { return nullptr; }
+    virtual AnimationPromiseOperation* asAnimationPromise() { return nullptr; }
 
 protected:
     Operation(Document& document, RvResourceCompletion callback, void* context)
@@ -418,6 +424,65 @@ private:
 };
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(FontFaceOperation);
+
+// Animation.ready or Animation.finished: the promise current at the call, identified by address while it is pending.
+// A current promise is never rejected; the engine rejects a promise only after replacing it, so a fulfilled current
+// promise is a resolved one. Every terminal is delivered from a later run-loop turn, or by cancel/release.
+class AnimationPromiseOperation final : public Operation {
+    WTF_MAKE_TZONE_ALLOCATED(AnimationPromiseOperation);
+
+public:
+    static Ref<AnimationPromiseOperation> create(Document& document, WebAnimation& animation, WebAnimationPromiseKind kind, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new AnimationPromiseOperation(document, animation, kind, callback, context));
+    }
+
+    RefPtr<WebAnimation> animation;
+    WebAnimationPromiseKind kind;
+    const void* promise { nullptr };
+
+    void detach() final
+    {
+        animation = nullptr;
+        promise = nullptr;
+        Operation::detach();
+    }
+
+    AnimationPromiseOperation* asAnimationPromise() final { return this; }
+
+    void settled(WebAnimation& candidate, WebAnimationPromiseKind settledKind, const void* settledPromise, std::optional<ExceptionCode> code)
+    {
+        if (terminal || animation.get() != &candidate || kind != settledKind || promise != settledPromise)
+            return;
+        finish(code ? RV_RESOURCE_ABORTED : RV_RESOURCE_SUCCEEDED);
+    }
+
+    void start()
+    {
+        starting = true;
+        if (kind == WebAnimationPromiseKind::Ready) {
+            auto& current = animation->bindingsReady();
+            promise = &current;
+            if (current.isFulfilled())
+                finish(RV_RESOURCE_SUCCEEDED);
+        } else {
+            auto& current = animation->bindingsFinished();
+            promise = &current;
+            if (current.isFulfilled())
+                finish(RV_RESOURCE_SUCCEEDED);
+        }
+    }
+
+private:
+    AnimationPromiseOperation(Document& document, WebAnimation& animation, WebAnimationPromiseKind kind, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+        , animation(&animation)
+        , kind(kind)
+    {
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(AnimationPromiseOperation);
 
 // Reads a blob, or the blob a blob URL refers to, through the engine's FileReaderLoader, as Blob.text(),
 // arrayBuffer() and bytes() read it. The bytes, the type and the error name stay until release.
@@ -1011,6 +1076,45 @@ int32_t ranvier_font_face_load(RvNode* documentHandle, RvFontFace* faceHandle, i
     *operation = nextOperation++;
     operations().emplace(*operation, value.copyRef());
     value->start(load);
+    return RV_OK;
+}
+
+namespace {
+
+void animationPromiseSettled(WebAnimation& animation, WebAnimationPromiseKind kind, const void* promise, std::optional<ExceptionCode> code)
+{
+    Vector<Ref<Operation>> candidates;
+    for (auto& entry : operations()) {
+        if (entry.second->asAnimationPromise())
+            candidates.append(entry.second.copyRef());
+    }
+    for (auto& candidate : candidates)
+        candidate->asAnimationPromise()->settled(animation, kind, promise, code);
+}
+
+}
+
+int32_t ranvier_animation_promise(RvNode* documentHandle, RvEventTarget* animationHandle, int32_t finished, RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || !animationHandle || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    RefPtr animation = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(animationHandle));
+    if (!animation)
+        return RV_ERR_WRONG_INTERFACE;
+    if (!document || animation->scriptExecutionContext() != document)
+        return RV_ERR_WRONG_HOST;
+    if (!nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    static bool observing = false;
+    if (!std::exchange(observing, true))
+        setWebAnimationPromiseObserver(animationPromiseSettled);
+    Ref value = AnimationPromiseOperation::create(*document, *animation, finished ? WebAnimationPromiseKind::Finished : WebAnimationPromiseKind::Ready, callback, context);
+    *operation = nextOperation++;
+    operations().emplace(*operation, value.copyRef());
+    value->start();
     return RV_OK;
 }
 

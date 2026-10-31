@@ -1,0 +1,3 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+animation-lifecycle oracle repeat: 30/30 identical to fixture sha 8cdba296670d9b107ee376ec2cf5a79fe16cc545009cd3a37a7f4fa68b0c686e
+animation-events oracle repeat: 30/30 identical to fixture sha 1f0610161907eaeeee1832973894f250cfd33c635e697f295c50d6e6cf8eb746

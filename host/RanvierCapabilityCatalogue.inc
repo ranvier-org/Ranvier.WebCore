@@ -412,6 +412,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "font-load",
     "font-readiness",
     "font-face-load",
+    "animation-promises",
     "event-construction",
     "input-state",
     "pointer-input",
