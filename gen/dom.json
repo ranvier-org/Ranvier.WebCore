@@ -31,7 +31,8 @@
     "customOperations replaces a [Custom] operation with the signature its native binding implements, and callExpressions names the C++ an operation calls.",
     "syntheticDictionaries lists the dictionaries of syntheticIdl, which no WebKit IDL file defines.",
     "contextDocuments names the C++ document of an object whose operations take a checked context Document: another document returns RV_ERR_WRONG_HOST.",
-    "resultValueOverloads adds C++ overloads that convert a result dictionary field to its IDL transport type."
+    "resultValueOverloads adds C++ overloads that convert a result dictionary field to its IDL transport type.",
+    "browserResultConversions maps Interface.member to the JavaScript function the Fable provider applies to the browser's result: getKeyframes gives ComputedKeyframe objects."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -1248,7 +1249,8 @@
     "Animatable.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "Element.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
-    "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
+    "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}",
+    "AnimationEffect.updateTiming.timing": "(t)=>{if(t==null)return t;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing'])if(t[k]!==undefined)r[k]=t[k];const d=t.duration;if(d!==undefined)r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
   },
   "customOperations": {
     "KeyframeEffect.getKeyframes": {
@@ -1269,5 +1271,8 @@
   },
   "resultValueOverloads": [
     "CSSNumberish resultValue(const WebAnimationTime& value) { return value; }"
-  ]
+  ],
+  "browserResultConversions": {
+    "KeyframeEffect.getKeyframes": "(l)=>l.map((k)=>({offset:k.offset,computedOffset:k.computedOffset,easing:k.easing,composite:k.composite,properties:Object.keys(k).filter((n)=>!['offset','computedOffset','easing','composite'].includes(n)).map((n)=>({name:n,value:k[n]}))}))"
+  }
 }
