@@ -80,6 +80,7 @@
 #include "DOMSelection.h"
 #include "DOMStringMap.h"
 #include "DOMTokenList.h"
+#include "DOMURL.h"
 #include "Document.h"
 #include "DocumentFragment.h"
 #include "DocumentOrShadowRootFullscreen.h"
@@ -284,6 +285,11 @@
 #include "TreeWalker.h"
 #include "TrustedScriptURL.h"
 #include "UIEvent.h"
+#include "URLPattern.h"
+#include "URLPatternInit.h"
+#include "URLPatternOptions.h"
+#include "URLPatternResult.h"
+#include "URLSearchParams.h"
 #include "ValidityState.h"
 #include "WheelEvent.h"
 #include "svg/properties/SVGAnimatedPropertyImpl.h"
@@ -658,6 +664,29 @@ template<typename T> struct DomSequenceArgument {
     }
     operator std::optional<Vector<T>>() && { return std::move(values); }
 };
+template<typename T> const T* resultField(const T& value) { return &value; }
+template<typename T> const T* resultField(const std::optional<T>& value) { return value ? &*value : nullptr; }
+template<typename V, typename S, typename E> int32_t storeOptionalDictionary(V&& value, S** result, E&& encode)
+{
+    *result = value ? encode(*value) : nullptr;
+    return RV_OK;
+}
+RvDomUtf8StringInput copyOwnedDomStringInput(const String& value)
+{
+    if (value.isNull()) return { 0, nullptr, 0 };
+    auto utf8 = value.utf8();
+    auto* result = static_cast<uint8_t*>(std::malloc(utf8.length() + 1));
+    RELEASE_ASSERT(result);
+    std::memcpy(result, utf8.data(), utf8.length());
+    result[utf8.length()] = 0;
+    return { 1, result, static_cast<int32_t>(utf8.length()) };
+}
+RvDomURLPatternResult* encodeDictRvDomURLPatternResult(const URLPatternResult& value);
+void releaseDictRvDomURLPatternResult(RvDomURLPatternResult* value);
+RvDomURLPatternInit* encodeDictRvDomURLPatternInit(const URLPatternInit& value);
+void releaseDictRvDomURLPatternInit(RvDomURLPatternInit* value);
+RvDomURLPatternComponentResult* encodeDictRvDomURLPatternComponentResult(const URLPatternComponentResult& value);
+void releaseDictRvDomURLPatternComponentResult(RvDomURLPatternComponentResult* value);
 RvDomUtf8StringSpan copyOwnedDomStringSpan(const String& value)
 {
     if (value.isNull()) return { nullptr, -1 };
@@ -1424,6 +1453,19 @@ template<typename V> int32_t encodeRvDomUnionMediaListOrDOMString(V&& input, RvD
     return RV_OK;
 }
 
+std::optional<Vector<String>> decodeRvDomSequenceUSVString(const RvDomSequenceUSVString* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<String> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        result.append(String::fromUTF8(source->items[i]));
+    }
+    return Vector<String> { std::move(result) };
+}
+
 void clearRvDomSequenceUSVString(RvDomSequenceUSVString* value)
 {
     if (!value) return;
@@ -2169,6 +2211,493 @@ template<typename V> int32_t encodeRvDomSequencePointerEvent(V&& input, RvDomSeq
     return RV_OK;
 }
 
+std::optional<Vector<Vector<String>>> decodeRvDomSequenceSequenceOfUSVString(const RvDomSequenceSequenceOfUSVString* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Vector<String>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomSequenceUSVString(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Vector<String>> { std::move(result) };
+}
+
+void clearRvDomSequenceSequenceOfUSVString(RvDomSequenceSequenceOfUSVString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomSequenceUSVString(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceSequenceOfUSVString(V&& input, RvDomSequenceSequenceOfUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomSequenceUSVString*>(std::calloc(value.size(), sizeof(RvDomSequenceUSVString))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomSequenceUSVString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<KeyValuePair<String, String>> decodeRvDomPairUSVStringAndUSVString(const RvDomPairUSVStringAndUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->key.length < 0 || (source->key.length > 0 && !source->key.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    String key = source->key.length < 0 ? String() : source->key.length ? String::fromUTF8(std::span<const uint8_t> { source->key.data, static_cast<size_t>(source->key.length) }) : emptyString();
+    if (source->key.length >= 0 && key.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    auto decoded0 = key;
+    if (source->value.length < 0 || (source->value.length > 0 && !source->value.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    String value = source->value.length < 0 ? String() : source->value.length ? String::fromUTF8(std::span<const uint8_t> { source->value.data, static_cast<size_t>(source->value.length) }) : emptyString();
+    if (source->value.length >= 0 && value.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    auto decoded1 = value;
+    return KeyValuePair<String, String> { std::move(decoded0), std::move(decoded1) };
+}
+
+void clearRvDomPairUSVStringAndUSVString(RvDomPairUSVStringAndUSVString* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->key.data));
+    std::free(const_cast<uint8_t*>(value->value.data));
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomPairUSVStringAndUSVString(V&& input, RvDomPairUSVStringAndUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->key = copyOwnedDomStringSpan(asString(value.key));
+    result->value = copyOwnedDomStringSpan(asString(value.value));
+    return RV_OK;
+}
+
+std::optional<Vector<KeyValuePair<String, String>>> decodeRvDomSequencePairUSVStringAndUSVString(const RvDomSequencePairUSVStringAndUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<KeyValuePair<String, String>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomPairUSVStringAndUSVString(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<KeyValuePair<String, String>> { std::move(result) };
+}
+
+void clearRvDomSequencePairUSVStringAndUSVString(RvDomSequencePairUSVStringAndUSVString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomPairUSVStringAndUSVString(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequencePairUSVStringAndUSVString(V&& input, RvDomSequencePairUSVStringAndUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomPairUSVStringAndUSVString*>(std::calloc(value.size(), sizeof(RvDomPairUSVStringAndUSVString))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomPairUSVStringAndUSVString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String>> decodeRvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString(const RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        auto arm0 = decodeRvDomSequenceSequenceOfUSVString(&source->arm0, status);
+        if (status != RV_OK) return std::nullopt;
+        return Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String> { Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String> { WTF::InPlaceIndex<0>, std::move(*arm0) } };
+    }
+    case 2: {
+        auto arm1 = decodeRvDomSequencePairUSVStringAndUSVString(&source->arm1, status);
+        if (status != RV_OK) return std::nullopt;
+        return Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String> { Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String> { WTF::InPlaceIndex<1>, std::move(*arm1) } };
+    }
+    case 3: {
+        if (source->arm2.length < 0 || (source->arm2.length > 0 && !source->arm2.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm2 = source->arm2.length < 0 ? String() : source->arm2.length ? String::fromUTF8(std::span<const uint8_t> { source->arm2.data, static_cast<size_t>(source->arm2.length) }) : emptyString();
+        if (source->arm2.length >= 0 && arm2.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String> { Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String> { WTF::InPlaceIndex<2>, arm2 } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString(RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        clearRvDomSequenceSequenceOfUSVString(&value->arm0);
+        break;
+    case 2:
+        clearRvDomSequencePairUSVStringAndUSVString(&value->arm1);
+        break;
+    case 3:
+        std::free(const_cast<uint8_t*>(value->arm2.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString(V&& value, RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* result)
+{
+    if constexpr (I < 3) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                encodeRvDomSequenceSequenceOfUSVString(std::get<I>(value), &result->arm0);
+            }
+            else if constexpr (I == 1) {
+                encodeRvDomSequencePairUSVStringAndUSVString(std::get<I>(value), &result->arm1);
+            }
+            else if constexpr (I == 2) {
+                result->arm2 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString(V&& input, RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString(value, result);
+    return RV_OK;
+}
+
+std::optional<Variant<String, URLPatternInit>> decodeRvDomUnionUSVStringOrURLPatternInit(const RvDomUnionUSVStringOrURLPatternInit* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (source->arm0.length < 0 || (source->arm0.length > 0 && !source->arm0.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm0 = source->arm0.length < 0 ? String() : source->arm0.length ? String::fromUTF8(std::span<const uint8_t> { source->arm0.data, static_cast<size_t>(source->arm0.length) }) : emptyString();
+        if (source->arm0.length >= 0 && arm0.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<String, URLPatternInit> { Variant<String, URLPatternInit> { WTF::InPlaceIndex<0>, arm0 } };
+    }
+    case 2: {
+        URLPatternInit arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomURLPatternInit, protocol) + sizeof(source->arm1->protocol)) {
+                    if (source->arm1->protocol.present != 0 && source->arm1->protocol.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->protocol.present) {
+                        if (source->arm1->protocol.length < 0 || (source->arm1->protocol.length > 0 && !source->arm1->protocol.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.protocol, source->arm1->protocol.data, source->arm1->protocol.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomURLPatternInit, username) + sizeof(source->arm1->username)) {
+                    if (source->arm1->username.present != 0 && source->arm1->username.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->username.present) {
+                        if (source->arm1->username.length < 0 || (source->arm1->username.length > 0 && !source->arm1->username.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.username, source->arm1->username.data, source->arm1->username.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomURLPatternInit, password) + sizeof(source->arm1->password)) {
+                    if (source->arm1->password.present != 0 && source->arm1->password.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->password.present) {
+                        if (source->arm1->password.length < 0 || (source->arm1->password.length > 0 && !source->arm1->password.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.password, source->arm1->password.data, source->arm1->password.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomURLPatternInit, hostname) + sizeof(source->arm1->hostname)) {
+                    if (source->arm1->hostname.present != 0 && source->arm1->hostname.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->hostname.present) {
+                        if (source->arm1->hostname.length < 0 || (source->arm1->hostname.length > 0 && !source->arm1->hostname.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.hostname, source->arm1->hostname.data, source->arm1->hostname.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomURLPatternInit, port) + sizeof(source->arm1->port)) {
+                    if (source->arm1->port.present != 0 && source->arm1->port.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->port.present) {
+                        if (source->arm1->port.length < 0 || (source->arm1->port.length > 0 && !source->arm1->port.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.port, source->arm1->port.data, source->arm1->port.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomURLPatternInit, pathname) + sizeof(source->arm1->pathname)) {
+                    if (source->arm1->pathname.present != 0 && source->arm1->pathname.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->pathname.present) {
+                        if (source->arm1->pathname.length < 0 || (source->arm1->pathname.length > 0 && !source->arm1->pathname.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.pathname, source->arm1->pathname.data, source->arm1->pathname.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomURLPatternInit, search) + sizeof(source->arm1->search)) {
+                    if (source->arm1->search.present != 0 && source->arm1->search.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->search.present) {
+                        if (source->arm1->search.length < 0 || (source->arm1->search.length > 0 && !source->arm1->search.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.search, source->arm1->search.data, source->arm1->search.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomURLPatternInit, hash) + sizeof(source->arm1->hash)) {
+                    if (source->arm1->hash.present != 0 && source->arm1->hash.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->hash.present) {
+                        if (source->arm1->hash.length < 0 || (source->arm1->hash.length > 0 && !source->arm1->hash.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.hash, source->arm1->hash.data, source->arm1->hash.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomURLPatternInit, base_url) + sizeof(source->arm1->base_url)) {
+                    if (source->arm1->base_url.present != 0 && source->arm1->base_url.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->base_url.present) {
+                        if (source->arm1->base_url.length < 0 || (source->arm1->base_url.length > 0 && !source->arm1->base_url.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.baseURL, source->arm1->base_url.data, source->arm1->base_url.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<String, URLPatternInit> { Variant<String, URLPatternInit> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUSVStringOrURLPatternInit(RvDomUnionUSVStringOrURLPatternInit* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        std::free(const_cast<uint8_t*>(value->arm0.data));
+        break;
+    case 2:
+        releaseDictRvDomURLPatternInit(const_cast<RvDomURLPatternInit*>(value->arm1));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUSVStringOrURLPatternInit(V&& value, RvDomUnionUSVStringOrURLPatternInit* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = encodeDictRvDomURLPatternInit(std::get<I>(value));
+            }
+        } else encodeArmsRvDomUnionUSVStringOrURLPatternInit<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUSVStringOrURLPatternInit(V&& input, RvDomUnionUSVStringOrURLPatternInit* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUSVStringOrURLPatternInit(value, result);
+    return RV_OK;
+}
+
+std::optional<Vector<Variant<String, URLPatternInit>>> decodeRvDomSequenceUSVStringOrURLPatternInit(const RvDomSequenceUSVStringOrURLPatternInit* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Variant<String, URLPatternInit>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomUnionUSVStringOrURLPatternInit(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Variant<String, URLPatternInit>> { std::move(result) };
+}
+
+void clearRvDomSequenceUSVStringOrURLPatternInit(RvDomSequenceUSVStringOrURLPatternInit* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionUSVStringOrURLPatternInit(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceUSVStringOrURLPatternInit(V&& input, RvDomSequenceUSVStringOrURLPatternInit* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomUnionUSVStringOrURLPatternInit*>(std::calloc(value.size(), sizeof(RvDomUnionUSVStringOrURLPatternInit))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomUnionUSVStringOrURLPatternInit(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<std::monostate, String>> decodeRvDomUnionUndefinedOrUSVString(const RvDomUnionUndefinedOrUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (source->arm0 != 0) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<std::monostate, String> { Variant<std::monostate, String> { WTF::InPlaceIndex<0>, std::monostate { } } };
+    }
+    case 2: {
+        if (source->arm1.length < 0 || (source->arm1.length > 0 && !source->arm1.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm1 = source->arm1.length < 0 ? String() : source->arm1.length ? String::fromUTF8(std::span<const uint8_t> { source->arm1.data, static_cast<size_t>(source->arm1.length) }) : emptyString();
+        if (source->arm1.length >= 0 && arm1.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<std::monostate, String> { Variant<std::monostate, String> { WTF::InPlaceIndex<1>, arm1 } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUndefinedOrUSVString(RvDomUnionUndefinedOrUSVString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        std::free(const_cast<uint8_t*>(value->arm1.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUndefinedOrUSVString(V&& value, RvDomUnionUndefinedOrUSVString* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = 0;
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionUndefinedOrUSVString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUndefinedOrUSVString(V&& input, RvDomUnionUndefinedOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUndefinedOrUSVString(value, result);
+    return RV_OK;
+}
+
+std::optional<KeyValuePair<String, Variant<std::monostate, String>>> decodeRvDomPairUSVStringAndUnionUndefinedOrUSVString(const RvDomPairUSVStringAndUnionUndefinedOrUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->key.length < 0 || (source->key.length > 0 && !source->key.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    String key = source->key.length < 0 ? String() : source->key.length ? String::fromUTF8(std::span<const uint8_t> { source->key.data, static_cast<size_t>(source->key.length) }) : emptyString();
+    if (source->key.length >= 0 && key.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    auto decoded0 = key;
+    auto value = decodeRvDomUnionUndefinedOrUSVString(&source->value, status);
+    if (status != RV_OK) return std::nullopt;
+    auto decoded1 = std::move(*value);
+    return KeyValuePair<String, Variant<std::monostate, String>> { std::move(decoded0), std::move(decoded1) };
+}
+
+void clearRvDomPairUSVStringAndUnionUndefinedOrUSVString(RvDomPairUSVStringAndUnionUndefinedOrUSVString* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->key.data));
+    clearRvDomUnionUndefinedOrUSVString(&value->value);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomPairUSVStringAndUnionUndefinedOrUSVString(V&& input, RvDomPairUSVStringAndUnionUndefinedOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->key = copyOwnedDomStringSpan(asString(value.key));
+    encodeRvDomUnionUndefinedOrUSVString(value.value, &result->value);
+    return RV_OK;
+}
+
+std::optional<Vector<KeyValuePair<String, Variant<std::monostate, String>>>> decodeRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(const RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<KeyValuePair<String, Variant<std::monostate, String>>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomPairUSVStringAndUnionUndefinedOrUSVString(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<KeyValuePair<String, Variant<std::monostate, String>>> { std::move(result) };
+}
+
+void clearRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomPairUSVStringAndUnionUndefinedOrUSVString(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(V&& input, RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomPairUSVStringAndUnionUndefinedOrUSVString*>(std::calloc(value.size(), sizeof(RvDomPairUSVStringAndUnionUndefinedOrUSVString))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomPairUSVStringAndUnionUndefinedOrUSVString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
 void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
 {
     if (!value) return;
@@ -2271,6 +2800,136 @@ template<typename V> int32_t encodeRvDomSequencePairUSVStringAndUnionFileOrUSVSt
     }
     return RV_OK;
 }
+
+RvDomURLPatternResult* encodeDictRvDomURLPatternResult(const URLPatternResult& value)
+{
+    auto* result = static_cast<RvDomURLPatternResult*>(std::calloc(1, sizeof(RvDomURLPatternResult)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomURLPatternResult);
+    if (auto* field = resultField(value.inputs)) {
+        auto* container = static_cast<RvDomSequenceUSVStringOrURLPatternInit*>(std::calloc(1, sizeof(RvDomSequenceUSVStringOrURLPatternInit)));
+        RELEASE_ASSERT(container);
+        encodeRvDomSequenceUSVStringOrURLPatternInit(*field, container);
+        result->inputs = container;
+    }
+    if (auto* field = resultField(value.protocol)) {
+        result->protocol = encodeDictRvDomURLPatternComponentResult(*field);
+    }
+    if (auto* field = resultField(value.username)) {
+        result->username = encodeDictRvDomURLPatternComponentResult(*field);
+    }
+    if (auto* field = resultField(value.password)) {
+        result->password = encodeDictRvDomURLPatternComponentResult(*field);
+    }
+    if (auto* field = resultField(value.hostname)) {
+        result->hostname = encodeDictRvDomURLPatternComponentResult(*field);
+    }
+    if (auto* field = resultField(value.port)) {
+        result->port = encodeDictRvDomURLPatternComponentResult(*field);
+    }
+    if (auto* field = resultField(value.pathname)) {
+        result->pathname = encodeDictRvDomURLPatternComponentResult(*field);
+    }
+    if (auto* field = resultField(value.search)) {
+        result->search = encodeDictRvDomURLPatternComponentResult(*field);
+    }
+    if (auto* field = resultField(value.hash)) {
+        result->hash = encodeDictRvDomURLPatternComponentResult(*field);
+    }
+    return result;
+}
+
+void releaseDictRvDomURLPatternResult(RvDomURLPatternResult* value)
+{
+    if (!value) return;
+    clearRvDomSequenceUSVStringOrURLPatternInit(const_cast<RvDomSequenceUSVStringOrURLPatternInit*>(value->inputs));
+    std::free(const_cast<RvDomSequenceUSVStringOrURLPatternInit*>(value->inputs));
+    releaseDictRvDomURLPatternComponentResult(const_cast<RvDomURLPatternComponentResult*>(value->protocol));
+    releaseDictRvDomURLPatternComponentResult(const_cast<RvDomURLPatternComponentResult*>(value->username));
+    releaseDictRvDomURLPatternComponentResult(const_cast<RvDomURLPatternComponentResult*>(value->password));
+    releaseDictRvDomURLPatternComponentResult(const_cast<RvDomURLPatternComponentResult*>(value->hostname));
+    releaseDictRvDomURLPatternComponentResult(const_cast<RvDomURLPatternComponentResult*>(value->port));
+    releaseDictRvDomURLPatternComponentResult(const_cast<RvDomURLPatternComponentResult*>(value->pathname));
+    releaseDictRvDomURLPatternComponentResult(const_cast<RvDomURLPatternComponentResult*>(value->search));
+    releaseDictRvDomURLPatternComponentResult(const_cast<RvDomURLPatternComponentResult*>(value->hash));
+    std::free(value);
+}
+
+RvDomURLPatternInit* encodeDictRvDomURLPatternInit(const URLPatternInit& value)
+{
+    auto* result = static_cast<RvDomURLPatternInit*>(std::calloc(1, sizeof(RvDomURLPatternInit)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomURLPatternInit);
+    if (auto* field = resultField(value.protocol)) {
+        result->protocol = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.username)) {
+        result->username = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.password)) {
+        result->password = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.hostname)) {
+        result->hostname = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.port)) {
+        result->port = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.pathname)) {
+        result->pathname = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.search)) {
+        result->search = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.hash)) {
+        result->hash = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.baseURL)) {
+        result->base_url = copyOwnedDomStringInput(asString(*field));
+    }
+    return result;
+}
+
+void releaseDictRvDomURLPatternInit(RvDomURLPatternInit* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->protocol.data));
+    std::free(const_cast<uint8_t*>(value->username.data));
+    std::free(const_cast<uint8_t*>(value->password.data));
+    std::free(const_cast<uint8_t*>(value->hostname.data));
+    std::free(const_cast<uint8_t*>(value->port.data));
+    std::free(const_cast<uint8_t*>(value->pathname.data));
+    std::free(const_cast<uint8_t*>(value->search.data));
+    std::free(const_cast<uint8_t*>(value->hash.data));
+    std::free(const_cast<uint8_t*>(value->base_url.data));
+    std::free(value);
+}
+
+RvDomURLPatternComponentResult* encodeDictRvDomURLPatternComponentResult(const URLPatternComponentResult& value)
+{
+    auto* result = static_cast<RvDomURLPatternComponentResult*>(std::calloc(1, sizeof(RvDomURLPatternComponentResult)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomURLPatternComponentResult);
+    if (auto* field = resultField(value.input)) {
+        result->input = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.groups)) {
+        auto* container = static_cast<RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*>(std::calloc(1, sizeof(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString)));
+        RELEASE_ASSERT(container);
+        encodeRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(*field, container);
+        result->groups = container;
+    }
+    return result;
+}
+
+void releaseDictRvDomURLPatternComponentResult(RvDomURLPatternComponentResult* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->input.data));
+    clearRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(const_cast<RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*>(value->groups));
+    std::free(const_cast<RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*>(value->groups));
+    std::free(value);
+}
 }
 
 using namespace WebCore;
@@ -2281,7 +2940,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2309,9 +2968,13 @@ int32_t ranvier_dom_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "dom-css-style-values"))
         return 1;
+    if (!std::strcmp(feature, "dom-url-static"))
+        return 1;
     if (!std::strcmp(feature, "dom-css-style-map-entries"))
         return 1;
     if (!std::strcmp(feature, "dom-form-data-entries"))
+        return 1;
+    if (!std::strcmp(feature, "dom-url-search-params-entries"))
         return 1;
     return 0;
 }
@@ -2501,6 +3164,51 @@ void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value
     if (isMainThread()) clearRvDomSequencePointerEvent(value);
 }
 
+void ranvier_dom_sequence_sequence_of_usv_string_release(RvDomSequenceSequenceOfUSVString* value)
+{
+    if (isMainThread()) clearRvDomSequenceSequenceOfUSVString(value);
+}
+
+void ranvier_dom_pair_usv_string_and_usv_string_release(RvDomPairUSVStringAndUSVString* value)
+{
+    if (isMainThread()) clearRvDomPairUSVStringAndUSVString(value);
+}
+
+void ranvier_dom_sequence_pair_usv_string_and_usv_string_release(RvDomSequencePairUSVStringAndUSVString* value)
+{
+    if (isMainThread()) clearRvDomSequencePairUSVStringAndUSVString(value);
+}
+
+void ranvier_dom_union_sequence_of_sequence_of_usv_string_or_record_of_usv_string_and_usv_string_or_usv_string_release(RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString(value);
+}
+
+void ranvier_dom_union_usv_string_or_url_pattern_init_release(RvDomUnionUSVStringOrURLPatternInit* value)
+{
+    if (isMainThread()) clearRvDomUnionUSVStringOrURLPatternInit(value);
+}
+
+void ranvier_dom_sequence_usv_string_or_url_pattern_init_release(RvDomSequenceUSVStringOrURLPatternInit* value)
+{
+    if (isMainThread()) clearRvDomSequenceUSVStringOrURLPatternInit(value);
+}
+
+void ranvier_dom_union_undefined_or_usv_string_release(RvDomUnionUndefinedOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomUnionUndefinedOrUSVString(value);
+}
+
+void ranvier_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomPairUSVStringAndUnionUndefinedOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomPairUSVStringAndUnionUndefinedOrUSVString(value);
+}
+
+void ranvier_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomSequencePairUSVStringAndUnionUndefinedOrUSVString(value);
+}
+
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
 {
     if (isMainThread()) clearRvDomSequenceCSSStyleValue(value);
@@ -2524,6 +3232,21 @@ void ranvier_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairU
 void ranvier_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value)
 {
     if (isMainThread()) clearRvDomSequencePairUSVStringAndUnionFileOrUSVString(value);
+}
+
+void ranvier_dom_url_pattern_result_release(RvDomURLPatternResult* value)
+{
+    if (isMainThread()) releaseDictRvDomURLPatternResult(value);
+}
+
+void ranvier_dom_url_pattern_init_release(RvDomURLPatternInit* value)
+{
+    if (isMainThread()) releaseDictRvDomURLPatternInit(value);
+}
+
+void ranvier_dom_url_pattern_component_result_release(RvDomURLPatternComponentResult* value)
+{
+    if (isMainThread()) releaseDictRvDomURLPatternComponentResult(value);
 }
 
 void ranvier_dom_dom_implementation_release(RvDOMImplementation* handle)
@@ -3279,6 +4002,48 @@ RvTreeWalker* ranvier_dom_tree_walker_retain(RvTreeWalker* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<TreeWalker*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_domurl_release(RvDOMURL* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<DOMURL*>(handle)->deref();
+}
+
+RvDOMURL* ranvier_dom_domurl_retain(RvDOMURL* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<DOMURL*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_url_search_params_release(RvURLSearchParams* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<URLSearchParams*>(handle)->deref();
+}
+
+RvURLSearchParams* ranvier_dom_url_search_params_retain(RvURLSearchParams* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<URLSearchParams*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_url_pattern_release(RvURLPattern* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<URLPattern*>(handle)->deref();
+}
+
+RvURLPattern* ranvier_dom_url_pattern_retain(RvURLPattern* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<URLPattern*>(handle)->ref();
     return handle;
 }
 
@@ -37945,6 +38710,610 @@ int32_t ranvier_dom_tree_walker_next_node(RvTreeWalker* target, RvNode** result)
     return deliver([&]() -> decltype(auto) { return impl->nextNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
+// DOMURL.constructor: target is the Document of the constructed object; base_length -1 means absent; base may be NULL (absent); *result is a new reference
+int32_t ranvier_dom_domurl_create(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, RvDOMURL** result)
+{
+    if (!target || !(url_length >= 0 && (url_length <= 0 || url)) || !(base_length >= -1 && (base_length <= 0 || base)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { url, url_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { base, base_length };
+    if (base_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return DOMURL::create(a0.string(), a1); }, [&](auto&& value) { return storeHandle<DOMURL>(value, result); });
+}
+
+// DOMURL.href getter: attribute USVString href
+int32_t ranvier_dom_domurl_get_href(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->href(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.href setter: attribute USVString href
+int32_t ranvier_dom_domurl_set_href(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setHref(a0.string()); });
+}
+
+// DOMURL.origin getter: readonly attribute USVString origin
+int32_t ranvier_dom_domurl_get_origin(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->origin(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.protocol getter: attribute USVString protocol
+int32_t ranvier_dom_domurl_get_protocol(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->protocol(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.protocol setter: attribute USVString protocol
+int32_t ranvier_dom_domurl_set_protocol(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setProtocol(a0.string()); });
+}
+
+// DOMURL.username getter: attribute USVString username
+int32_t ranvier_dom_domurl_get_username(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->username(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.username setter: attribute USVString username
+int32_t ranvier_dom_domurl_set_username(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setUsername(a0.string()); });
+}
+
+// DOMURL.password getter: attribute USVString password
+int32_t ranvier_dom_domurl_get_password(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->password(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.password setter: attribute USVString password
+int32_t ranvier_dom_domurl_set_password(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setPassword(a0.string()); });
+}
+
+// DOMURL.host getter: attribute USVString host
+int32_t ranvier_dom_domurl_get_host(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->host(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.host setter: attribute USVString host
+int32_t ranvier_dom_domurl_set_host(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setHost(a0.string()); });
+}
+
+// DOMURL.hostname getter: attribute USVString hostname
+int32_t ranvier_dom_domurl_get_hostname(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->hostname(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.hostname setter: attribute USVString hostname
+int32_t ranvier_dom_domurl_set_hostname(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setHostname(a0.string()); });
+}
+
+// DOMURL.port getter: attribute USVString port
+int32_t ranvier_dom_domurl_get_port(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->port(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.port setter: attribute USVString port
+int32_t ranvier_dom_domurl_set_port(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setPort(a0.string()); });
+}
+
+// DOMURL.pathname getter: attribute USVString pathname
+int32_t ranvier_dom_domurl_get_pathname(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->pathname(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.pathname setter: attribute USVString pathname
+int32_t ranvier_dom_domurl_set_pathname(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setPathname(a0.string()); });
+}
+
+// DOMURL.hash getter: attribute USVString hash
+int32_t ranvier_dom_domurl_get_hash(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->hash(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.hash setter: attribute USVString hash
+int32_t ranvier_dom_domurl_set_hash(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setHash(a0.string()); });
+}
+
+// DOMURL.search getter: attribute USVString search
+int32_t ranvier_dom_domurl_get_search(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->search(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DOMURL.search setter: attribute USVString search
+int32_t ranvier_dom_domurl_set_search(RvDOMURL* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setSearch(a0.string()); });
+}
+
+// DOMURL.searchParams getter: readonly attribute URLSearchParams searchParams; *result is a new reference
+int32_t ranvier_dom_domurl_get_search_params(RvDOMURL* target, RvURLSearchParams** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->searchParams(); }, [&](auto&& value) { return storeHandle<URLSearchParams>(value, result); });
+}
+
+// DOMURL.toJSON() -> USVString
+int32_t ranvier_dom_domurl_to_json(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMURL> impl = reinterpret_cast<DOMURL*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->toJSON(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLSearchParams.constructor: target is the Document of the constructed object; init defaults to "" in IDL; *result is a new reference
+int32_t ranvier_dom_url_search_params_create(RvNode* target, const RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* init, RvURLSearchParams** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString(init, status0);
+    if (!init) { a0 = Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String> { }; status0 = RV_OK; }
+    if (status0 != RV_OK) return status0;
+    return deliver([&]() -> decltype(auto) { return URLSearchParams::create(std::move(*a0)); }, [&](auto&& value) { return storeHandle<URLSearchParams>(value, result); });
+}
+
+// URLSearchParams.size getter: readonly attribute unsigned long size
+int32_t ranvier_dom_url_search_params_get_size(RvURLSearchParams* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->size(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// URLSearchParams.append(USVString name, USVString value) -> undefined
+int32_t ranvier_dom_url_search_params_append(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { value, value_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->append(a0.string(), a1.string()); });
+}
+
+// URLSearchParams.delete(USVString name, optional USVString value) -> undefined; value_length -1 means absent; value may be NULL (absent)
+int32_t ranvier_dom_url_search_params_delete(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !(value_length >= -1 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { value, value_length };
+    if (value_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->remove(a0.string(), a1); });
+}
+
+// URLSearchParams.get(USVString name) -> USVString?
+int32_t ranvier_dom_url_search_params_get(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->get(a0.string()); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// URLSearchParams.getAll(USVString name) -> sequence<USVString>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_url_search_params_get_all(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, RvDomSequenceUSVString* result)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->getAll(a0.string()); }, [&](auto&& value) { return encodeRvDomSequenceUSVString(value, result); });
+}
+
+// URLSearchParams.has(USVString name, optional USVString value) -> boolean; value_length -1 means absent; value may be NULL (absent)
+int32_t ranvier_dom_url_search_params_has(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length, int32_t* result)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !(value_length >= -1 && (value_length <= 0 || value)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { value, value_length };
+    if (value_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->has(a0.string(), a1); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// URLSearchParams.set(USVString name, USVString value) -> undefined
+int32_t ranvier_dom_url_search_params_set(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { value, value_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->set(a0.string(), a1.string()); });
+}
+
+// URLSearchParams.sort() -> undefined
+int32_t ranvier_dom_url_search_params_sort(RvURLSearchParams* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->sort(); });
+}
+
+// URLSearchParams.toString() -> DOMString
+int32_t ranvier_dom_url_search_params_to_string(RvURLSearchParams* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->toString(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLPattern.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_url_pattern_create_3(RvNode* target, const RvDomUnionUSVStringOrURLPatternInit* input, const uint8_t* base_url, int32_t base_url_length, const RvDomURLPatternOptions* options, RvURLPattern** result)
+{
+    if (!target || !input || !(base_url_length >= 0 && (base_url_length <= 0 || base_url)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionUSVStringOrURLPatternInit(input, status0);
+    if (status0 != RV_OK) return status0;
+    StringArg a1 { base_url, base_url_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    URLPatternOptions a2 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomURLPatternOptions, ignore_case) + sizeof(options->ignore_case))
+            assignValue(a2.ignoreCase, !!options->ignore_case);
+    }
+    return deliver([&]() -> decltype(auto) { return URLPattern::create(std::move(*a0), a1.string(), std::move(a2)); }, [&](auto&& value) { return storeHandle<URLPattern>(value, result); });
+}
+
+// URLPattern.constructor: target is the Document of the constructed object; input defaults to {} in IDL; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_url_pattern_create_2(RvNode* target, const RvDomUnionUSVStringOrURLPatternInit* input, const RvDomURLPatternOptions* options, RvURLPattern** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionUSVStringOrURLPatternInit(input, status0);
+    if (!input) { a0 = Variant<String, URLPatternInit> { WTF::InPlaceIndex<1>, URLPatternInit { } }; status0 = RV_OK; }
+    if (status0 != RV_OK) return status0;
+    URLPatternOptions a1 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomURLPatternOptions, ignore_case) + sizeof(options->ignore_case))
+            assignValue(a1.ignoreCase, !!options->ignore_case);
+    }
+    return deliver([&]() -> decltype(auto) { return URLPattern::create(std::move(*a0), std::move(a1)); }, [&](auto&& value) { return storeHandle<URLPattern>(value, result); });
+}
+
+// URLPattern.protocol getter: readonly attribute USVString protocol
+int32_t ranvier_dom_url_pattern_get_protocol(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->protocol(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLPattern.username getter: readonly attribute USVString username
+int32_t ranvier_dom_url_pattern_get_username(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->username(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLPattern.password getter: readonly attribute USVString password
+int32_t ranvier_dom_url_pattern_get_password(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->password(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLPattern.hostname getter: readonly attribute USVString hostname
+int32_t ranvier_dom_url_pattern_get_hostname(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->hostname(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLPattern.port getter: readonly attribute USVString port
+int32_t ranvier_dom_url_pattern_get_port(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->port(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLPattern.pathname getter: readonly attribute USVString pathname
+int32_t ranvier_dom_url_pattern_get_pathname(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->pathname(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLPattern.search getter: readonly attribute USVString search
+int32_t ranvier_dom_url_pattern_get_search(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->search(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLPattern.hash getter: readonly attribute USVString hash
+int32_t ranvier_dom_url_pattern_get_hash(RvURLPattern* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->hash(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// URLPattern.hasRegExpGroups getter: readonly attribute boolean hasRegExpGroups
+int32_t ranvier_dom_url_pattern_get_has_reg_exp_groups(RvURLPattern* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->hasRegExpGroups(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// URLPattern.test(optional URLPatternInput input = {}, optional USVString baseURL) -> boolean; input defaults to {} in IDL; base_url_length -1 means absent; base_url may be NULL (absent)
+int32_t ranvier_dom_url_pattern_test(RvURLPattern* target, const RvDomUnionUSVStringOrURLPatternInit* input, const uint8_t* base_url, int32_t base_url_length, int32_t* result)
+{
+    if (!target || !(base_url_length >= -1 && (base_url_length <= 0 || base_url)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionUSVStringOrURLPatternInit(input, status0);
+    if (!input) { a0 = Variant<String, URLPatternInit> { WTF::InPlaceIndex<1>, URLPatternInit { } }; status0 = RV_OK; }
+    if (status0 != RV_OK) return status0;
+    StringArg a1 { base_url, base_url_length };
+    if (base_url_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->test(std::move(*a0), a1); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// URLPattern.exec(optional URLPatternInput input = {}, optional USVString baseURL) -> URLPatternResult?; input defaults to {} in IDL; base_url_length -1 means absent; base_url may be NULL (absent); *result is NULL for null; *result is owned; release it with rv_dom_url_pattern_result_release
+int32_t ranvier_dom_url_pattern_exec(RvURLPattern* target, const RvDomUnionUSVStringOrURLPatternInit* input, const uint8_t* base_url, int32_t base_url_length, RvDomURLPatternResult** result)
+{
+    if (!target || !(base_url_length >= -1 && (base_url_length <= 0 || base_url)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLPattern> impl = reinterpret_cast<URLPattern*>(target);
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionUSVStringOrURLPatternInit(input, status0);
+    if (!input) { a0 = Variant<String, URLPatternInit> { WTF::InPlaceIndex<1>, URLPatternInit { } }; status0 = RV_OK; }
+    if (status0 != RV_OK) return status0;
+    StringArg a1 { base_url, base_url_length };
+    if (base_url_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->exec(std::move(*a0), a1); }, [&](auto&& value) { return storeOptionalDictionary(value, result, [](const auto& item) { return encodeDictRvDomURLPatternResult(item); }); });
+}
+
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
 int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result)
 {
@@ -38541,6 +39910,40 @@ int32_t ranvier_dom_css_style_value_parse_all(RvNode* target, const uint8_t* pro
     return deliver([&]() -> decltype(auto) { return CSSStyleValue::parseAll(document.get(), a0.atom(), a1.string()); }, [&](auto&& value) { return encodeRvDomSequenceCSSStyleValue(value, result); });
 }
 
+// DOMURL.parse: static operation with checked Document context and UTF-8 byte lengths; base_length -1 means absent; base may be NULL (absent); *result is a new reference, or NULL
+int32_t ranvier_dom_domurl_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, RvDOMURL** result)
+{
+    if (!target || !(url_length >= 0 && (url_length <= 0 || url)) || !(base_length >= -1 && (base_length <= 0 || base)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { url, url_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { base, base_length };
+    if (base_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return DOMURL::parse(a0.string(), a1); }, [&](auto&& value) { return storeHandle<DOMURL>(value, result); });
+}
+
+// DOMURL.canParse: static operation with checked Document context and UTF-8 byte lengths; base_length -1 means absent; base may be NULL (absent)
+int32_t ranvier_dom_domurl_can_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, int32_t* result)
+{
+    if (!target || !(url_length >= 0 && (url_length <= 0 || url)) || !(base_length >= -1 && (base_length <= 0 || base)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { url, url_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { base, base_length };
+    if (base_length >= 0 && a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return DOMURL::canParse(a0.string(), a1); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
 // StylePropertyMapReadOnly.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document for the operation; *result owns its contents; release with the matching rv_dom_*_release
 int32_t ranvier_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result)
 {
@@ -38569,6 +39972,21 @@ int32_t ranvier_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* context
         return RV_ERR_WRONG_INTERFACE;
     Ref document = contextDocument.releaseNonNull();
     return deliver([&]() -> decltype(auto) { return ([&]() { Vector<KeyValuePair<String, Variant<Ref<File>, String>>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequencePairUSVStringAndUnionFileOrUSVString(value, result); });
+}
+
+// URLSearchParams.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document for the operation; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_url_search_params_entries(RvURLSearchParams* target, RvNode* context, RvDomSequencePairUSVStringAndUSVString* result)
+{
+    if (!target || !context || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    return deliver([&]() -> decltype(auto) { return ([&]() { Vector<KeyValuePair<String, String>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequencePairUSVStringAndUSVString(value, result); });
 }
 
 int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)

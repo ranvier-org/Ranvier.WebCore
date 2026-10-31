@@ -864,6 +864,47 @@ type RvDomDOMMatrix2DInit =
     val mutable m41: nativeint
     val mutable m42: nativeint
 
+/// <summary>The IDL dictionary URLPatternInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomURLPatternInit =
+    val mutable size: uint32
+    val mutable protocol: RvDomUtf8StringInput
+    val mutable username: RvDomUtf8StringInput
+    val mutable password: RvDomUtf8StringInput
+    val mutable hostname: RvDomUtf8StringInput
+    val mutable port: RvDomUtf8StringInput
+    val mutable pathname: RvDomUtf8StringInput
+    val mutable search: RvDomUtf8StringInput
+    val mutable hash: RvDomUtf8StringInput
+    val mutable base_url: RvDomUtf8StringInput
+
+/// <summary>The IDL dictionary URLPatternOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomURLPatternOptions =
+    val mutable size: uint32
+    val mutable ignore_case: int
+
+/// <summary>The IDL dictionary URLPatternComponentResult; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomURLPatternComponentResult =
+    val mutable size: uint32
+    val mutable input: RvDomUtf8StringInput
+    val mutable groups: nativeint
+
+/// <summary>The IDL dictionary URLPatternResult; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomURLPatternResult =
+    val mutable size: uint32
+    val mutable inputs: nativeint
+    val mutable protocol: nativeint
+    val mutable username: nativeint
+    val mutable password: nativeint
+    val mutable hostname: nativeint
+    val mutable port: nativeint
+    val mutable pathname: nativeint
+    val mutable search: nativeint
+    val mutable hash: nativeint
+
 /// <summary>The IDL dictionary DOMCSSCustomPropertyDescriptor; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomDOMCSSCustomPropertyDescriptor =
@@ -1311,6 +1352,94 @@ type RvDomSequencePointerEvent =
     val mutable count: int
     val mutable items: nativeint
 
+/// <summary>ABI transport for SequenceOfUSVString sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceSequenceOfUSVString =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+/// <summary>ABI transport for USVStringAndUSVString entry; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomPairUSVStringAndUSVString =
+    val mutable present: int
+    val mutable key: RvDomUtf8StringSpan
+    val mutable value: RvDomUtf8StringSpan
+
+/// <summary>ABI transport for PairUSVStringAndUSVString sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequencePairUSVStringAndUSVString =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_SEQUENCE_OF_USV_STRING = 1
+
+[<Literal>]
+let RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_SEQUENCE_PAIR_USV_STRING_AND_USV_STRING = 2
+
+[<Literal>]
+let RV_DOM_UNION_SEQUENCE_OF_SEQUENCE_OF_USV_STRING_OR_RECORD_OF_USV_STRING_AND_USV_STRING_OR_USV_STRING_STRING = 3
+
+/// <summary>ABI transport for SequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: RvDomSequenceSequenceOfUSVString
+    val mutable arm1: RvDomSequencePairUSVStringAndUSVString
+    val mutable arm2: RvDomUtf8StringSpan
+
+[<Literal>]
+let RV_DOM_UNION_USV_STRING_OR_URL_PATTERN_INIT_STRING = 1
+
+[<Literal>]
+let RV_DOM_UNION_USV_STRING_OR_URL_PATTERN_INIT_URL_PATTERN_INIT = 2
+
+/// <summary>ABI transport for USVStringOrURLPatternInit; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUSVStringOrURLPatternInit =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: RvDomUtf8StringSpan
+    val mutable arm1: nativeint
+
+/// <summary>ABI transport for USVStringOrURLPatternInit sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceUSVStringOrURLPatternInit =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_UNDEFINED_OR_USV_STRING_VOID = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNDEFINED_OR_USV_STRING_STRING = 2
+
+/// <summary>ABI transport for UndefinedOrUSVString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUndefinedOrUSVString =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: int
+    val mutable arm1: RvDomUtf8StringSpan
+
+/// <summary>ABI transport for USVStringAndUnionUndefinedOrUSVString entry; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomPairUSVStringAndUnionUndefinedOrUSVString =
+    val mutable present: int
+    val mutable key: RvDomUtf8StringSpan
+    val mutable value: RvDomUnionUndefinedOrUSVString
+
+/// <summary>ABI transport for PairUSVStringAndUnionUndefinedOrUSVString sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for CSSStyleValue sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceCSSStyleValue =
@@ -1458,6 +1587,33 @@ extern void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVStr
 extern void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_sequence_sequence_of_usv_string_release(RvDomSequenceSequenceOfUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_pair_usv_string_and_usv_string_release(RvDomPairUSVStringAndUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_pair_usv_string_and_usv_string_release(RvDomSequencePairUSVStringAndUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_sequence_of_sequence_of_usv_string_or_record_of_usv_string_and_usv_string_or_usv_string_release(RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_usv_string_or_url_pattern_init_release(RvDomUnionUSVStringOrURLPatternInit& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_usv_string_or_url_pattern_init_release(RvDomSequenceUSVStringOrURLPatternInit& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_undefined_or_usv_string_release(RvDomUnionUndefinedOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomPairUSVStringAndUnionUndefinedOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
 
 [<DllImport(Lib)>]
@@ -1471,6 +1627,15 @@ extern void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPai
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_url_pattern_result_release(nativeint value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_url_pattern_init_release(nativeint value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_url_pattern_component_result_release(nativeint value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_dom_implementation_release(nativeint handle)
@@ -1795,6 +1960,24 @@ extern void rv_dom_tree_walker_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_tree_walker_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_domurl_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_domurl_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_url_search_params_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_url_search_params_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_url_pattern_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_url_pattern_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -9303,6 +9486,147 @@ extern int rv_dom_tree_walker_previous_node(nativeint target, nativeint& result)
 extern int rv_dom_tree_walker_next_node(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_domurl_create(nativeint target, byte[] url, int url_length, byte[] ``base``, int base_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_href(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_href(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_origin(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_protocol(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_protocol(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_username(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_username(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_password(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_password(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_host(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_host(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_hostname(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_hostname(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_port(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_port(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_pathname(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_pathname(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_hash(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_hash(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_search(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_set_search(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_get_search_params(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_to_json(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_create(nativeint target, [<In>] RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString[] init, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_get_size(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_append(nativeint target, byte[] name, int name_length, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_delete(nativeint target, byte[] name, int name_length, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_get(nativeint target, byte[] name, int name_length, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_get_all(nativeint target, byte[] name, int name_length, RvDomSequenceUSVString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_has(nativeint target, byte[] name, int name_length, byte[] value, int value_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_set(nativeint target, byte[] name, int name_length, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_sort(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_to_string(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_create_3(nativeint target, [<In>] RvDomUnionUSVStringOrURLPatternInit[] input, byte[] base_url, int base_url_length, [<In>] RvDomURLPatternOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_create_2(nativeint target, [<In>] RvDomUnionUSVStringOrURLPatternInit[] input, [<In>] RvDomURLPatternOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_get_protocol(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_get_username(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_get_password(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_get_hostname(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_get_port(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_get_pathname(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_get_search(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_get_hash(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_get_has_reg_exp_groups(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_test(nativeint target, [<In>] RvDomUnionUSVStringOrURLPatternInit[] input, byte[] base_url, int base_url_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_pattern_exec(nativeint target, [<In>] RvDomUnionUSVStringOrURLPatternInit[] input, byte[] base_url, int base_url_length, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
@@ -9369,7 +9693,16 @@ extern int rv_dom_css_style_value_parse(nativeint target, byte[] property, int p
 extern int rv_dom_css_style_value_parse_all(nativeint target, byte[] property, int property_length, byte[] css_text, int css_text_length, RvDomSequenceCSSStyleValue& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_domurl_parse(nativeint target, byte[] url, int url_length, byte[] ``base``, int base_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_domurl_can_parse(nativeint target, byte[] url, int url_length, byte[] ``base``, int base_length, int& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_style_property_map_read_only_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_form_data_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndUnionFileOrUSVString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_url_search_params_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndUSVString& result)

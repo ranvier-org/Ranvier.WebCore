@@ -1,0 +1,223 @@
+{
+ "comment": "Measured differences between the runtime (WebKit URL parser) and Chromium 156.0.8078.4, each with the runtime value. url_values.py fails on any other difference.",
+ "differences": {
+  "parse[39]": {
+   "note": "A space is a forbidden host code point (WHATWG URL host parser): the engine fails, as the spec and WPT require; Chromium percent-encodes it.",
+   "native": {
+    "url": {
+     "error": "TypeError"
+    },
+    "canParse": false,
+    "parse": null,
+    "json": {
+     "error": "TypeError"
+    }
+   },
+   "chromium": {
+    "url": {
+     "href": "http://ex%20ample.com/",
+     "origin": "http://ex%20ample.com",
+     "protocol": "http:",
+     "username": "",
+     "password": "",
+     "host": "ex%20ample.com",
+     "hostname": "ex%20ample.com",
+     "port": "",
+     "pathname": "/",
+     "search": "",
+     "hash": ""
+    },
+    "canParse": true,
+    "parse": "http://ex%20ample.com/",
+    "json": "http://ex%20ample.com/"
+   }
+  },
+  "parse[44]": {
+   "note": "\"|\" is outside the path percent-encode set: the engine keeps it, as the spec does; Chromium encodes it as %7C.",
+   "native": {
+    "url": {
+     "href": "http://example.com/%22%3C%3E%60%7B%7D|%5E",
+     "origin": "http://example.com",
+     "protocol": "http:",
+     "username": "",
+     "password": "",
+     "host": "example.com",
+     "hostname": "example.com",
+     "port": "",
+     "pathname": "/%22%3C%3E%60%7B%7D|%5E",
+     "search": "",
+     "hash": ""
+    },
+    "canParse": true,
+    "parse": "http://example.com/%22%3C%3E%60%7B%7D|%5E",
+    "json": "http://example.com/%22%3C%3E%60%7B%7D|%5E"
+   },
+   "chromium": {
+    "url": {
+     "href": "http://example.com/%22%3C%3E%60%7B%7D%7C%5E",
+     "origin": "http://example.com",
+     "protocol": "http:",
+     "username": "",
+     "password": "",
+     "host": "example.com",
+     "hostname": "example.com",
+     "port": "",
+     "pathname": "/%22%3C%3E%60%7B%7D%7C%5E",
+     "search": "",
+     "hash": ""
+    },
+    "canParse": true,
+    "parse": "http://example.com/%22%3C%3E%60%7B%7D%7C%5E",
+    "json": "http://example.com/%22%3C%3E%60%7B%7D%7C%5E"
+   }
+  },
+  "parse[53]": {
+   "note": "The engine keeps the drive letter case of file:c:\foo; Chromium uppercases it.",
+   "native": {
+    "url": {
+     "href": "file:///c:/foo/bar",
+     "origin": "file://",
+     "protocol": "file:",
+     "username": "",
+     "password": "",
+     "host": "",
+     "hostname": "",
+     "port": "",
+     "pathname": "/c:/foo/bar",
+     "search": "",
+     "hash": ""
+    },
+    "canParse": true,
+    "parse": "file:///c:/foo/bar",
+    "json": "file:///c:/foo/bar"
+   },
+   "chromium": {
+    "url": {
+     "href": "file:///C:/foo/bar",
+     "origin": "file://",
+     "protocol": "file:",
+     "username": "",
+     "password": "",
+     "host": "",
+     "hostname": "",
+     "port": "",
+     "pathname": "/C:/foo/bar",
+     "search": "",
+     "hash": ""
+    },
+    "canParse": true,
+    "parse": "file:///C:/foo/bar",
+    "json": "file:///C:/foo/bar"
+   }
+  },
+  "parse[55]": {
+   "note": "The spec file-host state replaces the host \"localhost\" with the empty host: the engine does; Chromium keeps localhost.",
+   "native": {
+    "url": {
+     "href": "file:///etc/x",
+     "origin": "file://",
+     "protocol": "file:",
+     "username": "",
+     "password": "",
+     "host": "",
+     "hostname": "",
+     "port": "",
+     "pathname": "/etc/x",
+     "search": "",
+     "hash": ""
+    },
+    "canParse": true,
+    "parse": "file:///etc/x",
+    "json": "file:///etc/x"
+   },
+   "chromium": {
+    "url": {
+     "href": "file://localhost/etc/x",
+     "origin": "file://",
+     "protocol": "file:",
+     "username": "",
+     "password": "",
+     "host": "localhost",
+     "hostname": "localhost",
+     "port": "",
+     "pathname": "/etc/x",
+     "search": "",
+     "hash": ""
+    },
+    "canParse": true,
+    "parse": "file://localhost/etc/x",
+    "json": "file://localhost/etc/x"
+   }
+  },
+  "setters[3]": {
+   "note": "The protocol setter cannot turn a non-special scheme into a special one: the engine keeps mailto:, as the spec does; Chromium switches to https.",
+   "native": {
+    "threw": null,
+    "url": {
+     "href": "mailto:x@y",
+     "origin": "null",
+     "protocol": "mailto:",
+     "username": "",
+     "password": "",
+     "host": "",
+     "hostname": "",
+     "port": "",
+     "pathname": "x@y",
+     "search": "",
+     "hash": ""
+    }
+   },
+   "chromium": {
+    "threw": null,
+    "url": {
+     "href": "https://x@y/",
+     "origin": "https://y",
+     "protocol": "https:",
+     "username": "x",
+     "password": "",
+     "host": "y",
+     "hostname": "y",
+     "port": "",
+     "pathname": "/",
+     "search": "",
+     "hash": ""
+    }
+   }
+  },
+  "setters[22]": {
+   "note": "Setting search to \"?\" sets an empty query, so href keeps the \"?\" (spec); Chromium drops it.",
+   "native": {
+    "threw": null,
+    "url": {
+     "href": "http://a.test/?",
+     "origin": "http://a.test",
+     "protocol": "http:",
+     "username": "",
+     "password": "",
+     "host": "a.test",
+     "hostname": "a.test",
+     "port": "",
+     "pathname": "/",
+     "search": "",
+     "hash": ""
+    }
+   },
+   "chromium": {
+    "threw": null,
+    "url": {
+     "href": "http://a.test/",
+     "origin": "http://a.test",
+     "protocol": "http:",
+     "username": "",
+     "password": "",
+     "host": "a.test",
+     "hostname": "a.test",
+     "port": "",
+     "pathname": "/",
+     "search": "",
+     "hash": ""
+    }
+   }
+  }
+ }
+}

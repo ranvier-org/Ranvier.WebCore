@@ -1316,6 +1316,18 @@
     {
       "name": "TreeWalker",
       "base": null
+    },
+    {
+      "name": "DOMURL",
+      "base": null
+    },
+    {
+      "name": "URLSearchParams",
+      "base": null
+    },
+    {
+      "name": "URLPattern",
+      "base": null
     }
   ],
   "contractInterfaces": [
@@ -3710,6 +3722,33 @@
       "mixin": false,
       "contractOnly": false,
       "source": "dom/TreeWalker.idl"
+    },
+    {
+      "name": "URL",
+      "idlName": "DOMURL",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/DOMURL.idl"
+    },
+    {
+      "name": "URLSearchParams",
+      "idlName": "URLSearchParams",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/URLSearchParams.idl"
+    },
+    {
+      "name": "URLPattern",
+      "idlName": "URLPattern",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "Modules/url-pattern/URLPattern.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -134292,6 +134331,3179 @@
       }
     },
     {
+      "interface": "DOMURL",
+      "member": "constructor",
+      "contractOwner": "URL",
+      "kind": "constructor",
+      "function": "rv_dom_domurl_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "url"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "url_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "base"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "base_length"
+        },
+        {
+          "ctype": "RvDOMURL**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "url",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "base",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMURL",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMURL",
+        "root": "DOMURL",
+        "class": "DOMURL",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DOMURL",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "href",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "href",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_href",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "origin",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_origin",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "protocol",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_protocol",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "protocol",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_protocol",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "username",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_username",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "username",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_username",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "password",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_password",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "password",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_password",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "host",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_host",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "host",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_host",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "hostname",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_hostname",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "hostname",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_hostname",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "port",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_port",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "port",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_port",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "pathname",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_pathname",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "pathname",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_pathname",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "hash",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_hash",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "hash",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_hash",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "search",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_search",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "search",
+      "contractOwner": "URL",
+      "kind": "setter",
+      "function": "rv_dom_domurl_set_search",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "searchParams",
+      "contractOwner": "URL",
+      "kind": "getter",
+      "function": "rv_dom_domurl_get_search_params",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvURLSearchParams**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "URLSearchParams",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "URLSearchParams",
+        "root": "URLSearchParams",
+        "class": "URLSearchParams",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMURL",
+      "member": "toJSON",
+      "contractOwner": "URL",
+      "kind": "operation",
+      "function": "rv_dom_domurl_to_json",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMURL*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "constructor",
+      "contractOwner": "URLSearchParams",
+      "kind": "constructor",
+      "function": "rv_dom_url_search_params_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString*",
+          "name": "init"
+        },
+        {
+          "ctype": "RvURLSearchParams**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "init",
+          "idlType": "(sequence<sequence<USVString>> or record<USVString, USVString> or USVString)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "sequence",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "sequence",
+                    "nullable": false,
+                    "subtypes": [
+                      {
+                        "name": "USVString",
+                        "nullable": false,
+                        "subtypes": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "record",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "USVString",
+                    "nullable": false,
+                    "subtypes": []
+                  },
+                  {
+                    "name": "USVString",
+                    "nullable": false,
+                    "subtypes": []
+                  }
+                ]
+              },
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": "\"\"",
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "SequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "sequence",
+                "ctype": "RvDomSequenceSequenceOfUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "SequenceOfUSVString sequence",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "sequence",
+                    "ctype": "RvDomSequenceUSVString",
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": "USVString sequence",
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [
+                      {
+                        "kind": "string",
+                        "ctype": null,
+                        "interface": null,
+                        "root": null,
+                        "class": null,
+                        "enum": null,
+                        "label": null,
+                        "nullable": false,
+                        "atom": false,
+                        "subtypes": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "sequence",
+                "ctype": "RvDomSequencePairUSVStringAndUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "PairUSVStringAndUSVString sequence",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "pair",
+                    "ctype": "RvDomPairUSVStringAndUSVString",
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": "USVStringAndUSVString entry",
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [
+                      {
+                        "kind": "string",
+                        "ctype": null,
+                        "interface": null,
+                        "root": null,
+                        "class": null,
+                        "enum": null,
+                        "label": null,
+                        "nullable": false,
+                        "atom": false,
+                        "subtypes": [],
+                        "stringTransport": "utf8-lengths"
+                      },
+                      {
+                        "kind": "string",
+                        "ctype": null,
+                        "interface": null,
+                        "root": null,
+                        "class": null,
+                        "enum": null,
+                        "label": null,
+                        "nullable": false,
+                        "atom": false,
+                        "subtypes": [],
+                        "stringTransport": "utf8-lengths"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "URLSearchParams",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "URLSearchParams",
+        "root": "URLSearchParams",
+        "class": "URLSearchParams",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:URLSearchParams",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "size",
+      "contractOwner": "URLSearchParams",
+      "kind": "getter",
+      "function": "rv_dom_url_search_params_get_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "append",
+      "contractOwner": "URLSearchParams",
+      "kind": "operation",
+      "function": "rv_dom_url_search_params_append",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "delete",
+      "contractOwner": "URLSearchParams",
+      "kind": "operation",
+      "function": "rv_dom_url_search_params_delete",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "get",
+      "contractOwner": "URLSearchParams",
+      "kind": "operation",
+      "function": "rv_dom_url_search_params_get",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "getAll",
+      "contractOwner": "URLSearchParams",
+      "kind": "operation",
+      "function": "rv_dom_url_search_params_get_all",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "RvDomSequenceUSVString*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "has",
+      "contractOwner": "URLSearchParams",
+      "kind": "operation",
+      "function": "rv_dom_url_search_params_has",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "set",
+      "contractOwner": "URLSearchParams",
+      "kind": "operation",
+      "function": "rv_dom_url_search_params_set",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "sort",
+      "contractOwner": "URLSearchParams",
+      "kind": "operation",
+      "function": "rv_dom_url_search_params_sort",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "toString",
+      "contractOwner": "URLSearchParams",
+      "kind": "operation",
+      "function": "rv_dom_url_search_params_to_string",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLPattern",
+      "member": "constructor",
+      "contractOwner": "URLPattern",
+      "kind": "constructor",
+      "function": "rv_dom_url_pattern_create_3",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionUSVStringOrURLPatternInit*",
+          "name": "input"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "base_url"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "base_url_length"
+        },
+        {
+          "ctype": "const RvDomURLPatternOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvURLPattern**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "input",
+          "idlType": "URLPatternInput",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "URLPatternInit",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUSVStringOrURLPatternInit",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringOrURLPatternInit",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "URLPatternInit",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "baseURL",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "URLPatternOptions",
+          "idl": {
+            "name": "URLPatternOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "URLPatternOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "URLPattern",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "URLPattern",
+        "root": "URLPattern",
+        "class": "URLPattern",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:URLPattern",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLPattern",
+      "member": "constructor",
+      "contractOwner": "URLPattern",
+      "kind": "constructor",
+      "function": "rv_dom_url_pattern_create_2",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionUSVStringOrURLPatternInit*",
+          "name": "input"
+        },
+        {
+          "ctype": "const RvDomURLPatternOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvURLPattern**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "input",
+          "idlType": "URLPatternInput",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "URLPatternInit",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUSVStringOrURLPatternInit",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringOrURLPatternInit",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "URLPatternInit",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "URLPatternOptions",
+          "idl": {
+            "name": "URLPatternOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "URLPatternOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "URLPattern",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "URLPattern",
+        "root": "URLPattern",
+        "class": "URLPattern",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:URLPattern",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLPattern",
+      "member": "protocol",
+      "contractOwner": "URLPattern",
+      "kind": "getter",
+      "function": "rv_dom_url_pattern_get_protocol",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLPattern",
+      "member": "username",
+      "contractOwner": "URLPattern",
+      "kind": "getter",
+      "function": "rv_dom_url_pattern_get_username",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLPattern",
+      "member": "password",
+      "contractOwner": "URLPattern",
+      "kind": "getter",
+      "function": "rv_dom_url_pattern_get_password",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLPattern",
+      "member": "hostname",
+      "contractOwner": "URLPattern",
+      "kind": "getter",
+      "function": "rv_dom_url_pattern_get_hostname",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLPattern",
+      "member": "port",
+      "contractOwner": "URLPattern",
+      "kind": "getter",
+      "function": "rv_dom_url_pattern_get_port",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLPattern",
+      "member": "pathname",
+      "contractOwner": "URLPattern",
+      "kind": "getter",
+      "function": "rv_dom_url_pattern_get_pathname",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLPattern",
+      "member": "search",
+      "contractOwner": "URLPattern",
+      "kind": "getter",
+      "function": "rv_dom_url_pattern_get_search",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLPattern",
+      "member": "hash",
+      "contractOwner": "URLPattern",
+      "kind": "getter",
+      "function": "rv_dom_url_pattern_get_hash",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLPattern",
+      "member": "hasRegExpGroups",
+      "contractOwner": "URLPattern",
+      "kind": "getter",
+      "function": "rv_dom_url_pattern_get_has_reg_exp_groups",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "URLPattern",
+      "member": "test",
+      "contractOwner": "URLPattern",
+      "kind": "operation",
+      "function": "rv_dom_url_pattern_test",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionUSVStringOrURLPatternInit*",
+          "name": "input"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "base_url"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "base_url_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "input",
+          "idlType": "URLPatternInput",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "URLPatternInit",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUSVStringOrURLPatternInit",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringOrURLPatternInit",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "URLPatternInit",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "baseURL",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "URLPattern",
+      "member": "exec",
+      "contractOwner": "URLPattern",
+      "kind": "operation",
+      "function": "rv_dom_url_pattern_exec",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLPattern*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionUSVStringOrURLPatternInit*",
+          "name": "input"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "base_url"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "base_url_length"
+        },
+        {
+          "ctype": "RvDomURLPatternResult**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "input",
+          "idlType": "URLPatternInput",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "URLPatternInit",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUSVStringOrURLPatternInit",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringOrURLPatternInit",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "URLPatternInit",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "baseURL",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "URLPatternResult",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "dict",
+        "ctype": null,
+        "interface": "URLPatternResult",
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -135983,6 +139195,216 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "DOMURL",
+      "member": "parse",
+      "contractOwner": "URL",
+      "kind": "static_operation",
+      "function": "rv_dom_domurl_parse",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "url"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "url_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "base"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "base_length"
+        },
+        {
+          "ctype": "RvDOMURL**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "url",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "base",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMURL",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMURL",
+        "root": "DOMURL",
+        "class": "DOMURL",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-url-static",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMURL",
+      "member": "canParse",
+      "contractOwner": "URL",
+      "kind": "static_operation",
+      "function": "rv_dom_domurl_can_parse",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "url"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "url_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "base"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "base_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "url",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "base",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-url-static",
+      "binding": "facade",
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "StylePropertyMapReadOnly",
       "member": "entries",
       "contractOwner": "StylePropertyMapReadOnly",
@@ -136236,6 +139658,108 @@
       },
       "binding": "facade",
       "feature": "dom-form-data-entries",
+      "sourceKind": "iterable",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "URLSearchParams",
+      "member": "entries",
+      "contractOwner": "URLSearchParams",
+      "kind": "iterator_snapshot",
+      "function": "rv_dom_url_search_params_entries",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvURLSearchParams*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "RvDomSequencePairUSVStringAndUSVString*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "pair",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequencePairUSVStringAndUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "PairUSVStringAndUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "pair",
+            "ctype": "RvDomPairUSVStringAndUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringAndUSVString entry",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        ]
+      },
+      "binding": "facade",
+      "feature": "dom-url-search-params-entries",
       "sourceKind": "iterable",
       "contextReceiver": "Document",
       "contextParameter": "context"
@@ -137778,6 +141302,546 @@
     {
       "mapping": {
         "kind": "sequence",
+        "ctype": "RvDomSequenceSequenceOfUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "SequenceOfUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVString sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_sequence_of_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "pair",
+        "ctype": "RvDomPairUSVStringAndUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringAndUSVString entry",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_pair_usv_string_and_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequencePairUSVStringAndUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "PairUSVStringAndUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "pair",
+            "ctype": "RvDomPairUSVStringAndUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringAndUSVString entry",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_pair_usv_string_and_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "SequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceSequenceOfUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "SequenceOfUSVString sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "sequence",
+                "ctype": "RvDomSequenceUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "USVString sequence",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "sequence",
+            "ctype": "RvDomSequencePairUSVStringAndUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "PairUSVStringAndUSVString sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "pair",
+                "ctype": "RvDomPairUSVStringAndUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "USVStringAndUSVString entry",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  },
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_sequence_of_sequence_of_usv_string_or_record_of_usv_string_and_usv_string_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUSVStringOrURLPatternInit",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringOrURLPatternInit",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "URLPatternInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_usv_string_or_url_pattern_init_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceUSVStringOrURLPatternInit",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringOrURLPatternInit sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "union",
+            "ctype": "RvDomUnionUSVStringOrURLPatternInit",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringOrURLPatternInit",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "URLPatternInit",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_usv_string_or_url_pattern_init_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUndefinedOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UndefinedOrUSVString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "void",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_undefined_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "pair",
+        "ctype": "RvDomPairUSVStringAndUnionUndefinedOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringAndUnionUndefinedOrUSVString entry",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "union",
+            "ctype": "RvDomUnionUndefinedOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "UndefinedOrUSVString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "void",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "PairUSVStringAndUnionUndefinedOrUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "pair",
+            "ctype": "RvDomPairUSVStringAndUnionUndefinedOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringAndUnionUndefinedOrUSVString entry",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionUndefinedOrUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "UndefinedOrUSVString",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "void",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
         "ctype": "RvDomSequenceCSSStyleValue",
         "interface": null,
         "root": null,
@@ -138072,7 +142136,20 @@
       "releaseFunction": "rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release"
     }
   ],
-  "resultDictionaries": {},
+  "resultDictionaries": {
+    "URLPatternResult": {
+      "struct": "RvDomURLPatternResult",
+      "releaseFunction": "rv_dom_url_pattern_result_release"
+    },
+    "URLPatternInit": {
+      "struct": "RvDomURLPatternInit",
+      "releaseFunction": "rv_dom_url_pattern_init_release"
+    },
+    "URLPatternComponentResult": {
+      "struct": "RvDomURLPatternComponentResult",
+      "releaseFunction": "rv_dom_url_pattern_component_result_release"
+    }
+  },
   "dictionaries": {
     "GetRootNodeOptions": [
       {
@@ -139889,6 +143966,517 @@
           "kind": "number",
           "ctype": "double",
           "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "URLPatternInit": [
+      {
+        "name": "protocol",
+        "field": "protocol",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "username",
+        "field": "username",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "password",
+        "field": "password",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "hostname",
+        "field": "hostname",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "port",
+        "field": "port",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "pathname",
+        "field": "pathname",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "search",
+        "field": "search",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "hash",
+        "field": "hash",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "baseURL",
+        "field": "base_url",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "URLPatternOptions": [
+      {
+        "name": "ignoreCase",
+        "field": "ignore_case",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "URLPatternComponentResult": [
+      {
+        "name": "input",
+        "field": "input",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "groups",
+        "field": "groups",
+        "ctype": "const RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "sequence",
+          "ctype": "RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "PairUSVStringAndUnionUndefinedOrUSVString sequence",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "pair",
+              "ctype": "RvDomPairUSVStringAndUnionUndefinedOrUSVString",
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": "USVStringAndUnionUndefinedOrUSVString entry",
+              "nullable": false,
+              "atom": false,
+              "subtypes": [
+                {
+                  "kind": "string",
+                  "ctype": null,
+                  "interface": null,
+                  "root": null,
+                  "class": null,
+                  "enum": null,
+                  "label": null,
+                  "nullable": false,
+                  "atom": false,
+                  "subtypes": [],
+                  "stringTransport": "utf8-lengths"
+                },
+                {
+                  "kind": "union",
+                  "ctype": "RvDomUnionUndefinedOrUSVString",
+                  "interface": null,
+                  "root": null,
+                  "class": null,
+                  "enum": null,
+                  "label": "UndefinedOrUSVString",
+                  "nullable": false,
+                  "atom": false,
+                  "subtypes": [
+                    {
+                      "kind": "void",
+                      "ctype": null,
+                      "interface": null,
+                      "root": null,
+                      "class": null,
+                      "enum": null,
+                      "label": null,
+                      "nullable": false,
+                      "atom": false,
+                      "subtypes": []
+                    },
+                    {
+                      "kind": "string",
+                      "ctype": null,
+                      "interface": null,
+                      "root": null,
+                      "class": null,
+                      "enum": null,
+                      "label": null,
+                      "nullable": false,
+                      "atom": false,
+                      "subtypes": [],
+                      "stringTransport": "utf8-lengths"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "URLPatternResult": [
+      {
+        "name": "inputs",
+        "field": "inputs",
+        "ctype": "const RvDomSequenceUSVStringOrURLPatternInit*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "sequence",
+          "ctype": "RvDomSequenceUSVStringOrURLPatternInit",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "USVStringOrURLPatternInit sequence",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "union",
+              "ctype": "RvDomUnionUSVStringOrURLPatternInit",
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": "USVStringOrURLPatternInit",
+              "nullable": false,
+              "atom": false,
+              "subtypes": [
+                {
+                  "kind": "string",
+                  "ctype": null,
+                  "interface": null,
+                  "root": null,
+                  "class": null,
+                  "enum": null,
+                  "label": null,
+                  "nullable": false,
+                  "atom": false,
+                  "subtypes": [],
+                  "stringTransport": "utf8-lengths"
+                },
+                {
+                  "kind": "dict",
+                  "ctype": null,
+                  "interface": "URLPatternInit",
+                  "root": null,
+                  "class": null,
+                  "enum": null,
+                  "label": null,
+                  "nullable": false,
+                  "atom": false,
+                  "subtypes": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "protocol",
+        "field": "protocol",
+        "ctype": "const RvDomURLPatternComponentResult*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "URLPatternComponentResult",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "username",
+        "field": "username",
+        "ctype": "const RvDomURLPatternComponentResult*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "URLPatternComponentResult",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "password",
+        "field": "password",
+        "ctype": "const RvDomURLPatternComponentResult*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "URLPatternComponentResult",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "hostname",
+        "field": "hostname",
+        "ctype": "const RvDomURLPatternComponentResult*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "URLPatternComponentResult",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "port",
+        "field": "port",
+        "ctype": "const RvDomURLPatternComponentResult*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "URLPatternComponentResult",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "pathname",
+        "field": "pathname",
+        "ctype": "const RvDomURLPatternComponentResult*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "URLPatternComponentResult",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "search",
+        "field": "search",
+        "ctype": "const RvDomURLPatternComponentResult*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "URLPatternComponentResult",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "hash",
+        "field": "hash",
+        "ctype": "const RvDomURLPatternComponentResult*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "dict",
+          "ctype": null,
+          "interface": "URLPatternComponentResult",
           "root": null,
           "class": null,
           "enum": null,

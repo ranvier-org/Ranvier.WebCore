@@ -490,6 +490,63 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
                     failwithf "HTMLDialogElement.close after destroy: %d" closed
 
                 rv_node_release held.Value
+        | "url values" ->
+            let text = Text.Encoding.UTF8.GetBytes "https://held.test/a?b=c"
+            rv_dom_domurl_create (document, text, text.Length, null, -1, &held.contents) |> check "URL"
+            let mutable parameters = 0n
+            rv_dom_domurl_get_search_params (held.Value, &parameters) |> check "URL.searchParams"
+
+            fun () ->
+                let mutable size = 0u
+
+                rv_dom_url_search_params_get_size (parameters, &size)
+                |> check "URLSearchParams.size after destroy"
+
+                if size <> 1u then
+                    failwith "URLSearchParams.size changed after destroy"
+
+                let buffer = Array.zeroCreate<byte> 64
+                let length = [| 0 |]
+                rv_dom_domurl_get_href (held.Value, buffer, buffer.Length, length) |> check "URL.href after destroy"
+
+                if Text.Encoding.UTF8.GetString(buffer, 0, length[0]) <> "https://held.test/a?b=c" then
+                    failwith "URL.href changed after destroy"
+
+                rv_dom_url_search_params_release parameters
+                rv_dom_domurl_release held.Value
+        | "url pattern result" ->
+            let pattern = Text.Encoding.UTF8.GetBytes "https://h.test/held/:id"
+            let target = Text.Encoding.UTF8.GetBytes "https://h.test/held/7"
+            let memory = Runtime.InteropServices.Marshal.AllocHGlobal(pattern.Length + target.Length)
+            Runtime.InteropServices.Marshal.Copy(pattern, 0, memory, pattern.Length)
+            Runtime.InteropServices.Marshal.Copy(target, 0, memory + nativeint pattern.Length, target.Length)
+
+            let input (offset: int) (length: int) =
+                let mutable span = RvDomUtf8StringSpan()
+                span.data <- memory + nativeint offset
+                span.length <- length
+                let mutable value = RvDomUnionUSVStringOrURLPatternInit()
+                value.present <- 1
+                value.tag <- 1
+                value.arm0 <- span
+                value
+
+            rv_dom_url_pattern_create_2 (document, [| input 0 pattern.Length |], null, &held.contents)
+            |> check "URLPattern"
+
+            let mutable result = 0n
+
+            rv_dom_url_pattern_exec (held.Value, [| input pattern.Length target.Length |], null, -1, &result)
+            |> check "URLPattern.exec"
+
+            Runtime.InteropServices.Marshal.FreeHGlobal memory
+
+            fun () ->
+                if result = 0n then
+                    failwith "URLPattern.exec matched nothing"
+
+                rv_dom_url_pattern_result_release result
+                rv_dom_url_pattern_release held.Value
         | "toggle event" ->
             let button = rv_document_create_element (host, "button")
             rv_node_append_child (div, button) |> check "append button"
@@ -629,6 +686,8 @@ let run (outDir: string) =
                     "submit event"
                     "open modal dialog"
                     "toggle event"
+                    "url values"
+                    "url pattern result"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

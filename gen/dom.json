@@ -157,6 +157,24 @@
     "DOMFormData": {
       "receiver": "Document",
       "factory": "DOMFormData::create"
+    },
+    "DOMURL": {
+      "receiver": "Document",
+      "factory": "DOMURL::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "URLSearchParams": {
+      "receiver": "Document",
+      "factory": "URLSearchParams::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "URLPattern": {
+      "receiver": "Document",
+      "factory": "URLPattern::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
     }
   },
   "dictionaryCppTypes": {
@@ -245,19 +263,26 @@
     "DOMMatrixReadOnly": "DOMMatrix"
   },
   "dictionaryStringInputs": {
-    "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence"
+    "DOMCSSCustomPropertyDescriptor": "utf8-lengths-presence",
+    "URLPatternInit": "utf8-lengths-presence",
+    "URLPatternResult": "utf8-lengths-presence",
+    "URLPatternComponentResult": "utf8-lengths-presence"
   },
   "stringifiers": [
     "CSSStyleValue",
     "DOMMatrixReadOnly",
-    "CSSTransformComponent"
+    "CSSTransformComponent",
+    "URLSearchParams"
   ],
   "complexStringSpans": [
     "USVStringOrCSSOMVariableReferenceValue",
     "CSSStyleValueOrUSVString",
     "DOMStringOrSequenceOfUnrestrictedDouble",
     "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
-    "FileOrUSVString"
+    "FileOrUSVString",
+    "USVStringOrURLPatternInit",
+    "UndefinedOrUSVString",
+    "SequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString"
   ],
   "complexNullableElements": [
     "CSSStyleValue"
@@ -268,13 +293,17 @@
     "StylePropertyMapReadOnly": "utf8-lengths",
     "StylePropertyMap": "utf8-lengths",
     "DOMMatrix": "utf8-lengths",
-    "DOMFormData": "utf8-lengths"
+    "DOMFormData": "utf8-lengths",
+    "DOMURL": "utf8-lengths",
+    "URLSearchParams": "utf8-lengths",
+    "URLPattern": "utf8-lengths"
   },
   "objectContexts": {
     "StylePropertyMapReadOnly": "Document",
     "StylePropertyMap": "Document",
     "DOMMatrix": "Document",
-    "DOMFormData": "Document"
+    "DOMFormData": "Document",
+    "URLSearchParams": "Document"
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -551,7 +580,10 @@
     "SVGUseElement",
     "NodeFilter",
     "NodeIterator",
-    "TreeWalker"
+    "TreeWalker",
+    "DOMURL",
+    "URLSearchParams",
+    "URLPattern"
   ],
   "skipDirectories": [
     "Modules/",
@@ -612,7 +644,8 @@
       "CSSTransitionEvent": "TransitionEvent",
       "CSSOMKeywordValue": "CSSKeywordValue",
       "CSSStyleImageValue": "CSSImageValue",
-      "CSSOMVariableReferenceValue": "CSSVariableReferenceValue"
+      "CSSOMVariableReferenceValue": "CSSVariableReferenceValue",
+      "DOMURL": "URL"
     },
     "mixins": {
       "AriaAttributes": "ARIAMixin",
@@ -838,6 +871,15 @@
       ],
       "feature": "dom-css-style-values",
       "stringInputs": "utf8-lengths"
+    },
+    "DOMURL": {
+      "receiver": "Document",
+      "members": [
+        "parse",
+        "canParse"
+      ],
+      "feature": "dom-url-static",
+      "stringInputs": "utf8-lengths"
     }
   },
   "iterableBindings": {
@@ -846,6 +888,9 @@
     },
     "DOMFormData": {
       "feature": "dom-form-data-entries"
+    },
+    "URLSearchParams": {
+      "feature": "dom-url-search-params-entries"
     }
   },
   "windowBindings": {
@@ -884,5 +929,10 @@
         }
       }
     }
-  }
+  },
+  "resultDictionaries": [
+    "URLPatternResult",
+    "URLPatternComponentResult",
+    "URLPatternInit"
+  ]
 }
