@@ -58,3 +58,22 @@ payload. `tests/abi/binary_values.py` fails there with `dom-binary-values advert
 3. **Managed GREEN:** the shared conformance fixture runs on native JIT, NativeAOT and Chromium. It covers reads with
    owner-bound cancellation, UTF-8 text and data URLs, D13's File entries read through the H11 service, and teardown
    cases, with an evidence JSON.
+
+## Native GREEN (Native31/ABI39, local)
+
+Candidate 4 (WebCore d6396ada, Host 5a279da7, JSC 95149cdc) was built at 00077e3 and frozen at
+`artifacts/native31-frozen`. The batch runs 43 probes, all exit 0, with 48,932 assertions: 446 from
+`binary_values` and 1,168 from `form_collections`, which now reads a File entry's handle. All 78 teardown cases are
+collected, including the two "blob slice" cases. The build borrows the pre-0035 objects. Its receipt records the
+narrow `Document.cpp` exemption for G09's Source patch 0035 (`source-exemption.json`). Evidence:
+`docs/binary-values-evidence/final-evidence.json`.
+
+Measured qualifications:
+
+- Endings `"native"` write the platform's line break: CRLF on Windows, which equals Windows Chromium's bytes
+  `610d0a620d0a630d0a64`, and LF elsewhere. The probe asserts each platform's value.
+- No promise and no FileReader engine object is exposed, because the host loader has no blob-URL path. The managed
+  layer provides text and data URLs over `rv_blob_read_bytes`, with cancellation.
+- `slice` takes int64 arguments, so the `[Clamp]` case `slice(1.9, 4.2)` applies to browsers only.
+- String parts are UTF-8 that the caller writes from the USVString, with U+FFFD for a lone surrogate. Invalid UTF-8
+  returns `RV_ERR_NULL_ARGUMENT`.
