@@ -2000,11 +2000,15 @@ class Generator(ComplexGeneratorMixin):
                     "subtypes": [describe_idl(child) for child in value.subtypes]}
 
         def argument(member, mapped):
-            return {
+            described = {
                 "name": member.name, "idlType": str(member.type), "idl": describe_idl(member.type),
                 "optional": member.optional, "default": member.default,
                 "variadic": member.variadic, "mapping": self.describe_mapping(mapped),
             }
+            # A null value converts to the empty string, where other strings convert it to "null".
+            if mapped.kind == "string" and ("LegacyNullToEmptyString" in member.attrs or "LegacyNullToEmptyString" in member.type.attrs):
+                described["legacyNullToEmptyString"] = True
+            return described
 
         functions = []
         for function in self.functions:

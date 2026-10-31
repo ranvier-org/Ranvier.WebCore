@@ -1643,6 +1643,19 @@ interface UnboundSet { setlike<AbstractRange>; readonly attribute long other; };
         self.assertEqual(supports.params[1:3], [('const uint8_t*', 'condition_text'), ('int32_t', 'condition_text_length')])
         self.assertIn('(condition_text_length >= -1 && (condition_text_length <= 0 || condition_text))', generator.glue())
 
+    def test_legacy_null_to_empty_string_arguments_are_marked_in_the_contract(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+partial interface Node { attribute [LegacyNullToEmptyString] DOMString emptyForNull; attribute DOMString plainText; };
+''')
+        generator = domgen.Generator(domgen.World(self.source, dict(self.world.config)))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        functions = {item['function']: item for item in json.loads(generator.api_model())['functions']}
+        self.assertTrue(functions['rv_dom_node_set_empty_for_null']['arguments'][0]['legacyNullToEmptyString'])
+        self.assertNotIn('legacyNullToEmptyString', functions['rv_dom_node_set_plain_text']['arguments'][0])
+
     def test_retired_string_transport_keys_fail_the_run(self):
         for key, value in [('complexStringSpans', []), ('interfaceStringInputs', {}), ('dictionaryStringInputs', {})]:
             with self.subTest(key=key):
