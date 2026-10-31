@@ -26,12 +26,13 @@ int32_t rv_host_set_clipboard(RvHost*, int32_t style, RvClipboardWrite write, Rv
   1. The host fires `copy` or `cut` with a writable `clipboardData`.
   2. If the page cancelled the event and set data, that data is what was copied. Otherwise it is the
      selection as `text/plain` and `text/html`.
-  3. In the App style the host passes each type and value to `write`. In the Native style WebCore writes
+  3. In the App style the host passes each type and value to `write`: the type NUL-terminated, the value as
+     UTF-8 bytes and a byte count (ABI 55), so it may hold U+0000. In the Native style WebCore writes
      the platform clipboard. In the DOM style nothing is written.
   4. A cut then deletes the selection, unless the page cancelled the event.
 - **Paste:**
   1. In the App style the host calls `read`, which hands over each type the app has, through
-     `rv_clipboard_offer(request, type, data)`.
+     `rv_clipboard_offer(request, type, data, data_length)`.
   2. The host fires `paste` with a read-only `clipboardData` holding those types.
   3. Unless the page cancelled the event, the host inserts `text/html` as a fragment, or else `text/plain`.
   4. In the Native style WebCore reads the platform clipboard. In the DOM style the page receives an empty
@@ -47,7 +48,7 @@ int32_t rv_host_set_drag(RvHost*, int32_t style);
 - **Dragging into the page**, the App style (ABI 19):
   1. The app forwards the OS drag events with `rv_host_drag(host, RV_DRAG_OVER | LEAVE | DROP, x, y,
      allowedOperations, data, modifiers)`.
-  2. `data` is an `RvDragData` built with `rv_drag_data_create` and `rv_drag_data_add(type, value)`, with
+  2. `data` is an `RvDragData` built with `rv_drag_data_create` and `rv_drag_data_add(type, data, data_length)`, with
      types such as `text/plain`, `text/html` and `text/uri-list`. Files go as file URLs in
      `text/uri-list`, because `dataTransfer.files` needs file objects the ABI does not make yet.
   3. The host fires `dragenter` and `dragleave` as the element under the point changes, then `dragover`,

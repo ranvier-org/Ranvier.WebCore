@@ -92,12 +92,12 @@ def verify(native_directory, webkit_source, evidence_json=None):
     host = bind('rv_host_create', pointer, [integer, integer])(500, 300)
     expect(bool(host), 'host creation')
     try:
-        call('rv_host_load_html', [pointer, ctypes.c_char_p], host, markup)
+        call('rv_host_load_html', [pointer, Utf8], host, markup)
         expect(bind('rv_run_loop_cycle', integer, [integer])(20) >= 0, 'SVG document load event readiness')
         expect(bind('rv_host_update', integer, [pointer])(host) >= 0, 'SVG initial rendering update')
 
         def node(identifier):
-            result = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])(host, identifier.encode())
+            result = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])(host, identifier.encode())
             expect(bool(result), 'find ' + identifier)
             retained.append(('rv_node_release', result))
             return result
@@ -315,7 +315,7 @@ def verify(native_directory, webkit_source, evidence_json=None):
                 return 1
         callback = callback_type(on_event)
         for event_name in ['beginEvent', 'endEvent', 'repeatEvent']:
-            listener = bind('rv_node_add_event_listener', pointer, [pointer, ctypes.c_char_p, integer, callback_type, pointer])(animation, event_name.encode(), 0, callback, None)
+            listener = bind('rv_node_add_event_listener', pointer, [pointer, Utf8, integer, callback_type, pointer])(animation, event_name.encode(), 0, callback, None)
             expect(bool(listener), 'SMIL event listener ' + event_name)
             listeners.append(listener)
         target = handle('rv_dom_svg_animation_element_get_target_element', [pointer], [animation], 'node')
@@ -348,7 +348,7 @@ def verify(native_directory, webkit_source, evidence_json=None):
         live, live_target = node('liveAnimation'), node('liveTarget')
         events.clear()
         for event_name in ['beginEvent', 'endEvent', 'repeatEvent']:
-            listener = bind('rv_node_add_event_listener', pointer, [pointer, ctypes.c_char_p, integer, callback_type, pointer])(live, event_name.encode(), 0, callback, None)
+            listener = bind('rv_node_add_event_listener', pointer, [pointer, Utf8, integer, callback_type, pointer])(live, event_name.encode(), 0, callback, None)
             expect(bool(listener), 'running SMIL listener ' + event_name)
             listeners.append(listener)
         before_resume = number('rv_dom_svgsvg_element_get_current_time', [pointer], [root])

@@ -203,8 +203,8 @@ let run (outDir: string) =
     let focusIsText = focusNode = t
     step "Accessibility: rv_ax_release focusNode"
     rv_ax_release focusNode
-    step "Accessibility: let setValue = rv_ax_set_value (t, 'Bob')"
-    let setValue = rv_ax_set_value (t, "Bob")
+    step "Accessibility: let setValue = rv_ax_set_value (t, utf8 ('Bob'), utf8Length ('Bob'))"
+    let setValue = rv_ax_set_value (t, utf8 "Bob", utf8Length "Bob")
     let valueAfter = axString t 2
     step "Accessibility: let setNumber = rv_ax_set_number (s, 7.0)"
     let setNumber = rv_ax_set_number (s, 7.0)

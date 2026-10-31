@@ -57,7 +57,7 @@ def verify(native_directory):
                 self.call('rv_dom_element_set_inner_html', [pointer, Utf8], self.body, markup.encode('utf-8'))
                 self.nodes = {}
                 for name in ['first', 'copy', 'item']:
-                    raw = bind('rv_document_get_element_by_id', pointer, [pointer, string])(self.host, name.encode('ascii'))
+                    raw = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])(self.host, name.encode('ascii'))
                     self.nodes[name] = self.own(raw, 'rv_node_release')
                 self.first = self.declared(self.nodes['first'])
                 self.copy = self.declared(self.nodes['copy'])
@@ -269,7 +269,7 @@ def verify(native_directory):
             inline = fixture.handle('rv_dom_html_element_get_attribute_style_map', [pointer], target, release='rv_dom_style_property_map_read_only_release')
             declaration = fixture.handle('rv_dom_html_element_get_style', [pointer], target, release='rv_dom_css_style_declaration_release')
             owner = (None, None, None, inline, declaration)
-            fixture.call('rv_element_set_style', [pointer, string, string, integer], target, b'--extent', b'30px', 1)
+            fixture.call('rv_element_set_style', [pointer, string, Utf8, integer], target, b'--extent', b'30px', 1)
             expect(fixture.priority(owner, '--extent') == 'important', 'inline custom property starts important')
             expect(fixture.set('--extent', '44px', typed=True, map_value=inline) == 0, 'typed inline custom map assignment succeeds')
             actual = fixture.read(owner, '--extent')
@@ -277,7 +277,7 @@ def verify(native_directory):
             expect(actual == '44px', f'typed inline map replaces important value: expected44px, actual{actual}, priority{priority}')
             expect(fixture.priority(owner, '--extent') == '', 'typed inline map removes old important priority')
             expect(fixture.rect()[2:] == (44.0, 10.0), 'typed inline assignment reaches actual geometry')
-            fixture.call('rv_element_set_style', [pointer, string, string, integer], target, b'--extent', b'44px', 1)
+            fixture.call('rv_element_set_style', [pointer, string, Utf8, integer], target, b'--extent', b'44px', 1)
             expect(fixture.priority(owner, '--extent') == 'important', 'same-value inline control restores important priority')
             geometry = fixture.rect()
             expect(fixture.set('--extent', '44px', typed=True, map_value=inline) == 0, 'same-value inline typed assignment succeeds')

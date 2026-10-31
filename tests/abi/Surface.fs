@@ -77,27 +77,27 @@ let run (outDir: string) =
     use a = host.GetElementById "a"
 
     // Classes.
-    let added = rv_element_class (a.Handle, "on", 1)
-    let contains = rv_element_class (a.Handle, "on", 0)
+    let added = rv_element_class (a.Handle, utf8 "on", utf8Length "on", 1)
+    let contains = rv_element_class (a.Handle, utf8 "on", utf8Length "on", 0)
     let blue = rgbAt (host.Paint ()) 240 30 40
-    let removed = rv_element_class (a.Handle, "on", 2)
-    let toggled = rv_element_class (a.Handle, "on", 3)
-    rv_element_class (a.Handle, "on", 2) |> ignore
+    let removed = rv_element_class (a.Handle, utf8 "on", utf8Length "on", 2)
+    let toggled = rv_element_class (a.Handle, utf8 "on", utf8Length "on", 3)
+    rv_element_class (a.Handle, utf8 "on", utf8Length "on", 2) |> ignore
 
     // Inline and computed style.
-    rv_element_set_style (a.Handle, "width", "150px", 0)
+    rv_element_set_style (a.Handle, "width", utf8 "150px", utf8Length "150px", 0)
     |> check "set_style"
 
     let inlineWidth = style a "width"
     let computedWidth = computed a "width"
     let _, _, rectWidth, _ = rect a
 
-    rv_element_set_style (a.Handle, "width", "bogus", 0)
+    rv_element_set_style (a.Handle, "width", utf8 "bogus", utf8Length "bogus", 0)
     |> check "set_style invalid"
 
     let afterInvalid = style a "width"
 
-    rv_element_set_style (a.Handle, "width", "", 0)
+    rv_element_set_style (a.Handle, "width", utf8 "", utf8Length "", 0)
     |> check "set_style remove"
 
     let afterRemove = computed a "width"
@@ -146,7 +146,7 @@ let run (outDir: string) =
     // Text selection.
     use field = host.GetElementById "field"
 
-    rv_node_set_string (field.Handle, 6, "hello")
+    rv_node_set_string (field.Handle, 6, utf8 "hello", utf8Length "hello")
     |> check "set value"
 
     rv_text_set_selection (field.Handle, 1, 3)
@@ -159,7 +159,7 @@ let run (outDir: string) =
     |> check "text_selection"
 
     // A CSS animation: listed, named, seekable, pausable, retimed, finished and cancelled.
-    rv_element_class (a.Handle, "anim", 1) |> ignore
+    rv_element_class (a.Handle, utf8 "anim", utf8Length "anim", 1) |> ignore
     host.Update ()
     let listed = animations a
     let name, initialState, anim = listed[0]
@@ -205,7 +205,7 @@ let run (outDir: string) =
     use t = host.GetElementById "t"
     host.Update ()
 
-    rv_element_set_style (t.Handle, "opacity", "0", 0)
+    rv_element_set_style (t.Handle, "opacity", utf8 "0", utf8Length "0", 0)
     |> check "start transition"
 
     host.Update ()

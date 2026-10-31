@@ -90,9 +90,10 @@ type PopupCallback =
         context: nativeint * popup: nativeint * action: int * x: int * y: int * width: int * height: int * selected: int ->
             unit
 
-/// <summary>The <c>RvClipboardWrite</c> of the header; <c>type</c> and <c>data</c> are NUL-terminated UTF-8.</summary>
+/// <summary>The <c>RvClipboardWrite</c> of the header; <c>type</c> is NUL-terminated UTF-8, <c>data</c> is <c>dataLength</c> UTF-8 bytes.</summary>
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
-type ClipboardWrite = delegate of context: nativeint * ``type``: nativeint * data: nativeint * first: int -> unit
+type ClipboardWrite =
+    delegate of context: nativeint * ``type``: nativeint * data: nativeint * dataLength: int * first: int -> unit
 
 /// <summary>The <c>RvClipboardRead</c> of the header.</summary>
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
@@ -392,7 +393,7 @@ module Raw =
     extern void rv_host_destroy(nativeint host)
 
     [<DllImport(Lib)>]
-    extern int rv_host_load_html(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string html)
+    extern int rv_host_load_html(nativeint host, [<In>] byte[] html, int html_length)
 
     [<DllImport(Lib)>]
     extern int rv_host_scripts_enabled(nativeint host)
@@ -407,28 +408,26 @@ module Raw =
     extern nativeint rv_document_head(nativeint host)
 
     [<DllImport(Lib)>]
-    extern nativeint rv_document_get_element_by_id(
-        nativeint host,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string elementId
-    )
+    extern nativeint rv_document_get_element_by_id(nativeint host, [<In>] byte[] elementId, int elementId_length)
 
     [<DllImport(Lib)>]
     extern nativeint rv_document_create_element(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string tagName)
 
     [<DllImport(Lib)>]
-    extern nativeint rv_document_create_text(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data)
+    extern nativeint rv_document_create_text(nativeint host, [<In>] byte[] data, int data_length)
 
     [<DllImport(Lib)>]
     extern int rv_node_append_child(nativeint parent, nativeint child)
 
     [<DllImport(Lib)>]
-    extern int rv_node_set_text_content(nativeint node, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string text)
+    extern int rv_node_set_text_content(nativeint node, [<In>] byte[] text, int text_length)
 
     [<DllImport(Lib)>]
     extern int rv_element_set_attribute(
         nativeint node,
         [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value
+        [<In>] byte[] value,
+        int value_length
     )
 
     [<DllImport(Lib)>]
@@ -452,7 +451,8 @@ module Raw =
     [<DllImport(Lib)>]
     extern nativeint rv_node_add_event_listener(
         nativeint target,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
+        [<In>] byte[] ``type``,
+        int type_length,
         int capture,
         nativeint callback,
         nativeint context
@@ -470,7 +470,8 @@ module Raw =
     [<DllImport(Lib)>]
     extern int rv_node_dispatch_event(
         nativeint target,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
+        [<In>] byte[] ``type``,
+        int type_length,
         int bubbles,
         int cancelable,
         int& defaultPrevented
@@ -498,7 +499,7 @@ module Raw =
     extern nativeint rv_host_document(nativeint host)
 
     [<DllImport(Lib)>]
-    extern nativeint rv_document_create_comment(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data)
+    extern nativeint rv_document_create_comment(nativeint host, [<In>] byte[] data, int data_length)
 
     [<DllImport(Lib)>]
     extern nativeint rv_document_create_fragment(nativeint host)
@@ -507,7 +508,7 @@ module Raw =
     extern nativeint rv_document_import_node(nativeint host, nativeint node, int deep)
 
     [<DllImport(Lib)>]
-    extern nativeint rv_node_parse_fragment(nativeint context, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string markup)
+    extern nativeint rv_node_parse_fragment(nativeint context, [<In>] byte[] markup, int markup_length)
 
     [<DllImport(Lib)>]
     extern int rv_node_type(nativeint node)
@@ -519,7 +520,7 @@ module Raw =
     extern int rv_node_get_string(nativeint node, int property, byte[] buffer, int capacity, int[] length)
 
     [<DllImport(Lib)>]
-    extern int rv_node_set_string(nativeint node, int property, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+    extern int rv_node_set_string(nativeint node, int property, [<In>] byte[] value, int value_length)
 
     [<DllImport(Lib)>]
     extern int rv_node_insert_before(nativeint parent, nativeint child, nativeint reference)
@@ -567,7 +568,8 @@ module Raw =
     extern nativeint rv_host_create_event(
         nativeint host,
         int eventInterface,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
+        [<In>] byte[] ``type``,
+        int type_length,
         int bubbles,
         int cancelable
     )
@@ -701,7 +703,8 @@ module Raw =
         int action,
         [<MarshalAs(UnmanagedType.LPUTF8Str)>] string key,
         [<MarshalAs(UnmanagedType.LPUTF8Str)>] string code,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string text,
+        [<In>] byte[] text,
+        int text_length,
         int modifiers,
         int repeat
     )
@@ -739,13 +742,14 @@ module Raw =
     [<DllImport(Lib)>]
     extern int rv_host_ime_set_composition(
         nativeint host,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string text,
+        [<In>] byte[] text,
+        int text_length,
         int selectionStart,
         int selectionEnd
     )
 
     [<DllImport(Lib)>]
-    extern int rv_host_ime_commit(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string text)
+    extern int rv_host_ime_commit(nativeint host, [<In>] byte[] text, int text_length)
 
     [<DllImport(Lib)>]
     extern int rv_host_ime_cancel(nativeint host)
@@ -754,13 +758,14 @@ module Raw =
     extern int rv_host_ime_rect(nativeint host, int& x, int& y, int& width, int& height)
 
     [<DllImport(Lib)>]
-    extern int rv_element_class(nativeint node, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string token, int operation)
+    extern int rv_element_class(nativeint node, [<In>] byte[] token, int token_length, int operation)
 
     [<DllImport(Lib)>]
     extern int rv_element_set_style(
         nativeint node,
         [<MarshalAs(UnmanagedType.LPUTF8Str)>] string property,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value,
+        [<In>] byte[] value,
+        int value_length,
         int important
     )
 
@@ -908,7 +913,8 @@ module Raw =
     extern int rv_clipboard_offer(
         nativeint value,
         [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data
+        [<In>] byte[] data,
+        int data_length
     )
 
     [<DllImport(Lib)>]
@@ -924,7 +930,8 @@ module Raw =
     extern int rv_drag_data_add(
         nativeint value,
         [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data
+        [<In>] byte[] data,
+        int data_length
     )
 
     [<DllImport(Lib)>]
@@ -1023,7 +1030,7 @@ module Raw =
     extern int rv_ax_action(nativeint ax, int action)
 
     [<DllImport(Lib)>]
-    extern int rv_ax_set_value(nativeint ax, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+    extern int rv_ax_set_value(nativeint ax, [<In>] byte[] value, int value_length)
 
     [<DllImport(Lib)>]
     extern int rv_ax_set_number(nativeint ax, float value)
@@ -1063,7 +1070,7 @@ module Raw =
     extern int rv_ax_text_child_range(nativeint ancestor, nativeint child, int& start, int& ``end``)
 
     [<DllImport(Lib)>]
-    extern int rv_host_load_svg(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string svg)
+    extern int rv_host_load_svg(nativeint host, [<In>] byte[] svg, int svg_length)
 
     [<DllImport(Lib)>]
     extern int rv_capability_count(int category)
@@ -1143,7 +1150,8 @@ module Raw =
     extern nativeint rv_host_construct_event(
         nativeint host,
         int kind,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
+        [<In>] byte[] ``type``,
+        int type_length,
         EventInit& init
     )
 
@@ -1171,7 +1179,8 @@ module Raw =
     [<DllImport(Lib)>]
     extern nativeint rv_event_target_add_listener(
         nativeint target,
-        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
+        [<In>] byte[] ``type``,
+        int type_length,
         int flags,
         nativeint callback,
         nativeint context
@@ -1387,17 +1396,17 @@ let rv_host_destroy (host: nativeint) : unit =
     else
         Raw.rv_host_destroy (host)
 
-let rv_host_load_html (host: nativeint, html: string) : int =
+let rv_host_load_html (host: nativeint, html: byte[], html_length: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_host_load_html (host, html)
+        let result = Raw.rv_host_load_html (host, html, html_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[4] <- Calls.Counts[4] + 1L
         Calls.Ticks[4] <- Calls.Ticks[4] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_host_load_html (host, html)
+        Raw.rv_host_load_html (host, html, html_length)
 
 let rv_host_scripts_enabled (host: nativeint) : int =
     if Calls.On then
@@ -1447,17 +1456,17 @@ let rv_document_head (host: nativeint) : nativeint =
     else
         Raw.rv_document_head (host)
 
-let rv_document_get_element_by_id (host: nativeint, elementId: string) : nativeint =
+let rv_document_get_element_by_id (host: nativeint, elementId: byte[], elementId_length: int) : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_document_get_element_by_id (host, elementId)
+        let result = Raw.rv_document_get_element_by_id (host, elementId, elementId_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[9] <- Calls.Counts[9] + 1L
         Calls.Ticks[9] <- Calls.Ticks[9] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_document_get_element_by_id (host, elementId)
+        Raw.rv_document_get_element_by_id (host, elementId, elementId_length)
 
 let rv_document_create_element (host: nativeint, tagName: string) : nativeint =
     if Calls.On then
@@ -1471,17 +1480,17 @@ let rv_document_create_element (host: nativeint, tagName: string) : nativeint =
     else
         Raw.rv_document_create_element (host, tagName)
 
-let rv_document_create_text (host: nativeint, data: string) : nativeint =
+let rv_document_create_text (host: nativeint, data: byte[], data_length: int) : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_document_create_text (host, data)
+        let result = Raw.rv_document_create_text (host, data, data_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[11] <- Calls.Counts[11] + 1L
         Calls.Ticks[11] <- Calls.Ticks[11] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_document_create_text (host, data)
+        Raw.rv_document_create_text (host, data, data_length)
 
 let rv_node_append_child (parent: nativeint, child: nativeint) : int =
     if Calls.On then
@@ -1495,29 +1504,29 @@ let rv_node_append_child (parent: nativeint, child: nativeint) : int =
     else
         Raw.rv_node_append_child (parent, child)
 
-let rv_node_set_text_content (node: nativeint, text: string) : int =
+let rv_node_set_text_content (node: nativeint, text: byte[], text_length: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_node_set_text_content (node, text)
+        let result = Raw.rv_node_set_text_content (node, text, text_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[13] <- Calls.Counts[13] + 1L
         Calls.Ticks[13] <- Calls.Ticks[13] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_node_set_text_content (node, text)
+        Raw.rv_node_set_text_content (node, text, text_length)
 
-let rv_element_set_attribute (node: nativeint, name: string, value: string) : int =
+let rv_element_set_attribute (node: nativeint, name: string, value: byte[], value_length: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_element_set_attribute (node, name, value)
+        let result = Raw.rv_element_set_attribute (node, name, value, value_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[14] <- Calls.Counts[14] + 1L
         Calls.Ticks[14] <- Calls.Ticks[14] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_element_set_attribute (node, name, value)
+        Raw.rv_element_set_attribute (node, name, value, value_length)
 
 let rv_node_release (node: nativeint) : unit =
     if Calls.On then
@@ -1594,13 +1603,13 @@ let rv_gpu_frame_release (value: nativeint) : int =
         Raw.rv_gpu_frame_release (value)
 
 let rv_node_add_event_listener
-    (target: nativeint, ``type``: string, capture: int, callback: nativeint, context: nativeint)
+    (target: nativeint, ``type``: byte[], type_length: int, capture: int, callback: nativeint, context: nativeint)
     : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
 
         let result =
-            Raw.rv_node_add_event_listener (target, ``type``, capture, callback, context)
+            Raw.rv_node_add_event_listener (target, ``type``, type_length, capture, callback, context)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[21] <- Calls.Counts[21] + 1L
@@ -1608,7 +1617,7 @@ let rv_node_add_event_listener
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_node_add_event_listener (target, ``type``, capture, callback, context)
+        Raw.rv_node_add_event_listener (target, ``type``, type_length, capture, callback, context)
 
 let rv_listener_remove (listener: nativeint) : int =
     if Calls.On then
@@ -1647,13 +1656,13 @@ let rv_node_filter_context (filter: nativeint, context: byref<nativeint>) : int 
         Raw.rv_node_filter_context (filter, &context)
 
 let rv_node_dispatch_event
-    (target: nativeint, ``type``: string, bubbles: int, cancelable: int, defaultPrevented: byref<int>)
+    (target: nativeint, ``type``: byte[], type_length: int, bubbles: int, cancelable: int, defaultPrevented: byref<int>)
     : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
 
         let result =
-            Raw.rv_node_dispatch_event (target, ``type``, bubbles, cancelable, &defaultPrevented)
+            Raw.rv_node_dispatch_event (target, ``type``, type_length, bubbles, cancelable, &defaultPrevented)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[25] <- Calls.Counts[25] + 1L
@@ -1661,7 +1670,7 @@ let rv_node_dispatch_event
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_node_dispatch_event (target, ``type``, bubbles, cancelable, &defaultPrevented)
+        Raw.rv_node_dispatch_event (target, ``type``, type_length, bubbles, cancelable, &defaultPrevented)
 
 let rv_element_click (node: nativeint) : int =
     if Calls.On then
@@ -1747,17 +1756,17 @@ let rv_host_document (host: nativeint) : nativeint =
     else
         Raw.rv_host_document (host)
 
-let rv_document_create_comment (host: nativeint, data: string) : nativeint =
+let rv_document_create_comment (host: nativeint, data: byte[], data_length: int) : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_document_create_comment (host, data)
+        let result = Raw.rv_document_create_comment (host, data, data_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[33] <- Calls.Counts[33] + 1L
         Calls.Ticks[33] <- Calls.Ticks[33] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_document_create_comment (host, data)
+        Raw.rv_document_create_comment (host, data, data_length)
 
 let rv_document_create_fragment (host: nativeint) : nativeint =
     if Calls.On then
@@ -1783,17 +1792,17 @@ let rv_document_import_node (host: nativeint, node: nativeint, deep: int) : nati
     else
         Raw.rv_document_import_node (host, node, deep)
 
-let rv_node_parse_fragment (context: nativeint, markup: string) : nativeint =
+let rv_node_parse_fragment (context: nativeint, markup: byte[], markup_length: int) : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_node_parse_fragment (context, markup)
+        let result = Raw.rv_node_parse_fragment (context, markup, markup_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[36] <- Calls.Counts[36] + 1L
         Calls.Ticks[36] <- Calls.Ticks[36] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_node_parse_fragment (context, markup)
+        Raw.rv_node_parse_fragment (context, markup, markup_length)
 
 let rv_node_type (node: nativeint) : int =
     if Calls.On then
@@ -1831,17 +1840,17 @@ let rv_node_get_string (node: nativeint, property: int, buffer: byte[], capacity
     else
         Raw.rv_node_get_string (node, property, buffer, capacity, length)
 
-let rv_node_set_string (node: nativeint, property: int, value: string) : int =
+let rv_node_set_string (node: nativeint, property: int, value: byte[], value_length: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_node_set_string (node, property, value)
+        let result = Raw.rv_node_set_string (node, property, value, value_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[40] <- Calls.Counts[40] + 1L
         Calls.Ticks[40] <- Calls.Ticks[40] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_node_set_string (node, property, value)
+        Raw.rv_node_set_string (node, property, value, value_length)
 
 let rv_node_insert_before (parent: nativeint, child: nativeint, reference: nativeint) : int =
     if Calls.On then
@@ -1988,13 +1997,13 @@ let rv_event_release (``event``: nativeint) : unit =
         Raw.rv_event_release (``event``)
 
 let rv_host_create_event
-    (host: nativeint, eventInterface: int, ``type``: string, bubbles: int, cancelable: int)
+    (host: nativeint, eventInterface: int, ``type``: byte[], type_length: int, bubbles: int, cancelable: int)
     : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
 
         let result =
-            Raw.rv_host_create_event (host, eventInterface, ``type``, bubbles, cancelable)
+            Raw.rv_host_create_event (host, eventInterface, ``type``, type_length, bubbles, cancelable)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[53] <- Calls.Counts[53] + 1L
@@ -2002,7 +2011,7 @@ let rv_host_create_event
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_host_create_event (host, eventInterface, ``type``, bubbles, cancelable)
+        Raw.rv_host_create_event (host, eventInterface, ``type``, type_length, bubbles, cancelable)
 
 let rv_node_dispatch (target: nativeint, ``event``: nativeint, defaultPrevented: byref<int>) : int =
     if Calls.On then
@@ -2428,18 +2437,29 @@ let rv_host_wheel (host: nativeint, x: int, y: int, deltaX: float32, deltaY: flo
         Raw.rv_host_wheel (host, x, y, deltaX, deltaY, modifiers)
 
 let rv_host_key
-    (host: nativeint, action: int, key: string, code: string, text: string, modifiers: int, repeat: int)
-    : int =
+    (
+        host: nativeint,
+        action: int,
+        key: string,
+        code: string,
+        text: byte[],
+        text_length: int,
+        modifiers: int,
+        repeat: int
+    ) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_host_key (host, action, key, code, text, modifiers, repeat)
+
+        let result =
+            Raw.rv_host_key (host, action, key, code, text, text_length, modifiers, repeat)
+
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[88] <- Calls.Counts[88] + 1L
         Calls.Ticks[88] <- Calls.Ticks[88] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_host_key (host, action, key, code, text, modifiers, repeat)
+        Raw.rv_host_key (host, action, key, code, text, text_length, modifiers, repeat)
 
 let rv_host_set_focused (host: nativeint, focused: int) : int =
     if Calls.On then
@@ -2561,12 +2581,14 @@ let rv_host_scroll_to (host: nativeint, x: int, y: int) : int =
     else
         Raw.rv_host_scroll_to (host, x, y)
 
-let rv_host_ime_set_composition (host: nativeint, text: string, selectionStart: int, selectionEnd: int) : int =
+let rv_host_ime_set_composition
+    (host: nativeint, text: byte[], text_length: int, selectionStart: int, selectionEnd: int)
+    : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
 
         let result =
-            Raw.rv_host_ime_set_composition (host, text, selectionStart, selectionEnd)
+            Raw.rv_host_ime_set_composition (host, text, text_length, selectionStart, selectionEnd)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[99] <- Calls.Counts[99] + 1L
@@ -2574,19 +2596,19 @@ let rv_host_ime_set_composition (host: nativeint, text: string, selectionStart: 
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_host_ime_set_composition (host, text, selectionStart, selectionEnd)
+        Raw.rv_host_ime_set_composition (host, text, text_length, selectionStart, selectionEnd)
 
-let rv_host_ime_commit (host: nativeint, text: string) : int =
+let rv_host_ime_commit (host: nativeint, text: byte[], text_length: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_host_ime_commit (host, text)
+        let result = Raw.rv_host_ime_commit (host, text, text_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[100] <- Calls.Counts[100] + 1L
         Calls.Ticks[100] <- Calls.Ticks[100] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_host_ime_commit (host, text)
+        Raw.rv_host_ime_commit (host, text, text_length)
 
 let rv_host_ime_cancel (host: nativeint) : int =
     if Calls.On then
@@ -2612,29 +2634,32 @@ let rv_host_ime_rect (host: nativeint, x: byref<int>, y: byref<int>, width: byre
     else
         Raw.rv_host_ime_rect (host, &x, &y, &width, &height)
 
-let rv_element_class (node: nativeint, token: string, operation: int) : int =
+let rv_element_class (node: nativeint, token: byte[], token_length: int, operation: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_element_class (node, token, operation)
+        let result = Raw.rv_element_class (node, token, token_length, operation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[103] <- Calls.Counts[103] + 1L
         Calls.Ticks[103] <- Calls.Ticks[103] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_element_class (node, token, operation)
+        Raw.rv_element_class (node, token, token_length, operation)
 
-let rv_element_set_style (node: nativeint, property: string, value: string, important: int) : int =
+let rv_element_set_style (node: nativeint, property: string, value: byte[], value_length: int, important: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_element_set_style (node, property, value, important)
+
+        let result =
+            Raw.rv_element_set_style (node, property, value, value_length, important)
+
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[104] <- Calls.Counts[104] + 1L
         Calls.Ticks[104] <- Calls.Ticks[104] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_element_set_style (node, property, value, important)
+        Raw.rv_element_set_style (node, property, value, value_length, important)
 
 let rv_element_get_style (node: nativeint, property: string, buffer: byte[], capacity: int, length: int[]) : int =
     if Calls.On then
@@ -3081,17 +3106,17 @@ let rv_host_set_clipboard (host: nativeint, style: int, write: nativeint, read: 
     else
         Raw.rv_host_set_clipboard (host, style, write, read, context)
 
-let rv_clipboard_offer (value: nativeint, ``type``: string, data: string) : int =
+let rv_clipboard_offer (value: nativeint, ``type``: string, data: byte[], data_length: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_clipboard_offer (value, ``type``, data)
+        let result = Raw.rv_clipboard_offer (value, ``type``, data, data_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[140] <- Calls.Counts[140] + 1L
         Calls.Ticks[140] <- Calls.Ticks[140] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_clipboard_offer (value, ``type``, data)
+        Raw.rv_clipboard_offer (value, ``type``, data, data_length)
 
 let rv_host_edit (host: nativeint, command: int) : int =
     if Calls.On then
@@ -3129,17 +3154,17 @@ let rv_drag_data_create () : nativeint =
     else
         Raw.rv_drag_data_create ()
 
-let rv_drag_data_add (value: nativeint, ``type``: string, data: string) : int =
+let rv_drag_data_add (value: nativeint, ``type``: string, data: byte[], data_length: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_drag_data_add (value, ``type``, data)
+        let result = Raw.rv_drag_data_add (value, ``type``, data, data_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[144] <- Calls.Counts[144] + 1L
         Calls.Ticks[144] <- Calls.Ticks[144] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_drag_data_add (value, ``type``, data)
+        Raw.rv_drag_data_add (value, ``type``, data, data_length)
 
 let rv_drag_data_release (value: nativeint) : unit =
     if Calls.On then
@@ -3501,17 +3526,17 @@ let rv_ax_action (ax: nativeint, action: int) : int =
     else
         Raw.rv_ax_action (ax, action)
 
-let rv_ax_set_value (ax: nativeint, value: string) : int =
+let rv_ax_set_value (ax: nativeint, value: byte[], value_length: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_ax_set_value (ax, value)
+        let result = Raw.rv_ax_set_value (ax, value, value_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[174] <- Calls.Counts[174] + 1L
         Calls.Ticks[174] <- Calls.Ticks[174] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_ax_set_value (ax, value)
+        Raw.rv_ax_set_value (ax, value, value_length)
 
 let rv_ax_set_number (ax: nativeint, value: float) : int =
     if Calls.On then
@@ -3633,17 +3658,17 @@ let rv_ax_text_child_range (ancestor: nativeint, child: nativeint, start: byref<
     else
         Raw.rv_ax_text_child_range (ancestor, child, &start, &``end``)
 
-let rv_host_load_svg (host: nativeint, svg: string) : int =
+let rv_host_load_svg (host: nativeint, svg: byte[], svg_length: int) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_host_load_svg (host, svg)
+        let result = Raw.rv_host_load_svg (host, svg, svg_length)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[185] <- Calls.Counts[185] + 1L
         Calls.Ticks[185] <- Calls.Ticks[185] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_host_load_svg (host, svg)
+        Raw.rv_host_load_svg (host, svg, svg_length)
 
 let rv_capability_count (category: int) : int =
     if Calls.On then
@@ -3796,17 +3821,19 @@ let rv_resource_release (operation: uint64) : int =
     else
         Raw.rv_resource_release (operation)
 
-let rv_host_construct_event (host: nativeint, kind: int, ``type``: string, init: byref<EventInit>) : nativeint =
+let rv_host_construct_event
+    (host: nativeint, kind: int, ``type``: byte[], type_length: int, init: byref<EventInit>)
+    : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_host_construct_event (host, kind, ``type``, &init)
+        let result = Raw.rv_host_construct_event (host, kind, ``type``, type_length, &init)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[197] <- Calls.Counts[197] + 1L
         Calls.Ticks[197] <- Calls.Ticks[197] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_host_construct_event (host, kind, ``type``, &init)
+        Raw.rv_host_construct_event (host, kind, ``type``, type_length, &init)
 
 let rv_custom_event_detail_json (``event``: nativeint, buffer: byte[], capacity: int, length: int[]) : int =
     if Calls.On then
@@ -3893,13 +3920,13 @@ let rv_event_target_equals (left: nativeint, right: nativeint) : int =
         Raw.rv_event_target_equals (left, right)
 
 let rv_event_target_add_listener
-    (target: nativeint, ``type``: string, flags: int, callback: nativeint, context: nativeint)
+    (target: nativeint, ``type``: byte[], type_length: int, flags: int, callback: nativeint, context: nativeint)
     : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
 
         let result =
-            Raw.rv_event_target_add_listener (target, ``type``, flags, callback, context)
+            Raw.rv_event_target_add_listener (target, ``type``, type_length, flags, callback, context)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[205] <- Calls.Counts[205] + 1L
@@ -3907,7 +3934,7 @@ let rv_event_target_add_listener
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
-        Raw.rv_event_target_add_listener (target, ``type``, flags, callback, context)
+        Raw.rv_event_target_add_listener (target, ``type``, type_length, flags, callback, context)
 
 let rv_event_target_dispatch (target: nativeint, ``event``: nativeint, defaultPrevented: byref<int>) : int =
     if Calls.On then
@@ -4448,6 +4475,20 @@ let readString (operation: string) (call: byte[] -> int -> int[] -> int) : strin
     else
         Text.Encoding.UTF8.GetString(buffer, 0, length[0])
 
+/// <summary>The UTF-8 bytes of a string input, passed with <c>utf8Length</c> of the same value; null for null.</summary>
+let utf8 (value: string) =
+    if isNull value then
+        null
+    else
+        Text.Encoding.UTF8.GetBytes value
+
+/// <summary>The byte count of a string input: -1 for null.</summary>
+let utf8Length (value: string) =
+    if isNull value then
+        -1
+    else
+        Text.Encoding.UTF8.GetByteCount value
+
 let check (operation: string) (status: int) =
     if status <> 0 then
         failwith $"{operation} returned {status}"
@@ -4541,10 +4582,12 @@ type Node(handle: nativeint) =
         rv_node_append_child (handle, child.Handle) |> check "append_child"
 
     member _.SetText(text: string) =
-        rv_node_set_text_content (handle, text) |> check "set_text_content"
+        rv_node_set_text_content (handle, utf8 text, utf8Length text)
+        |> check "set_text_content"
 
     member _.SetAttribute(name: string, value: string) =
-        rv_element_set_attribute (handle, name, value) |> check "set_attribute"
+        rv_element_set_attribute (handle, name, utf8 value, utf8Length value)
+        |> check "set_attribute"
 
     /// Registers a handler that runs synchronously on the host thread for each matching event.
     member _.Listen(eventType: string, capture: bool, handler: Event -> unit) =
@@ -4553,7 +4596,8 @@ type Node(handle: nativeint) =
         let listener =
             rv_node_add_event_listener (
                 handle,
-                eventType,
+                utf8 eventType,
+                utf8Length eventType,
                 (if capture then 1 else 0),
                 callbackPointer,
                 GCHandle.ToIntPtr context
@@ -4572,7 +4616,8 @@ type Node(handle: nativeint) =
         dispatching "dispatch_event" (fun () ->
             rv_node_dispatch_event (
                 handle,
-                eventType,
+                utf8 eventType,
+                utf8Length eventType,
                 (if bubbles then 1 else 0),
                 (if cancelable then 1 else 0),
                 &defaultPrevented.contents
@@ -4662,7 +4707,8 @@ type Host(width: int, height: int) =
         status = 1
 
     member _.Key(action: int, key: string, code: string, text: string, modifiers: int) =
-        let status = rv_host_key (handle, action, key, code, text, modifiers, 0)
+        let status =
+            rv_host_key (handle, action, key, code, utf8 text, utf8Length text, modifiers, 0)
 
         if status < 0 then
             failwith $"host_key returned {status}"
@@ -4711,7 +4757,7 @@ type Host(width: int, height: int) =
         | element -> Some(new Node(element))
 
     member _.GetElementById(id: string) =
-        new Node(rv_document_get_element_by_id (handle, id))
+        new Node(rv_document_get_element_by_id (handle, utf8 id, utf8Length id))
 
     /// <summary>The <c>RV_CURSOR_*</c> value for the mouse's position.</summary>
     member _.Cursor = rv_host_cursor handle
@@ -4728,11 +4774,12 @@ type Host(width: int, height: int) =
         rv_host_scroll_to (handle, x, y) |> check "host_scroll_to"
 
     member _.ImeSetComposition(text: string, selectionStart: int, selectionEnd: int) =
-        rv_host_ime_set_composition (handle, text, selectionStart, selectionEnd)
+        rv_host_ime_set_composition (handle, utf8 text, utf8Length text, selectionStart, selectionEnd)
         |> check "host_ime_set_composition"
 
     member _.ImeCommit(text: string) =
-        rv_host_ime_commit (handle, text) |> check "host_ime_commit"
+        rv_host_ime_commit (handle, utf8 text, utf8Length text)
+        |> check "host_ime_commit"
 
     member _.ImeCancel() =
         rv_host_ime_cancel handle |> check "host_ime_cancel"
@@ -4750,7 +4797,7 @@ type Host(width: int, height: int) =
         | status -> failwith $"host_ime_rect returned {status}"
 
     member _.LoadHtml(html: string) =
-        rv_host_load_html (handle, html) |> check "load_html"
+        rv_host_load_html (handle, utf8 html, utf8Length html) |> check "load_html"
 
     member _.ScriptsEnabled = rv_host_scripts_enabled handle
     member _.VmEntryDisallowed = rv_host_vm_entry_disallowed handle
@@ -4761,7 +4808,7 @@ type Host(width: int, height: int) =
         new Node(rv_document_create_element (handle, tagName))
 
     member _.CreateText(data: string) =
-        new Node(rv_document_create_text (handle, data))
+        new Node(rv_document_create_text (handle, utf8 data, utf8Length data))
 
     /// Serves the document's resource loads inside the native handler: <c>serve</c> maps a URL to its bytes and
     /// Content-Type, or to None to fail the load. A load whose <c>serve</c> raises fails. The loads complete during

@@ -101,7 +101,7 @@ def verify(native_directory):
             expect(value.value == 0, prefix + ' blur changes active element')
             expect(text('rv_dom_element_get_namespace_uri', [pointer], node) == namespace.decode(), prefix + ' retains namespace')
         call('rv_dom_svg_element_focus', [pointer, pointer], focus_nodes[0], None)
-        keyboard = bind('rv_host_key', integer, [pointer, integer, string, string, string, integer, integer])
+        keyboard = bind('rv_host_key', integer, [pointer, integer, string, string, Utf8, integer, integer])
         expect(keyboard(host, 0, b'Tab', b'Tab', b'', 0, 0) == 1, 'Tab handled by native focus traversal')
         active = bind('rv_document_active_element', pointer, [pointer])(host)
         expect(bool(active), 'active element after Tab')

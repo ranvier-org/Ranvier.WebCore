@@ -15,7 +15,7 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from utf8_inputs import Utf8, StringInput, bind as bind_utf8, string_input
 
-ABI = 54
+ABI = 55
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, BUFFER_TOO_SMALL, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -3, -6, -9, -11
 TRUSTED = 16
 MOUSE_MOVE, MOUSE_DOWN, MOUSE_UP, BUTTON_LEFT, BUTTON_NONE = 0, 1, 2, 0, -1
@@ -130,23 +130,23 @@ def verify(directory, oracle_path, qualified_path, evidence):
 
     host_create = bind('rv_host_create', p, [i32, i32])
     host_destroy = bind('rv_host_destroy', None, [p])
-    load_html = bind('rv_host_load_html', i32, [p, cstr])
+    load_html = bind('rv_host_load_html', i32, [p, Utf8])
     host_document = bind('rv_host_document', p, [p])
     update = bind('rv_host_update', i32, [p])
     cycle = bind('rv_run_loop_cycle', i32, [i32])
     resize = bind('rv_host_resize', i32, [p, i32, i32])
     mouse = bind('rv_host_mouse', i32, [p, i32, i32, i32, i32, i32, i32])
     wheel = bind('rv_host_wheel', i32, [p, i32, i32, ctypes.c_float, ctypes.c_float, i32])
-    key = bind('rv_host_key', i32, [p, i32, cstr, cstr, cstr, i32, i32])
+    key = bind('rv_host_key', i32, [p, i32, cstr, cstr, Utf8, i32, i32])
     set_focused = bind('rv_host_set_focused', i32, [p, i32])
-    by_id = bind('rv_document_get_element_by_id', p, [p, cstr])
-    set_attribute = bind('rv_element_set_attribute', i32, [p, cstr, cstr])
+    by_id = bind('rv_document_get_element_by_id', p, [p, Utf8])
+    set_attribute = bind('rv_element_set_attribute', i32, [p, cstr, Utf8])
     get_attribute = bind('rv_element_get_attribute', i32, [p, cstr, cstr, i32, ctypes.POINTER(i32)])
     node_release = bind('rv_node_release', None, [p])
     node_string = bind('rv_node_get_string', i32, [p, i32, cstr, i32, ctypes.POINTER(i32)])
     window_target = bind('rv_host_window_event_target', p, [p])
     match_media = bind('rv_host_match_media', p, [p, cstr])
-    add_listener = bind('rv_event_target_add_listener', p, [p, cstr, i32, callback_type, p])
+    add_listener = bind('rv_event_target_add_listener', p, [p, Utf8, i32, callback_type, p])
     listener_remove = bind('rv_listener_remove', i32, [p])
     target_release = bind('rv_event_target_release', None, [p])
     target_as_node = bind('rv_event_target_as_node', p, [p])
@@ -154,7 +154,7 @@ def verify(directory, oracle_path, qualified_path, evidence):
     get_target = bind('rv_event_get_target', p, [p, i32])
     event_release = bind('rv_event_release', None, [p])
     event_flags = bind('rv_event_flags', i32, [p])
-    construct = bind('rv_host_construct_event', p, [p, i32, cstr, p])
+    construct = bind('rv_host_construct_event', p, [p, i32, Utf8, p])
     last_exception = bind('rv_last_exception', i32, [i32, cstr, i32, ctypes.POINTER(i32)])
     interface_name = bind('rv_dom_event_get_interface_name', i32, [p, cstr, i32, ctypes.POINTER(i32)])
     numberish_release = bind('rv_dom_union_double_or_css_numeric_value_nullable_release', None, [ctypes.POINTER(Numberish)])
