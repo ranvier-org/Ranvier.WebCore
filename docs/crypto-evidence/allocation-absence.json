@@ -1,10 +1,10 @@
 {
-  "checkedAtUtc": "2026-10-31T08:58:45.837517+00:00",
+  "checkedAtUtc": "2026-10-31T09:35:36.245662+00:00",
   "purpose": "B22 crypto Native36/ABI44 (preview.36), DOM alpha.39, Views 0.1.29, WebCore backend alpha.29 reservation",
   "abi": 44,
-  "nativeHead": "88a2f8f5666fcd61a75a111757014180e7225c38",
-  "stackedOn": "88a2f8f (H11 6610b57 + G09 fb87eb0/a215ef9 + H13 3c7e8d4; D14 Native34/ABI42 and T06 Native35/ABI43 not yet merged)",
-  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1180:int32_t rv_abi_version(void) { return 41; }",
+  "nativeHead": "ae8c61bf4d23111dd2164b18e3410e3df41e6ac1",
+  "stackedOn": "ae8c61b (H11 6610b57 + G09 fb87eb0/a215ef9 + H13 3c7e8d4 + D14 23dd017 + T06 901ced5)",
+  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1255:int32_t rv_abi_version(void) { return 44; }",
   "packages": [
     {
       "package": "Ranvier.WebCore",
@@ -227,12 +227,6 @@
           "number": 133,
           "title": "feat(resources): add image decode and font readiness without JavaScript (Native22/ABI30)",
           "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/133"
-        },
-        {
-          "headRefName": "codex/native-api-svg-paint",
-          "number": 132,
-          "title": "feat(svg): expose paint servers, filters, clipping and resources (Native21/ABI29)",
-          "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/132"
         }
       ]
     },
