@@ -729,17 +729,17 @@
     }
   },
   "recompiledUnits": {
-    "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/000-RanvierDomGlue.cpp.obj",
-    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/InspectorGeneratedStub.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/001-InspectorGeneratedStub.cpp.obj",
-    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-9.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/002-UnifiedSource-JSBindings-9.cpp.obj",
-    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-Modules-1.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/003-UnifiedSource-Modules-1.cpp.obj",
-    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/004-UnifiedSource-html-16.cpp.obj",
-    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-23.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/005-UnifiedSource-html-23.cpp.obj",
-    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-24.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/006-UnifiedSource-html-24.cpp.obj",
-    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-26.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/007-UnifiedSource-html-26.cpp.obj",
-    "Source/WebCore/CMakeFiles/WebCore.dir/inspector/stub/InspectorStub.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/008-InspectorStub.cpp.obj",
-    "Ranvier/host/RanvierCanvasExportGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/090-RanvierCanvasExportGlue.cpp.obj",
-    "Ranvier/host/RanvierResourceGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/091-RanvierResourceGlue.cpp.obj"
+    "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/000-RanvierDomGlue.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/InspectorGeneratedStub.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/001-InspectorGeneratedStub.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-9.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/002-UnifiedSource-JSBindings-9.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-Modules-1.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/003-UnifiedSource-Modules-1.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/004-UnifiedSource-html-16.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-23.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/005-UnifiedSource-html-23.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-24.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/006-UnifiedSource-html-24.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-26.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/007-UnifiedSource-html-26.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/inspector/stub/InspectorStub.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/008-InspectorStub.cpp.obj",
+    "Ranvier/host/RanvierCanvasExportGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/090-RanvierCanvasExportGlue.cpp.obj",
+    "Ranvier/host/RanvierResourceGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/091-RanvierResourceGlue.cpp.obj"
   },
-  "srcDiffSha256": "9ec42f79c8db2ab382cf8653c14fa9ae7ffddb4d4f142e8bf4095163457ffa9f"
+  "srcDiffSha256": "df2e916241d2349d457844749c269912db1f9f89fa58b380faea9d46f492bbcf"
 }

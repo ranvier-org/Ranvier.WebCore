@@ -27,10 +27,8 @@
     "RV_IMAGE_BITMAP_RESIZE_*",
     "rv_dom_image_bitmap_get_width/height",
     "rv_dom_image_bitmap_close",
-    "rv_dom_image_bitmap_rendering_context_get_canvas",
     "rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap",
-    "rv_dom_image_bitmap_rendering_context_release/retain",
-    "rv_dom_union_html_canvas_element_release"
+    "rv_dom_image_bitmap_rendering_context_release/retain"
   ],
   "engine": "HTMLCanvasElement buffers, Blob and the bitmaprenderer context from host/RanvierCanvasExportGlue.cpp, encoding through Ranvier::Internal::encodeImage (R12), and ImageBitmap::createCompletionHandler as a resource operation in host/RanvierResourceGlue.cpp",
   "sourcePatches": {
@@ -93,8 +91,8 @@
       "recompiled": false
     }
   },
-  "sourceHeadOfBatch": "811d63eb527a738f0fda39f98bc3e88f37bd5a8d",
-  "batchRunHead": "811d63e",
+  "sourceHeadOfBatch": "f3dc0f4b838e3b613cdab58eb9890309e3fdd695",
+  "batchRunHead": "f3dc0f4",
   "red": {
     "exports": {
       "rv_canvas_encode": false,
@@ -127,14 +125,14 @@
     "patch0050": "red-patch-0050.log"
   },
   "green": {
-    "canvasExportAssertions": 286,
+    "canvasExportAssertions": 284,
     "repeats": 30,
     "repeatsDistinct": [
-      "canvas_export: 286 assertions PASS"
+      "canvas_export: 284 assertions PASS"
     ],
     "probes": 65,
     "allExitZero": true,
-    "rawAssertions": 91902,
+    "rawAssertions": 91900,
     "baselineRawAssertions": 91245,
     "baselineProbesChanged": {
       "abi_layouts": [
@@ -291,7 +289,6 @@
       0,
       0
     ],
-    "rendererCanvas": true,
     "transfer": {
       "sourceAfter": [
         0,
@@ -300,7 +297,7 @@
       "canvasData": true
     },
     "transferClosed": "InvalidStateError",
-    "assertions": 286
+    "assertions": 284
   },
   "chromiumOracle": {
     "browser": "156.0.8078.4",
@@ -418,15 +415,16 @@
     "toBlob completes during rv_canvas_to_blob: there is no callback, and a zero-size canvas gives a NULL Blob as the browser callback gets null.",
     "createImageBitmap sources: <img>, SVG <image>, <canvas>, ImageBitmap, ImageData and Blob. HTMLVideoElement, OffscreenCanvas and VideoFrame are outside slim (ENABLE_VIDEO, ENABLE_OFFSCREEN_CANVAS, ENABLE_WEB_CODECS OFF); CSSStyleImageValue is not a source kind.",
     "ImageBitmap transfer is transferFromImageBitmap, which detaches the source; postMessage transfer needs a script realm.",
-    "ImageBitmap buffers are unaccelerated where canvases are (patch 0050); GPU work is paused."
+    "ImageBitmap buffers are unaccelerated where canvases are (patch 0050); GPU work is paused.",
+    "ImageBitmapRenderingContext.canvas is not generated: its single-arm union typedef ImageBitmapCanvas would name a second HTMLCanvasElement type in the F# model (generator defect, queued by root: a single-arm union generates a duplicate F# type for its arm); the app holds the canvas it passed to rv_canvas_get_bitmap_context."
   ],
   "files": {
-    "batch-green.json": "2c013e50f5c4294cf1efa908fe649e315aa34007f7eee74d74f13d3af8265863",
+    "batch-green.json": "a6a9d0d2606563f7e590a5013a4a1dcc91f849e79ea1a580150673e621483a3b",
     "build_export_candidate.py": "488107b24102828299edc67cf6e12ef67dbcd111113f47906c86b8a4047c00e1",
-    "canvas-export-probe.log": "9574f948c3afc5b86d5c98a7b1c216a9bf4e9659bb246ad2b541cc093376b47a",
-    "canvas-export-repeat30.txt": "096b8a7162e778182efa996f507f729f2a7276d790144983105e24463924773c",
-    "canvas-export-report.json": "08ad61c37911c88d33b4666d44461034fe9d6bc5a970742b3c72ae9293e24419",
-    "make_export_evidence.py": "a7f85f88fb1b902ae831a1b1f39dec3b65084531273b7992478271972eafe2bf",
+    "canvas-export-probe.log": "3c82d5056cdef2ceff1ea9759ba6cb3e7560a4847d8f27c58872f72e1cfaf0e9",
+    "canvas-export-repeat30.txt": "dbf0cd2ebd434c4a1dd4a7fe4788991c91284a970c227365ab1fd3181b550366",
+    "canvas-export-report.json": "47834c96de067d16b16b9c7cca3cad357581ee1a185dfc04e00a70ccc261ffc4",
+    "make_export_evidence.py": "3ddd2b5cab13d48b0a9968db67fd46ed9a31a7eca8e1f1adbe07c89ea7f31065",
     "proposed-0049-image-bitmap-crop-completion-handler.diff": "412e58f31374f0e35697ccd7fdfef77044890b1e5a6c208011e93534453e1006",
     "proposed-0050-image-bitmap-unaccelerated-buffers.diff": "38c4076f0592b5cb46963da5d6b77b1544ddfa6f07cc453fbd45f86c82aa807b",
     "red-chromium.json": "a96723c0e4ed61e1d350fd9aceb7d9886a41d41d7b1de14110d84c21b4b3909c",
@@ -438,8 +436,8 @@
     "red_native.py": "bf51fb9162cefd7cf2d11e98171856a354df1cc842237cad051a96d1b2f0c43c",
     "repeat30.sh": "af0830f77f4213a22060d0fbc8b850c731b00594300bcc2427c631e02108ffbf",
     "run_export_full_batch.py": "09ff9f3f7e94d0a543c61241ca1ea85f4cced271b523d89a5a79d90e48e9512b",
-    "runtime-receipt.json": "333b540ed694fe11bd61d91b359057fd1a6041bc32baae72031e68f067b1868e",
-    "source-patches.json": "ae02f1bf13aecdcc5cd270e8445e7aa26243574f7e06ab8fbf633a1e78639699",
+    "runtime-receipt.json": "56cd80cb3f638362458586c91a94215290e169c09abf344c37fb3e113b932229",
+    "source-patches.json": "015ec37d5367499ad4b0224d1e3921946fe195d5c0df4bdd4d2db08aea54d52b",
     "teardown-probes.json": "5483c939d925c8cc0f30c1cba7ddaad63258da92a314e64be68ea35fcde86432"
   }
 }

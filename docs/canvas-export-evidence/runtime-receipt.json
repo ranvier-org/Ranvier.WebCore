@@ -1,10 +1,10 @@
 {
-  "sourceHead": "811d63eb527a738f0fda39f98bc3e88f37bd5a8d",
+  "sourceHead": "f3dc0f4b838e3b613cdab58eb9890309e3fdd695",
   "nativeVersion": "0.1.0-preview.46",
   "abiVersion": 55,
   "platform": "private win-x64 slim",
   "buildScript": "docs/canvas-export-evidence/build_export_candidate.py",
-  "buildHead": "811d63eb527a738f0fda39f98bc3e88f37bd5a8d",
+  "buildHead": "f3dc0f4b838e3b613cdab58eb9890309e3fdd695",
   "sourcePatches": {
     "patches": {
       "0035-caret-position-text-control-shadow-roots.patch": null,
@@ -736,19 +736,19 @@
       }
     },
     "recompiledUnits": {
-      "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/000-RanvierDomGlue.cpp.obj",
-      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/InspectorGeneratedStub.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/001-InspectorGeneratedStub.cpp.obj",
-      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-9.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/002-UnifiedSource-JSBindings-9.cpp.obj",
-      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-Modules-1.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/003-UnifiedSource-Modules-1.cpp.obj",
-      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/004-UnifiedSource-html-16.cpp.obj",
-      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-23.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/005-UnifiedSource-html-23.cpp.obj",
-      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-24.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/006-UnifiedSource-html-24.cpp.obj",
-      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-26.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/007-UnifiedSource-html-26.cpp.obj",
-      "Source/WebCore/CMakeFiles/WebCore.dir/inspector/stub/InspectorStub.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/008-InspectorStub.cpp.obj",
-      "Ranvier/host/RanvierCanvasExportGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/090-RanvierCanvasExportGlue.cpp.obj",
-      "Ranvier/host/RanvierResourceGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-5/091-RanvierResourceGlue.cpp.obj"
+      "Source/WebCore/CMakeFiles/WebCore.dir/C_/wk/ranvier-webcore/host/dom/RanvierDomGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/000-RanvierDomGlue.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/InspectorGeneratedStub.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/001-InspectorGeneratedStub.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-9.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/002-UnifiedSource-JSBindings-9.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-Modules-1.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/003-UnifiedSource-Modules-1.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/004-UnifiedSource-html-16.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-23.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/005-UnifiedSource-html-23.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-24.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/006-UnifiedSource-html-24.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-26.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/007-UnifiedSource-html-26.cpp.obj",
+      "Source/WebCore/CMakeFiles/WebCore.dir/inspector/stub/InspectorStub.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/008-InspectorStub.cpp.obj",
+      "Ranvier/host/RanvierCanvasExportGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/090-RanvierCanvasExportGlue.cpp.obj",
+      "Ranvier/host/RanvierResourceGlue.cpp.obj": "C:/wk/native-canvas-pixels/artifacts/export-candidate-6/091-RanvierResourceGlue.cpp.obj"
     },
-    "srcDiffSha256": "9ec42f79c8db2ab382cf8653c14fa9ae7ffddb4d4f142e8bf4095163457ffa9f"
+    "srcDiffSha256": "df2e916241d2349d457844749c269912db1f9f89fa58b380faea9d46f492bbcf"
   },
   "buildRuntimeSha256": {
     "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
@@ -766,12 +766,12 @@
     "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
     "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
     "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
-    "RanvierWebCoreHost.dll": "1d0530da5dd4bb0d736b3eef89ecf866c5049f11324a57f75cf8411b5b04a6ef",
-    "RanvierWebCoreHost.lib": "fefbb819c1e746f0ab83a1a32310938c7d771c17b63bbed762eef05d5eba63b6",
-    "RanvierWebCoreHost.pdb": "4626aced439fa647c3718a1345cfd8086c1e2746b79c9e39a15622391206d35d",
-    "WebCore.dll": "0651fcecdeb5cc296a2906266d1df79580e04ab12bec5f2f8cbcb219830e0b3f",
-    "WebCore.lib": "594e4db670dbe6021191349ef204df7fe50fbac85f08352f2a42bc4dd3d30b46",
-    "WebCore.pdb": "bc282ea3f7f7d77a8dee651a53dc5128ee5ddb3f6e42630a694d20ed117aad38",
+    "RanvierWebCoreHost.dll": "ac88993a52df9f4a4a5b99e239055f0e93d4254e26d3b36a01ded1a94c24e3c6",
+    "RanvierWebCoreHost.lib": "5679d5651cb39fbcd377cecaf47e3c8a7b4534a7bdb296705acc264d769ee11d",
+    "RanvierWebCoreHost.pdb": "f8cd69b3af8d6b130191d1a907b8a5fdca4f26ee38a02b33ee9cfa90160327a8",
+    "WebCore.dll": "52da7e60b19cf1f1c8a30bda47044ae503968c64089355ae24c504cd0b1e4f31",
+    "WebCore.lib": "0e08d7741089e30432a906fbf0a9301c466ef8b550539a6e739d4f0ded1ff312",
+    "WebCore.pdb": "3af4d0a1b582a4fb4c2f8ef18cdbf357781e8920ac17138843d11bb79e3cb90b",
     "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
   },
   "shippingFiles": [
@@ -852,13 +852,13 @@
     },
     {
       "name": "RanvierWebCoreHost.dll",
-      "bytes": 794112,
-      "sha256": "1d0530da5dd4bb0d736b3eef89ecf866c5049f11324a57f75cf8411b5b04a6ef"
+      "bytes": 793600,
+      "sha256": "ac88993a52df9f4a4a5b99e239055f0e93d4254e26d3b36a01ded1a94c24e3c6"
     },
     {
       "name": "WebCore.dll",
-      "bytes": 47024640,
-      "sha256": "0651fcecdeb5cc296a2906266d1df79580e04ab12bec5f2f8cbcb219830e0b3f"
+      "bytes": 47023616,
+      "sha256": "52da7e60b19cf1f1c8a30bda47044ae503968c64089355ae24c504cd0b1e4f31"
     },
     {
       "name": "zlib1.dll",

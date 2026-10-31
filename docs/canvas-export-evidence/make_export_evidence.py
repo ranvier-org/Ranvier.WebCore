@@ -82,7 +82,8 @@ result = {
         'ImageBitmap transfer is transferFromImageBitmap, which detaches the source; postMessage transfer needs a script realm.',
         'ImageBitmap buffers are unaccelerated where canvases are (patch 0050); GPU work is paused.',
         'ImageBitmapRenderingContext.canvas is not generated: its single-arm union typedef ImageBitmapCanvas would name a second '
-        'HTMLCanvasElement type in the F# model; the app holds the canvas it passed to rv_canvas_get_bitmap_context.',
+        'HTMLCanvasElement type in the F# model (generator defect, queued by root: a single-arm union generates a duplicate F# '
+        'type for its arm); the app holds the canvas it passed to rv_canvas_get_bitmap_context.',
     ],
 }
 files = sorted(p for p in evidence.iterdir() if p.is_file() and p.name != 'final-evidence.json' and p.suffix != '.pyc')

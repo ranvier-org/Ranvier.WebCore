@@ -143,7 +143,6 @@
   0,
   0
  ],
- "rendererCanvas": true,
  "transfer": {
   "sourceAfter": [
    0,
@@ -152,5 +151,5 @@
   "canvasData": true
  },
  "transferClosed": "InvalidStateError",
- "assertions": 286
+ "assertions": 284
 }
