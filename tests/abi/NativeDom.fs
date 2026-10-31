@@ -330,6 +330,36 @@ let RV_DOM_SVG_TEXT_CONTENT_ELEMENT_LENGTHADJUST_SPACING = 1
 let RV_DOM_SVG_TEXT_CONTENT_ELEMENT_LENGTHADJUST_SPACINGANDGLYPHS = 2
 
 [<Literal>]
+let RV_DOM_SVG_TEXT_PATH_ELEMENT_TEXTPATH_METHODTYPE_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVG_TEXT_PATH_ELEMENT_TEXTPATH_METHODTYPE_ALIGN = 1
+
+[<Literal>]
+let RV_DOM_SVG_TEXT_PATH_ELEMENT_TEXTPATH_METHODTYPE_STRETCH = 2
+
+[<Literal>]
+let RV_DOM_SVG_TEXT_PATH_ELEMENT_TEXTPATH_SPACINGTYPE_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVG_TEXT_PATH_ELEMENT_TEXTPATH_SPACINGTYPE_AUTO = 1
+
+[<Literal>]
+let RV_DOM_SVG_TEXT_PATH_ELEMENT_TEXTPATH_SPACINGTYPE_EXACT = 2
+
+[<Literal>]
+let RV_DOM_SVGFE_CONVOLVE_MATRIX_ELEMENT_SVG_EDGEMODE_UNKNOWN = 0
+
+[<Literal>]
+let RV_DOM_SVGFE_CONVOLVE_MATRIX_ELEMENT_SVG_EDGEMODE_DUPLICATE = 1
+
+[<Literal>]
+let RV_DOM_SVGFE_CONVOLVE_MATRIX_ELEMENT_SVG_EDGEMODE_WRAP = 2
+
+[<Literal>]
+let RV_DOM_SVGFE_CONVOLVE_MATRIX_ELEMENT_SVG_EDGEMODE_NONE = 3
+
+[<Literal>]
 let RV_DOM_ARIA_NOTIFICATION_INTERRUPT_NONE = 0
 
 [<Literal>]
@@ -1407,6 +1437,12 @@ extern void rv_dom_svg_animated_angle_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_svg_animated_angle_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_svg_animated_integer_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_svg_animated_integer_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -7935,6 +7971,162 @@ extern int rv_dom_svg_text_positioning_element_get_dy(nativeint target, nativein
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_text_positioning_element_get_rotate(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_circle_element_get_cx(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_circle_element_get_cy(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_circle_element_get_r(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_ellipse_element_get_cx(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_ellipse_element_get_cy(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_ellipse_element_get_rx(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_ellipse_element_get_ry(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_line_element_get_x1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_line_element_get_y1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_line_element_get_x2(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_line_element_get_y2(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_rect_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_rect_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_rect_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_rect_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_rect_element_get_rx(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_rect_element_get_ry(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_text_path_element_get_start_offset(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_text_path_element_get_method(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_text_path_element_get_spacing(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_text_path_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_get_target_element(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_get_required_extensions(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_get_system_language(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_get_start_time(nativeint target, float32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_get_current_time(nativeint target, float32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_get_simple_duration(nativeint target, float32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_begin_element(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_begin_element_at(nativeint target, float32 offset)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_end_element(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animation_element_end_element_at(nativeint target, float32 offset)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgm_path_element_get_href(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_in1(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_order_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_order_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_kernel_matrix(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_divisor(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_bias(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_target_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_target_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_edge_mode(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_kernel_unit_length_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_kernel_unit_length_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_preserve_alpha(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_x(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_y(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_width(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_height(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svgfe_convolve_matrix_element_get_result(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animated_integer_get_base_val(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animated_integer_set_base_val(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_svg_animated_integer_get_anim_val(nativeint target, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)

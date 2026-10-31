@@ -1,0 +1,48 @@
+diff --git a/Source/WebCore/svg/SVGSVGElement.cpp b/Source/WebCore/svg/SVGSVGElement.cpp
+index 45f0a9d523..94247c6238 100644
+--- a/Source/WebCore/svg/SVGSVGElement.cpp
++++ b/Source/WebCore/svg/SVGSVGElement.cpp
+@@ -73,6 +73,7 @@ inline SVGSVGElement::SVGSVGElement(const QualifiedName& tagName, Document& docu
+     , m_timeContainer(SMILTimeContainer::create(*this))
+ {
+     ASSERT(hasTagName(SVGNames::svgTag));
++    m_currentTranslate->attach(this, SVGPropertyAccess::ReadWrite);
+     document.registerForDocumentSuspensionCallbacks(*this);
+ 
+     static bool didRegistration = false;
+@@ -97,6 +98,7 @@ Ref<SVGSVGElement> SVGSVGElement::create(Document& document)
+ 
+ SVGSVGElement::~SVGSVGElement()
+ {
++    m_currentTranslate->detach();
+     if (RefPtr viewSpec = m_viewSpec)
+         viewSpec->resetContextElement();
+     Ref<Document> document = this->document();
+@@ -171,6 +173,15 @@ void SVGSVGElement::updateCurrentTranslate()
+     updateSVGRendererForElementChange();
+ }
+ 
++void SVGSVGElement::commitPropertyChange(SVGProperty* property)
++{
++    if (property == m_currentTranslate.ptr()) {
++        updateCurrentTranslate();
++        return;
++    }
++    SVGGraphicsElement::commitPropertyChange(property);
++}
++
+ void SVGSVGElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason attributeModificationReason)
+ {
+     if (!SVGGraphicsElement::nearestViewportElement(this) && isConnected()) {
+diff --git a/Source/WebCore/svg/SVGSVGElement.h b/Source/WebCore/svg/SVGSVGElement.h
+index 847ebd7925..bbbcc97707 100644
+--- a/Source/WebCore/svg/SVGSVGElement.h
++++ b/Source/WebCore/svg/SVGSVGElement.h
+@@ -133,6 +133,7 @@ private:
+ 
+     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) override;
+     void svgAttributeChanged(const QualifiedName&) override;
++    void commitPropertyChange(SVGProperty*) override;
+     bool selfHasRelativeLengths() const override;
+     bool isValid() const override;
+ 

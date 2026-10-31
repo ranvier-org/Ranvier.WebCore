@@ -1,0 +1,12 @@
+diff --git a/Source/WebCore/loader/EmptyClients.h b/Source/WebCore/loader/EmptyClients.h
+--- a/Source/WebCore/loader/EmptyClients.h
++++ b/Source/WebCore/loader/EmptyClients.h
+@@ -218,7 +218,7 @@
+ 
+     void wheelEventHandlersChanged(bool) final { }
+     
+-    bool isEmptyChromeClient() const final { return true; }
++    bool isEmptyChromeClient() const override { return true; }
+ 
+     void didAssociateFormControls(const Vector<Ref<Element>>&, LocalFrame&) final { }
+     bool shouldNotifyOnFormChanges() final { return false; }

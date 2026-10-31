@@ -1,0 +1,28 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "assertions": 126,
+  "adjustedText": {
+    "computed": 90,
+    "bbox": [
+      8.5,
+      83.98260498046875,
+      96.57263946533203,
+      30.54979705810547
+    ],
+    "end": {
+      "x": 98.19078063964844,
+      "y": 106.84040069580078
+    },
+    "authored": "90",
+    "lengthAdjust": 2
+  },
+  "pausedSeekEvents": [],
+  "liveEvents": [
+    "beginEvent",
+    "repeatEvent",
+    "endEvent"
+  ],
+  "currentViewCapability": "NotExposed",
+  "pathDataCapability": "authored d through actual SVGPathElement attribute operations and engine geometry",
+  "fontReady": true
+}

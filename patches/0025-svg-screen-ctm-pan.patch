@@ -1,0 +1,27 @@
+diff --git a/Source/WebCore/svg/SVGSVGElement.cpp b/Source/WebCore/svg/SVGSVGElement.cpp
+--- a/Source/WebCore/svg/SVGSVGElement.cpp
++++ b/Source/WebCore/svg/SVGSVGElement.cpp
+@@ -461,16 +461,13 @@ AffineTransform SVGSVGElement::localCoordinateSpaceTransform(CTMScope mode) cons
+                     cssTransform.setF(cssTransform.f() / pageZoomFactor);
+                 }
+ 
+-                // The accumulated matrix maps from the border-box origin to the screen.
+-                // SVG content starts at the content box (after border+padding), so we
+-                // must include that offset. Convert to CSS pixels (divide by page zoom)
+-                // before composing. Compose BEFORE scaling a,b,c,d by CSS zoom, so the
+-                // border+padding offset is not multiplied by the CSS zoom scale.
+-                FloatSize borderAndPadding(legacyRenderSVGRoot->borderLeft() + legacyRenderSVGRoot->paddingLeft(), legacyRenderSVGRoot->borderTop() + legacyRenderSVGRoot->paddingTop());
+-                // Border+padding values are in layout units; use reciprocal
+-                // because FloatSize::scale() only multiplies, not divides.
+-                borderAndPadding.scale(1.0f / pageZoomFactor);
+-                cssTransform = cssTransform * AffineTransform::makeTranslation(borderAndPadding);
++                // Border, padding and SVG pan are in layout units. Convert their
++                // offset to CSS pixels before applying CSS zoom to the content.
++                FloatSize contentOffset(legacyRenderSVGRoot->borderLeft() + legacyRenderSVGRoot->paddingLeft(), legacyRenderSVGRoot->borderTop() + legacyRenderSVGRoot->paddingTop());
++                FloatPoint currentTranslate = currentTranslateValue();
++                contentOffset.expand(currentTranslate.x(), currentTranslate.y());
++                contentOffset.scale(1.0f / pageZoomFactor);
++                cssTransform = cssTransform * AffineTransform::makeTranslation(contentOffset);
+ 
+                 // The a, b, c, d components from mapLocalToContainer reflect only CSS
+                 // transforms, not the CSS 'zoom' property. Scale them by the CSS zoom

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/mnt/c/wk/native-svg-surfaces/tests/abi/svg_surfaces.py (HEAD d5471ce copy)", line 412, in <module>
+    verify(options.native_directory, options.webkit_source, options.evidence_json)
+  File "/mnt/c/wk/native-svg-surfaces/tests/abi/svg_surfaces.py (HEAD d5471ce copy)", line 124, in verify
+    expect(current.value == 60, 'actual Ahem font readiness')
+  File "/mnt/c/wk/native-svg-surfaces/tests/abi/svg_surfaces.py (HEAD d5471ce copy)", line 35, in expect
+    raise AssertionError(label)
+AssertionError: actual Ahem font readiness

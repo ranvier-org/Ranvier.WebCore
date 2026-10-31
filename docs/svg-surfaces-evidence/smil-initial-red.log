@@ -1,0 +1,11 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-svg-surfaces\tests\abi\svg_surfaces.py", line 329, in <module>
+    verify(options.native_directory, options.webkit_source)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-surfaces\tests\abi\svg_surfaces.py", line 263, in verify
+    expect(actual_time == 1, 'SMIL actual current time: ' + repr(actual_time) + '; root=' + repr(number('rv_dom_svgsvg_element_get_current_time', [pointer], [root])))
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-svg-surfaces\tests\abi\svg_surfaces.py", line 34, in expect
+    raise AssertionError(label)
+AssertionError: SMIL actual current time: 0.0; root=0.0

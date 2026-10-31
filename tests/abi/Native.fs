@@ -240,7 +240,8 @@ module Calls =
            "rv_ax_text_set_selection"
            "rv_ax_text_rects"
            "rv_ax_text_offset_at"
-           "rv_ax_text_child_range" |]
+           "rv_ax_text_child_range"
+           "rv_host_load_svg" |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
     let Ticks: int64 array = Array.zeroCreate Names.Length
@@ -921,6 +922,9 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_ax_text_child_range(nativeint ancestor, nativeint child, int& start, int& ``end``)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_load_svg(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string svg)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -3167,6 +3171,20 @@ let rv_ax_text_child_range (ancestor: nativeint, child: nativeint, start: byref<
         result
     else
         Raw.rv_ax_text_child_range (ancestor, child, &start, &``end``)
+
+let rv_host_load_svg (host: nativeint, svg: string) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_load_svg (host, svg)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+
+        Calls.Counts[181] <- Calls.Counts[181] + 1L
+        Calls.Ticks[181] <- Calls.Ticks[181] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_load_svg (host, svg)
 
 // END GENERATED
 

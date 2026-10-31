@@ -1,0 +1,293 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "rows": [
+    {
+      "label": "initial",
+      "contentType": "image/svg+xml",
+      "scale": 1,
+      "translate": [
+        0,
+        0
+      ],
+      "ctm": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "screen": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "bcr": [
+        10,
+        10,
+        20,
+        20
+      ],
+      "rootBcr": [
+        0,
+        0,
+        500,
+        300
+      ],
+      "window": {
+        "innerWidth": 500,
+        "innerHeight": 300,
+        "devicePixelRatio": 1
+      },
+      "visualViewport": {
+        "width": 500,
+        "height": 300,
+        "scale": 1
+      },
+      "hash": ""
+    },
+    {
+      "label": "scaleTranslate",
+      "contentType": "image/svg+xml",
+      "scale": 2,
+      "translate": [
+        20,
+        30
+      ],
+      "ctm": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "screen": [
+        2,
+        0,
+        0,
+        2,
+        20,
+        30
+      ],
+      "bcr": [
+        40,
+        50,
+        40,
+        40
+      ],
+      "rootBcr": [
+        0,
+        0,
+        500,
+        300
+      ],
+      "window": {
+        "innerWidth": 500,
+        "innerHeight": 300,
+        "devicePixelRatio": 1
+      },
+      "visualViewport": {
+        "width": 500,
+        "height": 300,
+        "scale": 1
+      },
+      "hash": ""
+    },
+    {
+      "label": "panAgain",
+      "contentType": "image/svg+xml",
+      "scale": 2,
+      "translate": [
+        60,
+        60
+      ],
+      "ctm": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "screen": [
+        2,
+        0,
+        0,
+        2,
+        60,
+        60
+      ],
+      "bcr": [
+        80,
+        80,
+        40,
+        40
+      ],
+      "rootBcr": [
+        0,
+        0,
+        500,
+        300
+      ],
+      "window": {
+        "innerWidth": 500,
+        "innerHeight": 300,
+        "devicePixelRatio": 1
+      },
+      "visualViewport": {
+        "width": 500,
+        "height": 300,
+        "scale": 1
+      },
+      "hash": ""
+    },
+    {
+      "label": "activateView",
+      "contentType": "image/svg+xml",
+      "scale": 1,
+      "translate": [
+        0,
+        0
+      ],
+      "ctm": [
+        5,
+        0,
+        0,
+        5,
+        0,
+        25
+      ],
+      "screen": [
+        5,
+        0,
+        0,
+        5,
+        0,
+        25
+      ],
+      "bcr": [
+        50,
+        75,
+        100,
+        100
+      ],
+      "rootBcr": [
+        0,
+        0,
+        500,
+        300
+      ],
+      "window": {
+        "innerWidth": 500,
+        "innerHeight": 300,
+        "devicePixelRatio": 1
+      },
+      "visualViewport": {
+        "width": 500,
+        "height": 300,
+        "scale": 1
+      },
+      "hash": "#detail"
+    },
+    {
+      "label": "activeViewWidth200",
+      "contentType": "image/svg+xml",
+      "scale": 1,
+      "translate": [
+        0,
+        0
+      ],
+      "ctm": [
+        5,
+        0,
+        0,
+        5,
+        0,
+        25
+      ],
+      "screen": [
+        5,
+        0,
+        0,
+        5,
+        0,
+        25
+      ],
+      "bcr": [
+        50,
+        75,
+        100,
+        100
+      ],
+      "rootBcr": [
+        0,
+        0,
+        500,
+        300
+      ],
+      "window": {
+        "innerWidth": 500,
+        "innerHeight": 300,
+        "devicePixelRatio": 1
+      },
+      "visualViewport": {
+        "width": 500,
+        "height": 300,
+        "scale": 1
+      },
+      "hash": "#detail"
+    },
+    {
+      "label": "resetView",
+      "contentType": "image/svg+xml",
+      "scale": 1,
+      "translate": [
+        0,
+        0
+      ],
+      "ctm": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "screen": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "bcr": [
+        10,
+        10,
+        20,
+        20
+      ],
+      "rootBcr": [
+        0,
+        0,
+        500,
+        300
+      ],
+      "window": {
+        "innerWidth": 500,
+        "innerHeight": 300,
+        "devicePixelRatio": 1
+      },
+      "visualViewport": {
+        "width": 500,
+        "height": 300,
+        "scale": 1
+      },
+      "hash": "#root"
+    }
+  ]
+}

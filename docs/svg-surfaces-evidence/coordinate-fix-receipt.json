@@ -1,0 +1,39 @@
+{
+  "qualification": "Private Windows probe runtime includes one unshipped window-metrics export; allocated ABI27 runtime proof remains separate",
+  "probes": [
+    {
+      "source": "tests/abi/svg_view_controls.py",
+      "exitCode": 0,
+      "log": "docs/svg-surfaces-evidence/coordinate-fix-svg_view_controls.log"
+    },
+    {
+      "source": "artifacts/audit_svg_standalone_native.py",
+      "exitCode": 0,
+      "log": "docs/svg-surfaces-evidence/coordinate-fix-audit_svg_standalone_native.log"
+    }
+  ],
+  "files": {
+    "docs/svg-surfaces-evidence/coordinate-fix-svg_view_controls.py": "546c573f0543e440cc19cb383885ab89d9a13e347aaa11d31524cf3382f83922",
+    "docs/svg-surfaces-evidence/coordinate-fix-audit_svg_standalone_native.py": "fb67b5e1f1ba48f29d39c52ad4b91bd8db97908e0fd204e8747cadc7abea5df9",
+    "docs/svg-surfaces-evidence/coordinate-fix-metrics.json": "3c78c9d5ac8cf76682f53db9a8c90375d4634023c34047129f31433a83ef5b55",
+    "patches/0024-svg-current-translate-owner.patch": "998235544ec313bd17e4794328fc3fc4226dde6f46f11d0b4e59b2c18e279fcd",
+    "patches/0025-svg-screen-ctm-pan.patch": "3c8d7fd47a4d6258f9db40cf0042b803c938b2ef807d7728b10619637e2850dd",
+    "docs/svg-surfaces-evidence/coordinate-fix-svg_view_controls.log": "c5257d6dbc6332179009041968470523af082eac4d2c2e59f76ce4bc1369f5bc",
+    "docs/svg-surfaces-evidence/coordinate-fix-audit_svg_standalone_native.log": "defdd18147cf5f5642b482f04e576ac3d04562417f4ffbb867a48fb40fa240c2"
+  },
+  "runtime": {
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "RanvierWebCoreHost.dll": "87a73e96974965ffd7c752723c236769677004d79e9fd1c06bc26f41ff4c1f01",
+    "WebCore.dll": "4422b6c2b9ca5831e3454647272022f57661149cc2ecc3c81d08d51c90aa490d"
+  },
+  "shippingRuntimeLink": {
+    "receipt": "final-evidence.json",
+    "runtime": {
+      "RanvierWebCoreHost.dll": "9506e0e995769d85429a6d68ea98a4936000efbe554718f81c01f413ffc39848",
+      "WebCore.dll": "fd4cb94341812dd815c725c2a06aab31793bd8b3e01563d4c1919a295205cd57",
+      "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+    },
+    "sameCoordinateFixtureFinalProbe": "final-svg_view_controls.log",
+    "assertions": 318
+  }
+}

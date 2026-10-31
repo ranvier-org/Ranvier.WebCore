@@ -1,0 +1,21 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.8078.4 Safari/537.36",
+  "assertions": 9,
+  "motion": [
+    1,
+    0,
+    0,
+    1,
+    69.99995422363281,
+    30
+  ],
+  "transform": [
+    0.7071073461281018,
+    0.707106216244542,
+    -0.707106216244542,
+    0.7071073461281018,
+    0,
+    0
+  ],
+  "setX": 350
+}
