@@ -1,0 +1,1 @@
+screen_metrics repeat30 on native38-frozen-7 (candidate-7, head ed56af2): 30/30 PASS 222 assertions

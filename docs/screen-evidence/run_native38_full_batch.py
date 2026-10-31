@@ -85,7 +85,7 @@ probes = [('css_supports', 72), ('computed_style', 93), ('fragment_rectangles', 
           ('typed_style_values', 190), ('custom_properties', 231), ('geometry_values', 260), ('matrix_values', 1091), ('css_transforms', 405),
           ('svg_geometry', 639), ('svg_surfaces', 1594), ('svg_documents', 78), ('svg_view_controls', 318), ('svg_animation_variants', 70),
           ('capabilities', None), ('svg_view_selection', None),
-          ('svg_paint_servers', None), ('svg_filters', None), ('svg_clip_mask_marker', None), ('svg_resources', 454), ('mathml_surface', 371), ('svg_tests_lists', 191), ('image_decode', 73), ('font_load', 42), ('event_construction', 82), ('tree_traversal', None), ('focus_input', 80), ('viewport_events', 364), ('form_collections', 1168), ('form_navigation', None), ('viewport_scroll', None), ('dialog_popover', None), ('binary_values', None), ('caret_hit', None), ('url_values', None), ('url_wpt', None), ('form_submission', None), ('text_segmentation', None), ('crypto_random', 275), ('screen_metrics', 222)]
+          ('svg_paint_servers', None), ('svg_filters', None), ('svg_clip_mask_marker', None), ('svg_resources', 454), ('mathml_surface', 371), ('svg_tests_lists', 191), ('image_decode', 73), ('font_load', 42), ('event_construction', 82), ('tree_traversal', None), ('focus_input', 80), ('viewport_events', 364), ('form_collections', 1168), ('form_navigation', None), ('viewport_scroll', None), ('dialog_popover', None), ('binary_values', None), ('caret_hit', None), ('url_values', None), ('url_wpt', None), ('form_submission', None), ('text_segmentation', None), ('crypto_random', 275), ('visual_viewport', None), ('screen_metrics', 222), ('abi_layouts', 12)]
 for name, expected in probes:
     arguments = ['C:/Python314/python.exe', '-I', '-X', 'utf8', str(repo / 'tests/abi' / (name + '.py')), '--native-directory', str(runtime)]
     if name in ('svg_surfaces', 'font_load', 'caret_hit'):
@@ -110,6 +110,6 @@ for name in ['frames', 'teardown']:
     assets = [p for p in driver.rglob('*') if p.is_file() and p.suffix.lower() in ['.dll', '.exe', '.json']]
     run(name, ['dotnet', str(driver / 'RanvierWebCoreAbi.Driver.dll')], environment=env, executed=assets, timeout=900)
 teardown = json.loads((out / 'teardown/teardown-probes.json').read_text())
-assert len(teardown) == 88 and all(item['documentRefsAfterCollection'] == -1 and item['targetRefsAfterCollection'] == -1 for item in teardown)
+assert len(teardown) == 90 and all(item['documentRefsAfterCollection'] == -1 and item['targetRefsAfterCollection'] == -1 for item in teardown)
 (out / 'results.json').write_text(json.dumps(records, indent=2))
-print('NATIVE38_FULL_BATCH=' + str(sum(item.get('assertions', 0) for item in records)) + ' RAW +88 TEARDOWN', flush=True)
+print('NATIVE38_FULL_BATCH=' + str(sum(item.get('assertions', 0) for item in records)) + ' RAW +90 TEARDOWN', flush=True)
