@@ -434,10 +434,7 @@
         "generateKey": "pair"
       },
       "RSA-OAEP": {
-        "generateKey": false,
-        "name": "SyntaxError",
-        "isDOMException": true,
-        "ctor": "DOMException"
+        "generateKey": "pair"
       },
       "AES-CFB-8": {
         "generateKey": false,
