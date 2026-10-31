@@ -2146,6 +2146,14 @@ SVGStyleElement includes LinkStyle;
                 self.assertFalse(case.startswith('|') and '=' in case, line)
         self.assertIn('and NodeFilterResult =', lines)
 
+    def test_fable_reads_wide_integers_as_bigint_and_passes_them_as_numbers(self):
+        # Fable represents int64 and uint64 as BigInt; a browser reads and takes them as numbers.
+        source = (ROOT / 'gen' / 'Ranvier.Dom.fs').read_text(encoding='utf-8').replace('\r\n', '\n')
+        for member in ['size: uint64 with get', 'lastModified: int64 with get']:
+            name = member.split(':')[0]
+            self.assertIn(f'#if FABLE_COMPILER\n    [<Fable.Core.Emit("BigInt($0.{name})")>]\n#endif\n    abstract member {member}', source)
+        self.assertIn('o.slice(a0===void 0?void 0:Number(a0),a1===void 0?void 0:Number(a1),a2))($0,$1,$2,$3)', source)
+
     def test_fable_adapters_are_not_shadowed_by_inherited_intrinsic_members(self):
         # F# prefers an intrinsic member to an extension, so a Fable adapter extension on an interface is unreachable
         # while an ancestor declares an intrinsic member of the same name.

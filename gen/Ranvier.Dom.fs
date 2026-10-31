@@ -4803,20 +4803,35 @@ and [<AllowNullLiteral>] TreeWalker =
 
 /// <summary>Blob in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] Blob =
+
     /// <summary>Blob.size.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("BigInt($0.size)")>]
+#endif
     abstract member size: uint64 with get
+
     /// <summary>Blob.type.</summary>
     abstract member ``type``: string with get
+
     /// <summary>Blob.slice.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((o,a0,a1,a2)=>o.slice(a0===void 0?void 0:Number(a0),a1===void 0?void 0:Number(a1),a2))($0,$1,$2,$3)")>]
+#endif
     abstract member slice: ?start: int64 * ?``end``: int64 * ?contentType: string -> Blob
+
 
 /// <summary>File in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] File =
     inherit Blob
     /// <summary>File.name.</summary>
     abstract member name: string with get
+
     /// <summary>File.lastModified.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("BigInt($0.lastModified)")>]
+#endif
     abstract member lastModified: int64 with get
+
 
 /// <summary>FileList in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] FileList =

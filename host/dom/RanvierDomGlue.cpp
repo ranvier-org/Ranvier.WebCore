@@ -38929,7 +38929,7 @@ int32_t ranvier_dom_tree_walker_next_node(RvTreeWalker* target, RvNode** result)
     return deliver([&]() -> decltype(auto) { return impl->nextNode(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
-// Blob.constructor: target is the Document of the constructed object; blob_parts may be NULL for an absent optional argument; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+// Blob.constructor: target is the Document of the constructed object; a string part of blob_parts is UTF-8, and invalid UTF-8 returns RV_ERR_NULL_ARGUMENT; blob_parts may be NULL for an absent optional argument; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
 int32_t ranvier_dom_blob_create(RvNode* target, const RvDomSequenceBufferSourceOrBlobOrUSVString* blob_parts, const RvDomBlobPropertyBag* options, RvBlob** result)
 {
     if (!target || !result)
@@ -38990,7 +38990,7 @@ int32_t ranvier_dom_blob_slice(RvBlob* target, int64_t start, int64_t end, const
     return deliver([&]() -> decltype(auto) { return impl->slice(start, end, a2.string()); }, [&](auto&& value) { return storeHandle<Blob>(value, result); });
 }
 
-// File.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+// File.constructor: target is the Document of the constructed object; a string part of file_bits is UTF-8, and invalid UTF-8 returns RV_ERR_NULL_ARGUMENT; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
 int32_t ranvier_dom_file_create(RvNode* target, const RvDomSequenceBufferSourceOrBlobOrUSVString* file_bits, const uint8_t* file_name, int32_t file_name_length, const RvDomFilePropertyBag* options, RvBlob** result)
 {
     if (!target || !file_bits || !(file_name_length >= 0 && (file_name_length <= 0 || file_name)) || !result)
