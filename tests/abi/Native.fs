@@ -14,6 +14,29 @@ let private Lib = "RanvierWebCoreHost"
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type EventCallback = delegate of context: nativeint * event: nativeint -> int
 
+/// <summary>The <c>RvEventInit</c> of the header; strings are caller-owned NUL-terminated UTF-8 pointers.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type EventInit =
+    val mutable size: int
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable detail: int
+    val mutable modifiers: int
+    val mutable screenX: float
+    val mutable screenY: float
+    val mutable clientX: float
+    val mutable clientY: float
+    val mutable button: int
+    val mutable buttons: int
+    val mutable key: nativeint
+    val mutable code: nativeint
+    val mutable location: int
+    val mutable repeat: int
+    val mutable isComposing: int
+    val mutable relatedTarget: nativeint
+    val mutable customDetailJson: nativeint
+
 /// <summary>The <c>RvResourceHandler</c> of the header; <c>url</c> is a NUL-terminated UTF-8 string.</summary>
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type ResourceHandler = delegate of context: nativeint * load: nativeint * url: nativeint -> unit
@@ -264,6 +287,18 @@ module Calls =
             "rv_font_load"
             "rv_resource_cancel"
             "rv_resource_release"
+            "rv_host_construct_event"
+            "rv_custom_event_detail_json"
+            "rv_host_create_event_target"
+            "rv_event_target_retain"
+            "rv_event_target_release"
+            "rv_node_as_event_target"
+            "rv_event_target_as_node"
+            "rv_event_target_equals"
+            "rv_event_target_add_listener"
+            "rv_event_target_dispatch"
+            "rv_event_get_target"
+            "rv_event_get_related_target"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1028,6 +1063,53 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_resource_release(uint64 operation)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_host_construct_event(
+        nativeint host,
+        int kind,
+        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
+        EventInit& init
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_custom_event_detail_json(nativeint ``event``, byte[] buffer, int capacity, int[] length)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_host_create_event_target(nativeint host)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_event_target_retain(nativeint value)
+
+    [<DllImport(Lib)>]
+    extern void rv_event_target_release(nativeint value)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_node_as_event_target(nativeint node)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_event_target_as_node(nativeint value)
+
+    [<DllImport(Lib)>]
+    extern int rv_event_target_equals(nativeint value, nativeint value)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_event_target_add_listener(
+        nativeint value,
+        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``,
+        int flags,
+        nativeint callback,
+        nativeint context
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_event_target_dispatch(nativeint value, nativeint ``event``, int& defaultPrevented)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_event_get_target(nativeint ``event``, int current)
+
+    [<DllImport(Lib)>]
+    extern nativeint rv_event_get_related_target(nativeint ``event``)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -3461,6 +3543,155 @@ let rv_resource_release (operation: uint64) : int =
         result
     else
         Raw.rv_resource_release (operation)
+
+let rv_host_construct_event (host: nativeint, kind: int, ``type``: string, init: byref<EventInit>) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_construct_event (host, kind, ``type``, &init)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[195] <- Calls.Counts[195] + 1L
+        Calls.Ticks[195] <- Calls.Ticks[195] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_construct_event (host, kind, ``type``, &init)
+
+let rv_custom_event_detail_json (``event``: nativeint, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_custom_event_detail_json (``event``, buffer, capacity, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[196] <- Calls.Counts[196] + 1L
+        Calls.Ticks[196] <- Calls.Ticks[196] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_custom_event_detail_json (``event``, buffer, capacity, length)
+
+let rv_host_create_event_target (host: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_create_event_target (host)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[197] <- Calls.Counts[197] + 1L
+        Calls.Ticks[197] <- Calls.Ticks[197] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_create_event_target (host)
+
+let rv_event_target_retain (value: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_event_target_retain (value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[198] <- Calls.Counts[198] + 1L
+        Calls.Ticks[198] <- Calls.Ticks[198] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_event_target_retain (value)
+
+let rv_event_target_release (value: nativeint) : unit =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_event_target_release (value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[199] <- Calls.Counts[199] + 1L
+        Calls.Ticks[199] <- Calls.Ticks[199] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_event_target_release (value)
+
+let rv_node_as_event_target (node: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_node_as_event_target (node)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[200] <- Calls.Counts[200] + 1L
+        Calls.Ticks[200] <- Calls.Ticks[200] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_node_as_event_target (node)
+
+let rv_event_target_as_node (value: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_event_target_as_node (value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[201] <- Calls.Counts[201] + 1L
+        Calls.Ticks[201] <- Calls.Ticks[201] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_event_target_as_node (value)
+
+let rv_event_target_equals (value: nativeint, value: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_event_target_equals (value, value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[202] <- Calls.Counts[202] + 1L
+        Calls.Ticks[202] <- Calls.Ticks[202] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_event_target_equals (value, value)
+
+let rv_event_target_add_listener
+    (value: nativeint, ``type``: string, flags: int, callback: nativeint, context: nativeint)
+    : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_event_target_add_listener (value, ``type``, flags, callback, context)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[203] <- Calls.Counts[203] + 1L
+        Calls.Ticks[203] <- Calls.Ticks[203] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_event_target_add_listener (value, ``type``, flags, callback, context)
+
+let rv_event_target_dispatch (value: nativeint, ``event``: nativeint, defaultPrevented: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_event_target_dispatch (value, ``event``, &defaultPrevented)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[204] <- Calls.Counts[204] + 1L
+        Calls.Ticks[204] <- Calls.Ticks[204] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_event_target_dispatch (value, ``event``, &defaultPrevented)
+
+let rv_event_get_target (``event``: nativeint, current: int) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_event_get_target (``event``, current)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[205] <- Calls.Counts[205] + 1L
+        Calls.Ticks[205] <- Calls.Ticks[205] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_event_get_target (``event``, current)
+
+let rv_event_get_related_target (``event``: nativeint) : nativeint =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_event_get_related_target (``event``)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[206] <- Calls.Counts[206] + 1L
+        Calls.Ticks[206] <- Calls.Ticks[206] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_event_get_related_target (``event``)
 
 // END GENERATED
 

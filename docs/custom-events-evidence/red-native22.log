@@ -1,0 +1,12 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-custom-events\tests\abi\event_construction.py", line 281, in <module>
+    verify(options.native_directory, options.evidence_json)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-custom-events\tests\abi\event_construction.py", line 59, in verify
+    expect(bind('rv_abi_version', i32, [])() == 32, 'ABI version 32')
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-custom-events\tests\abi\event_construction.py", line 43, in expect
+    raise AssertionError(message)
+AssertionError: ABI version 32
+EXIT=1

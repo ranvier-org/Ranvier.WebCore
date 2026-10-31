@@ -3,6 +3,7 @@
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
 #include "RanvierResourceGlue.h"
+#include "RanvierEventGlue.h"
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
@@ -138,6 +139,7 @@
 #include <WebCore/HandleUserInputEventResult.h>
 #include <WebCore/InputEvent.h>
 #include <WebCore/MouseEvent.h>
+#include <WebCore/EventTargetInlines.h>
 #include <WebCore/MouseEventTypes.h>
 #include <WebCore/PlatformKeyboardEvent.h>
 #include <WebCore/PlatformMouseEvent.h>
@@ -1109,7 +1111,7 @@ private:
 
 struct RvListener {
     Ref<RvEventListener> listener;
-    Ref<Node> target;
+    Ref<EventTarget> target;
     AtomString type;
     bool capture;
 };
@@ -1157,7 +1159,7 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 31; }
+int32_t rv_abi_version(void) { return 32; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1178,6 +1180,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "image-decode"))
         return 1;
     if (!std::strcmp(feature, "font-load"))
+        return 1;
+    if (!std::strcmp(feature, "event-construction"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -1293,6 +1297,7 @@ void rv_host_destroy(RvHost* host)
     if (!host || !onOwningThread())
         return;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -1309,6 +1314,7 @@ int32_t rv_host_load_html(RvHost* host, const char* html)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadHTML(host->frame(), utf8(html));
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
@@ -1323,6 +1329,7 @@ int32_t rv_host_load_svg(RvHost* host, const char* svg)
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     loadDocument(host->frame(), utf8(svg), "image/svg+xml"_s);
     if (host->accessibility)
         host->document().axObjectCache();
@@ -2128,6 +2135,110 @@ void rv_event_release(RvEvent* handle)
         event(handle)->deref();
 }
 
+static EventTarget* eventTarget(RvEventTarget* handle) { return reinterpret_cast<EventTarget*>(handle); }
+
+static RvEventTarget* targetHandleOrNull(EventTarget* target)
+{
+    if (!target)
+        return nullptr;
+    target->ref();
+    return reinterpret_cast<RvEventTarget*>(target);
+}
+
+RvEvent* rv_host_construct_event(RvHost* host, int32_t kind, const char* type, const RvEventInit* init)
+{
+    if (!host || !type || !init || !onOwningThread())
+        return nullptr;
+    return ranvier_event_construct(reinterpret_cast<RvNode*>(&host->document()), kind, type, init);
+}
+
+int32_t rv_custom_event_detail_json(RvEvent* handle, char* buffer, int32_t capacity, int32_t* length)
+{
+    return ranvier_custom_event_detail_json(handle, buffer, capacity, length);
+}
+
+RvEventTarget* rv_host_create_event_target(RvHost* host)
+{
+    if (!host || !onOwningThread())
+        return nullptr;
+    return ranvier_event_target_create(reinterpret_cast<RvNode*>(&host->document()));
+}
+
+RvEventTarget* rv_event_target_retain(RvEventTarget* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    eventTarget(handle)->ref();
+    return handle;
+}
+
+void rv_event_target_release(RvEventTarget* handle)
+{
+    if (handle && onOwningThread())
+        eventTarget(handle)->deref();
+}
+
+RvEventTarget* rv_node_as_event_target(RvNode* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(static_cast<EventTarget*>(node(handle)));
+}
+
+RvNode* rv_event_target_as_node(RvEventTarget* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    return handleOrNull(dynamicDowncast<Node>(eventTarget(handle)));
+}
+
+int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* right)
+{
+    return left && right && eventTarget(left) == eventTarget(right) ? 1 : 0;
+}
+
+RvListener* rv_event_target_add_listener(RvEventTarget* target, const char* type, int32_t flags, RvEventCallback callback, void* context)
+{
+    if (!target || !type || !callback || !onOwningThread())
+        return nullptr;
+    auto* listener = new RvListener { RvEventListener::create(callback, context), *eventTarget(target),
+        AtomString::fromUTF8(type), !!(flags & RV_LISTENER_CAPTURE) };
+    AddEventListenerOptions options;
+    options.capture = listener->capture;
+    if (flags & RV_LISTENER_PASSIVE_SPECIFIED)
+        options.passive = !!(flags & RV_LISTENER_PASSIVE);
+    listener->target->addEventListener(listener->type, listener->listener.copyRef(), options);
+    return listener;
+}
+
+int32_t rv_event_target_dispatch(RvEventTarget* target, RvEvent* dispatched, int32_t* defaultPrevented)
+{
+    if (!target || !dispatched)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    Ref protectedTarget = *eventTarget(target);
+    Ref protectedEvent = *event(dispatched);
+    auto result = dispatchCountingFailures([&] { protectedTarget->dispatchEvent(protectedEvent); });
+    if (defaultPrevented)
+        *defaultPrevented = protectedEvent->defaultPrevented() ? 1 : 0;
+    return result;
+}
+
+RvEventTarget* rv_event_get_target(RvEvent* subject, int32_t current)
+{
+    if (!subject || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(current ? event(subject)->currentTarget() : event(subject)->target());
+}
+
+RvEventTarget* rv_event_get_related_target(RvEvent* subject)
+{
+    if (!subject || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(event(subject)->relatedTarget());
+}
+
 RvEvent* rv_host_create_event(RvHost* host, int32_t eventInterface, const char* type, int32_t bubbles, int32_t cancelable)
 {
     if (!host || !type || !onOwningThread())
@@ -2197,6 +2308,8 @@ int32_t rv_event_interface(RvEvent* handle)
         return RV_EVENT_INPUT;
     case EventInterfaceType::FocusEvent:
         return RV_EVENT_FOCUS;
+    case EventInterfaceType::CustomEvent:
+        return RV_EVENT_CUSTOM;
     default:
         return RV_EVENT_OTHER;
     }
