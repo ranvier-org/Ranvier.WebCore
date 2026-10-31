@@ -124,7 +124,9 @@
     {"init": ["sequence", [["a", "1"], ["b", "x y"], ["a", "2"]]], "ops": [["toString"], ["delete", "a", "2"], ["toString"], ["delete", "a"], ["toString"]]},
     {"init": ["sequence", [["only"]]], "ops": [["toString"]]},
     {"init": ["record", [["k", "v"], ["k2", "v&2"]]], "ops": [["toString"], ["set", "k", "w"], ["append", "k", "x"], ["getAll", "k"], ["set", "k", "y"], ["toString"]]},
-    {"init": ["string", ""], "ops": [["size"], ["get", "missing"], ["toString"], ["append", "a+b", "c=d&e"], ["toString"]]}
+    {"init": ["string", ""], "ops": [["size"], ["get", "missing"], ["toString"], ["append", "a+b", "c=d&e"], ["toString"]]},
+    {"init": ["string", "a=x%00y&a=%00&%00k=v"], "ops": [["get", "a"], ["getAll", "a"], ["entries"], ["toString"]]},
+    {"init": ["sequence", [["k\u0000", "v\u0000w"], ["n", "\u0000"]]], "ops": [["entries"], ["getAll", "k\u0000"], ["toString"]]}
   ],
   "linked": [
     ["http://a.test/p?x=1&y=2#f", [["searchParams.append", "z", "3 4"], ["href"], ["searchParams.delete", "x"], ["href"], ["search=", "?q=w+v"], ["searchParams.get", "q"], ["searchParams.sort"], ["href"]]],

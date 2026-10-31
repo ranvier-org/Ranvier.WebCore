@@ -183,7 +183,8 @@ WEBCORE_EXPORT void ranvier_dom_sequence_file_or_usv_string_release(RvDomSequenc
 WEBCORE_EXPORT void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
 WEBCORE_EXPORT void ranvier_dom_union_buffer_source_or_blob_or_usv_string_release(RvDomUnionBufferSourceOrBlobOrUSVString* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_buffer_source_or_blob_or_usv_string_release(RvDomSequenceBufferSourceOrBlobOrUSVString* value);
-WEBCORE_EXPORT void ranvier_dom_sequence_sequence_of_usv_string_release(RvDomSequenceSequenceOfUSVString* value);
+WEBCORE_EXPORT void ranvier_dom_sequence_usv_string_utf8_release(RvDomSequenceUSVStringUtf8* value);
+WEBCORE_EXPORT void ranvier_dom_sequence_sequence_of_usv_string_utf8_release(RvDomSequenceSequenceOfUSVStringUtf8* value);
 WEBCORE_EXPORT void ranvier_dom_pair_usv_string_and_usv_string_release(RvDomPairUSVStringAndUSVString* value);
 WEBCORE_EXPORT void ranvier_dom_sequence_pair_usv_string_and_usv_string_release(RvDomSequencePairUSVStringAndUSVString* value);
 WEBCORE_EXPORT void ranvier_dom_union_sequence_of_sequence_of_usv_string_or_record_of_usv_string_and_usv_string_or_usv_string_release(RvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVStringOrUSVString* value);
@@ -2748,7 +2749,7 @@ WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_get_size(RvURLSearchParams*
 WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_append(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
 WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_delete(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
 WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_get(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, char* buffer, int32_t capacity, int32_t* length);
-WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_get_all(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, RvDomSequenceUSVString* result);
+WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_get_all(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, RvDomSequenceUSVStringUtf8* result);
 WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_has(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_set(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
 WEBCORE_EXPORT int32_t ranvier_dom_url_search_params_sort(RvURLSearchParams* target);

@@ -1462,19 +1462,6 @@ template<typename V> int32_t encodeRvDomUnionMediaListOrDOMString(V&& input, RvD
     return RV_OK;
 }
 
-std::optional<Vector<String>> decodeRvDomSequenceUSVString(const RvDomSequenceUSVString* source, int32_t& status)
-{
-    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
-    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
-    Vector<String> result;
-    result.reserveInitialCapacity(source->count);
-    for (int32_t i = 0; i < source->count; ++i) {
-        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
-        result.append(String::fromUTF8(source->items[i]));
-    }
-    return Vector<String> { std::move(result) };
-}
-
 void clearRvDomSequenceUSVString(RvDomSequenceUSVString* value)
 {
     if (!value) return;
@@ -2290,39 +2277,79 @@ void clearRvDomSequenceBufferSourceOrBlobOrUSVString(RvDomSequenceBufferSourceOr
     *value = { };
 }
 
-std::optional<Vector<Vector<String>>> decodeRvDomSequenceSequenceOfUSVString(const RvDomSequenceSequenceOfUSVString* source, int32_t& status)
+std::optional<Vector<String>> decodeRvDomSequenceUSVStringUtf8(const RvDomSequenceUSVStringUtf8* source, int32_t& status)
 {
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<String> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (source->items[i].length < 0 || (source->items[i].length > 0 && !source->items[i].data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String item = source->items[i].length < 0 ? String() : source->items[i].length ? String::fromUTF8(std::span<const uint8_t> { source->items[i].data, static_cast<size_t>(source->items[i].length) }) : emptyString();
+        if (source->items[i].length >= 0 && item.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        result.append(item);
+    }
+    return Vector<String> { std::move(result) };
+}
+
+void clearRvDomSequenceUSVStringUtf8(RvDomSequenceUSVStringUtf8* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        std::free(const_cast<uint8_t*>(value->items[i].data));
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceUSVStringUtf8(V&& input, RvDomSequenceUSVStringUtf8* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomUtf8StringSpan*>(std::calloc(value.size(), sizeof(RvDomUtf8StringSpan))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        result->items[i] = copyOwnedDomStringSpan(asString(value[i]));
+    }
+    return RV_OK;
+}
+
+std::optional<Vector<Vector<String>>> decodeRvDomSequenceSequenceOfUSVStringUtf8(const RvDomSequenceSequenceOfUSVStringUtf8* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
     if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
     Vector<Vector<String>> result;
     result.reserveInitialCapacity(source->count);
     for (int32_t i = 0; i < source->count; ++i) {
-        auto item = decodeRvDomSequenceUSVString(&source->items[i], status);
+        auto item = decodeRvDomSequenceUSVStringUtf8(&source->items[i], status);
         if (status != RV_OK) return std::nullopt;
         result.append(std::move(*item));
     }
     return Vector<Vector<String>> { std::move(result) };
 }
 
-void clearRvDomSequenceSequenceOfUSVString(RvDomSequenceSequenceOfUSVString* value)
+void clearRvDomSequenceSequenceOfUSVStringUtf8(RvDomSequenceSequenceOfUSVStringUtf8* value)
 {
     if (!value) return;
     for (int32_t i = 0; i < value->count; ++i) {
-        clearRvDomSequenceUSVString(&value->items[i]);
+        clearRvDomSequenceUSVStringUtf8(&value->items[i]);
     }
     std::free(value->items);
     *value = { };
 }
-template<typename V> int32_t encodeRvDomSequenceSequenceOfUSVString(V&& input, RvDomSequenceSequenceOfUSVString* result)
+template<typename V> int32_t encodeRvDomSequenceSequenceOfUSVStringUtf8(V&& input, RvDomSequenceSequenceOfUSVStringUtf8* result)
 {
     *result = { };
     auto&& value = input;
     result->present = 1;
     result->count = static_cast<int32_t>(value.size());
-    result->items = value.size() ? static_cast<RvDomSequenceUSVString*>(std::calloc(value.size(), sizeof(RvDomSequenceUSVString))) : nullptr;
+    result->items = value.size() ? static_cast<RvDomSequenceUSVStringUtf8*>(std::calloc(value.size(), sizeof(RvDomSequenceUSVStringUtf8))) : nullptr;
     RELEASE_ASSERT(!value.size() || result->items);
     for (int32_t i = 0; i < result->count; ++i) {
-        encodeRvDomSequenceUSVString(value[i], &result->items[i]);
+        encodeRvDomSequenceUSVStringUtf8(value[i], &result->items[i]);
     }
     return RV_OK;
 }
@@ -2403,7 +2430,7 @@ std::optional<Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
     switch (source->tag) {
     case 1: {
-        auto arm0 = decodeRvDomSequenceSequenceOfUSVString(&source->arm0, status);
+        auto arm0 = decodeRvDomSequenceSequenceOfUSVStringUtf8(&source->arm0, status);
         if (status != RV_OK) return std::nullopt;
         return Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String> { Variant<Vector<Vector<String>>, Vector<KeyValuePair<String, String>>, String> { WTF::InPlaceIndex<0>, std::move(*arm0) } };
     }
@@ -2427,7 +2454,7 @@ void clearRvDomUnionSequenceOfSequenceOfUSVStringOrRecordOfUSVStringAndUSVString
     if (!value) return;
     switch (value->tag) {
     case 1:
-        clearRvDomSequenceSequenceOfUSVString(&value->arm0);
+        clearRvDomSequenceSequenceOfUSVStringUtf8(&value->arm0);
         break;
     case 2:
         clearRvDomSequencePairUSVStringAndUSVString(&value->arm1);
@@ -2443,7 +2470,7 @@ template<size_t I = 0, typename V> void encodeArmsRvDomUnionSequenceOfSequenceOf
     if constexpr (I < 3) {
         if (value.index() == I) {
             if constexpr (I == 0) {
-                encodeRvDomSequenceSequenceOfUSVString(std::get<I>(value), &result->arm0);
+                encodeRvDomSequenceSequenceOfUSVStringUtf8(std::get<I>(value), &result->arm0);
             }
             else if constexpr (I == 1) {
                 encodeRvDomSequencePairUSVStringAndUSVString(std::get<I>(value), &result->arm1);
@@ -3253,9 +3280,14 @@ void ranvier_dom_sequence_buffer_source_or_blob_or_usv_string_release(RvDomSeque
     if (isMainThread()) clearRvDomSequenceBufferSourceOrBlobOrUSVString(value);
 }
 
-void ranvier_dom_sequence_sequence_of_usv_string_release(RvDomSequenceSequenceOfUSVString* value)
+void ranvier_dom_sequence_usv_string_utf8_release(RvDomSequenceUSVStringUtf8* value)
 {
-    if (isMainThread()) clearRvDomSequenceSequenceOfUSVString(value);
+    if (isMainThread()) clearRvDomSequenceUSVStringUtf8(value);
+}
+
+void ranvier_dom_sequence_sequence_of_usv_string_utf8_release(RvDomSequenceSequenceOfUSVStringUtf8* value)
+{
+    if (isMainThread()) clearRvDomSequenceSequenceOfUSVStringUtf8(value);
 }
 
 void ranvier_dom_pair_usv_string_and_usv_string_release(RvDomPairUSVStringAndUSVString* value)
@@ -39460,7 +39492,7 @@ int32_t ranvier_dom_url_search_params_get(RvURLSearchParams* target, const uint8
 }
 
 // URLSearchParams.getAll(USVString name) -> sequence<USVString>; *result owns its contents; release with the matching rv_dom_*_release
-int32_t ranvier_dom_url_search_params_get_all(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, RvDomSequenceUSVString* result)
+int32_t ranvier_dom_url_search_params_get_all(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, RvDomSequenceUSVStringUtf8* result)
 {
     if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !result)
         return RV_ERR_NULL_ARGUMENT;
@@ -39469,7 +39501,7 @@ int32_t ranvier_dom_url_search_params_get_all(RvURLSearchParams* target, const u
     RefPtr<URLSearchParams> impl = reinterpret_cast<URLSearchParams*>(target);
     StringArg a0 { name, name_length };
     if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
-    return deliver([&]() -> decltype(auto) { return impl->getAll(a0.string()); }, [&](auto&& value) { return encodeRvDomSequenceUSVString(value, result); });
+    return deliver([&]() -> decltype(auto) { return impl->getAll(a0.string()); }, [&](auto&& value) { return encodeRvDomSequenceUSVStringUtf8(value, result); });
 }
 
 // URLSearchParams.has(USVString name, optional USVString value) -> boolean; value_length -1 means absent; value may be NULL (absent)
