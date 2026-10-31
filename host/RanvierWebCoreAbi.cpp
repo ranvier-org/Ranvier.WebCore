@@ -1254,6 +1254,13 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
+// The layouts tests/abi/abi_layouts.py checks from ctypes and the F# interop declares.
+static_assert(sizeof(void*) != 8 || (sizeof(RvFormSubmission) == 72 && offsetof(RvFormSubmission, method) == 8 && offsetof(RvFormSubmission, content_type) == 32
+    && offsetof(RvFormSubmission, body_length) == 48 && offsetof(RvFormSubmission, form) == 56 && offsetof(RvFormSubmission, submitter) == 64));
+static_assert(sizeof(void*) != 8 || (sizeof(RvTextSegments) == 32 && offsetof(RvTextSegments, starts) == 8 && offsetof(RvTextSegments, locale) == 24));
+static_assert(sizeof(void*) != 8 || (sizeof(RvEventInit) == 112 && offsetof(RvEventInit, screenX) == 24 && offsetof(RvEventInit, key) == 64
+    && offsetof(RvEventInit, relatedTarget) == 96 && offsetof(RvEventInit, customDetailJson) == 104));
+
 int32_t rv_abi_version(void) { return 45; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
