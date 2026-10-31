@@ -27,7 +27,10 @@
     "an overload, by argument count, its own factory settings.",
     "optionalObjectMembers lists optional nullable object dictionary members passed as Rv<Root>* const*: NULL absent, a pointer to NULL null.",
     "setterExpressions maps Interface.member to the C++ a setter calls with {value}, for a member whose C++ type differs from its IDL type.",
-    "browserArgumentConversions maps Interface.member.argument to the JavaScript function the Fable provider applies to an argument: Keyframe sequences become the browser's keyframe objects."
+    "browserArgumentConversions maps Interface.member.argument to the JavaScript function the Fable provider applies to an argument: Keyframe sequences become the browser's keyframe objects.",
+    "settingsDocuments maps an interface to the C++ that reads the Document whose settings gate its [EnabledBySetting] members; null returns RV_ERR_DETACHED.",
+    "callbackObjectRoots also lists callback functions (callback X = ...), whose handles the host creates; the generator binds their release and retain.",
+    "argumentHostChecks maps an object handle root to the C++ predicate (argument, receiver) that tells whether an argument belongs to the receiver's host: another host returns RV_ERR_WRONG_HOST."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -277,6 +280,10 @@
     "WebAnimation": {
       "receiver": "Document",
       "factory": "[](Document& document, AnimationEffect* effect, std::optional<RefPtr<AnimationTimeline>>&& timeline) -> Ref<WebAnimation> { return timeline ? WebAnimation::create(document, effect, timeline->get()) : WebAnimation::create(document, effect); }"
+    },
+    "CustomEffect": {
+      "receiver": "Document",
+      "factory": "CustomEffect::create"
     }
   },
   "dictionaryCppTypes": {
@@ -413,7 +420,8 @@
     "DOMFormData": "Document",
     "URLSearchParams": "Document",
     "KeyframeEffect": "Document",
-    "AnimationEffect": "Document"
+    "AnimationEffect": "Document",
+    "CustomEffect": "Document"
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -717,6 +725,7 @@
     "WebAnimation",
     "AnimationEffect",
     "KeyframeEffect",
+    "CustomEffect",
     "AnimationTimeline",
     "DocumentTimeline"
   ],
@@ -745,7 +754,8 @@
       "EventListenerOptions",
       "AddEventListenerOptions",
       "KeyframeEffectOptions",
-      "DocumentTimelineOptions"
+      "DocumentTimelineOptions",
+      "EffectTiming"
     ],
     "interfaces": [
       "SVGElement",
@@ -958,7 +968,9 @@
     "KeyframeAnimationOptions.rangeEnd",
     "AnimationEffect.getTiming",
     "AnimationEffect.getComputedTiming",
-    "AnimationEffect.updateTiming"
+    "AnimationEffect.updateTiming",
+    "CustomAnimationOptions.frameRate",
+    "DocumentTimeline.maximumFrameRate"
   ],
   "namespaceBindings": {
     "DOMCSSNamespace": {
@@ -1100,6 +1112,9 @@
           "Skip": 3
         }
       }
+    },
+    "CustomEffectCallback": {
+      "contract": "float -> unit"
     }
   },
   "byteSpanTypes": [
@@ -1243,5 +1258,14 @@
     "Element.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
+  },
+  "settingsDocuments": {
+    "DocumentTimeline": "impl->document()"
+  },
+  "argumentHostChecks": {
+    "CustomEffectCallback": {
+      "check": "Ranvier::customEffectCallbackMatches",
+      "header": "RanvierCustomEffects.h"
+    }
   }
 }

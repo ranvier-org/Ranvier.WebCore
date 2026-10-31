@@ -389,6 +389,15 @@ let private viewportDelegate =
 let private viewportCallback =
     System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate viewportDelegate
 
+let mutable private customEffectTicks = 0
+let mutable private customEffectReleases = 0
+
+let private customEffectTickDelegate =
+    CustomEffectTick(fun _ _ -> customEffectTicks <- customEffectTicks + 1)
+
+let private customEffectReleaseDelegate =
+    CustomEffectRelease(fun _ -> customEffectReleases <- customEffectReleases + 1)
+
 /// Appends a div with a child span, takes one extra handle of the kind from the div (removing the div first when
 /// <c>remove</c> is set), destroys the host, then releases that handle. The document and the div must be destroyed
 /// after collection whatever the destroy order.
@@ -1070,6 +1079,45 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
             rv_dom_animation_effect_release effect
             fun () -> rv_event_target_release held.Value
+        | "custom effect" ->
+            // A playing DocumentTimeline.animate effect with a tick queued by an update: host destroy revokes the callback,
+            // so the queued tick never runs, revoke after destroy still succeeds, and the effect keeps no document alive.
+            let callback =
+                rv_custom_effect_callback_create (
+                    host,
+                    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate customEffectTickDelegate,
+                    0n,
+                    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate customEffectReleaseDelegate
+                )
+
+            if callback = 0n then
+                failwith "rv_custom_effect_callback_create returned NULL"
+
+            let mutable timeline = 0n
+            rv_dom_document_get_timeline (document, &timeline) |> check "Document.timeline"
+            let mutable options = RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions()
+            options.present <- 1
+            options.tag <- 1
+            options.arm0 <- 1000.0
+
+            rv_dom_document_timeline_animate (timeline, callback, [| options |], &held.contents)
+            |> check "DocumentTimeline.animate"
+
+            rv_dom_animation_timeline_release timeline
+            rv_host_update host |> check "update"
+            let ticksAtDestroy = customEffectTicks
+            let releasesAtDestroy = customEffectReleases
+
+            fun () ->
+                if customEffectTicks <> ticksAtDestroy then
+                    failwith "a custom effect tick ran after host destroy"
+
+                rv_custom_effect_callback_revoke callback |> check "revoke after destroy"
+                rv_dom_custom_effect_callback_release callback
+                rv_event_target_release held.Value
+
+                if customEffectReleases - releasesAtDestroy > 1 then
+                    failwith "the custom effect release callback ran twice"
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -1347,6 +1395,7 @@ let run (outDir: string) =
                     "aria relations"
                     "coordinate spaces"
                     "web animation"
+                    "custom effect"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

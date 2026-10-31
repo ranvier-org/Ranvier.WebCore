@@ -5223,6 +5223,10 @@ and [<AllowNullLiteral>] KeyframeEffect =
 #endif
     abstract member setKeyframes: keyframes: (Keyframe) array -> unit
 
+/// <summary>CustomEffect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CustomEffect =
+    inherit AnimationEffect
+
 /// <summary>AnimationTimeline in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] AnimationTimeline =
 
@@ -5245,6 +5249,16 @@ and [<AllowNullLiteral>] AnimationTimeline =
 /// <summary>DocumentTimeline in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DocumentTimeline =
     inherit AnimationTimeline
+
+    /// <summary>DocumentTimeline.animate.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.animate($1, $2)")>]
+    abstract member __ranvier_animate: callback: CustomEffectCallback * ?options: obj -> WebAnimation
+#else
+    abstract member animate: callback: CustomEffectCallback -> WebAnimation
+    abstract member animate: callback: CustomEffectCallback * options: float -> WebAnimation
+    abstract member animate: callback: CustomEffectCallback * options: CustomAnimationOptions -> WebAnimation
+#endif
 
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
@@ -5706,6 +5720,11 @@ and [<RequireQualifiedAccess>] USVStringOrURLPatternInit =
     | USVString of string
     | URLPatternInit of URLPatternInit
 
+/// <summary>UnrestrictedDoubleOrCustomAnimationOptions in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrCustomAnimationOptions =
+    | UnrestrictedDouble of float
+    | CustomAnimationOptions of CustomAnimationOptions
+
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
@@ -5724,6 +5743,17 @@ and [<AllowNullLiteral; DomDictionary>] AddEventListenerOptions() =
 
 /// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
+    inherit EffectTiming()
+    member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
+    member val composite: CompositeOperation = CompositeOperation.Replace with get, set
+    member val pseudoElement: string = null with get, set
+
+/// <summary>DocumentTimelineOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] DocumentTimelineOptions() =
+    member val originTime: float = 0 with get, set
+
+/// <summary>EffectTiming in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] EffectTiming() =
     member val delay: float = 0 with get, set
     member val endDelay: float = 0 with get, set
     member val fill: FillMode = FillMode.Auto with get, set
@@ -5735,13 +5765,6 @@ and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
 
     member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
     member val easing: string = "linear" with get, set
-    member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
-    member val composite: CompositeOperation = CompositeOperation.Replace with get, set
-    member val pseudoElement: string = null with get, set
-
-/// <summary>DocumentTimelineOptions in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral; DomDictionary>] DocumentTimelineOptions() =
-    member val originTime: float = 0 with get, set
 
 /// <summary>GetRootNodeOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetRootNodeOptions() =
@@ -5908,10 +5931,28 @@ and [<AllowNullLiteral; DomDictionary>] URLPatternInit() =
     member val hash: (string) option = None with get, set
     member val baseURL: (string) option = None with get, set
 
+/// <summary>CustomAnimationOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] CustomAnimationOptions() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val id: string = "" with get, set
+
 /// <summary>FocusOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
     member val preventScroll: bool = false with get, set
     member val focusVisible: (bool) option = None with get, set
+
+/// <summary>CustomEffectCallback in the scoped DOM interface model.</summary>
+and CustomEffectCallback = float -> unit
 
 /// <summary>EventListener in the scoped DOM interface model.</summary>
 and EventListener = Event -> unit
@@ -6264,6 +6305,11 @@ module BrowserUnionAdapters =
         | USVStringOrURLPatternInit.USVString value -> box (normalizeUSVString value)
         | USVStringOrURLPatternInit.URLPatternInit value -> box value
 
+    let private boxUnrestrictedDoubleOrCustomAnimationOptions (value: UnrestrictedDoubleOrCustomAnimationOptions) : obj =
+        match value with
+        | UnrestrictedDoubleOrCustomAnimationOptions.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrCustomAnimationOptions.CustomAnimationOptions value -> box value
+
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
         match value with
         | NodeOrDOMString.Node value -> box value
@@ -6598,6 +6644,17 @@ module BrowserUnionAdapters =
                 None
             else
                 Some (unboxDoubleOrCSSNumericValue value)
+
+
+    type DocumentTimeline with
+        member this.animate(callback: CustomEffectCallback) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = None)
+
+        member this.animate(callback: CustomEffectCallback, options: float) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = Some (box options))
+
+        member this.animate(callback: CustomEffectCallback, options: CustomAnimationOptions) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = Some (box options))
 
 
     type ChildNode with

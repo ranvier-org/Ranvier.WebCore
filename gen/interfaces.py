@@ -574,10 +574,11 @@ class InterfaceEmitter:
                 declarations.append(('EventListenerObject', '[<AllowNullLiteral>]', ['    abstract member handleEvent: event: Event -> unit']))
             elif name in self.world.config.get('callbackObjectRoots', {}):
                 callback = self.world.config['callbackObjectRoots'][name]
-                result = callback['resultEnum']
                 declarations.append((name, '', ['    ' + callback['contract']]))
-                declarations.append((result['name'], '',
-                                     [f'    | {case} = {value}' for case, value in result['cases'].items()]))
+                if 'resultEnum' in callback:
+                    result = callback['resultEnum']
+                    declarations.append((result['name'], '',
+                                         [f'    | {case} = {value}' for case, value in result['cases'].items()]))
         for name, (values, _, _) in self.world.enums.items():
             if name in self.enums:
                 declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | [<CompiledName("{value}")>] {case_name(value)}' for value in values]))

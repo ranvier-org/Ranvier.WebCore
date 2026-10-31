@@ -1,0 +1,69 @@
+{
+ "group": "A09 native custom animation effects",
+ "candidate": "fx-candidate-1",
+ "parent": "C:/wk/native-waapi/artifacts/waapi-candidate-3 (A01 b95e555)",
+ "runtimeSha256": {
+  "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+  "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+  "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+  "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+  "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+  "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+  "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+  "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+  "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+  "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+  "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+  "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+  "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+  "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+  "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+  "RanvierWebCoreHost.dll": "1f85ee7f559fbca6c9eced86cfa1a90e1a4c5d3b5858c17c5a73318d271f800f",
+  "RanvierWebCoreHost.lib": "439cbb85725e5f74105a6f1a52f2cf7c958f776dd87fada7ff911d1d323da9d0",
+  "RanvierWebCoreHost.pdb": "1aa1e85239164f4f6b218c5f744ae22e50a21d7e7c4c67d397b2072f5ecb0e1b",
+  "WebCore.dll": "f1fe4a1b2084158de5bd585d2175e1a60c33f095c99b6620f3adb0f819545111",
+  "WebCore.lib": "2e994db3e83a2f24ceea6f041a814a0c5f1aa4de0fda178fe8c0b67680d33c1d",
+  "WebCore.pdb": "a71371d9843e8e2f65ccab02a9dd3742f1f4db4110c72a1140245d123befaf73",
+  "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+ },
+ "focusedProbe": {
+  "probe": "tests/abi/custom_effects.py",
+  "assertions": 663,
+  "vmEntryCrashArmed": true,
+  "oracle": "Chromium 156.0.8078.4",
+  "repeat30": "PASS lines: 30/30",
+  "oracleRepeat30": "SAME lines: 30/30"
+ },
+ "fullBatch": {
+  "raw": 92692,
+  "baselineRaw": 92029,
+  "added": 663,
+  "teardown": 108,
+  "baselineTeardown": 106,
+  "earlierCountsUnchanged": "each baseline probe asserted at its batch-green.json count (run_fx_full_batch.py expected=)"
+ },
+ "qualifications": [
+  "A tick runs from rv_run_loop_cycle after the rendering update that computed it, so a DOM write in a tick renders in the next update (browser/JS: same frame).",
+  "Tick counts depend on timing (a paused effect ticks only in updates something else causes): fixtures assert seeked progress and order, never a count.",
+  "Progress matches Chromium within 1e-5: the engines solve cubic-bezier easing to different precision (ease-in at 0.999).",
+  "The native tick is void; managed providers route exceptions to listener error reporting.",
+  "rv_host_update, run-loop turns, page loads and Animation.cancel attempt a VM entry the host refuses on every page, also on the parent runtime (update-vm-entry.txt): the probe arms the crash for custom effect calls and inside ticks, not around those.",
+  "Chromium has no CustomEffect: the oracle is a null-target KeyframeEffect of the same timing."
+ ],
+ "files": {
+  "docs\\animation-effects-evidence\\batch-green.json": "43cb109c498c6c332f2a144f2d10eb529169ba21e4b802674c29f7122cb75131",
+  "docs\\animation-effects-evidence\\build_fx_candidate.py": "3011e9574443a6b7cff9be2529a47bc64193cbb9d97f146553484d8cb1228e02",
+  "docs\\animation-effects-evidence\\custom-effects-oracle-repeat30.txt": "f6f812682a72f6ce63427cd916774d18ab2efd4180f89c7adf5b0152f7266999",
+  "docs\\animation-effects-evidence\\custom-effects-repeat30.txt": "42eb39452c94db8e1fda8b729d0abe1cf2076275155d3fdd58836e02c23f6371",
+  "docs\\animation-effects-evidence\\red-chromium.json": "ef6a61a9889e618d537b4851f846dbb58b43190f632b497fc1162aef4c7d073d",
+  "docs\\animation-effects-evidence\\red-native.json": "b8f33c928f274dfb25b1ecf3ad3b76a70787be4d9ef20fae9cbf64591e9b1e2b",
+  "docs\\animation-effects-evidence\\red_chromium_a09.mjs": "8613f1f34d9669b013c044b96ae147599528d687a985fda340014aa4a2bf778e",
+  "docs\\animation-effects-evidence\\red_native_a09.py": "db32ee5e3d94fd8c915bd43cc30fc10bcddcd941a1730038b79a12f7d24f53e6",
+  "docs\\animation-effects-evidence\\run_fx_full_batch.py": "8dea246ef13577d178b73aa3998946dda42f018e41180693772664fdf41d4e5a",
+  "docs\\animation-effects-evidence\\runtime-receipt.json": "5294c29e23a1991fcf848e2d76b720f432401db3a3ec9234a1188357f9460f04",
+  "docs\\animation-effects-evidence\\source-patches.json": "2be7eccdc4af7ff4ed2e0220ab48f4c6c0d5e3a654d27bb61f319386c2ab44df",
+  "docs\\animation-effects-evidence\\teardown-probes.json": "8f48b25215a4f13fe7cdd83c9c7db915b72ed53c925b3fb87e973c1769c4ad9a",
+  "docs\\animation-effects-evidence\\update-vm-entry.txt": "3e9bfe57b92800fa701b46aa4dc23608999f1974bd13abe8f7bba828e08f48d9",
+  "docs\\animation-effects-evidence\\update_vm_entry.py": "03f2c9600b5e6ab0d7d0fc90983c47ad961e6d56e52074ab4d8528d0e720e842"
+ }
+}

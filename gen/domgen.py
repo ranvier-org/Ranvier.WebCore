@@ -386,6 +386,8 @@ class World:
         return found
 
     def cpp_class(self, name):
+        if name not in self.interfaces and name in self.callbacks:
+            return name  # a callback function names its WebCore callback class
         interface = self.interfaces[name]
         return interface.attrs.get("ImplementedAs", name) if isinstance(interface.attrs.get("ImplementedAs"), str) else name
 
@@ -602,6 +604,9 @@ class World:
         if t.name in self.dictionaries:
             self.dictionary_fields(t.name)
             return Mapped("dict", t.nullable, interface=t.name)
+        if t.name in self.callbacks and t.name in self.config.get("callbackObjectRoots", {}):
+            # A callback function root is a refcounted handle of the host's native implementation.
+            return Mapped("object", t.nullable, interface=t.name, root=t.name, cls=t.name)
         if t.name in self.callbacks or t.name in ("EventHandler", "OnErrorEventHandler", "OnBeforeUnloadEventHandler"):
             raise Unsupported(f"callback {t.name}")
         raise Unsupported(f"type {t}")
@@ -691,6 +696,11 @@ class Generator(ComplexGeneratorMixin):
                 if root == name:
                     self.handles.append(name)
             self.interface(name)
+        for name in self.world.config.get("callbackObjectRoots", {}):
+            if name in self.world.callbacks and name not in self.world.interfaces:
+                # A callback function root has no interface of its own: only the handle's release and retain.
+                self.headers.add(f"{name}.h")
+                self.handles.append(name)
         for name, binding in self.world.config.get("namespaceBindings", {}).items():
             self.namespace(name, binding)
         for name, bindings in self.world.config.get("windowBindings", {}).items():
@@ -1374,6 +1384,12 @@ class Generator(ComplexGeneratorMixin):
             document = "(*settingsDocument)"
         elif chain[-1] in SETTINGS_DOCUMENT:
             document = SETTINGS_DOCUMENT[chain[-1]]
+        elif interface in self.world.config.get("settingsDocuments", {}):
+            # An object that holds its document weakly: a destroyed document detaches it.
+            self.headers.add("Document.h")
+            lines = [f"RefPtr<Document> settingsDocument = {self.world.config['settingsDocuments'][interface]};",
+                     "if (!settingsDocument)", "    return RV_ERR_DETACHED;"]
+            document = "(*settingsDocument)"
         elif interface in self.world.config.get("contextSettingsObjects", []):
             # An ActiveDOMObject reaches the settings through its script execution context, a Document on the host.
             self.headers |= {"ContextDestructionObserverInlines.h", "Document.h"}
@@ -1870,6 +1886,13 @@ class Generator(ComplexGeneratorMixin):
                     prepare.append(f"RefPtr<{mapped.cls}> a{index} = {name} ? {cast} : nullptr;")
                     prepare.append(f"if ({name} && !a{index})")
                     prepare.append("    return RV_ERR_WRONG_INTERFACE;")
+                host_check = self.world.config.get("argumentHostChecks", {}).get(mapped.root) if mapped.kind == "object" else None
+                if host_check:
+                    # The argument belongs to one host's document: a receiver of another host returns RV_ERR_WRONG_HOST.
+                    self.headers.add(host_check["header"])
+                    prepare.append(f"if (a{index} && !{host_check['check']}(*a{index}, *impl))")
+                    prepare.append("    return RV_ERR_WRONG_HOST;")
+                    notes.append(f"RV_ERR_WRONG_HOST for a {name} of another host's document")
                 presence = f"{function.interface}.{member.name}.{argument.name}" in self.world.config.get("presenceArguments", [])
                 if presence:
                     # An optional nullable argument whose absence differs from null: name_present 0 is absent.

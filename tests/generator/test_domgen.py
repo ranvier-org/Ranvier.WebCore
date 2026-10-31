@@ -103,6 +103,40 @@ interface SVGTransformList { SVGTransform createSVGTransformFromMatrix(''' + arg
             with self.subTest(argument=argument), self.assertRaisesRegex(SystemExit, 'one nonnullable DOMMatrix2DInit matrix argument'):
                 self.svg_matrix_generator(argument=argument).run()
 
+    def test_callback_function_roots_bind_host_handles_with_host_and_settings_checks(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+callback TickCallback = undefined (double progress);
+callback UnlistedCallback = undefined (double progress);
+interface Timeline {
+    [EnabledBySetting=TicksEnabled] Node tick(TickCallback callback);
+    Node unlisted(UnlistedCallback callback);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Timeline']
+        config['callbackObjectRoots'] = {'TickCallback': {'contract': 'float -> unit'}}
+        config['settingsDocuments'] = {'Timeline': 'impl->document()'}
+        config['argumentHostChecks'] = {'TickCallback': {'check': 'Ranvier::tickMatches', 'header': 'RanvierTicks.h'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue, header = generator.glue(), generator.header()
+        # A callback function root is a handle the host creates: release and retain only, no typedef of its own.
+        self.assertIn('RV_EXPORT void rv_dom_tick_callback_release(RvTickCallback*);', header)
+        self.assertNotIn('typedef struct RvTickCallback RvTickCallback;', header)
+        self.assertIn('RvTickCallback* callback', header)
+        self.assertIn('reinterpret_cast<TickCallback*>(handle)->deref();', glue)
+        self.assertIn('if (a0 && !Ranvier::tickMatches(*a0, *impl))', glue)
+        self.assertIn('    return RV_ERR_WRONG_HOST;', glue)
+        self.assertIn('#include "RanvierTicks.h"', glue)
+        self.assertIn('RefPtr<Document> settingsDocument = impl->document();', glue)
+        self.assertIn('settings.ticksEnabled', glue)
+        # A callback function outside callbackObjectRoots stays unsupported.
+        self.assertNotIn('rv_dom_timeline_unlisted', header)
+        self.assertIn('and TickCallback = float -> unit', generator.interfaces())
+
     def test_existing_atom_string_inputs_use_lookup_without_interning(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

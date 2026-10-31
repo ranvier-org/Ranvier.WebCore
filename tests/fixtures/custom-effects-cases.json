@@ -1,0 +1,25 @@
+{
+ "comment": "A09 custom effects: each timing case is sampled at each seek time; a custom effect's tick receives the progress the effect computes there, which the Chromium oracle reads from a null-target KeyframeEffect of the same timing (Chromium has no CustomEffect). errors lists timing inputs the constructor rejects.",
+ "times": [0, 100, 250, 500, 750, 999, 1000, 1200],
+ "cases": [
+  {"name": "linear", "timing": {"duration": 1000}},
+  {"name": "delay", "timing": {"duration": 1000, "delay": 200}},
+  {"name": "reverse", "timing": {"duration": 1000, "direction": "reverse"}},
+  {"name": "alternate2", "timing": {"duration": 500, "iterations": 2, "direction": "alternate"}},
+  {"name": "easeIn", "timing": {"duration": 1000, "easing": "ease-in"}},
+  {"name": "steps", "timing": {"duration": 1000, "easing": "steps(4, end)"}},
+  {"name": "fillBoth", "timing": {"duration": 1000, "delay": 100, "fill": "both"}},
+  {"name": "fillForwards", "timing": {"duration": 800, "fill": "forwards"}},
+  {"name": "iterStart", "timing": {"duration": 1000, "iterationStart": 0.25}},
+  {"name": "endDelay", "timing": {"duration": 500, "endDelay": 300, "fill": "forwards"}},
+  {"name": "number", "timing": 1000}
+ ],
+ "errors": [
+  {"name": "negativeDuration", "timing": {"duration": -1}},
+  {"name": "badEasing", "timing": {"duration": 1, "easing": "nope"}},
+  {"name": "nanIterations", "timing": {"duration": 1, "iterations": "NaN"}},
+  {"name": "negativeIterations", "timing": {"duration": 1, "iterations": -1}},
+  {"name": "durationString", "timing": {"duration": "x"}},
+  {"name": "negativeIterationStart", "timing": {"duration": 1, "iterationStart": -0.5}}
+ ]
+}

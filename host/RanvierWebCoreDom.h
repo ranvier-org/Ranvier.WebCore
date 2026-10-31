@@ -151,6 +151,8 @@ typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSeque
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionUnsignedLongOrAnimationFrameRatePreset RvDomUnionUnsignedLongOrAnimationFrameRatePreset;
 typedef struct RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions;
+typedef struct RvDomUnionUnrestrictedDoubleOrEffectTiming RvDomUnionUnrestrictedDoubleOrEffectTiming;
+typedef struct RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -990,12 +992,41 @@ typedef struct RvDomKeyframeEffectOptions {
     RvDomUtf8StringInput pseudo_element; /* CSSOMString?, default null */
 } RvDomKeyframeEffectOptions;
 
+/* The IDL dictionary EffectTiming. size is sizeof(RvDomEffectTiming) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomEffectTiming {
+    uint32_t size;
+    double delay; /* double, default 0 */
+    double end_delay; /* double, default 0 */
+    int32_t fill; /* FillMode, default "auto", RV_DOM_FILL_MODE_* */
+    double iteration_start; /* double, default 0.0 */
+    double iterations; /* unrestricted double, default 1.0 */
+    const RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* duration; /* (unrestricted double or CSSNumericValue or DOMString), default "auto" */
+    int32_t direction; /* PlaybackDirection, default "normal", RV_DOM_PLAYBACK_DIRECTION_* */
+    RvDomUtf8StringInput easing; /* DOMString, default "linear" */
+} RvDomEffectTiming;
+
 /* The IDL dictionary DocumentTimelineOptions. size is sizeof(RvDomDocumentTimelineOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDocumentTimelineOptions {
     uint32_t size;
     double origin_time; /* DOMHighResTimeStamp, default 0 */
 } RvDomDocumentTimelineOptions;
+
+/* The IDL dictionary CustomAnimationOptions. size is sizeof(RvDomCustomAnimationOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomCustomAnimationOptions {
+    uint32_t size;
+    double delay; /* double, default 0 */
+    double end_delay; /* double, default 0 */
+    int32_t fill; /* FillMode, default "auto", RV_DOM_FILL_MODE_* */
+    double iteration_start; /* double, default 0.0 */
+    double iterations; /* unrestricted double, default 1.0 */
+    const RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* duration; /* (unrestricted double or CSSNumericValue or DOMString), default "auto" */
+    int32_t direction; /* PlaybackDirection, default "normal", RV_DOM_PLAYBACK_DIRECTION_* */
+    RvDomUtf8StringInput easing; /* DOMString, default "linear" */
+    RvDomUtf8StringInput id; /* DOMString, default "" */
+} RvDomCustomAnimationOptions;
 
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -1098,6 +1129,8 @@ typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSeque
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionUnsignedLongOrAnimationFrameRatePreset RvDomUnionUnsignedLongOrAnimationFrameRatePreset;
 typedef struct RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions;
+typedef struct RvDomUnionUnrestrictedDoubleOrEffectTiming RvDomUnionUnrestrictedDoubleOrEffectTiming;
+typedef struct RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1740,6 +1773,32 @@ struct RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_EFFECT_TIMING_NUMBER = 1,
+    RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_EFFECT_TIMING_EFFECT_TIMING = 2,
+};
+struct RvDomUnionUnrestrictedDoubleOrEffectTiming {
+    int32_t present;
+    int32_t tag;
+    double arm0;
+    const RvDomEffectTiming* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_CUSTOM_ANIMATION_OPTIONS_NUMBER = 1,
+    RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_CUSTOM_ANIMATION_OPTIONS_CUSTOM_ANIMATION_OPTIONS = 2,
+};
+struct RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions {
+    int32_t present;
+    int32_t tag;
+    double arm0;
+    const RvDomCustomAnimationOptions* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1852,6 +1911,8 @@ RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 RV_EXPORT void rv_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDomUnionUnsignedLongOrAnimationFrameRatePreset* value);
 RV_EXPORT void rv_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* value);
+RV_EXPORT void rv_dom_union_unrestricted_double_or_effect_timing_release(RvDomUnionUnrestrictedDoubleOrEffectTiming* value);
+RV_EXPORT void rv_dom_union_unrestricted_double_or_custom_animation_options_release(RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -2121,6 +2182,10 @@ RV_EXPORT RvAnimationEffect* rv_dom_animation_effect_retain(RvAnimationEffect*);
 RV_EXPORT void rv_dom_animation_timeline_release(RvAnimationTimeline*);
 /* Adds a reference to a AnimationTimeline and returns it. */
 RV_EXPORT RvAnimationTimeline* rv_dom_animation_timeline_retain(RvAnimationTimeline*);
+/* Releases a handle to a CustomEffectCallback. */
+RV_EXPORT void rv_dom_custom_effect_callback_release(RvCustomEffectCallback*);
+/* Adds a reference to a CustomEffectCallback and returns it. */
+RV_EXPORT RvCustomEffectCallback* rv_dom_custom_effect_callback_retain(RvCustomEffectCallback*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -8538,6 +8603,12 @@ RV_EXPORT int32_t rv_dom_keyframe_effect_set_composite(RvAnimationEffect* target
  * objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; RV_ERR_DOM_EXCEPTION
  * (InvalidStateError) for a document without a global object */
 RV_EXPORT int32_t rv_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvNode* context, const RvDomSequenceKeyframeNullable* keyframes);
+/* CustomEffect */
+
+/* CustomEffect.constructor: target is the Document of the constructed object; RV_ERR_WRONG_HOST for a callback of
+ * another host's document; options defaults to {} in IDL; *result is a new reference; RV_ERR_UNSUPPORTED while the
+ * setting WebAnimationsCustomEffectsEnabled is off */
+RV_EXPORT int32_t rv_dom_custom_effect_create(RvNode* target, RvCustomEffectCallback* callback, const RvDomUnionUnrestrictedDoubleOrEffectTiming* options, RvAnimationEffect** result);
 /* AnimationTimeline */
 
 /* AnimationTimeline.currentTime getter: readonly attribute CSSNumberish? currentTime; *result owns its contents;
@@ -8551,6 +8622,10 @@ RV_EXPORT int32_t rv_dom_animation_timeline_get_duration(RvAnimationTimeline* ta
 /* DocumentTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL;
  * options may be NULL for the IDL default; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_timeline_create(RvNode* target, const RvDomDocumentTimelineOptions* options, RvAnimationTimeline** result);
+/* DocumentTimeline.animate(CustomEffectCallback callback, optional (unrestricted double or CustomAnimationOptions)
+ * options = {}) -> WebAnimation; RV_ERR_WRONG_HOST for a callback of another host's document; options defaults to {}
+ * in IDL; *result is a new reference; RV_ERR_UNSUPPORTED while the setting WebAnimationsCustomEffectsEnabled is off */
+RV_EXPORT int32_t rv_dom_document_timeline_animate(RvAnimationTimeline* target, RvCustomEffectCallback* callback, const RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* options, RvEventTarget** result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

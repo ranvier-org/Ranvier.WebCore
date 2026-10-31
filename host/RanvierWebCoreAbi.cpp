@@ -584,6 +584,8 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
     page->settings().setScreenOrientationAPIEnabled(true);
     page->settings().setVisualViewportAPIEnabled(true);
     page->settings().setInteractiveFormValidationEnabled(true);
+    // CustomEffect and DocumentTimeline.animate, which the host's native callbacks drive; scripts stay disabled.
+    page->settings().setWebAnimationsCustomEffectsEnabled(true);
     // Markup arrives decoded, so the document's encoding, which form submission and URL query encoding use, is UTF-8.
     page->settings().setDefaultTextEncodingName("UTF-8"_s);
 #if ENABLE(VIDEO)
@@ -1361,6 +1363,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "form-submission"))
         return 1;
+    if (!std::strcmp(feature, "animation-custom-effects"))
+        return 1;
     if (!std::strcmp(feature, "text-segmentation"))
         return 1;
     if (!std::strcmp(feature, "diagnostics"))
@@ -1736,6 +1740,7 @@ void rv_host_destroy(RvHost* host)
         return;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
     rv_host_detach_uia(host);
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
@@ -1754,6 +1759,7 @@ int32_t rv_host_load_html(RvHost* host, const char* html)
         return RV_ERR_WRONG_THREAD;
     ranvier_resource_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
     ranvier_event_glue_invalidate_document(reinterpret_cast<RvNode*>(&host->document()));
+    ranvier_custom_effect_callbacks_revoke_document(reinterpret_cast<RvNode*>(&host->document()));
     loadHTML(host->frame(), utf8(html));
     // The new document posts accessibility notifications once its cache exists.
     if (host->accessibility)
@@ -4132,6 +4138,22 @@ RvEventTarget* rv_animation_as_event_target(RvAnimation* handle)
     if (!handle || !onOwningThread())
         return nullptr;
     return targetHandleOrNull(static_cast<EventTarget*>(animation(handle)));
+}
+
+RvCustomEffectCallback* rv_custom_effect_callback_create(RvHost* host, RvCustomEffectTick tick, void* context, RvCustomEffectRelease release)
+{
+    if (!host || !tick || !onOwningThread() || !liveHosts.contains(host))
+        return nullptr;
+    return ranvier_custom_effect_callback_create(reinterpret_cast<RvNode*>(&host->document()), tick, context, release);
+}
+
+int32_t rv_custom_effect_callback_revoke(RvCustomEffectCallback* callback)
+{
+    if (!callback)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_custom_effect_callback_revoke(callback);
 }
 
 RvNode* rv_node_retain(RvNode* target)
