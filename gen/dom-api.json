@@ -858,6 +858,18 @@
       "base": null
     },
     {
+      "name": "HTMLFormControlsCollection",
+      "base": "HTMLCollection"
+    },
+    {
+      "name": "HTMLOptionsCollection",
+      "base": "HTMLCollection"
+    },
+    {
+      "name": "DOMFormData",
+      "base": null
+    },
+    {
       "name": "ValidityState",
       "base": null
     },
@@ -896,6 +908,14 @@
     {
       "name": "CompositionEvent",
       "base": "UIEvent"
+    },
+    {
+      "name": "SubmitEvent",
+      "base": "Event"
+    },
+    {
+      "name": "FormDataEvent",
+      "base": "Event"
     },
     {
       "name": "SVGGraphicsElement",
@@ -2649,6 +2669,33 @@
       "source": "html/HTMLCollection.idl"
     },
     {
+      "name": "HTMLFormControlsCollection",
+      "idlName": "HTMLFormControlsCollection",
+      "base": "HTMLCollection",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLFormControlsCollection.idl"
+    },
+    {
+      "name": "HTMLOptionsCollection",
+      "idlName": "HTMLOptionsCollection",
+      "base": "HTMLCollection",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/HTMLOptionsCollection.idl"
+    },
+    {
+      "name": "DOMFormData",
+      "idlName": "DOMFormData",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/DOMFormData.idl"
+    },
+    {
       "name": "ValidityState",
       "idlName": "ValidityState",
       "base": null,
@@ -2737,6 +2784,24 @@
       "mixin": false,
       "contractOnly": false,
       "source": "dom/CompositionEvent.idl"
+    },
+    {
+      "name": "SubmitEvent",
+      "idlName": "SubmitEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/SubmitEvent.idl"
+    },
+    {
+      "name": "FormDataEvent",
+      "idlName": "FormDataEvent",
+      "base": "Event",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/FormDataEvent.idl"
     },
     {
       "name": "SVGGraphicsElement",
@@ -3810,15 +3875,6 @@
       "source": "fileapi/FileList.idl"
     },
     {
-      "name": "FormDataEvent",
-      "idlName": "FormDataEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/FormDataEvent.idl"
-    },
-    {
       "name": "GamepadEvent",
       "idlName": "GamepadEvent",
       "base": "Event",
@@ -3826,24 +3882,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "Modules/gamepad/GamepadEvent.idl"
-    },
-    {
-      "name": "HTMLFormControlsCollection",
-      "idlName": "HTMLFormControlsCollection",
-      "base": "HTMLCollection",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLFormControlsCollection.idl"
-    },
-    {
-      "name": "HTMLOptionsCollection",
-      "idlName": "HTMLOptionsCollection",
-      "base": "HTMLCollection",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/HTMLOptionsCollection.idl"
     },
     {
       "name": "HashChangeEvent",
@@ -3970,15 +4008,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "storage/StorageEvent.idl"
-    },
-    {
-      "name": "SubmitEvent",
-      "idlName": "SubmitEvent",
-      "base": "Event",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "html/SubmitEvent.idl"
     },
     {
       "name": "TextTrack",
@@ -38757,6 +38786,99 @@
             "subtypes": []
           }
         ]
+      }
+    },
+    {
+      "interface": "HTMLFormElement",
+      "member": "submit",
+      "contractOwner": "HTMLFormElement",
+      "kind": "operation",
+      "function": "rv_dom_html_form_element_submit",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLFormElement",
+      "member": "requestSubmit",
+      "contractOwner": "HTMLFormElement",
+      "kind": "operation",
+      "function": "rv_dom_html_form_element_request_submit",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "submitter"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "submitter",
+          "idlType": "HTMLElement?",
+          "idl": {
+            "name": "HTMLElement",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLElement",
+            "root": null,
+            "class": "HTMLElement",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
       }
     },
     {
@@ -104478,6 +104600,1468 @@
       }
     },
     {
+      "interface": "HTMLFormControlsCollection",
+      "member": "item",
+      "contractOwner": "HTMLFormControlsCollection",
+      "kind": "operation",
+      "function": "rv_dom_html_form_controls_collection_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "HTMLElement",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "HTMLElement",
+        "root": null,
+        "class": "HTMLElement",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLFormControlsCollection",
+      "member": "namedItem",
+      "contractOwner": "HTMLFormControlsCollection",
+      "kind": "operation",
+      "function": "rv_dom_html_form_controls_collection_named_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "name"
+        },
+        {
+          "ctype": "RvDomUnionRadioNodeListOrElementNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "union",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "RadioNodeList",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "Element",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionRadioNodeListOrElementNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "RadioNodeListOrElement",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "RadioNodeList",
+            "root": "NodeList",
+            "class": "RadioNodeList",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "HTMLOptionsCollection",
+      "member": "length",
+      "contractOwner": "HTMLOptionsCollection",
+      "kind": "getter",
+      "function": "rv_dom_html_options_collection_get_length",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLOptionsCollection",
+      "member": "length",
+      "contractOwner": "HTMLOptionsCollection",
+      "kind": "setter",
+      "function": "rv_dom_html_options_collection_set_length",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLOptionsCollection",
+      "member": "selectedIndex",
+      "contractOwner": "HTMLOptionsCollection",
+      "kind": "getter",
+      "function": "rv_dom_html_options_collection_get_selected_index",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLOptionsCollection",
+      "member": "selectedIndex",
+      "contractOwner": "HTMLOptionsCollection",
+      "kind": "setter",
+      "function": "rv_dom_html_options_collection_set_selected_index",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLOptionsCollection",
+      "member": "setItem",
+      "contractOwner": "HTMLOptionsCollection",
+      "kind": "operation",
+      "function": "rv_dom_html_options_collection_set_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "option"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "option",
+          "idlType": "HTMLOptionElement?",
+          "idl": {
+            "name": "HTMLOptionElement",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLOptionElement",
+            "root": null,
+            "class": "HTMLOptionElement",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLOptionsCollection",
+      "member": "add",
+      "contractOwner": "HTMLOptionsCollection",
+      "kind": "operation",
+      "function": "rv_dom_html_options_collection_add",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionHTMLOptionElementOrHTMLOptGroupElement*",
+          "name": "element"
+        },
+        {
+          "ctype": "const RvDomUnionHTMLElementOrLongNullable*",
+          "name": "before"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "element",
+          "idlType": "(HTMLOptionElement or HTMLOptGroupElement)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "HTMLOptionElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "HTMLOptGroupElement",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionHTMLOptionElementOrHTMLOptGroupElement",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "HTMLOptionElementOrHTMLOptGroupElement",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "HTMLOptionElement",
+                "root": null,
+                "class": "HTMLOptionElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "HTMLOptGroupElement",
+                "root": null,
+                "class": "HTMLOptGroupElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "before",
+          "idlType": "(HTMLElement or long)?",
+          "idl": {
+            "name": "union",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "HTMLElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "long",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": "null",
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionHTMLElementOrLongNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "HTMLElementOrLong",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "HTMLElement",
+                "root": null,
+                "class": "HTMLElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "number",
+                "ctype": "int32_t",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLOptionsCollection",
+      "member": "remove",
+      "contractOwner": "HTMLOptionsCollection",
+      "kind": "operation",
+      "function": "rv_dom_html_options_collection_remove",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "index"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLOptionsCollection",
+      "member": "item",
+      "contractOwner": "HTMLOptionsCollection",
+      "kind": "operation",
+      "function": "rv_dom_html_options_collection_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "HTMLOptionElement",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "HTMLOptionElement",
+        "root": null,
+        "class": "HTMLOptionElement",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "HTMLOptionsCollection",
+      "member": "namedItem",
+      "contractOwner": "HTMLOptionsCollection",
+      "kind": "operation",
+      "function": "rv_dom_html_options_collection_named_item",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvHTMLCollection*",
+          "name": "target"
+        },
+        {
+          "ctype": "const char*",
+          "name": "name"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "HTMLOptionElement",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "HTMLOptionElement",
+        "root": null,
+        "class": "HTMLOptionElement",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "DOMFormData",
+      "member": "constructor",
+      "contractOwner": "DOMFormData",
+      "kind": "constructor",
+      "function": "rv_dom_dom_form_data_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "form"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "submitter"
+        },
+        {
+          "ctype": "RvDOMFormData**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "form",
+          "idlType": "HTMLFormElement",
+          "idl": {
+            "name": "HTMLFormElement",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLFormElement",
+            "root": null,
+            "class": "HTMLFormElement",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "submitter",
+          "idlType": "HTMLElement?",
+          "idl": {
+            "name": "HTMLElement",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "null",
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLElement",
+            "root": null,
+            "class": "HTMLElement",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DOMFormData",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMFormData",
+        "root": "DOMFormData",
+        "class": "DOMFormData",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DOMFormData",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMFormData",
+      "member": "append",
+      "contractOwner": "DOMFormData",
+      "kind": "operation",
+      "function": "rv_dom_dom_form_data_append",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMFormData*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMFormData",
+      "member": "delete",
+      "contractOwner": "DOMFormData",
+      "kind": "operation",
+      "function": "rv_dom_dom_form_data_delete",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMFormData*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMFormData",
+      "member": "get",
+      "contractOwner": "DOMFormData",
+      "kind": "operation",
+      "function": "rv_dom_dom_form_data_get",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMFormData*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "RvDomUnionFileOrUSVStringNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "union",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "File",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionFileOrUSVStringNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "FileOrUSVString",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "opaque",
+            "ctype": null,
+            "interface": "File",
+            "root": null,
+            "class": "File",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMFormData",
+      "member": "getAll",
+      "contractOwner": "DOMFormData",
+      "kind": "operation",
+      "function": "rv_dom_dom_form_data_get_all",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMFormData*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "RvDomSequenceFileOrUSVString*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "File",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceFileOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "FileOrUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "union",
+            "ctype": "RvDomUnionFileOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "FileOrUSVString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "opaque",
+                "ctype": null,
+                "interface": "File",
+                "root": null,
+                "class": "File",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        ]
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMFormData",
+      "member": "has",
+      "contractOwner": "DOMFormData",
+      "kind": "operation",
+      "function": "rv_dom_dom_form_data_has",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMFormData*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DOMFormData",
+      "member": "set",
+      "contractOwner": "DOMFormData",
+      "kind": "operation",
+      "function": "rv_dom_dom_form_data_set",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMFormData*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "name"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "name_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "name",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "value",
+          "idlType": "USVString",
+          "idl": {
+            "name": "USVString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "ValidityState",
       "member": "valueMissing",
       "contractOwner": "ValidityState",
@@ -108188,6 +109772,278 @@
         "interface": null,
         "root": null,
         "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "SubmitEvent",
+      "member": "constructor",
+      "contractOwner": "SubmitEvent",
+      "kind": "constructor",
+      "function": "rv_dom_submit_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomSubmitEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "SubmitEventInit",
+          "idl": {
+            "name": "SubmitEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "SubmitEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "SubmitEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "SubmitEvent",
+        "root": null,
+        "class": "SubmitEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:SubmitEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "SubmitEvent",
+      "member": "submitter",
+      "contractOwner": "SubmitEvent",
+      "kind": "getter",
+      "function": "rv_dom_submit_event_get_submitter",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "HTMLElement",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "HTMLElement",
+        "root": null,
+        "class": "HTMLElement",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FormDataEvent",
+      "member": "constructor",
+      "contractOwner": "FormDataEvent",
+      "kind": "constructor",
+      "function": "rv_dom_form_data_event_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "type"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "type_length"
+        },
+        {
+          "ctype": "const RvDomFormDataEventInit*",
+          "name": "event_init_dict"
+        },
+        {
+          "ctype": "RvEvent**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "type",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "eventInitDict",
+          "idlType": "FormDataEventInit",
+          "idl": {
+            "name": "FormDataEventInit",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "FormDataEventInit",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "FormDataEvent",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "event",
+        "ctype": null,
+        "interface": "FormDataEvent",
+        "root": null,
+        "class": "FormDataEvent",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:FormDataEvent",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FormDataEvent",
+      "member": "formData",
+      "contractOwner": "FormDataEvent",
+      "kind": "getter",
+      "function": "rv_dom_form_data_event_get_form_data",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMFormData**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMFormData",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMFormData",
+        "root": "DOMFormData",
+        "class": "DOMFormData",
         "enum": null,
         "label": null,
         "nullable": false,
@@ -133262,6 +135118,144 @@
       "sourceKind": "iterable",
       "contextReceiver": "Document",
       "contextParameter": "context"
+    },
+    {
+      "interface": "DOMFormData",
+      "member": "entries",
+      "contractOwner": "DOMFormData",
+      "kind": "iterator_snapshot",
+      "function": "rv_dom_dom_form_data_entries",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvDOMFormData*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "RvDomSequencePairUSVStringAndUnionFileOrUSVString*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "pair",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "USVString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "union",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "File",
+                    "nullable": false,
+                    "subtypes": []
+                  },
+                  {
+                    "name": "USVString",
+                    "nullable": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequencePairUSVStringAndUnionFileOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "PairUSVStringAndUnionFileOrUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "pair",
+            "ctype": "RvDomPairUSVStringAndUnionFileOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringAndUnionFileOrUSVString entry",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionFileOrUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "FileOrUSVString",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "opaque",
+                    "ctype": null,
+                    "interface": "File",
+                    "root": null,
+                    "class": "File",
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "binding": "facade",
+      "feature": "dom-form-data-entries",
+      "sourceKind": "iterable",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
     }
   ],
   "enumerations": {
@@ -134636,6 +136630,142 @@
     },
     {
       "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionFileOrUSVStringNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "FileOrUSVString",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "opaque",
+            "ctype": null,
+            "interface": "File",
+            "root": null,
+            "class": "File",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_file_or_usv_string_nullable_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionFileOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "FileOrUSVString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "opaque",
+            "ctype": null,
+            "interface": "File",
+            "root": null,
+            "class": "File",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_file_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceFileOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "FileOrUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "union",
+            "ctype": "RvDomUnionFileOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "FileOrUSVString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "opaque",
+                "ctype": null,
+                "interface": "File",
+                "root": null,
+                "class": "File",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_file_or_usv_string_release"
+    },
+    {
+      "mapping": {
         "kind": "sequence",
         "ctype": "RvDomSequencePointerEvent",
         "interface": null,
@@ -134810,6 +136940,153 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release"
+    },
+    {
+      "mapping": {
+        "kind": "pair",
+        "ctype": "RvDomPairUSVStringAndUnionFileOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "USVStringAndUnionFileOrUSVString entry",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "union",
+            "ctype": "RvDomUnionFileOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "FileOrUSVString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "opaque",
+                "ctype": null,
+                "interface": "File",
+                "root": null,
+                "class": "File",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_pair_usv_string_and_union_file_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequencePairUSVStringAndUnionFileOrUSVString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "PairUSVStringAndUnionFileOrUSVString sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "pair",
+            "ctype": "RvDomPairUSVStringAndUnionFileOrUSVString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "USVStringAndUnionFileOrUSVString entry",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionFileOrUSVString",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "FileOrUSVString",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "opaque",
+                    "ctype": null,
+                    "interface": "File",
+                    "root": null,
+                    "class": "File",
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release"
     }
   ],
   "dictionaries": {
@@ -136031,6 +138308,162 @@
           "interface": null,
           "root": null,
           "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "SubmitEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "submitter",
+        "field": "submitter",
+        "ctype": "RvNode*",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "node",
+          "ctype": null,
+          "interface": "HTMLElement",
+          "root": null,
+          "class": "HTMLElement",
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "FormDataEventInit": [
+      {
+        "name": "bubbles",
+        "field": "bubbles",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "cancelable",
+        "field": "cancelable",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composed",
+        "field": "composed",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "formData",
+        "field": "form_data",
+        "ctype": "RvDOMFormData*",
+        "required": true,
+        "default": null,
+        "mapping": {
+          "kind": "object",
+          "ctype": null,
+          "interface": "DOMFormData",
+          "root": "DOMFormData",
+          "class": "DOMFormData",
           "enum": null,
           "label": null,
           "nullable": false,

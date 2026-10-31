@@ -61,6 +61,7 @@
 #include "DOMCSSCustomPropertyDescriptor.h"
 #include "DOMCSSNamespace.h"
 #include "DOMCSSRegisterCustomProperty.h"
+#include "DOMFormData.h"
 #include "DOMImplementation.h"
 #include "DOMMatrix.h"
 #include "DOMMatrix2DInit.h"
@@ -90,8 +91,10 @@
 #include "EventTarget.h"
 #include "Exception.h"
 #include "ExceptionOr.h"
+#include "File.h"
 #include "FocusEvent.h"
 #include "FocusOptions.h"
+#include "FormDataEvent.h"
 #include "GetComposedRangesOptions.h"
 #include "GetHTMLOptions.h"
 #include "HTMLAnchorElement.h"
@@ -274,6 +277,7 @@
 #include "StylePropertyMapReadOnly.h"
 #include "StyleSheet.h"
 #include "StyleSheetList.h"
+#include "SubmitEvent.h"
 #include "Text.h"
 #include "TreeWalker.h"
 #include "TrustedScriptURL.h"
@@ -2046,6 +2050,100 @@ template<typename V> int32_t encodeRvDomUnionDOMStringOrSequenceOfUnrestrictedDo
     return RV_OK;
 }
 
+void clearRvDomUnionFileOrUSVStringNullable(RvDomUnionFileOrUSVStringNullable* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        std::free(const_cast<uint8_t*>(value->arm1.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionFileOrUSVStringNullable(V&& value, RvDomUnionFileOrUSVStringNullable* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = nullptr;
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionFileOrUSVStringNullable<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionFileOrUSVStringNullable(V&& input, RvDomUnionFileOrUSVStringNullable* result)
+{
+    *result = { };
+    if (!input) return RV_OK;
+    auto&& value = *input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionFileOrUSVStringNullable(value, result);
+    return RV_OK;
+}
+
+void clearRvDomUnionFileOrUSVString(RvDomUnionFileOrUSVString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        std::free(const_cast<uint8_t*>(value->arm1.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionFileOrUSVString(V&& value, RvDomUnionFileOrUSVString* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = nullptr;
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionFileOrUSVString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionFileOrUSVString(V&& input, RvDomUnionFileOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionFileOrUSVString(value, result);
+    return RV_OK;
+}
+
+void clearRvDomSequenceFileOrUSVString(RvDomSequenceFileOrUSVString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionFileOrUSVString(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceFileOrUSVString(V&& input, RvDomSequenceFileOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomUnionFileOrUSVString*>(std::calloc(value.size(), sizeof(RvDomUnionFileOrUSVString))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomUnionFileOrUSVString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
 void clearRvDomSequencePointerEvent(RvDomSequencePointerEvent* value)
 {
     if (!value) return;
@@ -2131,6 +2229,46 @@ template<typename V> int32_t encodeRvDomSequencePairUSVStringAndSequenceCSSStyle
     }
     return RV_OK;
 }
+
+void clearRvDomPairUSVStringAndUnionFileOrUSVString(RvDomPairUSVStringAndUnionFileOrUSVString* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->key.data));
+    clearRvDomUnionFileOrUSVString(&value->value);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomPairUSVStringAndUnionFileOrUSVString(V&& input, RvDomPairUSVStringAndUnionFileOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->key = copyOwnedDomStringSpan(asString(value.key));
+    encodeRvDomUnionFileOrUSVString(value.value, &result->value);
+    return RV_OK;
+}
+
+void clearRvDomSequencePairUSVStringAndUnionFileOrUSVString(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomPairUSVStringAndUnionFileOrUSVString(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequencePairUSVStringAndUnionFileOrUSVString(V&& input, RvDomSequencePairUSVStringAndUnionFileOrUSVString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomPairUSVStringAndUnionFileOrUSVString*>(std::calloc(value.size(), sizeof(RvDomPairUSVStringAndUnionFileOrUSVString))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomPairUSVStringAndUnionFileOrUSVString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
 }
 
 using namespace WebCore;
@@ -2141,7 +2279,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -2168,6 +2306,8 @@ int32_t ranvier_dom_has(const char* feature)
     if (!std::strcmp(feature, "dom-css-style-values"))
         return 1;
     if (!std::strcmp(feature, "dom-css-style-map-entries"))
+        return 1;
+    if (!std::strcmp(feature, "dom-form-data-entries"))
         return 1;
     return 0;
 }
@@ -2337,6 +2477,21 @@ void ranvier_dom_union_dom_string_or_sequence_of_unrestricted_double_release(RvD
     if (isMainThread()) clearRvDomUnionDOMStringOrSequenceOfUnrestrictedDouble(value);
 }
 
+void ranvier_dom_union_file_or_usv_string_nullable_release(RvDomUnionFileOrUSVStringNullable* value)
+{
+    if (isMainThread()) clearRvDomUnionFileOrUSVStringNullable(value);
+}
+
+void ranvier_dom_union_file_or_usv_string_release(RvDomUnionFileOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomUnionFileOrUSVString(value);
+}
+
+void ranvier_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomSequenceFileOrUSVString(value);
+}
+
 void ranvier_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value)
 {
     if (isMainThread()) clearRvDomSequencePointerEvent(value);
@@ -2355,6 +2510,16 @@ void ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_r
 void ranvier_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value)
 {
     if (isMainThread()) clearRvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement(value);
+}
+
+void ranvier_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairUSVStringAndUnionFileOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomPairUSVStringAndUnionFileOrUSVString(value);
+}
+
+void ranvier_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value)
+{
+    if (isMainThread()) clearRvDomSequencePairUSVStringAndUnionFileOrUSVString(value);
 }
 
 void ranvier_dom_dom_implementation_release(RvDOMImplementation* handle)
@@ -2676,6 +2841,20 @@ RvHTMLCollection* ranvier_dom_html_collection_retain(RvHTMLCollection* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<HTMLCollection*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_dom_form_data_release(RvDOMFormData* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<DOMFormData*>(handle)->deref();
+}
+
+RvDOMFormData* ranvier_dom_dom_form_data_retain(RvDOMFormData* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<DOMFormData*>(handle)->ref();
     return handle;
 }
 
@@ -11400,6 +11579,35 @@ int32_t ranvier_dom_html_form_element_named_item(RvNode* target, const char* nam
         return RV_ERR_WRONG_INTERFACE;
     StringArg a0 { name };
     return deliver([&]() -> decltype(auto) { return impl->namedItem(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return encodeRvDomUnionRadioNodeListOrElementNullable(value, result); });
+}
+
+// HTMLFormElement.submit() -> undefined
+int32_t ranvier_dom_html_form_element_submit(RvNode* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->submitFromJavaScript(); });
+}
+
+// HTMLFormElement.requestSubmit(optional HTMLElement? submitter) -> undefined; submitter may be NULL
+int32_t ranvier_dom_html_form_element_request_submit(RvNode* target, RvNode* submitter)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFormElement>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<HTMLElement> a0 = submitter ? dynamicDowncast<HTMLElement>(*nodeOf(submitter)) : nullptr;
+    if (submitter && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->requestSubmit(a0.get()); });
 }
 
 // HTMLFormElement.reset() -> undefined
@@ -29033,6 +29241,261 @@ int32_t ranvier_dom_html_collection_named_item(RvHTMLCollection* target, const c
     return deliver([&]() -> decltype(auto) { return impl->namedItem(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
 }
 
+// HTMLFormControlsCollection.item(unsigned long index) -> HTMLElement?; *result is a new reference, or NULL
+int32_t ranvier_dom_html_form_controls_collection_item(RvHTMLCollection* target, uint32_t index, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFormControlsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLFormControlsCollection.namedItem(DOMString name) -> (RadioNodeList or Element)?; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_html_form_controls_collection_named_item(RvHTMLCollection* target, const char* name, RvDomUnionRadioNodeListOrElementNullable* result)
+{
+    if (!target || !name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLFormControlsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { name };
+    return deliver([&]() -> decltype(auto) { return impl->namedItemOrItems(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return encodeRvDomUnionRadioNodeListOrElementNullable(value, result); });
+}
+
+// HTMLOptionsCollection.length getter: attribute unsigned long length
+int32_t ranvier_dom_html_options_collection_get_length(RvHTMLCollection* target, uint32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLOptionsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+}
+
+// HTMLOptionsCollection.length setter: attribute unsigned long length
+int32_t ranvier_dom_html_options_collection_set_length(RvHTMLCollection* target, uint32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLOptionsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setLength(value); });
+}
+
+// HTMLOptionsCollection.selectedIndex getter: attribute long selectedIndex
+int32_t ranvier_dom_html_options_collection_get_selected_index(RvHTMLCollection* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLOptionsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->selectedIndex(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// HTMLOptionsCollection.selectedIndex setter: attribute long selectedIndex
+int32_t ranvier_dom_html_options_collection_set_selected_index(RvHTMLCollection* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLOptionsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setSelectedIndex(value); });
+}
+
+// HTMLOptionsCollection.setItem(unsigned long index, HTMLOptionElement? option) -> undefined; option may be NULL
+int32_t ranvier_dom_html_options_collection_set_item(RvHTMLCollection* target, uint32_t index, RvNode* option)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLOptionsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<HTMLOptionElement> a1 = option ? dynamicDowncast<HTMLOptionElement>(*nodeOf(option)) : nullptr;
+    if (option && !a1)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setItem(index, a1.get()); });
+}
+
+// HTMLOptionsCollection.add((HTMLOptionElement or HTMLOptGroupElement) element, optional (HTMLElement or long)? before = null) -> undefined; before defaults to null in IDL
+int32_t ranvier_dom_html_options_collection_add(RvHTMLCollection* target, const RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* element, const RvDomUnionHTMLElementOrLongNullable* before)
+{
+    if (!target || !element)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLOptionsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionHTMLOptionElementOrHTMLOptGroupElement(element, status0);
+    if (status0 != RV_OK) return status0;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionHTMLElementOrLongNullable(before, status1);
+    if (status1 != RV_OK) return status1;
+    return invoke([&]() -> decltype(auto) { return impl->add(std::move(*a0), std::move(*a1)); });
+}
+
+// HTMLOptionsCollection.remove(long index) -> undefined
+int32_t ranvier_dom_html_options_collection_remove(RvHTMLCollection* target, int32_t index)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLOptionsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->remove(index); });
+}
+
+// HTMLOptionsCollection.item(unsigned long index) -> HTMLOptionElement?; *result is a new reference, or NULL
+int32_t ranvier_dom_html_options_collection_item(RvHTMLCollection* target, uint32_t index, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLOptionsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// HTMLOptionsCollection.namedItem(DOMString name) -> HTMLOptionElement?; *result is a new reference, or NULL
+int32_t ranvier_dom_html_options_collection_named_item(RvHTMLCollection* target, const char* name, RvNode** result)
+{
+    if (!target || !name || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<HTMLOptionsCollection>(*reinterpret_cast<HTMLCollection*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { name };
+    return deliver([&]() -> decltype(auto) { return impl->namedItem(StringView { a0.string() }.toExistingAtomString()); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// DOMFormData.constructor: target is the Document of the constructed object; form may be NULL; submitter defaults to null in IDL; submitter may be NULL; *result is a new reference
+int32_t ranvier_dom_dom_form_data_create(RvNode* target, RvNode* form, RvNode* submitter, RvDOMFormData** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<HTMLFormElement> a0 = form ? dynamicDowncast<HTMLFormElement>(*nodeOf(form)) : nullptr;
+    if (form && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<HTMLElement> a1 = submitter ? dynamicDowncast<HTMLElement>(*nodeOf(submitter)) : nullptr;
+    if (submitter && !a1)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DOMFormData::create(*impl, a0.get(), a1.get()); }, [&](auto&& value) { return storeHandle<DOMFormData>(value, result); });
+}
+
+// DOMFormData.append(USVString name, USVString value) -> undefined
+int32_t ranvier_dom_dom_form_data_append(RvDOMFormData* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMFormData> impl = reinterpret_cast<DOMFormData*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { value, value_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->append(a0.string(), a1.string()); });
+}
+
+// DOMFormData.delete(USVString name) -> undefined
+int32_t ranvier_dom_dom_form_data_delete(RvDOMFormData* target, const uint8_t* name, int32_t name_length)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMFormData> impl = reinterpret_cast<DOMFormData*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->remove(a0.string()); });
+}
+
+// DOMFormData.get(USVString name) -> FormDataEntryValue?; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_dom_form_data_get(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvDomUnionFileOrUSVStringNullable* result)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMFormData> impl = reinterpret_cast<DOMFormData*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->get(a0.string()); }, [&](auto&& value) { return encodeRvDomUnionFileOrUSVStringNullable(value, result); });
+}
+
+// DOMFormData.getAll(USVString name) -> sequence<FormDataEntryValue>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_dom_form_data_get_all(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvDomSequenceFileOrUSVString* result)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMFormData> impl = reinterpret_cast<DOMFormData*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->getAll(a0.string()); }, [&](auto&& value) { return encodeRvDomSequenceFileOrUSVString(value, result); });
+}
+
+// DOMFormData.has(USVString name) -> boolean
+int32_t ranvier_dom_dom_form_data_has(RvDOMFormData* target, const uint8_t* name, int32_t name_length, int32_t* result)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMFormData> impl = reinterpret_cast<DOMFormData*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->has(a0.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// DOMFormData.set(USVString name, USVString value) -> undefined
+int32_t ranvier_dom_dom_form_data_set(RvDOMFormData* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(name_length >= 0 && (name_length <= 0 || name)) || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMFormData> impl = reinterpret_cast<DOMFormData*>(target);
+    StringArg a0 { name, name_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { value, value_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->set(a0.string(), a1.string()); });
+}
+
 // ValidityState.valueMissing getter: readonly attribute boolean valueMissing
 int32_t ranvier_dom_validity_state_get_value_missing(RvValidityState* target, int32_t* result)
 {
@@ -30223,6 +30686,91 @@ int32_t ranvier_dom_composition_event_get_data(RvEvent* target, char* buffer, in
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->data(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// SubmitEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_submit_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomSubmitEventInit* event_init_dict, RvEvent** result)
+{
+    if (!target || !(type_length >= 0 && (type_length <= 0 || type)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { type, type_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    SubmitEvent::Init a1 { };
+    if (event_init_dict) {
+        if (event_init_dict->size >= offsetof(RvDomSubmitEventInit, bubbles) + sizeof(event_init_dict->bubbles))
+            assignValue(a1.bubbles, !!event_init_dict->bubbles);
+        if (event_init_dict->size >= offsetof(RvDomSubmitEventInit, cancelable) + sizeof(event_init_dict->cancelable))
+            assignValue(a1.cancelable, !!event_init_dict->cancelable);
+        if (event_init_dict->size >= offsetof(RvDomSubmitEventInit, composed) + sizeof(event_init_dict->composed))
+            assignValue(a1.composed, !!event_init_dict->composed);
+        if (event_init_dict->size >= offsetof(RvDomSubmitEventInit, submitter) + sizeof(event_init_dict->submitter) && event_init_dict->submitter) {
+            RefPtr value = dynamicDowncast<HTMLElement>(*nodeOf(event_init_dict->submitter));
+            if (!value)
+                return RV_ERR_WRONG_INTERFACE;
+            a1.submitter = value.get();
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return SubmitEvent::create(a0.atom(), std::move(a1)); }, [&](auto&& value) { return storeHandle<Event>(value, result); });
+}
+
+// SubmitEvent.submitter getter: readonly attribute HTMLElement? submitter; *result is a new reference, or NULL
+int32_t ranvier_dom_submit_event_get_submitter(RvEvent* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<SubmitEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->submitter(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// FormDataEvent.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_form_data_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomFormDataEventInit* event_init_dict, RvEvent** result)
+{
+    if (!target || !(type_length >= 0 && (type_length <= 0 || type)) || !event_init_dict || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { type, type_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    if (!(event_init_dict->size >= offsetof(RvDomFormDataEventInit, form_data) + sizeof(event_init_dict->form_data)) || !event_init_dict->form_data)
+        return RV_ERR_NULL_ARGUMENT;
+    RefPtr<DOMFormData> a1form_data = reinterpret_cast<DOMFormData*>(event_init_dict->form_data);
+    if (!a1form_data)
+        return RV_ERR_WRONG_INTERFACE;
+    FormDataEvent::Init a1 { { }, a1form_data.releaseNonNull() };
+    if (event_init_dict) {
+        if (event_init_dict->size >= offsetof(RvDomFormDataEventInit, bubbles) + sizeof(event_init_dict->bubbles))
+            assignValue(a1.bubbles, !!event_init_dict->bubbles);
+        if (event_init_dict->size >= offsetof(RvDomFormDataEventInit, cancelable) + sizeof(event_init_dict->cancelable))
+            assignValue(a1.cancelable, !!event_init_dict->cancelable);
+        if (event_init_dict->size >= offsetof(RvDomFormDataEventInit, composed) + sizeof(event_init_dict->composed))
+            assignValue(a1.composed, !!event_init_dict->composed);
+    }
+    return deliver([&]() -> decltype(auto) { return FormDataEvent::create(a0.atom(), std::move(a1)); }, [&](auto&& value) { return storeHandle<Event>(value, result); });
+}
+
+// FormDataEvent.formData getter: readonly attribute DOMFormData formData; *result is a new reference
+int32_t ranvier_dom_form_data_event_get_form_data(RvEvent* target, RvDOMFormData** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> FormDataEvent* { auto& event = *eventOf(target); return event.interfaceType() == EventInterfaceType::FormDataEvent ? static_cast<FormDataEvent*>(&event) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->formData(); }, [&](auto&& value) { return storeConstGetter<DOMFormData, DOMFormData>(value, result); });
 }
 
 // SVGGraphicsElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new reference
@@ -37721,6 +38269,21 @@ int32_t ranvier_dom_style_property_map_read_only_entries(RvStylePropertyMapReadO
         return RV_ERR_WRONG_INTERFACE;
     Ref document = contextDocument.releaseNonNull();
     return deliver([&]() -> decltype(auto) { return ([&]() { Vector<KeyValuePair<String, Vector<RefPtr<CSSStyleValue>>>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement(value, result); });
+}
+
+// DOMFormData.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document for the operation; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* context, RvDomSequencePairUSVStringAndUnionFileOrUSVString* result)
+{
+    if (!target || !context || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DOMFormData> impl = reinterpret_cast<DOMFormData*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    return deliver([&]() -> decltype(auto) { return ([&]() { Vector<KeyValuePair<String, Variant<Ref<File>, String>>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequencePairUSVStringAndUnionFileOrUSVString(value, result); });
 }
 
 int32_t ranvier_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length)

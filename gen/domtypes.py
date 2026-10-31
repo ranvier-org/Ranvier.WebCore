@@ -31,7 +31,7 @@ class ComplexGeneratorMixin:
         if mapped.kind not in ('union', 'sequence', 'pair'):
             if mapped.kind == 'dict':
                 self.use_dictionary(mapped.interface)
-            elif mapped.kind in ('node', 'event', 'object'):
+            elif mapped.kind in ('node', 'event', 'object', 'opaque'):
                 self.headers.add(f'{mapped.cls}.h')
             elif mapped.kind == 'enum':
                 self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
@@ -57,6 +57,8 @@ class ComplexGeneratorMixin:
             return 'RvDomUtf8StringSpan' if mapped.string_spans else 'const char*'
         if mapped.kind in ('node', 'event', 'object'):
             return f'{mapped.handle}*'
+        if mapped.kind == 'opaque':
+            return 'void*'
         if mapped.kind == 'dict':
             return f'const {mapped.handle}*'
         if mapped.kind in ('union', 'sequence', 'pair'):
@@ -75,7 +77,7 @@ class ComplexGeneratorMixin:
             return mapped.ctype
         if kind == 'enum':
             return mapped.enum
-        if kind in ('node', 'event', 'object'):
+        if kind in ('node', 'event', 'object', 'opaque'):
             return f'{"RefPtr" if mapped.nullable else "Ref"}<{mapped.cls}>'
         if kind == 'dict':
             return self.dictionary_cpp(mapped.interface)
@@ -86,6 +88,9 @@ class ComplexGeneratorMixin:
         else:
             value = f'Vector<{self.transport_cpp(mapped.subtypes[0])}>'
         return f'std::optional<{value}>' if mapped.nullable else value
+
+    def contains_opaque(self, mapped):
+        return mapped.kind == 'opaque' or any(self.contains_opaque(child) for child in mapped.subtypes)
 
     def contains_string_spans(self, mapped):
         return mapped.kind == 'string' and mapped.string_spans or any(self.contains_string_spans(child) for child in mapped.subtypes)
@@ -119,7 +124,8 @@ class ComplexGeneratorMixin:
             else:
                 lines += ['    int32_t tag;']
                 for index, child in enumerate(mapped.subtypes):
-                    lines += [f'    {self.transport_ctype(child)} arm{index};']
+                    note = f' /* {child.interface}: NULL; the tag identifies the arm */' if child.kind == 'opaque' else ''
+                    lines += [f'    {self.transport_ctype(child)} arm{index};{note}']
             lines += ['};']
         return lines
 
@@ -162,6 +168,8 @@ class ComplexGeneratorMixin:
             lines += [f'RefPtr<{mapped.cls}> {variable} = {converted};',
                       f'if ({expression} && !{variable}) {{ status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }}']
             return lines, f'{cpp} {{ {variable}.get() }}' if mapped.nullable else f'Ref {{ *{variable} }}'
+        if kind == 'opaque':
+            raise self.unsupported_type(f'opaque {mapped.interface} input')
         if kind == 'dict':
             fields = self.use_dictionary(mapped.interface)
             lines = [f'{cpp} {variable} {{ }};', f'if ({expression}) {{',
@@ -185,6 +193,8 @@ class ComplexGeneratorMixin:
             return [f'{target} = copyOwnedDomString(asString({expression}));']
         if kind in ('number', 'bool', 'enum'):
             return [f'{target} = static_cast<{self.transport_ctype(mapped)}>({expression});']
+        if kind == 'opaque':
+            return [f'{target} = nullptr;']
         if kind in ('node', 'event', 'object'):
             root = {'node': 'Node', 'event': 'Event'}.get(kind) or self.world.cpp_class(mapped.root)
             if root in self.tracked_roots:
@@ -234,39 +244,37 @@ class ComplexGeneratorMixin:
                       '    return { result, static_cast<int32_t>(utf8.length()) };', '}']
         for name, mapped in self.complex_used.items():
             cpp = self.transport_cpp(mapped)
-            decoder_start = len(lines)
-            lines += ['', f'std::optional<{cpp}> decode{name}(const {name}* source, int32_t& status)', '{']
-            if self.contains_string_spans(mapped):
-                lines += ['    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }']
-            if mapped.nullable:
-                lines += [f'    if (!source || !source->present) return std::optional<{cpp}> {{ std::in_place, std::nullopt }};']
-            else:
-                lines += ['    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }']
-            if mapped.kind == 'sequence':
-                element = mapped.subtypes[0]
-                value_cpp = f'Vector<{self.transport_cpp(element)}>'
-                lines += ['    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }',
-                          f'    {value_cpp} result;', '    result.reserveInitialCapacity(source->count);',
-                          '    for (int32_t i = 0; i < source->count; ++i) {']
-                decoded, value = self.decode_value(element, 'source->items[i]', 'item')
-                lines += ['        ' + line for line in decoded] + [f'        result.append({value});', '    }',
-                          f'    return {cpp} {{ std::move(result) }};', '}']
-            elif mapped.kind == 'pair':
-                for index, field in enumerate(['key', 'value']):
-                    decoded, value = self.decode_value(mapped.subtypes[index], f'source->{field}', field)
-                    lines += ['    ' + line for line in decoded]
-                    lines += [f'    auto decoded{index} = {value};']
-                lines += [f'    return {cpp} {{ std::move(decoded0), std::move(decoded1) }};', '}']
-            else:
-                value_cpp = 'Variant<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
-                lines += ['    switch (source->tag) {']
-                for index, child in enumerate(mapped.subtypes):
-                    decoded, value = self.decode_value(child, f'source->arm{index}', f'arm{index}')
-                    lines += [f'    case {index + 1}: {{'] + ['        ' + line for line in decoded]
-                    lines += [f'        return {cpp} {{ {value_cpp} {{ WTF::InPlaceIndex<{index}>, {value} }} }};', '    }']
-                lines += ['    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;', '    }', '}']
-            if name not in self.complex_inputs:
-                del lines[decoder_start:]
+            if name in self.complex_inputs:
+                lines += ['', f'std::optional<{cpp}> decode{name}(const {name}* source, int32_t& status)', '{']
+                if self.contains_string_spans(mapped):
+                    lines += ['    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }']
+                if mapped.nullable:
+                    lines += [f'    if (!source || !source->present) return std::optional<{cpp}> {{ std::in_place, std::nullopt }};']
+                else:
+                    lines += ['    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }']
+                if mapped.kind == 'sequence':
+                    element = mapped.subtypes[0]
+                    value_cpp = f'Vector<{self.transport_cpp(element)}>'
+                    lines += ['    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }',
+                              f'    {value_cpp} result;', '    result.reserveInitialCapacity(source->count);',
+                              '    for (int32_t i = 0; i < source->count; ++i) {']
+                    decoded, value = self.decode_value(element, 'source->items[i]', 'item')
+                    lines += ['        ' + line for line in decoded] + [f'        result.append({value});', '    }',
+                              f'    return {cpp} {{ std::move(result) }};', '}']
+                elif mapped.kind == 'pair':
+                    for index, field in enumerate(['key', 'value']):
+                        decoded, value = self.decode_value(mapped.subtypes[index], f'source->{field}', field)
+                        lines += ['    ' + line for line in decoded]
+                        lines += [f'    auto decoded{index} = {value};']
+                    lines += [f'    return {cpp} {{ std::move(decoded0), std::move(decoded1) }};', '}']
+                else:
+                    value_cpp = 'Variant<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
+                    lines += ['    switch (source->tag) {']
+                    for index, child in enumerate(mapped.subtypes):
+                        decoded, value = self.decode_value(child, f'source->arm{index}', f'arm{index}')
+                        lines += [f'    case {index + 1}: {{'] + ['        ' + line for line in decoded]
+                        lines += [f'        return {cpp} {{ {value_cpp} {{ WTF::InPlaceIndex<{index}>, {value} }} }};', '    }']
+                    lines += ['    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;', '    }', '}']
             lines += ['', f'void clear{name}({name}* value)', '{', '    if (!value) return;']
             if mapped.kind == 'sequence':
                 lines += ['    for (int32_t i = 0; i < value->count; ++i) {']

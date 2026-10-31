@@ -1,5 +1,6 @@
 import json
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
@@ -660,6 +661,73 @@ interface StylePropertyMapReadOnly {
         operation = next(item for item in model['functions'] if item['function'] == 'rv_dom_style_property_map_read_only_entries')
         self.assertEqual('facade', operation['binding'])
         self.assertEqual('iterable', operation['sourceKind'])
+
+    def form_data_generator(self, extra=''):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary EventInit { boolean bubbles = false; [ImplementedAs=trustedForBindingsOnly] boolean trusted = false; };
+interface File {};
+typedef (File or USVString) FormDataEntryValue;
+interface DOMFormData {
+    undefined append(USVString name, USVString value);
+    FormDataEntryValue? get(USVString name);
+    sequence<FormDataEntryValue> getAll(USVString name);
+    iterable<USVString, FormDataEntryValue>;
+};
+dictionary FormDataEventInit : EventInit { required DOMFormData formData; };
+interface FormDataEvent : Event {
+    constructor([AtomString] DOMString type, FormDataEventInit eventInitDict);
+    readonly attribute DOMFormData formData;
+};
+''' + extra)
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['DOMFormData', 'FormDataEvent']
+        config['exclude'] = list(config['exclude']) + ['EventInit.trusted']
+        config['opaqueUnionArms'] = ['File']
+        config['complexStringSpans'] = ['FileOrUSVString']
+        config['interfaceStringInputs'] = {'DOMFormData': 'utf8-lengths'}
+        config['objectContexts'] = {'DOMFormData': 'Document'}
+        config['iterableBindings'] = {'DOMFormData': {'feature': 'dom-form-data-entries'}}
+        config['dictionaryObjectMembers'] = ['FormDataEventInit.formData']
+        config['dictionaryCppTypes'] = {'FormDataEventInit': 'FormDataEvent::Init'}
+        config['eventInterfaceCasts'] = ['FormDataEvent']
+        config['constructors'] = {'FormDataEvent': {'receiver': 'Document', 'factory': 'FormDataEvent::create',
+                                                    'passReceiver': False, 'stringInputs': 'utf8-lengths'}}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
+    def test_opaque_union_arm_returns_a_tag_with_a_null_payload_and_no_decoder(self):
+        generator = self.form_data_generator()
+        names = {function.name for function in generator.functions}
+        self.assertTrue({'dom_form_data_get', 'dom_form_data_get_all', 'dom_form_data_entries'} <= names)
+        header = generator.header()
+        self.assertIn('void* arm0; /* File: NULL; the tag identifies the arm */', header)
+        self.assertIn('RvDomUtf8StringSpan arm1;', header)
+        glue = generator.glue()
+        self.assertNotIn('decodeRvDomUnionFileOrUSVString', glue)
+        self.assertIn('result->arm0 = nullptr;', glue)
+
+    def test_opaque_union_arm_is_refused_as_an_input_or_a_bare_result(self):
+        generator = self.form_data_generator('''
+partial interface DOMFormData { undefined take(FormDataEntryValue value); File file(); };
+''')
+        names = {function.name for function in generator.functions}
+        self.assertNotIn('dom_form_data_take', names)
+        self.assertNotIn('dom_form_data_file', names)
+        reasons = dict(generator.excluded)
+        self.assertEqual('an opaque interface is a union result arm only', reasons['DOMFormData.take'])
+        self.assertEqual('an opaque interface is a union result arm only', reasons['DOMFormData.file'])
+
+    def test_required_dictionary_object_member_builds_the_init_with_its_reference(self):
+        generator = self.form_data_generator()
+        self.assertIn('RvDOMFormData* form_data; /* DOMFormData, required */', generator.header())
+        self.assertNotIn('trusted', generator.header().split('RvDomFormDataEventInit {')[1].split('}')[0])
+        glue = generator.glue()
+        self.assertIn('FormDataEvent::Init a1 { { }, a1form_data.releaseNonNull() };', glue)
+        self.assertIn('event.interfaceType() == EventInterfaceType::FormDataEvent', glue)
 
     def test_selected_nullable_sequence_elements_do_not_reuse_the_nonnullable_container(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
@@ -1798,6 +1866,49 @@ SVGStyleElement includes LinkStyle;
                 case = lines[index + 1].strip()
                 self.assertFalse(case.startswith('|') and '=' in case, line)
         self.assertIn('and NodeFilterResult =', lines)
+
+    def test_fable_adapters_are_not_shadowed_by_inherited_intrinsic_members(self):
+        # F# prefers an intrinsic member to an extension, so a Fable adapter extension on an interface is unreachable
+        # while an ancestor declares an intrinsic member of the same name.
+        fable, keep, stack = [], True, []
+        for line in (ROOT / 'gen' / 'Ranvier.Dom.fs').read_text(encoding='utf-8').splitlines():
+            directive = line.strip()
+            if directive == '#if FABLE_COMPILER':
+                stack.append(keep)
+            elif directive.startswith('#if '):
+                stack.append(keep)
+                keep = keep and directive != '#if !FABLE_COMPILER'
+            elif directive == '#else':
+                keep = stack[-1] and not keep
+            elif directive == '#endif':
+                keep = stack.pop()
+            elif keep:
+                fable.append(line)
+        bases, intrinsic, extensions, current = {}, {}, {}, None
+        for line in fable:
+            declared = re.match(r'(?:type|and) (?:\[<[^>]*>\] )*(\w+) =$', line)
+            extended = re.match(r'    type (\w+) with$', line)
+            if declared:
+                current = ('interface', declared.group(1))
+                bases.setdefault(current[1], [])
+            elif extended:
+                current = ('extension', extended.group(1))
+            elif current and current[0] == 'interface' and (match := re.match(r'    inherit (\w+)$', line)):
+                bases[current[1]].append(match.group(1))
+            elif current and current[0] == 'interface' and (match := re.match(r'    abstract member (\w+)', line)):
+                intrinsic.setdefault(current[1], set()).add(match.group(1))
+            elif current and current[0] == 'extension' and (match := re.match(r'        member this\.(\w+)', line)):
+                extensions.setdefault(current[1], set()).add(match.group(1))
+
+        def ancestors(name):
+            for base in bases.get(name, []):
+                yield base
+                yield from ancestors(base)
+
+        shadowed = sorted((owner, member, ancestor) for owner, members in extensions.items() for member in members
+                          for ancestor in ancestors(owner) if member in intrinsic.get(ancestor, set()))
+        self.assertEqual([], shadowed)
+        self.assertIn('namedItem', extensions['HTMLFormControlsCollection'])
 
 if __name__ == '__main__':
     unittest.main()

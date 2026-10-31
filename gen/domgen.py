@@ -376,7 +376,10 @@ class World:
             if mapped.kind == "dict" and (name not in self.config.get("nestedDictionaries", [])
                                           or member.required or not empty_default or mapped.nullable):
                 raise Unsupported(f"dictionary {name}: nested member {member.name} requires an opted-in nonnullable empty default")
-            if mapped.kind in ("object", "event") or mapped.interface == "EventTarget":
+            configured_object = f"{name}.{member.name}" in self.config.get("dictionaryObjectMembers", [])
+            if configured_object and (mapped.kind != "object" or not member.required or mapped.nullable):
+                raise SystemExit(f"{name}.{member.name}: dictionary object members must be required nonnullable object handles")
+            if (mapped.kind in ("object", "event") and not configured_object) or mapped.interface == "EventTarget":
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
             found.append((member, mapped))
         return found
@@ -397,6 +400,8 @@ class World:
             return Mapped("enum", False, "int32_t", enum=t.name)
         if t.name == "EventTarget":
             return Mapped("node", t.nullable, interface="EventTarget", cls="EventTarget")
+        if t.name in self.config.get('opaqueUnionArms', []):
+            return Mapped('opaque', t.nullable, interface=t.name, cls=self.cpp_class(t.name))
         if t.name in self.interfaces and not self.interfaces[t.name].mixin:
             if self.interfaces[t.name].callback:
                 if t.name not in self.config.get("callbackObjectRoots", []) or t.name not in self.scope:
@@ -937,6 +942,9 @@ class Generator(ComplexGeneratorMixin):
             matches = " || ".join(f"element->hasTagName(HTMLNames::{tag}Tag)" for tag in tags)
             return (f"([&]() -> {cls}* {{ auto* element = dynamicDowncast<HTMLElement>({value}); "
                     f"return element && ({matches}) ? static_cast<{cls}*>(element) : nullptr; }}())")
+        if root == "Event" and cls in self.world.config.get("eventInterfaceCasts", []):
+            return (f"([&]() -> {cls}* {{ auto& event = {value}; return event.interfaceType() == EventInterfaceType::{cls} "
+                    f"? static_cast<{cls}*>(&event) : nullptr; }}())")
         via = self.world.config.get("castVia", {}).get(cls)
         if via:
             self.headers.add(f"{via}.h")
@@ -1079,14 +1087,31 @@ class Generator(ComplexGeneratorMixin):
             if self.world.config.get("dictionaryStringInputs", {}).get(dictionary) == "utf8-lengths-presence":
                 return "RvDomUtf8StringInput"
             return "const char*"
-        if mapped.kind == "node":
-            return "RvNode*"
+        if mapped.kind in ("node", "object"):
+            return f"{mapped.handle}*"
         if mapped.kind == "dict":
             return f"const {mapped.handle}*"
         if mapped.kind in ("union", "sequence"):
             return f"const {mapped.ctype}*"
         ctype = mapped.ctype
         return f"const {ctype}*" if absent else ctype
+
+    def dictionary_object_prefix(self, pointer, struct, cpp, target, dictionary, objects, argument):
+        """Reads a dictionary's one required object member first: its C++ struct holds a Ref and has no default."""
+        own = self.world.dictionaries[dictionary]
+        if (len(objects) != 1 or argument.optional or not own.base or len(own.members) != 1
+                or own.members[0].name != objects[0][0].name):
+            raise SystemExit(f"{dictionary}: an object member must be the one own member of a derived dictionary argument")
+        member, mapped = objects[0]
+        field = c_name(member.name)
+        root = self.world.cpp_class(mapped.root)
+        self.headers.add(f"{mapped.cls}.h")
+        covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
+        source = f"reinterpret_cast<{root}*>({pointer}->{field})"
+        cast = source if root == mapped.cls else self.cast_expression(mapped.cls, root, f"*{source}")
+        return [f"if (!({covered}) || !{pointer}->{field})", "    return RV_ERR_NULL_ARGUMENT;",
+                f"RefPtr<{mapped.cls}> {target}{field} = {cast};", f"if (!{target}{field})", "    return RV_ERR_WRONG_INTERFACE;",
+                f"{cpp} {target} {{ {{ }}, {target}{field}.releaseNonNull() }};"]
 
     def dictionary_field(self, pointer, struct, target, member, mapped, dictionary=None):
         """The glue that copies one field of a C dictionary into the C++ one, when the struct's size covers it."""
@@ -1095,6 +1120,8 @@ class Generator(ComplexGeneratorMixin):
         covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
         ctype = self.field_ctype(member, mapped, dictionary)
         lines = []
+        if mapped.kind == "object":
+            raise Unsupported(f"dictionary object member {member.name} outside a derived dictionary argument")
         if member.required:
             lines += [f"if (!({covered}))", "    return RV_ERR_NULL_ARGUMENT;"]
             covered = "true"
@@ -1296,6 +1323,8 @@ class Generator(ComplexGeneratorMixin):
             self.headers.add('DOMMatrixReadOnly.h')
         if self.world.config.get('interfaceStringInputs', {}).get(function.interface) == 'utf8-lengths':
             function.string_spans = True
+        if returns.kind == 'opaque' or any(self.contains_opaque(mapped) for mapped in mapped_args):
+            raise Unsupported('an opaque interface is a union result arm only')
         self_type = self.self_param(interface)
         params = [(self_type, "target")]
         checks = ["target"]
@@ -1386,9 +1415,15 @@ class Generator(ComplexGeneratorMixin):
                 else:
                     notes.append(f"{name} may be NULL for the IDL default")
                 cpp = self.dictionary_cpp(mapped.interface)
-                prepare.append(f"{cpp} a{index} {{ }};")
+                objects = [(field_member, field_mapped) for field_member, field_mapped in fields if field_mapped.kind == "object"]
+                if objects:
+                    prepare += self.dictionary_object_prefix(name, struct, cpp, f"a{index}", mapped.interface, objects, argument)
+                else:
+                    prepare.append(f"{cpp} a{index} {{ }};")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
+                    if field_mapped.kind == "object":
+                        continue
                     prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped, mapped.interface)]
                 prepare.append("}")
                 if svg_matrix_binding:
@@ -1437,7 +1472,8 @@ class Generator(ComplexGeneratorMixin):
                 if mapped.cls == base:
                     prepare.append(f"RefPtr<{base}> a{index} = {accessor}({name});")
                 else:
-                    cast = (self.cast_expression(mapped.cls, base, f'*{accessor}({name})') if base in self.tracked_roots
+                    cast = (self.cast_expression(mapped.cls, base, f'*{accessor}({name})')
+                            if base in self.tracked_roots or base == 'Event'
                             else f'dynamicDowncast<{mapped.cls}>(*{accessor}({name}))')
                     prepare.append(f"RefPtr<{mapped.cls}> a{index} = {name} ? {cast} : nullptr;")
                     prepare.append(f"if ({name} && !a{index})")
@@ -1519,7 +1555,7 @@ class Generator(ComplexGeneratorMixin):
             if cls == "Event":
                 body.append("RefPtr<Event> impl = eventOf(target);")
             else:
-                body += [f"RefPtr impl = dynamicDowncast<{cls}>(*eventOf(target));", "if (!impl)", "    return RV_ERR_WRONG_INTERFACE;"]
+                body += [f"RefPtr impl = {self.cast_expression(cls, 'Event', '*eventOf(target)')};", "if (!impl)", "    return RV_ERR_WRONG_INTERFACE;"]
         else:
             root_cls = self.world.cpp_class(chain[-1])
             if root_cls == cls:
