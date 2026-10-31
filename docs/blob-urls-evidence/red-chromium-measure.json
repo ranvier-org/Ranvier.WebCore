@@ -1,0 +1,1778 @@
+{
+  "browser": "156.0.8078.4",
+  "headless": "new",
+  "blank": {
+    "format": {
+      "origin": "null",
+      "distinct": true,
+      "matches": true,
+      "selfOrigin": "null"
+    },
+    "fetch": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "text/plain",
+        "length": "3",
+        "text": "abc"
+      }
+    },
+    "fetchEmpty": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "",
+        "length": "0",
+        "text": ""
+      }
+    },
+    "fetchSlice": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "",
+        "length": "3",
+        "text": "234"
+      }
+    },
+    "fetchRevoked": {
+      "ok": false,
+      "name": "TypeError"
+    },
+    "fetchOtherStillLive": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "text/plain",
+        "length": "3",
+        "text": "abc"
+      }
+    },
+    "revokeTwice": "ok",
+    "fetchUnknown": {
+      "ok": false,
+      "name": "TypeError"
+    },
+    "fetchFragment": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "text/plain",
+        "length": "3",
+        "text": "abc"
+      }
+    },
+    "img": {
+      "event": "load",
+      "w": 7,
+      "h": 5
+    },
+    "imgRevoked": {
+      "event": "error",
+      "w": 0,
+      "h": 0
+    },
+    "imgGif": {
+      "event": "load",
+      "w": 3,
+      "h": 2
+    },
+    "imgGifUntyped": {
+      "event": "load",
+      "w": 3,
+      "h": 2
+    },
+    "imgGarbage": {
+      "event": "error",
+      "w": 0,
+      "h": 0
+    },
+    "iframe": {
+      "event": "load",
+      "text": "framed",
+      "origin": "null"
+    },
+    "iframeRevoked": {
+      "event": "timeout"
+    },
+    "teardown": {
+      "before": {
+        "ok": true,
+        "v": {
+          "status": 200,
+          "type": "",
+          "length": "5",
+          "text": "child"
+        }
+      },
+      "after": {
+        "ok": false,
+        "name": "TypeError"
+      }
+    },
+    "reader": {
+      "arrayBuffer": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "ArrayBuffer",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "ArrayBuffer",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": {
+            "hex": "68c3a9ff4100"
+          },
+          "error": null
+        }
+      },
+      "text": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "hé�A\u0000",
+          "error": null
+        }
+      },
+      "textLatin1": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "hÃ©ÿA\u0000",
+          "error": null
+        }
+      },
+      "textUtf16": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "AB",
+          "error": null
+        }
+      },
+      "textBogusLabel": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 3
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 3
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 3
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 3
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "hé",
+          "error": null
+        }
+      },
+      "textBomWins": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "A",
+          "error": null
+        }
+      },
+      "binaryString": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "hÃ©ÿA\u0000",
+          "error": null
+        }
+      },
+      "dataUrl": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "data:text/plain;charset=latin1;base64,aMOp/0EA",
+          "error": null
+        }
+      },
+      "dataUrlEmpty": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "data:application/octet-stream;base64,",
+          "error": null
+        }
+      },
+      "empty": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "ArrayBuffer",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "ArrayBuffer",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": {
+            "hex": ""
+          },
+          "error": null
+        }
+      },
+      "abortSync": {
+        "events": [
+          "abort",
+          "loadend",
+          "sync:1"
+        ],
+        "states": {
+          "abort": {
+            "readyState": 2,
+            "resultType": "null",
+            "error": "AbortError",
+            "lengthComputable": false,
+            "total": 0
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "null",
+            "error": "AbortError",
+            "lengthComputable": false,
+            "total": 0
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": null,
+          "error": "AbortError"
+        }
+      },
+      "abortInLoadstart": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "abort",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "abort": {
+            "readyState": 2,
+            "resultType": "null",
+            "error": "AbortError",
+            "lengthComputable": false,
+            "total": 0
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "null",
+            "error": "AbortError",
+            "lengthComputable": false,
+            "total": 0
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": null,
+          "error": "AbortError"
+        }
+      },
+      "abortInLoad": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "x",
+          "error": null
+        }
+      },
+      "readInLoadend": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": "ok",
+        "final": {
+          "readyState": 2,
+          "result": "y",
+          "error": null
+        }
+      },
+      "readWhileLoading": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null,
+          "second": "InvalidStateError"
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "x",
+          "error": null
+        }
+      },
+      "abortWhenEmpty": {
+        "readyState": 0,
+        "fired": []
+      },
+      "constants": [
+        0,
+        1,
+        2
+      ]
+    },
+    "promises": {
+      "text": {
+        "ok": true,
+        "v": "A�"
+      },
+      "arrayBuffer": {
+        "ok": true,
+        "v": {
+          "hex": "6162"
+        }
+      },
+      "bytes": {
+        "ok": true,
+        "v": {
+          "ctor": "Uint8Array",
+          "hex": "61,62"
+        }
+      },
+      "textLatin1Type": {
+        "ok": true,
+        "v": "é"
+      }
+    }
+  },
+  "http": {
+    "format": {
+      "origin": "http://rv.test",
+      "distinct": true,
+      "matches": true,
+      "selfOrigin": "http://rv.test"
+    },
+    "fetch": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "text/plain",
+        "length": "3",
+        "text": "abc"
+      }
+    },
+    "fetchEmpty": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "",
+        "length": "0",
+        "text": ""
+      }
+    },
+    "fetchSlice": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "",
+        "length": "3",
+        "text": "234"
+      }
+    },
+    "fetchRevoked": {
+      "ok": false,
+      "name": "TypeError"
+    },
+    "fetchOtherStillLive": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "text/plain",
+        "length": "3",
+        "text": "abc"
+      }
+    },
+    "revokeTwice": "ok",
+    "fetchUnknown": {
+      "ok": false,
+      "name": "TypeError"
+    },
+    "fetchFragment": {
+      "ok": true,
+      "v": {
+        "status": 200,
+        "type": "text/plain",
+        "length": "3",
+        "text": "abc"
+      }
+    },
+    "img": {
+      "event": "load",
+      "w": 7,
+      "h": 5
+    },
+    "imgRevoked": {
+      "event": "error",
+      "w": 0,
+      "h": 0
+    },
+    "imgGif": {
+      "event": "load",
+      "w": 3,
+      "h": 2
+    },
+    "imgGifUntyped": {
+      "event": "load",
+      "w": 3,
+      "h": 2
+    },
+    "imgGarbage": {
+      "event": "error",
+      "w": 0,
+      "h": 0
+    },
+    "iframe": {
+      "event": "load",
+      "text": "framed",
+      "origin": "http://rv.test"
+    },
+    "iframeRevoked": {
+      "event": "load",
+      "text": "cross:SecurityError",
+      "origin": null
+    },
+    "teardown": {
+      "before": {
+        "ok": true,
+        "v": {
+          "status": 200,
+          "type": "",
+          "length": "5",
+          "text": "child"
+        }
+      },
+      "after": {
+        "ok": false,
+        "name": "TypeError"
+      }
+    },
+    "reader": {
+      "arrayBuffer": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "ArrayBuffer",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "ArrayBuffer",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": {
+            "hex": "68c3a9ff4100"
+          },
+          "error": null
+        }
+      },
+      "text": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "hé�A\u0000",
+          "error": null
+        }
+      },
+      "textLatin1": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "hÃ©ÿA\u0000",
+          "error": null
+        }
+      },
+      "textUtf16": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "AB",
+          "error": null
+        }
+      },
+      "textBogusLabel": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 3
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 3
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 3
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 3
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "hé",
+          "error": null
+        }
+      },
+      "textBomWins": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 4
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "A",
+          "error": null
+        }
+      },
+      "binaryString": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "hÃ©ÿA\u0000",
+          "error": null
+        }
+      },
+      "dataUrl": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 6
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "data:text/plain;charset=latin1;base64,aMOp/0EA",
+          "error": null
+        }
+      },
+      "dataUrlEmpty": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "data:application/octet-stream;base64,",
+          "error": null
+        }
+      },
+      "empty": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "ArrayBuffer",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "ArrayBuffer",
+            "error": null,
+            "lengthComputable": true,
+            "total": 0
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": {
+            "hex": ""
+          },
+          "error": null
+        }
+      },
+      "abortSync": {
+        "events": [
+          "abort",
+          "loadend",
+          "sync:1"
+        ],
+        "states": {
+          "abort": {
+            "readyState": 2,
+            "resultType": "null",
+            "error": "AbortError",
+            "lengthComputable": false,
+            "total": 0
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "null",
+            "error": "AbortError",
+            "lengthComputable": false,
+            "total": 0
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": null,
+          "error": "AbortError"
+        }
+      },
+      "abortInLoadstart": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "abort",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "abort": {
+            "readyState": 2,
+            "resultType": "null",
+            "error": "AbortError",
+            "lengthComputable": false,
+            "total": 0
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "null",
+            "error": "AbortError",
+            "lengthComputable": false,
+            "total": 0
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": null,
+          "error": "AbortError"
+        }
+      },
+      "abortInLoad": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "x",
+          "error": null
+        }
+      },
+      "readInLoadend": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null
+        },
+        "inLoadend": "ok",
+        "final": {
+          "readyState": 2,
+          "result": "y",
+          "error": null
+        }
+      },
+      "readWhileLoading": {
+        "events": [
+          "sync:1",
+          "loadstart",
+          "progress",
+          "load",
+          "loadend"
+        ],
+        "states": {
+          "loadstart": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "progress": {
+            "readyState": 1,
+            "resultType": "null",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "load": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          },
+          "loadend": {
+            "readyState": 2,
+            "resultType": "string",
+            "error": null,
+            "lengthComputable": true,
+            "total": 1
+          }
+        },
+        "sync": {
+          "threw": null,
+          "readyState": 1,
+          "result": null,
+          "second": "InvalidStateError"
+        },
+        "inLoadend": null,
+        "final": {
+          "readyState": 2,
+          "result": "x",
+          "error": null
+        }
+      },
+      "abortWhenEmpty": {
+        "readyState": 0,
+        "fired": []
+      },
+      "constants": [
+        0,
+        1,
+        2
+      ]
+    },
+    "promises": {
+      "text": {
+        "ok": true,
+        "v": "A�"
+      },
+      "arrayBuffer": {
+        "ok": true,
+        "v": {
+          "hex": "6162"
+        }
+      },
+      "bytes": {
+        "ok": true,
+        "v": {
+          "ctor": "Uint8Array",
+          "hex": "61,62"
+        }
+      },
+      "textLatin1Type": {
+        "ok": true,
+        "v": "é"
+      }
+    }
+  },
+  "navigation": {
+    "url": "blob:http://rv.test/2b780468-01e5-445b-b709-dbc2941c88cd",
+    "otherBefore": {
+      "ok": true,
+      "v": "nav"
+    },
+    "afterNav": {
+      "ok": false,
+      "name": "TypeError"
+    },
+    "otherAfter": {
+      "ok": false,
+      "name": "TypeError"
+    }
+  },
+  "file": {
+    "name": "data.txt",
+    "size": 10,
+    "type": "text/plain",
+    "text": "file-bytes",
+    "fetch": {
+      "status": 200,
+      "type": "text/plain",
+      "text": "file-bytes"
+    },
+    "slice": "il"
+  },
+  "deleted": {
+    "reader": {
+      "events": [
+        "error",
+        "loadend"
+      ],
+      "readyState": 2,
+      "result": null,
+      "error": "NotFoundError"
+    },
+    "text": {
+      "ok": false,
+      "name": "NotFoundError"
+    },
+    "fetched": {
+      "ok": false,
+      "name": "TypeError"
+    }
+  }
+}

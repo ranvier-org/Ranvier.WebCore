@@ -52,8 +52,9 @@ result = {
     'batchRunHead': sys.argv[4],
     'stackedOn': sys.argv[5],
     'red': {
-        'native42': 'no object URL, FileReader or engine read exports; rv_abi_has("blob-urls") and "dom:FileReader" are 0; the host '
-                    'loader handed blob: URLs to the resource handler, which failed them',
+        'native42': {'file': 'red-native42.json', 'script': 'red_native42.py', 'runtime': 'C:/wk/native-inspect/artifacts/native42-candidate-3',
+                     'result': json.loads((evidence / 'red-native42.json').read_text()),
+                     'loader': 'the host loader handed blob: URLs to the resource handler, which failed them'},
         'crossHostLeak': {'file': 'red-candidate1-cross-host-leak.json', 'candidate': 'native44-candidate-1 (pre-fix)',
                           'otherRead': leak['otherRead'], 'otherImage': leak['otherImage'],
                           'fix': 'rv_blob_url_read refuses a URL the document origin cannot request (LOAD_FAILED, NotFoundError)'},
