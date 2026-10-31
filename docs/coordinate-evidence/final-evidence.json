@@ -1,0 +1,297 @@
+{
+  "group": [
+    "G14 coordinate-space conversion (ranvier-org/Ranvier.WebCore#58)"
+  ],
+  "native": "0.1.0-preview.45",
+  "abi": 53,
+  "features": [
+    "coordinate-spaces"
+  ],
+  "members": [
+    "rv_node_convert_points",
+    "rv_node_box_quad",
+    "RV_SPACE_NODE/PAGE/CLIENT/HOST/DEVICE",
+    "RV_QUAD_*_BOX",
+    "RV_ERR_WRONG_HOST (-12)"
+  ],
+  "sourcePatch": "none: the conversion is WebCore embedder glue (host/RanvierViewportGlue.cpp)",
+  "sourceHeadOfBatch": "f79391ee174424ddba068fbe379814a73b85c26f",
+  "stackedOn": "f79391e: I11 5eee88a + H08 acf26e3 + #142 3e6639d + #144 f0eb376 (rename head; this batch is its full-batch proof)",
+  "baseline": {
+    "batch": "C:\\wk\\native-blob\\artifacts\\native44-candidate-5-batch",
+    "head": "2b97cc0 (#144 Native44 batch; f0eb376 rename head has no batch of its own)",
+    "rawAssertions": 77247,
+    "teardownCases": 100
+  },
+  "red": {
+    "native": "red-native.json (red_native.py)",
+    "chromium": "red-chromium.json (red_chromium.mjs)",
+    "finding": "no conversion export; rv_element_rect gives axis-aligned bounds; at page scale 2 origin 40,60 rv_host_mouse lands at client x/2, y/2 while rv_host_scroll_position reads 40,60"
+  },
+  "chromiumOracle": {
+    "file": "tests/fixtures/coordinate-spaces-oracle.json",
+    "script": "tests/abi/coordinate_spaces_browser.mjs",
+    "browser": "156.0.8078.4"
+  },
+  "green": {
+    "coordinateSpacesAssertions": 6803,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "coordinate spaces PASS: 6803 assertions; max errors {'nodeToPageVsChromium': 0.000214, 'documentNodeIsPage': 0.0, 'projectiveDistanceFromChromium': 26.539088, 'pageToClient': 0.0, 'clientToPage': 0.0, 'pageToHost': 0.0, 'hostToPage': 0.0, 'pageToDevice': 0.0, 'deviceToPage': 0.0, 'nodeToClientVsRect': 0.0, 'roundTrip': 8.4e-05, 'boxQuad': 0.0}"
+    ],
+    "maxError": {
+      "nodeToPageVsChromium": 0.00021399869315509218,
+      "documentNodeIsPage": 0.0,
+      "projectiveDistanceFromChromium": 26.53908838448,
+      "pageToClient": 0.0,
+      "clientToPage": 0.0,
+      "pageToHost": 0.0,
+      "hostToPage": 0.0,
+      "pageToDevice": 0.0,
+      "deviceToPage": 0.0,
+      "nodeToClientVsRect": 0.0,
+      "roundTrip": 8.392333984375e-05,
+      "boxQuad": 0.0
+    },
+    "qualified": {
+      "q": {
+        "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+        "distanceFromChromium": 11.655499882891581
+      },
+      "r": {
+        "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+        "distanceFromChromium": 8.198937137403666
+      },
+      "v": {
+        "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+        "distanceFromChromium": 26.53908838448
+      },
+      "w": {
+        "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+        "distanceFromChromium": 22.51384867221989
+      },
+      "e": {
+        "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+        "distanceFromChromium": 11.81359818556325
+      },
+      "g": {
+        "reason": "a perspective() function, the perspective property or preserve-3d in the chain: the slim software path paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the distance from the Chromium composition is recorded, not asserted",
+        "distanceFromChromium": 2.260675699577246
+      }
+    },
+    "perspectivePaint": {
+      "convertedLeftEdge": 61.697776794433594,
+      "firstRedColumn": 62,
+      "chromiumLeftEdge": 54.0,
+      "hits": {
+        "(3.0, 50.0)": "q",
+        "(97.0, 50.0)": "q",
+        "(50.0, 3.0)": "q",
+        "(50.0, 97.0)": "q",
+        "chromium-only 56,100": "p"
+      }
+    },
+    "perspectiveFunctionPaint": {
+      "corners": [
+        [
+          110.9048080444336,
+          62.75316619873047
+        ],
+        [
+          169.09519958496094,
+          57.24683380126953
+        ],
+        [
+          169.09519958496094,
+          117.24683380126953
+        ],
+        [
+          110.9048080444336,
+          122.75316619873047
+        ]
+      ],
+      "edges": {
+        "left": [
+          111,
+          111
+        ],
+        "right": [
+          168,
+          168
+        ],
+        "top": [
+          60,
+          60
+        ],
+        "bottom": [
+          119,
+          119
+        ]
+      },
+      "hits": {
+        "(3.0, 30.0)": "e",
+        "(77.0, 30.0)": "e",
+        "(40.0, 3.0)": "e",
+        "(40.0, 57.0)": "e"
+      }
+    },
+    "singular": {
+      "z": "node to page OK; page to node UNSUPPORTED",
+      "y": "node to page OK; page to node UNSUPPORTED"
+    },
+    "teardownStatuses": {
+      "node removed from its document": [
+        -10,
+        -10,
+        -10,
+        -10
+      ],
+      "nodes of two hosts": [
+        -12,
+        -12,
+        -12,
+        -12
+      ],
+      "node held past rv_host_destroy": [
+        -10,
+        -10,
+        -10,
+        -10
+      ],
+      "node of a replaced document": [
+        -10,
+        -10,
+        -10,
+        -10
+      ],
+      "replaced document node": [
+        -10,
+        -10,
+        -10,
+        -10
+      ]
+    },
+    "arguments": {
+      "NULL from": -1,
+      "NULL xy with count 1": -1,
+      "NULL xy with count 0": 0,
+      "count -1": -9,
+      "from space 5": -9,
+      "to space -1": -9,
+      "NaN": -9,
+      "infinity": -9,
+      "display none as NODE": -9,
+      "display none as PAGE anchor": 0,
+      "inline span as NODE": -9,
+      "inline span text as NODE": -9,
+      "box quad NULL node": -1,
+      "box quad NULL quad": -1,
+      "box quad box 4": -9,
+      "box quad display none": -9,
+      "box quad to space 9": -9
+    },
+    "pageScaleStates": [
+      {
+        "name": "initial",
+        "pageOffset": [
+          0.0,
+          0.0
+        ],
+        "scale": 1.0
+      },
+      {
+        "name": "scroll 10,20",
+        "pageOffset": [
+          10.0,
+          20.0
+        ],
+        "scale": 1.0
+      },
+      {
+        "name": "device scale 2",
+        "pageOffset": [
+          0.0,
+          0.0
+        ],
+        "scale": 1.0
+      },
+      {
+        "name": "page scale 2 at 40,60",
+        "pageOffset": [
+          20.0,
+          30.0
+        ],
+        "scale": 2.0,
+        "clientToHost": [
+          20.0,
+          40.0
+        ],
+        "hostToClient": [
+          5.0,
+          10.0
+        ]
+      },
+      {
+        "name": "page scale 2 at 40,60, device scale 2",
+        "pageOffset": [
+          20.0,
+          30.0
+        ],
+        "scale": 2.0,
+        "clientToHost": [
+          20.0,
+          40.0
+        ],
+        "hostToClient": [
+          5.0,
+          10.0
+        ]
+      },
+      {
+        "name": "page scale 1.5 at 30,90, scroll",
+        "pageOffset": [
+          40.0,
+          100.0
+        ],
+        "scale": 1.5,
+        "clientToHost": [
+          15.0,
+          30.0
+        ],
+        "hostToClient": [
+          6.666667938232422,
+          13.333335876464844
+        ]
+      }
+    ],
+    "probes": 60,
+    "allExitZero": true,
+    "rawAssertions": 84050,
+    "baselineProbesSameCount": true,
+    "newProbes": [
+      "coordinate_spaces"
+    ],
+    "teardownCases": 102,
+    "teardownAllCollected": true
+  },
+  "files": {
+    "absence_g14.py": "2e7cdbbc0a10504aaeb490ff9552ad7bdd723dbc7932d19b868b593ca980ab52",
+    "allocation-absence.json": "5e49aaa2cd2208f6409acab0fdaff2d657f641471c289840308acf778c406b43",
+    "baseline-comparison.json": "f02f2c8633fb6d4c04a5078c20cb82172e0a2b7ab1e3b06571b8a7a646a3bd0b",
+    "batch-green.json": "ae06d3aab8205b30485206fe4e01aa225e7646275bf5783aa80d84afc89c8a7a",
+    "build_coords_candidate.py": "fd7f8222856bfda5d884afec6a11f6dbb6da955a27cf851602a475af9df2deb2",
+    "coordinate-spaces-probe.log": "79ddbfb26a5c2b2872f5fc816c028a9224db731ce85f974a0100ccb41af33b49",
+    "coordinate-spaces-repeat30.txt": "b014fa124d67049b83d60b1094128bf3699d4ffb57fabd71086a7058a272dfeb",
+    "coordinate-spaces-report.json": "1bed1262bd16ea6bddb49390628556726325155be57d6990cdc2e764d87f5435",
+    "make_coords_evidence.py": "27ba2e023161902d7411e92c4582569f255d882e24fbb1d61b8598d877fc8a5d",
+    "red-chromium.json": "b11c8737354a795e035ed77440f53d155cb4a10dbd2408fb0626545f2845a1f9",
+    "red-native.json": "ef6dbd289e727f55416266b3a9d5471117a2a502b809fdb5c46347529e8eb12b",
+    "red_chromium.mjs": "063dfc5bea1eb0f52c72b50dbc20b9693149f90677007721e524e006e452215d",
+    "red_native.py": "d1ec005941ecbde0b316f29ffaac3be6e45d8f758ca3d652beb5082390b4c33a",
+    "repeat30.sh": "2eeb25ea563e02403c061d1f34e575929f9bcb0e41421b89d850a047facc5680",
+    "run_coords_full_batch.py": "d066d9cf8cef8d1bf381d0632d5af40ab48f18626773c87e1d34c0e9f017506c",
+    "runtime-receipt.json": "6cbda05bd02e51a2ec4ee5dbd310c86d036136455ddb35a6ba70a3c74b76f314",
+    "source-patches.json": "fdd51ac267edf0d3592a14cfa3a6b80c91b21f9f9b33fb56120a7ed98213a8e5",
+    "teardown-probes.json": "cf638b48c4e7bd8d6dd17eb403f71c9780d4e016b8726c90aa8f0dcf359954ec"
+  }
+}
