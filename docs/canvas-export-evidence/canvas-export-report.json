@@ -1,0 +1,156 @@
+{
+ "webpEncoded": true,
+ "toDataURL": {
+  "prefix": "data:image/png;base64,",
+  "jpegPrefix": "data:image/jpeg;base64,",
+  "zeroSize": "data:,"
+ },
+ "blobType": "image/png",
+ "bitmap": [
+  4,
+  2
+ ],
+ "decodedBlob": [
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  255,
+  255,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  255,
+  255
+ ],
+ "wholePixels": [
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  255,
+  255,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  255,
+  0,
+  0,
+  255,
+  255,
+  0,
+  0,
+  255,
+  255
+ ],
+ "crop": {
+  "size": [
+   2,
+   2
+  ],
+  "pixels": [
+   255,
+   0,
+   0,
+   255,
+   0,
+   0,
+   255,
+   255
+  ]
+ },
+ "flipY": [
+  0,
+  0,
+  255,
+  255,
+  255,
+  0,
+  0,
+  255
+ ],
+ "resized": [
+  8,
+  4
+ ],
+ "fromImage": {
+  "size": [
+   2,
+   2
+  ],
+  "pixels": [
+   255,
+   0,
+   0,
+   255,
+   0,
+   255,
+   0,
+   255,
+   0,
+   0,
+   255,
+   255,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "errors": {
+  "zeroCrop": "RangeError",
+  "zeroCanvas": "InvalidStateError",
+  "badBlob": "InvalidStateError",
+  "closedSource": "InvalidStateError",
+  "drawClosed": "InvalidStateError"
+ },
+ "closed": [
+  0,
+  0
+ ],
+ "rendererCanvas": true,
+ "transfer": {
+  "sourceAfter": [
+   0,
+   0
+  ],
+  "canvasData": true
+ },
+ "transferClosed": "InvalidStateError",
+ "assertions": 286
+}
