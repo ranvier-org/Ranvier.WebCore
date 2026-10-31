@@ -198,8 +198,31 @@ def type_label(t):
     return "".join(word[:1].upper() + word[1:] for word in t.name.split())
 
 
+# Configuration keys of the transport before every generated string input carried an explicit byte length (WebCore
+# #142, ABI 51). A stale key fails the run instead of silently selecting nothing.
+RETIRED_STRING_KEYS = ('complexStringSpans', 'interfaceStringInputs', 'dictionaryStringInputs', 'stringInputs')
+
+
+def retired_string_keys(value, path='gen/dom.json'):
+    """The paths of every retired string-transport key in a configuration value."""
+    found = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key in RETIRED_STRING_KEYS:
+                found.append(f'{path}.{key}')
+            found += retired_string_keys(child, f'{path}.{key}')
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            found += retired_string_keys(child, f'{path}[{index}]')
+    return found
+
+
 class World:
     def __init__(self, source: pathlib.Path, config: dict):
+        retired = retired_string_keys(config)
+        if retired:
+            raise SystemExit('string inputs are UTF-8 with explicit byte lengths by default; remove the retired keys '
+                             + ', '.join(retired))
         self.webcore = source / "Source" / "WebCore"
         self.config = config
         self.skip = config["skipDirectories"]
@@ -214,7 +237,7 @@ class World:
         self.namespace_partials = {}
         self.dictionary_partials = {}
         self.dictionary_exclusions = set()
-        # True while the members of an interface in sequenceStringSpans are mapped.
+        # True while the members of an interface in sequenceStringSpans are mapped: their string sequences are named Utf8.
         self.span_sequences = False
         for path in sorted(self.webcore.rglob("*.idl")):
             relative = path.relative_to(self.webcore).as_posix()
@@ -496,10 +519,9 @@ class World:
             if label in self.config.get('finiteUnionInputs', []):
                 for source, child in zip(t.subtypes, children):
                     child.finite_input = self.resolve(source).name in ('double', 'float')
-            if label in self.config.get('complexStringSpans', []):
-                for child in children:
-                    if child.kind == 'string':
-                        child.string_spans = True
+            for child in children:
+                if child.kind == 'string':
+                    child.string_spans = True
             return Mapped("union", t.nullable, "RvDomUnion" + label + ("Nullable" if t.nullable else ""),
                           subtypes=children, label=label)
         if t.name in ("sequence", "FrozenArray"):
@@ -510,10 +532,11 @@ class World:
                 label = child.ctype.removeprefix('RvDom')
             if element.nullable and element.name in self.config.get('complexNullableElements', []):
                 label += 'NullableElement'
+            if child.kind == 'string':
+                child.string_spans = True
             if self.span_sequences and (child.kind == 'string' or (child.kind == 'sequence' and child.ctype.endswith('Utf8'))):
-                # A string that may hold U+0000 keeps its byte length; the distinct name keeps other sequences' layout.
-                if child.kind == 'string':
-                    child.string_spans = True
+                # FUTURE CLEANUP: the Utf8 name predates length-delimited strings everywhere; RvDomSequenceUSVStringUtf8
+                # and RvDomSequenceUSVString now share a layout. The name stays for ABI and wrapper stability.
                 label += 'Utf8'
             return Mapped("sequence", t.nullable, "RvDomSequence" + label + ("Nullable" if t.nullable else ""),
                           subtypes=[child], label=label + " sequence")
@@ -653,6 +676,9 @@ class Generator(ComplexGeneratorMixin):
         releases = [snake(name) for name in self.handles] + [snake(name) for name in self.result_dicts]
         if len(set(releases)) != len(releases):
             raise SystemExit(f"dictionary result releases collide with handle releases: {sorted(releases)}")
+        terminated = [f"rv_dom_{f.name}" for f in self.functions if any(ctype == "const char*" for ctype, _ in f.params)]
+        if terminated:
+            raise SystemExit(f"NUL-terminated string inputs, which truncate at U+0000: {terminated}")
         names = [f.name for f in self.functions]
         duplicates = {n for n in names if names.count(n) > 1}
         if duplicates:
@@ -695,8 +721,6 @@ class Generator(ComplexGeneratorMixin):
             raise SystemExit(f'{name}: configured Window interface was not found')
         if 'Document' not in self.world.scope:
             raise SystemExit(f'{name}: Window context receiver must be a scoped Document')
-        if binding.get('stringInputs') != 'utf8-lengths':
-            raise SystemExit(f'{name}: Window string inputs require explicit UTF-8 lengths')
         self.headers.add('LocalDOMWindow.h')
         selected = set(binding['members'])
         operations = {}
@@ -742,8 +766,6 @@ class Generator(ComplexGeneratorMixin):
                                     f'Window.{operation}: checked Document context; nullable string byte length -1 means null')
                 function.receiver = 'Document'
                 function.feature = binding['feature']
-                function.string_spans = True
-                function.nullable_spans = True
                 function.context_checks = ['if (!impl->window())', '    return RV_ERR_UNSUPPORTED;']
                 try:
                     args = [self.world.map(argument.type) for argument in member.arguments]
@@ -761,8 +783,6 @@ class Generator(ComplexGeneratorMixin):
         such as Window.crypto or Window.screen.orientation, called through the Window of a checked Document."""
         if binding.get('receiver') != 'Document' or 'Document' not in self.world.scope:
             raise SystemExit(f'{name}: Window object bindings require a scoped Document receiver')
-        if binding.get('stringInputs') != 'utf8-lengths':
-            raise SystemExit(f'{name}: Window object string inputs require explicit UTF-8 lengths')
         if name not in self.world.interfaces or 'DOMWindow' not in self.world.interfaces:
             raise SystemExit(f'{name}: configured Window object interface was not found')
         accessor = binding.get('accessor') or ''
@@ -823,7 +843,6 @@ class Generator(ComplexGeneratorMixin):
                 function.receiver = 'Document'
                 function.context_owner = name
                 function.feature = binding['feature']
-                function.string_spans = True
                 function.context_checks = ['if (!impl->window())', '    return RV_ERR_UNSUPPORTED;']
                 try:
                     args = [self.world.map(argument.type) for argument in member.arguments]
@@ -909,7 +928,6 @@ class Generator(ComplexGeneratorMixin):
             snapshot = '; *result is a snapshot copy in iteration order, unchanged by later mutation' if operation in ('values', 'entries') else ''
             function = Function(name, member, 'operation', f'{snake(name)}_{snake(operation)}', [],
                                 f'{name}.{operation}: {declaration.type}{snapshot}')
-            function.string_spans = binding.get('stringInputs') == 'utf8-lengths'
             try:
                 args = [self.world.map(argument.type) for argument in arguments]
                 result = self.world.map(returns)
@@ -924,8 +942,6 @@ class Generator(ComplexGeneratorMixin):
         receiver = binding['receiver']
         if receiver not in self.world.scope or 'Node' not in self.world.chain(receiver):
             raise SystemExit(f'{name}: static receiver must be a scoped node interface')
-        if binding.get('stringInputs') != 'utf8-lengths':
-            raise SystemExit(f'{name}: static string inputs require explicit UTF-8 lengths')
         selected = set(binding['members'])
         operations = {}
         for member in self.world.members(name):
@@ -947,7 +963,6 @@ class Generator(ComplexGeneratorMixin):
                                     f'{name}.{operation}: static operation with checked {receiver} context and UTF-8 byte lengths')
                 function.receiver = receiver
                 function.feature = binding['feature']
-                function.string_spans = True
                 try:
                     args = [self.world.map(argument.type) for argument in member.arguments]
                     result = self.world.map(member.type)
@@ -983,8 +998,6 @@ class Generator(ComplexGeneratorMixin):
         receiver = binding["receiver"]
         if receiver not in self.world.scope or "Node" not in self.world.chain(receiver):
             raise SystemExit(f"{name}: namespace receiver must be a scoped node interface")
-        if binding.get("stringInputs") != "utf8-lengths":
-            raise SystemExit(f"{name}: namespace string inputs require explicit UTF-8 lengths")
         public = definition.attrs.get("InterfaceName", name)
         cpp = definition.attrs.get("ImplementedAs", name)
         self.headers.add(f"{cpp}.h")
@@ -1015,7 +1028,6 @@ class Generator(ComplexGeneratorMixin):
                 function.namespace = public
                 function.receiver = receiver
                 function.feature = binding.get("memberFeatures", {}).get(operation, binding["feature"])
-                function.string_spans = True
                 try:
                     args = [self.world.map(argument.type) for argument in member.arguments]
                     result = self.world.map(member.type)
@@ -1365,9 +1377,7 @@ class Generator(ComplexGeneratorMixin):
         """The C type of a dictionary field: a pointer for an optional scalar without a default, NULL for absent."""
         absent = mapped.nullable or (not member.required and member.default is None)
         if mapped.kind == "string":
-            if self.world.config.get("dictionaryStringInputs", {}).get(dictionary) == "utf8-lengths-presence":
-                return "RvDomUtf8StringInput"
-            return "const char*"
+            return "RvDomUtf8StringInput"
         if mapped.kind in ("node", "object"):
             return f"{mapped.handle}*"
         if mapped.kind == "dict":
@@ -1407,22 +1417,18 @@ class Generator(ComplexGeneratorMixin):
             lines += [f"if (!({covered}))", "    return RV_ERR_NULL_ARGUMENT;"]
             covered = "true"
         if mapped.kind == "string":
-            if ctype == "RvDomUtf8StringInput":
-                span = f"{pointer}->{field}"
-                if member.required:
-                    lines += [f"if ({span}.present != 1)", "    return RV_ERR_NULL_ARGUMENT;"]
-                lines += [f"if ({covered}) {{",
-                          f"    if ({span}.present != 0 && {span}.present != 1)",
-                          "        return RV_ERR_NULL_ARGUMENT;",
-                          f"    if ({span}.present) {{",
-                          f"        if ({span}.length < 0 || ({span}.length > 0 && !{span}.data))",
-                          "            return RV_ERR_NULL_ARGUMENT;",
-                          f"        if (!assignString({target}.{cpp_field}, {span}.data, {span}.length))",
-                          "            return RV_ERR_NULL_ARGUMENT;",
-                          "    }", "}"]
-            else:
-                lines.append(f"if ({covered} && {pointer}->{field})")
-                lines.append(f"    assignString({target}.{cpp_field}, {pointer}->{field});")
+            span = f"{pointer}->{field}"
+            if member.required:
+                lines += [f"if ({span}.present != 1)", "    return RV_ERR_NULL_ARGUMENT;"]
+            lines += [f"if ({covered}) {{",
+                      f"    if ({span}.present != 0 && {span}.present != 1)",
+                      "        return RV_ERR_NULL_ARGUMENT;",
+                      f"    if ({span}.present) {{",
+                      f"        if ({span}.length < 0 || ({span}.length > 0 && !{span}.data))",
+                      "            return RV_ERR_NULL_ARGUMENT;",
+                      f"        if (!assignString({target}.{cpp_field}, {span}.data, {span}.length))",
+                      "            return RV_ERR_NULL_ARGUMENT;",
+                      "    }", "}"]
         elif mapped.kind == "node":
             self.headers.add(f"{mapped.cls}.h")
             lines.append(f"if ({covered} && {pointer}->{field}) {{")
@@ -1566,7 +1572,6 @@ class Generator(ComplexGeneratorMixin):
                 note = "; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a browsing context"
             function = Function(interface, member, "constructor", f"{snake(interface)}_create", [],
                                 f"{interface}.constructor: target is the {receiver} of the constructed object{note}")
-            function.string_spans = configured.get('stringInputs') == 'utf8-lengths'
             self.finish(function, receiver, member, member.arguments, args, returns, call, [])
             if overloaded:
                 locked = self.lock.get(function.name)
@@ -1613,8 +1618,6 @@ class Generator(ComplexGeneratorMixin):
                 raise SystemExit(f'{svg_matrix_key}: requires one nonnullable DOMMatrix2DInit matrix argument and its SVG return type')
             self.svg_matrix_bindings_used.add(svg_matrix_key)
             self.headers.add('DOMMatrixReadOnly.h')
-        if self.world.config.get('interfaceStringInputs', {}).get(function.interface) == 'utf8-lengths':
-            function.string_spans = True
         if returns.kind == 'opaque' or any(self.contains_opaque(mapped) for mapped in mapped_args):
             raise Unsupported('an opaque interface is a union result arm only')
         self_type = self.self_param(interface)
@@ -1644,26 +1647,14 @@ class Generator(ComplexGeneratorMixin):
             if argument.optional and argument.default is not None:
                 notes.append(f"{name} defaults to {argument.default} in IDL")
             if mapped.kind == "string":
-                if getattr(function, "string_spans", False):
-                    nullable_span = (getattr(function, 'nullable_spans', False) and mapped.nullable
-                                     and not optional_no_default and argument.default in (None, 'null'))
-                    if optional_no_default and not mapped.nullable:
-                        nullable_span = True
-                        notes.append(f"{name}_length -1 means absent")
-                    defaulted = argument.optional and argument.default not in (None, 'null') and not mapped.nullable
-                    if (argument.optional or mapped.nullable) and not nullable_span and not defaulted:
-                        raise Unsupported("optional or nullable namespace strings need an explicit presence representation")
-                    params += [("const uint8_t*", name), ("int32_t", name + "_length")]
-                    minimum = -1 if nullable_span else 0
-                    checks.append(f"({name}_length >= {minimum} && ({name}_length <= 0 || {name}))")
-                    null_guard = f'{name}_length >= 0 && ' if nullable_span else ''
-                    prepare += [f"StringArg a{index} {{ {name}, {name}_length }};",
-                                f"if ({null_guard}a{index}.string().isNull()) return RV_ERR_NULL_ARGUMENT;"]
-                else:
-                    params.append(("const char*", name))
-                    if not maybe_null:
-                        checks.append(name)
-                    prepare.append(f"StringArg a{index} {{ {name} }};")
+                # UTF-8 bytes and their count, so the string may hold U+0000; -1 is null, or absent for an optional
+                # argument without a default.
+                params += [("const uint8_t*", name), ("int32_t", name + "_length")]
+                minimum = -1 if maybe_null else 0
+                checks.append(f"({name}_length >= {minimum} && ({name}_length <= 0 || {name}))")
+                null_guard = f'{name}_length >= 0 && ' if maybe_null else ''
+                prepare += [f"StringArg a{index} {{ {name}, {name}_length }};",
+                            f"if ({null_guard}a{index}.string().isNull()) return RV_ERR_NULL_ARGUMENT;"]
                 atom = ("AtomString" in argument.attrs or "AtomString" in argument.type.attrs or mapped.atom
                         or f"{interface}.{member.name}" in self.world.config["atomArguments"])
                 existing_atom = ('RequiresExistingAtomString' in argument.attrs or 'RequiresExistingAtomString' in argument.type.attrs)
@@ -1676,7 +1667,7 @@ class Generator(ComplexGeneratorMixin):
                 else:
                     passed.append(f"a{index}.atom()" if atom else f"a{index}.string()")
                 if maybe_null:
-                    notes.append(f"{name} may be NULL" + (" (absent)" if optional_no_default else " (null)"))
+                    notes.append(f"{name}_length -1 means " + ("absent" if optional_no_default else "null"))
             elif mapped.kind in ("bool", "number"):
                 ctype = mapped.ctype
                 if (mapped.kind == 'number' and (function.interface in self.world.config.get('finiteNumberInputs', []) or f'{function.interface}.{member.name}' in self.world.config.get('finiteNumberInputs', []))
@@ -2027,8 +2018,7 @@ class Generator(ComplexGeneratorMixin):
             if function.kind == "constructor":
                 functions[-1]["receiver"] = self.world.config["constructors"][function.interface]["receiver"]
                 functions[-1]["feature"] = f"dom-constructor:{function.interface}"
-                if getattr(function, 'string_spans', False):
-                    functions[-1]['stringInputs'] = 'utf8-lengths'
+                functions[-1]['stringInputs'] = 'utf8-lengths'
             if function.kind == "namespace_operation":
                 functions[-1].update(receiver=function.receiver, namespace=function.namespace, feature=function.feature,
                                      binding="facade", stringInputs="utf8-lengths")
@@ -2040,7 +2030,7 @@ class Generator(ComplexGeneratorMixin):
                                      binding='facade', stringInputs='utf8-lengths')
             if function.kind == 'iterator_snapshot':
                 functions[-1].update(binding='facade', feature=function.feature, sourceKind='iterable')
-            if function.kind in ('operation', 'setter') and getattr(function, 'string_spans', False):
+            if function.kind in ('operation', 'setter'):
                 functions[-1]['stringInputs'] = 'utf8-lengths'
             if getattr(function, 'context_receiver', None):
                 functions[-1].update(contextReceiver=function.context_receiver, contextParameter='context')
@@ -2094,10 +2084,11 @@ class Generator(ComplexGeneratorMixin):
             " * - Each function returns RV_OK or a negative status and writes its result through the last parameters.",
             " * - target is the object the member belongs to. A node handle of another interface returns",
             " *   RV_ERR_WRONG_INTERFACE, as does a node argument of another interface.",
-            " * - String inputs use UTF-8, with explicit byte lengths where the signature supplies them; otherwise",
-            " *   inputs are NUL-terminated. String outputs copy into buffer as RanvierWebCoreAbi.h describes.",
-            " * - Booleans are int32_t 0 or 1. An argument that is nullable or optional without a default is a pointer,",
-            " *   NULL for null or absent.",
+            " * - String inputs are UTF-8 with an explicit byte count, so a string may hold U+0000: a pointer and a",
+            " *   length, -1 for null or absent; RvDomUtf8StringSpan in a union or sequence; RvDomUtf8StringInput in a",
+            " *   dictionary, present 0 for the default. String outputs copy into buffer as RanvierWebCoreAbi.h describes.",
+            " * - Booleans are int32_t 0 or 1. Any other argument that is nullable or optional without a default is a",
+            " *   pointer, NULL for null or absent.",
             " * - Handles out are new references: rv_node_release, rv_event_release, or the rv_dom_*_release of the type.",
             " * - A member that throws returns RV_ERR_DOM_EXCEPTION, with the exception in rv_last_exception.",
             " * - A string union with Trusted Types, such as (TrustedHTML or DOMString), is a string. A dictionary is a",
@@ -2497,10 +2488,7 @@ template<typename Concrete, typename Root> Concrete* castTrackedHandle(Root& val
                 ctype = self.field_ctype(member, mapped, name)
                 field = c_name(member.name)
                 field = f"``{field}``" if field in FSHARP_KEYWORDS else field
-                if ctype == "const char*":
-                    lines.append("    [<MarshalAs(UnmanagedType.LPUTF8Str)>]")
-                    lines.append(f"    val mutable {field}: string")
-                elif ctype.endswith("*"):
+                if ctype.endswith("*"):
                     lines.append(f"    val mutable {field}: nativeint")
                 elif ctype == "RvDomUtf8StringInput":
                     lines.append(f"    val mutable {field}: RvDomUtf8StringInput")
@@ -2726,15 +2714,6 @@ template<typename T, typename V> void assignValue(T& field, V value)
     field = static_cast<typename Unwrapped<T>::Type>(value);
 }
 
-template<typename T> void assignString(T& field, const char* text)
-{
-    using Type = typename Unwrapped<T>::Type;
-    if constexpr (std::is_same_v<Type, AtomString>)
-        field = AtomString::fromUTF8(text);
-    else
-        field = Type { String::fromUTF8(text) };
-}
-
 template<typename T> bool assignString(T& field, const uint8_t* text, int32_t length)
 {
     String value = length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString();
@@ -2788,13 +2767,9 @@ int32_t storeNode(Node* pointer, RvNode** result)
     return RV_OK;
 }
 
-// A UTF-8 argument, which converts to the string type the member takes. NULL is the null string, or an absent
-// optional string.
+// A UTF-8 argument and its byte count, which converts to the string type the member takes. Length -1 is the null
+// string, or an absent optional string.
 struct StringArg {
-    explicit StringArg(const char* text)
-        : value(text ? String::fromUTF8(text) : String { })
-    {
-    }
     StringArg(const uint8_t* text, int32_t length)
         : value(length < 0 ? String() : length ? String::fromUTF8(std::span<const uint8_t> { text, static_cast<size_t>(length) }) : emptyString())
     {
@@ -2882,8 +2857,6 @@ def wrap_comment(text, width=118):
 
 def fsharp_param(ctype, name):
     fname = f"``{name}``" if name in FSHARP_KEYWORDS else name
-    if ctype == "const char*":
-        return f"[<MarshalAs(UnmanagedType.LPUTF8Str)>] string {fname}"
     if ctype in ("char*", "uint8_t*"):
         return f"byte[] {fname}"
     if ctype == "int32_t*" and name == "length":

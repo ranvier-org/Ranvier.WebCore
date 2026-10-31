@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 from dialog_popover import Runner, OK, UNSUPPORTED, P, I, CALLBACK
 from form_collections import Entries, span_text
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 ABI = 51
@@ -134,9 +135,9 @@ class SubmissionRunner(Runner):
             first = request(target, None)
             return self.outcome(first if first != OK else request(target, None))
         if op == 'setAttribute':
-            return self.outcome(p.bind('rv_dom_element_set_attribute', I, [P, ctypes.c_char_p, ctypes.c_char_p])(target, s['name'].encode(), s['value'].encode()))
+            return self.outcome(p.bind('rv_dom_element_set_attribute', I, [P, Utf8, Utf8])(target, s['name'].encode(), s['value'].encode()))
         if op == 'setValue':
-            return self.outcome(p.bind('rv_dom_html_input_element_set_value', I, [P, ctypes.c_char_p])(target, s['value'].encode()))
+            return self.outcome(p.bind('rv_dom_html_input_element_set_value', I, [P, Utf8])(target, s['value'].encode()))
         if op == 'checkValidity':
             value = I()
             return self.outcome(p.bind('rv_dom_html_form_element_check_validity', I, [P, ctypes.POINTER(I)])(target, ctypes.byref(value)), bool(value.value))

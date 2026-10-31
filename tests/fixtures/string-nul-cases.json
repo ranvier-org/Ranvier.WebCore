@@ -24,6 +24,7 @@
     {"id": "ErrorEvent message", "category": "B", "op": "errorEvent", "value": "m\u0000sg"},
     {"id": "Blob type with U+0000", "category": "B", "op": "blobType", "value": "text/plain\u0000x"},
     {"id": "Blob type", "category": "B", "op": "blobType", "value": "Text/Plain"},
+    {"id": "HighlightRegistry name (T03)", "category": "C", "op": "highlightRegistry", "value": "h\u0000l"},
     {"id": "getAttributeNames", "category": "R", "op": "getAttributeNames", "value": "data-\u00e9"},
     {"id": "hidden getter string", "category": "R", "op": "hiddenGetter"}
   ]

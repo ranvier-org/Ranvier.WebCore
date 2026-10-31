@@ -91,7 +91,10 @@ def structs(t):
     class BlobPropertyBag(ctypes.Structure):
         _fields_ = [('size', U), ('type', t.input_type), ('endings', I)]
 
-    return dict(NodeOrString=NodeOrString, NodesOrStrings=NodesOrStrings, Strings=Strings, Hidden=Hidden,
+    class Ranges(ctypes.Structure):
+        _fields_ = [('present', I), ('count', I), ('items', P)]
+
+    return dict(Ranges=Ranges, NodeOrString=NodeOrString, NodesOrStrings=NodesOrStrings, Strings=Strings, Hidden=Hidden,
                 ToggleEventInit=ToggleEventInit, CommandEventInit=CommandEventInit,
                 CompositionEventInit=CompositionEventInit, ErrorEventInit=ErrorEventInit, BlobPropertyBag=BlobPropertyBag)
 
@@ -235,6 +238,25 @@ class Strings:
                 return n.text('rv_dom_blob_get_type', [P], blob)
             finally:
                 n.bind('rv_dom_blob_release', None, [P])(blob)
+        if op == 'highlightRegistry':
+            registry = n.handle('rv_dom_css_get_highlights', [P], self.document, nullable=False)
+            ranges = s['Ranges'](1, 0, None)
+            highlight = n.handle('rv_dom_highlight_create', [P, ctypes.POINTER(s['Ranges'])], self.document,
+                                 ctypes.byref(ranges), nullable=False)
+            try:
+                n.ok('rv_dom_highlight_registry_set', [P] + t.plain_types + [P], registry, *t.plain(v), highlight)
+                found = []
+                for key in (v, v.split(chr(0))[0]):
+                    present = I()
+                    n.ok('rv_dom_highlight_registry_has', [P] + t.plain_types + [ctypes.POINTER(I)], registry, *t.plain(key),
+                         ctypes.byref(present))
+                    found.append(present.value == 1)
+                n.ok('rv_dom_highlight_registry_delete', [P] + t.plain_types + [ctypes.POINTER(I)], registry, *t.plain(v),
+                     ctypes.byref(I()))
+                return found
+            finally:
+                n.bind('rv_dom_highlight_release', None, [P])(highlight)
+                n.bind('rv_dom_highlight_registry_release', None, [P])(registry)
         if op == 'getAttributeNames':
             element = self.element()
             self.set_attribute(element, v, '1')

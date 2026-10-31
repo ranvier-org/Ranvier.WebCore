@@ -29,6 +29,10 @@
     "ErrorEvent message": "m\u0000sg",
     "Blob type with U+0000": "",
     "Blob type": "text/plain",
+    "HighlightRegistry name (T03)": [
+      true,
+      false
+    ],
     "getAttributeNames": [
       "data-é",
       "b"

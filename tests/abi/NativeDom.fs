@@ -823,8 +823,7 @@ type RvDomAssignedNodesOptions =
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomCSSStyleSheetInit =
     val mutable size: uint32
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable base_url: string
+    val mutable base_url: RvDomUtf8StringInput
     val mutable media: nativeint
     val mutable disabled: int
 
@@ -885,8 +884,7 @@ type RvDomCompositionEventInit =
     val mutable cancelable: int
     val mutable composed: int
     val mutable detail: int
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable data: string
+    val mutable data: RvDomUtf8StringInput
 
 /// <summary>The IDL dictionary SubmitEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -913,10 +911,8 @@ type RvDomToggleEventInit =
     val mutable bubbles: int
     val mutable cancelable: int
     val mutable composed: int
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable old_state: string
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable new_state: string
+    val mutable old_state: RvDomUtf8StringInput
+    val mutable new_state: RvDomUtf8StringInput
     val mutable source: nativeint
 
 /// <summary>The IDL dictionary CommandEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
@@ -927,8 +923,7 @@ type RvDomCommandEventInit =
     val mutable cancelable: int
     val mutable composed: int
     val mutable source: nativeint
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable command: string
+    val mutable command: RvDomUtf8StringInput
 
 /// <summary>The IDL dictionary ErrorEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -937,10 +932,8 @@ type RvDomErrorEventInit =
     val mutable bubbles: int
     val mutable cancelable: int
     val mutable composed: int
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable message: string
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable filename: string
+    val mutable message: RvDomUtf8StringInput
+    val mutable filename: RvDomUtf8StringInput
     val mutable lineno: uint32
     val mutable colno: uint32
 
@@ -962,11 +955,9 @@ type RvDomAnimationEventInit =
     val mutable bubbles: int
     val mutable cancelable: int
     val mutable composed: int
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable animation_name: string
+    val mutable animation_name: RvDomUtf8StringInput
     val mutable elapsed_time: float
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable pseudo_element: string
+    val mutable pseudo_element: RvDomUtf8StringInput
 
 /// <summary>The IDL dictionary TransitionEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -975,11 +966,9 @@ type RvDomTransitionEventInit =
     val mutable bubbles: int
     val mutable cancelable: int
     val mutable composed: int
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable property_name: string
+    val mutable property_name: RvDomUtf8StringInput
     val mutable elapsed_time: float
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable pseudo_element: string
+    val mutable pseudo_element: RvDomUtf8StringInput
 
 /// <summary>The IDL dictionary ContentVisibilityAutoStateChangeEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1016,10 +1005,8 @@ type RvDomHashChangeEventInit =
     val mutable bubbles: int
     val mutable cancelable: int
     val mutable composed: int
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable old_url: string
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable new_url: string
+    val mutable old_url: RvDomUtf8StringInput
+    val mutable new_url: RvDomUtf8StringInput
 
 /// <summary>The IDL dictionary MediaQueryListEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1028,8 +1015,7 @@ type RvDomMediaQueryListEventInit =
     val mutable bubbles: int
     val mutable cancelable: int
     val mutable composed: int
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable media: string
+    val mutable media: RvDomUtf8StringInput
     val mutable matches: int
 
 /// <summary>The IDL dictionary PopStateEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
@@ -1062,16 +1048,14 @@ type RvDomDOMMatrix2DInit =
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomBlobPropertyBag =
     val mutable size: uint32
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable ``type``: string
+    val mutable ``type``: RvDomUtf8StringInput
     val mutable endings: int
 
 /// <summary>The IDL dictionary FilePropertyBag; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomFilePropertyBag =
     val mutable size: uint32
-    [<MarshalAs(UnmanagedType.LPUTF8Str)>]
-    val mutable ``type``: string
+    val mutable ``type``: RvDomUtf8StringInput
     val mutable endings: int
     val mutable last_modified: nativeint
 
@@ -1167,7 +1151,7 @@ type RvDomUnionNodeOrDOMString =
     val mutable present: int
     val mutable tag: int
     val mutable arm0: nativeint
-    val mutable arm1: nativeint
+    val mutable arm1: RvDomUtf8StringSpan
 
 /// <summary>ABI transport for NodeOrDOMString sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1208,7 +1192,7 @@ let RV_DOM_UNION_DOM_STRING_OR_ELEMENT_CREATION_OPTIONS_ELEMENT_CREATION_OPTIONS
 type RvDomUnionDOMStringOrElementCreationOptions =
     val mutable present: int
     val mutable tag: int
-    val mutable arm0: nativeint
+    val mutable arm0: RvDomUtf8StringSpan
     val mutable arm1: nativeint
 
 [<Literal>]
@@ -1262,7 +1246,7 @@ type RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable =
     val mutable tag: int
     val mutable arm0: int
     val mutable arm1: float
-    val mutable arm2: nativeint
+    val mutable arm2: RvDomUtf8StringSpan
 
 [<Literal>]
 let RV_DOM_UNION_TOGGLE_POPOVER_OPTIONS_OR_BOOLEAN_TOGGLE_POPOVER_OPTIONS = 1
@@ -1360,7 +1344,7 @@ type RvDomUnionMediaListOrDOMString =
     val mutable present: int
     val mutable tag: int
     val mutable arm0: nativeint
-    val mutable arm1: nativeint
+    val mutable arm1: RvDomUtf8StringSpan
 
 /// <summary>ABI transport for USVString sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -2384,13 +2368,13 @@ extern int rv_dom_node_get_next_sibling(nativeint target, nativeint& result)
 extern int rv_dom_node_get_node_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_node_set_node_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_node_set_node_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_get_text_content(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_node_set_text_content(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_node_set_text_content(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_get_root_node(nativeint target, [<In>] RvDomGetRootNodeOptions[] options, nativeint& result)
@@ -2417,13 +2401,13 @@ extern int rv_dom_node_compare_document_position(nativeint target, nativeint oth
 extern int rv_dom_node_contains(nativeint target, nativeint other, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_node_lookup_prefix(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_node_lookup_prefix(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_node_lookup_namespace_uri(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string prefix, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_node_lookup_namespace_uri(nativeint target, byte[] prefix, int prefix_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_node_is_default_namespace(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, int& result)
+extern int rv_dom_node_is_default_namespace(nativeint target, byte[] namespace_uri, int namespace_uri_length, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_insert_before(nativeint target, nativeint node, nativeint child, nativeint& result)
@@ -2441,7 +2425,7 @@ extern int rv_dom_node_remove_child(nativeint target, nativeint child, nativeint
 extern int rv_dom_character_data_get_data(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_character_data_set_data(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_character_data_set_data(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_character_data_get_length(nativeint target, uint32& result)
@@ -2456,16 +2440,16 @@ extern int rv_dom_character_data_get_next_element_sibling(nativeint target, nati
 extern int rv_dom_character_data_substring_data(nativeint target, uint32 offset, uint32 count, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_character_data_append_data(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data)
+extern int rv_dom_character_data_append_data(nativeint target, byte[] data, int data_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_character_data_insert_data(nativeint target, uint32 offset, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data)
+extern int rv_dom_character_data_insert_data(nativeint target, uint32 offset, byte[] data, int data_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_character_data_delete_data(nativeint target, uint32 offset, uint32 count)
 
 [<DllImport(Lib)>]
-extern int rv_dom_character_data_replace_data(nativeint target, uint32 offset, uint32 count, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data)
+extern int rv_dom_character_data_replace_data(nativeint target, uint32 offset, uint32 count, byte[] data, int data_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_character_data_before(nativeint target, [<In>] RvDomSequenceNodeOrDOMString[] nodes)
@@ -2513,13 +2497,13 @@ extern int rv_dom_document_fragment_replace_children(nativeint target, [<In>] Rv
 extern int rv_dom_document_fragment_move_before(nativeint target, nativeint node, nativeint child)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_fragment_query_selector(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, nativeint& result)
+extern int rv_dom_document_fragment_query_selector(nativeint target, byte[] selectors, int selectors_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_fragment_query_selector_all(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, nativeint& result)
+extern int rv_dom_document_fragment_query_selector_all(nativeint target, byte[] selectors, int selectors_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_fragment_get_element_by_id(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string element_id, nativeint& result)
+extern int rv_dom_document_fragment_get_element_by_id(nativeint target, byte[] element_id, int element_id_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_shadow_root_get_mode(nativeint target, int& result)
@@ -2543,7 +2527,7 @@ extern int rv_dom_shadow_root_get_host(nativeint target, nativeint& result)
 extern int rv_dom_shadow_root_get_reference_target(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_shadow_root_set_reference_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_shadow_root_set_reference_target(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_shadow_root_get_active_element(nativeint target, nativeint& result)
@@ -2567,7 +2551,7 @@ extern int rv_dom_shadow_root_get_pointer_lock_element(nativeint target, nativei
 extern int rv_dom_shadow_root_get_inner_html(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_shadow_root_set_inner_html(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_shadow_root_set_inner_html(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_shadow_root_element_from_point(nativeint target, float x, float y, nativeint& result)
@@ -2576,7 +2560,7 @@ extern int rv_dom_shadow_root_element_from_point(nativeint target, float x, floa
 extern int rv_dom_shadow_root_elements_from_point(nativeint target, float x, float y, RvDomSequenceElement& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_shadow_root_set_html_unsafe(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string html)
+extern int rv_dom_shadow_root_set_html_unsafe(nativeint target, byte[] html, int html_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_shadow_root_get_html(nativeint target, [<In>] RvDomGetHTMLOptions[] options, byte[] buffer, int capacity, int[] length)
@@ -2606,13 +2590,13 @@ extern int rv_dom_document_get_ready_state(nativeint target, int& result)
 extern int rv_dom_document_get_title(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_set_title(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_document_set_title(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_dir(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_set_dir(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_document_set_dir(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_body(nativeint target, nativeint& result)
@@ -2639,7 +2623,7 @@ extern int rv_dom_document_get_scripts(nativeint target, nativeint& result)
 extern int rv_dom_document_get_design_mode(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_set_design_mode(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_document_set_design_mode(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_anchors(nativeint target, nativeint& result)
@@ -2678,28 +2662,28 @@ extern int rv_dom_document_get_adopted_style_sheets(nativeint target, RvDomSeque
 extern int rv_dom_document_set_adopted_style_sheets(nativeint target, [<In>] RvDomSequenceCSSStyleSheet[] value)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_create_element(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, [<In>] RvDomUnionDOMStringOrElementCreationOptions[] options, nativeint& result)
+extern int rv_dom_document_create_element(nativeint target, byte[] local_name, int local_name_length, [<In>] RvDomUnionDOMStringOrElementCreationOptions[] options, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_create_element_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, [<In>] RvDomUnionDOMStringOrElementCreationOptions[] options, nativeint& result)
+extern int rv_dom_document_create_element_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] qualified_name, int qualified_name_length, [<In>] RvDomUnionDOMStringOrElementCreationOptions[] options, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_get_elements_by_tag_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, nativeint& result)
+extern int rv_dom_document_get_elements_by_tag_name(nativeint target, byte[] qualified_name, int qualified_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_get_elements_by_tag_name_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, nativeint& result)
+extern int rv_dom_document_get_elements_by_tag_name_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] local_name, int local_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_get_elements_by_class_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string class_names, nativeint& result)
+extern int rv_dom_document_get_elements_by_class_name(nativeint target, byte[] class_names, int class_names_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_create_document_fragment(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_create_text_node(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data, nativeint& result)
+extern int rv_dom_document_create_text_node(nativeint target, byte[] data, int data_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_create_comment(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data, nativeint& result)
+extern int rv_dom_document_create_comment(nativeint target, byte[] data, int data_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_import_node(nativeint target, nativeint node, [<In>] RvDomUnionBooleanOrImportNodeOptions[] options, nativeint& result)
@@ -2708,13 +2692,13 @@ extern int rv_dom_document_import_node(nativeint target, nativeint node, [<In>] 
 extern int rv_dom_document_adopt_node(nativeint target, nativeint node, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_create_attribute(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, nativeint& result)
+extern int rv_dom_document_create_attribute(nativeint target, byte[] local_name, int local_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_create_attribute_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, nativeint& result)
+extern int rv_dom_document_create_attribute_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] qualified_name, int qualified_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_create_event(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``, nativeint& result)
+extern int rv_dom_document_create_event(nativeint target, byte[] ``type``, int type_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_create_range(nativeint target, nativeint& result)
@@ -2729,37 +2713,37 @@ extern int rv_dom_document_create_tree_walker(nativeint target, nativeint root, 
 extern int rv_dom_document_caret_range_from_point(nativeint target, int x, int y, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_aria_notify(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement)
+extern int rv_dom_document_aria_notify(nativeint target, byte[] announcement, int announcement_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_aria_notify_2(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement, [<In>] RvDomAriaNotifyOptions[] options)
+extern int rv_dom_document_aria_notify_2(nativeint target, byte[] announcement, int announcement_length, [<In>] RvDomAriaNotifyOptions[] options)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_caret_position_from_point(nativeint target, float x, float y, [<In>] RvDomCaretPositionFromPointOptions[] options, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_get_elements_by_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string element_name, nativeint& result)
+extern int rv_dom_document_get_elements_by_name(nativeint target, byte[] element_name, int element_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_has_focus(nativeint target, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_exec_command(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string command_id, int show_ui, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value, int& result)
+extern int rv_dom_document_exec_command(nativeint target, byte[] command_id, int command_id_length, int show_ui, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_query_command_enabled(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string command_id, int& result)
+extern int rv_dom_document_query_command_enabled(nativeint target, byte[] command_id, int command_id_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_query_command_indeterm(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string command_id, int& result)
+extern int rv_dom_document_query_command_indeterm(nativeint target, byte[] command_id, int command_id_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_query_command_state(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string command_id, int& result)
+extern int rv_dom_document_query_command_state(nativeint target, byte[] command_id, int command_id_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_query_command_supported(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string command_id, int& result)
+extern int rv_dom_document_query_command_supported(nativeint target, byte[] command_id, int command_id_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_query_command_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string command_id, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_document_query_command_value(nativeint target, byte[] command_id, int command_id_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_selection(nativeint target, nativeint& result)
@@ -2777,13 +2761,13 @@ extern int rv_dom_document_replace_children(nativeint target, [<In>] RvDomSequen
 extern int rv_dom_document_move_before(nativeint target, nativeint node, nativeint child)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_query_selector(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, nativeint& result)
+extern int rv_dom_document_query_selector(nativeint target, byte[] selectors, int selectors_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_query_selector_all(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, nativeint& result)
+extern int rv_dom_document_query_selector_all(nativeint target, byte[] selectors, int selectors_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_document_get_element_by_id(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string element_id, nativeint& result)
+extern int rv_dom_document_get_element_by_id(nativeint target, byte[] element_id, int element_id_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_element_from_point(nativeint target, float x, float y, nativeint& result)
@@ -2792,7 +2776,7 @@ extern int rv_dom_document_element_from_point(nativeint target, float x, float y
 extern int rv_dom_document_elements_from_point(nativeint target, float x, float y, RvDomSequenceElement& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_implementation_create_html_document(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string title, nativeint& result)
+extern int rv_dom_dom_implementation_create_html_document(nativeint target, byte[] title, int title_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_implementation_has_feature(nativeint target, int& result)
@@ -2813,13 +2797,13 @@ extern int rv_dom_element_get_tag_name(nativeint target, byte[] buffer, int capa
 extern int rv_dom_element_get_id(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_id(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_id(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_class_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_class_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_class_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_class_list(nativeint target, nativeint& result)
@@ -2828,7 +2812,7 @@ extern int rv_dom_element_get_class_list(nativeint target, nativeint& result)
 extern int rv_dom_element_get_slot(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_slot(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_slot(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_part(nativeint target, nativeint& result)
@@ -2873,13 +2857,13 @@ extern int rv_dom_element_get_current_css_zoom(nativeint target, float& result)
 extern int rv_dom_element_get_outer_html(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_outer_html(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_outer_html(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_role(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_role(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_role(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_active_descendant_element(nativeint target, nativeint& result)
@@ -2891,259 +2875,259 @@ extern int rv_dom_element_set_aria_active_descendant_element(nativeint target, n
 extern int rv_dom_element_get_aria_atomic(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_atomic(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_atomic(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_auto_complete(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_auto_complete(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_auto_complete(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_braille_label(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_braille_label(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_braille_label(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_braille_role_description(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_braille_role_description(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_braille_role_description(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_busy(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_busy(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_busy(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_checked(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_checked(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_checked(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_col_count(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_col_count(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_col_count(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_col_index(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_col_index(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_col_index(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_col_index_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_col_index_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_col_index_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_col_span(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_col_span(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_col_span(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_current(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_current(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_current(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_description(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_description(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_description(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_disabled(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_disabled(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_disabled(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_expanded(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_expanded(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_expanded(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_has_popup(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_has_popup(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_has_popup(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_hidden(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_hidden(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_hidden(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_invalid(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_invalid(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_invalid(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_key_shortcuts(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_key_shortcuts(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_key_shortcuts(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_label(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_label(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_label(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_level(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_level(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_level(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_live(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_live(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_live(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_modal(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_modal(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_modal(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_multi_line(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_multi_line(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_multi_line(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_multi_selectable(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_multi_selectable(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_multi_selectable(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_orientation(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_orientation(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_orientation(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_placeholder(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_placeholder(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_placeholder(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_pos_in_set(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_pos_in_set(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_pos_in_set(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_pressed(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_pressed(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_pressed(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_read_only(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_read_only(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_read_only(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_relevant(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_relevant(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_relevant(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_required(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_required(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_required(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_role_description(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_role_description(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_role_description(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_row_count(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_row_count(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_row_count(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_row_index(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_row_index(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_row_index(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_row_index_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_row_index_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_row_index_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_row_span(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_row_span(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_row_span(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_selected(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_selected(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_selected(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_set_size(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_set_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_set_size(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_sort(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_sort(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_sort(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_value_max(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_value_max(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_value_max(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_value_min(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_value_min(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_value_min(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_value_now(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_value_now(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_value_now(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_aria_value_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_aria_value_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_aria_value_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_previous_element_sibling(nativeint target, nativeint& result)
@@ -3170,7 +3154,7 @@ extern int rv_dom_element_get_assigned_slot(nativeint target, nativeint& result)
 extern int rv_dom_element_get_inner_html(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_inner_html(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_inner_html(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_has_attributes(nativeint target, int& result)
@@ -3179,37 +3163,37 @@ extern int rv_dom_element_has_attributes(nativeint target, int& result)
 extern int rv_dom_element_get_attribute_names(nativeint target, RvDomSequenceDOMString& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_get_attribute(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_element_get_attribute(nativeint target, byte[] qualified_name, int qualified_name_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_get_attribute_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_element_get_attribute_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] local_name, int local_name_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_attribute(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_attribute(nativeint target, byte[] qualified_name, int qualified_name_length, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_attribute_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_element_set_attribute_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] qualified_name, int qualified_name_length, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_remove_attribute(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name)
+extern int rv_dom_element_remove_attribute(nativeint target, byte[] qualified_name, int qualified_name_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_remove_attribute_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name)
+extern int rv_dom_element_remove_attribute_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] local_name, int local_name_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_toggle_attribute(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, int[] force, int& result)
+extern int rv_dom_element_toggle_attribute(nativeint target, byte[] qualified_name, int qualified_name_length, int[] force, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_has_attribute(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, int& result)
+extern int rv_dom_element_has_attribute(nativeint target, byte[] qualified_name, int qualified_name_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_has_attribute_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, int& result)
+extern int rv_dom_element_has_attribute_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] local_name, int local_name_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_get_attribute_node(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, nativeint& result)
+extern int rv_dom_element_get_attribute_node(nativeint target, byte[] qualified_name, int qualified_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_get_attribute_node_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, nativeint& result)
+extern int rv_dom_element_get_attribute_node_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] local_name, int local_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_set_attribute_node(nativeint target, nativeint attr, nativeint& result)
@@ -3224,31 +3208,31 @@ extern int rv_dom_element_remove_attribute_node(nativeint target, nativeint attr
 extern int rv_dom_element_attach_shadow(nativeint target, [<In>] RvDomShadowRootInit[] init, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_closest(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, nativeint& result)
+extern int rv_dom_element_closest(nativeint target, byte[] selectors, int selectors_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_matches(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, int& result)
+extern int rv_dom_element_matches(nativeint target, byte[] selectors, int selectors_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_get_elements_by_tag_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, nativeint& result)
+extern int rv_dom_element_get_elements_by_tag_name(nativeint target, byte[] qualified_name, int qualified_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_get_elements_by_tag_name_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, nativeint& result)
+extern int rv_dom_element_get_elements_by_tag_name_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] local_name, int local_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_get_elements_by_class_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, nativeint& result)
+extern int rv_dom_element_get_elements_by_class_name(nativeint target, byte[] name, int name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_insert_adjacent_element(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string where, nativeint element, nativeint& result)
+extern int rv_dom_element_insert_adjacent_element(nativeint target, byte[] where, int where_length, nativeint element, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_insert_adjacent_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string where, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string data)
+extern int rv_dom_element_insert_adjacent_text(nativeint target, byte[] where, int where_length, byte[] data, int data_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_aria_notify(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement)
+extern int rv_dom_element_aria_notify(nativeint target, byte[] announcement, int announcement_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_aria_notify_2(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement, [<In>] RvDomAriaNotifyOptions[] options)
+extern int rv_dom_element_aria_notify_2(nativeint target, byte[] announcement, int announcement_length, [<In>] RvDomAriaNotifyOptions[] options)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_client_rects(nativeint target, nativeint& result)
@@ -3284,7 +3268,7 @@ extern int rv_dom_element_scroll_by(nativeint target, float x, float y)
 extern int rv_dom_element_scroll_into_view_if_needed(nativeint target, int center_if_needed)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_insert_adjacent_html(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string position, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string text)
+extern int rv_dom_element_insert_adjacent_html(nativeint target, byte[] position, int position_length, byte[] text, int text_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_set_pointer_capture(nativeint target, int pointer_id)
@@ -3323,13 +3307,13 @@ extern int rv_dom_element_replace_children(nativeint target, [<In>] RvDomSequenc
 extern int rv_dom_element_move_before(nativeint target, nativeint node, nativeint child)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_query_selector(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, nativeint& result)
+extern int rv_dom_element_query_selector(nativeint target, byte[] selectors, int selectors_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_query_selector_all(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selectors, nativeint& result)
+extern int rv_dom_element_query_selector_all(nativeint target, byte[] selectors, int selectors_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_element_set_html_unsafe(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string html)
+extern int rv_dom_element_set_html_unsafe(nativeint target, byte[] html, int html_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_get_html(nativeint target, [<In>] RvDomGetHTMLOptions[] options, byte[] buffer, int capacity, int[] length)
@@ -3350,7 +3334,7 @@ extern int rv_dom_attr_get_name(nativeint target, byte[] buffer, int capacity, i
 extern int rv_dom_attr_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_attr_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_attr_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_attr_get_owner_element(nativeint target, nativeint& result)
@@ -3368,10 +3352,10 @@ extern int rv_dom_named_node_map_get_length(nativeint target, uint32& result)
 extern int rv_dom_named_node_map_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_named_node_map_get_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, nativeint& result)
+extern int rv_dom_named_node_map_get_named_item(nativeint target, byte[] qualified_name, int qualified_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_named_node_map_get_named_item_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, nativeint& result)
+extern int rv_dom_named_node_map_get_named_item_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] local_name, int local_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_named_node_map_set_named_item(nativeint target, nativeint attr, nativeint& result)
@@ -3380,22 +3364,22 @@ extern int rv_dom_named_node_map_set_named_item(nativeint target, nativeint attr
 extern int rv_dom_named_node_map_set_named_item_ns(nativeint target, nativeint attr, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_named_node_map_remove_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string qualified_name, nativeint& result)
+extern int rv_dom_named_node_map_remove_named_item(nativeint target, byte[] qualified_name, int qualified_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_named_node_map_remove_named_item_ns(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string namespace_uri, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string local_name, nativeint& result)
+extern int rv_dom_named_node_map_remove_named_item_ns(nativeint target, byte[] namespace_uri, int namespace_uri_length, byte[] local_name, int local_name_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_title(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_title(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_title(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_lang(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_lang(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_lang(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_translate(nativeint target, int& result)
@@ -3407,7 +3391,7 @@ extern int rv_dom_html_element_set_translate(nativeint target, int value)
 extern int rv_dom_html_element_get_dir(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_dir(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_dir(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_cue(nativeint target, int& result)
@@ -3431,7 +3415,7 @@ extern int rv_dom_html_element_set_hidden(nativeint target, [<In>] RvDomUnionBoo
 extern int rv_dom_html_element_get_access_key(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_access_key(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_access_key(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_access_key_label(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -3452,13 +3436,13 @@ extern int rv_dom_html_element_set_spellcheck(nativeint target, int value)
 extern int rv_dom_html_element_get_autocapitalize(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_autocapitalize(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_autocapitalize(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_inner_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_inner_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_inner_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_inert(nativeint target, int& result)
@@ -3482,13 +3466,13 @@ extern int rv_dom_html_element_set_heading_reset(nativeint target, int value)
 extern int rv_dom_html_element_get_popover(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_popover(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_popover(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_outer_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_outer_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_outer_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_autocorrect(nativeint target, int& result)
@@ -3500,7 +3484,7 @@ extern int rv_dom_html_element_set_autocorrect(nativeint target, int value)
 extern int rv_dom_html_element_get_writing_suggestions(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_writing_suggestions(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_writing_suggestions(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_offset_parent(nativeint target, nativeint& result)
@@ -3521,13 +3505,13 @@ extern int rv_dom_html_element_get_offset_height(nativeint target, int& result)
 extern int rv_dom_html_element_get_content_editable(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_content_editable(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_content_editable(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_enter_key_hint(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_enter_key_hint(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_enter_key_hint(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_is_content_editable(nativeint target, int& result)
@@ -3536,7 +3520,7 @@ extern int rv_dom_html_element_get_is_content_editable(nativeint target, int& re
 extern int rv_dom_html_element_get_input_mode(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_input_mode(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_input_mode(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_dataset(nativeint target, nativeint& result)
@@ -3545,7 +3529,7 @@ extern int rv_dom_html_element_get_dataset(nativeint target, nativeint& result)
 extern int rv_dom_html_element_get_nonce(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_element_set_nonce(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_element_set_nonce(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_element_get_autofocus(nativeint target, int& result)
@@ -3587,61 +3571,61 @@ extern int rv_dom_html_element_blur(nativeint target)
 extern int rv_dom_html_anchor_element_get_charset(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_charset(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_charset(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_coords(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_coords(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_coords(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_download(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_download(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_download(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_hreflang(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_hreflang(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_hreflang(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_rel(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_rel(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_rel(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_rev(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_rev(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_rev(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_shape(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_shape(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_shape(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_rel_list(nativeint target, nativeint& result)
@@ -3650,7 +3634,7 @@ extern int rv_dom_html_anchor_element_get_rel_list(nativeint target, nativeint& 
 extern int rv_dom_html_anchor_element_get_referrer_policy(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_referrer_policy(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_referrer_policy(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_origin(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -3659,79 +3643,79 @@ extern int rv_dom_html_anchor_element_get_origin(nativeint target, byte[] buffer
 extern int rv_dom_html_anchor_element_get_protocol(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_protocol(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_protocol(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_username(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_username(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_username(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_password(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_password(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_password(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_host(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_host(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_host(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_hostname(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_hostname(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_hostname(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_port(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_port(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_port(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_pathname(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_pathname(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_pathname(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_search(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_search(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_search(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_hash(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_hash(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_hash(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_href(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_href(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_href(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_anchor_element_get_target(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_anchor_element_set_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_anchor_element_set_target(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_alt(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_alt(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_alt(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_coords(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_coords(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_coords(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_no_href(nativeint target, int& result)
@@ -3743,25 +3727,25 @@ extern int rv_dom_html_area_element_set_no_href(nativeint target, int value)
 extern int rv_dom_html_area_element_get_rel(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_rel(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_rel(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_shape(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_shape(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_shape(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_download(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_download(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_download(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_referrer_policy(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_referrer_policy(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_referrer_policy(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_rel_list(nativeint target, nativeint& result)
@@ -3773,103 +3757,103 @@ extern int rv_dom_html_area_element_get_origin(nativeint target, byte[] buffer, 
 extern int rv_dom_html_area_element_get_protocol(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_protocol(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_protocol(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_username(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_username(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_username(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_password(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_password(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_password(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_host(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_host(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_host(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_hostname(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_hostname(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_hostname(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_port(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_port(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_port(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_pathname(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_pathname(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_pathname(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_search(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_search(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_search(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_hash(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_hash(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_hash(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_href(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_href(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_href(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_area_element_get_target(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_area_element_set_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_area_element_set_target(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_body_element_get_a_link(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_body_element_set_a_link(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_body_element_set_a_link(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_body_element_get_background(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_body_element_set_background(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_body_element_set_background(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_body_element_get_bg_color(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_body_element_set_bg_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_body_element_set_bg_color(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_body_element_get_link(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_body_element_set_link(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_body_element_set_link(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_body_element_get_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_body_element_set_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_body_element_set_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_body_element_get_v_link(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_body_element_set_v_link(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_body_element_set_v_link(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_get_disabled(nativeint target, int& result)
@@ -3884,25 +3868,25 @@ extern int rv_dom_html_button_element_get_form(nativeint target, nativeint& resu
 extern int rv_dom_html_button_element_get_form_action(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_form_action(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_button_element_set_form_action(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_get_form_enctype(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_form_enctype(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_button_element_set_form_enctype(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_get_form_method(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_form_method(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_button_element_set_form_method(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_button_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_get_form_no_validate(nativeint target, int& result)
@@ -3914,19 +3898,19 @@ extern int rv_dom_html_button_element_set_form_no_validate(nativeint target, int
 extern int rv_dom_html_button_element_get_form_target(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_form_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_button_element_set_form_target(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_button_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_button_element_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_get_command_for_element(nativeint target, nativeint& result)
@@ -3938,7 +3922,7 @@ extern int rv_dom_html_button_element_set_command_for_element(nativeint target, 
 extern int rv_dom_html_button_element_get_command(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_command(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_button_element_set_command(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_get_will_validate(nativeint target, int& result)
@@ -3962,7 +3946,7 @@ extern int rv_dom_html_button_element_set_popover_target_element(nativeint targe
 extern int rv_dom_html_button_element_get_popover_target_action(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_popover_target_action(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_button_element_set_popover_target_action(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_button_element_check_validity(nativeint target, int& result)
@@ -3971,13 +3955,13 @@ extern int rv_dom_html_button_element_check_validity(nativeint target, int& resu
 extern int rv_dom_html_button_element_report_validity(nativeint target, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_button_element_set_custom_validity(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string error)
+extern int rv_dom_html_button_element_set_custom_validity(nativeint target, byte[] error, int error_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_details_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_details_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_details_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_details_element_get_open(nativeint target, int& result)
@@ -3995,13 +3979,13 @@ extern int rv_dom_html_dialog_element_set_open(nativeint target, int value)
 extern int rv_dom_html_dialog_element_get_return_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_dialog_element_set_return_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_dialog_element_set_return_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_dialog_element_get_closed_by(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_dialog_element_set_closed_by(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_dialog_element_set_closed_by(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_dialog_element_show(nativeint target)
@@ -4010,16 +3994,16 @@ extern int rv_dom_html_dialog_element_show(nativeint target)
 extern int rv_dom_html_dialog_element_show_modal(nativeint target)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_dialog_element_close(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string return_value)
+extern int rv_dom_html_dialog_element_close(nativeint target, byte[] return_value, int return_value_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_dialog_element_request_close(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string return_value)
+extern int rv_dom_html_dialog_element_request_close(nativeint target, byte[] return_value, int return_value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_div_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_div_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_div_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_field_set_element_get_disabled(nativeint target, int& result)
@@ -4034,7 +4018,7 @@ extern int rv_dom_html_field_set_element_get_form(nativeint target, nativeint& r
 extern int rv_dom_html_field_set_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_field_set_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_field_set_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_field_set_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -4058,49 +4042,49 @@ extern int rv_dom_html_field_set_element_check_validity(nativeint target, int& r
 extern int rv_dom_html_field_set_element_report_validity(nativeint target, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_field_set_element_set_custom_validity(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string error)
+extern int rv_dom_html_field_set_element_set_custom_validity(nativeint target, byte[] error, int error_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_accept_charset(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_set_accept_charset(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_form_element_set_accept_charset(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_action(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_set_action(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_form_element_set_action(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_autocomplete(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_set_autocomplete(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_form_element_set_autocomplete(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_enctype(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_set_enctype(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_form_element_set_enctype(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_encoding(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_set_encoding(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_form_element_set_encoding(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_method(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_set_method(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_form_element_set_method(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_form_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_no_validate(nativeint target, int& result)
@@ -4112,13 +4096,13 @@ extern int rv_dom_html_form_element_set_no_validate(nativeint target, int value)
 extern int rv_dom_html_form_element_get_target(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_set_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_form_element_set_target(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_rel(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_set_rel(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_form_element_set_rel(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_get_rel_list(nativeint target, nativeint& result)
@@ -4133,7 +4117,7 @@ extern int rv_dom_html_form_element_get_length(nativeint target, uint32& result)
 extern int rv_dom_html_form_element_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_element_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, RvDomUnionRadioNodeListOrElementNullable& result)
+extern int rv_dom_html_form_element_named_item(nativeint target, byte[] name, int name_length, RvDomUnionRadioNodeListOrElementNullable& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_submit(nativeint target)
@@ -4154,37 +4138,37 @@ extern int rv_dom_html_form_element_report_validity(nativeint target, int& resul
 extern int rv_dom_html_image_element_get_alt(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_alt(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_alt(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_src(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_src(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_src(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_srcset(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_srcset(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_srcset(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_sizes(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_sizes(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_sizes(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_cross_origin(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_cross_origin(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_cross_origin(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_use_map(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_use_map(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_use_map(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_is_map(nativeint target, int& result)
@@ -4226,37 +4210,37 @@ extern int rv_dom_html_image_element_get_current_src(nativeint target, byte[] bu
 extern int rv_dom_html_image_element_get_referrer_policy(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_referrer_policy(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_referrer_policy(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_decoding(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_decoding(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_decoding(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_loading(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_loading(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_loading(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_lowsrc(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_lowsrc(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_lowsrc(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_hspace(nativeint target, uint32& result)
@@ -4274,19 +4258,19 @@ extern int rv_dom_html_image_element_set_vspace(nativeint target, uint32 value)
 extern int rv_dom_html_image_element_get_long_desc(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_long_desc(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_long_desc(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_border(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_border(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_border(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_fetch_priority(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_image_element_set_fetch_priority(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_image_element_set_fetch_priority(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_image_element_get_attachment_identifier(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -4301,7 +4285,7 @@ extern int rv_dom_html_image_element_get_y(nativeint target, int& result)
 extern int rv_dom_html_input_element_get_accept(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_accept(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_accept(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_alpha(nativeint target, int& result)
@@ -4313,13 +4297,13 @@ extern int rv_dom_html_input_element_set_alpha(nativeint target, int value)
 extern int rv_dom_html_input_element_get_alt(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_alt(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_alt(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_autocomplete(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_autocomplete(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_autocomplete(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_default_checked(nativeint target, int& result)
@@ -4337,13 +4321,13 @@ extern int rv_dom_html_input_element_set_checked(nativeint target, int value)
 extern int rv_dom_html_input_element_get_color_space(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_color_space(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_color_space(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_dir_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_dir_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_dir_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_disabled(nativeint target, int& result)
@@ -4364,19 +4348,19 @@ extern int rv_dom_html_input_element_set_files(nativeint target, nativeint value
 extern int rv_dom_html_input_element_get_form_action(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_form_action(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_form_action(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_form_enctype(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_form_enctype(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_form_enctype(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_form_method(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_form_method(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_form_method(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_form_no_validate(nativeint target, int& result)
@@ -4388,7 +4372,7 @@ extern int rv_dom_html_input_element_set_form_no_validate(nativeint target, int 
 extern int rv_dom_html_input_element_get_form_target(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_form_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_form_target(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_height(nativeint target, uint32& result)
@@ -4409,7 +4393,7 @@ extern int rv_dom_html_input_element_get_list(nativeint target, nativeint& resul
 extern int rv_dom_html_input_element_get_max(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_max(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_max(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_min_length(nativeint target, int& result)
@@ -4427,7 +4411,7 @@ extern int rv_dom_html_input_element_set_max_length(nativeint target, int value)
 extern int rv_dom_html_input_element_get_min(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_min(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_min(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_multiple(nativeint target, int& result)
@@ -4439,19 +4423,19 @@ extern int rv_dom_html_input_element_set_multiple(nativeint target, int value)
 extern int rv_dom_html_input_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_pattern(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_pattern(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_pattern(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_placeholder(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_placeholder(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_placeholder(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_read_only(nativeint target, int& result)
@@ -4475,13 +4459,13 @@ extern int rv_dom_html_input_element_set_size(nativeint target, uint32 value)
 extern int rv_dom_html_input_element_get_src(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_src(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_src(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_step(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_step(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_step(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_switch(nativeint target, int& result)
@@ -4493,19 +4477,19 @@ extern int rv_dom_html_input_element_set_switch(nativeint target, int value)
 extern int rv_dom_html_input_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_default_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_default_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_default_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_value_as_number(nativeint target, float& result)
@@ -4547,25 +4531,25 @@ extern int rv_dom_html_input_element_set_selection_end(nativeint target, uint32[
 extern int rv_dom_html_input_element_get_selection_direction(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_selection_direction(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_selection_direction(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_use_map(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_use_map(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_use_map(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_capture(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_capture(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_capture(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_get_popover_target_element(nativeint target, nativeint& result)
@@ -4577,7 +4561,7 @@ extern int rv_dom_html_input_element_set_popover_target_element(nativeint target
 extern int rv_dom_html_input_element_get_popover_target_action(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_popover_target_action(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_input_element_set_popover_target_action(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_step_up(nativeint target, int n)
@@ -4592,19 +4576,19 @@ extern int rv_dom_html_input_element_check_validity(nativeint target, int& resul
 extern int rv_dom_html_input_element_report_validity(nativeint target, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_custom_validity(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string error)
+extern int rv_dom_html_input_element_set_custom_validity(nativeint target, byte[] error, int error_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_input_element_select(nativeint target)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_range_text_1(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string replacement)
+extern int rv_dom_html_input_element_set_range_text_1(nativeint target, byte[] replacement, int replacement_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_range_text_4(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string replacement, uint32 start, uint32 ``end``, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selection_mode)
+extern int rv_dom_html_input_element_set_range_text_4(nativeint target, byte[] replacement, int replacement_length, uint32 start, uint32 ``end``, byte[] selection_mode, int selection_mode_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_input_element_set_selection_range(nativeint target, uint32 start, uint32 ``end``, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string direction)
+extern int rv_dom_html_input_element_set_selection_range(nativeint target, uint32 start, uint32 ``end``, byte[] direction, int direction_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_label_element_get_form(nativeint target, nativeint& result)
@@ -4613,7 +4597,7 @@ extern int rv_dom_html_label_element_get_form(nativeint target, nativeint& resul
 extern int rv_dom_html_label_element_get_html_for(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_label_element_set_html_for(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_label_element_set_html_for(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_label_element_get_control(nativeint target, nativeint& result)
@@ -4625,13 +4609,13 @@ extern int rv_dom_html_legend_element_get_form(nativeint target, nativeint& resu
 extern int rv_dom_html_legend_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_legend_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_legend_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_htmlli_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_htmlli_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_htmlli_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_htmlli_element_get_value(nativeint target, int& result)
@@ -4700,7 +4684,7 @@ extern int rv_dom_htmlo_list_element_set_reversed(nativeint target, int value)
 extern int rv_dom_htmlo_list_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_htmlo_list_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_htmlo_list_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_opt_group_element_get_disabled(nativeint target, int& result)
@@ -4712,7 +4696,7 @@ extern int rv_dom_html_opt_group_element_set_disabled(nativeint target, int valu
 extern int rv_dom_html_opt_group_element_get_label(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_opt_group_element_set_label(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_opt_group_element_set_label(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_option_element_get_disabled(nativeint target, int& result)
@@ -4727,7 +4711,7 @@ extern int rv_dom_html_option_element_get_form(nativeint target, nativeint& resu
 extern int rv_dom_html_option_element_get_label(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_option_element_set_label(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_option_element_set_label(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_option_element_get_default_selected(nativeint target, int& result)
@@ -4745,13 +4729,13 @@ extern int rv_dom_html_option_element_set_selected(nativeint target, int value)
 extern int rv_dom_html_option_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_option_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_option_element_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_option_element_get_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_option_element_set_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_option_element_set_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_option_element_get_index(nativeint target, int& result)
@@ -4766,7 +4750,7 @@ extern int rv_dom_html_output_element_get_form(nativeint target, nativeint& resu
 extern int rv_dom_html_output_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_output_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_output_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_output_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -4775,13 +4759,13 @@ extern int rv_dom_html_output_element_get_type(nativeint target, byte[] buffer, 
 extern int rv_dom_html_output_element_get_default_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_output_element_set_default_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_output_element_set_default_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_output_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_output_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_output_element_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_output_element_get_will_validate(nativeint target, int& result)
@@ -4802,13 +4786,13 @@ extern int rv_dom_html_output_element_check_validity(nativeint target, int& resu
 extern int rv_dom_html_output_element_report_validity(nativeint target, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_output_element_set_custom_validity(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string error)
+extern int rv_dom_html_output_element_set_custom_validity(nativeint target, byte[] error, int error_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_paragraph_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_paragraph_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_paragraph_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_progress_element_get_value(nativeint target, float& result)
@@ -4832,7 +4816,7 @@ extern int rv_dom_html_progress_element_get_labels(nativeint target, nativeint& 
 extern int rv_dom_html_select_element_get_autocomplete(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_select_element_set_autocomplete(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_select_element_set_autocomplete(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_select_element_get_disabled(nativeint target, int& result)
@@ -4853,7 +4837,7 @@ extern int rv_dom_html_select_element_set_multiple(nativeint target, int value)
 extern int rv_dom_html_select_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_select_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_select_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_select_element_get_required(nativeint target, int& result)
@@ -4892,7 +4876,7 @@ extern int rv_dom_html_select_element_set_selected_index(nativeint target, int v
 extern int rv_dom_html_select_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_select_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_select_element_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_select_element_get_will_validate(nativeint target, int& result)
@@ -4910,7 +4894,7 @@ extern int rv_dom_html_select_element_get_labels(nativeint target, nativeint& re
 extern int rv_dom_html_select_element_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_select_element_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, nativeint& result)
+extern int rv_dom_html_select_element_named_item(nativeint target, byte[] name, int name_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_select_element_add(nativeint target, [<In>] RvDomUnionHTMLOptionElementOrHTMLOptGroupElement[] element, [<In>] RvDomUnionHTMLElementOrLongNullable[] before)
@@ -4931,13 +4915,13 @@ extern int rv_dom_html_select_element_check_validity(nativeint target, int& resu
 extern int rv_dom_html_select_element_report_validity(nativeint target, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_select_element_set_custom_validity(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string error)
+extern int rv_dom_html_select_element_set_custom_validity(nativeint target, byte[] error, int error_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_slot_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_slot_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_slot_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_slot_element_assigned_nodes(nativeint target, [<In>] RvDomAssignedNodesOptions[] options, RvDomSequenceNode& result)
@@ -4976,55 +4960,55 @@ extern int rv_dom_html_table_element_get_rows(nativeint target, nativeint& resul
 extern int rv_dom_html_table_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_element_get_border(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_element_set_border(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_element_set_border(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_element_get_frame(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_element_set_frame(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_element_set_frame(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_element_get_rules(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_element_set_rules(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_element_set_rules(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_element_get_summary(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_element_set_summary(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_element_set_summary(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_element_set_width(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_element_get_bg_color(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_element_set_bg_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_element_set_bg_color(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_element_get_cell_padding(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_element_set_cell_padding(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_element_set_cell_padding(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_element_get_cell_spacing(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_element_set_cell_spacing(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_element_set_cell_spacing(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_element_create_caption(nativeint target, nativeint& result)
@@ -5057,25 +5041,25 @@ extern int rv_dom_html_table_element_delete_row(nativeint target, int index)
 extern int rv_dom_html_table_caption_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_caption_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_caption_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_col_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_col_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_col_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_col_element_get_ch(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_col_element_set_ch(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_col_element_set_ch(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_col_element_get_ch_off(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_col_element_set_ch_off(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_col_element_set_ch_off(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_col_element_get_span(nativeint target, uint32& result)
@@ -5087,13 +5071,13 @@ extern int rv_dom_html_table_col_element_set_span(nativeint target, uint32 value
 extern int rv_dom_html_table_col_element_get_v_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_col_element_set_v_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_col_element_set_v_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_col_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_col_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_col_element_set_width(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_section_element_get_rows(nativeint target, nativeint& result)
@@ -5102,25 +5086,25 @@ extern int rv_dom_html_table_section_element_get_rows(nativeint target, nativein
 extern int rv_dom_html_table_section_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_section_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_section_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_section_element_get_ch(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_section_element_set_ch(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_section_element_set_ch(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_section_element_get_ch_off(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_section_element_set_ch_off(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_section_element_set_ch_off(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_section_element_get_v_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_section_element_set_v_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_section_element_set_v_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_section_element_insert_row(nativeint target, int index, nativeint& result)
@@ -5141,31 +5125,31 @@ extern int rv_dom_html_table_row_element_get_cells(nativeint target, nativeint& 
 extern int rv_dom_html_table_row_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_row_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_row_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_row_element_get_bg_color(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_row_element_set_bg_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_row_element_set_bg_color(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_row_element_get_ch(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_row_element_set_ch(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_row_element_set_ch(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_row_element_get_ch_off(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_row_element_set_ch_off(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_row_element_set_ch_off(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_row_element_get_v_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_row_element_set_v_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_row_element_set_v_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_row_element_insert_cell(nativeint target, int index, nativeint& result)
@@ -5180,31 +5164,31 @@ extern int rv_dom_html_table_cell_element_get_cell_index(nativeint target, int& 
 extern int rv_dom_html_table_cell_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_axis(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_axis(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_axis(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_bg_color(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_bg_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_bg_color(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_ch(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_ch(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_ch(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_ch_off(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_ch_off(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_ch_off(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_col_span(nativeint target, uint32& result)
@@ -5222,13 +5206,13 @@ extern int rv_dom_html_table_cell_element_set_row_span(nativeint target, uint32 
 extern int rv_dom_html_table_cell_element_get_headers(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_headers(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_headers(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_height(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_height(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_height(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_no_wrap(nativeint target, int& result)
@@ -5240,31 +5224,31 @@ extern int rv_dom_html_table_cell_element_set_no_wrap(nativeint target, int valu
 extern int rv_dom_html_table_cell_element_get_v_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_v_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_v_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_width(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_abbr(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_abbr(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_abbr(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_table_cell_element_get_scope(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_table_cell_element_set_scope(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_table_cell_element_set_scope(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_dir_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_dir_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_text_area_element_set_dir_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_disabled(nativeint target, int& result)
@@ -5291,13 +5275,13 @@ extern int rv_dom_html_text_area_element_set_max_length(nativeint target, int va
 extern int rv_dom_html_text_area_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_text_area_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_placeholder(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_placeholder(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_text_area_element_set_placeholder(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_read_only(nativeint target, int& result)
@@ -5327,7 +5311,7 @@ extern int rv_dom_html_text_area_element_set_cols(nativeint target, uint32 value
 extern int rv_dom_html_text_area_element_get_wrap(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_wrap(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_text_area_element_set_wrap(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -5336,13 +5320,13 @@ extern int rv_dom_html_text_area_element_get_type(nativeint target, byte[] buffe
 extern int rv_dom_html_text_area_element_get_default_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_default_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_text_area_element_set_default_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_text_area_element_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_text_length(nativeint target, uint32& result)
@@ -5375,13 +5359,13 @@ extern int rv_dom_html_text_area_element_set_selection_end(nativeint target, uin
 extern int rv_dom_html_text_area_element_get_selection_direction(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_selection_direction(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_text_area_element_set_selection_direction(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_get_autocomplete(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_autocomplete(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_text_area_element_set_autocomplete(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_check_validity(nativeint target, int& result)
@@ -5390,19 +5374,19 @@ extern int rv_dom_html_text_area_element_check_validity(nativeint target, int& r
 extern int rv_dom_html_text_area_element_report_validity(nativeint target, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_custom_validity(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string error)
+extern int rv_dom_html_text_area_element_set_custom_validity(nativeint target, byte[] error, int error_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_text_area_element_select(nativeint target)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_range_text_1(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string replacement)
+extern int rv_dom_html_text_area_element_set_range_text_1(nativeint target, byte[] replacement, int replacement_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_range_text_4(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string replacement, uint32 start, uint32 ``end``, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selection_mode)
+extern int rv_dom_html_text_area_element_set_range_text_4(nativeint target, byte[] replacement, int replacement_length, uint32 start, uint32 ``end``, byte[] selection_mode, int selection_mode_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_text_area_element_set_selection_range(nativeint target, uint32 start, uint32 ``end``, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string direction)
+extern int rv_dom_html_text_area_element_set_selection_range(nativeint target, uint32 start, uint32 ``end``, byte[] direction, int direction_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_template_element_get_content(nativeint target, nativeint& result)
@@ -5411,7 +5395,7 @@ extern int rv_dom_html_template_element_get_content(nativeint target, nativeint&
 extern int rv_dom_html_template_element_get_shadow_root_mode(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_template_element_set_shadow_root_mode(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_template_element_set_shadow_root_mode(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_template_element_get_shadow_root_delegates_focus(nativeint target, int& result)
@@ -5423,7 +5407,7 @@ extern int rv_dom_html_template_element_set_shadow_root_delegates_focus(nativein
 extern int rv_dom_html_template_element_get_shadow_root_slot_assignment(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_template_element_set_shadow_root_slot_assignment(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_template_element_set_shadow_root_slot_assignment(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_template_element_get_shadow_root_clonable(nativeint target, int& result)
@@ -5441,13 +5425,13 @@ extern int rv_dom_html_template_element_set_shadow_root_serializable(nativeint t
 extern int rv_dom_html_template_element_get_shadow_root_custom_element_registry(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_template_element_set_shadow_root_custom_element_registry(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_template_element_set_shadow_root_custom_element_registry(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_template_element_get_shadow_root_reference_target(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_template_element_set_shadow_root_reference_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_template_element_set_shadow_root_reference_target(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_htmlu_list_element_get_compact(nativeint target, int& result)
@@ -5459,31 +5443,31 @@ extern int rv_dom_htmlu_list_element_set_compact(nativeint target, int value)
 extern int rv_dom_htmlu_list_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_htmlu_list_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_htmlu_list_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_base_element_get_href(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_base_element_set_href(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_base_element_set_href(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_base_element_get_target(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_base_element_set_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_base_element_set_target(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_htmlbr_element_get_clear(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_htmlbr_element_set_clear(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_htmlbr_element_set_clear(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_data_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_data_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_data_element_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_data_list_element_get_options(nativeint target, nativeint& result)
@@ -5504,37 +5488,37 @@ extern int rv_dom_htmld_list_element_set_compact(nativeint target, int value)
 extern int rv_dom_html_font_element_get_color(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_font_element_set_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_font_element_set_color(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_font_element_get_face(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_font_element_set_face(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_font_element_set_face(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_font_element_get_size(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_font_element_set_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_font_element_set_size(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_heading_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_heading_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_heading_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_htmlhr_element_get_align(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_htmlhr_element_set_align(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_htmlhr_element_set_align(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_htmlhr_element_get_color(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_htmlhr_element_set_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_htmlhr_element_set_color(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_htmlhr_element_get_no_shade(nativeint target, int& result)
@@ -5546,19 +5530,19 @@ extern int rv_dom_htmlhr_element_set_no_shade(nativeint target, int value)
 extern int rv_dom_htmlhr_element_get_size(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_htmlhr_element_set_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_htmlhr_element_set_size(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_htmlhr_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_htmlhr_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_htmlhr_element_set_width(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_html_element_get_version(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_html_element_set_version(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_html_element_set_version(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_map_element_get_areas(nativeint target, nativeint& result)
@@ -5567,31 +5551,31 @@ extern int rv_dom_html_map_element_get_areas(nativeint target, nativeint& result
 extern int rv_dom_html_map_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_map_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_map_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_marquee_element_get_behavior(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_marquee_element_set_behavior(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_marquee_element_set_behavior(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_marquee_element_get_bg_color(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_marquee_element_set_bg_color(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_marquee_element_set_bg_color(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_marquee_element_get_direction(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_marquee_element_set_direction(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_marquee_element_set_direction(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_marquee_element_get_height(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_marquee_element_set_height(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_marquee_element_set_height(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_marquee_element_get_hspace(nativeint target, uint32& result)
@@ -5633,7 +5617,7 @@ extern int rv_dom_html_marquee_element_set_vspace(nativeint target, uint32 value
 extern int rv_dom_html_marquee_element_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_marquee_element_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_marquee_element_set_width(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_marquee_element_start(nativeint target)
@@ -5651,67 +5635,67 @@ extern int rv_dom_html_menu_element_set_compact(nativeint target, int value)
 extern int rv_dom_html_meta_element_get_content(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_meta_element_set_content(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_meta_element_set_content(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_meta_element_get_http_equiv(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_meta_element_set_http_equiv(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_meta_element_set_http_equiv(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_meta_element_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_meta_element_set_media(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_meta_element_set_media(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_meta_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_meta_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_meta_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_meta_element_get_scheme(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_meta_element_set_scheme(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_meta_element_set_scheme(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_mod_element_get_cite(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_mod_element_set_cite(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_mod_element_set_cite(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_mod_element_get_date_time(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_mod_element_set_date_time(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_mod_element_set_date_time(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_param_element_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_param_element_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_param_element_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_param_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_param_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_param_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_param_element_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_param_element_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_param_element_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_param_element_get_value_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_param_element_set_value_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_param_element_set_value_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_pre_element_get_width(nativeint target, int& result)
@@ -5723,37 +5707,37 @@ extern int rv_dom_html_pre_element_set_width(nativeint target, int value)
 extern int rv_dom_html_quote_element_get_cite(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_quote_element_set_cite(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_quote_element_set_cite(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_source_element_get_src(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_source_element_set_src(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_source_element_set_src(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_source_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_source_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_source_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_source_element_get_srcset(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_source_element_set_srcset(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_source_element_set_srcset(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_source_element_get_sizes(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_source_element_set_sizes(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_source_element_set_sizes(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_source_element_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_source_element_set_media(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_source_element_set_media(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_source_element_get_width(nativeint target, uint32& result)
@@ -5774,13 +5758,13 @@ extern int rv_dom_html_source_element_get_attachment_identifier(nativeint target
 extern int rv_dom_html_time_element_get_date_time(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_time_element_set_date_time(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_time_element_set_date_time(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_title_element_get_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_title_element_set_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_title_element_set_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_element_get_class_name(nativeint target, nativeint& result)
@@ -5798,7 +5782,7 @@ extern int rv_dom_svg_element_get_dataset(nativeint target, nativeint& result)
 extern int rv_dom_svg_element_get_nonce(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_element_set_nonce(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_element_set_nonce(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_element_get_autofocus(nativeint target, int& result)
@@ -5831,7 +5815,7 @@ extern int rv_dom_math_ml_element_get_dataset(nativeint target, nativeint& resul
 extern int rv_dom_math_ml_element_get_nonce(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_math_ml_element_set_nonce(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_math_ml_element_set_nonce(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_math_ml_element_get_autofocus(nativeint target, int& result)
@@ -5867,13 +5851,13 @@ extern int rv_dom_html_style_element_set_disabled(nativeint target, int value)
 extern int rv_dom_html_style_element_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_style_element_set_media(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_style_element_set_media(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_style_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_style_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_style_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_style_element_get_blocking(nativeint target, nativeint& result)
@@ -5891,19 +5875,19 @@ extern int rv_dom_svg_style_element_set_disabled(nativeint target, int value)
 extern int rv_dom_svg_style_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_style_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_style_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_style_element_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_style_element_set_media(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_style_element_set_media(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_style_element_get_title(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_style_element_set_title(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_style_element_set_title(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_style_element_get_sheet(nativeint target, nativeint& result)
@@ -5912,25 +5896,25 @@ extern int rv_dom_svg_style_element_get_sheet(nativeint target, nativeint& resul
 extern int rv_dom_html_link_element_get_href(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_href(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_href(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_cross_origin(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_cross_origin(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_cross_origin(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_rel(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_rel(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_rel(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_as(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_as(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_as(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_rel_list(nativeint target, nativeint& result)
@@ -5939,25 +5923,25 @@ extern int rv_dom_html_link_element_get_rel_list(nativeint target, nativeint& re
 extern int rv_dom_html_link_element_get_media(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_media(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_media(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_integrity(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_integrity(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_integrity(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_hreflang(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_hreflang(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_hreflang(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_sizes(nativeint target, nativeint& result)
@@ -5966,19 +5950,19 @@ extern int rv_dom_html_link_element_get_sizes(nativeint target, nativeint& resul
 extern int rv_dom_html_link_element_get_image_srcset(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_image_srcset(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_image_srcset(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_image_sizes(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_image_sizes(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_image_sizes(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_referrer_policy(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_referrer_policy(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_referrer_policy(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_blocking(nativeint target, nativeint& result)
@@ -5993,25 +5977,25 @@ extern int rv_dom_html_link_element_set_disabled(nativeint target, int value)
 extern int rv_dom_html_link_element_get_fetch_priority(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_fetch_priority(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_fetch_priority(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_charset(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_charset(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_charset(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_rev(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_rev(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_rev(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_target(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_link_element_set_target(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_html_link_element_set_target(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_link_element_get_sheet(nativeint target, nativeint& result)
@@ -6047,7 +6031,7 @@ extern int rv_dom_style_sheet_list_get_length(nativeint target, uint32& result)
 extern int rv_dom_style_sheet_list_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_style_sheet_list_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, nativeint& result)
+extern int rv_dom_style_sheet_list_named_item(nativeint target, byte[] name, int name_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_sheet_create(nativeint target, [<In>] RvDomCSSStyleSheetInit[] options, nativeint& result)
@@ -6062,16 +6046,16 @@ extern int rv_dom_css_style_sheet_get_css_rules(nativeint target, nativeint& res
 extern int rv_dom_css_style_sheet_get_rules(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_sheet_insert_rule(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string rule, uint32 index, uint32& result)
+extern int rv_dom_css_style_sheet_insert_rule(nativeint target, byte[] rule, int rule_length, uint32 index, uint32& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_sheet_delete_rule(nativeint target, uint32 index)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_sheet_replace_sync(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string text)
+extern int rv_dom_css_style_sheet_replace_sync(nativeint target, byte[] text, int text_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_sheet_add_rule(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string selector, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string style, uint32[] index, int& result)
+extern int rv_dom_css_style_sheet_add_rule(nativeint target, byte[] selector, int selector_length, byte[] style, int style_length, uint32[] index, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_sheet_remove_rule(nativeint target, uint32 index)
@@ -6080,7 +6064,7 @@ extern int rv_dom_css_style_sheet_remove_rule(nativeint target, uint32 index)
 extern int rv_dom_media_list_get_media_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_media_list_set_media_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_media_list_set_media_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_media_list_get_length(nativeint target, uint32& result)
@@ -6089,16 +6073,16 @@ extern int rv_dom_media_list_get_length(nativeint target, uint32& result)
 extern int rv_dom_media_list_item(nativeint target, uint32 index, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_media_list_delete_medium(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string old_medium)
+extern int rv_dom_media_list_delete_medium(nativeint target, byte[] old_medium, int old_medium_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_media_list_append_medium(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string new_medium)
+extern int rv_dom_media_list_append_medium(nativeint target, byte[] new_medium, int new_medium_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_css_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_rule_set_css_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_rule_set_css_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_parent_rule(nativeint target, nativeint& result)
@@ -6119,7 +6103,7 @@ extern int rv_dom_css_rule_list_item(nativeint target, uint32 index, nativeint& 
 extern int rv_dom_css_style_rule_get_selector_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_rule_set_selector_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_style_rule_set_selector_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_rule_get_style(nativeint target, nativeint& result)
@@ -6131,7 +6115,7 @@ extern int rv_dom_css_style_rule_get_css_rules(nativeint target, nativeint& resu
 extern int rv_dom_css_style_rule_get_style_map(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_rule_insert_rule(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string rule, uint32 index, uint32& result)
+extern int rv_dom_css_style_rule_insert_rule(nativeint target, byte[] rule, int rule_length, uint32 index, uint32& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_rule_delete_rule(nativeint target, uint32 index)
@@ -6140,13 +6124,13 @@ extern int rv_dom_css_style_rule_delete_rule(nativeint target, uint32 index)
 extern int rv_dom_css_style_properties_get_css_float(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_properties_set_css_float(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_style_properties_set_css_float(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_grouping_rule_get_css_rules(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_grouping_rule_insert_rule(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string rule, uint32 index, uint32& result)
+extern int rv_dom_css_grouping_rule_insert_rule(nativeint target, byte[] rule, int rule_length, uint32 index, uint32& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_grouping_rule_delete_rule(nativeint target, uint32 index)
@@ -6203,7 +6187,7 @@ extern int rv_dom_css_namespace_rule_get_prefix(nativeint target, byte[] buffer,
 extern int rv_dom_css_keyframes_rule_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_keyframes_rule_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_keyframes_rule_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_keyframes_rule_get_css_rules(nativeint target, nativeint& result)
@@ -6215,19 +6199,19 @@ extern int rv_dom_css_keyframes_rule_get_length(nativeint target, uint32& result
 extern int rv_dom_css_keyframes_rule_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_keyframes_rule_append_rule(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string rule)
+extern int rv_dom_css_keyframes_rule_append_rule(nativeint target, byte[] rule, int rule_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_keyframes_rule_delete_rule(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string key)
+extern int rv_dom_css_keyframes_rule_delete_rule(nativeint target, byte[] key, int key_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_keyframes_rule_find_rule(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string key, nativeint& result)
+extern int rv_dom_css_keyframes_rule_find_rule(nativeint target, byte[] key, int key_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_keyframe_rule_get_key_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_keyframe_rule_set_key_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_keyframe_rule_set_key_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_keyframe_rule_get_style(nativeint target, nativeint& result)
@@ -6239,157 +6223,157 @@ extern int rv_dom_css_font_face_rule_get_style(nativeint target, nativeint& resu
 extern int rv_dom_css_font_face_descriptors_get_src(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_src(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_src(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_family(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_family(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_family(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_family_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_family_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_family_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_style(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_style(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_style(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_style_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_style_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_style_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_weight(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_weight(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_weight(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_weight_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_weight_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_weight_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_stretch(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_stretch(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_stretch(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_stretch_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_stretch_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_stretch_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_width(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_width(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_width_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_width_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_width_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_size_adjust(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_size_adjust(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_size_adjust(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_size_adjust_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_size_adjust_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_size_adjust_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_unicode_range(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_unicode_range(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_unicode_range(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_unicode_range_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_unicode_range_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_unicode_range_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_feature_settings(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_feature_settings(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_feature_settings(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_feature_settings_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_feature_settings_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_feature_settings_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_display(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_display(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_display(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_font_display_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_font_display_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_font_display_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_ascent_override(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_ascent_override(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_ascent_override(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_ascent_override_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_ascent_override_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_ascent_override_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_descent_override(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_descent_override(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_descent_override(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_descent_override_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_descent_override_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_descent_override_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_line_gap_override(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_line_gap_override(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_line_gap_override(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_face_descriptors_get_line_gap_override_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_face_descriptors_set_line_gap_override_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_face_descriptors_set_line_gap_override_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_feature_values_rule_get_font_family(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_font_feature_values_rule_set_font_family(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_font_feature_values_rule_set_font_family(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_font_palette_values_rule_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -6407,67 +6391,67 @@ extern int rv_dom_css_font_palette_values_rule_get_override_colors(nativeint tar
 extern int rv_dom_css_counter_style_rule_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_name(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_system(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_system(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_system(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_symbols(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_symbols(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_symbols(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_additive_symbols(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_additive_symbols(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_additive_symbols(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_negative(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_negative(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_negative(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_prefix(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_prefix(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_prefix(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_suffix(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_suffix(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_suffix(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_range(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_range(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_range(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_pad(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_pad(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_pad(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_speak_as(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_speak_as(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_speak_as(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_counter_style_rule_get_fallback(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_counter_style_rule_set_fallback(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_counter_style_rule_set_fallback(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_property_rule_get_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -6716,421 +6700,421 @@ extern int rv_dom_css_position_try_rule_get_style(nativeint target, nativeint& r
 extern int rv_dom_css_position_try_descriptors_get_margin(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_top(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_top(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_top(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_right(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_right(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_right(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_bottom(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_bottom(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_bottom(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_left(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_left(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_left(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_block(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_block(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_block(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_block_start(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_block_start(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_block_start(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_block_end(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_block_end(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_block_end(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_inline(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_inline(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_inline(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_inline_start(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_inline_start(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_inline_start(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_inline_end(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_inline_end(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_inline_end(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_top_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_top_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_top_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_right_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_right_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_right_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_bottom_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_bottom_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_bottom_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_left_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_left_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_left_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_block_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_block_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_block_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_block_start_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_block_start_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_block_start_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_block_end_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_block_end_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_block_end_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_inline_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_inline_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_inline_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_inline_start_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_inline_start_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_inline_start_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_margin_inline_end_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_margin_inline_end_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_margin_inline_end_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_block(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_block(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_block(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_block_start(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_block_start(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_block_start(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_block_end(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_block_end(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_block_end(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_inline(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_inline(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_inline(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_inline_start(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_inline_start(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_inline_start(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_inline_end(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_inline_end(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_inline_end(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_top(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_top(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_top(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_left(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_left(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_left(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_right(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_right(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_right(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_bottom(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_bottom(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_bottom(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_block_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_block_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_block_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_block_start_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_block_start_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_block_start_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_block_end_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_block_end_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_block_end_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_inline_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_inline_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_inline_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_inline_start_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_inline_start_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_inline_start_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inset_inline_end_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inset_inline_end_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inset_inline_end_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_width(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_min_width(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_min_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_min_width(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_max_width(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_max_width(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_max_width(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_height(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_height(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_height(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_min_height(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_min_height(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_min_height(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_max_height(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_max_height(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_max_height(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_block_size(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_block_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_block_size(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_min_block_size(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_min_block_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_min_block_size(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_max_block_size(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_max_block_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_max_block_size(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inline_size(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inline_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inline_size(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_min_inline_size(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_min_inline_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_min_inline_size(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_max_inline_size(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_max_inline_size(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_max_inline_size(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_min_width_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_min_width_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_min_width_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_max_width_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_max_width_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_max_width_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_min_height_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_min_height_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_min_height_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_max_height_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_max_height_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_max_height_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_block_size_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_block_size_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_block_size_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_min_block_size_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_min_block_size_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_min_block_size_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_max_block_size_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_max_block_size_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_max_block_size_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_inline_size_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_inline_size_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_inline_size_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_min_inline_size_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_min_inline_size_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_min_inline_size_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_max_inline_size_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_max_inline_size_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_max_inline_size_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_place_self(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_place_self(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_place_self(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_align_self(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_align_self(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_align_self(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_justify_self(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_justify_self(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_justify_self(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_place_self_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_place_self_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_place_self_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_align_self_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_align_self_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_align_self_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_justify_self_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_justify_self_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_justify_self_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_position_anchor(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_position_anchor(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_position_anchor(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_position_anchor_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_position_anchor_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_position_anchor_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_position_area(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_position_area(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_position_area(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_position_try_descriptors_get_position_area_css(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_position_try_descriptors_set_position_area_css(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_position_try_descriptors_set_position_area_css(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_view_transition_rule_get_navigation(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -7142,7 +7126,7 @@ extern int rv_dom_css_view_transition_rule_get_types(nativeint target, RvDomSequ
 extern int rv_dom_css_style_declaration_get_css_text(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_declaration_set_css_text(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_css_style_declaration_set_css_text(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_style_declaration_get_css_rules(nativeint target, nativeint& result)
@@ -7157,16 +7141,16 @@ extern int rv_dom_css_style_declaration_get_parent_rule(nativeint target, native
 extern int rv_dom_css_style_declaration_item(nativeint target, uint32 index, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_declaration_get_property_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string property, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_css_style_declaration_get_property_value(nativeint target, byte[] property, int property_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_declaration_get_property_priority(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string property, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_css_style_declaration_get_property_priority(nativeint target, byte[] property, int property_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_declaration_set_property(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string property, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string priority)
+extern int rv_dom_css_style_declaration_set_property(nativeint target, byte[] property, int property_length, byte[] value, int value_length, byte[] priority, int priority_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_css_style_declaration_remove_property(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string property, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_css_style_declaration_remove_property(nativeint target, byte[] property, int property_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_token_list_get_length(nativeint target, uint32& result)
@@ -7175,13 +7159,13 @@ extern int rv_dom_dom_token_list_get_length(nativeint target, uint32& result)
 extern int rv_dom_dom_token_list_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_token_list_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_dom_token_list_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_token_list_item(nativeint target, uint32 index, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_token_list_contains(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string token, int& result)
+extern int rv_dom_dom_token_list_contains(nativeint target, byte[] token, int token_length, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_token_list_add(nativeint target, [<In>] RvDomSequenceDOMString[] tokens)
@@ -7190,22 +7174,22 @@ extern int rv_dom_dom_token_list_add(nativeint target, [<In>] RvDomSequenceDOMSt
 extern int rv_dom_dom_token_list_remove(nativeint target, [<In>] RvDomSequenceDOMString[] tokens)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_token_list_toggle(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string token, int[] force, int& result)
+extern int rv_dom_dom_token_list_toggle(nativeint target, byte[] token, int token_length, int[] force, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_token_list_replace(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string token, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string new_token, int& result)
+extern int rv_dom_dom_token_list_replace(nativeint target, byte[] token, int token_length, byte[] new_token, int new_token_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_token_list_supports(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string token, int& result)
+extern int rv_dom_dom_token_list_supports(nativeint target, byte[] token, int token_length, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_string_map_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_dom_string_map_named_item(nativeint target, byte[] name, int name_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_string_map_set_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_dom_string_map_set_named_item(nativeint target, byte[] name, int name_length, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_string_map_delete_named_property(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name)
+extern int rv_dom_dom_string_map_delete_named_property(nativeint target, byte[] name, int name_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_abstract_range_get_start_container(nativeint target, nativeint& result)
@@ -7286,7 +7270,7 @@ extern int rv_dom_range_compare_point(nativeint target, nativeint node, uint32 o
 extern int rv_dom_range_intersects_node(nativeint target, nativeint node, int& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_range_expand(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string unit)
+extern int rv_dom_range_expand(nativeint target, byte[] unit, int unit_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_range_compare_node(nativeint target, nativeint node, int16& result)
@@ -7298,7 +7282,7 @@ extern int rv_dom_range_get_client_rects(nativeint target, nativeint& result)
 extern int rv_dom_range_get_bounding_client_rect(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_range_create_contextual_fragment(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string fragment, nativeint& result)
+extern int rv_dom_range_create_contextual_fragment(nativeint target, byte[] fragment, int fragment_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_selection_get_anchor_node(nativeint target, nativeint& result)
@@ -7385,7 +7369,7 @@ extern int rv_dom_dom_selection_contains_node(nativeint target, nativeint node, 
 extern int rv_dom_dom_selection_to_string(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_dom_selection_modify(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string alter, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string direction, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string granularity)
+extern int rv_dom_dom_selection_modify(nativeint target, byte[] alter, int alter_length, byte[] direction, int direction_length, byte[] granularity, int granularity_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_rect_read_only_create(nativeint target, float x, float y, float width, float height, nativeint& result)
@@ -7811,7 +7795,7 @@ extern int rv_dom_node_list_item(nativeint target, uint32 index, nativeint& resu
 extern int rv_dom_radio_node_list_get_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_radio_node_list_set_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_radio_node_list_set_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_collection_get_length(nativeint target, uint32& result)
@@ -7820,13 +7804,13 @@ extern int rv_dom_html_collection_get_length(nativeint target, uint32& result)
 extern int rv_dom_html_collection_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_collection_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, nativeint& result)
+extern int rv_dom_html_collection_named_item(nativeint target, byte[] name, int name_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_controls_collection_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_form_controls_collection_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, RvDomUnionRadioNodeListOrElementNullable& result)
+extern int rv_dom_html_form_controls_collection_named_item(nativeint target, byte[] name, int name_length, RvDomUnionRadioNodeListOrElementNullable& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_options_collection_get_length(nativeint target, uint32& result)
@@ -7853,7 +7837,7 @@ extern int rv_dom_html_options_collection_remove(nativeint target, int index)
 extern int rv_dom_html_options_collection_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_html_options_collection_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, nativeint& result)
+extern int rv_dom_html_options_collection_named_item(nativeint target, byte[] name, int name_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_form_data_create(nativeint target, nativeint form, nativeint submitter, nativeint& result)
@@ -7967,7 +7951,7 @@ extern int rv_dom_event_stop_immediate_propagation(nativeint target)
 extern int rv_dom_event_prevent_default(nativeint target)
 
 [<DllImport(Lib)>]
-extern int rv_dom_event_init_event(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``, int bubbles, int cancelable)
+extern int rv_dom_event_init_event(nativeint target, byte[] ``type``, int type_length, int bubbles, int cancelable)
 
 [<DllImport(Lib)>]
 extern int rv_dom_ui_event_get_detail(nativeint target, int& result)
@@ -8045,7 +8029,7 @@ extern int rv_dom_mouse_event_get_from_element(nativeint target, nativeint& resu
 extern int rv_dom_mouse_event_get_to_element(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_mouse_event_get_modifier_state(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string key_arg, int& result)
+extern int rv_dom_mouse_event_get_modifier_state(nativeint target, byte[] key_arg, int key_arg_length, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_pointer_event_get_pointer_id(nativeint target, int& result)
@@ -8147,7 +8131,7 @@ extern int rv_dom_keyboard_event_get_char_code(nativeint target, uint32& result)
 extern int rv_dom_keyboard_event_get_key_code(nativeint target, uint32& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_keyboard_event_get_modifier_state(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string key_arg, int& result)
+extern int rv_dom_keyboard_event_get_modifier_state(nativeint target, byte[] key_arg, int key_arg_length, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_focus_event_get_related_target(nativeint target, nativeint& result)
@@ -8303,7 +8287,7 @@ extern int rv_dom_pop_state_event_get_has_ua_visual_transition(nativeint target,
 extern int rv_dom_before_unload_event_get_return_value(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_before_unload_event_set_return_value(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_before_unload_event_set_return_value(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_graphics_element_get_transform(nativeint target, nativeint& result)
@@ -8429,7 +8413,7 @@ extern int rv_dom_svgsvg_element_create_svg_transform(nativeint target, nativein
 extern int rv_dom_svgsvg_element_create_svg_transform_from_matrix(nativeint target, [<In>] RvDomDOMMatrix2DInit[] matrix, nativeint& result)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svgsvg_element_get_element_by_id(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string element_id, nativeint& result)
+extern int rv_dom_svgsvg_element_get_element_by_id(nativeint target, byte[] element_id, int element_id_length, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svgsvg_element_pause_animations(nativeint target)
@@ -8684,7 +8668,7 @@ extern int rv_dom_svg_length_set_value_in_specified_units(nativeint target, floa
 extern int rv_dom_svg_length_get_value_as_string(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_length_set_value_as_string(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_length_set_value_as_string(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_length_new_value_specified_units(nativeint target, uint16 unit_type, float32 value_in_specified_units)
@@ -8711,7 +8695,7 @@ extern int rv_dom_svg_angle_set_value_in_specified_units(nativeint target, float
 extern int rv_dom_svg_angle_get_value_as_string(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_angle_set_value_as_string(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_angle_set_value_as_string(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_angle_new_value_specified_units(nativeint target, uint16 unit_type, float32 value_in_specified_units)
@@ -8849,7 +8833,7 @@ extern int rv_dom_svg_animated_enumeration_get_anim_val(nativeint target, uint16
 extern int rv_dom_svg_animated_string_get_base_val(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_animated_string_set_base_val(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_animated_string_set_base_val(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_animated_string_get_anim_val(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -8873,25 +8857,25 @@ extern int rv_dom_svg_string_list_get_number_of_items(nativeint target, uint32& 
 extern int rv_dom_svg_string_list_clear(nativeint target)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_string_list_initialize(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string new_item, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_svg_string_list_initialize(nativeint target, byte[] new_item, int new_item_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_string_list_get_item(nativeint target, uint32 index, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_string_list_insert_item_before(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string new_item, uint32 index, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_svg_string_list_insert_item_before(nativeint target, byte[] new_item, int new_item_length, uint32 index, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_string_list_replace_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string new_item, uint32 index, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_svg_string_list_replace_item(nativeint target, byte[] new_item, int new_item_length, uint32 index, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_string_list_remove_item(nativeint target, uint32 index, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_string_list_append_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string new_item, byte[] buffer, int capacity, int[] length)
+extern int rv_dom_svg_string_list_append_item(nativeint target, byte[] new_item, int new_item_length, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_string_list_set_item(nativeint target, uint32 index, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string new_item)
+extern int rv_dom_svg_string_list_set_item(nativeint target, uint32 index, byte[] new_item, int new_item_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_view_spec_get_transform(nativeint target, nativeint& result)
@@ -8966,7 +8950,7 @@ extern int rv_dom_svg_marker_element_get_orient_angle(nativeint target, nativein
 extern int rv_dom_svg_marker_element_get_orient(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_marker_element_set_orient(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_marker_element_set_orient(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_marker_element_get_view_box(nativeint target, nativeint& result)
@@ -9797,13 +9781,13 @@ extern int rv_dom_svga_element_get_target(nativeint target, nativeint& result)
 extern int rv_dom_svga_element_get_hreflang(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svga_element_set_hreflang(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svga_element_set_hreflang(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svga_element_get_rel(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svga_element_set_rel(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svga_element_set_rel(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svga_element_get_rel_list(nativeint target, nativeint& result)
@@ -9812,7 +9796,7 @@ extern int rv_dom_svga_element_get_rel_list(nativeint target, nativeint& result)
 extern int rv_dom_svga_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svga_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svga_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svga_element_get_href(nativeint target, nativeint& result)
@@ -9848,7 +9832,7 @@ extern int rv_dom_svg_image_element_get_preserve_aspect_ratio(nativeint target, 
 extern int rv_dom_svg_image_element_get_cross_origin(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_image_element_set_cross_origin(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_image_element_set_cross_origin(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_image_element_get_href(nativeint target, nativeint& result)
@@ -9857,7 +9841,7 @@ extern int rv_dom_svg_image_element_get_href(nativeint target, nativeint& result
 extern int rv_dom_svg_script_element_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
-extern int rv_dom_svg_script_element_set_type(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string value)
+extern int rv_dom_svg_script_element_set_type(nativeint target, byte[] value, int value_length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_script_element_get_async(nativeint target, int& result)

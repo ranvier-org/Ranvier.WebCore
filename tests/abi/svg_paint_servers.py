@@ -6,6 +6,7 @@ import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 
 def verify(native_directory):
@@ -85,10 +86,10 @@ def verify(native_directory):
         object_units = p.paint()
         p.expect(p.pixel(object_units, 75, 50)[0] > 240 and p.pixel(object_units, 75, 50)[2] < 10, 'gradient objectBoundingBox units affect actual paint')
         enum(linear, 'gradient_units', 1)
-        p.call('rv_dom_svg_animated_string_set_base_val', [p.pointer, ctypes.c_char_p], href, b'#missing')
+        p.call('rv_dom_svg_animated_string_set_base_val', [p.pointer, Utf8], href, b'#missing')
         missing = p.paint()
         p.expect(p.pixel(missing, 325, 50) == [255, 255, 255, 255], 'missing gradient URI produces no invented paint')
-        p.call('rv_dom_svg_animated_string_set_base_val', [p.pointer, ctypes.c_char_p], href, b'#linear')
+        p.call('rv_dom_svg_animated_string_set_base_val', [p.pointer, Utf8], href, b'#linear')
         set_lengths(radial, [('cx', 225), ('cy', 55), ('r', 20), ('fx', 225), ('fy', 55)])
         moved_radial = p.paint()
         p.expect(p.pixel(moved_radial, 225, 55)[0] > 240 and p.pixel(moved_radial, 200, 55) == [0, 0, 255, 255], 'radial coordinate mutation changes actual paint')
@@ -100,10 +101,10 @@ def verify(native_directory):
         p.call('rv_dom_svg_animated_number_set_base_val', [p.pointer, p.single], offset, 0.5)
         p.expect(p.attribute(start, 'offset') == '0.5', 'stop offset reflects typed edit')
         style = p.property('svg_element', start, 'style', 'css_style_declaration')
-        p.call('rv_dom_css_style_declaration_set_property', [p.pointer, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p], style, b'stop-color', b'rgb(0, 255, 0)', b'')
+        p.call('rv_dom_css_style_declaration_set_property', [p.pointer, Utf8, Utf8, Utf8], style, b'stop-color', b'rgb(0, 255, 0)', b'')
         green = p.paint()
         p.expect(p.pixel(green, 10, 50) == [0, 255, 0, 255], 'stop offset and CSS color change actual paint')
-        p.call('rv_dom_css_style_declaration_set_property', [p.pointer, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p], style, b'stop-opacity', b'0.5', b'')
+        p.call('rv_dom_css_style_declaration_set_property', [p.pointer, Utf8, Utf8, Utf8], style, b'stop-opacity', b'0.5', b'')
         faded = p.pixel(p.paint(), 10, 50)
         p.expect(faded[1] == 255 and 120 <= faded[0] <= 135 and 120 <= faded[2] <= 135, 'stop opacity changes actual composited paint')
         set_lengths(pattern, [('x', 5), ('width', 20), ('height', 20)])
@@ -116,7 +117,7 @@ def verify(native_directory):
         translate(pattern_transform, 3, 4)
         translated_pattern = p.paint()
         p.expect(p.pixel(translated_pattern, 10, 131) == [255, 0, 0, 255] and p.pixel(translated_pattern, 15, 131) == [0, 0, 255, 255], 'pattern transform changes actual paint')
-        p.call('rv_dom_element_set_attribute', [p.pointer, ctypes.c_char_p, ctypes.c_char_p], pattern, b'viewBox', b'0 0 20 20')
+        p.call('rv_dom_element_set_attribute', [p.pointer, Utf8, Utf8], pattern, b'viewBox', b'0 0 20 20')
         view_box_wrapper = p.property('svg_pattern_element', pattern, 'view_box', 'svg_animated_rect')
         view_box = p.property('svg_animated_rect', view_box_wrapper, 'base_val', 'svg_rect')
         for field, value in [('x', 0), ('y', 0), ('width', 10), ('height', 10)]:
@@ -129,7 +130,7 @@ def verify(native_directory):
         print('PATTERN_VIEWBOX', {'attribute': p.attribute(pattern, 'viewBox'), 'rect': [p.read('svg_rect', view_box, field) for field in ['x','y','width','height']], 'pixel15_131': p.pixel(view_box_paint,15,131)}, flush=True)
         p.expect(p.pixel(view_box_paint, 15, 131) == [255, 0, 0, 255], 'pattern viewBox changes actual content scaling')
         p.call('rv_dom_svg_transform_list_clear', [p.pointer], pattern_transform)
-        p.call('rv_dom_element_remove_attribute', [p.pointer, ctypes.c_char_p], pattern, b'viewBox')
+        p.call('rv_dom_element_remove_attribute', [p.pointer, Utf8], pattern, b'viewBox')
         set_lengths(pattern, [('x', 0), ('y', 0), ('width', 1), ('height', 1)])
         enum(pattern, 'pattern_units', 2)
         unit_paint = p.paint()
@@ -144,7 +145,7 @@ def verify(native_directory):
         for field, value in [('required_extensions', 'urn:unsupported-svg-extension'), ('system_language', 'zz')]:
             items = p.property('svg_pattern_element', pattern, field, 'svg_string_list')
             p.expect(p.read('svg_string_list', items, 'number_of_items', p.unsigned) == 0, 'initial SVGTests list ' + field)
-            p.expect(p.text('rv_dom_svg_string_list_append_item', [p.pointer, ctypes.c_char_p], items, value.encode()) == value, 'SVGTests typed list edit ' + field)
+            p.expect(p.text('rv_dom_svg_string_list_append_item', [p.pointer, Utf8], items, value.encode()) == value, 'SVGTests typed list edit ' + field)
             p.expect(p.read('svg_string_list', items, 'number_of_items', p.unsigned) == 1, 'SVGTests edit changes actual list length ' + field)
             p.expect(p.text('rv_dom_svg_string_list_get_item', [p.pointer, p.unsigned], items, 0) == value, 'SVGTests edited item is readable ' + field)
             invalid_pattern = p.paint()
@@ -154,7 +155,7 @@ def verify(native_directory):
             p.expect(p.pixel(p.paint(), 2, 122) == [255, 0, 0, 255], 'cleared SVGTests restores actual paint ' + field)
         pattern_href = p.property('svg_pattern_element', p.node('patternDerived'), 'href', 'svg_animated_string')
         p.expect(p.text('rv_dom_svg_animated_string_get_base_val', [p.pointer], pattern_href) == '#pattern', 'pattern inheritance URI')
-        p.call('rv_dom_svg_animated_string_set_base_val', [p.pointer, ctypes.c_char_p], pattern_href, b'#missing')
+        p.call('rv_dom_svg_animated_string_set_base_val', [p.pointer, Utf8], pattern_href, b'#missing')
         p.expect(p.pixel(p.paint(), 202, 122) == [255, 255, 255, 255], 'missing pattern reference has no invented paint')
         wrong = p.pointer(123)
         p.expect(p.bind('rv_dom_svg_linear_gradient_element_get_x2', p.integer, [p.pointer, ctypes.POINTER(p.pointer)])(root, ctypes.byref(wrong)) == -11 and wrong.value == 123, 'gradient subtype error preserves output')

@@ -12,6 +12,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8, StringInput, string_input
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -3, -9, -11
@@ -212,7 +213,7 @@ class Runner:
         member = {'returnValue': 'html_dialog_element_set_return_value', 'closedBy': 'html_dialog_element_set_closed_by',
                   'popover': 'html_element_set_popover', 'popoverTargetAction': kind + '_set_popover_target_action',
                   'command': 'html_button_element_set_command'}[name]
-        return self.outcome(p.bind('rv_dom_' + member, I, [P, ctypes.c_char_p])(target, None if value is None else value.encode()))
+        return self.outcome(p.bind('rv_dom_' + member, I, [P, Utf8])(target, None if value is None else value.encode()))
 
     def construct(self, interface, kind, init, document):
         """Builds a ToggleEvent or CommandEvent; returns (status, event) or ('absent', None)."""
@@ -243,15 +244,15 @@ class Runner:
             return {**self.set(target, s['name'], s['value']), 'value': None}
         if op == 'hasAttr':
             value = I()
-            return self.outcome(p.bind('rv_dom_element_has_attribute', I, [P, ctypes.c_char_p, ctypes.POINTER(I)])(target, s['name'].encode(), ctypes.byref(value)), bool(value.value))
+            return self.outcome(p.bind('rv_dom_element_has_attribute', I, [P, Utf8, ctypes.POINTER(I)])(target, s['name'].encode(), ctypes.byref(value)), bool(value.value))
         if op == 'matches':
             value = I()
-            return self.outcome(p.bind('rv_dom_element_matches', I, [P, ctypes.c_char_p, ctypes.POINTER(I)])(target, s['selector'].encode(), ctypes.byref(value)), bool(value.value))
+            return self.outcome(p.bind('rv_dom_element_matches', I, [P, Utf8, ctypes.POINTER(I)])(target, s['selector'].encode(), ctypes.byref(value)), bool(value.value))
         if op in ('show', 'showModal'):
             return self.outcome(p.bind('rv_dom_html_dialog_element_' + ('show' if op == 'show' else 'show_modal'), I, [P])(target))
         if op in ('close', 'requestClose'):
             value = s.get('value')
-            return self.outcome(p.bind('rv_dom_html_dialog_element_' + ('close' if op == 'close' else 'request_close'), I, [P, ctypes.c_char_p])(target, None if value is None else value.encode()))
+            return self.outcome(p.bind('rv_dom_html_dialog_element_' + ('close' if op == 'close' else 'request_close'), I, [P, Utf8])(target, None if value is None else value.encode()))
         if op == 'showPopover':
             options = ShowPopoverOptions(ctypes.sizeof(ShowPopoverOptions), self.node(s['source']) if 'source' in s else None)
             return self.outcome(p.bind('rv_dom_html_element_show_popover', I, [P, ctypes.POINTER(ShowPopoverOptions)])(target, ctypes.byref(options) if 'source' in s else None))
@@ -326,18 +327,18 @@ class Runner:
 
 def make_init(interface, init, node):
     """The ctypes ToggleEventInit or CommandEventInit; the field order follows the generated header."""
-    strings = {key: init.get(key, '').encode() for key in (['oldState', 'newState'] if interface == 'ToggleEvent' else ['command'])}
+    strings = {key: string_input(init.get(key, '')) for key in (['oldState', 'newState'] if interface == 'ToggleEvent' else ['command'])}
     source = node(init['source']) if init.get('source') else None
     if interface == 'ToggleEvent':
         class Init(ctypes.Structure):
             _fields_ = [('size', ctypes.c_uint32), ('bubbles', I), ('cancelable', I), ('composed', I),
-                        ('old_state', ctypes.c_char_p), ('new_state', ctypes.c_char_p), ('source', P)]
+                        ('old_state', StringInput), ('new_state', StringInput), ('source', P)]
         value = Init(ctypes.sizeof(Init), int(init.get('bubbles', False)), int(init.get('cancelable', False)), 0,
                      strings['oldState'], strings['newState'], source)
     else:
         class Init(ctypes.Structure):
             _fields_ = [('size', ctypes.c_uint32), ('bubbles', I), ('cancelable', I), ('composed', I), ('source', P),
-                        ('command', ctypes.c_char_p)]
+                        ('command', StringInput)]
         value = Init(ctypes.sizeof(Init), int(init.get('bubbles', False)), int(init.get('cancelable', False)), 0,
                      source, strings['command'])
     value._strings = strings
@@ -388,10 +389,10 @@ def teardown(native_directory, cases):
         p.dispose_host()
         value = I(-1)
         open_status = p.bind('rv_dom_html_dialog_element_get_open', I, [P, ctypes.POINTER(I)])(dialog, ctypes.byref(value))
-        close_status = p.bind('rv_dom_html_dialog_element_close', I, [P, ctypes.c_char_p])(dialog, b'late')
+        close_status = p.bind('rv_dom_html_dialog_element_close', I, [P, Utf8])(dialog, b'late')
         after = I(-1)
         after_status = p.bind('rv_dom_html_dialog_element_get_open', I, [P, ctypes.POINTER(I)])(dialog, ctypes.byref(after))
-        request_status = p.bind('rv_dom_html_dialog_element_request_close', I, [P, ctypes.c_char_p])(dialog, b'late')
+        request_status = p.bind('rv_dom_html_dialog_element_request_close', I, [P, Utf8])(dialog, b'late')
         show_status = p.bind('rv_dom_html_dialog_element_show_modal', I, [P])(dialog)
         p.expect(open_status in allowed and close_status in allowed + (DOM_EXCEPTION,) and request_status in allowed + (DOM_EXCEPTION,)
                  and show_status in allowed + (DOM_EXCEPTION,), 'dialog members after destroy ' + str((open_status, close_status, request_status, show_status)))
@@ -421,7 +422,7 @@ def teardown(native_directory, cases):
         replaced = runner.events[:]
         runner.events.clear()
         matches = I(-1)
-        old_open = p.bind('rv_dom_element_matches', I, [P, ctypes.c_char_p, ctypes.POINTER(I)])(old, b':popover-open', ctypes.byref(matches))
+        old_open = p.bind('rv_dom_element_matches', I, [P, Utf8, ctypes.POINTER(I)])(old, b':popover-open', ctypes.byref(matches))
         hide = p.bind('rv_dom_html_element_hide_popover', I, [P])(old)
         show = p.bind('rv_dom_html_element_show_popover', I, [P, P])(old, None)
         runner.flush()

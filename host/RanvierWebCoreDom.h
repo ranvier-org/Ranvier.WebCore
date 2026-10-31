@@ -6,10 +6,11 @@
  * - Each function returns RV_OK or a negative status and writes its result through the last parameters.
  * - target is the object the member belongs to. A node handle of another interface returns
  *   RV_ERR_WRONG_INTERFACE, as does a node argument of another interface.
- * - String inputs use UTF-8, with explicit byte lengths where the signature supplies them; otherwise
- *   inputs are NUL-terminated. String outputs copy into buffer as RanvierWebCoreAbi.h describes.
- * - Booleans are int32_t 0 or 1. An argument that is nullable or optional without a default is a pointer,
- *   NULL for null or absent.
+ * - String inputs are UTF-8 with an explicit byte count, so a string may hold U+0000: a pointer and a
+ *   length, -1 for null or absent; RvDomUtf8StringSpan in a union or sequence; RvDomUtf8StringInput in a
+ *   dictionary, present 0 for the default. String outputs copy into buffer as RanvierWebCoreAbi.h describes.
+ * - Booleans are int32_t 0 or 1. Any other argument that is nullable or optional without a default is a
+ *   pointer, NULL for null or absent.
  * - Handles out are new references: rv_node_release, rv_event_release, or the rv_dom_*_release of the type.
  * - A member that throws returns RV_ERR_DOM_EXCEPTION, with the exception in rv_last_exception.
  * - A string union with Trusted Types, such as (TrustedHTML or DOMString), is a string. A dictionary is a
@@ -555,7 +556,7 @@ typedef struct RvDomAssignedNodesOptions {
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomCSSStyleSheetInit {
     uint32_t size;
-    const char* base_url; /* DOMString, default null */
+    RvDomUtf8StringInput base_url; /* DOMString, default null */
     const RvDomUnionMediaListOrDOMString* media; /* (MediaList or DOMString), default "" */
     int32_t disabled; /* boolean, default false */
 } RvDomCSSStyleSheetInit;
@@ -621,7 +622,7 @@ typedef struct RvDomCompositionEventInit {
     int32_t cancelable; /* boolean, default false */
     int32_t composed; /* boolean, default false */
     int32_t detail; /* long, default 0 */
-    const char* data; /* DOMString, default "" */
+    RvDomUtf8StringInput data; /* DOMString, default "" */
 } RvDomCompositionEventInit;
 
 /* The IDL dictionary SubmitEventInit. size is sizeof(RvDomSubmitEventInit) as the caller compiles it; a field past
@@ -651,8 +652,8 @@ typedef struct RvDomToggleEventInit {
     int32_t bubbles; /* boolean, default false */
     int32_t cancelable; /* boolean, default false */
     int32_t composed; /* boolean, default false */
-    const char* old_state; /* DOMString, default "" */
-    const char* new_state; /* DOMString, default "" */
+    RvDomUtf8StringInput old_state; /* DOMString, default "" */
+    RvDomUtf8StringInput new_state; /* DOMString, default "" */
     RvNode* source; /* Element?, default null */
 } RvDomToggleEventInit;
 
@@ -664,7 +665,7 @@ typedef struct RvDomCommandEventInit {
     int32_t cancelable; /* boolean, default false */
     int32_t composed; /* boolean, default false */
     RvNode* source; /* Element?, default null */
-    const char* command; /* DOMString, default "" */
+    RvDomUtf8StringInput command; /* DOMString, default "" */
 } RvDomCommandEventInit;
 
 /* The IDL dictionary ErrorEventInit. size is sizeof(RvDomErrorEventInit) as the caller compiles it; a field past
@@ -674,8 +675,8 @@ typedef struct RvDomErrorEventInit {
     int32_t bubbles; /* boolean, default false */
     int32_t cancelable; /* boolean, default false */
     int32_t composed; /* boolean, default false */
-    const char* message; /* DOMString, default "" */
-    const char* filename; /* USVString, default "" */
+    RvDomUtf8StringInput message; /* DOMString, default "" */
+    RvDomUtf8StringInput filename; /* USVString, default "" */
     uint32_t lineno; /* unsigned long, default 0 */
     uint32_t colno; /* unsigned long, default 0 */
 } RvDomErrorEventInit;
@@ -699,9 +700,9 @@ typedef struct RvDomAnimationEventInit {
     int32_t bubbles; /* boolean, default false */
     int32_t cancelable; /* boolean, default false */
     int32_t composed; /* boolean, default false */
-    const char* animation_name; /* DOMString, default "" */
+    RvDomUtf8StringInput animation_name; /* DOMString, default "" */
     double elapsed_time; /* double, default 0.0 */
-    const char* pseudo_element; /* DOMString, default "" */
+    RvDomUtf8StringInput pseudo_element; /* DOMString, default "" */
 } RvDomAnimationEventInit;
 
 /* The IDL dictionary TransitionEventInit. size is sizeof(RvDomTransitionEventInit) as the caller compiles it; a field past
@@ -711,9 +712,9 @@ typedef struct RvDomTransitionEventInit {
     int32_t bubbles; /* boolean, default false */
     int32_t cancelable; /* boolean, default false */
     int32_t composed; /* boolean, default false */
-    const char* property_name; /* DOMString, default "" */
+    RvDomUtf8StringInput property_name; /* DOMString, default "" */
     double elapsed_time; /* double, default 0.0 */
-    const char* pseudo_element; /* DOMString, default "" */
+    RvDomUtf8StringInput pseudo_element; /* DOMString, default "" */
 } RvDomTransitionEventInit;
 
 /* The IDL dictionary ContentVisibilityAutoStateChangeEventInit. size is sizeof(RvDomContentVisibilityAutoStateChangeEventInit) as the caller compiles it; a field past
@@ -754,8 +755,8 @@ typedef struct RvDomHashChangeEventInit {
     int32_t bubbles; /* boolean, default false */
     int32_t cancelable; /* boolean, default false */
     int32_t composed; /* boolean, default false */
-    const char* old_url; /* USVString, default "" */
-    const char* new_url; /* USVString, default "" */
+    RvDomUtf8StringInput old_url; /* USVString, default "" */
+    RvDomUtf8StringInput new_url; /* USVString, default "" */
 } RvDomHashChangeEventInit;
 
 /* The IDL dictionary MediaQueryListEventInit. size is sizeof(RvDomMediaQueryListEventInit) as the caller compiles it; a field past
@@ -765,7 +766,7 @@ typedef struct RvDomMediaQueryListEventInit {
     int32_t bubbles; /* boolean, default false */
     int32_t cancelable; /* boolean, default false */
     int32_t composed; /* boolean, default false */
-    const char* media; /* DOMString, default "" */
+    RvDomUtf8StringInput media; /* DOMString, default "" */
     int32_t matches; /* boolean, default false */
 } RvDomMediaQueryListEventInit;
 
@@ -801,7 +802,7 @@ typedef struct RvDomDOMMatrix2DInit {
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomBlobPropertyBag {
     uint32_t size;
-    const char* type; /* DOMString, default "" */
+    RvDomUtf8StringInput type; /* DOMString, default "" */
     int32_t endings; /* EndingType, default "transparent", RV_DOM_ENDING_TYPE_* */
 } RvDomBlobPropertyBag;
 
@@ -809,7 +810,7 @@ typedef struct RvDomBlobPropertyBag {
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomFilePropertyBag {
     uint32_t size;
-    const char* type; /* DOMString, default "" */
+    RvDomUtf8StringInput type; /* DOMString, default "" */
     int32_t endings; /* EndingType, default "transparent", RV_DOM_ENDING_TYPE_* */
     const int64_t* last_modified; /* long long, NULL for absent */
 } RvDomFilePropertyBag;
@@ -973,7 +974,7 @@ struct RvDomUnionNodeOrDOMString {
     int32_t present;
     int32_t tag;
     RvNode* arm0;
-    const char* arm1;
+    RvDomUtf8StringSpan arm1;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1017,7 +1018,7 @@ enum {
 struct RvDomUnionDOMStringOrElementCreationOptions {
     int32_t present;
     int32_t tag;
-    const char* arm0;
+    RvDomUtf8StringSpan arm0;
     const RvDomElementCreationOptions* arm1;
 };
 
@@ -1039,7 +1040,7 @@ struct RvDomUnionBooleanOrImportNodeOptions {
 struct RvDomSequenceDOMString {
     int32_t present;
     int32_t count;
-    const char** items;
+    RvDomUtf8StringSpan* items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1067,7 +1068,7 @@ struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable {
     int32_t tag;
     int32_t arm0;
     double arm1;
-    const char* arm2;
+    RvDomUtf8StringSpan arm2;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1161,7 +1162,7 @@ struct RvDomUnionMediaListOrDOMString {
     int32_t present;
     int32_t tag;
     RvMediaList* arm0;
-    const char* arm1;
+    RvDomUtf8StringSpan arm1;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1169,7 +1170,7 @@ struct RvDomUnionMediaListOrDOMString {
 struct RvDomSequenceUSVString {
     int32_t present;
     int32_t count;
-    const char** items;
+    RvDomUtf8StringSpan* items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1925,12 +1926,12 @@ RV_EXPORT int32_t rv_dom_node_get_previous_sibling(RvNode* target, RvNode** resu
 RV_EXPORT int32_t rv_dom_node_get_next_sibling(RvNode* target, RvNode** result);
 /* Node.nodeValue getter: attribute DOMString? nodeValue */
 RV_EXPORT int32_t rv_dom_node_get_node_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Node.nodeValue setter: attribute DOMString? nodeValue; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_node_set_node_value(RvNode* target, const char* value);
+/* Node.nodeValue setter: attribute DOMString? nodeValue; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_node_set_node_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Node.textContent getter: attribute DOMString? textContent */
 RV_EXPORT int32_t rv_dom_node_get_text_content(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Node.textContent setter: attribute DOMString? textContent; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_node_set_text_content(RvNode* target, const char* value);
+/* Node.textContent setter: attribute DOMString? textContent; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_node_set_text_content(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Node.getRootNode(optional GetRootNodeOptions options = {}) -> Node; options defaults to {} in IDL; options may be
  * NULL for the IDL default; *result is a new reference */
 RV_EXPORT int32_t rv_dom_node_get_root_node(RvNode* target, const RvDomGetRootNodeOptions* options, RvNode** result);
@@ -1948,12 +1949,12 @@ RV_EXPORT int32_t rv_dom_node_is_same_node(RvNode* target, RvNode* other, int32_
 RV_EXPORT int32_t rv_dom_node_compare_document_position(RvNode* target, RvNode* other, uint16_t* result);
 /* Node.contains(Node? other) -> boolean; other may be NULL */
 RV_EXPORT int32_t rv_dom_node_contains(RvNode* target, RvNode* other, int32_t* result);
-/* Node.lookupPrefix(DOMString? namespaceURI) -> DOMString?; namespace_uri may be NULL (null) */
-RV_EXPORT int32_t rv_dom_node_lookup_prefix(RvNode* target, const char* namespace_uri, char* buffer, int32_t capacity, int32_t* length);
-/* Node.lookupNamespaceURI(DOMString? prefix) -> DOMString?; prefix may be NULL (null) */
-RV_EXPORT int32_t rv_dom_node_lookup_namespace_uri(RvNode* target, const char* prefix, char* buffer, int32_t capacity, int32_t* length);
-/* Node.isDefaultNamespace(DOMString? namespaceURI) -> boolean; namespace_uri may be NULL (null) */
-RV_EXPORT int32_t rv_dom_node_is_default_namespace(RvNode* target, const char* namespace_uri, int32_t* result);
+/* Node.lookupPrefix(DOMString? namespaceURI) -> DOMString?; namespace_uri_length -1 means null */
+RV_EXPORT int32_t rv_dom_node_lookup_prefix(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, char* buffer, int32_t capacity, int32_t* length);
+/* Node.lookupNamespaceURI(DOMString? prefix) -> DOMString?; prefix_length -1 means null */
+RV_EXPORT int32_t rv_dom_node_lookup_namespace_uri(RvNode* target, const uint8_t* prefix, int32_t prefix_length, char* buffer, int32_t capacity, int32_t* length);
+/* Node.isDefaultNamespace(DOMString? namespaceURI) -> boolean; namespace_uri_length -1 means null */
+RV_EXPORT int32_t rv_dom_node_is_default_namespace(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, int32_t* result);
 /* Node.insertBefore(Node node, Node? child) -> Node; child may be NULL */
 RV_EXPORT int32_t rv_dom_node_insert_before(RvNode* target, RvNode* node, RvNode* child, RvNode** result);
 /* Node.appendChild(Node node) -> Node */
@@ -1967,7 +1968,7 @@ RV_EXPORT int32_t rv_dom_node_remove_child(RvNode* target, RvNode* child, RvNode
 /* CharacterData.data getter: attribute DOMString data */
 RV_EXPORT int32_t rv_dom_character_data_get_data(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* CharacterData.data setter: attribute DOMString data */
-RV_EXPORT int32_t rv_dom_character_data_set_data(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_character_data_set_data(RvNode* target, const uint8_t* value, int32_t value_length);
 /* CharacterData.length getter: readonly attribute unsigned long length */
 RV_EXPORT int32_t rv_dom_character_data_get_length(RvNode* target, uint32_t* result);
 /* CharacterData.previousElementSibling getter: readonly attribute Element? previousElementSibling; *result is a new
@@ -1979,13 +1980,13 @@ RV_EXPORT int32_t rv_dom_character_data_get_next_element_sibling(RvNode* target,
 /* CharacterData.substringData(unsigned long offset, unsigned long count) -> DOMString */
 RV_EXPORT int32_t rv_dom_character_data_substring_data(RvNode* target, uint32_t offset, uint32_t count, char* buffer, int32_t capacity, int32_t* length);
 /* CharacterData.appendData(DOMString data) -> undefined */
-RV_EXPORT int32_t rv_dom_character_data_append_data(RvNode* target, const char* data);
+RV_EXPORT int32_t rv_dom_character_data_append_data(RvNode* target, const uint8_t* data, int32_t data_length);
 /* CharacterData.insertData(unsigned long offset, DOMString data) -> undefined */
-RV_EXPORT int32_t rv_dom_character_data_insert_data(RvNode* target, uint32_t offset, const char* data);
+RV_EXPORT int32_t rv_dom_character_data_insert_data(RvNode* target, uint32_t offset, const uint8_t* data, int32_t data_length);
 /* CharacterData.deleteData(unsigned long offset, unsigned long count) -> undefined */
 RV_EXPORT int32_t rv_dom_character_data_delete_data(RvNode* target, uint32_t offset, uint32_t count);
 /* CharacterData.replaceData(unsigned long offset, unsigned long count, DOMString data) -> undefined */
-RV_EXPORT int32_t rv_dom_character_data_replace_data(RvNode* target, uint32_t offset, uint32_t count, const char* data);
+RV_EXPORT int32_t rv_dom_character_data_replace_data(RvNode* target, uint32_t offset, uint32_t count, const uint8_t* data, int32_t data_length);
 /* CharacterData.before((Node or DOMString) nodes) -> undefined */
 RV_EXPORT int32_t rv_dom_character_data_before(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 /* CharacterData.after((Node or DOMString) nodes) -> undefined */
@@ -2024,11 +2025,11 @@ RV_EXPORT int32_t rv_dom_document_fragment_replace_children(RvNode* target, cons
  * setting MoveBeforeEnabled is off */
 RV_EXPORT int32_t rv_dom_document_fragment_move_before(RvNode* target, RvNode* node, RvNode* child);
 /* DocumentFragment.querySelector(DOMString selectors) -> Element?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_document_fragment_query_selector(RvNode* target, const char* selectors, RvNode** result);
+RV_EXPORT int32_t rv_dom_document_fragment_query_selector(RvNode* target, const uint8_t* selectors, int32_t selectors_length, RvNode** result);
 /* DocumentFragment.querySelectorAll(DOMString selectors) -> NodeList; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_fragment_query_selector_all(RvNode* target, const char* selectors, RvNodeList** result);
+RV_EXPORT int32_t rv_dom_document_fragment_query_selector_all(RvNode* target, const uint8_t* selectors, int32_t selectors_length, RvNodeList** result);
 /* DocumentFragment.getElementById(DOMString elementId) -> Element?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_document_fragment_get_element_by_id(RvNode* target, const char* element_id, RvNode** result);
+RV_EXPORT int32_t rv_dom_document_fragment_get_element_by_id(RvNode* target, const uint8_t* element_id, int32_t element_id_length, RvNode** result);
 /* ShadowRoot */
 
 /* ShadowRoot.mode getter: readonly attribute ShadowRootMode mode */
@@ -2048,7 +2049,7 @@ RV_EXPORT int32_t rv_dom_shadow_root_get_host(RvNode* target, RvNode** result);
 RV_EXPORT int32_t rv_dom_shadow_root_get_reference_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* ShadowRoot.referenceTarget setter: attribute DOMString referenceTarget; RV_ERR_UNSUPPORTED while the setting
  * ShadowRootReferenceTargetEnabled is off */
-RV_EXPORT int32_t rv_dom_shadow_root_set_reference_target(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_shadow_root_set_reference_target(RvNode* target, const uint8_t* value, int32_t value_length);
 /* ShadowRoot.activeElement getter: readonly attribute Element? activeElement; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_shadow_root_get_active_element(RvNode* target, RvNode** result);
 /* ShadowRoot.styleSheets getter: readonly attribute StyleSheetList styleSheets; *result is a new reference */
@@ -2068,14 +2069,14 @@ RV_EXPORT int32_t rv_dom_shadow_root_get_pointer_lock_element(RvNode* target, Rv
 /* ShadowRoot.innerHTML getter: attribute (TrustedHTML or DOMString) innerHTML */
 RV_EXPORT int32_t rv_dom_shadow_root_get_inner_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* ShadowRoot.innerHTML setter: attribute (TrustedHTML or DOMString) innerHTML */
-RV_EXPORT int32_t rv_dom_shadow_root_set_inner_html(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_shadow_root_set_inner_html(RvNode* target, const uint8_t* value, int32_t value_length);
 /* ShadowRoot.elementFromPoint(double x, double y) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_shadow_root_element_from_point(RvNode* target, double x, double y, RvNode** result);
 /* ShadowRoot.elementsFromPoint(double x, double y) -> sequence<Element>; *result owns its contents; release with the
  * matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_shadow_root_elements_from_point(RvNode* target, double x, double y, RvDomSequenceElement* result);
 /* ShadowRoot.setHTMLUnsafe((TrustedHTML or DOMString) html) -> undefined */
-RV_EXPORT int32_t rv_dom_shadow_root_set_html_unsafe(RvNode* target, const char* html);
+RV_EXPORT int32_t rv_dom_shadow_root_set_html_unsafe(RvNode* target, const uint8_t* html, int32_t html_length);
 /* ShadowRoot.getHTML(optional GetHTMLOptions options = {}) -> DOMString; options defaults to {} in IDL; options may
  * be NULL for the IDL default */
 RV_EXPORT int32_t rv_dom_shadow_root_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length);
@@ -2098,11 +2099,11 @@ RV_EXPORT int32_t rv_dom_document_get_ready_state(RvNode* target, int32_t* resul
 /* Document.title getter: attribute DOMString title */
 RV_EXPORT int32_t rv_dom_document_get_title(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Document.title setter: attribute DOMString title */
-RV_EXPORT int32_t rv_dom_document_set_title(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_document_set_title(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Document.dir getter: attribute DOMString dir */
 RV_EXPORT int32_t rv_dom_document_get_dir(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Document.dir setter: attribute DOMString dir */
-RV_EXPORT int32_t rv_dom_document_set_dir(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_document_set_dir(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Document.body getter: attribute HTMLElement? body; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_get_body(RvNode* target, RvNode** result);
 /* Document.body setter: attribute HTMLElement? body; value may be NULL */
@@ -2120,7 +2121,7 @@ RV_EXPORT int32_t rv_dom_document_get_scripts(RvNode* target, RvHTMLCollection**
 /* Document.designMode getter: attribute DOMString designMode */
 RV_EXPORT int32_t rv_dom_document_get_design_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Document.designMode setter: attribute DOMString designMode */
-RV_EXPORT int32_t rv_dom_document_set_design_mode(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_document_set_design_mode(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Document.anchors getter: readonly attribute HTMLCollection anchors; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_get_anchors(RvNode* target, RvHTMLCollection** result);
 /* Document.hidden getter: readonly attribute boolean hidden */
@@ -2149,36 +2150,36 @@ RV_EXPORT int32_t rv_dom_document_get_adopted_style_sheets(RvNode* target, RvDom
 RV_EXPORT int32_t rv_dom_document_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value);
 /* Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) ->
  * Element; options defaults to {} in IDL; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_create_element(RvNode* target, const char* local_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
+RV_EXPORT int32_t rv_dom_document_create_element(RvNode* target, const uint8_t* local_name, int32_t local_name_length, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
 /* Document.createElementNS(DOMString? namespaceURI, DOMString qualifiedName, optional (DOMString or
- * ElementCreationOptions) options = {}) -> Element; namespace_uri may be NULL (null); options defaults to {} in IDL;
- * *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_create_element_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
+ * ElementCreationOptions) options = {}) -> Element; namespace_uri_length -1 means null; options defaults to {} in
+ * IDL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_create_element_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* qualified_name, int32_t qualified_name_length, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
 /* Document.getElementsByTagName(DOMString qualifiedName) -> HTMLCollection; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_get_elements_by_tag_name(RvNode* target, const char* qualified_name, RvHTMLCollection** result);
-/* Document.getElementsByTagNameNS(DOMString? namespaceURI, DOMString localName) -> HTMLCollection; namespace_uri may
- * be NULL (null); *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_get_elements_by_tag_name_ns(RvNode* target, const char* namespace_uri, const char* local_name, RvHTMLCollection** result);
+RV_EXPORT int32_t rv_dom_document_get_elements_by_tag_name(RvNode* target, const uint8_t* qualified_name, int32_t qualified_name_length, RvHTMLCollection** result);
+/* Document.getElementsByTagNameNS(DOMString? namespaceURI, DOMString localName) -> HTMLCollection;
+ * namespace_uri_length -1 means null; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_get_elements_by_tag_name_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* local_name, int32_t local_name_length, RvHTMLCollection** result);
 /* Document.getElementsByClassName(DOMString classNames) -> HTMLCollection; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_get_elements_by_class_name(RvNode* target, const char* class_names, RvHTMLCollection** result);
+RV_EXPORT int32_t rv_dom_document_get_elements_by_class_name(RvNode* target, const uint8_t* class_names, int32_t class_names_length, RvHTMLCollection** result);
 /* Document.createDocumentFragment() -> DocumentFragment; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_create_document_fragment(RvNode* target, RvNode** result);
 /* Document.createTextNode(DOMString data) -> Text; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_create_text_node(RvNode* target, const char* data, RvNode** result);
+RV_EXPORT int32_t rv_dom_document_create_text_node(RvNode* target, const uint8_t* data, int32_t data_length, RvNode** result);
 /* Document.createComment(DOMString data) -> Comment; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_create_comment(RvNode* target, const char* data, RvNode** result);
+RV_EXPORT int32_t rv_dom_document_create_comment(RvNode* target, const uint8_t* data, int32_t data_length, RvNode** result);
 /* Document.importNode(Node node, optional (boolean or ImportNodeOptions) options = false) -> Node; options defaults
  * to false in IDL; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_import_node(RvNode* target, RvNode* node, const RvDomUnionBooleanOrImportNodeOptions* options, RvNode** result);
 /* Document.adoptNode(Node node) -> Node; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_adopt_node(RvNode* target, RvNode* node, RvNode** result);
 /* Document.createAttribute(DOMString localName) -> Attr; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_create_attribute(RvNode* target, const char* local_name, RvNode** result);
-/* Document.createAttributeNS(DOMString? namespaceURI, DOMString qualifiedName) -> Attr; namespace_uri may be NULL
- * (null); *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_create_attribute_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, RvNode** result);
+RV_EXPORT int32_t rv_dom_document_create_attribute(RvNode* target, const uint8_t* local_name, int32_t local_name_length, RvNode** result);
+/* Document.createAttributeNS(DOMString? namespaceURI, DOMString qualifiedName) -> Attr; namespace_uri_length -1 means
+ * null; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_create_attribute_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* qualified_name, int32_t qualified_name_length, RvNode** result);
 /* Document.createEvent(DOMString type) -> Event; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_create_event(RvNode* target, const char* type, RvEvent** result);
+RV_EXPORT int32_t rv_dom_document_create_event(RvNode* target, const uint8_t* type, int32_t type_length, RvEvent** result);
 /* Document.createRange() -> Range; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_create_range(RvNode* target, RvAbstractRange** result);
 /* Document.createNodeIterator(Node root, optional unsigned long whatToShow = 0xFFFFFFFF, optional NodeFilter? filter
@@ -2194,31 +2195,31 @@ RV_EXPORT int32_t rv_dom_document_create_tree_walker(RvNode* target, RvNode* roo
 RV_EXPORT int32_t rv_dom_document_caret_range_from_point(RvNode* target, int32_t x, int32_t y, RvAbstractRange** result);
 /* Document.ariaNotify(DOMString announcement) -> undefined; RV_ERR_UNSUPPORTED while the setting IsARIANotifyEnabled
  * is off */
-RV_EXPORT int32_t rv_dom_document_aria_notify(RvNode* target, const char* announcement);
+RV_EXPORT int32_t rv_dom_document_aria_notify(RvNode* target, const uint8_t* announcement, int32_t announcement_length);
 /* Document.ariaNotify(DOMString announcement, AriaNotifyOptions options) -> undefined; RV_ERR_UNSUPPORTED while the
  * setting IsARIANotifyEnabled is off */
-RV_EXPORT int32_t rv_dom_document_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options);
+RV_EXPORT int32_t rv_dom_document_aria_notify_2(RvNode* target, const uint8_t* announcement, int32_t announcement_length, const RvDomAriaNotifyOptions* options);
 /* Document.caretPositionFromPoint(double x, double y, optional CaretPositionFromPointOptions options = {}) ->
  * CaretPosition?; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference,
  * or NULL; RV_ERR_UNSUPPORTED while the setting CaretPositionFromPointEnabled is off */
 RV_EXPORT int32_t rv_dom_document_caret_position_from_point(RvNode* target, double x, double y, const RvDomCaretPositionFromPointOptions* options, RvCaretPosition** result);
 /* Document.getElementsByName(DOMString elementName) -> NodeList; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_get_elements_by_name(RvNode* target, const char* element_name, RvNodeList** result);
+RV_EXPORT int32_t rv_dom_document_get_elements_by_name(RvNode* target, const uint8_t* element_name, int32_t element_name_length, RvNodeList** result);
 /* Document.hasFocus() -> boolean */
 RV_EXPORT int32_t rv_dom_document_has_focus(RvNode* target, int32_t* result);
 /* Document.execCommand(DOMString commandId, optional boolean showUI = false, optional (DOMString or TrustedHTML)
  * value = "") -> boolean; show_ui defaults to false in IDL; value defaults to "" in IDL */
-RV_EXPORT int32_t rv_dom_document_exec_command(RvNode* target, const char* command_id, int32_t show_ui, const char* value, int32_t* result);
+RV_EXPORT int32_t rv_dom_document_exec_command(RvNode* target, const uint8_t* command_id, int32_t command_id_length, int32_t show_ui, const uint8_t* value, int32_t value_length, int32_t* result);
 /* Document.queryCommandEnabled(DOMString commandId) -> boolean */
-RV_EXPORT int32_t rv_dom_document_query_command_enabled(RvNode* target, const char* command_id, int32_t* result);
+RV_EXPORT int32_t rv_dom_document_query_command_enabled(RvNode* target, const uint8_t* command_id, int32_t command_id_length, int32_t* result);
 /* Document.queryCommandIndeterm(DOMString commandId) -> boolean */
-RV_EXPORT int32_t rv_dom_document_query_command_indeterm(RvNode* target, const char* command_id, int32_t* result);
+RV_EXPORT int32_t rv_dom_document_query_command_indeterm(RvNode* target, const uint8_t* command_id, int32_t command_id_length, int32_t* result);
 /* Document.queryCommandState(DOMString commandId) -> boolean */
-RV_EXPORT int32_t rv_dom_document_query_command_state(RvNode* target, const char* command_id, int32_t* result);
+RV_EXPORT int32_t rv_dom_document_query_command_state(RvNode* target, const uint8_t* command_id, int32_t command_id_length, int32_t* result);
 /* Document.queryCommandSupported(DOMString commandId) -> boolean */
-RV_EXPORT int32_t rv_dom_document_query_command_supported(RvNode* target, const char* command_id, int32_t* result);
+RV_EXPORT int32_t rv_dom_document_query_command_supported(RvNode* target, const uint8_t* command_id, int32_t command_id_length, int32_t* result);
 /* Document.queryCommandValue(DOMString commandId) -> DOMString */
-RV_EXPORT int32_t rv_dom_document_query_command_value(RvNode* target, const char* command_id, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_document_query_command_value(RvNode* target, const uint8_t* command_id, int32_t command_id_length, char* buffer, int32_t capacity, int32_t* length);
 /* Document.getSelection() -> DOMSelection?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_get_selection(RvNode* target, RvDOMSelection** result);
 /* Document.prepend((Node or DOMString) nodes) -> undefined */
@@ -2231,11 +2232,11 @@ RV_EXPORT int32_t rv_dom_document_replace_children(RvNode* target, const RvDomSe
  * MoveBeforeEnabled is off */
 RV_EXPORT int32_t rv_dom_document_move_before(RvNode* target, RvNode* node, RvNode* child);
 /* Document.querySelector(DOMString selectors) -> Element?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_document_query_selector(RvNode* target, const char* selectors, RvNode** result);
+RV_EXPORT int32_t rv_dom_document_query_selector(RvNode* target, const uint8_t* selectors, int32_t selectors_length, RvNode** result);
 /* Document.querySelectorAll(DOMString selectors) -> NodeList; *result is a new reference */
-RV_EXPORT int32_t rv_dom_document_query_selector_all(RvNode* target, const char* selectors, RvNodeList** result);
+RV_EXPORT int32_t rv_dom_document_query_selector_all(RvNode* target, const uint8_t* selectors, int32_t selectors_length, RvNodeList** result);
 /* Document.getElementById(DOMString elementId) -> Element?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_document_get_element_by_id(RvNode* target, const char* element_id, RvNode** result);
+RV_EXPORT int32_t rv_dom_document_get_element_by_id(RvNode* target, const uint8_t* element_id, int32_t element_id_length, RvNode** result);
 /* Document.elementFromPoint(double x, double y) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_element_from_point(RvNode* target, double x, double y, RvNode** result);
 /* Document.elementsFromPoint(double x, double y) -> sequence<Element>; *result owns its contents; release with the
@@ -2243,9 +2244,9 @@ RV_EXPORT int32_t rv_dom_document_element_from_point(RvNode* target, double x, d
 RV_EXPORT int32_t rv_dom_document_elements_from_point(RvNode* target, double x, double y, RvDomSequenceElement* result);
 /* DOMImplementation */
 
-/* DOMImplementation.createHTMLDocument(optional DOMString title) -> HTMLDocument; title may be NULL (absent); *result
- * is a new reference */
-RV_EXPORT int32_t rv_dom_dom_implementation_create_html_document(RvDOMImplementation* target, const char* title, RvNode** result);
+/* DOMImplementation.createHTMLDocument(optional DOMString title) -> HTMLDocument; title_length -1 means absent;
+ * *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_implementation_create_html_document(RvDOMImplementation* target, const uint8_t* title, int32_t title_length, RvNode** result);
 /* DOMImplementation.hasFeature() -> boolean */
 RV_EXPORT int32_t rv_dom_dom_implementation_has_feature(RvDOMImplementation* target, int32_t* result);
 /* Element */
@@ -2261,17 +2262,17 @@ RV_EXPORT int32_t rv_dom_element_get_tag_name(RvNode* target, char* buffer, int3
 /* Element.id getter: attribute DOMString id */
 RV_EXPORT int32_t rv_dom_element_get_id(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.id setter: attribute DOMString id */
-RV_EXPORT int32_t rv_dom_element_set_id(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_element_set_id(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.className getter: attribute DOMString className */
 RV_EXPORT int32_t rv_dom_element_get_class_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.className setter: attribute DOMString className */
-RV_EXPORT int32_t rv_dom_element_set_class_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_element_set_class_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.classList getter: readonly attribute DOMTokenList classList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_element_get_class_list(RvNode* target, RvDOMTokenList** result);
 /* Element.slot getter: attribute DOMString slot */
 RV_EXPORT int32_t rv_dom_element_get_slot(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.slot setter: attribute DOMString slot */
-RV_EXPORT int32_t rv_dom_element_set_slot(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_element_set_slot(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.part getter: readonly attribute DOMTokenList part; *result is a new reference */
 RV_EXPORT int32_t rv_dom_element_get_part(RvNode* target, RvDOMTokenList** result);
 /* Element.attributes getter: readonly attribute NamedNodeMap attributes; *result is a new reference */
@@ -2302,11 +2303,11 @@ RV_EXPORT int32_t rv_dom_element_get_current_css_zoom(RvNode* target, double* re
 /* Element.outerHTML getter: attribute (TrustedHTML or DOMString) outerHTML */
 RV_EXPORT int32_t rv_dom_element_get_outer_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.outerHTML setter: attribute (TrustedHTML or DOMString) outerHTML */
-RV_EXPORT int32_t rv_dom_element_set_outer_html(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_element_set_outer_html(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.role getter: attribute DOMString? role */
 RV_EXPORT int32_t rv_dom_element_get_role(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.role setter: attribute DOMString? role; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_role(RvNode* target, const char* value);
+/* Element.role setter: attribute DOMString? role; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_role(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaActiveDescendantElement getter: attribute Element? ariaActiveDescendantElement; *result is a new
  * reference, or NULL */
 RV_EXPORT int32_t rv_dom_element_get_aria_active_descendant_element(RvNode* target, RvNode** result);
@@ -2314,177 +2315,177 @@ RV_EXPORT int32_t rv_dom_element_get_aria_active_descendant_element(RvNode* targ
 RV_EXPORT int32_t rv_dom_element_set_aria_active_descendant_element(RvNode* target, RvNode* value);
 /* Element.ariaAtomic getter: attribute DOMString? ariaAtomic */
 RV_EXPORT int32_t rv_dom_element_get_aria_atomic(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaAtomic setter: attribute DOMString? ariaAtomic; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_atomic(RvNode* target, const char* value);
+/* Element.ariaAtomic setter: attribute DOMString? ariaAtomic; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_atomic(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaAutoComplete getter: attribute DOMString? ariaAutoComplete */
 RV_EXPORT int32_t rv_dom_element_get_aria_auto_complete(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaAutoComplete setter: attribute DOMString? ariaAutoComplete; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_auto_complete(RvNode* target, const char* value);
+/* Element.ariaAutoComplete setter: attribute DOMString? ariaAutoComplete; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_auto_complete(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaBrailleLabel getter: attribute DOMString? ariaBrailleLabel */
 RV_EXPORT int32_t rv_dom_element_get_aria_braille_label(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaBrailleLabel setter: attribute DOMString? ariaBrailleLabel; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_braille_label(RvNode* target, const char* value);
+/* Element.ariaBrailleLabel setter: attribute DOMString? ariaBrailleLabel; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_braille_label(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaBrailleRoleDescription getter: attribute DOMString? ariaBrailleRoleDescription */
 RV_EXPORT int32_t rv_dom_element_get_aria_braille_role_description(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaBrailleRoleDescription setter: attribute DOMString? ariaBrailleRoleDescription; value may be NULL
- * (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_braille_role_description(RvNode* target, const char* value);
+/* Element.ariaBrailleRoleDescription setter: attribute DOMString? ariaBrailleRoleDescription; value_length -1 means
+ * null */
+RV_EXPORT int32_t rv_dom_element_set_aria_braille_role_description(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaBusy getter: attribute DOMString? ariaBusy */
 RV_EXPORT int32_t rv_dom_element_get_aria_busy(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaBusy setter: attribute DOMString? ariaBusy; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_busy(RvNode* target, const char* value);
+/* Element.ariaBusy setter: attribute DOMString? ariaBusy; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_busy(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaChecked getter: attribute DOMString? ariaChecked */
 RV_EXPORT int32_t rv_dom_element_get_aria_checked(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaChecked setter: attribute DOMString? ariaChecked; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_checked(RvNode* target, const char* value);
+/* Element.ariaChecked setter: attribute DOMString? ariaChecked; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_checked(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaColCount getter: attribute DOMString? ariaColCount */
 RV_EXPORT int32_t rv_dom_element_get_aria_col_count(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaColCount setter: attribute DOMString? ariaColCount; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_col_count(RvNode* target, const char* value);
+/* Element.ariaColCount setter: attribute DOMString? ariaColCount; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_col_count(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaColIndex getter: attribute DOMString? ariaColIndex */
 RV_EXPORT int32_t rv_dom_element_get_aria_col_index(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaColIndex setter: attribute DOMString? ariaColIndex; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_col_index(RvNode* target, const char* value);
+/* Element.ariaColIndex setter: attribute DOMString? ariaColIndex; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_col_index(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaColIndexText getter: attribute DOMString? ariaColIndexText */
 RV_EXPORT int32_t rv_dom_element_get_aria_col_index_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaColIndexText setter: attribute DOMString? ariaColIndexText; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_col_index_text(RvNode* target, const char* value);
+/* Element.ariaColIndexText setter: attribute DOMString? ariaColIndexText; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_col_index_text(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaColSpan getter: attribute DOMString? ariaColSpan */
 RV_EXPORT int32_t rv_dom_element_get_aria_col_span(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaColSpan setter: attribute DOMString? ariaColSpan; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_col_span(RvNode* target, const char* value);
+/* Element.ariaColSpan setter: attribute DOMString? ariaColSpan; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_col_span(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaCurrent getter: attribute DOMString? ariaCurrent */
 RV_EXPORT int32_t rv_dom_element_get_aria_current(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaCurrent setter: attribute DOMString? ariaCurrent; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_current(RvNode* target, const char* value);
+/* Element.ariaCurrent setter: attribute DOMString? ariaCurrent; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_current(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaDescription getter: attribute DOMString? ariaDescription */
 RV_EXPORT int32_t rv_dom_element_get_aria_description(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaDescription setter: attribute DOMString? ariaDescription; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_description(RvNode* target, const char* value);
+/* Element.ariaDescription setter: attribute DOMString? ariaDescription; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_description(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaDisabled getter: attribute DOMString? ariaDisabled */
 RV_EXPORT int32_t rv_dom_element_get_aria_disabled(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaDisabled setter: attribute DOMString? ariaDisabled; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_disabled(RvNode* target, const char* value);
+/* Element.ariaDisabled setter: attribute DOMString? ariaDisabled; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_disabled(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaExpanded getter: attribute DOMString? ariaExpanded */
 RV_EXPORT int32_t rv_dom_element_get_aria_expanded(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaExpanded setter: attribute DOMString? ariaExpanded; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_expanded(RvNode* target, const char* value);
+/* Element.ariaExpanded setter: attribute DOMString? ariaExpanded; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_expanded(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaHasPopup getter: attribute DOMString? ariaHasPopup */
 RV_EXPORT int32_t rv_dom_element_get_aria_has_popup(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaHasPopup setter: attribute DOMString? ariaHasPopup; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_has_popup(RvNode* target, const char* value);
+/* Element.ariaHasPopup setter: attribute DOMString? ariaHasPopup; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_has_popup(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaHidden getter: attribute DOMString? ariaHidden */
 RV_EXPORT int32_t rv_dom_element_get_aria_hidden(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaHidden setter: attribute DOMString? ariaHidden; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_hidden(RvNode* target, const char* value);
+/* Element.ariaHidden setter: attribute DOMString? ariaHidden; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_hidden(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaInvalid getter: attribute DOMString? ariaInvalid */
 RV_EXPORT int32_t rv_dom_element_get_aria_invalid(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaInvalid setter: attribute DOMString? ariaInvalid; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_invalid(RvNode* target, const char* value);
+/* Element.ariaInvalid setter: attribute DOMString? ariaInvalid; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_invalid(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaKeyShortcuts getter: attribute DOMString? ariaKeyShortcuts */
 RV_EXPORT int32_t rv_dom_element_get_aria_key_shortcuts(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaKeyShortcuts setter: attribute DOMString? ariaKeyShortcuts; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_key_shortcuts(RvNode* target, const char* value);
+/* Element.ariaKeyShortcuts setter: attribute DOMString? ariaKeyShortcuts; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_key_shortcuts(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaLabel getter: attribute DOMString? ariaLabel */
 RV_EXPORT int32_t rv_dom_element_get_aria_label(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaLabel setter: attribute DOMString? ariaLabel; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_label(RvNode* target, const char* value);
+/* Element.ariaLabel setter: attribute DOMString? ariaLabel; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_label(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaLevel getter: attribute DOMString? ariaLevel */
 RV_EXPORT int32_t rv_dom_element_get_aria_level(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaLevel setter: attribute DOMString? ariaLevel; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_level(RvNode* target, const char* value);
+/* Element.ariaLevel setter: attribute DOMString? ariaLevel; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_level(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaLive getter: attribute DOMString? ariaLive */
 RV_EXPORT int32_t rv_dom_element_get_aria_live(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaLive setter: attribute DOMString? ariaLive; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_live(RvNode* target, const char* value);
+/* Element.ariaLive setter: attribute DOMString? ariaLive; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_live(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaModal getter: attribute DOMString? ariaModal */
 RV_EXPORT int32_t rv_dom_element_get_aria_modal(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaModal setter: attribute DOMString? ariaModal; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_modal(RvNode* target, const char* value);
+/* Element.ariaModal setter: attribute DOMString? ariaModal; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_modal(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaMultiLine getter: attribute DOMString? ariaMultiLine */
 RV_EXPORT int32_t rv_dom_element_get_aria_multi_line(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaMultiLine setter: attribute DOMString? ariaMultiLine; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_multi_line(RvNode* target, const char* value);
+/* Element.ariaMultiLine setter: attribute DOMString? ariaMultiLine; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_multi_line(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaMultiSelectable getter: attribute DOMString? ariaMultiSelectable */
 RV_EXPORT int32_t rv_dom_element_get_aria_multi_selectable(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaMultiSelectable setter: attribute DOMString? ariaMultiSelectable; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_multi_selectable(RvNode* target, const char* value);
+/* Element.ariaMultiSelectable setter: attribute DOMString? ariaMultiSelectable; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_multi_selectable(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaOrientation getter: attribute DOMString? ariaOrientation */
 RV_EXPORT int32_t rv_dom_element_get_aria_orientation(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaOrientation setter: attribute DOMString? ariaOrientation; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_orientation(RvNode* target, const char* value);
+/* Element.ariaOrientation setter: attribute DOMString? ariaOrientation; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_orientation(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaPlaceholder getter: attribute DOMString? ariaPlaceholder */
 RV_EXPORT int32_t rv_dom_element_get_aria_placeholder(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaPlaceholder setter: attribute DOMString? ariaPlaceholder; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_placeholder(RvNode* target, const char* value);
+/* Element.ariaPlaceholder setter: attribute DOMString? ariaPlaceholder; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_placeholder(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaPosInSet getter: attribute DOMString? ariaPosInSet */
 RV_EXPORT int32_t rv_dom_element_get_aria_pos_in_set(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaPosInSet setter: attribute DOMString? ariaPosInSet; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_pos_in_set(RvNode* target, const char* value);
+/* Element.ariaPosInSet setter: attribute DOMString? ariaPosInSet; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_pos_in_set(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaPressed getter: attribute DOMString? ariaPressed */
 RV_EXPORT int32_t rv_dom_element_get_aria_pressed(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaPressed setter: attribute DOMString? ariaPressed; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_pressed(RvNode* target, const char* value);
+/* Element.ariaPressed setter: attribute DOMString? ariaPressed; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_pressed(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaReadOnly getter: attribute DOMString? ariaReadOnly */
 RV_EXPORT int32_t rv_dom_element_get_aria_read_only(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaReadOnly setter: attribute DOMString? ariaReadOnly; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_read_only(RvNode* target, const char* value);
+/* Element.ariaReadOnly setter: attribute DOMString? ariaReadOnly; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_read_only(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaRelevant getter: attribute DOMString? ariaRelevant */
 RV_EXPORT int32_t rv_dom_element_get_aria_relevant(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaRelevant setter: attribute DOMString? ariaRelevant; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_relevant(RvNode* target, const char* value);
+/* Element.ariaRelevant setter: attribute DOMString? ariaRelevant; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_relevant(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaRequired getter: attribute DOMString? ariaRequired */
 RV_EXPORT int32_t rv_dom_element_get_aria_required(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaRequired setter: attribute DOMString? ariaRequired; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_required(RvNode* target, const char* value);
+/* Element.ariaRequired setter: attribute DOMString? ariaRequired; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_required(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaRoleDescription getter: attribute DOMString? ariaRoleDescription */
 RV_EXPORT int32_t rv_dom_element_get_aria_role_description(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaRoleDescription setter: attribute DOMString? ariaRoleDescription; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_role_description(RvNode* target, const char* value);
+/* Element.ariaRoleDescription setter: attribute DOMString? ariaRoleDescription; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_role_description(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaRowCount getter: attribute DOMString? ariaRowCount */
 RV_EXPORT int32_t rv_dom_element_get_aria_row_count(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaRowCount setter: attribute DOMString? ariaRowCount; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_row_count(RvNode* target, const char* value);
+/* Element.ariaRowCount setter: attribute DOMString? ariaRowCount; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_row_count(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaRowIndex getter: attribute DOMString? ariaRowIndex */
 RV_EXPORT int32_t rv_dom_element_get_aria_row_index(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaRowIndex setter: attribute DOMString? ariaRowIndex; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_row_index(RvNode* target, const char* value);
+/* Element.ariaRowIndex setter: attribute DOMString? ariaRowIndex; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_row_index(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaRowIndexText getter: attribute DOMString? ariaRowIndexText */
 RV_EXPORT int32_t rv_dom_element_get_aria_row_index_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaRowIndexText setter: attribute DOMString? ariaRowIndexText; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_row_index_text(RvNode* target, const char* value);
+/* Element.ariaRowIndexText setter: attribute DOMString? ariaRowIndexText; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_row_index_text(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaRowSpan getter: attribute DOMString? ariaRowSpan */
 RV_EXPORT int32_t rv_dom_element_get_aria_row_span(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaRowSpan setter: attribute DOMString? ariaRowSpan; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_row_span(RvNode* target, const char* value);
+/* Element.ariaRowSpan setter: attribute DOMString? ariaRowSpan; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_row_span(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaSelected getter: attribute DOMString? ariaSelected */
 RV_EXPORT int32_t rv_dom_element_get_aria_selected(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaSelected setter: attribute DOMString? ariaSelected; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_selected(RvNode* target, const char* value);
+/* Element.ariaSelected setter: attribute DOMString? ariaSelected; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_selected(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaSetSize getter: attribute DOMString? ariaSetSize */
 RV_EXPORT int32_t rv_dom_element_get_aria_set_size(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaSetSize setter: attribute DOMString? ariaSetSize; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_set_size(RvNode* target, const char* value);
+/* Element.ariaSetSize setter: attribute DOMString? ariaSetSize; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_set_size(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaSort getter: attribute DOMString? ariaSort */
 RV_EXPORT int32_t rv_dom_element_get_aria_sort(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaSort setter: attribute DOMString? ariaSort; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_sort(RvNode* target, const char* value);
+/* Element.ariaSort setter: attribute DOMString? ariaSort; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_sort(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaValueMax getter: attribute DOMString? ariaValueMax */
 RV_EXPORT int32_t rv_dom_element_get_aria_value_max(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaValueMax setter: attribute DOMString? ariaValueMax; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_value_max(RvNode* target, const char* value);
+/* Element.ariaValueMax setter: attribute DOMString? ariaValueMax; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_value_max(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaValueMin getter: attribute DOMString? ariaValueMin */
 RV_EXPORT int32_t rv_dom_element_get_aria_value_min(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaValueMin setter: attribute DOMString? ariaValueMin; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_value_min(RvNode* target, const char* value);
+/* Element.ariaValueMin setter: attribute DOMString? ariaValueMin; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_value_min(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaValueNow getter: attribute DOMString? ariaValueNow */
 RV_EXPORT int32_t rv_dom_element_get_aria_value_now(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaValueNow setter: attribute DOMString? ariaValueNow; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_value_now(RvNode* target, const char* value);
+/* Element.ariaValueNow setter: attribute DOMString? ariaValueNow; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_value_now(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.ariaValueText getter: attribute DOMString? ariaValueText */
 RV_EXPORT int32_t rv_dom_element_get_aria_value_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* Element.ariaValueText setter: attribute DOMString? ariaValueText; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_aria_value_text(RvNode* target, const char* value);
+/* Element.ariaValueText setter: attribute DOMString? ariaValueText; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_aria_value_text(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.previousElementSibling getter: readonly attribute Element? previousElementSibling; *result is a new
  * reference, or NULL */
 RV_EXPORT int32_t rv_dom_element_get_previous_element_sibling(RvNode* target, RvNode** result);
@@ -2505,38 +2506,38 @@ RV_EXPORT int32_t rv_dom_element_get_assigned_slot(RvNode* target, RvNode** resu
 /* Element.innerHTML getter: attribute (TrustedHTML or DOMString) innerHTML */
 RV_EXPORT int32_t rv_dom_element_get_inner_html(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Element.innerHTML setter: attribute (TrustedHTML or DOMString) innerHTML */
-RV_EXPORT int32_t rv_dom_element_set_inner_html(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_element_set_inner_html(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Element.hasAttributes() -> boolean */
 RV_EXPORT int32_t rv_dom_element_has_attributes(RvNode* target, int32_t* result);
 /* Element.getAttributeNames() -> sequence<DOMString>; *result owns its contents; release with the matching
  * rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_element_get_attribute_names(RvNode* target, RvDomSequenceDOMString* result);
 /* Element.getAttribute(DOMString qualifiedName) -> DOMString? */
-RV_EXPORT int32_t rv_dom_element_get_attribute(RvNode* target, const char* qualified_name, char* buffer, int32_t capacity, int32_t* length);
-/* Element.getAttributeNS(DOMString? namespaceURI, DOMString localName) -> DOMString?; namespace_uri may be NULL
- * (null) */
-RV_EXPORT int32_t rv_dom_element_get_attribute_ns(RvNode* target, const char* namespace_uri, const char* local_name, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_element_get_attribute(RvNode* target, const uint8_t* qualified_name, int32_t qualified_name_length, char* buffer, int32_t capacity, int32_t* length);
+/* Element.getAttributeNS(DOMString? namespaceURI, DOMString localName) -> DOMString?; namespace_uri_length -1 means
+ * null */
+RV_EXPORT int32_t rv_dom_element_get_attribute_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* local_name, int32_t local_name_length, char* buffer, int32_t capacity, int32_t* length);
 /* Element.setAttribute(DOMString qualifiedName, (TrustedType or DOMString) value) -> undefined */
-RV_EXPORT int32_t rv_dom_element_set_attribute(RvNode* target, const char* qualified_name, const char* value);
+RV_EXPORT int32_t rv_dom_element_set_attribute(RvNode* target, const uint8_t* qualified_name, int32_t qualified_name_length, const uint8_t* value, int32_t value_length);
 /* Element.setAttributeNS(DOMString? namespaceURI, DOMString qualifiedName, (TrustedType or DOMString) value) ->
- * undefined; namespace_uri may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_set_attribute_ns(RvNode* target, const char* namespace_uri, const char* qualified_name, const char* value);
+ * undefined; namespace_uri_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_set_attribute_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* qualified_name, int32_t qualified_name_length, const uint8_t* value, int32_t value_length);
 /* Element.removeAttribute(DOMString qualifiedName) -> undefined */
-RV_EXPORT int32_t rv_dom_element_remove_attribute(RvNode* target, const char* qualified_name);
-/* Element.removeAttributeNS(DOMString? namespaceURI, DOMString localName) -> undefined; namespace_uri may be NULL
- * (null) */
-RV_EXPORT int32_t rv_dom_element_remove_attribute_ns(RvNode* target, const char* namespace_uri, const char* local_name);
+RV_EXPORT int32_t rv_dom_element_remove_attribute(RvNode* target, const uint8_t* qualified_name, int32_t qualified_name_length);
+/* Element.removeAttributeNS(DOMString? namespaceURI, DOMString localName) -> undefined; namespace_uri_length -1 means
+ * null */
+RV_EXPORT int32_t rv_dom_element_remove_attribute_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* local_name, int32_t local_name_length);
 /* Element.toggleAttribute(DOMString qualifiedName, optional boolean force) -> boolean; force may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_element_toggle_attribute(RvNode* target, const char* qualified_name, const int32_t* force, int32_t* result);
+RV_EXPORT int32_t rv_dom_element_toggle_attribute(RvNode* target, const uint8_t* qualified_name, int32_t qualified_name_length, const int32_t* force, int32_t* result);
 /* Element.hasAttribute(DOMString qualifiedName) -> boolean */
-RV_EXPORT int32_t rv_dom_element_has_attribute(RvNode* target, const char* qualified_name, int32_t* result);
-/* Element.hasAttributeNS(DOMString? namespaceURI, DOMString localName) -> boolean; namespace_uri may be NULL (null) */
-RV_EXPORT int32_t rv_dom_element_has_attribute_ns(RvNode* target, const char* namespace_uri, const char* local_name, int32_t* result);
+RV_EXPORT int32_t rv_dom_element_has_attribute(RvNode* target, const uint8_t* qualified_name, int32_t qualified_name_length, int32_t* result);
+/* Element.hasAttributeNS(DOMString? namespaceURI, DOMString localName) -> boolean; namespace_uri_length -1 means null */
+RV_EXPORT int32_t rv_dom_element_has_attribute_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* local_name, int32_t local_name_length, int32_t* result);
 /* Element.getAttributeNode(DOMString qualifiedName) -> Attr?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_element_get_attribute_node(RvNode* target, const char* qualified_name, RvNode** result);
-/* Element.getAttributeNodeNS(DOMString? namespaceURI, DOMString localName) -> Attr?; namespace_uri may be NULL
- * (null); *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_element_get_attribute_node_ns(RvNode* target, const char* namespace_uri, const char* local_name, RvNode** result);
+RV_EXPORT int32_t rv_dom_element_get_attribute_node(RvNode* target, const uint8_t* qualified_name, int32_t qualified_name_length, RvNode** result);
+/* Element.getAttributeNodeNS(DOMString? namespaceURI, DOMString localName) -> Attr?; namespace_uri_length -1 means
+ * null; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_element_get_attribute_node_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* local_name, int32_t local_name_length, RvNode** result);
 /* Element.setAttributeNode(Attr attr) -> Attr?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_element_set_attribute_node(RvNode* target, RvNode* attr, RvNode** result);
 /* Element.setAttributeNodeNS(Attr attr) -> Attr?; *result is a new reference, or NULL */
@@ -2546,26 +2547,26 @@ RV_EXPORT int32_t rv_dom_element_remove_attribute_node(RvNode* target, RvNode* a
 /* Element.attachShadow(ShadowRootInit init) -> ShadowRoot; *result is a new reference */
 RV_EXPORT int32_t rv_dom_element_attach_shadow(RvNode* target, const RvDomShadowRootInit* init, RvNode** result);
 /* Element.closest(DOMString selectors) -> Element?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_element_closest(RvNode* target, const char* selectors, RvNode** result);
+RV_EXPORT int32_t rv_dom_element_closest(RvNode* target, const uint8_t* selectors, int32_t selectors_length, RvNode** result);
 /* Element.matches(DOMString selectors) -> boolean */
-RV_EXPORT int32_t rv_dom_element_matches(RvNode* target, const char* selectors, int32_t* result);
+RV_EXPORT int32_t rv_dom_element_matches(RvNode* target, const uint8_t* selectors, int32_t selectors_length, int32_t* result);
 /* Element.getElementsByTagName(DOMString qualifiedName) -> HTMLCollection; *result is a new reference */
-RV_EXPORT int32_t rv_dom_element_get_elements_by_tag_name(RvNode* target, const char* qualified_name, RvHTMLCollection** result);
-/* Element.getElementsByTagNameNS(DOMString? namespaceURI, DOMString localName) -> HTMLCollection; namespace_uri may
- * be NULL (null); *result is a new reference */
-RV_EXPORT int32_t rv_dom_element_get_elements_by_tag_name_ns(RvNode* target, const char* namespace_uri, const char* local_name, RvHTMLCollection** result);
+RV_EXPORT int32_t rv_dom_element_get_elements_by_tag_name(RvNode* target, const uint8_t* qualified_name, int32_t qualified_name_length, RvHTMLCollection** result);
+/* Element.getElementsByTagNameNS(DOMString? namespaceURI, DOMString localName) -> HTMLCollection;
+ * namespace_uri_length -1 means null; *result is a new reference */
+RV_EXPORT int32_t rv_dom_element_get_elements_by_tag_name_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* local_name, int32_t local_name_length, RvHTMLCollection** result);
 /* Element.getElementsByClassName(DOMString name) -> HTMLCollection; *result is a new reference */
-RV_EXPORT int32_t rv_dom_element_get_elements_by_class_name(RvNode* target, const char* name, RvHTMLCollection** result);
+RV_EXPORT int32_t rv_dom_element_get_elements_by_class_name(RvNode* target, const uint8_t* name, int32_t name_length, RvHTMLCollection** result);
 /* Element.insertAdjacentElement(DOMString where, Element element) -> Element?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_element_insert_adjacent_element(RvNode* target, const char* where, RvNode* element, RvNode** result);
+RV_EXPORT int32_t rv_dom_element_insert_adjacent_element(RvNode* target, const uint8_t* where, int32_t where_length, RvNode* element, RvNode** result);
 /* Element.insertAdjacentText(DOMString where, DOMString data) -> undefined */
-RV_EXPORT int32_t rv_dom_element_insert_adjacent_text(RvNode* target, const char* where, const char* data);
+RV_EXPORT int32_t rv_dom_element_insert_adjacent_text(RvNode* target, const uint8_t* where, int32_t where_length, const uint8_t* data, int32_t data_length);
 /* Element.ariaNotify(DOMString announcement) -> undefined; RV_ERR_UNSUPPORTED while the setting IsARIANotifyEnabled
  * is off */
-RV_EXPORT int32_t rv_dom_element_aria_notify(RvNode* target, const char* announcement);
+RV_EXPORT int32_t rv_dom_element_aria_notify(RvNode* target, const uint8_t* announcement, int32_t announcement_length);
 /* Element.ariaNotify(DOMString announcement, AriaNotifyOptions options) -> undefined; RV_ERR_UNSUPPORTED while the
  * setting IsARIANotifyEnabled is off */
-RV_EXPORT int32_t rv_dom_element_aria_notify_2(RvNode* target, const char* announcement, const RvDomAriaNotifyOptions* options);
+RV_EXPORT int32_t rv_dom_element_aria_notify_2(RvNode* target, const uint8_t* announcement, int32_t announcement_length, const RvDomAriaNotifyOptions* options);
 /* Element.getClientRects() -> DOMRectList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_element_get_client_rects(RvNode* target, RvDOMRectList** result);
 /* Element.getBoundingClientRect() -> DOMRect; *result is a new reference */
@@ -2595,7 +2596,7 @@ RV_EXPORT int32_t rv_dom_element_scroll_by(RvNode* target, double x, double y);
  * true in IDL */
 RV_EXPORT int32_t rv_dom_element_scroll_into_view_if_needed(RvNode* target, int32_t center_if_needed);
 /* Element.insertAdjacentHTML(DOMString position, (TrustedHTML or DOMString) text) -> undefined */
-RV_EXPORT int32_t rv_dom_element_insert_adjacent_html(RvNode* target, const char* position, const char* text);
+RV_EXPORT int32_t rv_dom_element_insert_adjacent_html(RvNode* target, const uint8_t* position, int32_t position_length, const uint8_t* text, int32_t text_length);
 /* Element.setPointerCapture(long pointerId) -> undefined */
 RV_EXPORT int32_t rv_dom_element_set_pointer_capture(RvNode* target, int32_t pointer_id);
 /* Element.releasePointerCapture(long pointerId) -> undefined */
@@ -2622,11 +2623,11 @@ RV_EXPORT int32_t rv_dom_element_replace_children(RvNode* target, const RvDomSeq
  * MoveBeforeEnabled is off */
 RV_EXPORT int32_t rv_dom_element_move_before(RvNode* target, RvNode* node, RvNode* child);
 /* Element.querySelector(DOMString selectors) -> Element?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_element_query_selector(RvNode* target, const char* selectors, RvNode** result);
+RV_EXPORT int32_t rv_dom_element_query_selector(RvNode* target, const uint8_t* selectors, int32_t selectors_length, RvNode** result);
 /* Element.querySelectorAll(DOMString selectors) -> NodeList; *result is a new reference */
-RV_EXPORT int32_t rv_dom_element_query_selector_all(RvNode* target, const char* selectors, RvNodeList** result);
+RV_EXPORT int32_t rv_dom_element_query_selector_all(RvNode* target, const uint8_t* selectors, int32_t selectors_length, RvNodeList** result);
 /* Element.setHTMLUnsafe((TrustedHTML or DOMString) html) -> undefined */
-RV_EXPORT int32_t rv_dom_element_set_html_unsafe(RvNode* target, const char* html);
+RV_EXPORT int32_t rv_dom_element_set_html_unsafe(RvNode* target, const uint8_t* html, int32_t html_length);
 /* Element.getHTML(optional GetHTMLOptions options = {}) -> DOMString; options defaults to {} in IDL; options may be
  * NULL for the IDL default */
 RV_EXPORT int32_t rv_dom_element_get_html(RvNode* target, const RvDomGetHTMLOptions* options, char* buffer, int32_t capacity, int32_t* length);
@@ -2643,7 +2644,7 @@ RV_EXPORT int32_t rv_dom_attr_get_name(RvNode* target, char* buffer, int32_t cap
 /* Attr.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_attr_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* Attr.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_attr_set_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_attr_set_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* Attr.ownerElement getter: readonly attribute Element? ownerElement; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_attr_get_owner_element(RvNode* target, RvNode** result);
 /* Attr.specified getter: readonly attribute boolean specified */
@@ -2657,29 +2658,29 @@ RV_EXPORT int32_t rv_dom_named_node_map_get_length(RvNamedNodeMap* target, uint3
 /* NamedNodeMap.item(unsigned long index) -> Attr?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_named_node_map_item(RvNamedNodeMap* target, uint32_t index, RvNode** result);
 /* NamedNodeMap.getNamedItem(DOMString qualifiedName) -> Attr?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_named_node_map_get_named_item(RvNamedNodeMap* target, const char* qualified_name, RvNode** result);
-/* NamedNodeMap.getNamedItemNS(DOMString? namespaceURI, DOMString localName) -> Attr?; namespace_uri may be NULL
- * (null); *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_named_node_map_get_named_item_ns(RvNamedNodeMap* target, const char* namespace_uri, const char* local_name, RvNode** result);
+RV_EXPORT int32_t rv_dom_named_node_map_get_named_item(RvNamedNodeMap* target, const uint8_t* qualified_name, int32_t qualified_name_length, RvNode** result);
+/* NamedNodeMap.getNamedItemNS(DOMString? namespaceURI, DOMString localName) -> Attr?; namespace_uri_length -1 means
+ * null; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_named_node_map_get_named_item_ns(RvNamedNodeMap* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* local_name, int32_t local_name_length, RvNode** result);
 /* NamedNodeMap.setNamedItem(Attr attr) -> Attr?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_named_node_map_set_named_item(RvNamedNodeMap* target, RvNode* attr, RvNode** result);
 /* NamedNodeMap.setNamedItemNS(Attr attr) -> Attr?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_named_node_map_set_named_item_ns(RvNamedNodeMap* target, RvNode* attr, RvNode** result);
 /* NamedNodeMap.removeNamedItem(DOMString qualifiedName) -> Attr; *result is a new reference */
-RV_EXPORT int32_t rv_dom_named_node_map_remove_named_item(RvNamedNodeMap* target, const char* qualified_name, RvNode** result);
-/* NamedNodeMap.removeNamedItemNS(DOMString? namespaceURI, DOMString localName) -> Attr; namespace_uri may be NULL
- * (null); *result is a new reference */
-RV_EXPORT int32_t rv_dom_named_node_map_remove_named_item_ns(RvNamedNodeMap* target, const char* namespace_uri, const char* local_name, RvNode** result);
+RV_EXPORT int32_t rv_dom_named_node_map_remove_named_item(RvNamedNodeMap* target, const uint8_t* qualified_name, int32_t qualified_name_length, RvNode** result);
+/* NamedNodeMap.removeNamedItemNS(DOMString? namespaceURI, DOMString localName) -> Attr; namespace_uri_length -1 means
+ * null; *result is a new reference */
+RV_EXPORT int32_t rv_dom_named_node_map_remove_named_item_ns(RvNamedNodeMap* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* local_name, int32_t local_name_length, RvNode** result);
 /* HTMLElement */
 
 /* HTMLElement.title getter: attribute DOMString title */
 RV_EXPORT int32_t rv_dom_html_element_get_title(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.title setter: attribute DOMString title */
-RV_EXPORT int32_t rv_dom_html_element_set_title(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_title(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.lang getter: attribute DOMString lang */
 RV_EXPORT int32_t rv_dom_html_element_get_lang(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.lang setter: attribute DOMString lang */
-RV_EXPORT int32_t rv_dom_html_element_set_lang(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_lang(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.translate getter: attribute boolean translate */
 RV_EXPORT int32_t rv_dom_html_element_get_translate(RvNode* target, int32_t* result);
 /* HTMLElement.translate setter: attribute boolean translate */
@@ -2687,7 +2688,7 @@ RV_EXPORT int32_t rv_dom_html_element_set_translate(RvNode* target, int32_t valu
 /* HTMLElement.dir getter: attribute DOMString dir */
 RV_EXPORT int32_t rv_dom_html_element_get_dir(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.dir setter: attribute DOMString dir */
-RV_EXPORT int32_t rv_dom_html_element_set_dir(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_dir(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.cue getter: attribute boolean cue */
 RV_EXPORT int32_t rv_dom_html_element_get_cue(RvNode* target, int32_t* result);
 /* HTMLElement.cue setter: attribute boolean cue */
@@ -2704,7 +2705,7 @@ RV_EXPORT int32_t rv_dom_html_element_set_hidden(RvNode* target, const RvDomUnio
 /* HTMLElement.accessKey getter: attribute DOMString accessKey */
 RV_EXPORT int32_t rv_dom_html_element_get_access_key(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.accessKey setter: attribute DOMString accessKey */
-RV_EXPORT int32_t rv_dom_html_element_set_access_key(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_access_key(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.accessKeyLabel getter: readonly attribute DOMString accessKeyLabel */
 RV_EXPORT int32_t rv_dom_html_element_get_access_key_label(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.draggable getter: attribute boolean draggable */
@@ -2720,11 +2721,11 @@ RV_EXPORT int32_t rv_dom_html_element_set_spellcheck(RvNode* target, int32_t val
 RV_EXPORT int32_t rv_dom_html_element_get_autocapitalize(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.autocapitalize setter: attribute DOMString autocapitalize; RV_ERR_UNSUPPORTED where WebKit builds
  * without AUTOCAPITALIZE */
-RV_EXPORT int32_t rv_dom_html_element_set_autocapitalize(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_autocapitalize(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.innerText getter: attribute DOMString innerText */
 RV_EXPORT int32_t rv_dom_html_element_get_inner_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.innerText setter: attribute DOMString innerText */
-RV_EXPORT int32_t rv_dom_html_element_set_inner_text(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_inner_text(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.inert getter: attribute boolean inert */
 RV_EXPORT int32_t rv_dom_html_element_get_inert(RvNode* target, int32_t* result);
 /* HTMLElement.inert setter: attribute boolean inert */
@@ -2744,13 +2745,13 @@ RV_EXPORT int32_t rv_dom_html_element_set_heading_reset(RvNode* target, int32_t 
 /* HTMLElement.popover getter: attribute DOMString? popover; RV_ERR_UNSUPPORTED while the setting
  * PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_get_popover(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLElement.popover setter: attribute DOMString? popover; value may be NULL (null); RV_ERR_UNSUPPORTED while the
+/* HTMLElement.popover setter: attribute DOMString? popover; value_length -1 means null; RV_ERR_UNSUPPORTED while the
  * setting PopoverAttributeEnabled is off */
-RV_EXPORT int32_t rv_dom_html_element_set_popover(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_popover(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.outerText getter: attribute DOMString outerText */
 RV_EXPORT int32_t rv_dom_html_element_get_outer_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.outerText setter: attribute DOMString outerText */
-RV_EXPORT int32_t rv_dom_html_element_set_outer_text(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_outer_text(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.autocorrect getter: attribute boolean autocorrect; RV_ERR_UNSUPPORTED where WebKit builds without
  * AUTOCORRECT */
 RV_EXPORT int32_t rv_dom_html_element_get_autocorrect(RvNode* target, int32_t* result);
@@ -2762,7 +2763,7 @@ RV_EXPORT int32_t rv_dom_html_element_set_autocorrect(RvNode* target, int32_t va
 RV_EXPORT int32_t rv_dom_html_element_get_writing_suggestions(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.writingSuggestions setter: attribute DOMString writingSuggestions; RV_ERR_UNSUPPORTED where WebKit
  * builds without WRITING_SUGGESTIONS */
-RV_EXPORT int32_t rv_dom_html_element_set_writing_suggestions(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_writing_suggestions(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.offsetParent getter: readonly attribute Element? offsetParent; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_element_get_offset_parent(RvNode* target, RvNode** result);
 /* HTMLElement.offsetTop getter: readonly attribute long offsetTop */
@@ -2776,25 +2777,25 @@ RV_EXPORT int32_t rv_dom_html_element_get_offset_height(RvNode* target, int32_t*
 /* HTMLElement.contentEditable getter: attribute DOMString contentEditable */
 RV_EXPORT int32_t rv_dom_html_element_get_content_editable(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.contentEditable setter: attribute DOMString contentEditable */
-RV_EXPORT int32_t rv_dom_html_element_set_content_editable(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_content_editable(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.enterKeyHint getter: attribute DOMString enterKeyHint; RV_ERR_UNSUPPORTED while the setting
  * EnterKeyHintEnabled is off */
 RV_EXPORT int32_t rv_dom_html_element_get_enter_key_hint(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.enterKeyHint setter: attribute DOMString enterKeyHint; RV_ERR_UNSUPPORTED while the setting
  * EnterKeyHintEnabled is off */
-RV_EXPORT int32_t rv_dom_html_element_set_enter_key_hint(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_enter_key_hint(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.isContentEditable getter: readonly attribute boolean isContentEditable */
 RV_EXPORT int32_t rv_dom_html_element_get_is_content_editable(RvNode* target, int32_t* result);
 /* HTMLElement.inputMode getter: attribute DOMString inputMode */
 RV_EXPORT int32_t rv_dom_html_element_get_input_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.inputMode setter: attribute DOMString inputMode */
-RV_EXPORT int32_t rv_dom_html_element_set_input_mode(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_input_mode(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.dataset getter: readonly attribute DOMStringMap dataset; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_element_get_dataset(RvNode* target, RvDOMStringMap** result);
 /* HTMLElement.nonce getter: attribute DOMString nonce */
 RV_EXPORT int32_t rv_dom_html_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLElement.nonce setter: attribute DOMString nonce */
-RV_EXPORT int32_t rv_dom_html_element_set_nonce(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_element_set_nonce(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLElement.autofocus getter: attribute boolean autofocus */
 RV_EXPORT int32_t rv_dom_html_element_get_autofocus(RvNode* target, int32_t* result);
 /* HTMLElement.autofocus setter: attribute boolean autofocus */
@@ -2828,107 +2829,107 @@ RV_EXPORT int32_t rv_dom_html_element_blur(RvNode* target);
 /* HTMLAnchorElement.charset getter: attribute DOMString charset */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_charset(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.charset setter: attribute DOMString charset */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_charset(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_charset(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.coords getter: attribute DOMString coords */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_coords(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.coords setter: attribute DOMString coords */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_coords(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_coords(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.download getter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting
  * DownloadAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_download(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.download setter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting
  * DownloadAttributeEnabled is off */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_download(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_download(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.hreflang getter: attribute DOMString hreflang */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_hreflang(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.hreflang setter: attribute DOMString hreflang */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_hreflang(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_hreflang(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.rel getter: attribute DOMString rel */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.rel setter: attribute DOMString rel */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_rel(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_rel(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.rev getter: attribute DOMString rev */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_rev(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.rev setter: attribute DOMString rev */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_rev(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_rev(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.shape getter: attribute DOMString shape */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_shape(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.shape setter: attribute DOMString shape */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_shape(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_shape(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.text getter: attribute DOMString text */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.text setter: attribute DOMString text */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_text(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_text(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_rel_list(RvNode* target, RvDOMTokenList** result);
 /* HTMLAnchorElement.referrerPolicy getter: attribute DOMString referrerPolicy */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_referrer_policy(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.referrerPolicy setter: attribute DOMString referrerPolicy */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_referrer_policy(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_referrer_policy(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.origin getter: readonly attribute USVString origin */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.protocol getter: attribute USVString protocol */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_protocol(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.protocol setter: attribute USVString protocol */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_protocol(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_protocol(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.username getter: attribute USVString username */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_username(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.username setter: attribute USVString username */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_username(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_username(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.password getter: attribute USVString password */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_password(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.password setter: attribute USVString password */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_password(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_password(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.host getter: attribute USVString host */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_host(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.host setter: attribute USVString host */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_host(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_host(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.hostname getter: attribute USVString hostname */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_hostname(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.hostname setter: attribute USVString hostname */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_hostname(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_hostname(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.port getter: attribute USVString port */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_port(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.port setter: attribute USVString port */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_port(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_port(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.pathname getter: attribute USVString pathname */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_pathname(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.pathname setter: attribute USVString pathname */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_pathname(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_pathname(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.search getter: attribute USVString search */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_search(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.search setter: attribute USVString search */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_search(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_search(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.hash getter: attribute USVString hash */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_hash(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.hash setter: attribute USVString hash */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_hash(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_hash(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.href getter: attribute USVString href */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.href setter: attribute USVString href */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_href(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_href(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAnchorElement.target getter: attribute DOMString target */
 RV_EXPORT int32_t rv_dom_html_anchor_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAnchorElement.target setter: attribute DOMString target */
-RV_EXPORT int32_t rv_dom_html_anchor_element_set_target(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_anchor_element_set_target(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement */
 
 /* HTMLAreaElement.alt getter: attribute DOMString alt */
 RV_EXPORT int32_t rv_dom_html_area_element_get_alt(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.alt setter: attribute DOMString alt */
-RV_EXPORT int32_t rv_dom_html_area_element_set_alt(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_alt(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.coords getter: attribute DOMString coords */
 RV_EXPORT int32_t rv_dom_html_area_element_get_coords(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.coords setter: attribute DOMString coords */
-RV_EXPORT int32_t rv_dom_html_area_element_set_coords(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_coords(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.noHref getter: attribute boolean noHref */
 RV_EXPORT int32_t rv_dom_html_area_element_get_no_href(RvNode* target, int32_t* result);
 /* HTMLAreaElement.noHref setter: attribute boolean noHref */
@@ -2936,21 +2937,21 @@ RV_EXPORT int32_t rv_dom_html_area_element_set_no_href(RvNode* target, int32_t v
 /* HTMLAreaElement.rel getter: attribute DOMString rel */
 RV_EXPORT int32_t rv_dom_html_area_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.rel setter: attribute DOMString rel */
-RV_EXPORT int32_t rv_dom_html_area_element_set_rel(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_rel(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.shape getter: attribute DOMString shape */
 RV_EXPORT int32_t rv_dom_html_area_element_get_shape(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.shape setter: attribute DOMString shape */
-RV_EXPORT int32_t rv_dom_html_area_element_set_shape(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_shape(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.download getter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting
  * DownloadAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_area_element_get_download(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.download setter: attribute DOMString download; RV_ERR_UNSUPPORTED while the setting
  * DownloadAttributeEnabled is off */
-RV_EXPORT int32_t rv_dom_html_area_element_set_download(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_download(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.referrerPolicy getter: attribute DOMString referrerPolicy */
 RV_EXPORT int32_t rv_dom_html_area_element_get_referrer_policy(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.referrerPolicy setter: attribute DOMString referrerPolicy */
-RV_EXPORT int32_t rv_dom_html_area_element_set_referrer_policy(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_referrer_policy(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_area_element_get_rel_list(RvNode* target, RvDOMTokenList** result);
 /* HTMLAreaElement.origin getter: readonly attribute USVString origin */
@@ -2958,73 +2959,73 @@ RV_EXPORT int32_t rv_dom_html_area_element_get_origin(RvNode* target, char* buff
 /* HTMLAreaElement.protocol getter: attribute USVString protocol */
 RV_EXPORT int32_t rv_dom_html_area_element_get_protocol(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.protocol setter: attribute USVString protocol */
-RV_EXPORT int32_t rv_dom_html_area_element_set_protocol(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_protocol(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.username getter: attribute USVString username */
 RV_EXPORT int32_t rv_dom_html_area_element_get_username(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.username setter: attribute USVString username */
-RV_EXPORT int32_t rv_dom_html_area_element_set_username(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_username(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.password getter: attribute USVString password */
 RV_EXPORT int32_t rv_dom_html_area_element_get_password(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.password setter: attribute USVString password */
-RV_EXPORT int32_t rv_dom_html_area_element_set_password(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_password(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.host getter: attribute USVString host */
 RV_EXPORT int32_t rv_dom_html_area_element_get_host(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.host setter: attribute USVString host */
-RV_EXPORT int32_t rv_dom_html_area_element_set_host(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_host(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.hostname getter: attribute USVString hostname */
 RV_EXPORT int32_t rv_dom_html_area_element_get_hostname(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.hostname setter: attribute USVString hostname */
-RV_EXPORT int32_t rv_dom_html_area_element_set_hostname(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_hostname(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.port getter: attribute USVString port */
 RV_EXPORT int32_t rv_dom_html_area_element_get_port(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.port setter: attribute USVString port */
-RV_EXPORT int32_t rv_dom_html_area_element_set_port(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_port(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.pathname getter: attribute USVString pathname */
 RV_EXPORT int32_t rv_dom_html_area_element_get_pathname(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.pathname setter: attribute USVString pathname */
-RV_EXPORT int32_t rv_dom_html_area_element_set_pathname(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_pathname(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.search getter: attribute USVString search */
 RV_EXPORT int32_t rv_dom_html_area_element_get_search(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.search setter: attribute USVString search */
-RV_EXPORT int32_t rv_dom_html_area_element_set_search(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_search(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.hash getter: attribute USVString hash */
 RV_EXPORT int32_t rv_dom_html_area_element_get_hash(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.hash setter: attribute USVString hash */
-RV_EXPORT int32_t rv_dom_html_area_element_set_hash(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_hash(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.href getter: attribute USVString href */
 RV_EXPORT int32_t rv_dom_html_area_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.href setter: attribute USVString href */
-RV_EXPORT int32_t rv_dom_html_area_element_set_href(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_href(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLAreaElement.target getter: attribute DOMString target */
 RV_EXPORT int32_t rv_dom_html_area_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLAreaElement.target setter: attribute DOMString target */
-RV_EXPORT int32_t rv_dom_html_area_element_set_target(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_area_element_set_target(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLBodyElement */
 
 /* HTMLBodyElement.aLink getter: attribute DOMString aLink */
 RV_EXPORT int32_t rv_dom_html_body_element_get_a_link(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLBodyElement.aLink setter: attribute DOMString aLink */
-RV_EXPORT int32_t rv_dom_html_body_element_set_a_link(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_body_element_set_a_link(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLBodyElement.background getter: attribute DOMString background */
 RV_EXPORT int32_t rv_dom_html_body_element_get_background(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLBodyElement.background setter: attribute DOMString background */
-RV_EXPORT int32_t rv_dom_html_body_element_set_background(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_body_element_set_background(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLBodyElement.bgColor getter: attribute DOMString bgColor */
 RV_EXPORT int32_t rv_dom_html_body_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLBodyElement.bgColor setter: attribute DOMString bgColor */
-RV_EXPORT int32_t rv_dom_html_body_element_set_bg_color(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_body_element_set_bg_color(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLBodyElement.link getter: attribute DOMString link */
 RV_EXPORT int32_t rv_dom_html_body_element_get_link(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLBodyElement.link setter: attribute DOMString link */
-RV_EXPORT int32_t rv_dom_html_body_element_set_link(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_body_element_set_link(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLBodyElement.text getter: attribute DOMString text */
 RV_EXPORT int32_t rv_dom_html_body_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLBodyElement.text setter: attribute DOMString text */
-RV_EXPORT int32_t rv_dom_html_body_element_set_text(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_body_element_set_text(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLBodyElement.vLink getter: attribute DOMString vLink */
 RV_EXPORT int32_t rv_dom_html_body_element_get_v_link(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLBodyElement.vLink setter: attribute DOMString vLink */
-RV_EXPORT int32_t rv_dom_html_body_element_set_v_link(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_body_element_set_v_link(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement */
 
 /* HTMLButtonElement.disabled getter: attribute boolean disabled */
@@ -3036,19 +3037,19 @@ RV_EXPORT int32_t rv_dom_html_button_element_get_form(RvNode* target, RvNode** r
 /* HTMLButtonElement.formAction getter: attribute USVString formAction */
 RV_EXPORT int32_t rv_dom_html_button_element_get_form_action(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLButtonElement.formAction setter: attribute USVString formAction */
-RV_EXPORT int32_t rv_dom_html_button_element_set_form_action(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_button_element_set_form_action(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement.formEnctype getter: attribute DOMString formEnctype */
 RV_EXPORT int32_t rv_dom_html_button_element_get_form_enctype(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLButtonElement.formEnctype setter: attribute DOMString formEnctype */
-RV_EXPORT int32_t rv_dom_html_button_element_set_form_enctype(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_button_element_set_form_enctype(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement.formMethod getter: attribute DOMString formMethod */
 RV_EXPORT int32_t rv_dom_html_button_element_get_form_method(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLButtonElement.formMethod setter: attribute DOMString formMethod */
-RV_EXPORT int32_t rv_dom_html_button_element_set_form_method(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_button_element_set_form_method(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_button_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLButtonElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_html_button_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_button_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement.formNoValidate getter: attribute boolean formNoValidate */
 RV_EXPORT int32_t rv_dom_html_button_element_get_form_no_validate(RvNode* target, int32_t* result);
 /* HTMLButtonElement.formNoValidate setter: attribute boolean formNoValidate */
@@ -3056,15 +3057,15 @@ RV_EXPORT int32_t rv_dom_html_button_element_set_form_no_validate(RvNode* target
 /* HTMLButtonElement.formTarget getter: attribute DOMString formTarget */
 RV_EXPORT int32_t rv_dom_html_button_element_get_form_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLButtonElement.formTarget setter: attribute DOMString formTarget */
-RV_EXPORT int32_t rv_dom_html_button_element_set_form_target(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_button_element_set_form_target(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_button_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLButtonElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_button_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_button_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_html_button_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLButtonElement.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_html_button_element_set_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_button_element_set_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement.commandForElement getter: attribute Element? commandForElement; *result is a new reference, or
  * NULL; RV_ERR_UNSUPPORTED while the setting CommandAttributesEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_get_command_for_element(RvNode* target, RvNode** result);
@@ -3076,7 +3077,7 @@ RV_EXPORT int32_t rv_dom_html_button_element_set_command_for_element(RvNode* tar
 RV_EXPORT int32_t rv_dom_html_button_element_get_command(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLButtonElement.command setter: attribute DOMString command; RV_ERR_UNSUPPORTED while the setting
  * CommandAttributesEnabled is off */
-RV_EXPORT int32_t rv_dom_html_button_element_set_command(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_button_element_set_command(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement.willValidate getter: readonly attribute boolean willValidate */
 RV_EXPORT int32_t rv_dom_html_button_element_get_will_validate(RvNode* target, int32_t* result);
 /* HTMLButtonElement.validity getter: readonly attribute ValidityState validity; *result is a new reference */
@@ -3096,20 +3097,20 @@ RV_EXPORT int32_t rv_dom_html_button_element_set_popover_target_element(RvNode* 
 RV_EXPORT int32_t rv_dom_html_button_element_get_popover_target_action(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLButtonElement.popoverTargetAction setter: attribute DOMString popoverTargetAction; RV_ERR_UNSUPPORTED while the
  * setting PopoverAttributeEnabled is off */
-RV_EXPORT int32_t rv_dom_html_button_element_set_popover_target_action(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_button_element_set_popover_target_action(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLButtonElement.checkValidity() -> boolean */
 RV_EXPORT int32_t rv_dom_html_button_element_check_validity(RvNode* target, int32_t* result);
 /* HTMLButtonElement.reportValidity() -> boolean; RV_ERR_UNSUPPORTED while the setting
  * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_button_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLButtonElement.setCustomValidity(DOMString error) -> undefined */
-RV_EXPORT int32_t rv_dom_html_button_element_set_custom_validity(RvNode* target, const char* error);
+RV_EXPORT int32_t rv_dom_html_button_element_set_custom_validity(RvNode* target, const uint8_t* error, int32_t error_length);
 /* HTMLDetailsElement */
 
 /* HTMLDetailsElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_details_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLDetailsElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_details_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_details_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLDetailsElement.open getter: attribute boolean open */
 RV_EXPORT int32_t rv_dom_html_details_element_get_open(RvNode* target, int32_t* result);
 /* HTMLDetailsElement.open setter: attribute boolean open */
@@ -3123,27 +3124,27 @@ RV_EXPORT int32_t rv_dom_html_dialog_element_set_open(RvNode* target, int32_t va
 /* HTMLDialogElement.returnValue getter: attribute DOMString returnValue */
 RV_EXPORT int32_t rv_dom_html_dialog_element_get_return_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLDialogElement.returnValue setter: attribute DOMString returnValue */
-RV_EXPORT int32_t rv_dom_html_dialog_element_set_return_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_dialog_element_set_return_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLDialogElement.closedBy getter: attribute DOMString closedBy; RV_ERR_UNSUPPORTED while the setting
  * CloseWatcherEnabled is off */
 RV_EXPORT int32_t rv_dom_html_dialog_element_get_closed_by(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLDialogElement.closedBy setter: attribute DOMString closedBy; RV_ERR_UNSUPPORTED while the setting
  * CloseWatcherEnabled is off */
-RV_EXPORT int32_t rv_dom_html_dialog_element_set_closed_by(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_dialog_element_set_closed_by(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLDialogElement.show() -> undefined */
 RV_EXPORT int32_t rv_dom_html_dialog_element_show(RvNode* target);
 /* HTMLDialogElement.showModal() -> undefined */
 RV_EXPORT int32_t rv_dom_html_dialog_element_show_modal(RvNode* target);
-/* HTMLDialogElement.close(optional DOMString returnValue) -> undefined; return_value may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_html_dialog_element_close(RvNode* target, const char* return_value);
-/* HTMLDialogElement.requestClose(optional DOMString returnValue) -> undefined; return_value may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_html_dialog_element_request_close(RvNode* target, const char* return_value);
+/* HTMLDialogElement.close(optional DOMString returnValue) -> undefined; return_value_length -1 means absent */
+RV_EXPORT int32_t rv_dom_html_dialog_element_close(RvNode* target, const uint8_t* return_value, int32_t return_value_length);
+/* HTMLDialogElement.requestClose(optional DOMString returnValue) -> undefined; return_value_length -1 means absent */
+RV_EXPORT int32_t rv_dom_html_dialog_element_request_close(RvNode* target, const uint8_t* return_value, int32_t return_value_length);
 /* HTMLDivElement */
 
 /* HTMLDivElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_div_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLDivElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_div_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_div_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFieldSetElement */
 
 /* HTMLFieldSetElement.disabled getter: attribute boolean disabled */
@@ -3155,7 +3156,7 @@ RV_EXPORT int32_t rv_dom_html_field_set_element_get_form(RvNode* target, RvNode*
 /* HTMLFieldSetElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_field_set_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFieldSetElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_field_set_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_field_set_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFieldSetElement.type getter: readonly attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_field_set_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFieldSetElement.elements getter: readonly attribute HTMLCollection elements; *result is a new reference */
@@ -3172,37 +3173,37 @@ RV_EXPORT int32_t rv_dom_html_field_set_element_check_validity(RvNode* target, i
  * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_field_set_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLFieldSetElement.setCustomValidity(DOMString error) -> undefined */
-RV_EXPORT int32_t rv_dom_html_field_set_element_set_custom_validity(RvNode* target, const char* error);
+RV_EXPORT int32_t rv_dom_html_field_set_element_set_custom_validity(RvNode* target, const uint8_t* error, int32_t error_length);
 /* HTMLFormElement */
 
 /* HTMLFormElement.acceptCharset getter: attribute DOMString acceptCharset */
 RV_EXPORT int32_t rv_dom_html_form_element_get_accept_charset(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFormElement.acceptCharset setter: attribute DOMString acceptCharset */
-RV_EXPORT int32_t rv_dom_html_form_element_set_accept_charset(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_form_element_set_accept_charset(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFormElement.action getter: attribute USVString action */
 RV_EXPORT int32_t rv_dom_html_form_element_get_action(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFormElement.action setter: attribute USVString action */
-RV_EXPORT int32_t rv_dom_html_form_element_set_action(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_form_element_set_action(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFormElement.autocomplete getter: attribute DOMString autocomplete */
 RV_EXPORT int32_t rv_dom_html_form_element_get_autocomplete(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFormElement.autocomplete setter: attribute DOMString autocomplete */
-RV_EXPORT int32_t rv_dom_html_form_element_set_autocomplete(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_form_element_set_autocomplete(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFormElement.enctype getter: attribute DOMString enctype */
 RV_EXPORT int32_t rv_dom_html_form_element_get_enctype(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFormElement.enctype setter: attribute DOMString enctype */
-RV_EXPORT int32_t rv_dom_html_form_element_set_enctype(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_form_element_set_enctype(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFormElement.encoding getter: attribute DOMString encoding */
 RV_EXPORT int32_t rv_dom_html_form_element_get_encoding(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFormElement.encoding setter: attribute DOMString encoding */
-RV_EXPORT int32_t rv_dom_html_form_element_set_encoding(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_form_element_set_encoding(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFormElement.method getter: attribute DOMString method */
 RV_EXPORT int32_t rv_dom_html_form_element_get_method(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFormElement.method setter: attribute DOMString method */
-RV_EXPORT int32_t rv_dom_html_form_element_set_method(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_form_element_set_method(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFormElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_form_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFormElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_form_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_form_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFormElement.noValidate getter: attribute boolean noValidate */
 RV_EXPORT int32_t rv_dom_html_form_element_get_no_validate(RvNode* target, int32_t* result);
 /* HTMLFormElement.noValidate setter: attribute boolean noValidate */
@@ -3210,11 +3211,11 @@ RV_EXPORT int32_t rv_dom_html_form_element_set_no_validate(RvNode* target, int32
 /* HTMLFormElement.target getter: attribute DOMString target */
 RV_EXPORT int32_t rv_dom_html_form_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFormElement.target setter: attribute DOMString target */
-RV_EXPORT int32_t rv_dom_html_form_element_set_target(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_form_element_set_target(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFormElement.rel getter: attribute DOMString rel */
 RV_EXPORT int32_t rv_dom_html_form_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFormElement.rel setter: attribute DOMString rel */
-RV_EXPORT int32_t rv_dom_html_form_element_set_rel(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_form_element_set_rel(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFormElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_form_element_get_rel_list(RvNode* target, RvDOMTokenList** result);
 /* HTMLFormElement.elements getter: readonly attribute HTMLFormControlsCollection elements; *result is a new reference */
@@ -3225,7 +3226,7 @@ RV_EXPORT int32_t rv_dom_html_form_element_get_length(RvNode* target, uint32_t* 
 RV_EXPORT int32_t rv_dom_html_form_element_item(RvNode* target, uint32_t index, RvNode** result);
 /* HTMLFormElement.namedItem(DOMString name) -> (RadioNodeList or Element)?; *result owns its contents; release with
  * the matching rv_dom_*_release */
-RV_EXPORT int32_t rv_dom_html_form_element_named_item(RvNode* target, const char* name, RvDomUnionRadioNodeListOrElementNullable* result);
+RV_EXPORT int32_t rv_dom_html_form_element_named_item(RvNode* target, const uint8_t* name, int32_t name_length, RvDomUnionRadioNodeListOrElementNullable* result);
 /* HTMLFormElement.submit() -> undefined */
 RV_EXPORT int32_t rv_dom_html_form_element_submit(RvNode* target);
 /* HTMLFormElement.requestSubmit(optional HTMLElement? submitter) -> undefined; submitter may be NULL */
@@ -3242,27 +3243,27 @@ RV_EXPORT int32_t rv_dom_html_form_element_report_validity(RvNode* target, int32
 /* HTMLImageElement.alt getter: attribute DOMString alt */
 RV_EXPORT int32_t rv_dom_html_image_element_get_alt(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.alt setter: attribute DOMString alt */
-RV_EXPORT int32_t rv_dom_html_image_element_set_alt(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_alt(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.src getter: attribute USVString src */
 RV_EXPORT int32_t rv_dom_html_image_element_get_src(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.src setter: attribute USVString src */
-RV_EXPORT int32_t rv_dom_html_image_element_set_src(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_src(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.srcset getter: attribute USVString srcset */
 RV_EXPORT int32_t rv_dom_html_image_element_get_srcset(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.srcset setter: attribute USVString srcset */
-RV_EXPORT int32_t rv_dom_html_image_element_set_srcset(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_srcset(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.sizes getter: attribute DOMString sizes */
 RV_EXPORT int32_t rv_dom_html_image_element_get_sizes(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.sizes setter: attribute DOMString sizes */
-RV_EXPORT int32_t rv_dom_html_image_element_set_sizes(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_sizes(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.crossOrigin getter: attribute DOMString? crossOrigin */
 RV_EXPORT int32_t rv_dom_html_image_element_get_cross_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLImageElement.crossOrigin setter: attribute DOMString? crossOrigin; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_html_image_element_set_cross_origin(RvNode* target, const char* value);
+/* HTMLImageElement.crossOrigin setter: attribute DOMString? crossOrigin; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_html_image_element_set_cross_origin(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.useMap getter: attribute DOMString useMap */
 RV_EXPORT int32_t rv_dom_html_image_element_get_use_map(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.useMap setter: attribute DOMString useMap */
-RV_EXPORT int32_t rv_dom_html_image_element_set_use_map(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_use_map(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.isMap getter: attribute boolean isMap */
 RV_EXPORT int32_t rv_dom_html_image_element_get_is_map(RvNode* target, int32_t* result);
 /* HTMLImageElement.isMap setter: attribute boolean isMap */
@@ -3292,29 +3293,29 @@ RV_EXPORT int32_t rv_dom_html_image_element_get_current_src(RvNode* target, char
 /* HTMLImageElement.referrerPolicy getter: attribute DOMString referrerPolicy */
 RV_EXPORT int32_t rv_dom_html_image_element_get_referrer_policy(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.referrerPolicy setter: attribute DOMString referrerPolicy */
-RV_EXPORT int32_t rv_dom_html_image_element_set_referrer_policy(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_referrer_policy(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.decoding getter: attribute DOMString decoding */
 RV_EXPORT int32_t rv_dom_html_image_element_get_decoding(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.decoding setter: attribute DOMString decoding */
-RV_EXPORT int32_t rv_dom_html_image_element_set_decoding(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_decoding(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.loading getter: attribute DOMString loading; RV_ERR_UNSUPPORTED while the setting
  * LazyImageLoadingEnabled is off */
 RV_EXPORT int32_t rv_dom_html_image_element_get_loading(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.loading setter: attribute DOMString loading; RV_ERR_UNSUPPORTED while the setting
  * LazyImageLoadingEnabled is off */
-RV_EXPORT int32_t rv_dom_html_image_element_set_loading(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_loading(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_image_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_image_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.lowsrc getter: attribute USVString lowsrc */
 RV_EXPORT int32_t rv_dom_html_image_element_get_lowsrc(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.lowsrc setter: attribute USVString lowsrc */
-RV_EXPORT int32_t rv_dom_html_image_element_set_lowsrc(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_lowsrc(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_image_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_image_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.hspace getter: attribute unsigned long hspace */
 RV_EXPORT int32_t rv_dom_html_image_element_get_hspace(RvNode* target, uint32_t* result);
 /* HTMLImageElement.hspace setter: attribute unsigned long hspace */
@@ -3326,15 +3327,15 @@ RV_EXPORT int32_t rv_dom_html_image_element_set_vspace(RvNode* target, uint32_t 
 /* HTMLImageElement.longDesc getter: attribute USVString longDesc */
 RV_EXPORT int32_t rv_dom_html_image_element_get_long_desc(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.longDesc setter: attribute USVString longDesc */
-RV_EXPORT int32_t rv_dom_html_image_element_set_long_desc(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_long_desc(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.border getter: attribute DOMString border */
 RV_EXPORT int32_t rv_dom_html_image_element_get_border(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.border setter: attribute DOMString border */
-RV_EXPORT int32_t rv_dom_html_image_element_set_border(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_border(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.fetchPriority getter: attribute DOMString fetchPriority */
 RV_EXPORT int32_t rv_dom_html_image_element_get_fetch_priority(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLImageElement.fetchPriority setter: attribute DOMString fetchPriority */
-RV_EXPORT int32_t rv_dom_html_image_element_set_fetch_priority(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_image_element_set_fetch_priority(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLImageElement.attachmentIdentifier getter: readonly attribute DOMString attachmentIdentifier; RV_ERR_UNSUPPORTED
  * where WebKit builds without ATTACHMENT_ELEMENT */
 RV_EXPORT int32_t rv_dom_html_image_element_get_attachment_identifier(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
@@ -3347,7 +3348,7 @@ RV_EXPORT int32_t rv_dom_html_image_element_get_y(RvNode* target, int32_t* resul
 /* HTMLInputElement.accept getter: attribute DOMString accept */
 RV_EXPORT int32_t rv_dom_html_input_element_get_accept(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.accept setter: attribute DOMString accept */
-RV_EXPORT int32_t rv_dom_html_input_element_set_accept(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_accept(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.alpha getter: attribute boolean alpha; RV_ERR_UNSUPPORTED while the setting
  * InputTypeColorEnhancementsEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_get_alpha(RvNode* target, int32_t* result);
@@ -3357,11 +3358,11 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_alpha(RvNode* target, int32_t va
 /* HTMLInputElement.alt getter: attribute DOMString alt */
 RV_EXPORT int32_t rv_dom_html_input_element_get_alt(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.alt setter: attribute DOMString alt */
-RV_EXPORT int32_t rv_dom_html_input_element_set_alt(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_alt(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.autocomplete getter: attribute DOMString autocomplete */
 RV_EXPORT int32_t rv_dom_html_input_element_get_autocomplete(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.autocomplete setter: attribute DOMString autocomplete */
-RV_EXPORT int32_t rv_dom_html_input_element_set_autocomplete(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_autocomplete(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.defaultChecked getter: attribute boolean defaultChecked */
 RV_EXPORT int32_t rv_dom_html_input_element_get_default_checked(RvNode* target, int32_t* result);
 /* HTMLInputElement.defaultChecked setter: attribute boolean defaultChecked */
@@ -3375,11 +3376,11 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_checked(RvNode* target, int32_t 
 RV_EXPORT int32_t rv_dom_html_input_element_get_color_space(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.colorSpace setter: attribute DOMString colorSpace; RV_ERR_UNSUPPORTED while the setting
  * InputTypeColorEnhancementsEnabled is off */
-RV_EXPORT int32_t rv_dom_html_input_element_set_color_space(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_color_space(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.dirName getter: attribute DOMString dirName */
 RV_EXPORT int32_t rv_dom_html_input_element_get_dir_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.dirName setter: attribute DOMString dirName */
-RV_EXPORT int32_t rv_dom_html_input_element_set_dir_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_dir_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.disabled getter: attribute boolean disabled */
 RV_EXPORT int32_t rv_dom_html_input_element_get_disabled(RvNode* target, int32_t* result);
 /* HTMLInputElement.disabled setter: attribute boolean disabled */
@@ -3393,15 +3394,15 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_files(RvNode* target, RvFileList
 /* HTMLInputElement.formAction getter: attribute USVString formAction */
 RV_EXPORT int32_t rv_dom_html_input_element_get_form_action(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.formAction setter: attribute USVString formAction */
-RV_EXPORT int32_t rv_dom_html_input_element_set_form_action(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_form_action(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.formEnctype getter: attribute DOMString formEnctype */
 RV_EXPORT int32_t rv_dom_html_input_element_get_form_enctype(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.formEnctype setter: attribute DOMString formEnctype */
-RV_EXPORT int32_t rv_dom_html_input_element_set_form_enctype(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_form_enctype(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.formMethod getter: attribute DOMString formMethod */
 RV_EXPORT int32_t rv_dom_html_input_element_get_form_method(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.formMethod setter: attribute DOMString formMethod */
-RV_EXPORT int32_t rv_dom_html_input_element_set_form_method(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_form_method(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.formNoValidate getter: attribute boolean formNoValidate */
 RV_EXPORT int32_t rv_dom_html_input_element_get_form_no_validate(RvNode* target, int32_t* result);
 /* HTMLInputElement.formNoValidate setter: attribute boolean formNoValidate */
@@ -3409,7 +3410,7 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_form_no_validate(RvNode* target,
 /* HTMLInputElement.formTarget getter: attribute DOMString formTarget */
 RV_EXPORT int32_t rv_dom_html_input_element_get_form_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.formTarget setter: attribute DOMString formTarget */
-RV_EXPORT int32_t rv_dom_html_input_element_set_form_target(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_form_target(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.height getter: attribute unsigned long height */
 RV_EXPORT int32_t rv_dom_html_input_element_get_height(RvNode* target, uint32_t* result);
 /* HTMLInputElement.height setter: attribute unsigned long height */
@@ -3423,7 +3424,7 @@ RV_EXPORT int32_t rv_dom_html_input_element_get_list(RvNode* target, RvNode** re
 /* HTMLInputElement.max getter: attribute DOMString max */
 RV_EXPORT int32_t rv_dom_html_input_element_get_max(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.max setter: attribute DOMString max */
-RV_EXPORT int32_t rv_dom_html_input_element_set_max(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_max(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.minLength getter: attribute long minLength */
 RV_EXPORT int32_t rv_dom_html_input_element_get_min_length(RvNode* target, int32_t* result);
 /* HTMLInputElement.minLength setter: attribute long minLength */
@@ -3435,7 +3436,7 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_max_length(RvNode* target, int32
 /* HTMLInputElement.min getter: attribute DOMString min */
 RV_EXPORT int32_t rv_dom_html_input_element_get_min(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.min setter: attribute DOMString min */
-RV_EXPORT int32_t rv_dom_html_input_element_set_min(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_min(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.multiple getter: attribute boolean multiple */
 RV_EXPORT int32_t rv_dom_html_input_element_get_multiple(RvNode* target, int32_t* result);
 /* HTMLInputElement.multiple setter: attribute boolean multiple */
@@ -3443,15 +3444,15 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_multiple(RvNode* target, int32_t
 /* HTMLInputElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_input_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_input_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.pattern getter: attribute DOMString pattern */
 RV_EXPORT int32_t rv_dom_html_input_element_get_pattern(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.pattern setter: attribute DOMString pattern */
-RV_EXPORT int32_t rv_dom_html_input_element_set_pattern(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_pattern(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.placeholder getter: attribute DOMString placeholder */
 RV_EXPORT int32_t rv_dom_html_input_element_get_placeholder(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.placeholder setter: attribute DOMString placeholder */
-RV_EXPORT int32_t rv_dom_html_input_element_set_placeholder(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_placeholder(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.readOnly getter: attribute boolean readOnly */
 RV_EXPORT int32_t rv_dom_html_input_element_get_read_only(RvNode* target, int32_t* result);
 /* HTMLInputElement.readOnly setter: attribute boolean readOnly */
@@ -3467,11 +3468,11 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_size(RvNode* target, uint32_t va
 /* HTMLInputElement.src getter: attribute USVString src */
 RV_EXPORT int32_t rv_dom_html_input_element_get_src(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.src setter: attribute USVString src */
-RV_EXPORT int32_t rv_dom_html_input_element_set_src(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_src(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.step getter: attribute DOMString step */
 RV_EXPORT int32_t rv_dom_html_input_element_get_step(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.step setter: attribute DOMString step */
-RV_EXPORT int32_t rv_dom_html_input_element_set_step(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_step(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.switch getter: attribute boolean switch; RV_ERR_UNSUPPORTED while the setting SwitchControlEnabled
  * is off */
 RV_EXPORT int32_t rv_dom_html_input_element_get_switch(RvNode* target, int32_t* result);
@@ -3481,15 +3482,15 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_switch(RvNode* target, int32_t v
 /* HTMLInputElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_input_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_html_input_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.defaultValue getter: attribute DOMString defaultValue */
 RV_EXPORT int32_t rv_dom_html_input_element_get_default_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.defaultValue setter: attribute DOMString defaultValue */
-RV_EXPORT int32_t rv_dom_html_input_element_set_default_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_default_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_html_input_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_html_input_element_set_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.valueAsNumber getter: attribute unrestricted double valueAsNumber */
 RV_EXPORT int32_t rv_dom_html_input_element_get_value_as_number(RvNode* target, double* result);
 /* HTMLInputElement.valueAsNumber setter: attribute unrestricted double valueAsNumber */
@@ -3518,22 +3519,22 @@ RV_EXPORT int32_t rv_dom_html_input_element_get_selection_end(RvNode* target, ui
 RV_EXPORT int32_t rv_dom_html_input_element_set_selection_end(RvNode* target, const uint32_t* value);
 /* HTMLInputElement.selectionDirection getter: attribute DOMString? selectionDirection */
 RV_EXPORT int32_t rv_dom_html_input_element_get_selection_direction(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLInputElement.selectionDirection setter: attribute DOMString? selectionDirection; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_html_input_element_set_selection_direction(RvNode* target, const char* value);
+/* HTMLInputElement.selectionDirection setter: attribute DOMString? selectionDirection; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_html_input_element_set_selection_direction(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_input_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_input_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.useMap getter: attribute DOMString useMap */
 RV_EXPORT int32_t rv_dom_html_input_element_get_use_map(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.useMap setter: attribute DOMString useMap */
-RV_EXPORT int32_t rv_dom_html_input_element_set_use_map(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_use_map(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.capture getter: attribute DOMString capture; RV_ERR_UNSUPPORTED where WebKit builds without
  * MEDIA_CAPTURE */
 RV_EXPORT int32_t rv_dom_html_input_element_get_capture(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.capture setter: attribute DOMString capture; RV_ERR_UNSUPPORTED where WebKit builds without
  * MEDIA_CAPTURE */
-RV_EXPORT int32_t rv_dom_html_input_element_set_capture(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_capture(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.popoverTargetElement getter: attribute Element? popoverTargetElement; *result is a new reference,
  * or NULL; RV_ERR_UNSUPPORTED while the setting PopoverAttributeEnabled is off */
 RV_EXPORT int32_t rv_dom_html_input_element_get_popover_target_element(RvNode* target, RvNode** result);
@@ -3545,7 +3546,7 @@ RV_EXPORT int32_t rv_dom_html_input_element_set_popover_target_element(RvNode* t
 RV_EXPORT int32_t rv_dom_html_input_element_get_popover_target_action(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLInputElement.popoverTargetAction setter: attribute DOMString popoverTargetAction; RV_ERR_UNSUPPORTED while the
  * setting PopoverAttributeEnabled is off */
-RV_EXPORT int32_t rv_dom_html_input_element_set_popover_target_action(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_input_element_set_popover_target_action(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLInputElement.stepUp(optional long n = 1) -> undefined; n defaults to 1 in IDL */
 RV_EXPORT int32_t rv_dom_html_input_element_step_up(RvNode* target, int32_t n);
 /* HTMLInputElement.stepDown(optional long n = 1) -> undefined; n defaults to 1 in IDL */
@@ -3556,17 +3557,17 @@ RV_EXPORT int32_t rv_dom_html_input_element_check_validity(RvNode* target, int32
  * is off */
 RV_EXPORT int32_t rv_dom_html_input_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLInputElement.setCustomValidity(DOMString error) -> undefined */
-RV_EXPORT int32_t rv_dom_html_input_element_set_custom_validity(RvNode* target, const char* error);
+RV_EXPORT int32_t rv_dom_html_input_element_set_custom_validity(RvNode* target, const uint8_t* error, int32_t error_length);
 /* HTMLInputElement.select() -> undefined */
 RV_EXPORT int32_t rv_dom_html_input_element_select(RvNode* target);
 /* HTMLInputElement.setRangeText(DOMString replacement) -> undefined */
-RV_EXPORT int32_t rv_dom_html_input_element_set_range_text_1(RvNode* target, const char* replacement);
+RV_EXPORT int32_t rv_dom_html_input_element_set_range_text_1(RvNode* target, const uint8_t* replacement, int32_t replacement_length);
 /* HTMLInputElement.setRangeText(DOMString replacement, unsigned long start, unsigned long end, optional DOMString
- * selectionMode) -> undefined; selection_mode may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_html_input_element_set_range_text_4(RvNode* target, const char* replacement, uint32_t start, uint32_t end, const char* selection_mode);
+ * selectionMode) -> undefined; selection_mode_length -1 means absent */
+RV_EXPORT int32_t rv_dom_html_input_element_set_range_text_4(RvNode* target, const uint8_t* replacement, int32_t replacement_length, uint32_t start, uint32_t end, const uint8_t* selection_mode, int32_t selection_mode_length);
 /* HTMLInputElement.setSelectionRange(unsigned long start, unsigned long end, optional DOMString direction) ->
- * undefined; direction may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_html_input_element_set_selection_range(RvNode* target, uint32_t start, uint32_t end, const char* direction);
+ * undefined; direction_length -1 means absent */
+RV_EXPORT int32_t rv_dom_html_input_element_set_selection_range(RvNode* target, uint32_t start, uint32_t end, const uint8_t* direction, int32_t direction_length);
 /* HTMLLabelElement */
 
 /* HTMLLabelElement.form getter: readonly attribute HTMLFormElement? form; *result is a new reference, or NULL */
@@ -3574,7 +3575,7 @@ RV_EXPORT int32_t rv_dom_html_label_element_get_form(RvNode* target, RvNode** re
 /* HTMLLabelElement.htmlFor getter: attribute DOMString htmlFor */
 RV_EXPORT int32_t rv_dom_html_label_element_get_html_for(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLabelElement.htmlFor setter: attribute DOMString htmlFor */
-RV_EXPORT int32_t rv_dom_html_label_element_set_html_for(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_label_element_set_html_for(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLabelElement.control getter: readonly attribute HTMLElement? control; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_label_element_get_control(RvNode* target, RvNode** result);
 /* HTMLLegendElement */
@@ -3584,13 +3585,13 @@ RV_EXPORT int32_t rv_dom_html_legend_element_get_form(RvNode* target, RvNode** r
 /* HTMLLegendElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_legend_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLegendElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_legend_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_legend_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLIElement */
 
 /* HTMLLIElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_htmlli_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLIElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_htmlli_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_htmlli_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLIElement.value getter: attribute long value */
 RV_EXPORT int32_t rv_dom_htmlli_element_get_value(RvNode* target, int32_t* result);
 /* HTMLLIElement.value setter: attribute long value */
@@ -3640,7 +3641,7 @@ RV_EXPORT int32_t rv_dom_htmlo_list_element_set_reversed(RvNode* target, int32_t
 /* HTMLOListElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_htmlo_list_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLOListElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_htmlo_list_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_htmlo_list_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLOptGroupElement */
 
 /* HTMLOptGroupElement.disabled getter: attribute boolean disabled */
@@ -3650,7 +3651,7 @@ RV_EXPORT int32_t rv_dom_html_opt_group_element_set_disabled(RvNode* target, int
 /* HTMLOptGroupElement.label getter: attribute DOMString label */
 RV_EXPORT int32_t rv_dom_html_opt_group_element_get_label(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLOptGroupElement.label setter: attribute DOMString label */
-RV_EXPORT int32_t rv_dom_html_opt_group_element_set_label(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_opt_group_element_set_label(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLOptionElement */
 
 /* HTMLOptionElement.disabled getter: attribute boolean disabled */
@@ -3662,7 +3663,7 @@ RV_EXPORT int32_t rv_dom_html_option_element_get_form(RvNode* target, RvNode** r
 /* HTMLOptionElement.label getter: attribute DOMString label */
 RV_EXPORT int32_t rv_dom_html_option_element_get_label(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLOptionElement.label setter: attribute DOMString label */
-RV_EXPORT int32_t rv_dom_html_option_element_set_label(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_option_element_set_label(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLOptionElement.defaultSelected getter: attribute boolean defaultSelected */
 RV_EXPORT int32_t rv_dom_html_option_element_get_default_selected(RvNode* target, int32_t* result);
 /* HTMLOptionElement.defaultSelected setter: attribute boolean defaultSelected */
@@ -3674,11 +3675,11 @@ RV_EXPORT int32_t rv_dom_html_option_element_set_selected(RvNode* target, int32_
 /* HTMLOptionElement.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_html_option_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLOptionElement.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_html_option_element_set_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_option_element_set_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLOptionElement.text getter: attribute DOMString text */
 RV_EXPORT int32_t rv_dom_html_option_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLOptionElement.text setter: attribute DOMString text */
-RV_EXPORT int32_t rv_dom_html_option_element_set_text(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_option_element_set_text(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLOptionElement.index getter: readonly attribute long index */
 RV_EXPORT int32_t rv_dom_html_option_element_get_index(RvNode* target, int32_t* result);
 /* HTMLOutputElement */
@@ -3690,17 +3691,17 @@ RV_EXPORT int32_t rv_dom_html_output_element_get_form(RvNode* target, RvNode** r
 /* HTMLOutputElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_output_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLOutputElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_output_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_output_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLOutputElement.type getter: readonly attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_output_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLOutputElement.defaultValue getter: attribute DOMString defaultValue */
 RV_EXPORT int32_t rv_dom_html_output_element_get_default_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLOutputElement.defaultValue setter: attribute DOMString defaultValue */
-RV_EXPORT int32_t rv_dom_html_output_element_set_default_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_output_element_set_default_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLOutputElement.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_html_output_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLOutputElement.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_html_output_element_set_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_output_element_set_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLOutputElement.willValidate getter: readonly attribute boolean willValidate */
 RV_EXPORT int32_t rv_dom_html_output_element_get_will_validate(RvNode* target, int32_t* result);
 /* HTMLOutputElement.validity getter: readonly attribute ValidityState validity; *result is a new reference */
@@ -3715,13 +3716,13 @@ RV_EXPORT int32_t rv_dom_html_output_element_check_validity(RvNode* target, int3
  * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_output_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLOutputElement.setCustomValidity(DOMString error) -> undefined */
-RV_EXPORT int32_t rv_dom_html_output_element_set_custom_validity(RvNode* target, const char* error);
+RV_EXPORT int32_t rv_dom_html_output_element_set_custom_validity(RvNode* target, const uint8_t* error, int32_t error_length);
 /* HTMLParagraphElement */
 
 /* HTMLParagraphElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_paragraph_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLParagraphElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_paragraph_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_paragraph_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLProgressElement */
 
 /* HTMLProgressElement.value getter: attribute double value */
@@ -3741,7 +3742,7 @@ RV_EXPORT int32_t rv_dom_html_progress_element_get_labels(RvNode* target, RvNode
 /* HTMLSelectElement.autocomplete getter: attribute DOMString autocomplete */
 RV_EXPORT int32_t rv_dom_html_select_element_get_autocomplete(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSelectElement.autocomplete setter: attribute DOMString autocomplete */
-RV_EXPORT int32_t rv_dom_html_select_element_set_autocomplete(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_select_element_set_autocomplete(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSelectElement.disabled getter: attribute boolean disabled */
 RV_EXPORT int32_t rv_dom_html_select_element_get_disabled(RvNode* target, int32_t* result);
 /* HTMLSelectElement.disabled setter: attribute boolean disabled */
@@ -3755,7 +3756,7 @@ RV_EXPORT int32_t rv_dom_html_select_element_set_multiple(RvNode* target, int32_
 /* HTMLSelectElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_select_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSelectElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_select_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_select_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSelectElement.required getter: attribute boolean required */
 RV_EXPORT int32_t rv_dom_html_select_element_get_required(RvNode* target, int32_t* result);
 /* HTMLSelectElement.required setter: attribute boolean required */
@@ -3782,7 +3783,7 @@ RV_EXPORT int32_t rv_dom_html_select_element_set_selected_index(RvNode* target, 
 /* HTMLSelectElement.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_html_select_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSelectElement.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_html_select_element_set_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_select_element_set_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSelectElement.willValidate getter: readonly attribute boolean willValidate */
 RV_EXPORT int32_t rv_dom_html_select_element_get_will_validate(RvNode* target, int32_t* result);
 /* HTMLSelectElement.validity getter: readonly attribute ValidityState validity; *result is a new reference */
@@ -3794,7 +3795,7 @@ RV_EXPORT int32_t rv_dom_html_select_element_get_labels(RvNode* target, RvNodeLi
 /* HTMLSelectElement.item(unsigned long index) -> HTMLOptionElement?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_select_element_item(RvNode* target, uint32_t index, RvNode** result);
 /* HTMLSelectElement.namedItem(DOMString name) -> HTMLOptionElement?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_html_select_element_named_item(RvNode* target, const char* name, RvNode** result);
+RV_EXPORT int32_t rv_dom_html_select_element_named_item(RvNode* target, const uint8_t* name, int32_t name_length, RvNode** result);
 /* HTMLSelectElement.add((HTMLOptionElement or HTMLOptGroupElement) element, optional (HTMLElement or long)? before =
  * null) -> undefined; before defaults to null in IDL */
 RV_EXPORT int32_t rv_dom_html_select_element_add(RvNode* target, const RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* element, const RvDomUnionHTMLElementOrLongNullable* before);
@@ -3810,13 +3811,13 @@ RV_EXPORT int32_t rv_dom_html_select_element_check_validity(RvNode* target, int3
  * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_select_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLSelectElement.setCustomValidity(DOMString error) -> undefined */
-RV_EXPORT int32_t rv_dom_html_select_element_set_custom_validity(RvNode* target, const char* error);
+RV_EXPORT int32_t rv_dom_html_select_element_set_custom_validity(RvNode* target, const uint8_t* error, int32_t error_length);
 /* HTMLSlotElement */
 
 /* HTMLSlotElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_slot_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSlotElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_slot_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_slot_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSlotElement.assignedNodes(optional AssignedNodesOptions options = {}) -> sequence<Node>; options defaults to {}
  * in IDL; options may be NULL for the IDL default; *result owns its contents; release with the matching
  * rv_dom_*_release */
@@ -3848,39 +3849,39 @@ RV_EXPORT int32_t rv_dom_html_table_element_get_rows(RvNode* target, RvHTMLColle
 /* HTMLTableElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_table_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_table_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableElement.border getter: attribute DOMString border */
 RV_EXPORT int32_t rv_dom_html_table_element_get_border(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableElement.border setter: attribute DOMString border */
-RV_EXPORT int32_t rv_dom_html_table_element_set_border(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_element_set_border(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableElement.frame getter: attribute DOMString frame */
 RV_EXPORT int32_t rv_dom_html_table_element_get_frame(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableElement.frame setter: attribute DOMString frame */
-RV_EXPORT int32_t rv_dom_html_table_element_set_frame(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_element_set_frame(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableElement.rules getter: attribute DOMString rules */
 RV_EXPORT int32_t rv_dom_html_table_element_get_rules(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableElement.rules setter: attribute DOMString rules */
-RV_EXPORT int32_t rv_dom_html_table_element_set_rules(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_element_set_rules(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableElement.summary getter: attribute DOMString summary */
 RV_EXPORT int32_t rv_dom_html_table_element_get_summary(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableElement.summary setter: attribute DOMString summary */
-RV_EXPORT int32_t rv_dom_html_table_element_set_summary(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_element_set_summary(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableElement.width getter: attribute DOMString width */
 RV_EXPORT int32_t rv_dom_html_table_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableElement.width setter: attribute DOMString width */
-RV_EXPORT int32_t rv_dom_html_table_element_set_width(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_element_set_width(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableElement.bgColor getter: attribute DOMString bgColor */
 RV_EXPORT int32_t rv_dom_html_table_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableElement.bgColor setter: attribute DOMString bgColor */
-RV_EXPORT int32_t rv_dom_html_table_element_set_bg_color(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_element_set_bg_color(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableElement.cellPadding getter: attribute DOMString cellPadding */
 RV_EXPORT int32_t rv_dom_html_table_element_get_cell_padding(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableElement.cellPadding setter: attribute DOMString cellPadding */
-RV_EXPORT int32_t rv_dom_html_table_element_set_cell_padding(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_element_set_cell_padding(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableElement.cellSpacing getter: attribute DOMString cellSpacing */
 RV_EXPORT int32_t rv_dom_html_table_element_get_cell_spacing(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableElement.cellSpacing setter: attribute DOMString cellSpacing */
-RV_EXPORT int32_t rv_dom_html_table_element_set_cell_spacing(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_element_set_cell_spacing(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableElement.createCaption() -> HTMLTableCaptionElement; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_table_element_create_caption(RvNode* target, RvNode** result);
 /* HTMLTableElement.deleteCaption() -> undefined */
@@ -3905,21 +3906,21 @@ RV_EXPORT int32_t rv_dom_html_table_element_delete_row(RvNode* target, int32_t i
 /* HTMLTableCaptionElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_table_caption_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCaptionElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_table_caption_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_caption_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableColElement */
 
 /* HTMLTableColElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_table_col_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableColElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_table_col_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableColElement.ch getter: attribute DOMString ch */
 RV_EXPORT int32_t rv_dom_html_table_col_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableColElement.ch setter: attribute DOMString ch */
-RV_EXPORT int32_t rv_dom_html_table_col_element_set_ch(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_ch(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableColElement.chOff getter: attribute DOMString chOff */
 RV_EXPORT int32_t rv_dom_html_table_col_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableColElement.chOff setter: attribute DOMString chOff */
-RV_EXPORT int32_t rv_dom_html_table_col_element_set_ch_off(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_ch_off(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableColElement.span getter: attribute unsigned long span */
 RV_EXPORT int32_t rv_dom_html_table_col_element_get_span(RvNode* target, uint32_t* result);
 /* HTMLTableColElement.span setter: attribute unsigned long span */
@@ -3927,11 +3928,11 @@ RV_EXPORT int32_t rv_dom_html_table_col_element_set_span(RvNode* target, uint32_
 /* HTMLTableColElement.vAlign getter: attribute DOMString vAlign */
 RV_EXPORT int32_t rv_dom_html_table_col_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableColElement.vAlign setter: attribute DOMString vAlign */
-RV_EXPORT int32_t rv_dom_html_table_col_element_set_v_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_v_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableColElement.width getter: attribute DOMString width */
 RV_EXPORT int32_t rv_dom_html_table_col_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableColElement.width setter: attribute DOMString width */
-RV_EXPORT int32_t rv_dom_html_table_col_element_set_width(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_col_element_set_width(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableSectionElement */
 
 /* HTMLTableSectionElement.rows getter: readonly attribute HTMLCollection rows; *result is a new reference */
@@ -3939,19 +3940,19 @@ RV_EXPORT int32_t rv_dom_html_table_section_element_get_rows(RvNode* target, RvH
 /* HTMLTableSectionElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_table_section_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableSectionElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_table_section_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_section_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableSectionElement.ch getter: attribute DOMString ch */
 RV_EXPORT int32_t rv_dom_html_table_section_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableSectionElement.ch setter: attribute DOMString ch */
-RV_EXPORT int32_t rv_dom_html_table_section_element_set_ch(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_section_element_set_ch(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableSectionElement.chOff getter: attribute DOMString chOff */
 RV_EXPORT int32_t rv_dom_html_table_section_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableSectionElement.chOff setter: attribute DOMString chOff */
-RV_EXPORT int32_t rv_dom_html_table_section_element_set_ch_off(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_section_element_set_ch_off(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableSectionElement.vAlign getter: attribute DOMString vAlign */
 RV_EXPORT int32_t rv_dom_html_table_section_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableSectionElement.vAlign setter: attribute DOMString vAlign */
-RV_EXPORT int32_t rv_dom_html_table_section_element_set_v_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_section_element_set_v_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableSectionElement.insertRow(optional long index = -1) -> HTMLTableRowElement; index defaults to -1 in IDL;
  * *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_table_section_element_insert_row(RvNode* target, int32_t index, RvNode** result);
@@ -3968,23 +3969,23 @@ RV_EXPORT int32_t rv_dom_html_table_row_element_get_cells(RvNode* target, RvHTML
 /* HTMLTableRowElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_table_row_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableRowElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_table_row_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableRowElement.bgColor getter: attribute DOMString bgColor */
 RV_EXPORT int32_t rv_dom_html_table_row_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableRowElement.bgColor setter: attribute DOMString bgColor */
-RV_EXPORT int32_t rv_dom_html_table_row_element_set_bg_color(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_bg_color(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableRowElement.ch getter: attribute DOMString ch */
 RV_EXPORT int32_t rv_dom_html_table_row_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableRowElement.ch setter: attribute DOMString ch */
-RV_EXPORT int32_t rv_dom_html_table_row_element_set_ch(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_ch(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableRowElement.chOff getter: attribute DOMString chOff */
 RV_EXPORT int32_t rv_dom_html_table_row_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableRowElement.chOff setter: attribute DOMString chOff */
-RV_EXPORT int32_t rv_dom_html_table_row_element_set_ch_off(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_ch_off(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableRowElement.vAlign getter: attribute DOMString vAlign */
 RV_EXPORT int32_t rv_dom_html_table_row_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableRowElement.vAlign setter: attribute DOMString vAlign */
-RV_EXPORT int32_t rv_dom_html_table_row_element_set_v_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_row_element_set_v_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableRowElement.insertCell(optional long index = -1) -> HTMLElement; index defaults to -1 in IDL; *result is a
  * new reference */
 RV_EXPORT int32_t rv_dom_html_table_row_element_insert_cell(RvNode* target, int32_t index, RvNode** result);
@@ -3997,23 +3998,23 @@ RV_EXPORT int32_t rv_dom_html_table_cell_element_get_cell_index(RvNode* target, 
 /* HTMLTableCellElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.axis getter: attribute DOMString axis */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_axis(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.axis setter: attribute DOMString axis */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_axis(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_axis(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.bgColor getter: attribute DOMString bgColor */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.bgColor setter: attribute DOMString bgColor */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_bg_color(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_bg_color(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.ch getter: attribute DOMString ch */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_ch(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.ch setter: attribute DOMString ch */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_ch(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_ch(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.chOff getter: attribute DOMString chOff */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_ch_off(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.chOff setter: attribute DOMString chOff */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_ch_off(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_ch_off(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.colSpan getter: attribute unsigned long colSpan */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_col_span(RvNode* target, uint32_t* result);
 /* HTMLTableCellElement.colSpan setter: attribute unsigned long colSpan */
@@ -4025,11 +4026,11 @@ RV_EXPORT int32_t rv_dom_html_table_cell_element_set_row_span(RvNode* target, ui
 /* HTMLTableCellElement.headers getter: attribute DOMString headers */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_headers(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.headers setter: attribute DOMString headers */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_headers(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_headers(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.height getter: attribute DOMString height */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_height(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.height setter: attribute DOMString height */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_height(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_height(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.noWrap getter: attribute boolean noWrap */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_no_wrap(RvNode* target, int32_t* result);
 /* HTMLTableCellElement.noWrap setter: attribute boolean noWrap */
@@ -4037,25 +4038,25 @@ RV_EXPORT int32_t rv_dom_html_table_cell_element_set_no_wrap(RvNode* target, int
 /* HTMLTableCellElement.vAlign getter: attribute DOMString vAlign */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_v_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.vAlign setter: attribute DOMString vAlign */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_v_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_v_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.width getter: attribute DOMString width */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.width setter: attribute DOMString width */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_width(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_width(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.abbr getter: attribute DOMString abbr */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_abbr(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.abbr setter: attribute DOMString abbr */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_abbr(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_abbr(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTableCellElement.scope getter: attribute DOMString scope */
 RV_EXPORT int32_t rv_dom_html_table_cell_element_get_scope(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTableCellElement.scope setter: attribute DOMString scope */
-RV_EXPORT int32_t rv_dom_html_table_cell_element_set_scope(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_table_cell_element_set_scope(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTextAreaElement */
 
 /* HTMLTextAreaElement.dirName getter: attribute DOMString dirName */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_dir_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTextAreaElement.dirName setter: attribute DOMString dirName */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_dir_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_dir_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTextAreaElement.disabled getter: attribute boolean disabled */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_disabled(RvNode* target, int32_t* result);
 /* HTMLTextAreaElement.disabled setter: attribute boolean disabled */
@@ -4073,11 +4074,11 @@ RV_EXPORT int32_t rv_dom_html_text_area_element_set_max_length(RvNode* target, i
 /* HTMLTextAreaElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTextAreaElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTextAreaElement.placeholder getter: attribute DOMString placeholder */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_placeholder(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTextAreaElement.placeholder setter: attribute DOMString placeholder */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_placeholder(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_placeholder(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTextAreaElement.readOnly getter: attribute boolean readOnly */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_read_only(RvNode* target, int32_t* result);
 /* HTMLTextAreaElement.readOnly setter: attribute boolean readOnly */
@@ -4097,17 +4098,17 @@ RV_EXPORT int32_t rv_dom_html_text_area_element_set_cols(RvNode* target, uint32_
 /* HTMLTextAreaElement.wrap getter: attribute DOMString wrap */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_wrap(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTextAreaElement.wrap setter: attribute DOMString wrap */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_wrap(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_wrap(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTextAreaElement.type getter: readonly attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTextAreaElement.defaultValue getter: attribute DOMString defaultValue */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_default_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTextAreaElement.defaultValue setter: attribute DOMString defaultValue */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_default_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_default_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTextAreaElement.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTextAreaElement.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTextAreaElement.textLength getter: readonly attribute unsigned long textLength */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_text_length(RvNode* target, uint32_t* result);
 /* HTMLTextAreaElement.willValidate getter: readonly attribute boolean willValidate */
@@ -4129,28 +4130,28 @@ RV_EXPORT int32_t rv_dom_html_text_area_element_set_selection_end(RvNode* target
 /* HTMLTextAreaElement.selectionDirection getter: attribute DOMString selectionDirection */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_selection_direction(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTextAreaElement.selectionDirection setter: attribute DOMString selectionDirection */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_selection_direction(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_selection_direction(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTextAreaElement.autocomplete getter: attribute DOMString autocomplete */
 RV_EXPORT int32_t rv_dom_html_text_area_element_get_autocomplete(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTextAreaElement.autocomplete setter: attribute DOMString autocomplete */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_autocomplete(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_autocomplete(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTextAreaElement.checkValidity() -> boolean */
 RV_EXPORT int32_t rv_dom_html_text_area_element_check_validity(RvNode* target, int32_t* result);
 /* HTMLTextAreaElement.reportValidity() -> boolean; RV_ERR_UNSUPPORTED while the setting
  * InteractiveFormValidationEnabled is off */
 RV_EXPORT int32_t rv_dom_html_text_area_element_report_validity(RvNode* target, int32_t* result);
 /* HTMLTextAreaElement.setCustomValidity(DOMString error) -> undefined */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_custom_validity(RvNode* target, const char* error);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_custom_validity(RvNode* target, const uint8_t* error, int32_t error_length);
 /* HTMLTextAreaElement.select() -> undefined */
 RV_EXPORT int32_t rv_dom_html_text_area_element_select(RvNode* target);
 /* HTMLTextAreaElement.setRangeText(DOMString replacement) -> undefined */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_range_text_1(RvNode* target, const char* replacement);
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_range_text_1(RvNode* target, const uint8_t* replacement, int32_t replacement_length);
 /* HTMLTextAreaElement.setRangeText(DOMString replacement, unsigned long start, unsigned long end, optional DOMString
- * selectionMode) -> undefined; selection_mode may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_range_text_4(RvNode* target, const char* replacement, uint32_t start, uint32_t end, const char* selection_mode);
+ * selectionMode) -> undefined; selection_mode_length -1 means absent */
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_range_text_4(RvNode* target, const uint8_t* replacement, int32_t replacement_length, uint32_t start, uint32_t end, const uint8_t* selection_mode, int32_t selection_mode_length);
 /* HTMLTextAreaElement.setSelectionRange(unsigned long start, unsigned long end, optional DOMString direction) ->
- * undefined; direction may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_html_text_area_element_set_selection_range(RvNode* target, uint32_t start, uint32_t end, const char* direction);
+ * undefined; direction_length -1 means absent */
+RV_EXPORT int32_t rv_dom_html_text_area_element_set_selection_range(RvNode* target, uint32_t start, uint32_t end, const uint8_t* direction, int32_t direction_length);
 /* HTMLTemplateElement */
 
 /* HTMLTemplateElement.content getter: readonly attribute DocumentFragment content; *result is a new reference */
@@ -4158,7 +4159,7 @@ RV_EXPORT int32_t rv_dom_html_template_element_get_content(RvNode* target, RvNod
 /* HTMLTemplateElement.shadowRootMode getter: attribute DOMString shadowRootMode */
 RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_mode(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTemplateElement.shadowRootMode setter: attribute DOMString shadowRootMode */
-RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_mode(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_mode(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTemplateElement.shadowRootDelegatesFocus getter: attribute boolean shadowRootDelegatesFocus */
 RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_delegates_focus(RvNode* target, int32_t* result);
 /* HTMLTemplateElement.shadowRootDelegatesFocus setter: attribute boolean shadowRootDelegatesFocus */
@@ -4166,7 +4167,7 @@ RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_delegates_focus(R
 /* HTMLTemplateElement.shadowRootSlotAssignment getter: attribute DOMString shadowRootSlotAssignment */
 RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_slot_assignment(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTemplateElement.shadowRootSlotAssignment setter: attribute DOMString shadowRootSlotAssignment */
-RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_slot_assignment(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_slot_assignment(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTemplateElement.shadowRootClonable getter: attribute boolean shadowRootClonable */
 RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_clonable(RvNode* target, int32_t* result);
 /* HTMLTemplateElement.shadowRootClonable setter: attribute boolean shadowRootClonable */
@@ -4180,13 +4181,13 @@ RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_serializable(RvNo
 RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_custom_element_registry(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTemplateElement.shadowRootCustomElementRegistry setter: attribute DOMString shadowRootCustomElementRegistry;
  * RV_ERR_UNSUPPORTED while the setting ScopedCustomElementRegistryEnabled is off */
-RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_custom_element_registry(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_custom_element_registry(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTemplateElement.shadowRootReferenceTarget getter: attribute DOMString shadowRootReferenceTarget;
  * RV_ERR_UNSUPPORTED while the setting ShadowRootReferenceTargetEnabled is off */
 RV_EXPORT int32_t rv_dom_html_template_element_get_shadow_root_reference_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTemplateElement.shadowRootReferenceTarget setter: attribute DOMString shadowRootReferenceTarget;
  * RV_ERR_UNSUPPORTED while the setting ShadowRootReferenceTargetEnabled is off */
-RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_reference_target(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_template_element_set_shadow_root_reference_target(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLUListElement */
 
 /* HTMLUListElement.compact getter: attribute boolean compact */
@@ -4196,29 +4197,29 @@ RV_EXPORT int32_t rv_dom_htmlu_list_element_set_compact(RvNode* target, int32_t 
 /* HTMLUListElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_htmlu_list_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLUListElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_htmlu_list_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_htmlu_list_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLBaseElement */
 
 /* HTMLBaseElement.href getter: attribute USVString href */
 RV_EXPORT int32_t rv_dom_html_base_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLBaseElement.href setter: attribute USVString href */
-RV_EXPORT int32_t rv_dom_html_base_element_set_href(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_base_element_set_href(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLBaseElement.target getter: attribute DOMString target */
 RV_EXPORT int32_t rv_dom_html_base_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLBaseElement.target setter: attribute DOMString target */
-RV_EXPORT int32_t rv_dom_html_base_element_set_target(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_base_element_set_target(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLBRElement */
 
 /* HTMLBRElement.clear getter: attribute DOMString clear */
 RV_EXPORT int32_t rv_dom_htmlbr_element_get_clear(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLBRElement.clear setter: attribute DOMString clear */
-RV_EXPORT int32_t rv_dom_htmlbr_element_set_clear(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_htmlbr_element_set_clear(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLDataElement */
 
 /* HTMLDataElement.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_html_data_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLDataElement.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_html_data_element_set_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_data_element_set_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLDataListElement */
 
 /* HTMLDataListElement.options getter: readonly attribute HTMLCollection options; *result is a new reference;
@@ -4241,31 +4242,31 @@ RV_EXPORT int32_t rv_dom_htmld_list_element_set_compact(RvNode* target, int32_t 
 /* HTMLFontElement.color getter: attribute DOMString color */
 RV_EXPORT int32_t rv_dom_html_font_element_get_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFontElement.color setter: attribute DOMString color */
-RV_EXPORT int32_t rv_dom_html_font_element_set_color(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_font_element_set_color(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFontElement.face getter: attribute DOMString face */
 RV_EXPORT int32_t rv_dom_html_font_element_get_face(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFontElement.face setter: attribute DOMString face */
-RV_EXPORT int32_t rv_dom_html_font_element_set_face(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_font_element_set_face(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLFontElement.size getter: attribute DOMString size */
 RV_EXPORT int32_t rv_dom_html_font_element_get_size(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLFontElement.size setter: attribute DOMString size */
-RV_EXPORT int32_t rv_dom_html_font_element_set_size(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_font_element_set_size(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLHeadingElement */
 
 /* HTMLHeadingElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_html_heading_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLHeadingElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_html_heading_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_heading_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLHRElement */
 
 /* HTMLHRElement.align getter: attribute DOMString align */
 RV_EXPORT int32_t rv_dom_htmlhr_element_get_align(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLHRElement.align setter: attribute DOMString align */
-RV_EXPORT int32_t rv_dom_htmlhr_element_set_align(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_htmlhr_element_set_align(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLHRElement.color getter: attribute DOMString color */
 RV_EXPORT int32_t rv_dom_htmlhr_element_get_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLHRElement.color setter: attribute DOMString color */
-RV_EXPORT int32_t rv_dom_htmlhr_element_set_color(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_htmlhr_element_set_color(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLHRElement.noShade getter: attribute boolean noShade */
 RV_EXPORT int32_t rv_dom_htmlhr_element_get_no_shade(RvNode* target, int32_t* result);
 /* HTMLHRElement.noShade setter: attribute boolean noShade */
@@ -4273,17 +4274,17 @@ RV_EXPORT int32_t rv_dom_htmlhr_element_set_no_shade(RvNode* target, int32_t val
 /* HTMLHRElement.size getter: attribute DOMString size */
 RV_EXPORT int32_t rv_dom_htmlhr_element_get_size(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLHRElement.size setter: attribute DOMString size */
-RV_EXPORT int32_t rv_dom_htmlhr_element_set_size(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_htmlhr_element_set_size(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLHRElement.width getter: attribute DOMString width */
 RV_EXPORT int32_t rv_dom_htmlhr_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLHRElement.width setter: attribute DOMString width */
-RV_EXPORT int32_t rv_dom_htmlhr_element_set_width(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_htmlhr_element_set_width(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLHtmlElement */
 
 /* HTMLHtmlElement.version getter: attribute DOMString version */
 RV_EXPORT int32_t rv_dom_html_html_element_get_version(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLHtmlElement.version setter: attribute DOMString version */
-RV_EXPORT int32_t rv_dom_html_html_element_set_version(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_html_element_set_version(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMapElement */
 
 /* HTMLMapElement.areas getter: readonly attribute HTMLCollection areas; *result is a new reference */
@@ -4291,25 +4292,25 @@ RV_EXPORT int32_t rv_dom_html_map_element_get_areas(RvNode* target, RvHTMLCollec
 /* HTMLMapElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_map_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMapElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_map_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_map_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMarqueeElement */
 
 /* HTMLMarqueeElement.behavior getter: attribute DOMString behavior */
 RV_EXPORT int32_t rv_dom_html_marquee_element_get_behavior(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMarqueeElement.behavior setter: attribute DOMString behavior */
-RV_EXPORT int32_t rv_dom_html_marquee_element_set_behavior(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_marquee_element_set_behavior(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMarqueeElement.bgColor getter: attribute DOMString bgColor */
 RV_EXPORT int32_t rv_dom_html_marquee_element_get_bg_color(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMarqueeElement.bgColor setter: attribute DOMString bgColor */
-RV_EXPORT int32_t rv_dom_html_marquee_element_set_bg_color(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_marquee_element_set_bg_color(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMarqueeElement.direction getter: attribute DOMString direction */
 RV_EXPORT int32_t rv_dom_html_marquee_element_get_direction(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMarqueeElement.direction setter: attribute DOMString direction */
-RV_EXPORT int32_t rv_dom_html_marquee_element_set_direction(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_marquee_element_set_direction(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMarqueeElement.height getter: attribute DOMString height */
 RV_EXPORT int32_t rv_dom_html_marquee_element_get_height(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMarqueeElement.height setter: attribute DOMString height */
-RV_EXPORT int32_t rv_dom_html_marquee_element_set_height(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_marquee_element_set_height(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMarqueeElement.hspace getter: attribute unsigned long hspace */
 RV_EXPORT int32_t rv_dom_html_marquee_element_get_hspace(RvNode* target, uint32_t* result);
 /* HTMLMarqueeElement.hspace setter: attribute unsigned long hspace */
@@ -4337,7 +4338,7 @@ RV_EXPORT int32_t rv_dom_html_marquee_element_set_vspace(RvNode* target, uint32_
 /* HTMLMarqueeElement.width getter: attribute DOMString width */
 RV_EXPORT int32_t rv_dom_html_marquee_element_get_width(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMarqueeElement.width setter: attribute DOMString width */
-RV_EXPORT int32_t rv_dom_html_marquee_element_set_width(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_marquee_element_set_width(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMarqueeElement.start() -> undefined */
 RV_EXPORT int32_t rv_dom_html_marquee_element_start(RvNode* target);
 /* HTMLMarqueeElement.stop() -> undefined */
@@ -4353,51 +4354,51 @@ RV_EXPORT int32_t rv_dom_html_menu_element_set_compact(RvNode* target, int32_t v
 /* HTMLMetaElement.content getter: attribute DOMString content */
 RV_EXPORT int32_t rv_dom_html_meta_element_get_content(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMetaElement.content setter: attribute DOMString content */
-RV_EXPORT int32_t rv_dom_html_meta_element_set_content(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_meta_element_set_content(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMetaElement.httpEquiv getter: attribute DOMString httpEquiv */
 RV_EXPORT int32_t rv_dom_html_meta_element_get_http_equiv(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMetaElement.httpEquiv setter: attribute DOMString httpEquiv */
-RV_EXPORT int32_t rv_dom_html_meta_element_set_http_equiv(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_meta_element_set_http_equiv(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMetaElement.media getter: attribute DOMString media */
 RV_EXPORT int32_t rv_dom_html_meta_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMetaElement.media setter: attribute DOMString media */
-RV_EXPORT int32_t rv_dom_html_meta_element_set_media(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_meta_element_set_media(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMetaElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_meta_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMetaElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_meta_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_meta_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLMetaElement.scheme getter: attribute DOMString scheme */
 RV_EXPORT int32_t rv_dom_html_meta_element_get_scheme(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLMetaElement.scheme setter: attribute DOMString scheme */
-RV_EXPORT int32_t rv_dom_html_meta_element_set_scheme(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_meta_element_set_scheme(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLModElement */
 
 /* HTMLModElement.cite getter: attribute USVString cite */
 RV_EXPORT int32_t rv_dom_html_mod_element_get_cite(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLModElement.cite setter: attribute USVString cite */
-RV_EXPORT int32_t rv_dom_html_mod_element_set_cite(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_mod_element_set_cite(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLModElement.dateTime getter: attribute DOMString dateTime */
 RV_EXPORT int32_t rv_dom_html_mod_element_get_date_time(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLModElement.dateTime setter: attribute DOMString dateTime */
-RV_EXPORT int32_t rv_dom_html_mod_element_set_date_time(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_mod_element_set_date_time(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLParamElement */
 
 /* HTMLParamElement.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_html_param_element_get_name(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLParamElement.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_html_param_element_set_name(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_param_element_set_name(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLParamElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_param_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLParamElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_html_param_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_param_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLParamElement.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_html_param_element_get_value(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLParamElement.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_html_param_element_set_value(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_param_element_set_value(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLParamElement.valueType getter: attribute DOMString valueType */
 RV_EXPORT int32_t rv_dom_html_param_element_get_value_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLParamElement.valueType setter: attribute DOMString valueType */
-RV_EXPORT int32_t rv_dom_html_param_element_set_value_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_param_element_set_value_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLPreElement */
 
 /* HTMLPreElement.width getter: attribute long width */
@@ -4409,29 +4410,29 @@ RV_EXPORT int32_t rv_dom_html_pre_element_set_width(RvNode* target, int32_t valu
 /* HTMLQuoteElement.cite getter: attribute USVString cite */
 RV_EXPORT int32_t rv_dom_html_quote_element_get_cite(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLQuoteElement.cite setter: attribute USVString cite */
-RV_EXPORT int32_t rv_dom_html_quote_element_set_cite(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_quote_element_set_cite(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSourceElement */
 
 /* HTMLSourceElement.src getter: attribute USVString src */
 RV_EXPORT int32_t rv_dom_html_source_element_get_src(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSourceElement.src setter: attribute USVString src */
-RV_EXPORT int32_t rv_dom_html_source_element_set_src(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_source_element_set_src(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSourceElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_source_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSourceElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_html_source_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_source_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSourceElement.srcset getter: attribute USVString srcset */
 RV_EXPORT int32_t rv_dom_html_source_element_get_srcset(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSourceElement.srcset setter: attribute USVString srcset */
-RV_EXPORT int32_t rv_dom_html_source_element_set_srcset(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_source_element_set_srcset(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSourceElement.sizes getter: attribute DOMString sizes */
 RV_EXPORT int32_t rv_dom_html_source_element_get_sizes(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSourceElement.sizes setter: attribute DOMString sizes */
-RV_EXPORT int32_t rv_dom_html_source_element_set_sizes(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_source_element_set_sizes(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSourceElement.media getter: attribute DOMString media */
 RV_EXPORT int32_t rv_dom_html_source_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLSourceElement.media setter: attribute DOMString media */
-RV_EXPORT int32_t rv_dom_html_source_element_set_media(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_source_element_set_media(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLSourceElement.width getter: attribute unsigned long width */
 RV_EXPORT int32_t rv_dom_html_source_element_get_width(RvNode* target, uint32_t* result);
 /* HTMLSourceElement.width setter: attribute unsigned long width */
@@ -4448,13 +4449,13 @@ RV_EXPORT int32_t rv_dom_html_source_element_get_attachment_identifier(RvNode* t
 /* HTMLTimeElement.dateTime getter: attribute DOMString dateTime */
 RV_EXPORT int32_t rv_dom_html_time_element_get_date_time(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTimeElement.dateTime setter: attribute DOMString dateTime */
-RV_EXPORT int32_t rv_dom_html_time_element_set_date_time(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_time_element_set_date_time(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLTitleElement */
 
 /* HTMLTitleElement.text getter: attribute DOMString text */
 RV_EXPORT int32_t rv_dom_html_title_element_get_text(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLTitleElement.text setter: attribute DOMString text */
-RV_EXPORT int32_t rv_dom_html_title_element_set_text(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_title_element_set_text(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGElement */
 
 /* SVGElement.className getter: readonly attribute SVGAnimatedString className; *result is a new reference */
@@ -4470,7 +4471,7 @@ RV_EXPORT int32_t rv_dom_svg_element_get_dataset(RvNode* target, RvDOMStringMap*
 /* SVGElement.nonce getter: attribute DOMString nonce */
 RV_EXPORT int32_t rv_dom_svg_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGElement.nonce setter: attribute DOMString nonce */
-RV_EXPORT int32_t rv_dom_svg_element_set_nonce(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_svg_element_set_nonce(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGElement.autofocus getter: attribute boolean autofocus */
 RV_EXPORT int32_t rv_dom_svg_element_get_autofocus(RvNode* target, int32_t* result);
 /* SVGElement.autofocus setter: attribute boolean autofocus */
@@ -4499,7 +4500,7 @@ RV_EXPORT int32_t rv_dom_math_ml_element_get_dataset(RvNode* target, RvDOMString
 RV_EXPORT int32_t rv_dom_math_ml_element_get_nonce(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* MathMLElement.nonce setter: attribute DOMString nonce; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is off;
  * RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
-RV_EXPORT int32_t rv_dom_math_ml_element_set_nonce(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_math_ml_element_set_nonce(RvNode* target, const uint8_t* value, int32_t value_length);
 /* MathMLElement.autofocus getter: attribute boolean autofocus; RV_ERR_UNSUPPORTED while the setting MathMLEnabled is
  * off; RV_ERR_UNSUPPORTED where WebKit builds without MATHML */
 RV_EXPORT int32_t rv_dom_math_ml_element_get_autofocus(RvNode* target, int32_t* result);
@@ -4535,11 +4536,11 @@ RV_EXPORT int32_t rv_dom_html_style_element_set_disabled(RvNode* target, int32_t
 /* HTMLStyleElement.media getter: attribute DOMString media */
 RV_EXPORT int32_t rv_dom_html_style_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLStyleElement.media setter: attribute DOMString media */
-RV_EXPORT int32_t rv_dom_html_style_element_set_media(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_style_element_set_media(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLStyleElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_style_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLStyleElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_html_style_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_style_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLStyleElement.blocking getter: readonly attribute DOMTokenList blocking; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_style_element_get_blocking(RvNode* target, RvDOMTokenList** result);
 /* HTMLStyleElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL */
@@ -4553,15 +4554,15 @@ RV_EXPORT int32_t rv_dom_svg_style_element_set_disabled(RvNode* target, int32_t 
 /* SVGStyleElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_svg_style_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGStyleElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_svg_style_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_svg_style_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGStyleElement.media getter: attribute DOMString media */
 RV_EXPORT int32_t rv_dom_svg_style_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGStyleElement.media setter: attribute DOMString media */
-RV_EXPORT int32_t rv_dom_svg_style_element_set_media(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_svg_style_element_set_media(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGStyleElement.title getter: attribute DOMString title */
 RV_EXPORT int32_t rv_dom_svg_style_element_get_title(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGStyleElement.title setter: attribute DOMString title */
-RV_EXPORT int32_t rv_dom_svg_style_element_set_title(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_svg_style_element_set_title(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGStyleElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_svg_style_element_get_sheet(RvNode* target, RvStyleSheet** result);
 /* HTMLLinkElement */
@@ -4569,51 +4570,51 @@ RV_EXPORT int32_t rv_dom_svg_style_element_get_sheet(RvNode* target, RvStyleShee
 /* HTMLLinkElement.href getter: attribute USVString href */
 RV_EXPORT int32_t rv_dom_html_link_element_get_href(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.href setter: attribute USVString href */
-RV_EXPORT int32_t rv_dom_html_link_element_set_href(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_href(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.crossOrigin getter: attribute DOMString? crossOrigin */
 RV_EXPORT int32_t rv_dom_html_link_element_get_cross_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* HTMLLinkElement.crossOrigin setter: attribute DOMString? crossOrigin; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_html_link_element_set_cross_origin(RvNode* target, const char* value);
+/* HTMLLinkElement.crossOrigin setter: attribute DOMString? crossOrigin; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_html_link_element_set_cross_origin(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.rel getter: attribute DOMString rel */
 RV_EXPORT int32_t rv_dom_html_link_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.rel setter: attribute DOMString rel */
-RV_EXPORT int32_t rv_dom_html_link_element_set_rel(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_rel(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.as getter: attribute DOMString as */
 RV_EXPORT int32_t rv_dom_html_link_element_get_as(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.as setter: attribute DOMString as */
-RV_EXPORT int32_t rv_dom_html_link_element_set_as(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_as(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_link_element_get_rel_list(RvNode* target, RvDOMTokenList** result);
 /* HTMLLinkElement.media getter: attribute DOMString media */
 RV_EXPORT int32_t rv_dom_html_link_element_get_media(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.media setter: attribute DOMString media */
-RV_EXPORT int32_t rv_dom_html_link_element_set_media(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_media(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.integrity getter: attribute DOMString integrity */
 RV_EXPORT int32_t rv_dom_html_link_element_get_integrity(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.integrity setter: attribute DOMString integrity */
-RV_EXPORT int32_t rv_dom_html_link_element_set_integrity(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_integrity(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.hreflang getter: attribute DOMString hreflang */
 RV_EXPORT int32_t rv_dom_html_link_element_get_hreflang(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.hreflang setter: attribute DOMString hreflang */
-RV_EXPORT int32_t rv_dom_html_link_element_set_hreflang(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_hreflang(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_html_link_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_html_link_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.sizes getter: readonly attribute DOMTokenList sizes; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_link_element_get_sizes(RvNode* target, RvDOMTokenList** result);
 /* HTMLLinkElement.imageSrcset getter: attribute DOMString imageSrcset */
 RV_EXPORT int32_t rv_dom_html_link_element_get_image_srcset(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.imageSrcset setter: attribute DOMString imageSrcset */
-RV_EXPORT int32_t rv_dom_html_link_element_set_image_srcset(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_image_srcset(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.imageSizes getter: attribute DOMString imageSizes */
 RV_EXPORT int32_t rv_dom_html_link_element_get_image_sizes(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.imageSizes setter: attribute DOMString imageSizes */
-RV_EXPORT int32_t rv_dom_html_link_element_set_image_sizes(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_image_sizes(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.referrerPolicy getter: attribute DOMString referrerPolicy */
 RV_EXPORT int32_t rv_dom_html_link_element_get_referrer_policy(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.referrerPolicy setter: attribute DOMString referrerPolicy */
-RV_EXPORT int32_t rv_dom_html_link_element_set_referrer_policy(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_referrer_policy(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.blocking getter: readonly attribute DOMTokenList blocking; *result is a new reference */
 RV_EXPORT int32_t rv_dom_html_link_element_get_blocking(RvNode* target, RvDOMTokenList** result);
 /* HTMLLinkElement.disabled getter: attribute boolean disabled */
@@ -4623,19 +4624,19 @@ RV_EXPORT int32_t rv_dom_html_link_element_set_disabled(RvNode* target, int32_t 
 /* HTMLLinkElement.fetchPriority getter: attribute DOMString fetchPriority */
 RV_EXPORT int32_t rv_dom_html_link_element_get_fetch_priority(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.fetchPriority setter: attribute DOMString fetchPriority */
-RV_EXPORT int32_t rv_dom_html_link_element_set_fetch_priority(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_fetch_priority(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.charset getter: attribute DOMString charset */
 RV_EXPORT int32_t rv_dom_html_link_element_get_charset(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.charset setter: attribute DOMString charset */
-RV_EXPORT int32_t rv_dom_html_link_element_set_charset(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_charset(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.rev getter: attribute DOMString rev */
 RV_EXPORT int32_t rv_dom_html_link_element_get_rev(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.rev setter: attribute DOMString rev */
-RV_EXPORT int32_t rv_dom_html_link_element_set_rev(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_rev(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.target getter: attribute DOMString target */
 RV_EXPORT int32_t rv_dom_html_link_element_get_target(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* HTMLLinkElement.target setter: attribute DOMString target */
-RV_EXPORT int32_t rv_dom_html_link_element_set_target(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_html_link_element_set_target(RvNode* target, const uint8_t* value, int32_t value_length);
 /* HTMLLinkElement.sheet getter: readonly attribute CSSStyleSheet? sheet; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_link_element_get_sheet(RvNode* target, RvStyleSheet** result);
 /* StyleSheet */
@@ -4664,7 +4665,7 @@ RV_EXPORT int32_t rv_dom_style_sheet_list_get_length(RvStyleSheetList* target, u
 /* StyleSheetList.item(unsigned long index) -> StyleSheet?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_style_sheet_list_item(RvStyleSheetList* target, uint32_t index, RvStyleSheet** result);
 /* StyleSheetList.namedItem(DOMString name) -> CSSStyleSheet; *result is a new reference */
-RV_EXPORT int32_t rv_dom_style_sheet_list_named_item(RvStyleSheetList* target, const char* name, RvStyleSheet** result);
+RV_EXPORT int32_t rv_dom_style_sheet_list_named_item(RvStyleSheetList* target, const uint8_t* name, int32_t name_length, RvStyleSheet** result);
 /* CSSStyleSheet */
 
 /* CSSStyleSheet.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options
@@ -4678,15 +4679,15 @@ RV_EXPORT int32_t rv_dom_css_style_sheet_get_css_rules(RvStyleSheet* target, RvC
 RV_EXPORT int32_t rv_dom_css_style_sheet_get_rules(RvStyleSheet* target, RvCSSRuleList** result);
 /* CSSStyleSheet.insertRule(DOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to 0 in
  * IDL */
-RV_EXPORT int32_t rv_dom_css_style_sheet_insert_rule(RvStyleSheet* target, const char* rule, uint32_t index, uint32_t* result);
+RV_EXPORT int32_t rv_dom_css_style_sheet_insert_rule(RvStyleSheet* target, const uint8_t* rule, int32_t rule_length, uint32_t index, uint32_t* result);
 /* CSSStyleSheet.deleteRule(unsigned long index) -> undefined */
 RV_EXPORT int32_t rv_dom_css_style_sheet_delete_rule(RvStyleSheet* target, uint32_t index);
 /* CSSStyleSheet.replaceSync(USVString text) -> undefined */
-RV_EXPORT int32_t rv_dom_css_style_sheet_replace_sync(RvStyleSheet* target, const char* text);
+RV_EXPORT int32_t rv_dom_css_style_sheet_replace_sync(RvStyleSheet* target, const uint8_t* text, int32_t text_length);
 /* CSSStyleSheet.addRule(optional DOMString selector = "undefined", optional DOMString style = "undefined", optional
  * unsigned long index) -> long; selector defaults to "undefined" in IDL; style defaults to "undefined" in IDL; index
  * may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_css_style_sheet_add_rule(RvStyleSheet* target, const char* selector, const char* style, const uint32_t* index, int32_t* result);
+RV_EXPORT int32_t rv_dom_css_style_sheet_add_rule(RvStyleSheet* target, const uint8_t* selector, int32_t selector_length, const uint8_t* style, int32_t style_length, const uint32_t* index, int32_t* result);
 /* CSSStyleSheet.removeRule(optional unsigned long index = 0) -> undefined; index defaults to 0 in IDL */
 RV_EXPORT int32_t rv_dom_css_style_sheet_remove_rule(RvStyleSheet* target, uint32_t index);
 /* MediaList */
@@ -4694,21 +4695,21 @@ RV_EXPORT int32_t rv_dom_css_style_sheet_remove_rule(RvStyleSheet* target, uint3
 /* MediaList.mediaText getter: attribute DOMString mediaText */
 RV_EXPORT int32_t rv_dom_media_list_get_media_text(RvMediaList* target, char* buffer, int32_t capacity, int32_t* length);
 /* MediaList.mediaText setter: attribute DOMString mediaText */
-RV_EXPORT int32_t rv_dom_media_list_set_media_text(RvMediaList* target, const char* value);
+RV_EXPORT int32_t rv_dom_media_list_set_media_text(RvMediaList* target, const uint8_t* value, int32_t value_length);
 /* MediaList.length getter: readonly attribute unsigned long length */
 RV_EXPORT int32_t rv_dom_media_list_get_length(RvMediaList* target, uint32_t* result);
 /* MediaList.item(unsigned long index) -> DOMString? */
 RV_EXPORT int32_t rv_dom_media_list_item(RvMediaList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
 /* MediaList.deleteMedium(DOMString oldMedium) -> undefined */
-RV_EXPORT int32_t rv_dom_media_list_delete_medium(RvMediaList* target, const char* old_medium);
+RV_EXPORT int32_t rv_dom_media_list_delete_medium(RvMediaList* target, const uint8_t* old_medium, int32_t old_medium_length);
 /* MediaList.appendMedium(DOMString newMedium) -> undefined */
-RV_EXPORT int32_t rv_dom_media_list_append_medium(RvMediaList* target, const char* new_medium);
+RV_EXPORT int32_t rv_dom_media_list_append_medium(RvMediaList* target, const uint8_t* new_medium, int32_t new_medium_length);
 /* CSSRule */
 
 /* CSSRule.cssText getter: attribute DOMString cssText */
 RV_EXPORT int32_t rv_dom_css_rule_get_css_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSRule.cssText setter: attribute DOMString cssText */
-RV_EXPORT int32_t rv_dom_css_rule_set_css_text(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_rule_set_css_text(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSRule.parentRule getter: readonly attribute CSSRule? parentRule; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_css_rule_get_parent_rule(RvCSSRule* target, RvCSSRule** result);
 /* CSSRule.parentStyleSheet getter: readonly attribute CSSStyleSheet? parentStyleSheet; *result is a new reference, or
@@ -4727,7 +4728,7 @@ RV_EXPORT int32_t rv_dom_css_rule_list_item(RvCSSRuleList* target, uint32_t inde
 /* CSSStyleRule.selectorText getter: attribute DOMString selectorText */
 RV_EXPORT int32_t rv_dom_css_style_rule_get_selector_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSStyleRule.selectorText setter: attribute DOMString selectorText */
-RV_EXPORT int32_t rv_dom_css_style_rule_set_selector_text(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_style_rule_set_selector_text(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSStyleRule.style getter: readonly attribute CSSStyleProperties style; *result is a new reference */
 RV_EXPORT int32_t rv_dom_css_style_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
 /* CSSStyleRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference */
@@ -4736,7 +4737,7 @@ RV_EXPORT int32_t rv_dom_css_style_rule_get_css_rules(RvCSSRule* target, RvCSSRu
 RV_EXPORT int32_t rv_dom_css_style_rule_get_style_map(RvCSSRule* target, RvStylePropertyMapReadOnly** result);
 /* CSSStyleRule.insertRule(CSSOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to 0
  * in IDL */
-RV_EXPORT int32_t rv_dom_css_style_rule_insert_rule(RvCSSRule* target, const char* rule, uint32_t index, uint32_t* result);
+RV_EXPORT int32_t rv_dom_css_style_rule_insert_rule(RvCSSRule* target, const uint8_t* rule, int32_t rule_length, uint32_t index, uint32_t* result);
 /* CSSStyleRule.deleteRule(unsigned long index) -> undefined */
 RV_EXPORT int32_t rv_dom_css_style_rule_delete_rule(RvCSSRule* target, uint32_t index);
 /* CSSStyleProperties */
@@ -4744,14 +4745,14 @@ RV_EXPORT int32_t rv_dom_css_style_rule_delete_rule(RvCSSRule* target, uint32_t 
 /* CSSStyleProperties.cssFloat getter: attribute CSSOMString cssFloat */
 RV_EXPORT int32_t rv_dom_css_style_properties_get_css_float(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSStyleProperties.cssFloat setter: attribute CSSOMString cssFloat */
-RV_EXPORT int32_t rv_dom_css_style_properties_set_css_float(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_style_properties_set_css_float(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSGroupingRule */
 
 /* CSSGroupingRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference */
 RV_EXPORT int32_t rv_dom_css_grouping_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result);
 /* CSSGroupingRule.insertRule(CSSOMString rule, optional unsigned long index = 0) -> unsigned long; index defaults to
  * 0 in IDL */
-RV_EXPORT int32_t rv_dom_css_grouping_rule_insert_rule(RvCSSRule* target, const char* rule, uint32_t index, uint32_t* result);
+RV_EXPORT int32_t rv_dom_css_grouping_rule_insert_rule(RvCSSRule* target, const uint8_t* rule, int32_t rule_length, uint32_t index, uint32_t* result);
 /* CSSGroupingRule.deleteRule(unsigned long index) -> undefined */
 RV_EXPORT int32_t rv_dom_css_grouping_rule_delete_rule(RvCSSRule* target, uint32_t index);
 /* CSSConditionRule */
@@ -4810,7 +4811,7 @@ RV_EXPORT int32_t rv_dom_css_namespace_rule_get_prefix(RvCSSRule* target, char* 
 /* CSSKeyframesRule.name getter: attribute CSSOMString name */
 RV_EXPORT int32_t rv_dom_css_keyframes_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSKeyframesRule.name setter: attribute CSSOMString name */
-RV_EXPORT int32_t rv_dom_css_keyframes_rule_set_name(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_set_name(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSKeyframesRule.cssRules getter: readonly attribute CSSRuleList cssRules; *result is a new reference */
 RV_EXPORT int32_t rv_dom_css_keyframes_rule_get_css_rules(RvCSSRule* target, RvCSSRuleList** result);
 /* CSSKeyframesRule.length getter: readonly attribute unsigned long length */
@@ -4818,17 +4819,17 @@ RV_EXPORT int32_t rv_dom_css_keyframes_rule_get_length(RvCSSRule* target, uint32
 /* CSSKeyframesRule.item(unsigned long index) -> CSSKeyframeRule; *result is a new reference */
 RV_EXPORT int32_t rv_dom_css_keyframes_rule_item(RvCSSRule* target, uint32_t index, RvCSSRule** result);
 /* CSSKeyframesRule.appendRule(CSSOMString rule) -> undefined */
-RV_EXPORT int32_t rv_dom_css_keyframes_rule_append_rule(RvCSSRule* target, const char* rule);
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_append_rule(RvCSSRule* target, const uint8_t* rule, int32_t rule_length);
 /* CSSKeyframesRule.deleteRule(CSSOMString key) -> undefined */
-RV_EXPORT int32_t rv_dom_css_keyframes_rule_delete_rule(RvCSSRule* target, const char* key);
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_delete_rule(RvCSSRule* target, const uint8_t* key, int32_t key_length);
 /* CSSKeyframesRule.findRule(CSSOMString key) -> CSSKeyframeRule?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_css_keyframes_rule_find_rule(RvCSSRule* target, const char* key, RvCSSRule** result);
+RV_EXPORT int32_t rv_dom_css_keyframes_rule_find_rule(RvCSSRule* target, const uint8_t* key, int32_t key_length, RvCSSRule** result);
 /* CSSKeyframeRule */
 
 /* CSSKeyframeRule.keyText getter: attribute CSSOMString keyText */
 RV_EXPORT int32_t rv_dom_css_keyframe_rule_get_key_text(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSKeyframeRule.keyText setter: attribute CSSOMString keyText */
-RV_EXPORT int32_t rv_dom_css_keyframe_rule_set_key_text(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_keyframe_rule_set_key_text(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSKeyframeRule.style getter: readonly attribute CSSStyleProperties style; *result is a new reference */
 RV_EXPORT int32_t rv_dom_css_keyframe_rule_get_style(RvCSSRule* target, RvCSSStyleDeclaration** result);
 /* CSSFontFaceRule */
@@ -4840,121 +4841,121 @@ RV_EXPORT int32_t rv_dom_css_font_face_rule_get_style(RvCSSRule* target, RvCSSSt
 /* CSSFontFaceDescriptors.src getter: attribute CSSOMString src */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_src(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.src setter: attribute CSSOMString src */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_src(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_src(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.fontFamily getter: attribute CSSOMString fontFamily */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_family(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.fontFamily setter: attribute CSSOMString fontFamily */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_family(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_family(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.font-family getter: attribute CSSOMString font-family */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_family_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.font-family setter: attribute CSSOMString font-family */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_family_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_family_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.fontStyle getter: attribute CSSOMString fontStyle */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_style(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.fontStyle setter: attribute CSSOMString fontStyle */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_style(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_style(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.font-style getter: attribute CSSOMString font-style */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_style_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.font-style setter: attribute CSSOMString font-style */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_style_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_style_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.fontWeight getter: attribute CSSOMString fontWeight */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_weight(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.fontWeight setter: attribute CSSOMString fontWeight */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_weight(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_weight(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.font-weight getter: attribute CSSOMString font-weight */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_weight_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.font-weight setter: attribute CSSOMString font-weight */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_weight_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_weight_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.fontStretch getter: attribute CSSOMString fontStretch */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_stretch(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.fontStretch setter: attribute CSSOMString fontStretch */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_stretch(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_stretch(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.font-stretch getter: attribute CSSOMString font-stretch */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_stretch_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.font-stretch setter: attribute CSSOMString font-stretch */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_stretch_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_stretch_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.fontWidth getter: attribute CSSOMString fontWidth */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.fontWidth setter: attribute CSSOMString fontWidth */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_width(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_width(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.font-width getter: attribute CSSOMString font-width */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_width_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.font-width setter: attribute CSSOMString font-width */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_width_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_width_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.sizeAdjust getter: attribute CSSOMString sizeAdjust */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_size_adjust(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.sizeAdjust setter: attribute CSSOMString sizeAdjust */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_size_adjust(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_size_adjust(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.size-adjust getter: attribute CSSOMString size-adjust */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_size_adjust_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.size-adjust setter: attribute CSSOMString size-adjust */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_size_adjust_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_size_adjust_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.unicodeRange getter: attribute CSSOMString unicodeRange */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_unicode_range(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.unicodeRange setter: attribute CSSOMString unicodeRange */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_unicode_range(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_unicode_range(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.unicode-range getter: attribute CSSOMString unicode-range */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_unicode_range_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.unicode-range setter: attribute CSSOMString unicode-range */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_unicode_range_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_unicode_range_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.fontFeatureSettings getter: attribute CSSOMString fontFeatureSettings */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_feature_settings(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.fontFeatureSettings setter: attribute CSSOMString fontFeatureSettings */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_feature_settings(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_feature_settings(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.font-feature-settings getter: attribute CSSOMString font-feature-settings */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_feature_settings_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.font-feature-settings setter: attribute CSSOMString font-feature-settings */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_feature_settings_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_feature_settings_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.fontDisplay getter: attribute CSSOMString fontDisplay */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_display(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.fontDisplay setter: attribute CSSOMString fontDisplay */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_display(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_display(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.font-display getter: attribute CSSOMString font-display */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_font_display_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.font-display setter: attribute CSSOMString font-display */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_display_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_font_display_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.ascentOverride getter: attribute CSSOMString ascentOverride; RV_ERR_UNSUPPORTED while the
  * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_ascent_override(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.ascentOverride setter: attribute CSSOMString ascentOverride; RV_ERR_UNSUPPORTED while the
  * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_ascent_override(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_ascent_override(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.ascent-override getter: attribute CSSOMString ascent-override; RV_ERR_UNSUPPORTED while the
  * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_ascent_override_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.ascent-override setter: attribute CSSOMString ascent-override; RV_ERR_UNSUPPORTED while the
  * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_ascent_override_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_ascent_override_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.descentOverride getter: attribute CSSOMString descentOverride; RV_ERR_UNSUPPORTED while the
  * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_descent_override(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.descentOverride setter: attribute CSSOMString descentOverride; RV_ERR_UNSUPPORTED while the
  * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_descent_override(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_descent_override(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.descent-override getter: attribute CSSOMString descent-override; RV_ERR_UNSUPPORTED while
  * the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_descent_override_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.descent-override setter: attribute CSSOMString descent-override; RV_ERR_UNSUPPORTED while
  * the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_descent_override_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_descent_override_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.lineGapOverride getter: attribute CSSOMString lineGapOverride; RV_ERR_UNSUPPORTED while the
  * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_line_gap_override(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.lineGapOverride setter: attribute CSSOMString lineGapOverride; RV_ERR_UNSUPPORTED while the
  * setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_line_gap_override(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_line_gap_override(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFaceDescriptors.line-gap-override getter: attribute CSSOMString line-gap-override; RV_ERR_UNSUPPORTED while
  * the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
 RV_EXPORT int32_t rv_dom_css_font_face_descriptors_get_line_gap_override_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFaceDescriptors.line-gap-override setter: attribute CSSOMString line-gap-override; RV_ERR_UNSUPPORTED while
  * the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off */
-RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_line_gap_override_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_face_descriptors_set_line_gap_override_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSFontFeatureValuesRule */
 
 /* CSSFontFeatureValuesRule.fontFamily getter: attribute CSSOMString fontFamily */
 RV_EXPORT int32_t rv_dom_css_font_feature_values_rule_get_font_family(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSFontFeatureValuesRule.fontFamily setter: attribute CSSOMString fontFamily */
-RV_EXPORT int32_t rv_dom_css_font_feature_values_rule_set_font_family(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_font_feature_values_rule_set_font_family(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSFontPaletteValuesRule */
 
 /* CSSFontPaletteValuesRule.name getter: readonly attribute CSSOMString name */
@@ -4970,47 +4971,47 @@ RV_EXPORT int32_t rv_dom_css_font_palette_values_rule_get_override_colors(RvCSSR
 /* CSSCounterStyleRule.name getter: attribute DOMString name */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.name setter: attribute DOMString name */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_name(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_name(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.system getter: attribute DOMString system */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_system(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.system setter: attribute DOMString system */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_system(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_system(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.symbols getter: attribute DOMString symbols */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_symbols(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.symbols setter: attribute DOMString symbols */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_symbols(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_symbols(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.additiveSymbols getter: attribute DOMString additiveSymbols */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_additive_symbols(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.additiveSymbols setter: attribute DOMString additiveSymbols */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_additive_symbols(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_additive_symbols(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.negative getter: attribute DOMString negative */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_negative(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.negative setter: attribute DOMString negative */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_negative(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_negative(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.prefix getter: attribute DOMString prefix */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_prefix(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.prefix setter: attribute DOMString prefix */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_prefix(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_prefix(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.suffix getter: attribute DOMString suffix */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_suffix(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.suffix setter: attribute DOMString suffix */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_suffix(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_suffix(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.range getter: attribute DOMString range */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_range(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.range setter: attribute DOMString range */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_range(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_range(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.pad getter: attribute DOMString pad */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_pad(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.pad setter: attribute DOMString pad */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_pad(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_pad(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.speakAs getter: attribute DOMString speakAs */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_speak_as(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.speakAs setter: attribute DOMString speakAs */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_speak_as(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_speak_as(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSCounterStyleRule.fallback getter: attribute DOMString fallback */
 RV_EXPORT int32_t rv_dom_css_counter_style_rule_get_fallback(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSCounterStyleRule.fallback setter: attribute DOMString fallback */
-RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_fallback(RvCSSRule* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_counter_style_rule_set_fallback(RvCSSRule* target, const uint8_t* value, int32_t value_length);
 /* CSSPropertyRule */
 
 /* CSSPropertyRule.name getter: readonly attribute CSSOMString name */
@@ -5232,421 +5233,421 @@ RV_EXPORT int32_t rv_dom_css_position_try_rule_get_style(RvCSSRule* target, RvCS
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin setter: attribute CSSOMString margin; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginTop getter: attribute CSSOMString marginTop; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_top(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginTop setter: attribute CSSOMString marginTop; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_top(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_top(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginRight getter: attribute CSSOMString marginRight; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_right(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginRight setter: attribute CSSOMString marginRight; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_right(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_right(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginBottom getter: attribute CSSOMString marginBottom; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_bottom(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginBottom setter: attribute CSSOMString marginBottom; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_bottom(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_bottom(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginLeft getter: attribute CSSOMString marginLeft; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_left(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginLeft setter: attribute CSSOMString marginLeft; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_left(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_left(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginBlock getter: attribute CSSOMString marginBlock; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginBlock setter: attribute CSSOMString marginBlock; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginBlockStart getter: attribute CSSOMString marginBlockStart; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginBlockStart setter: attribute CSSOMString marginBlockStart; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_start(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_start(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginBlockEnd getter: attribute CSSOMString marginBlockEnd; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginBlockEnd setter: attribute CSSOMString marginBlockEnd; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_end(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_end(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginInline getter: attribute CSSOMString marginInline; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginInline setter: attribute CSSOMString marginInline; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginInlineStart getter: attribute CSSOMString marginInlineStart; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginInlineStart setter: attribute CSSOMString marginInlineStart; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_start(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_start(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.marginInlineEnd getter: attribute CSSOMString marginInlineEnd; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.marginInlineEnd setter: attribute CSSOMString marginInlineEnd; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_end(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_end(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-top getter: attribute CSSOMString margin-top; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_top_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-top setter: attribute CSSOMString margin-top; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_top_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_top_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-right getter: attribute CSSOMString margin-right; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_right_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-right setter: attribute CSSOMString margin-right; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_right_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_right_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-bottom getter: attribute CSSOMString margin-bottom; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_bottom_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-bottom setter: attribute CSSOMString margin-bottom; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_bottom_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_bottom_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-left getter: attribute CSSOMString margin-left; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_left_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-left setter: attribute CSSOMString margin-left; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_left_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_left_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-block getter: attribute CSSOMString margin-block; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-block setter: attribute CSSOMString margin-block; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-block-start getter: attribute CSSOMString margin-block-start; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-block-start setter: attribute CSSOMString margin-block-start; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_start_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_start_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-block-end getter: attribute CSSOMString margin-block-end; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_block_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-block-end setter: attribute CSSOMString margin-block-end; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_end_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_block_end_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-inline getter: attribute CSSOMString margin-inline; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-inline setter: attribute CSSOMString margin-inline; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-inline-start getter: attribute CSSOMString margin-inline-start; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-inline-start setter: attribute CSSOMString margin-inline-start; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_start_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_start_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.margin-inline-end getter: attribute CSSOMString margin-inline-end; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_margin_inline_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.margin-inline-end setter: attribute CSSOMString margin-inline-end; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_end_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_margin_inline_end_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.inset getter: attribute CSSOMString inset; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.inset setter: attribute CSSOMString inset; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.insetBlock getter: attribute CSSOMString insetBlock; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.insetBlock setter: attribute CSSOMString insetBlock; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.insetBlockStart getter: attribute CSSOMString insetBlockStart; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.insetBlockStart setter: attribute CSSOMString insetBlockStart; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_start(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_start(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.insetBlockEnd getter: attribute CSSOMString insetBlockEnd; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.insetBlockEnd setter: attribute CSSOMString insetBlockEnd; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_end(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_end(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.insetInline getter: attribute CSSOMString insetInline; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.insetInline setter: attribute CSSOMString insetInline; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.insetInlineStart getter: attribute CSSOMString insetInlineStart; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_start(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.insetInlineStart setter: attribute CSSOMString insetInlineStart; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_start(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_start(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.insetInlineEnd getter: attribute CSSOMString insetInlineEnd; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_end(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.insetInlineEnd setter: attribute CSSOMString insetInlineEnd; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_end(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_end(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.top getter: attribute CSSOMString top; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_top(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.top setter: attribute CSSOMString top; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_top(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_top(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.left getter: attribute CSSOMString left; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_left(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.left setter: attribute CSSOMString left; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_left(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_left(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.right getter: attribute CSSOMString right; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_right(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.right setter: attribute CSSOMString right; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_right(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_right(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.bottom getter: attribute CSSOMString bottom; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_bottom(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.bottom setter: attribute CSSOMString bottom; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_bottom(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_bottom(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.inset-block getter: attribute CSSOMString inset-block; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.inset-block setter: attribute CSSOMString inset-block; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.inset-block-start getter: attribute CSSOMString inset-block-start; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.inset-block-start setter: attribute CSSOMString inset-block-start; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_start_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_start_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.inset-block-end getter: attribute CSSOMString inset-block-end; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_block_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.inset-block-end setter: attribute CSSOMString inset-block-end; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_end_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_block_end_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.inset-inline getter: attribute CSSOMString inset-inline; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.inset-inline setter: attribute CSSOMString inset-inline; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.inset-inline-start getter: attribute CSSOMString inset-inline-start; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_start_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.inset-inline-start setter: attribute CSSOMString inset-inline-start; RV_ERR_UNSUPPORTED
  * while the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_start_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_start_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.inset-inline-end getter: attribute CSSOMString inset-inline-end; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inset_inline_end_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.inset-inline-end setter: attribute CSSOMString inset-inline-end; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_end_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inset_inline_end_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.width getter: attribute CSSOMString width; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.width setter: attribute CSSOMString width; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_width(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_width(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.minWidth getter: attribute CSSOMString minWidth; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.minWidth setter: attribute CSSOMString minWidth; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_width(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_width(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.maxWidth getter: attribute CSSOMString maxWidth; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_width(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.maxWidth setter: attribute CSSOMString maxWidth; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_width(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_width(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.height getter: attribute CSSOMString height; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_height(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.height setter: attribute CSSOMString height; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_height(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_height(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.minHeight getter: attribute CSSOMString minHeight; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_height(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.minHeight setter: attribute CSSOMString minHeight; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_height(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_height(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.maxHeight getter: attribute CSSOMString maxHeight; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_height(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.maxHeight setter: attribute CSSOMString maxHeight; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_height(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_height(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.blockSize getter: attribute CSSOMString blockSize; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_block_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.blockSize setter: attribute CSSOMString blockSize; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_block_size(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_block_size(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.minBlockSize getter: attribute CSSOMString minBlockSize; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_block_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.minBlockSize setter: attribute CSSOMString minBlockSize; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_block_size(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_block_size(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.maxBlockSize getter: attribute CSSOMString maxBlockSize; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_block_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.maxBlockSize setter: attribute CSSOMString maxBlockSize; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_block_size(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_block_size(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.inlineSize getter: attribute CSSOMString inlineSize; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inline_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.inlineSize setter: attribute CSSOMString inlineSize; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inline_size(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inline_size(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.minInlineSize getter: attribute CSSOMString minInlineSize; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_inline_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.minInlineSize setter: attribute CSSOMString minInlineSize; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_inline_size(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_inline_size(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.maxInlineSize getter: attribute CSSOMString maxInlineSize; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_inline_size(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.maxInlineSize setter: attribute CSSOMString maxInlineSize; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_inline_size(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_inline_size(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.min-width getter: attribute CSSOMString min-width; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_width_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.min-width setter: attribute CSSOMString min-width; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_width_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_width_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.max-width getter: attribute CSSOMString max-width; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_width_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.max-width setter: attribute CSSOMString max-width; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_width_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_width_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.min-height getter: attribute CSSOMString min-height; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_height_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.min-height setter: attribute CSSOMString min-height; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_height_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_height_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.max-height getter: attribute CSSOMString max-height; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_height_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.max-height setter: attribute CSSOMString max-height; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_height_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_height_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.block-size getter: attribute CSSOMString block-size; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_block_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.block-size setter: attribute CSSOMString block-size; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_block_size_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_block_size_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.min-block-size getter: attribute CSSOMString min-block-size; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_block_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.min-block-size setter: attribute CSSOMString min-block-size; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_block_size_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_block_size_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.max-block-size getter: attribute CSSOMString max-block-size; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_block_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.max-block-size setter: attribute CSSOMString max-block-size; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_block_size_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_block_size_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.inline-size getter: attribute CSSOMString inline-size; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_inline_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.inline-size setter: attribute CSSOMString inline-size; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inline_size_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_inline_size_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.min-inline-size getter: attribute CSSOMString min-inline-size; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_min_inline_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.min-inline-size setter: attribute CSSOMString min-inline-size; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_inline_size_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_min_inline_size_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.max-inline-size getter: attribute CSSOMString max-inline-size; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_max_inline_size_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.max-inline-size setter: attribute CSSOMString max-inline-size; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_inline_size_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_max_inline_size_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.placeSelf getter: attribute CSSOMString placeSelf; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_place_self(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.placeSelf setter: attribute CSSOMString placeSelf; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_place_self(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_place_self(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.alignSelf getter: attribute CSSOMString alignSelf; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_align_self(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.alignSelf setter: attribute CSSOMString alignSelf; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_align_self(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_align_self(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.justifySelf getter: attribute CSSOMString justifySelf; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_justify_self(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.justifySelf setter: attribute CSSOMString justifySelf; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_justify_self(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_justify_self(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.place-self getter: attribute CSSOMString place-self; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_place_self_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.place-self setter: attribute CSSOMString place-self; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_place_self_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_place_self_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.align-self getter: attribute CSSOMString align-self; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_align_self_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.align-self setter: attribute CSSOMString align-self; RV_ERR_UNSUPPORTED while the setting
  * CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_align_self_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_align_self_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.justify-self getter: attribute CSSOMString justify-self; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_justify_self_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.justify-self setter: attribute CSSOMString justify-self; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_justify_self_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_justify_self_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.positionAnchor getter: attribute CSSOMString positionAnchor; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_position_anchor(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.positionAnchor setter: attribute CSSOMString positionAnchor; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_anchor(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_anchor(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.position-anchor getter: attribute CSSOMString position-anchor; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_position_anchor_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.position-anchor setter: attribute CSSOMString position-anchor; RV_ERR_UNSUPPORTED while
  * the setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_anchor_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_anchor_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.positionArea getter: attribute CSSOMString positionArea; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_position_area(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.positionArea setter: attribute CSSOMString positionArea; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_area(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_area(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSPositionTryDescriptors.position-area getter: attribute CSSOMString position-area; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
 RV_EXPORT int32_t rv_dom_css_position_try_descriptors_get_position_area_css(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSPositionTryDescriptors.position-area setter: attribute CSSOMString position-area; RV_ERR_UNSUPPORTED while the
  * setting CSSAnchorPositioningEnabled is off */
-RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_area_css(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_position_try_descriptors_set_position_area_css(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSViewTransitionRule */
 
 /* CSSViewTransitionRule.navigation getter: readonly attribute CSSOMString navigation */
@@ -5659,7 +5660,7 @@ RV_EXPORT int32_t rv_dom_css_view_transition_rule_get_types(RvCSSRule* target, R
 /* CSSStyleDeclaration.cssText getter: attribute CSSOMString cssText */
 RV_EXPORT int32_t rv_dom_css_style_declaration_get_css_text(RvCSSStyleDeclaration* target, char* buffer, int32_t capacity, int32_t* length);
 /* CSSStyleDeclaration.cssText setter: attribute CSSOMString cssText */
-RV_EXPORT int32_t rv_dom_css_style_declaration_set_css_text(RvCSSStyleDeclaration* target, const char* value);
+RV_EXPORT int32_t rv_dom_css_style_declaration_set_css_text(RvCSSStyleDeclaration* target, const uint8_t* value, int32_t value_length);
 /* CSSStyleDeclaration.cssRules getter: readonly attribute CSSRuleList? cssRules; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_css_style_declaration_get_css_rules(RvCSSStyleDeclaration* target, RvCSSRuleList** result);
 /* CSSStyleDeclaration.length getter: readonly attribute unsigned long length */
@@ -5669,14 +5670,14 @@ RV_EXPORT int32_t rv_dom_css_style_declaration_get_parent_rule(RvCSSStyleDeclara
 /* CSSStyleDeclaration.item(unsigned long index) -> CSSOMString */
 RV_EXPORT int32_t rv_dom_css_style_declaration_item(RvCSSStyleDeclaration* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
 /* CSSStyleDeclaration.getPropertyValue(CSSOMString property) -> CSSOMString */
-RV_EXPORT int32_t rv_dom_css_style_declaration_get_property_value(RvCSSStyleDeclaration* target, const char* property, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_css_style_declaration_get_property_value(RvCSSStyleDeclaration* target, const uint8_t* property, int32_t property_length, char* buffer, int32_t capacity, int32_t* length);
 /* CSSStyleDeclaration.getPropertyPriority(CSSOMString property) -> CSSOMString */
-RV_EXPORT int32_t rv_dom_css_style_declaration_get_property_priority(RvCSSStyleDeclaration* target, const char* property, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_css_style_declaration_get_property_priority(RvCSSStyleDeclaration* target, const uint8_t* property, int32_t property_length, char* buffer, int32_t capacity, int32_t* length);
 /* CSSStyleDeclaration.setProperty(CSSOMString property, CSSOMString value, optional CSSOMString priority = "") ->
  * undefined; priority defaults to "" in IDL */
-RV_EXPORT int32_t rv_dom_css_style_declaration_set_property(RvCSSStyleDeclaration* target, const char* property, const char* value, const char* priority);
+RV_EXPORT int32_t rv_dom_css_style_declaration_set_property(RvCSSStyleDeclaration* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, const uint8_t* priority, int32_t priority_length);
 /* CSSStyleDeclaration.removeProperty(CSSOMString property) -> CSSOMString */
-RV_EXPORT int32_t rv_dom_css_style_declaration_remove_property(RvCSSStyleDeclaration* target, const char* property, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_css_style_declaration_remove_property(RvCSSStyleDeclaration* target, const uint8_t* property, int32_t property_length, char* buffer, int32_t capacity, int32_t* length);
 /* DOMTokenList */
 
 /* DOMTokenList.length getter: readonly attribute unsigned long length */
@@ -5684,29 +5685,29 @@ RV_EXPORT int32_t rv_dom_dom_token_list_get_length(RvDOMTokenList* target, uint3
 /* DOMTokenList.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_dom_token_list_get_value(RvDOMTokenList* target, char* buffer, int32_t capacity, int32_t* length);
 /* DOMTokenList.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_dom_token_list_set_value(RvDOMTokenList* target, const char* value);
+RV_EXPORT int32_t rv_dom_dom_token_list_set_value(RvDOMTokenList* target, const uint8_t* value, int32_t value_length);
 /* DOMTokenList.item(unsigned long index) -> DOMString? */
 RV_EXPORT int32_t rv_dom_dom_token_list_item(RvDOMTokenList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
 /* DOMTokenList.contains(DOMString token) -> boolean */
-RV_EXPORT int32_t rv_dom_dom_token_list_contains(RvDOMTokenList* target, const char* token, int32_t* result);
+RV_EXPORT int32_t rv_dom_dom_token_list_contains(RvDOMTokenList* target, const uint8_t* token, int32_t token_length, int32_t* result);
 /* DOMTokenList.add(DOMString tokens) -> undefined */
 RV_EXPORT int32_t rv_dom_dom_token_list_add(RvDOMTokenList* target, const RvDomSequenceDOMString* tokens);
 /* DOMTokenList.remove(DOMString tokens) -> undefined */
 RV_EXPORT int32_t rv_dom_dom_token_list_remove(RvDOMTokenList* target, const RvDomSequenceDOMString* tokens);
 /* DOMTokenList.toggle(DOMString token, optional boolean force) -> boolean; force may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_dom_token_list_toggle(RvDOMTokenList* target, const char* token, const int32_t* force, int32_t* result);
+RV_EXPORT int32_t rv_dom_dom_token_list_toggle(RvDOMTokenList* target, const uint8_t* token, int32_t token_length, const int32_t* force, int32_t* result);
 /* DOMTokenList.replace(DOMString token, DOMString newToken) -> boolean */
-RV_EXPORT int32_t rv_dom_dom_token_list_replace(RvDOMTokenList* target, const char* token, const char* new_token, int32_t* result);
+RV_EXPORT int32_t rv_dom_dom_token_list_replace(RvDOMTokenList* target, const uint8_t* token, int32_t token_length, const uint8_t* new_token, int32_t new_token_length, int32_t* result);
 /* DOMTokenList.supports(DOMString token) -> boolean */
-RV_EXPORT int32_t rv_dom_dom_token_list_supports(RvDOMTokenList* target, const char* token, int32_t* result);
+RV_EXPORT int32_t rv_dom_dom_token_list_supports(RvDOMTokenList* target, const uint8_t* token, int32_t token_length, int32_t* result);
 /* DOMStringMap */
 
 /* DOMStringMap.namedItem(DOMString name) -> DOMString */
-RV_EXPORT int32_t rv_dom_dom_string_map_named_item(RvDOMStringMap* target, const char* name, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_dom_string_map_named_item(RvDOMStringMap* target, const uint8_t* name, int32_t name_length, char* buffer, int32_t capacity, int32_t* length);
 /* DOMStringMap.setNamedItem(DOMString name, DOMString value) -> undefined */
-RV_EXPORT int32_t rv_dom_dom_string_map_set_named_item(RvDOMStringMap* target, const char* name, const char* value);
+RV_EXPORT int32_t rv_dom_dom_string_map_set_named_item(RvDOMStringMap* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
 /* DOMStringMap.deleteNamedProperty(DOMString name) -> undefined */
-RV_EXPORT int32_t rv_dom_dom_string_map_delete_named_property(RvDOMStringMap* target, const char* name);
+RV_EXPORT int32_t rv_dom_dom_string_map_delete_named_property(RvDOMStringMap* target, const uint8_t* name, int32_t name_length);
 /* AbstractRange */
 
 /* AbstractRange.startContainer getter: readonly attribute Node startContainer; *result is a new reference */
@@ -5764,8 +5765,8 @@ RV_EXPORT int32_t rv_dom_range_is_point_in_range(RvAbstractRange* target, RvNode
 RV_EXPORT int32_t rv_dom_range_compare_point(RvAbstractRange* target, RvNode* node, uint32_t offset, int16_t* result);
 /* Range.intersectsNode(Node node) -> boolean */
 RV_EXPORT int32_t rv_dom_range_intersects_node(RvAbstractRange* target, RvNode* node, int32_t* result);
-/* Range.expand(optional DOMString unit) -> undefined; unit may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_range_expand(RvAbstractRange* target, const char* unit);
+/* Range.expand(optional DOMString unit) -> undefined; unit_length -1 means absent */
+RV_EXPORT int32_t rv_dom_range_expand(RvAbstractRange* target, const uint8_t* unit, int32_t unit_length);
 /* Range.compareNode(Node node) -> short */
 RV_EXPORT int32_t rv_dom_range_compare_node(RvAbstractRange* target, RvNode* node, int16_t* result);
 /* Range.getClientRects() -> DOMRectList; *result is a new reference */
@@ -5773,7 +5774,7 @@ RV_EXPORT int32_t rv_dom_range_get_client_rects(RvAbstractRange* target, RvDOMRe
 /* Range.getBoundingClientRect() -> DOMRect; *result is a new reference */
 RV_EXPORT int32_t rv_dom_range_get_bounding_client_rect(RvAbstractRange* target, RvDOMRectReadOnly** result);
 /* Range.createContextualFragment((TrustedHTML or DOMString) fragment) -> DocumentFragment; *result is a new reference */
-RV_EXPORT int32_t rv_dom_range_create_contextual_fragment(RvAbstractRange* target, const char* fragment, RvNode** result);
+RV_EXPORT int32_t rv_dom_range_create_contextual_fragment(RvAbstractRange* target, const uint8_t* fragment, int32_t fragment_length, RvNode** result);
 /* DOMSelection */
 
 /* DOMSelection.anchorNode getter: readonly attribute Node? anchorNode; *result is a new reference, or NULL */
@@ -5839,8 +5840,8 @@ RV_EXPORT int32_t rv_dom_dom_selection_contains_node(RvDOMSelection* target, RvN
 /* DOMSelection.toString() -> DOMString */
 RV_EXPORT int32_t rv_dom_dom_selection_to_string(RvDOMSelection* target, char* buffer, int32_t capacity, int32_t* length);
 /* DOMSelection.modify(optional DOMString alter, optional DOMString direction, optional DOMString granularity) ->
- * undefined; alter may be NULL (absent); direction may be NULL (absent); granularity may be NULL (absent) */
-RV_EXPORT int32_t rv_dom_dom_selection_modify(RvDOMSelection* target, const char* alter, const char* direction, const char* granularity);
+ * undefined; alter_length -1 means absent; direction_length -1 means absent; granularity_length -1 means absent */
+RV_EXPORT int32_t rv_dom_dom_selection_modify(RvDOMSelection* target, const uint8_t* alter, int32_t alter_length, const uint8_t* direction, int32_t direction_length, const uint8_t* granularity, int32_t granularity_length);
 /* DOMRectReadOnly */
 
 /* DOMRectReadOnly.constructor: target is the Document of the constructed object; x defaults to 0 in IDL; y defaults
@@ -6191,7 +6192,7 @@ RV_EXPORT int32_t rv_dom_node_list_item(RvNodeList* target, uint32_t index, RvNo
 /* RadioNodeList.value getter: attribute DOMString value */
 RV_EXPORT int32_t rv_dom_radio_node_list_get_value(RvNodeList* target, char* buffer, int32_t capacity, int32_t* length);
 /* RadioNodeList.value setter: attribute DOMString value */
-RV_EXPORT int32_t rv_dom_radio_node_list_set_value(RvNodeList* target, const char* value);
+RV_EXPORT int32_t rv_dom_radio_node_list_set_value(RvNodeList* target, const uint8_t* value, int32_t value_length);
 /* HTMLCollection */
 
 /* HTMLCollection.length getter: readonly attribute unsigned long length */
@@ -6199,14 +6200,14 @@ RV_EXPORT int32_t rv_dom_html_collection_get_length(RvHTMLCollection* target, ui
 /* HTMLCollection.item(unsigned long index) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_collection_item(RvHTMLCollection* target, uint32_t index, RvNode** result);
 /* HTMLCollection.namedItem(DOMString name) -> Element?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_html_collection_named_item(RvHTMLCollection* target, const char* name, RvNode** result);
+RV_EXPORT int32_t rv_dom_html_collection_named_item(RvHTMLCollection* target, const uint8_t* name, int32_t name_length, RvNode** result);
 /* HTMLFormControlsCollection */
 
 /* HTMLFormControlsCollection.item(unsigned long index) -> HTMLElement?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_form_controls_collection_item(RvHTMLCollection* target, uint32_t index, RvNode** result);
 /* HTMLFormControlsCollection.namedItem(DOMString name) -> (RadioNodeList or Element)?; *result owns its contents;
  * release with the matching rv_dom_*_release */
-RV_EXPORT int32_t rv_dom_html_form_controls_collection_named_item(RvHTMLCollection* target, const char* name, RvDomUnionRadioNodeListOrElementNullable* result);
+RV_EXPORT int32_t rv_dom_html_form_controls_collection_named_item(RvHTMLCollection* target, const uint8_t* name, int32_t name_length, RvDomUnionRadioNodeListOrElementNullable* result);
 /* HTMLOptionsCollection */
 
 /* HTMLOptionsCollection.length getter: attribute unsigned long length */
@@ -6227,7 +6228,7 @@ RV_EXPORT int32_t rv_dom_html_options_collection_remove(RvHTMLCollection* target
 /* HTMLOptionsCollection.item(unsigned long index) -> HTMLOptionElement?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_options_collection_item(RvHTMLCollection* target, uint32_t index, RvNode** result);
 /* HTMLOptionsCollection.namedItem(DOMString name) -> HTMLOptionElement?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_html_options_collection_named_item(RvHTMLCollection* target, const char* name, RvNode** result);
+RV_EXPORT int32_t rv_dom_html_options_collection_named_item(RvHTMLCollection* target, const uint8_t* name, int32_t name_length, RvNode** result);
 /* DOMFormData */
 
 /* DOMFormData.constructor: target is the Document of the constructed object; form may be NULL; submitter defaults to
@@ -6236,7 +6237,7 @@ RV_EXPORT int32_t rv_dom_dom_form_data_create(RvNode* target, RvNode* form, RvNo
 /* DOMFormData.append(USVString name, USVString value) -> undefined */
 RV_EXPORT int32_t rv_dom_dom_form_data_append(RvDOMFormData* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
 /* DOMFormData.append(USVString name, Blob blobValue, optional USVString filename) -> undefined; filename_length -1
- * means absent; filename may be NULL (absent) */
+ * means absent */
 RV_EXPORT int32_t rv_dom_dom_form_data_append_3(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvBlob* blob_value, const uint8_t* filename, int32_t filename_length);
 /* DOMFormData.delete(USVString name) -> undefined */
 RV_EXPORT int32_t rv_dom_dom_form_data_delete(RvDOMFormData* target, const uint8_t* name, int32_t name_length);
@@ -6251,7 +6252,7 @@ RV_EXPORT int32_t rv_dom_dom_form_data_has(RvDOMFormData* target, const uint8_t*
 /* DOMFormData.set(USVString name, USVString value) -> undefined */
 RV_EXPORT int32_t rv_dom_dom_form_data_set(RvDOMFormData* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
 /* DOMFormData.set(USVString name, Blob blobValue, optional USVString filename) -> undefined; filename_length -1 means
- * absent; filename may be NULL (absent) */
+ * absent */
 RV_EXPORT int32_t rv_dom_dom_form_data_set_3(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvBlob* blob_value, const uint8_t* filename, int32_t filename_length);
 /* ValidityState */
 
@@ -6315,7 +6316,7 @@ RV_EXPORT int32_t rv_dom_event_stop_immediate_propagation(RvEvent* target);
 RV_EXPORT int32_t rv_dom_event_prevent_default(RvEvent* target);
 /* Event.initEvent(DOMString type, optional boolean bubbles = false, optional boolean cancelable = false) ->
  * undefined; bubbles defaults to false in IDL; cancelable defaults to false in IDL */
-RV_EXPORT int32_t rv_dom_event_init_event(RvEvent* target, const char* type, int32_t bubbles, int32_t cancelable);
+RV_EXPORT int32_t rv_dom_event_init_event(RvEvent* target, const uint8_t* type, int32_t type_length, int32_t bubbles, int32_t cancelable);
 /* UIEvent */
 
 /* UIEvent.detail getter: readonly attribute long detail */
@@ -6371,7 +6372,7 @@ RV_EXPORT int32_t rv_dom_mouse_event_get_from_element(RvEvent* target, RvNode** 
 /* MouseEvent.toElement getter: readonly attribute Node? toElement; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_mouse_event_get_to_element(RvEvent* target, RvNode** result);
 /* MouseEvent.getModifierState(DOMString keyArg) -> boolean */
-RV_EXPORT int32_t rv_dom_mouse_event_get_modifier_state(RvEvent* target, const char* key_arg, int32_t* result);
+RV_EXPORT int32_t rv_dom_mouse_event_get_modifier_state(RvEvent* target, const uint8_t* key_arg, int32_t key_arg_length, int32_t* result);
 /* PointerEvent */
 
 /* PointerEvent.pointerId getter: readonly attribute long pointerId */
@@ -6449,7 +6450,7 @@ RV_EXPORT int32_t rv_dom_keyboard_event_get_char_code(RvEvent* target, uint32_t*
 /* KeyboardEvent.keyCode getter: readonly attribute unsigned long keyCode */
 RV_EXPORT int32_t rv_dom_keyboard_event_get_key_code(RvEvent* target, uint32_t* result);
 /* KeyboardEvent.getModifierState(DOMString keyArg) -> boolean */
-RV_EXPORT int32_t rv_dom_keyboard_event_get_modifier_state(RvEvent* target, const char* key_arg, int32_t* result);
+RV_EXPORT int32_t rv_dom_keyboard_event_get_modifier_state(RvEvent* target, const uint8_t* key_arg, int32_t key_arg_length, int32_t* result);
 /* FocusEvent */
 
 /* FocusEvent.relatedTarget getter: readonly attribute EventTarget? relatedTarget; *result is a new reference, or NULL */
@@ -6609,7 +6610,7 @@ RV_EXPORT int32_t rv_dom_pop_state_event_get_has_ua_visual_transition(RvEvent* t
 /* BeforeUnloadEvent.returnValue getter: attribute DOMString returnValue */
 RV_EXPORT int32_t rv_dom_before_unload_event_get_return_value(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
 /* BeforeUnloadEvent.returnValue setter: attribute DOMString returnValue */
-RV_EXPORT int32_t rv_dom_before_unload_event_set_return_value(RvEvent* target, const char* value);
+RV_EXPORT int32_t rv_dom_before_unload_event_set_return_value(RvEvent* target, const uint8_t* value, int32_t value_length);
 /* SVGGraphicsElement */
 
 /* SVGGraphicsElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new
@@ -6713,7 +6714,7 @@ RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_transform(RvNode* target, RvS
  * to {} in IDL; matrix may be NULL for the IDL default; *result is a new reference */
 RV_EXPORT int32_t rv_dom_svgsvg_element_create_svg_transform_from_matrix(RvNode* target, const RvDomDOMMatrix2DInit* matrix, RvSVGTransform** result);
 /* SVGSVGElement.getElementById(DOMString elementId) -> Element?; *result is a new reference, or NULL */
-RV_EXPORT int32_t rv_dom_svgsvg_element_get_element_by_id(RvNode* target, const char* element_id, RvNode** result);
+RV_EXPORT int32_t rv_dom_svgsvg_element_get_element_by_id(RvNode* target, const uint8_t* element_id, int32_t element_id_length, RvNode** result);
 /* SVGSVGElement.pauseAnimations() -> undefined */
 RV_EXPORT int32_t rv_dom_svgsvg_element_pause_animations(RvNode* target);
 /* SVGSVGElement.unpauseAnimations() -> undefined */
@@ -6910,7 +6911,7 @@ RV_EXPORT int32_t rv_dom_svg_length_set_value_in_specified_units(RvSVGLength* ta
 /* SVGLength.valueAsString getter: attribute DOMString valueAsString */
 RV_EXPORT int32_t rv_dom_svg_length_get_value_as_string(RvSVGLength* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGLength.valueAsString setter: attribute DOMString valueAsString */
-RV_EXPORT int32_t rv_dom_svg_length_set_value_as_string(RvSVGLength* target, const char* value);
+RV_EXPORT int32_t rv_dom_svg_length_set_value_as_string(RvSVGLength* target, const uint8_t* value, int32_t value_length);
 /* SVGLength.newValueSpecifiedUnits(unsigned short unitType, float valueInSpecifiedUnits) -> undefined */
 RV_EXPORT int32_t rv_dom_svg_length_new_value_specified_units(RvSVGLength* target, uint16_t unit_type, float value_in_specified_units);
 /* SVGLength.convertToSpecifiedUnits(unsigned short unitType) -> undefined */
@@ -6930,7 +6931,7 @@ RV_EXPORT int32_t rv_dom_svg_angle_set_value_in_specified_units(RvSVGAngle* targ
 /* SVGAngle.valueAsString getter: attribute DOMString valueAsString */
 RV_EXPORT int32_t rv_dom_svg_angle_get_value_as_string(RvSVGAngle* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGAngle.valueAsString setter: attribute DOMString valueAsString */
-RV_EXPORT int32_t rv_dom_svg_angle_set_value_as_string(RvSVGAngle* target, const char* value);
+RV_EXPORT int32_t rv_dom_svg_angle_set_value_as_string(RvSVGAngle* target, const uint8_t* value, int32_t value_length);
 /* SVGAngle.newValueSpecifiedUnits(unsigned short unitType, float valueInSpecifiedUnits) -> undefined */
 RV_EXPORT int32_t rv_dom_svg_angle_new_value_specified_units(RvSVGAngle* target, uint16_t unit_type, float value_in_specified_units);
 /* SVGAngle.convertToSpecifiedUnits(unsigned short unitType) -> undefined */
@@ -7040,7 +7041,7 @@ RV_EXPORT int32_t rv_dom_svg_animated_enumeration_get_anim_val(RvSVGAnimatedEnum
 /* SVGAnimatedString.baseVal getter: attribute (DOMString or TrustedScriptURL) baseVal */
 RV_EXPORT int32_t rv_dom_svg_animated_string_get_base_val(RvSVGAnimatedString* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGAnimatedString.baseVal setter: attribute (DOMString or TrustedScriptURL) baseVal */
-RV_EXPORT int32_t rv_dom_svg_animated_string_set_base_val(RvSVGAnimatedString* target, const char* value);
+RV_EXPORT int32_t rv_dom_svg_animated_string_set_base_val(RvSVGAnimatedString* target, const uint8_t* value, int32_t value_length);
 /* SVGAnimatedString.animVal getter: readonly attribute DOMString animVal */
 RV_EXPORT int32_t rv_dom_svg_animated_string_get_anim_val(RvSVGAnimatedString* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGAnimatedBoolean */
@@ -7060,19 +7061,19 @@ RV_EXPORT int32_t rv_dom_svg_string_list_get_number_of_items(RvSVGStringList* ta
 /* SVGStringList.clear() -> undefined */
 RV_EXPORT int32_t rv_dom_svg_string_list_clear(RvSVGStringList* target);
 /* SVGStringList.initialize(DOMString newItem) -> DOMString */
-RV_EXPORT int32_t rv_dom_svg_string_list_initialize(RvSVGStringList* target, const char* new_item, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_svg_string_list_initialize(RvSVGStringList* target, const uint8_t* new_item, int32_t new_item_length, char* buffer, int32_t capacity, int32_t* length);
 /* SVGStringList.getItem(unsigned long index) -> DOMString */
 RV_EXPORT int32_t rv_dom_svg_string_list_get_item(RvSVGStringList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
 /* SVGStringList.insertItemBefore(DOMString newItem, unsigned long index) -> DOMString */
-RV_EXPORT int32_t rv_dom_svg_string_list_insert_item_before(RvSVGStringList* target, const char* new_item, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_svg_string_list_insert_item_before(RvSVGStringList* target, const uint8_t* new_item, int32_t new_item_length, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
 /* SVGStringList.replaceItem(DOMString newItem, unsigned long index) -> DOMString */
-RV_EXPORT int32_t rv_dom_svg_string_list_replace_item(RvSVGStringList* target, const char* new_item, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_svg_string_list_replace_item(RvSVGStringList* target, const uint8_t* new_item, int32_t new_item_length, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
 /* SVGStringList.removeItem(unsigned long index) -> DOMString */
 RV_EXPORT int32_t rv_dom_svg_string_list_remove_item(RvSVGStringList* target, uint32_t index, char* buffer, int32_t capacity, int32_t* length);
 /* SVGStringList.appendItem(DOMString newItem) -> DOMString */
-RV_EXPORT int32_t rv_dom_svg_string_list_append_item(RvSVGStringList* target, const char* new_item, char* buffer, int32_t capacity, int32_t* length);
+RV_EXPORT int32_t rv_dom_svg_string_list_append_item(RvSVGStringList* target, const uint8_t* new_item, int32_t new_item_length, char* buffer, int32_t capacity, int32_t* length);
 /* SVGStringList.setItem(unsigned long index, DOMString newItem) -> undefined */
-RV_EXPORT int32_t rv_dom_svg_string_list_set_item(RvSVGStringList* target, uint32_t index, const char* new_item);
+RV_EXPORT int32_t rv_dom_svg_string_list_set_item(RvSVGStringList* target, uint32_t index, const uint8_t* new_item, int32_t new_item_length);
 /* SVGViewSpec */
 
 /* SVGViewSpec.transform getter: readonly attribute SVGTransformList transform; *result is a new reference */
@@ -7137,7 +7138,7 @@ RV_EXPORT int32_t rv_dom_svg_marker_element_get_orient_angle(RvNode* target, RvS
 /* SVGMarkerElement.orient getter: attribute DOMString orient */
 RV_EXPORT int32_t rv_dom_svg_marker_element_get_orient(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGMarkerElement.orient setter: attribute DOMString orient */
-RV_EXPORT int32_t rv_dom_svg_marker_element_set_orient(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_svg_marker_element_set_orient(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGMarkerElement.viewBox getter: readonly attribute SVGAnimatedRect viewBox; *result is a new reference */
 RV_EXPORT int32_t rv_dom_svg_marker_element_get_view_box(RvNode* target, RvSVGAnimatedRect** result);
 /* SVGMarkerElement.preserveAspectRatio getter: readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio;
@@ -7838,17 +7839,17 @@ RV_EXPORT int32_t rv_dom_svga_element_get_target(RvNode* target, RvSVGAnimatedSt
 /* SVGAElement.hreflang getter: attribute DOMString hreflang */
 RV_EXPORT int32_t rv_dom_svga_element_get_hreflang(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGAElement.hreflang setter: attribute DOMString hreflang */
-RV_EXPORT int32_t rv_dom_svga_element_set_hreflang(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_svga_element_set_hreflang(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGAElement.rel getter: attribute DOMString rel */
 RV_EXPORT int32_t rv_dom_svga_element_get_rel(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGAElement.rel setter: attribute DOMString rel */
-RV_EXPORT int32_t rv_dom_svga_element_set_rel(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_svga_element_set_rel(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGAElement.relList getter: readonly attribute DOMTokenList relList; *result is a new reference */
 RV_EXPORT int32_t rv_dom_svga_element_get_rel_list(RvNode* target, RvDOMTokenList** result);
 /* SVGAElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_svga_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGAElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_svga_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_svga_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGAElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
 RV_EXPORT int32_t rv_dom_svga_element_get_href(RvNode* target, RvSVGAnimatedString** result);
 /* SVGForeignObjectElement */
@@ -7876,8 +7877,8 @@ RV_EXPORT int32_t rv_dom_svg_image_element_get_height(RvNode* target, RvSVGAnima
 RV_EXPORT int32_t rv_dom_svg_image_element_get_preserve_aspect_ratio(RvNode* target, RvSVGAnimatedPreserveAspectRatio** result);
 /* SVGImageElement.crossOrigin getter: attribute DOMString? crossOrigin */
 RV_EXPORT int32_t rv_dom_svg_image_element_get_cross_origin(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
-/* SVGImageElement.crossOrigin setter: attribute DOMString? crossOrigin; value may be NULL (null) */
-RV_EXPORT int32_t rv_dom_svg_image_element_set_cross_origin(RvNode* target, const char* value);
+/* SVGImageElement.crossOrigin setter: attribute DOMString? crossOrigin; value_length -1 means null */
+RV_EXPORT int32_t rv_dom_svg_image_element_set_cross_origin(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGImageElement.href getter: readonly attribute SVGAnimatedString href; *result is a new reference */
 RV_EXPORT int32_t rv_dom_svg_image_element_get_href(RvNode* target, RvSVGAnimatedString** result);
 /* SVGScriptElement */
@@ -7885,7 +7886,7 @@ RV_EXPORT int32_t rv_dom_svg_image_element_get_href(RvNode* target, RvSVGAnimate
 /* SVGScriptElement.type getter: attribute DOMString type */
 RV_EXPORT int32_t rv_dom_svg_script_element_get_type(RvNode* target, char* buffer, int32_t capacity, int32_t* length);
 /* SVGScriptElement.type setter: attribute DOMString type */
-RV_EXPORT int32_t rv_dom_svg_script_element_set_type(RvNode* target, const char* value);
+RV_EXPORT int32_t rv_dom_svg_script_element_set_type(RvNode* target, const uint8_t* value, int32_t value_length);
 /* SVGScriptElement.async getter: attribute boolean async */
 RV_EXPORT int32_t rv_dom_svg_script_element_get_async(RvNode* target, int32_t* result);
 /* SVGScriptElement.async setter: attribute boolean async */
@@ -7988,8 +7989,8 @@ RV_EXPORT int32_t rv_dom_caret_position_get_offset(RvCaretPosition* target, uint
 RV_EXPORT int32_t rv_dom_caret_position_get_client_rect(RvCaretPosition* target, RvDOMRectReadOnly** result);
 /* DOMURL */
 
-/* DOMURL.constructor: target is the Document of the constructed object; base_length -1 means absent; base may be NULL
- * (absent); *result is a new reference */
+/* DOMURL.constructor: target is the Document of the constructed object; base_length -1 means absent; *result is a new
+ * reference */
 RV_EXPORT int32_t rv_dom_domurl_create(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, RvDOMURL** result);
 /* DOMURL.href getter: attribute USVString href */
 RV_EXPORT int32_t rv_dom_domurl_get_href(RvDOMURL* target, char* buffer, int32_t capacity, int32_t* length);
@@ -8046,16 +8047,14 @@ RV_EXPORT int32_t rv_dom_url_search_params_create(RvNode* target, const RvDomUni
 RV_EXPORT int32_t rv_dom_url_search_params_get_size(RvURLSearchParams* target, uint32_t* result);
 /* URLSearchParams.append(USVString name, USVString value) -> undefined */
 RV_EXPORT int32_t rv_dom_url_search_params_append(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
-/* URLSearchParams.delete(USVString name, optional USVString value) -> undefined; value_length -1 means absent; value
- * may be NULL (absent) */
+/* URLSearchParams.delete(USVString name, optional USVString value) -> undefined; value_length -1 means absent */
 RV_EXPORT int32_t rv_dom_url_search_params_delete(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
 /* URLSearchParams.get(USVString name) -> USVString? */
 RV_EXPORT int32_t rv_dom_url_search_params_get(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, char* buffer, int32_t capacity, int32_t* length);
 /* URLSearchParams.getAll(USVString name) -> sequence<USVString>; *result owns its contents; release with the matching
  * rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_url_search_params_get_all(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, RvDomSequenceUSVStringUtf8* result);
-/* URLSearchParams.has(USVString name, optional USVString value) -> boolean; value_length -1 means absent; value may
- * be NULL (absent) */
+/* URLSearchParams.has(USVString name, optional USVString value) -> boolean; value_length -1 means absent */
 RV_EXPORT int32_t rv_dom_url_search_params_has(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length, int32_t* result);
 /* URLSearchParams.set(USVString name, USVString value) -> undefined */
 RV_EXPORT int32_t rv_dom_url_search_params_set(RvURLSearchParams* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
@@ -8090,11 +8089,11 @@ RV_EXPORT int32_t rv_dom_url_pattern_get_hash(RvURLPattern* target, char* buffer
 /* URLPattern.hasRegExpGroups getter: readonly attribute boolean hasRegExpGroups */
 RV_EXPORT int32_t rv_dom_url_pattern_get_has_reg_exp_groups(RvURLPattern* target, int32_t* result);
 /* URLPattern.test(optional URLPatternInput input = {}, optional USVString baseURL) -> boolean; input defaults to {}
- * in IDL; base_url_length -1 means absent; base_url may be NULL (absent) */
+ * in IDL; base_url_length -1 means absent */
 RV_EXPORT int32_t rv_dom_url_pattern_test(RvURLPattern* target, const RvDomUnionUSVStringOrURLPatternInit* input, const uint8_t* base_url, int32_t base_url_length, int32_t* result);
 /* URLPattern.exec(optional URLPatternInput input = {}, optional USVString baseURL) -> URLPatternResult?; input
- * defaults to {} in IDL; base_url_length -1 means absent; base_url may be NULL (absent); *result is NULL for null;
- * *result is owned; release it with rv_dom_url_pattern_result_release */
+ * defaults to {} in IDL; base_url_length -1 means absent; *result is NULL for null; *result is owned; release it with
+ * rv_dom_url_pattern_result_release */
 RV_EXPORT int32_t rv_dom_url_pattern_exec(RvURLPattern* target, const RvDomUnionUSVStringOrURLPatternInit* input, const uint8_t* base_url, int32_t base_url_length, RvDomURLPatternResult** result);
 /* VisualViewport */
 
@@ -8142,7 +8141,7 @@ RV_EXPORT int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSS
 /* DOMWindow */
 
 /* Window.getComputedStyle: checked Document context; nullable string byte length -1 means null; pseudo_element
- * defaults to null in IDL; pseudo_element may be NULL (null); *result is a new reference */
+ * defaults to null in IDL; pseudo_element_length -1 means null; *result is a new reference */
 RV_EXPORT int32_t rv_dom_window_get_computed_style(RvNode* target, RvNode* element, const uint8_t* pseudo_element, int32_t pseudo_element_length, RvCSSStyleDeclaration** result);
 /* Window.scrollX getter: checked Document context */
 RV_EXPORT int32_t rv_dom_window_get_scroll_x(RvNode* target, double* result);
@@ -8249,10 +8248,9 @@ RV_EXPORT int32_t rv_dom_css_style_value_parse_all(RvNode* target, const uint8_t
 /* DOMURL */
 
 /* DOMURL.parse: static operation with checked Document context and UTF-8 byte lengths; base_length -1 means absent;
- * base may be NULL (absent); *result is a new reference, or NULL */
+ * *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_domurl_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, RvDOMURL** result);
-/* DOMURL.canParse: static operation with checked Document context and UTF-8 byte lengths; base_length -1 means
- * absent; base may be NULL (absent) */
+/* DOMURL.canParse: static operation with checked Document context and UTF-8 byte lengths; base_length -1 means absent */
 RV_EXPORT int32_t rv_dom_domurl_can_parse(RvNode* target, const uint8_t* url, int32_t url_length, const uint8_t* base, int32_t base_length, int32_t* result);
 /* StylePropertyMapReadOnly */
 

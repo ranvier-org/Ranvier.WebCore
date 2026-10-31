@@ -3,6 +3,10 @@ import ctypes
 import os
 import pathlib
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
 
 
 def verify(native_directory):
@@ -16,9 +20,7 @@ def verify(native_directory):
     count = 0
 
     def bind(name, result, args):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, args
-        return function
+        return bind_utf8(library, name, result, args)
 
     def expect(condition, message):
         nonlocal count
@@ -57,7 +59,7 @@ def verify(native_directory):
                      'shape': 'rect', 'download': 'sample.txt', 'referrer_policy': 'no-referrer',
                      'href': 'https://example.invalid/area', 'target': 'sample-frame'}
         for member, value in reflected.items():
-            call(prefix + 'set_' + member, [pointer, string], area, value.encode())
+            call(prefix + 'set_' + member, [pointer, Utf8], area, value.encode())
             expect(text(prefix + 'get_' + member, [pointer], area) == value, member + ' reflection')
             buffer, length = ctypes.create_string_buffer(128), integer()
             getter = bind(prefix + 'get_' + member, integer, [pointer, pointer, integer, numbers])
@@ -75,18 +77,18 @@ def verify(native_directory):
                       'host': 'other.invalid:9443', 'hostname': 'other.invalid', 'port': '9443',
                       'pathname': '/next/path', 'search': '?q=new', 'hash': '#next'}
         for member, value in components.items():
-            call(prefix + 'set_href', [pointer, string], area, initial)
-            call(prefix + 'set_' + member, [pointer, string], area, value.encode())
+            call(prefix + 'set_href', [pointer, Utf8], area, initial)
+            call(prefix + 'set_' + member, [pointer, Utf8], area, value.encode())
             expect(text(prefix + 'get_' + member, [pointer], area) == value, member + ' URL component')
             expect(text(prefix + 'get_href', [pointer], area) != initial.decode(), member + ' updates href')
-        call(prefix + 'set_href', [pointer, string], area, initial)
+        call(prefix + 'set_href', [pointer, Utf8], area, initial)
         expect(text(prefix + 'get_origin', [pointer], area) == 'https://example.invalid:8443', 'URL origin')
 
         tokens = handle(prefix + 'get_rel_list', area, 'rv_dom_dom_token_list_release')
         expect(text('rv_dom_dom_token_list_get_value', [pointer], tokens) == 'noopener', 'relList initial tokens')
-        call('rv_dom_dom_token_list_set_value', [pointer, string], tokens, b'noreferrer external')
+        call('rv_dom_dom_token_list_set_value', [pointer, Utf8], tokens, b'noreferrer external')
         expect(text(prefix + 'get_rel', [pointer], area) == 'noreferrer external', 'token mutation updates rel')
-        call(prefix + 'set_rel', [pointer, string], area, b'noopener')
+        call(prefix + 'set_rel', [pointer, Utf8], area, b'noopener')
         expect(text('rv_dom_dom_token_list_get_value', [pointer], tokens) == 'noopener', 'retained tokens remain live')
 
         areas = handle('rv_dom_html_map_element_get_areas', image_map, 'rv_dom_html_collection_release')
