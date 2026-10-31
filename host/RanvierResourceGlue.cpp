@@ -1,10 +1,15 @@
 #include "config.h"
 #include "RanvierResourceGlue.h"
+#include "dom/RanvierDomGlue.h"
+#include "AbortSignal.h"
 #include "Blob.h"
 #include "CSSFontFace.h"
+#include "CSSFontFaceSet.h"
 #include "CachedImage.h"
 #include "DOMException.h"
 #include "Document.h"
+#include "EventListener.h"
+#include "EventNames.h"
 #include "DocumentInlines.h"
 #include "File.h"
 #include "FileReader.h"
@@ -16,6 +21,7 @@
 #include "HTMLElementTypeHelpers.h"
 #include "Image.h"
 #include "ImageLoader.h"
+#include "LocalDOMWindow.h"
 #include "Node.h"
 #include "OriginAccessPatterns.h"
 #include "SVGImageElement.h"
@@ -24,6 +30,8 @@
 #include "SVGElementTypeHelpers.h"
 #include <JavaScriptCore/ArrayBuffer.h>
 #include <unordered_map>
+#include <wtf/Deque.h>
+#include <wtf/HashMap.h>
 #include <wtf/MainThread.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RunLoop.h>
@@ -400,6 +408,285 @@ private:
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(BlobReadOperation);
 
+std::optional<String> textFromBytes(const uint8_t* bytes, int32_t length)
+{
+    if (!length)
+        return String { };
+    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(bytes), static_cast<size_t>(length) });
+    if (text.isNull())
+        return std::nullopt;
+    return text;
+}
+
+// FontFaceSet.load(font, text) over the document's CSSFontFaceSet: settles when every matching face has loaded, or at
+// the first face that fails. width is the number of matching faces.
+class FontsLoadOperation final : public Operation, public FontEventClient {
+    WTF_MAKE_TZONE_ALLOCATED(FontsLoadOperation);
+
+public:
+    static Ref<FontsLoadOperation> create(Document& document, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new FontsLoadOperation(document, callback, context));
+    }
+
+    void ref() const final { Operation::ref(); }
+    void deref() const final { Operation::deref(); }
+
+    Vector<Ref<CSSFontFace>> faces;
+    int32_t count { 0 };
+
+    void detach() final
+    {
+        faces.clear();
+        Operation::detach();
+    }
+
+    void measure(int32_t& width, int32_t&) final { width = count; }
+
+    // A face reports its new status to clients before it stores it, so the finishing face's status is passed in.
+    void evaluate(const CSSFontFace* finished = nullptr, CSSFontFace::Status finishedStatus = CSSFontFace::Status::Pending)
+    {
+        if (terminal)
+            return;
+        bool waiting = false;
+        for (auto& face : faces) {
+            auto status = face.ptr() == finished ? finishedStatus : face->status();
+            if (status == CSSFontFace::Status::Failure) {
+                finish(RV_RESOURCE_LOAD_FAILED);
+                return;
+            }
+            if (status != CSSFontFace::Status::Success)
+                waiting = true;
+        }
+        if (!waiting)
+            finish(RV_RESOURCE_SUCCEEDED);
+    }
+
+    void start(CSSFontFaceSet& backing, Vector<Ref<CSSFontFace>>&& matching)
+    {
+        starting = true;
+        faces = WTF::move(matching);
+        count = static_cast<int32_t>(faces.size());
+        backing.addFontEventClient(*this);
+        for (auto& face : faces)
+            face->load();
+        evaluate();
+        starting = false;
+    }
+
+private:
+    FontsLoadOperation(Document& document, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+    {
+    }
+
+    void faceFinished(CSSFontFace& face, CSSFontFace::Status status) final
+    {
+        if (faces.containsIf([&](auto& candidate) { return candidate.ptr() == &face; }))
+            evaluate(&face, status);
+    }
+    void startedLoading() final { }
+    void completedLoading() final { }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(FontsLoadOperation);
+
+class FontsReadyOperation;
+
+class ReadyLoadListener final : public EventListener {
+public:
+    static Ref<ReadyLoadListener> create(FontsReadyOperation& operation) { return adoptRef(*new ReadyLoadListener(operation)); }
+
+private:
+    explicit ReadyLoadListener(FontsReadyOperation&);
+    void handleEvent(ScriptExecutionContext&, Event&) final;
+
+    SingleThreadWeakPtr<Operation> m_operation;
+};
+
+// FontFaceSet.ready: settles once the document's load event has finished and no face is loading.
+class FontsReadyOperation final : public Operation, public FontEventClient {
+    WTF_MAKE_TZONE_ALLOCATED(FontsReadyOperation);
+
+public:
+    static Ref<FontsReadyOperation> create(Document& document, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new FontsReadyOperation(document, callback, context));
+    }
+
+    void ref() const final { Operation::ref(); }
+    void deref() const final { Operation::deref(); }
+
+    RefPtr<ReadyLoadListener> listener;
+    RefPtr<LocalDOMWindow> window;
+
+    void detach() final
+    {
+        if (window && listener)
+            window->removeEventListener(eventNames().loadEvent, *listener, { });
+        window = nullptr;
+        listener = nullptr;
+        Operation::detach();
+    }
+
+    void evaluate()
+    {
+        if (terminal || !document)
+            return;
+        if (document->loadEventFinished() && !document->processingLoadEvent() && !document->fonts()->backing().hasActiveFontFaces())
+            finish(RV_RESOURCE_SUCCEEDED);
+    }
+
+    void evaluateLater()
+    {
+        RunLoop::mainSingleton().dispatch([weak = SingleThreadWeakPtr<Operation> { *this }] {
+            if (RefPtr operation = weak.get())
+                static_cast<FontsReadyOperation&>(*operation).evaluate();
+        });
+    }
+
+    void start()
+    {
+        starting = true;
+        Ref protectedDocument = *document;
+        protectedDocument->updateLayoutIgnorePendingStylesheets();
+        if (!terminal && document) {
+            document->fonts()->backing().addFontEventClient(*this);
+            if (!document->loadEventFinished() || document->processingLoadEvent()) {
+                window = document->window();
+                listener = ReadyLoadListener::create(*this);
+                if (window)
+                    window->addEventListener(eventNames().loadEvent, *listener, { });
+            }
+            evaluate();
+        }
+        starting = false;
+    }
+
+private:
+    FontsReadyOperation(Document& document, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+    {
+    }
+
+    void faceFinished(CSSFontFace&, CSSFontFace::Status) final { }
+    void startedLoading() final { }
+    // The face set reports completion before its last face's load event ends; the check runs on a later turn.
+    void completedLoading() final { evaluateLater(); }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(FontsReadyOperation);
+
+ReadyLoadListener::ReadyLoadListener(FontsReadyOperation& operation)
+    : EventListener(CPPEventListenerType)
+    , m_operation(operation)
+{
+}
+
+void ReadyLoadListener::handleEvent(ScriptExecutionContext&, Event&)
+{
+    // The load event runs before the document clears processingLoadEvent.
+    if (RefPtr operation = m_operation.get())
+        static_cast<FontsReadyOperation&>(*operation).evaluateLater();
+}
+
+}
+
+// A CSS Font Loading event watch over one document's face set; see rv_fonts_watch.
+struct RvFontsWatch final : public RefCounted<RvFontsWatch>, public FontEventClient {
+    WTF_MAKE_TZONE_ALLOCATED(RvFontsWatch);
+
+public:
+    static Ref<RvFontsWatch> create(Document& document, RvFontsEventCallback callback, void* context)
+    {
+        return adoptRef(*new RvFontsWatch(document, callback, context));
+    }
+
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
+
+    RefPtr<Document> document;
+    RvFontsEventCallback callback { nullptr };
+    void* context { nullptr };
+    Vector<String> loaded;
+    Vector<String> failed;
+    Deque<std::pair<int32_t, Vector<String>>> queue;
+    bool flushing { false };
+
+    void end()
+    {
+        document = nullptr;
+        callback = nullptr;
+        queue.clear();
+        loaded.clear();
+        failed.clear();
+    }
+
+    void post(int32_t kind, Vector<String>&& families)
+    {
+        if (!callback)
+            return;
+        queue.append({ kind, WTF::move(families) });
+        RunLoop::mainSingleton().dispatch([watch = Ref { *this }] {
+            watch->deliver();
+        });
+    }
+
+    void deliver()
+    {
+        if (queue.isEmpty())
+            return;
+        Ref protectThis { *this };
+        auto [kind, families] = queue.takeFirst();
+        if (!callback)
+            return;
+        Vector<CString> bytes;
+        for (auto& family : families)
+            bytes.append(family.utf8());
+        Vector<const uint8_t*> pointers;
+        Vector<int32_t> lengths;
+        for (auto& value : bytes) {
+            pointers.append(reinterpret_cast<const uint8_t*>(value.data()));
+            lengths.append(static_cast<int32_t>(value.length()));
+        }
+        callback(context, kind, pointers.isEmpty() ? nullptr : pointers.span().data(), lengths.isEmpty() ? nullptr : lengths.span().data(), static_cast<int32_t>(bytes.size()));
+    }
+
+    RvFontsWatch(Document& document, RvFontsEventCallback callback, void* context)
+        : document(&document)
+        , callback(callback)
+        , context(context)
+    {
+    }
+
+    void startedLoading() final { post(RV_FONTS_EVENT_LOADING, { }); }
+
+private:
+    void faceFinished(CSSFontFace& face, CSSFontFace::Status status) final
+    {
+        if (!callback)
+            return;
+        (status == CSSFontFace::Status::Success ? loaded : failed).append(face.family());
+    }
+
+    // The CSS Font Loading "switch to loaded" steps: loadingdone with the loaded faces, then loadingerror when any failed.
+    void completedLoading() final
+    {
+        post(RV_FONTS_EVENT_LOADINGDONE, std::exchange(loaded, { }));
+        if (!failed.isEmpty())
+            post(RV_FONTS_EVENT_LOADINGERROR, std::exchange(failed, { }));
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(RvFontsWatch);
+
+namespace {
+HashMap<RvFontsWatch*, Ref<RvFontsWatch>>& fontsWatches()
+{
+    static NeverDestroyed<HashMap<RvFontsWatch*, Ref<RvFontsWatch>>> values;
+    return values;
+}
+
 std::unordered_map<uint64_t, Ref<Operation>>& operations()
 {
     static NeverDestroyed<std::unordered_map<uint64_t, Ref<Operation>>> values;
@@ -502,6 +789,118 @@ void ranvier_resource_invalidate_document(RvNode* handle)
         }
         releaseOperation(operation, RV_RESOURCE_INVALIDATED);
     }
+    for (auto& entry : fontsWatches()) {
+        if (entry.value->document == document)
+            entry.value->end();
+    }
+}
+
+namespace {
+
+Document* fontsDocument(RvNode* handle)
+{
+    auto* document = documentFromHandle(handle);
+    return document && document->window() ? document : nullptr;
+}
+
+}
+
+int32_t ranvier_fonts_status(RvNode* documentHandle, int32_t* status)
+{
+    if (!documentHandle || !status)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr document = fontsDocument(documentHandle);
+    if (!document)
+        return RV_ERR_UNSUPPORTED;
+    *status = document->fonts()->status() == FontFaceSet::LoadStatus::Loading ? RV_FONTS_LOADING : RV_FONTS_LOADED;
+    return RV_OK;
+}
+
+int32_t ranvier_fonts_check(RvNode* documentHandle, const uint8_t* font, int32_t fontLength, const uint8_t* text, int32_t textLength, int32_t* loaded)
+{
+    if (!documentHandle || !font || fontLength < 0 || textLength < 0 || (textLength && !text) || !loaded)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr document = fontsDocument(documentHandle);
+    auto fontText = textFromBytes(font, fontLength);
+    auto sample = text ? textFromBytes(text, textLength) : std::optional<String> { " "_s };
+    if (!document || !fontText || !sample)
+        return RV_ERR_UNSUPPORTED;
+    auto result = document->fonts()->check(*document, *fontText, *sample);
+    if (result.hasException())
+        return Ranvier::recordException(result.releaseException());
+    *loaded = result.releaseReturnValue() ? 1 : 0;
+    return RV_OK;
+}
+
+int32_t ranvier_fonts_load(RvNode* documentHandle, const uint8_t* font, int32_t fontLength, const uint8_t* text, int32_t textLength, RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || !font || fontLength < 0 || textLength < 0 || (textLength && !text) || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr document = fontsDocument(documentHandle);
+    auto fontText = textFromBytes(font, fontLength);
+    auto sample = text ? textFromBytes(text, textLength) : std::optional<String> { " "_s };
+    if (!document || !fontText || !sample || !nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    Ref backing = document->fonts()->backing();
+    backing->updateStyleIfNeeded();
+    auto matching = backing->matchingFacesExcludingPreinstalledFonts(*document, *fontText, *sample);
+    if (matching.hasException())
+        return Ranvier::recordException(matching.releaseException());
+    Ref value = FontsLoadOperation::create(*document, callback, context);
+    *operation = nextOperation++;
+    operations().emplace(*operation, value.copyRef());
+    value->start(backing, matching.releaseReturnValue());
+    return RV_OK;
+}
+
+int32_t ranvier_fonts_ready(RvNode* documentHandle, RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr document = fontsDocument(documentHandle);
+    if (!document || !nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    Ref value = FontsReadyOperation::create(*document, callback, context);
+    *operation = nextOperation++;
+    operations().emplace(*operation, value.copyRef());
+    value->start();
+    return RV_OK;
+}
+
+int32_t ranvier_fonts_watch(RvNode* documentHandle, RvFontsEventCallback callback, void* context, RvFontsWatch** watch)
+{
+    if (!documentHandle || !callback || !watch)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr document = fontsDocument(documentHandle);
+    if (!document)
+        return RV_ERR_UNSUPPORTED;
+    Ref value = RvFontsWatch::create(*document, callback, context);
+    Ref backing = document->fonts()->backing();
+    backing->addFontEventClient(value.get());
+    // A watch that starts inside a loading period reports it, as the event a watch present at its start received.
+    if (backing->hasActiveFontFaces())
+        value->post(RV_FONTS_EVENT_LOADING, { });
+    fontsWatches().add(value.ptr(), value.copyRef());
+    *watch = value.ptr();
+    return RV_OK;
+}
+
+void ranvier_fonts_unwatch(RvFontsWatch* watch)
+{
+    if (!watch || !WTF::isMainThread())
+        return;
+    if (RefPtr value = fontsWatches().take(watch))
+        value->end();
 }
 
 namespace {

@@ -119,6 +119,8 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', tests / 'svg_resources.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'image_decode.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'font_load.py', '--native-directory', out, '--webkit-source', args.source])
+    run([sys.executable, '-I', tests / 'font_readiness.py', '--native-directory', out, '--webkit-source', args.source])
+    run([sys.executable, '-I', tests / 'image_readiness.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'svg_tests_lists.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'mathml_surface.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'event_construction.py', '--native-directory', out])

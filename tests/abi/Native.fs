@@ -70,6 +70,13 @@ type FormSubmissionHandler = delegate of context: nativeint * submission: native
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type ResourceCompletion = delegate of context: nativeint * outcome: int * width: int * height: int -> unit
 
+/// <summary>
+/// The <c>RvFontsEventCallback</c> of the header: <c>families</c> and <c>familyLengths</c> point to <c>count</c> UTF-8
+/// family names and their byte counts, valid only during the call.
+/// </summary>
+[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
+type FontsEventCallback = delegate of context: nativeint * kind: int * families: nativeint * familyLengths: nativeint * count: int -> unit
+
 /// <summary>The <c>RvFrameCallback</c> of the header.</summary>
 [<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]
 type FrameCallback = delegate of context: nativeint -> unit
@@ -318,6 +325,12 @@ module Calls =
             "rv_font_load"
             "rv_resource_cancel"
             "rv_resource_release"
+            "rv_fonts_status"
+            "rv_fonts_check"
+            "rv_fonts_load"
+            "rv_fonts_ready"
+            "rv_fonts_watch"
+            "rv_fonts_unwatch"
             "rv_host_construct_event"
             "rv_custom_event_detail_json"
             "rv_host_create_event_target"
@@ -1138,6 +1151,33 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_resource_release(uint64 operation)
+
+    [<DllImport(Lib)>]
+    extern int rv_fonts_status(nativeint host, int& status)
+
+    [<DllImport(Lib)>]
+    extern int rv_fonts_check(nativeint host, [<In>] byte[] font, int font_length, [<In>] byte[] text, int text_length, int& loaded)
+
+    [<DllImport(Lib)>]
+    extern int rv_fonts_load(
+        nativeint host,
+        [<In>] byte[] font,
+        int font_length,
+        [<In>] byte[] text,
+        int text_length,
+        nativeint completion,
+        nativeint context,
+        uint64& operation
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_fonts_ready(nativeint host, nativeint completion, nativeint context, uint64& operation)
+
+    [<DllImport(Lib)>]
+    extern int rv_fonts_watch(nativeint host, nativeint callback, nativeint context, nativeint& watch)
+
+    [<DllImport(Lib)>]
+    extern void rv_fonts_unwatch(nativeint watch)
 
     [<DllImport(Lib)>]
     extern nativeint rv_host_construct_event(
