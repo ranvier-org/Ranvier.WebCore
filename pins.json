@@ -1,7 +1,7 @@
 {
   "package": {
     "id": "Ranvier.WebCore.Native",
-    "version": "0.1.0-preview.29"
+    "version": "0.1.0-preview.30"
   },
   "webkit": {
     "repository": "https://github.com/WebKit/WebKit.git",

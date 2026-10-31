@@ -471,6 +471,51 @@ let private releaseAfterDestroy (kind: string) (remove: bool) =
             rv_node_release select
             rv_node_release form
             releaseHeld
+        | "open modal dialog" ->
+            let dialog = rv_document_create_element (host, "dialog")
+            rv_node_append_child (div, dialog) |> check "append dialog"
+            rv_dom_html_dialog_element_show_modal dialog |> check "showModal"
+            held.Value <- dialog
+
+            fun () ->
+                let mutable isOpen = -1
+                let status = rv_dom_html_dialog_element_get_open (held.Value, &isOpen)
+
+                if status <> 0 && status <> -9 then
+                    failwithf "HTMLDialogElement.open after destroy: %d" status
+
+                let closed = rv_dom_html_dialog_element_close (held.Value, "late")
+
+                if closed <> 0 && closed <> -9 && closed <> -3 then
+                    failwithf "HTMLDialogElement.close after destroy: %d" closed
+
+                rv_node_release held.Value
+        | "toggle event" ->
+            let button = rv_document_create_element (host, "button")
+            rv_node_append_child (div, button) |> check "append button"
+            let mutable init = RvDomToggleEventInit()
+            init.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomToggleEventInit>())
+            init.old_state <- "closed"
+            init.new_state <- "open"
+            init.source <- button
+            let name = Text.Encoding.UTF8.GetBytes "toggle"
+
+            rv_dom_toggle_event_create (document, name, name.Length, [| init |], &held.contents)
+            |> check "ToggleEvent"
+
+            rv_node_release button
+
+            fun () ->
+                let buffer = Array.zeroCreate<byte> 16
+                let length = [| 0 |]
+
+                rv_dom_toggle_event_get_new_state (held.Value, buffer, buffer.Length, length)
+                |> check "ToggleEvent.newState after destroy"
+
+                if Text.Encoding.UTF8.GetString(buffer, 0, length[0]) <> "open" then
+                    failwith "ToggleEvent.newState changed after destroy"
+
+                rv_event_release held.Value
         | _ ->
             rv_dom_html_element_get_attribute_style_map (div, &held.contents)
             |> check "attributeStyleMap"
@@ -582,6 +627,8 @@ let run (outDir: string) =
                     "options collection"
                     "form data"
                     "submit event"
+                    "open modal dialog"
+                    "toggle event"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

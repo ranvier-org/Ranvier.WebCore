@@ -3349,6 +3349,24 @@ and [<AllowNullLiteral>] FormDataEvent =
     /// <summary>FormDataEvent.formData.</summary>
     abstract member formData: DOMFormData with get
 
+/// <summary>ToggleEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ToggleEvent =
+    inherit Event
+    /// <summary>ToggleEvent.oldState.</summary>
+    abstract member oldState: string with get
+    /// <summary>ToggleEvent.newState.</summary>
+    abstract member newState: string with get
+    /// <summary>ToggleEvent.source.</summary>
+    abstract member source: Element with get
+
+/// <summary>CommandEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CommandEvent =
+    inherit Event
+    /// <summary>CommandEvent.source.</summary>
+    abstract member source: Element with get
+    /// <summary>CommandEvent.command.</summary>
+    abstract member command: string with get
+
 /// <summary>SVGGraphicsElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGGraphicsElement =
     inherit SVGElement
@@ -4915,10 +4933,6 @@ and [<AllowNullLiteral>] TextTrackList =
 
 /// <summary>TimeRanges in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] TimeRanges = interface end
-
-/// <summary>ToggleEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ToggleEvent =
-    inherit Event
 
 /// <summary>TouchEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] TouchEvent =

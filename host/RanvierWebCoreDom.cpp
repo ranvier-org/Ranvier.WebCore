@@ -2103,6 +2103,13 @@ int32_t rv_dom_submit_event_create(RvNode* target, const uint8_t* type, int32_t 
 int32_t rv_dom_submit_event_get_submitter(RvEvent* target, RvNode** result) { return ranvier_dom_submit_event_get_submitter(target, result); }
 int32_t rv_dom_form_data_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomFormDataEventInit* event_init_dict, RvEvent** result) { return ranvier_dom_form_data_event_create(target, type, type_length, event_init_dict, result); }
 int32_t rv_dom_form_data_event_get_form_data(RvEvent* target, RvDOMFormData** result) { return ranvier_dom_form_data_event_get_form_data(target, result); }
+int32_t rv_dom_toggle_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomToggleEventInit* event_init_dict, RvEvent** result) { return ranvier_dom_toggle_event_create(target, type, type_length, event_init_dict, result); }
+int32_t rv_dom_toggle_event_get_old_state(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_toggle_event_get_old_state(target, buffer, capacity, length); }
+int32_t rv_dom_toggle_event_get_new_state(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_toggle_event_get_new_state(target, buffer, capacity, length); }
+int32_t rv_dom_toggle_event_get_source(RvEvent* target, RvNode** result) { return ranvier_dom_toggle_event_get_source(target, result); }
+int32_t rv_dom_command_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomCommandEventInit* event_init_dict, RvEvent** result) { return ranvier_dom_command_event_create(target, type, type_length, event_init_dict, result); }
+int32_t rv_dom_command_event_get_source(RvEvent* target, RvNode** result) { return ranvier_dom_command_event_get_source(target, result); }
+int32_t rv_dom_command_event_get_command(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_command_event_get_command(target, buffer, capacity, length); }
 int32_t rv_dom_svg_graphics_element_get_transform(RvNode* target, RvSVGAnimatedTransformList** result) { return ranvier_dom_svg_graphics_element_get_transform(target, result); }
 int32_t rv_dom_svg_graphics_element_get_required_extensions(RvNode* target, RvSVGStringList** result) { return ranvier_dom_svg_graphics_element_get_required_extensions(target, result); }
 int32_t rv_dom_svg_graphics_element_get_system_language(RvNode* target, RvSVGStringList** result) { return ranvier_dom_svg_graphics_element_get_system_language(target, result); }
