@@ -1042,7 +1042,7 @@ module Raw =
     extern int rv_event_target_equals(nativeint left, nativeint right)
 
     [<DllImport(Lib)>]
-    extern nativeint rv_event_target_add_listener(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``, int flags, EventCallback callback, nativeint context)
+    extern nativeint rv_event_target_add_listener(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string ``type``, int flags, nativeint callback, nativeint context)
 
     [<DllImport(Lib)>]
     extern int rv_event_target_dispatch(nativeint target, nativeint ``event``, int& defaultPrevented)
@@ -3543,7 +3543,7 @@ let rv_event_target_equals (left: nativeint, right: nativeint) : int =
     else
         Raw.rv_event_target_equals (left, right)
 
-let rv_event_target_add_listener (target: nativeint, ``type``: string, flags: int, callback: EventCallback, context: nativeint) : nativeint =
+let rv_event_target_add_listener (target: nativeint, ``type``: string, flags: int, callback: nativeint, context: nativeint) : nativeint =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp ()
         let result = Raw.rv_event_target_add_listener (target, ``type``, flags, callback, context)

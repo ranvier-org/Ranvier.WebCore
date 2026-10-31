@@ -110,6 +110,8 @@ def parameter(ctype: str, name: str) -> tuple[str, str]:
     if ctype == "int32_t*":
         # A string getter's length is passed as a one-element array, as readString passes it.
         return ("int[]", "") if name == "length" else ("int&", "")
+    if ctype == "const RvEventInit*":
+        return "EventInit&", ""
     if ctype == "void**":
         return "nativeint&", ""
     if ctype == "RvGpuFrame**":
@@ -136,6 +138,29 @@ def generated(header: str) -> str:
         "/// <summary>The <c>RvEventCallback</c> of the header.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
         "type EventCallback = delegate of context: nativeint * event: nativeint -> int",
+        "",
+        "/// <summary>The <c>RvEventInit</c> of the header; strings are caller-owned NUL-terminated UTF-8 pointers.</summary>",
+        "[<Struct; StructLayout(LayoutKind.Sequential)>]",
+        "type EventInit =",
+        "    val mutable size: int",
+        "    val mutable bubbles: int",
+        "    val mutable cancelable: int",
+        "    val mutable composed: int",
+        "    val mutable detail: int",
+        "    val mutable modifiers: int",
+        "    val mutable screenX: float",
+        "    val mutable screenY: float",
+        "    val mutable clientX: float",
+        "    val mutable clientY: float",
+        "    val mutable button: int",
+        "    val mutable buttons: int",
+        "    val mutable key: nativeint",
+        "    val mutable code: nativeint",
+        "    val mutable location: int",
+        "    val mutable repeat: int",
+        "    val mutable isComposing: int",
+        "    val mutable relatedTarget: nativeint",
+        "    val mutable customDetailJson: nativeint",
         "",
         "/// <summary>The <c>RvResourceHandler</c> of the header; <c>url</c> is a NUL-terminated UTF-8 string.</summary>",
         "[<UnmanagedFunctionPointer(CallingConvention.Cdecl)>]",
