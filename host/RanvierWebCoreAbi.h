@@ -1187,6 +1187,36 @@ RV_EXPORT int32_t rv_host_capability_value_text(RvHost*, int32_t category, const
  * The UTF-8 fragment is passed directly to the engine, without adding/removing '#' or URL parsing. */
 RV_EXPORT int32_t rv_host_select_svg_view(RvHost*, const char* fragment, int32_t* selected);
 
+/* Image decode readiness ("image-decode"), without JavaScript or a promise. */
+enum {
+    RV_RESOURCE_SUCCEEDED = 0,
+    RV_RESOURCE_LOAD_FAILED = 1,
+    RV_RESOURCE_DECODE_FAILED = 2,
+    RV_RESOURCE_CANCELLED = 3,
+    RV_RESOURCE_INVALIDATED = 4,
+};
+
+/* Receives exactly one terminal outcome per operation on the owning thread. width and height are the image's natural
+ * size on RV_RESOURCE_SUCCEEDED and 0 otherwise. */
+typedef void (*RvResourceCompletion)(void* context, int32_t outcome, int32_t width, int32_t height);
+
+/* Observes an existing <img> or SVG <image> in the host's current document without changing or refetching it, and
+ * writes an operation token. SUCCEEDED follows the decoder's completion for a bitmap; an SVG image has no separate
+ * decode stage and succeeds once loading finishes. A change of src/srcset/sizes/href/crossorigin/referrerpolicy, a
+ * different CachedImage or a new document ends the operation with INVALIDATED.
+ * The completion is never called before rv_image_decode returns; a terminal reached during the call is delivered on
+ * a later rv_run_loop_cycle, or by rv_resource_cancel/rv_resource_release, whichever is first. Other engine
+ * terminals are delivered from the engine callback that produces them. Returns RV_ERR_UNSUPPORTED for another
+ * element type or a target outside the host's document. */
+RV_EXPORT int32_t rv_image_decode(RvHost*, RvNode* image, RvResourceCompletion, void* context, uint64_t* operation);
+/* Delivers CANCELLED to an in-flight operation, or a pending terminal already reached, before returning. */
+RV_EXPORT int32_t rv_resource_cancel(uint64_t operation);
+/* Ends the operation as rv_resource_cancel does, then unregisters it; the completion and its context are not used
+ * afterwards. Every operation requires one release; repeated and unknown tokens return RV_OK. rv_host_destroy and
+ * a new document deliver INVALIDATED to in-flight operations and release them; a terminal operation stays
+ * registered until released and holds no document. */
+RV_EXPORT int32_t rv_resource_release(uint64_t operation);
+
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
 
