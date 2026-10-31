@@ -1,0 +1,227 @@
+{
+  "note": "Each value holds U+0000. The ops are replayed by tests/abi/host_string_nul.py and tests/abi/host_string_nul_browser.mjs.",
+  "cases": [
+    {
+      "id": "M1",
+      "family": "markup",
+      "op": "loadHtml",
+      "value": "<!doctype html><body><p>a\u0000b</p><p>tail</p>"
+    },
+    {
+      "id": "M2",
+      "family": "markup",
+      "op": "loadHtml",
+      "value": "<!doctype html><body><textarea>a\u0000b</textarea>tail"
+    },
+    {
+      "id": "M3",
+      "family": "markup",
+      "op": "loadHtmlInner",
+      "value": "<!doctype html><body><!--a\u0000b-->tail"
+    },
+    {
+      "id": "M4",
+      "family": "markup",
+      "op": "loadHtmlTitle",
+      "value": "<!doctype html><title>a\u0000b</title>"
+    },
+    {
+      "id": "M5",
+      "family": "markup",
+      "op": "loadSvg",
+      "value": "<svg xmlns=\"http://www.w3.org/2000/svg\"><text>a</text></svg>\u0000<!--tail-->"
+    },
+    {
+      "id": "M7",
+      "family": "markup",
+      "op": "parseFragment",
+      "value": "<b>a\u0000b</b><i>c</i>"
+    },
+    {
+      "id": "M8",
+      "family": "markup",
+      "op": "parseFragmentComment",
+      "value": "<!--a\u0000b-->"
+    },
+    {
+      "id": "M9",
+      "family": "markup",
+      "op": "setInnerHtml",
+      "value": "<textarea>a\u0000b</textarea><i>c</i>"
+    },
+    {
+      "id": "T1",
+      "family": "text",
+      "op": "setTextContent",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "T2",
+      "family": "text",
+      "op": "createText",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "T3",
+      "family": "text",
+      "op": "createComment",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "T4",
+      "family": "text",
+      "op": "setStringTextContent",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "T5",
+      "family": "text",
+      "op": "setStringData",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "T6",
+      "family": "text",
+      "op": "setStringValueInput",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "T7",
+      "family": "text",
+      "op": "setStringValueTextarea",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "T8",
+      "family": "text",
+      "op": "setStringTitleDocument",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "T9",
+      "family": "text",
+      "op": "setStringTitleElement",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "T10",
+      "family": "text",
+      "op": "setStringValueOption",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "A1",
+      "family": "attribute",
+      "op": "setAttribute",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "A2",
+      "family": "attribute",
+      "op": "getElementById",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "A3",
+      "family": "attribute",
+      "op": "classAdd",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "A4",
+      "family": "attribute",
+      "op": "classContains",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "A5",
+      "family": "attribute",
+      "op": "classRemove",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "I1",
+      "family": "ime",
+      "op": "imeComposition",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "I2",
+      "family": "ime",
+      "op": "imeCommit",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "X1",
+      "family": "ax",
+      "op": "axSetValueInput",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "X2",
+      "family": "ax",
+      "op": "axSetValueTextarea",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "C1",
+      "family": "clipboard",
+      "op": "clipboardOffer",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "C2",
+      "family": "clipboard",
+      "op": "clipboardWrite",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "C3",
+      "family": "clipboard",
+      "op": "dragDataAdd",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "L1",
+      "family": "low",
+      "op": "setStyleCustom",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "L2",
+      "family": "low",
+      "op": "setStyleContent",
+      "value": "'a\u0000b'"
+    },
+    {
+      "id": "L3",
+      "family": "low",
+      "op": "hostKeyChar",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "L4",
+      "family": "low",
+      "op": "nodeListenerType",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "L5",
+      "family": "low",
+      "op": "createEventType",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "L6",
+      "family": "low",
+      "op": "constructEventType",
+      "value": "a\u0000b"
+    },
+    {
+      "id": "L7",
+      "family": "low",
+      "op": "targetListenerType",
+      "value": "a\u0000b"
+    }
+  ]
+}
