@@ -56,7 +56,7 @@ def verify(directory, evidence):
         function.restype, function.argtypes = returns, arguments
         return function
 
-    expect(bind('rv_abi_version', i32, [])() == 50, 'ABI version 50')
+    expect(bind('rv_abi_version', i32, [])() == 52, 'ABI version 52')
     has = bind('rv_abi_has', i32, [ctypes.c_char_p])
     expect(has(b'event-construction') == 1, 'event-construction advertised')
     host_create = bind('rv_host_create', p, [i32, i32])
