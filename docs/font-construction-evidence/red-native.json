@@ -1,0 +1,48 @@
+{
+ "runtimeSha256": "d033e89a703b273d9054708d966c00f02c2821d355010e2091269b5983228a04",
+ "steps": [
+  {
+   "name": "no face",
+   "width": 57.7734375
+  },
+  {
+   "name": "rv_font_load bytes",
+   "status": 0,
+   "outcomes": [
+    0
+   ],
+   "width": 80.0
+  },
+  {
+   "name": "rv_resource_release removes the face",
+   "width": 57.7734375
+  }
+ ],
+ "abi": 54,
+ "features": {
+  "font-load": 1,
+  "font-readiness": 1,
+  "dom:FontFace": 0,
+  "dom:FontFaceSet": 0,
+  "dom-constructor:FontFace": 0,
+  "dom-font-face-set-values": 0,
+  "font-face-load": 0
+ },
+ "exports": {
+  "rv_font_load": true,
+  "rv_fonts_load": true,
+  "rv_dom_document_get_fonts": false,
+  "rv_dom_font_face_create": false,
+  "rv_dom_font_face_get_status": false,
+  "rv_dom_font_face_set_weight": false,
+  "rv_dom_font_face_set_add": false,
+  "rv_dom_font_face_set_delete": false,
+  "rv_dom_font_face_set_clear": false,
+  "rv_dom_font_face_set_has": false,
+  "rv_dom_font_face_set_get_size": false,
+  "rv_dom_font_face_set_values": false,
+  "rv_font_face_load": false,
+  "rv_font_face_loaded": false
+ },
+ "gap": "The parent ABI builds a font only from bytes through rv_font_load, with no descriptors (weight, style, stretch, unicode-range, feature settings, display, size-adjust), no URL source, no FontFace handle or status, and no FontFaceSet has/size/add/delete/clear/iteration: a registered face leaves the set only when its operation is released, and a host cannot see CSS-connected faces."
+}

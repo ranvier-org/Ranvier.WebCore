@@ -1648,6 +1648,14 @@
       "base": "EventTarget"
     },
     {
+      "name": "FontFace",
+      "base": null
+    },
+    {
+      "name": "FontFaceSet",
+      "base": "EventTarget"
+    },
+    {
       "name": "WebAnimation",
       "base": "EventTarget"
     },
@@ -4321,6 +4329,24 @@
       "mixin": false,
       "contractOnly": false,
       "source": "fileapi/FileReader.idl"
+    },
+    {
+      "name": "FontFace",
+      "idlName": "FontFace",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/FontFace.idl"
+    },
+    {
+      "name": "FontFaceSet",
+      "idlName": "FontFaceSet",
+      "base": "EventTarget",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/FontFaceSet.idl"
     },
     {
       "name": "WebAnimation",
@@ -13096,6 +13122,42 @@
         "enum": null,
         "label": null,
         "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Document",
+      "member": "fonts",
+      "contractOwner": "Document",
+      "kind": "getter",
+      "function": "rv_dom_document_get_fonts",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvEventTarget**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FontFaceSet",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "FontFaceSet",
+        "root": "EventTarget",
+        "class": "FontFaceSet",
+        "enum": null,
+        "label": null,
+        "nullable": false,
         "atom": false,
         "subtypes": []
       }
@@ -148986,6 +149048,1943 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "FontFace",
+      "member": "constructor",
+      "contractOwner": "FontFace",
+      "kind": "constructor",
+      "function": "rv_dom_font_face_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "family"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "family_length"
+        },
+        {
+          "ctype": "const RvDomUnionDOMStringOrArrayBufferOrArrayBufferView*",
+          "name": "source"
+        },
+        {
+          "ctype": "const RvDomFontFaceDescriptors*",
+          "name": "descriptors"
+        },
+        {
+          "ctype": "RvFontFace**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "family",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "source",
+          "idlType": "(DOMString or BinaryData)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "union",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "ArrayBuffer",
+                    "nullable": false,
+                    "subtypes": []
+                  },
+                  {
+                    "name": "ArrayBufferView",
+                    "nullable": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDOMStringOrArrayBufferOrArrayBufferView",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DOMStringOrArrayBufferOrArrayBufferView",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "bytes",
+                "ctype": "RvDomByteSpan",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "BinaryData",
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "descriptors",
+          "idlType": "FontFaceDescriptors",
+          "idl": {
+            "name": "FontFaceDescriptors",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "FontFaceDescriptors",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "FontFace",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "FontFace",
+        "root": "FontFace",
+        "class": "FontFace",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:FontFace",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "family",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_family",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "family",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_family",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "style",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_style",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "style",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_style",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "weight",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_weight",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "weight",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_weight",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "width",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "width",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "stretch",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_stretch",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "stretch",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_stretch",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "unicodeRange",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_unicode_range",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "unicodeRange",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_unicode_range",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "featureSettings",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_feature_settings",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "featureSettings",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_feature_settings",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "display",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_display",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "display",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_display",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "ascentOverride",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_ascent_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "ascentOverride",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_ascent_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "descentOverride",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_descent_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "descentOverride",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_descent_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "lineGapOverride",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_line_gap_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "lineGapOverride",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_line_gap_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "sizeAdjust",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_size_adjust",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "sizeAdjust",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_size_adjust",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "status",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_status",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FontFaceLoadStatus",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "FontFaceLoadStatus",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "size",
+      "contractOwner": "FontFaceSet",
+      "kind": "getter",
+      "function": "rv_dom_font_face_set_get_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "status",
+      "contractOwner": "FontFaceSet",
+      "kind": "getter",
+      "function": "rv_dom_font_face_set_get_status",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FontFaceSetLoadStatus",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "FontFaceSetLoadStatus",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "has",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_has",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvFontFace*",
+          "name": "font"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "font",
+          "idlType": "FontFace",
+          "idl": {
+            "name": "FontFace",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "add",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_add",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvFontFace*",
+          "name": "font"
+        },
+        {
+          "ctype": "RvEventTarget**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "font",
+          "idlType": "FontFace",
+          "idl": {
+            "name": "FontFace",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "FontFaceSet",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "FontFaceSet",
+        "root": "EventTarget",
+        "class": "FontFaceSet",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "delete",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_delete",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvFontFace*",
+          "name": "font"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "font",
+          "idlType": "FontFace",
+          "idl": {
+            "name": "FontFace",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "clear",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_clear",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "check",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_check",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "font"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "font_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "text"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "text_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "font",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "text",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "\" \"",
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "WebAnimation",
       "member": "constructor",
       "contractOwner": "WebAnimation",
@@ -156700,6 +158699,64 @@
       "contextParameter": "context"
     },
     {
+      "interface": "FontFaceSet",
+      "member": "entries",
+      "contractOwner": "FontFaceSet",
+      "kind": "iterator_snapshot",
+      "function": "rv_dom_font_face_set_values",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceFontFace*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "FontFace",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceFontFace",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "FontFace sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "binding": "facade",
+      "feature": "dom-font-face-set-values",
+      "sourceKind": "iterable"
+    },
+    {
       "interface": "Highlight",
       "member": "size",
       "contractOwner": "Highlight",
@@ -157612,6 +159669,24 @@
       ],
       {},
       "Modules/highlight/Highlight.idl"
+    ],
+    "FontFaceLoadStatus": [
+      [
+        "unloaded",
+        "loading",
+        "loaded",
+        "error"
+      ],
+      {},
+      "css/FontFace.idl"
+    ],
+    "FontFaceSetLoadStatus": [
+      [
+        "loading",
+        "loaded"
+      ],
+      {},
+      "css/FontFaceSet.idl"
     ],
     "AnimationFrameRatePreset": [
       [
@@ -160119,6 +162194,47 @@
     {
       "mapping": {
         "kind": "union",
+        "ctype": "RvDomUnionDOMStringOrArrayBufferOrArrayBufferView",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DOMStringOrArrayBufferOrArrayBufferView",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "bytes",
+            "ctype": "RvDomByteSpan",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "BinaryData",
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
         "ctype": "RvDomUnionUnsignedLongOrAnimationFrameRatePreset",
         "interface": null,
         "root": null,
@@ -160544,6 +162660,34 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceFontFace",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "FontFace sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_font_face_release"
     },
     {
       "mapping": {
@@ -166019,6 +168163,141 @@
           "kind": "dict",
           "ctype": null,
           "interface": "URLPatternComponentResult",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "FontFaceDescriptors": [
+      {
+        "name": "style",
+        "field": "style",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "weight",
+        "field": "weight",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "stretch",
+        "field": "stretch",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "unicodeRange",
+        "field": "unicode_range",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"U+0-10FFFF\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "featureSettings",
+        "field": "feature_settings",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "display",
+        "field": "display",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"auto\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "sizeAdjust",
+        "field": "size_adjust",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"100%\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
           "root": null,
           "class": null,
           "enum": null,

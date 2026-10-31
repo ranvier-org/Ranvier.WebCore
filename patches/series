@@ -45,3 +45,4 @@
 0045-touch-pointer-events-win.patch
 0046-pointer-capture-pen-mouse-path.patch
 0047-navigator-embedder-max-touch-points.patch
+0048-fontface-loaded-rejection.patch

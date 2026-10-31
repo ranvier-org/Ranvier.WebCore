@@ -19,6 +19,8 @@
 extern "C" {
 WEBCORE_EXPORT int32_t ranvier_resource_decode_image(RvNode* document, RvNode* target, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_resource_load_font(RvNode* document, const char* family, const uint8_t* bytes, int32_t length, RvResourceCompletion, void* context, uint64_t* operation);
+// A FontFace's load (load 1, FontFace.load()) or loaded (load 0) promise: see rv_font_face_load in RanvierWebCoreAbi.h.
+WEBCORE_EXPORT int32_t ranvier_font_face_load(RvNode* document, RvFontFace* face, int32_t load, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_resource_cancel(uint64_t operation);
 WEBCORE_EXPORT int32_t ranvier_resource_release(uint64_t operation);
 WEBCORE_EXPORT void ranvier_resource_invalidate_document(RvNode* document);

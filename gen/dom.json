@@ -323,6 +323,10 @@
     "WebAnimation": {
       "receiver": "Document",
       "factory": "[](Document& document, AnimationEffect* effect, std::optional<RefPtr<AnimationTimeline>>&& timeline) -> Ref<WebAnimation> { return timeline ? WebAnimation::create(document, effect, timeline->get()) : WebAnimation::create(document, effect); }"
+    },
+    "FontFace": {
+      "receiver": "Document",
+      "factory": "FontFace::create"
     }
   },
   "dictionaryCppTypes": {
@@ -347,7 +351,8 @@
     "PointerEventInit": "PointerEvent::Init",
     "StaticRangeInit": "StaticRange::Init",
     "Keyframe": "Ranvier::Keyframe",
-    "KeyframeProperty": "Ranvier::KeyframeProperty"
+    "KeyframeProperty": "Ranvier::KeyframeProperty",
+    "FontFaceDescriptors": "FontFace::Descriptors"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -770,6 +775,8 @@
     "Highlight",
     "HighlightRegistry",
     "FileReader",
+    "FontFace",
+    "FontFaceSet",
     "WebAnimation",
     "AnimationEffect",
     "KeyframeEffect",
@@ -1133,6 +1140,9 @@
     },
     "URLSearchParams": {
       "feature": "dom-url-search-params-entries"
+    },
+    "FontFaceSet": {
+      "feature": "dom-font-face-set-values"
     }
   },
   "windowBindings": {
@@ -1178,7 +1188,8 @@
     }
   },
   "byteSpanTypes": [
-    "BufferSource"
+    "BufferSource",
+    "BinaryData"
   ],
   "typedArrayViewTypes": [
     "ArrayBufferView"
@@ -1225,14 +1236,17 @@
     "DataTransferItem": "DataTransferItemList.item"
   },
   "contextSettingsObjects": [
-    "FileReader"
+    "FileReader",
+    "FontFace",
+    "FontFaceSet"
   ],
   "eventTargetObjects": {
     "FileReader": {},
     "VisualViewport": {
       "attached": "impl->frame()"
     },
-    "WebAnimation": {}
+    "WebAnimation": {},
+    "FontFaceSet": {}
   },
   "resultDictionaries": [
     "URLPatternResult",

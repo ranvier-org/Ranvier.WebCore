@@ -1505,6 +1505,23 @@ RV_EXPORT int32_t rv_fonts_watch(RvHost*, RvFontsEventCallback callback, void* c
  * and a watch already removed are ignored. */
 RV_EXPORT void rv_fonts_unwatch(RvFontsWatch*);
 
+/* FontFace promises ("font-face-load"), without JavaScript. RvFontFace is the generated handle of FontFace
+ * (RanvierWebCoreDom.h): rv_dom_font_face_create builds one from a URL source or bytes, and FontFaceSet.values and
+ * Document.fonts reach the document's faces. */
+typedef struct RvFontFace RvFontFace;
+/* FontFace.load(): starts the face's load and writes an operation token. SUCCEEDED once the face is loaded;
+ * DECODE_FAILED when the engine rejects the face with SyntaxError: an invalid descriptor or source string, or bytes the
+ * engine cannot use as a font, empty bytes included; LOAD_FAILED when it rejects with NetworkError, a URL source that
+ * fails to fetch or decode. A settled face keeps its outcome and is not loaded again. width and height are 0. The
+ * completion is called only from rv_run_loop_cycle, also for a face settled at the call, except that
+ * rv_resource_cancel and rv_resource_release deliver CANCELLED before they return. Release and invalidation follow
+ * rv_image_decode. Returns RV_ERR_WRONG_HOST for a face of another host's document, and RV_ERR_DETACHED for one whose
+ * document a later rv_host_load_html or rv_host_load_svg replaced. */
+RV_EXPORT int32_t rv_font_face_load(RvHost*, RvFontFace* face, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* FontFace.loaded: as rv_font_face_load, without starting a load. An unloaded face settles once a load starts
+ * elsewhere: rv_font_face_load, rv_fonts_load, or layout of text in a face of the document's font set. */
+RV_EXPORT int32_t rv_font_face_loaded(RvHost*, RvFontFace* face, RvResourceCompletion completion, void* context, uint64_t* operation);
+
 /* Event construction and standalone targets ("event-construction", v32). */
 typedef struct RvEventTarget RvEventTarget;
 

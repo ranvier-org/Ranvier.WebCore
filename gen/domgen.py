@@ -508,6 +508,13 @@ class World:
         return found
 
     def map(self, t: idl.Type, nested=False) -> Mapped:
+        if t.name in self.config.get('byteSpanTypes', []) and t.name in self.typedefs:
+            # A byte-span typedef, such as BinaryData, maps to bytes before its union resolves.
+            if t.nullable or self.typedefs[t.name].nullable:
+                raise Unsupported(f'nullable byte span {t.name}')
+            if not nested:
+                raise Unsupported(f'byte span {t.name} outside a union or sequence input')
+            return Mapped('bytes', False, 'RvDomByteSpan', label=t.name)
         t = self.resolve(t)
         if t.name == "undefined":
             return Mapped("void")
@@ -930,18 +937,26 @@ class Generator(ComplexGeneratorMixin):
         if name not in self.world.scope:
             raise SystemExit(f'{name}: iterable snapshot requires a scoped interface')
         members = [member for member in self.world.members(name) if member.kind == 'iterable']
-        if len(members) != 1 or members[0].type.subtypes[0].name != 'pair':
-            raise SystemExit(f'{name}: iterable snapshot requires one key/value iterable')
-        if self.world.config.get('objectContexts', {}).get(name) != 'Document':
+        if len(members) != 1:
+            raise SystemExit(f'{name}: iterable snapshot requires one iterable')
+        # A key/value iterable snapshots its entries; a value iterable of object handles, such as FontFaceSet's,
+        # its values.
+        paired = members[0].type.subtypes[0].name == 'pair'
+        if self.world.config.get('objectContexts', {}).get(name) != 'Document' and name not in self.world.config.get('contextSettingsObjects', []):
             raise SystemExit(f'{name}: iterable snapshot requires a checked Document context')
         member = members[0]
         mapped = self.world.map(member.type)
         entry_type = self.transport_cpp(mapped.subtypes[0])
-        function = Function(name, member, 'iterator_snapshot', f'{snake(name)}_entries', [],
-                            f'{name}.entries: owned snapshot of the engine key/value iterable')
+        if not paired and mapped.subtypes[0].kind not in ('node', 'object'):
+            raise SystemExit(f'{name}: a value iterable snapshot requires object handle values')
+        operation = 'entries' if paired else 'values'
+        description = 'key/value' if paired else 'value'
+        function = Function(name, member, 'iterator_snapshot', f'{snake(name)}_{operation}', [],
+                            f'{name}.{operation}: owned snapshot of the engine {description} iterable')
         function.feature = binding['feature']
+        append = 'WTF::move(*entry)' if paired else 'entry.releaseNonNull()'
         call = (f'([&]() {{ Vector<{entry_type}> entries; auto iterator = impl->createIterator(&{{call_with_bare}}); '
-                'while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })()')
+                f'while (auto entry = iterator.next()) entries.append({append}); return entries; }})()')
         self.finish(function, name, member, [], [], mapped, call, ['document'])
         self.namespace_features.append((function.feature, []))
 
@@ -2096,7 +2111,13 @@ class Generator(ComplexGeneratorMixin):
             body += self.setting_check(interface, chain, setting, bool(call_with and "Node" not in chain and context_receiver))
             notes.append(f"RV_ERR_UNSUPPORTED while the setting {setting} is off")
         if call_with:
-            if "Node" not in chain:
+            if "Node" not in chain and not context_receiver and interface in self.world.config.get("contextSettingsObjects", []):
+                # An ActiveDOMObject's script execution context is a Document on the host.
+                self.headers |= {"ContextDestructionObserverInlines.h", "Document.h"}
+                body += ['RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());',
+                         'if (!contextDocument)', '    return RV_ERR_DETACHED;',
+                         'Ref document = contextDocument.releaseNonNull();']
+            elif "Node" not in chain:
                 if not context_receiver:
                     raise Unsupported("[CallWith] on an interface other than a node")
                 body += ['RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));',
