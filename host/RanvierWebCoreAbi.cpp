@@ -1449,7 +1449,7 @@ RvHost* rv_host_create(int32_t width, int32_t height)
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = host;
     static PlatformDisplayID nextDisplayID = 0x52560000;
     host->displayID = ++nextDisplayID;
-    host->page->windowScreenDidChange(host->displayID, std::nullopt);
+    ranvier_page_set_display(reinterpret_cast<RvNode*>(&host->document()), host->displayID);
     host->noScript.emplace(host->document().vm());
 #if RANVIER_COMPOSITING
     applyCompositingMode(*host, RV_COMPOSITING_WHEN_NEEDED);

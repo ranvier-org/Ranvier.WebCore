@@ -142,7 +142,7 @@ def after_destroy(native, screen, report):
     n.bind('rv_node_retain', P, [P])(document)
     case.close()
     status = n.call('rv_dom_screen_get_width', [P, ctypes.POINTER(I)], document, ctypes.byref(I()))
-    n.expect(status in (OK, UNSUPPORTED), f'Screen.width after destroy {status}')
+    n.expect(status == OK, f'Screen.width after destroy {status}')
     n.bind('rv_node_release', None, [P])(document)
     report['afterDestroy'] = status
 
