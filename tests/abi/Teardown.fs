@@ -1019,6 +1019,44 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 if rv_diagnostic_live_count () <> live then
                     failwith "cascade snapshot leaked"
+        | "scroll timeline" ->
+            // A ScrollTimeline whose source is the div, and an idle animation on it, must not keep the document or the
+            // div alive; past host destroy the timeline reads no source and no current time.
+            let cell = Runtime.InteropServices.Marshal.AllocHGlobal IntPtr.Size
+            Runtime.InteropServices.Marshal.WriteIntPtr(cell, div)
+            let mutable options = RvDomScrollTimelineOptions()
+            options.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomScrollTimelineOptions>())
+            options.source <- cell
+            options.axis <- RV_DOM_SCROLL_AXIS_INLINE
+
+            rv_dom_scroll_timeline_create (document, [| options |], &held.contents)
+            |> check "ScrollTimeline"
+
+            Runtime.InteropServices.Marshal.FreeHGlobal cell
+            let mutable animation = 0n
+
+            rv_dom_web_animation_create (document, 0n, held.Value, 1, &animation)
+            |> check "Animation on a ScrollTimeline"
+
+            fun () ->
+                let mutable time = RvDomUnionDoubleOrCSSNumericValueNullable()
+
+                rv_dom_animation_timeline_get_current_time (held.Value, &time)
+                |> check "ScrollTimeline.currentTime after destroy"
+
+                if time.present <> 0 then
+                    failwith "ScrollTimeline.currentTime resolved after host destroy"
+
+                let mutable axis = -1
+
+                rv_dom_scroll_timeline_get_axis (held.Value, &axis)
+                |> check "ScrollTimeline.axis after destroy"
+
+                if axis <> RV_DOM_SCROLL_AXIS_INLINE then
+                    failwith "ScrollTimeline.axis changed after host destroy"
+
+                rv_event_target_release animation
+                rv_dom_animation_timeline_release held.Value
         | "document timeline" ->
             // A DocumentTimeline and an idle animation on it must not keep the document alive; past host destroy the
             // timeline's current time reads as null.
@@ -1374,6 +1412,7 @@ let run (outDir: string) =
                     "coordinate spaces"
                     "web animation"
                     "document timeline"
+                    "scroll timeline"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

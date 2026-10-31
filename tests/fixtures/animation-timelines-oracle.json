@@ -82,5 +82,330 @@
    "timeline": null,
    "own": null
   }
+ },
+ "a07": {
+  "axes": [
+   "block",
+   "inline",
+   "x",
+   "y"
+  ],
+  "source": true,
+  "nestedSource": "n",
+  "defaultSource": true,
+  "nullSource": null,
+  "visibleSource": "vis",
+  "duration": {
+   "value": 100,
+   "unit": "percent"
+  },
+  "nullDuration": {
+   "value": 100,
+   "unit": "percent"
+  },
+  "interfaceName": "ScrollTimeline",
+  "animationTimeline": true,
+  "points": [
+   {
+    "top": 0,
+    "left": 0,
+    "nested": 0,
+    "root": 0,
+    "times": {
+     "block": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "inline": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "x": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "y": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "def": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "nullSource": null,
+     "visible": null,
+     "nested": {
+      "value": 0,
+      "unit": "percent"
+     }
+    },
+    "a": {
+     "currentTime": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "startTime": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "playState": "running",
+     "opacity": "0"
+    },
+    "b": {
+     "currentTime": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "playState": "running",
+     "opacity": "0"
+    }
+   },
+   {
+    "top": 150,
+    "left": 100,
+    "nested": 80,
+    "root": 190,
+    "times": {
+     "block": {
+      "value": 50,
+      "unit": "percent"
+     },
+     "inline": {
+      "value": 50,
+      "unit": "percent"
+     },
+     "x": {
+      "value": 50,
+      "unit": "percent"
+     },
+     "y": {
+      "value": 50,
+      "unit": "percent"
+     },
+     "def": {
+      "value": 18.269230769230766,
+      "unit": "percent"
+     },
+     "nullSource": null,
+     "visible": null,
+     "nested": {
+      "value": 50,
+      "unit": "percent"
+     }
+    },
+    "a": {
+     "currentTime": {
+      "value": 50,
+      "unit": "percent"
+     },
+     "startTime": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "playState": "running",
+     "opacity": "0.5"
+    },
+    "b": {
+     "currentTime": {
+      "value": 50,
+      "unit": "percent"
+     },
+     "playState": "running",
+     "opacity": "0.5"
+    }
+   },
+   {
+    "top": 300,
+    "left": 200,
+    "nested": 160,
+    "root": 380,
+    "times": {
+     "block": {
+      "value": 100,
+      "unit": "percent"
+     },
+     "inline": {
+      "value": 100,
+      "unit": "percent"
+     },
+     "x": {
+      "value": 100,
+      "unit": "percent"
+     },
+     "y": {
+      "value": 100,
+      "unit": "percent"
+     },
+     "def": {
+      "value": 36.53846153846153,
+      "unit": "percent"
+     },
+     "nullSource": null,
+     "visible": null,
+     "nested": {
+      "value": 100,
+      "unit": "percent"
+     }
+    },
+    "a": {
+     "currentTime": {
+      "value": 100,
+      "unit": "percent"
+     },
+     "startTime": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "playState": "finished",
+     "opacity": "1"
+    },
+    "b": {
+     "currentTime": {
+      "value": 100,
+      "unit": "percent"
+     },
+     "playState": "finished",
+     "opacity": "1"
+    }
+   },
+   {
+    "top": 75,
+    "left": 50,
+    "nested": 40,
+    "root": 95,
+    "times": {
+     "block": {
+      "value": 25,
+      "unit": "percent"
+     },
+     "inline": {
+      "value": 25,
+      "unit": "percent"
+     },
+     "x": {
+      "value": 25,
+      "unit": "percent"
+     },
+     "y": {
+      "value": 25,
+      "unit": "percent"
+     },
+     "def": {
+      "value": 9.134615384615383,
+      "unit": "percent"
+     },
+     "nullSource": null,
+     "visible": null,
+     "nested": {
+      "value": 25,
+      "unit": "percent"
+     }
+    },
+    "a": {
+     "currentTime": {
+      "value": 25,
+      "unit": "percent"
+     },
+     "startTime": {
+      "value": 0,
+      "unit": "percent"
+     },
+     "playState": "running",
+     "opacity": "0.25"
+    },
+    "b": {
+     "currentTime": {
+      "value": 25,
+      "unit": "percent"
+     },
+     "playState": "running",
+     "opacity": "0.25"
+    }
+   }
+  ],
+  "resized": {
+   "scrollTop": 75,
+   "times": {
+    "block": {
+     "value": 50,
+     "unit": "percent"
+    },
+    "inline": {
+     "value": 25,
+     "unit": "percent"
+    },
+    "x": {
+     "value": 25,
+     "unit": "percent"
+    },
+    "y": {
+     "value": 50,
+     "unit": "percent"
+    },
+    "def": {
+     "value": 9.134615384615383,
+     "unit": "percent"
+    },
+    "nullSource": null,
+    "visible": null,
+    "nested": {
+     "value": 25,
+     "unit": "percent"
+    }
+   },
+   "a": {
+    "currentTime": {
+     "value": 50,
+     "unit": "percent"
+    },
+    "startTime": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "playState": "running",
+    "opacity": "0.5"
+   },
+   "b": {
+    "currentTime": {
+     "value": 25,
+     "unit": "percent"
+    },
+    "playState": "running",
+    "opacity": "0.25"
+   }
+  },
+  "removed": {
+   "times": {
+    "block": null,
+    "inline": null,
+    "x": null,
+    "y": null,
+    "def": {
+     "value": 10.106382978723405,
+     "unit": "percent"
+    },
+    "nullSource": null,
+    "visible": null,
+    "nested": null
+   },
+   "a": {
+    "currentTime": null,
+    "startTime": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "playState": "running",
+    "opacity": "1"
+   },
+   "b": {
+    "currentTime": null,
+    "playState": "running",
+    "opacity": "1"
+   }
+  },
+  "restyled": {
+   "a": "1",
+   "b": "1"
+  }
  }
 }

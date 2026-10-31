@@ -17,11 +17,15 @@ import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from form_collections import Native, P, I, U, OK, NULL_ARGUMENT, WRONG_THREAD, WRONG_INTERFACE, ABI  # noqa: E402
-from web_animations import (Arena, EffectOptions, KeyframeEffectOptions, Page, Time, TimelineOptions,  # noqa: E402
+from web_animations import (AnimationOptions, Arena, EffectOptions, KeyframeAnimationOptions, KeyframeEffectOptions, Page, Time,  # noqa: E402
+                            TimelineOptions,
                             arm_vm_entry_crash, PLAY_STATES)
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 CLOSE = 1e-6
+D = ctypes.c_double
+UNSUPPORTED = -9
+PROGRESS_CLOSE = 1e-4
 
 
 class Probe:
@@ -144,6 +148,180 @@ def a06(native, page, spec):
     return result, diagnostics
 
 
+class ScrollTimelineOptions(ctypes.Structure):
+    _fields_ = [('size', U), ('source', ctypes.POINTER(P)), ('axis', I)]
+
+
+AXES = ['block', 'inline', 'x', 'y']
+ABSENT = object()
+
+
+def computed_value(native, element, prop):
+    buffer, length = ctypes.create_string_buffer(512), I()
+    native.ok('rv_element_computed_style', [P, ctypes.c_char_p, P, I, ctypes.POINTER(I)], element, prop.encode(), buffer, 512, ctypes.byref(length))
+    return buffer.raw[:length.value].decode('utf-8')
+
+
+class ScrollProbe(Probe):
+    def unit(self, handle, fn='rv_dom_animation_timeline_get_current_time'):
+        """A timeline or animation time: a number, a CSSNumericValue as value and unit, or None."""
+        value = Time()
+        self.n.ok(fn, [P, ctypes.POINTER(Time)], handle, ctypes.byref(value))
+        if not value.present:
+            return None
+        if value.tag == 1:
+            return {'number': value.arm0}
+        self.n.expect(value.tag == 2 and bool(value.arm1), fn + ': a CSSNumericValue arm')
+        number = D()
+        self.n.ok('rv_dom_css_unit_value_get_value', [P, ctypes.POINTER(D)], value.arm1, ctypes.byref(number))
+        unit = self.n.text('rv_dom_css_unit_value_get_unit', [P], value.arm1)
+        self.n.bind('rv_dom_css_style_value_release', None, [P])(value.arm1)
+        return {'value': number.value, 'unit': unit}
+
+    def scroll_timeline(self, source=ABSENT, axis=None):
+        """source ABSENT leaves the options' pointer NULL (the scrolling element); None passes a pointer to NULL."""
+        options = ScrollTimelineOptions(ctypes.sizeof(ScrollTimelineOptions), None, AXES.index(axis or 'block'))
+        cell = P(source) if source is not ABSENT else None
+        if cell is not None:
+            options.source = ctypes.pointer(cell)
+        result = P()
+        self.n.ok('rv_dom_scroll_timeline_create', [P, ctypes.POINTER(ScrollTimelineOptions), ctypes.POINTER(P)], self.page.document,
+                  ctypes.byref(options), ctypes.byref(result))
+        return result.value
+
+    def source_id(self, timeline):
+        source = self.n.handle('rv_dom_scroll_timeline_get_source', [P], timeline)
+        if not source:
+            return None
+        name = self.n.text('rv_dom_element_get_id', [P], source)
+        self.n.bind('rv_node_release', None, [P])(source)
+        return name
+
+    def opacity(self, element):
+        return computed_value(self.n, element, 'opacity')
+
+    def scroll(self, element, top=None, left=None):
+        if top is not None:
+            self.n.ok('rv_dom_element_set_scroll_top', [P, I], element, top)
+        if left is not None:
+            self.n.ok('rv_dom_element_set_scroll_left', [P, I], element, left)
+
+    def settle(self):
+        for _ in range(2):
+            self.frame()
+
+
+def a07(native, spec):
+    """Scroll timelines over the oracle's scrollers; reads after two rendering updates, as the oracle after two frames."""
+    page = Page(native, spec['scrollMarkup'])
+    probe = ScrollProbe(native, page)
+    try:
+        s, n, vis, a, b, c = (page.element(name) for name in ('s', 'n', 'vis', 'a', 'b', 'c'))
+        scrolling = native.handle('rv_dom_document_get_scrolling_element', [P], page.document, nullable=False)
+        tl = {'block': probe.scroll_timeline(s), 'inline': probe.scroll_timeline(s, 'inline'), 'x': probe.scroll_timeline(s, 'x'),
+              'y': probe.scroll_timeline(s, 'y'), 'def': probe.scroll_timeline(), 'nullSource': probe.scroll_timeline(None),
+              'visible': probe.scroll_timeline(vis), 'nested': probe.scroll_timeline(n)}
+        arena, sa = Arena(), P()
+        native.ok('rv_dom_element_animate', [P, P, P, ctypes.POINTER(P)], a,
+                  arena.keyframes([{'props': {'opacity': '0'}}, {'props': {'opacity': '1'}}]),
+                  arena.options(AnimationOptions, KeyframeAnimationOptions, {'fill': 'both'}, tl['block']), ctypes.byref(sa))
+        sa = sa.value
+        effect = P()
+        native.ok('rv_dom_keyframe_effect_create_3', [P, P, P, P, ctypes.POINTER(P)], page.document, b,
+                  arena.keyframes([{'props': {'opacity': '0'}}, {'props': {'opacity': '1'}}]),
+                  arena.options(EffectOptions, KeyframeEffectOptions, {'fill': 'both'}), ctypes.byref(effect))
+        sb = probe.animation(b, tl['inline'], None, effect.value)
+        native.ok('rv_dom_web_animation_play', [P], sb)
+        page.guard('A07 creation')
+        sa_timeline = native.handle('rv_dom_web_animation_get_timeline', [P], sa, nullable=False)
+        def_source = native.handle('rv_dom_scroll_timeline_get_source', [P], tl['def'], nullable=False)
+        result = {'axes': [AXES[native.integer('rv_dom_scroll_timeline_get_axis', tl[k])] for k in AXES],
+                  'source': probe.source_id(tl['block']) == 's', 'nestedSource': probe.source_id(tl['nested']),
+                  'defaultSource': def_source == scrolling, 'nullSource': probe.source_id(tl['nullSource']),
+                  'visibleSource': probe.source_id(tl['visible']),
+                  'duration': probe.unit(tl['block'], 'rv_dom_animation_timeline_get_duration'),
+                  'nullDuration': probe.unit(tl['nullSource'], 'rv_dom_animation_timeline_get_duration'),
+                  'interfaceName': probe.interface_name(tl['block']), 'animationTimeline': sa_timeline == tl['block']}
+        for handle in (def_source, scrolling):
+            native.bind('rv_node_release', None, [P])(handle)
+        probe.release_timeline(sa_timeline)
+
+        def read():
+            return {'times': {k: probe.unit(v) for k, v in tl.items()},
+                    'a': {'currentTime': probe.unit(sa, 'rv_dom_web_animation_get_current_time'),
+                          'startTime': probe.unit(sa, 'rv_dom_web_animation_get_start_time'), 'playState': probe.state(sa),
+                          'opacity': probe.opacity(a)},
+                    'b': {'currentTime': probe.unit(sb, 'rv_dom_web_animation_get_current_time'), 'playState': probe.state(sb),
+                          'opacity': probe.opacity(b)}}
+
+        probe.settle()
+        result['points'] = []
+        for point in spec['a07']['points']:
+            probe.scroll(s, point['top'], point['left'])
+            probe.scroll(n, point['nested'])
+            native.ok('rv_host_scroll_to', [P, I, I], page.host, 0, point['root'])
+            probe.settle()
+            result['points'].append({**point, **read()})
+        name, value = b'style', ('height:' + spec['a07']['resizedHeight']).encode('utf-8')
+        native.ok('rv_dom_element_set_attribute', [P, ctypes.c_char_p, I, ctypes.c_char_p, I], c, name, len(name), value, len(value))
+        probe.settle()
+        result['resized'] = {'scrollTop': native.integer('rv_dom_element_get_scroll_top', s), **read()}
+        native.ok('rv_dom_element_remove', [P], s)
+        probe.settle()
+        result['removed'] = read()
+        # A style change on the targets: their styles recompute without the inactive animations.
+        for target in (a, b):
+            native.ok('rv_dom_element_set_attribute', [P, ctypes.c_char_p, I, ctypes.c_char_p, I], target, name, len(name), b'color:red', 9)
+        probe.settle()
+        result['restyled'] = {'a': probe.opacity(a), 'b': probe.opacity(b)}
+        page.guard('A07 reads')
+        for animation in (sa, sb):
+            native.ok('rv_dom_web_animation_cancel', [P], animation)
+            probe.release_target(animation)
+        for handle in tl.values():
+            probe.release_timeline(handle)
+    finally:
+        page.close()
+    return result
+
+
+def a07_contract(native, page):
+    """Null, receiver, interface, enumeration and thread errors of the ScrollTimeline functions, and the defaults."""
+    expect, probe = native.expect, ScrollProbe(native, page)
+    create = native.bind('rv_dom_scroll_timeline_create', I, [P, ctypes.POINTER(ScrollTimelineOptions), ctypes.POINTER(P)])
+    result, element = P(), page.element('a')
+    expect(create(None, None, ctypes.byref(result)) == NULL_ARGUMENT, 'ScrollTimeline NULL document')
+    expect(create(page.document, None, None) == NULL_ARGUMENT, 'ScrollTimeline NULL result')
+    expect(create(element, None, ctypes.byref(result)) == WRONG_INTERFACE, 'ScrollTimeline on an element receiver')
+    text = native.handle('rv_dom_document_create_text_node', [P, ctypes.c_char_p, I], page.document, b'x', 1, nullable=False)
+    cell = P(text)
+    options = ScrollTimelineOptions(ctypes.sizeof(ScrollTimelineOptions), ctypes.pointer(cell), 0)
+    expect(create(page.document, ctypes.byref(options), ctypes.byref(result)) == WRONG_INTERFACE, 'ScrollTimeline source of a text node')
+    native.bind('rv_node_release', None, [P])(text)
+    options = ScrollTimelineOptions(ctypes.sizeof(ScrollTimelineOptions), None, 9)
+    expect(create(page.document, ctypes.byref(options), ctypes.byref(result)) == UNSUPPORTED, 'ScrollTimeline axis out of range')
+    # A struct whose size stops before axis takes the IDL default block; NULL options take every default.
+    short = ScrollTimelineOptions(ScrollTimelineOptions.axis.offset, None, 3)
+    native.ok('rv_dom_scroll_timeline_create', [P, ctypes.POINTER(ScrollTimelineOptions), ctypes.POINTER(P)], page.document,
+              ctypes.byref(short), ctypes.byref(result))
+    expect(AXES[native.integer('rv_dom_scroll_timeline_get_axis', result.value)] == 'block', 'short options size: axis default block')
+    probe.release_timeline(result.value)
+    native.ok('rv_dom_scroll_timeline_create', [P, ctypes.POINTER(ScrollTimelineOptions), ctypes.POINTER(P)], page.document, None,
+              ctypes.byref(result))
+    expect(probe.interface_name(result.value) == 'ScrollTimeline', 'NULL options: a ScrollTimeline')
+    status = []
+    worker = threading.Thread(target=lambda: status.append(
+        native.call('rv_dom_scroll_timeline_get_axis', [P, ctypes.POINTER(I)], result.value, ctypes.byref(I()))))
+    worker.start(); worker.join()
+    expect(status == [WRONG_THREAD], 'ScrollTimeline.axis off the owning thread')
+    probe.release_timeline(result.value)
+    document_timeline = page.timeline()
+    expect(native.call('rv_dom_scroll_timeline_get_axis', [P, ctypes.POINTER(I)], document_timeline, ctypes.byref(I())) == WRONG_INTERFACE,
+           'ScrollTimeline.axis on a DocumentTimeline')
+    expect(native.call('rv_dom_scroll_timeline_get_source', [P, ctypes.POINTER(P)], document_timeline, ctypes.byref(P())) == WRONG_INTERFACE,
+           'ScrollTimeline.source on a DocumentTimeline')
+    probe.release_timeline(document_timeline)
+
 def a06_teardown(native, spec):
     """A second host's document timeline and a DocumentTimeline of its document, both held past rv_host_destroy."""
     page = Page(native, spec['markup'])
@@ -184,8 +362,8 @@ def contract_errors(native, page):
 
 
 def lock_free(native, page):
-    """With the VM-entry crash armed, the timeline constructor, currentTime, duration and an animation constructed on
-    a new timeline run unchanged; the effect is constructed before arming."""
+    """With the VM-entry crash armed, the DocumentTimeline and ScrollTimeline constructors, the timeline members and an
+    animation constructed on a new timeline run unchanged; the effect is constructed before arming."""
     probe = Probe(native, page)
     element = page.element('a')
     effect = probe.effect(element, 1000)
@@ -196,6 +374,15 @@ def lock_free(native, page):
     dt = page.timeline()
     native.expect(abs(probe.time(own) - (probe.time(dt) - 250)) < CLOSE, 'armed: origin offset')
     native.expect(probe.time(own, 'rv_dom_animation_timeline_get_duration') is None, 'armed: duration null')
+    # The ScrollTimeline constructor lays out the source's document; its members read the cached progress.
+    scroll = ScrollProbe(native, page)
+    scrolling = scroll.scroll_timeline()
+    native.expect(scroll.unit(scrolling, 'rv_dom_animation_timeline_get_duration') == {'value': 100.0, 'unit': 'percent'}, 'armed: scroll duration')
+    native.expect(scroll.unit(scrolling) is None, 'armed: the unscrollable root gives no current time')
+    native.expect(AXES[native.integer('rv_dom_scroll_timeline_get_axis', scrolling)] == 'block', 'armed: scroll axis')
+    source = native.handle('rv_dom_scroll_timeline_get_source', [P], scrolling, nullable=False)
+    native.bind('rv_node_release', None, [P])(source)
+    probe.release_timeline(scrolling)
     animation = probe.animation(element, own, 1000, effect)
     native.ok('rv_dom_web_animation_pause', [P], animation)
     native.ok('rv_dom_web_animation_set_current_time', [P, ctypes.POINTER(Time)], animation, ctypes.byref(Time(1, 1, 500.0, None)))
@@ -235,7 +422,11 @@ def compare(native, actual, wanted, failures, path='a06'):
             if actual != entry['webkit'] or wanted != entry['chromium']:
                 failures.append({'check': path + ' (qualified)', 'native': actual, 'chromium': wanted})
             return
-        if actual != wanted:
+        # A progress percentage is a ratio of two scroll offsets, which WebKit computes in single precision.
+        tolerance = PROGRESS_CLOSE if path.startswith(('a07', 'a08')) else CLOSE
+        close = (isinstance(actual, float) and isinstance(wanted, (int, float)) and not isinstance(wanted, bool)
+                 and abs(actual - wanted) < tolerance)
+        if actual != wanted and not close:
             failures.append({'check': path, 'native': actual, 'chromium': wanted})
 
 
@@ -245,7 +436,8 @@ def verify(directory, arm=True):
     native = Native(directory)
     native.expect(native.bind('rv_abi_version', I, [])() == ABI, 'ABI version ' + str(ABI))
     has = native.bind('rv_abi_has', I, [ctypes.c_char_p])
-    for capability in [b'dom:AnimationTimeline', b'dom:DocumentTimeline', b'dom-constructor:DocumentTimeline']:
+    for capability in [b'dom:AnimationTimeline', b'dom:DocumentTimeline', b'dom-constructor:DocumentTimeline', b'dom:ScrollTimeline',
+                       b'dom-constructor:ScrollTimeline']:
         native.expect(has(capability) == 1, 'rv_abi_has ' + capability.decode())
     page = Page(native, spec['markup'])
     page.directory = directory
@@ -255,6 +447,7 @@ def verify(directory, arm=True):
         native.expect(title != 'script ran', 'the page script did not run')
         actual['a06'], actual['diagnostics'] = a06(native, page, spec)
         contract_errors(native, page)
+        a07_contract(native, page)
         page.guard('contract errors')
         armed = arm and lock_free(native, page)
         if armed:
@@ -268,7 +461,9 @@ def verify(directory, arm=True):
             arm_vm_entry_crash(directory, False)
         page.close()
     actual['a06']['teardown'] = a06_teardown(native, spec)
-    compare(native, actual['a06'], oracle['a06'], failures)
+    actual['a07'] = a07(native, spec)
+    for group in ('a06', 'a07'):
+        compare(native, actual[group], oracle[group], failures, group)
     return native, actual, failures, oracle['browser'], armed
 
 

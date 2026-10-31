@@ -1,5 +1,6 @@
 // Chromium oracle for tests/abi/animation_timelines.py: writes tests/fixtures/animation-timelines-oracle.json.
 // A06: document timeline time origins, inactive timelines, start-time synchronization, teardown and the frame-rate gates.
+// A07: scroll timeline axes, sources and progress at scroll positions, animations on them, a resize and a removed source.
 import {createRequire} from 'node:module';
 import {readFileSync, writeFileSync} from 'node:fs';
 const {chromium} = createRequire('C:/wk/ranvier-views/tests/NativeApi.Conformance/package.json')('playwright');
@@ -7,10 +8,63 @@ const {chromium} = createRequire('C:/wk/ranvier-views/tests/NativeApi.Conformanc
 const spec = JSON.parse(readFileSync(new URL('../fixtures/animation-timelines-cases.json', import.meta.url), 'utf8'));
 const frames = (tab) => tab.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
+// A07: scroll timelines over #s (300 px of block and 200 px of inline scroll), the nested #n, the root scroller, an
+// unscrollable #vis, a null source and the default source; animations on two of them; a resize; the source removed.
+async function a07(tab) {
+  await tab.setContent(spec.scrollMarkup);
+  await tab.evaluate(() => {
+    window.unit = (v) => v === null ? null : typeof v === 'number' ? {number: v} : {value: v.value, unit: v.unit};
+    const s = document.getElementById('s');
+    window.tl = {block: new ScrollTimeline({source: s}), inline: new ScrollTimeline({source: s, axis: 'inline'}),
+      x: new ScrollTimeline({source: s, axis: 'x'}), y: new ScrollTimeline({source: s, axis: 'y'}), def: new ScrollTimeline(),
+      nullSource: new ScrollTimeline({source: null}), visible: new ScrollTimeline({source: document.getElementById('vis')}),
+      nested: new ScrollTimeline({source: document.getElementById('n')})};
+    window.sa = document.getElementById('a').animate([{opacity: 0}, {opacity: 1}], {timeline: tl.block, fill: 'both'});
+    window.sb = new Animation(new KeyframeEffect(document.getElementById('b'), [{opacity: 0}, {opacity: 1}], {fill: 'both'}), tl.inline);
+    sb.play();
+  });
+  const frames = () => tab.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  await frames();
+  const read = () => tab.evaluate(() => {
+    const times = Object.fromEntries(Object.entries(tl).map(([k, v]) => [k, unit(v.currentTime)]));
+    const opacity = (id) => getComputedStyle(document.getElementById(id)).opacity;
+    return {times, a: {currentTime: unit(sa.currentTime), startTime: unit(sa.startTime), playState: sa.playState, opacity: opacity('a')},
+      b: {currentTime: unit(sb.currentTime), playState: sb.playState, opacity: opacity('b')}};
+  });
+  const result = await tab.evaluate(() => {
+    const s = document.getElementById('s');
+    return {axes: ['block', 'inline', 'x', 'y'].map((k) => tl[k].axis), source: tl.block.source === s, nestedSource: tl.nested.source.id,
+      defaultSource: tl.def.source === document.scrollingElement, nullSource: tl.nullSource.source, visibleSource: tl.visible.source.id,
+      duration: unit(tl.block.duration), nullDuration: unit(tl.nullSource.duration), interfaceName: tl.block.constructor.name,
+      animationTimeline: sa.timeline === tl.block};
+  });
+  result.points = [];
+  for (const point of spec.a07.points) {
+    await tab.evaluate((p) => {
+      const s = document.getElementById('s');
+      s.scrollTop = p.top; s.scrollLeft = p.left; document.getElementById('n').scrollTop = p.nested; window.scrollTo(0, p.root);
+    }, point);
+    await frames();
+    result.points.push({...point, ...await read()});
+  }
+  await tab.evaluate((height) => { document.getElementById('c').style.height = height; }, spec.a07.resizedHeight);
+  await frames();
+  result.resized = {scrollTop: await tab.evaluate(() => document.getElementById('s').scrollTop), ...await read()};
+  await tab.evaluate(() => document.getElementById('s').remove());
+  await frames();
+  result.removed = await read();
+  await tab.evaluate(() => { for (const id of ['a', 'b']) document.getElementById(id).setAttribute('style', 'color:red'); });
+  await frames();
+  result.restyled = await tab.evaluate(() => ({a: getComputedStyle(document.getElementById('a')).opacity,
+    b: getComputedStyle(document.getElementById('b')).opacity}));
+  return result;
+}
+
 const browser = await chromium.launch({headless: true});
 const out = {browser: 'Chromium ' + browser.version()};
 try {
-  const tab = await (await browser.newContext({viewport: {width: 320, height: 240}, deviceScaleFactor: 1})).newPage();
+  const context = await browser.newContext({viewport: {width: 320, height: 240}, deviceScaleFactor: 1});
+  const tab = await context.newPage();
   await tab.setContent(spec.markup);
   const a06 = await tab.evaluate((spec) => {
     const dt = document.timeline;
@@ -59,6 +113,7 @@ try {
     return {before, timeline: tl.currentTime, own: own.currentTime};
   });
   out.a06 = a06;
+  out.a07 = await a07(await context.newPage());
 } finally {
   await browser.close();
 }

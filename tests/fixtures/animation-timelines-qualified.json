@@ -10,6 +10,16 @@
    "reason": "Follows from the start time above: the animation on the later-origin timeline reads a current time smaller by originTime.",
    "webkit": false,
    "chromium": true
+  },
+  "a07.removed.a.opacity": {
+   "reason": "Once the source leaves the tree the timeline is inactive and the animation current time reads null in both engines; the pinned WebKit keeps the last effect value until the target style is next invalidated (a07.restyled matches Chromium), Chromium drops it at once.",
+   "webkit": "0.5",
+   "chromium": "1"
+  },
+  "a07.removed.b.opacity": {
+   "reason": "Once the source leaves the tree the timeline is inactive and the animation current time reads null in both engines; the pinned WebKit keeps the last effect value until the target style is next invalidated (a07.restyled matches Chromium), Chromium drops it at once.",
+   "webkit": "0.25",
+   "chromium": "1"
   }
  }
 }
