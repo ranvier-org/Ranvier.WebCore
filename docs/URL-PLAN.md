@@ -58,8 +58,7 @@ dictionary results (docs/GENERATOR.md, "Dictionary results").
 - WPT `15b31607`: the engine passes urltestdata 896/896, setters 278/278 and urlpattern 369/369; Chromium
   passes 787, 238 and 369. All 150 disagreements are listed with both outcomes in
   `tests/fixtures/url-wpt-qualified.json`; no case fails on both engines.
-- `URLSearchParams.getAll` results and the `sequence<sequence<USVString>>` init arm use NUL-terminated strings,
-  so a value containing U+0000 is cut at it there; `get`, the entries snapshot and the record and string init
-  arms carry it.
+- Every URL, URLSearchParams and URLPattern string is length-delimited, so U+0000 survives every member
+  (URLSearchParams is in `sequenceStringSpans`).
 - The JavaScript overload `new URLPattern(input, options, baseURL)` throws a TypeError in binding conversion;
   the C ABI has no such call.
