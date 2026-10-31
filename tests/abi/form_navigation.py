@@ -24,7 +24,7 @@ CASES = [
 def run(directory):
     directory = Path(directory).resolve()
     search = os.add_dll_directory(str(directory)) if sys.platform == 'win32' else None
-    library = ctypes.CDLL(str(directory / 'RanvierWebCoreHost.dll'))
+    library = ctypes.CDLL(str(directory / {'win32': 'RanvierWebCoreHost.dll', 'darwin': 'libRanvierWebCoreHost.dylib'}.get(sys.platform, 'libRanvierWebCoreHost.so')))
 
     def bind(name, result, arguments):
         function = getattr(library, name)

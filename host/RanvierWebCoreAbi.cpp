@@ -169,6 +169,9 @@
 #if PLATFORM(COCOA)
 #include <WebCore/AttributedString.h>
 #endif
+#if PLATFORM(MAC)
+#include <WebCore/DeprecatedGlobalSettings.h>
+#endif
 #include <cmath>
 #include <mutex>
 #include <pal/SessionID.h>
@@ -1663,6 +1666,10 @@ RvHost* rv_host_create(int32_t width, int32_t height)
         JSC::initialize();
         WTF::initializeMainThread();
         setPlatformStrategies(new RvPlatformStrategies);
+#if PLATFORM(MAC)
+        // Overlay scrollbars take no layout width, as on the Adwaita ports and in Chromium.
+        DeprecatedGlobalSettings::setUsesOverlayScrollbars(true);
+#endif
 #if PLATFORM(GTK) || PLATFORM(WPE)
         if (!PlatformDisplay::sharedDisplayIfExists())
             PlatformDisplay::setSharedDisplay(PlatformDisplaySurfaceless::create());
