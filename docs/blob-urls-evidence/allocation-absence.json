@@ -1,10 +1,10 @@
 {
-  "checkedAtUtc": "2026-10-31T12:27:02.751519+00:00",
+  "checkedAtUtc": "2026-10-31T12:41:31.664262+00:00",
   "purpose": "#144 blob URLs Native44/ABI52 (preview.44), DOM alpha.47, Views 0.1.37, WebCore backend alpha.37 reservation",
   "abi": 52,
-  "nativeHead": "ac1bcbdbdf43286034a8fa7f358cabc36c68ee6d",
-  "stackedOn": "stacked on I11 5eee88a and H08 acf26e3; #142 pending",
-  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1322:int32_t rv_abi_version(void) { return 50; }",
+  "nativeHead": "34b573a523fffbc629f8f56a70de0da8e6c05124",
+  "stackedOn": "stacked on I11 5eee88a, H08 acf26e3 and #142 3e6639d",
+  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1322:int32_t rv_abi_version(void) { return 52; }",
   "packages": [
     {
       "package": "Ranvier.WebCore",
@@ -276,6 +276,12 @@
       "repository": "ranvier-org/Ranvier.View",
       "matchingTags": [],
       "openPullRequests": [
+        {
+          "headRefName": "codex/release-views018",
+          "number": 37,
+          "title": "chore: release 0.1.8",
+          "url": "https://github.com/ranvier-org/Ranvier.View/pull/37"
+        },
         {
           "headRefName": "codex/native-api-custom-events",
           "number": 33,
