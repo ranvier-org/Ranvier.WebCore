@@ -6080,10 +6080,8 @@ module BrowserUnionAdapters =
     let private unboxDOMStringOrCanvasGradientOrCanvasPattern (value: obj) : DOMStringOrCanvasGradientOrCanvasPattern =
         match value with
         | :? string as arm -> DOMStringOrCanvasGradientOrCanvasPattern.DOMString arm
-        | arm when isCanvasGradient arm ->
-            DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient (unbox<CanvasGradient> arm)
-        | arm when isCanvasPattern arm ->
-            DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern (unbox<CanvasPattern> arm)
+        | arm when isCanvasGradient arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasGradient (unbox<CanvasGradient> arm)
+        | arm when isCanvasPattern arm -> DOMStringOrCanvasGradientOrCanvasPattern.CanvasPattern (unbox<CanvasPattern> arm)
         | _ -> failwith "Unexpected DOM union result"
 
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =

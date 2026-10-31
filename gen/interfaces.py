@@ -370,7 +370,7 @@ class InterfaceEmitter:
                     else:
                         head = f'        | arm when is{resolved.name} arm ->'
                         value = f'{name}.{label(child)} (unbox<{ftype}> arm)'
-                        lines += [head, f'            {value}'] if name not in self.world.config.get('validatedReferenceUnions', []) and len(head + ' ' + value) > 120 else [head + ' ' + value]
+                        lines += [head, f'            {value}'] if name not in self.world.config.get('validatedReferenceUnions', []) and len(head + ' ' + value) > 150 else [head + ' ' + value]
                 lines += ['        | _ -> failwith "Unexpected DOM union result"']
         for owner in dict.fromkeys(owner for owner, _ in self.adapters):
             lines += ['', f'    type {owner} with']
