@@ -248,7 +248,10 @@ module Calls =
            "rv_host_capability_value_kind"
            "rv_host_capability_value_number"
            "rv_host_capability_value_text"
-           "rv_host_select_svg_view" |]
+           "rv_host_select_svg_view"
+           "rv_image_decode"
+           "rv_resource_cancel"
+           "rv_resource_release" |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
     let Ticks: int64 array = Array.zeroCreate Names.Length
@@ -953,6 +956,15 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_select_svg_view(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string fragment, int& selected)
+
+    [<DllImport(Lib)>]
+    extern int rv_image_decode(nativeint host, nativeint image, nativeint completion, nativeint context, uint64& operation)
+
+    [<DllImport(Lib)>]
+    extern int rv_resource_cancel(uint64 operation)
+
+    [<DllImport(Lib)>]
+    extern int rv_resource_release(uint64 operation)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -3297,6 +3309,42 @@ let rv_host_select_svg_view (host: nativeint, fragment: string, selected: byref<
         result
     else
         Raw.rv_host_select_svg_view (host, fragment, &selected)
+
+let rv_image_decode (host: nativeint, image: nativeint, completion: nativeint, context: nativeint, operation: byref<uint64>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_image_decode (host, image, completion, context, &operation)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[189] <- Calls.Counts[189] + 1L
+        Calls.Ticks[189] <- Calls.Ticks[189] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_image_decode (host, image, completion, context, &operation)
+
+let rv_resource_cancel (operation: uint64) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_resource_cancel (operation)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[190] <- Calls.Counts[190] + 1L
+        Calls.Ticks[190] <- Calls.Ticks[190] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_resource_cancel (operation)
+
+let rv_resource_release (operation: uint64) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_resource_release (operation)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[191] <- Calls.Counts[191] + 1L
+        Calls.Ticks[191] <- Calls.Ticks[191] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_resource_release (operation)
 
 // END GENERATED
 

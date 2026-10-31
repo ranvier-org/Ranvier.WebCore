@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 29.
+ * Ranvier native WebCore C ABI, version 30.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -1201,14 +1201,15 @@ enum {
 typedef void (*RvResourceCompletion)(void* context, int32_t outcome, int32_t width, int32_t height);
 
 /* Observes an existing <img> or SVG <image> in the host's current document without changing or refetching it, and
- * writes an operation token. SUCCEEDED follows the decoder's completion for a bitmap; an SVG image has no separate
- * decode stage and succeeds once loading finishes. A change of src/srcset/sizes/href/crossorigin/referrerpolicy, a
- * different CachedImage or a new document ends the operation with INVALIDATED.
+ * writes an operation token. The element's ImageLoader settles the operation where it settles HTMLImageElement.decode():
+ * SUCCEEDED after the decoder completes for a bitmap, or once loading finishes for an SVG image, which has no separate
+ * decode stage; INVALIDATED for a source change or an inactive document; CANCELLED for a cancelled load; LOAD_FAILED
+ * for a missing source, a load error or an access-control error; DECODE_FAILED for an invalid bitmap.
  * The completion is never called before rv_image_decode returns; a terminal reached during the call is delivered on
  * a later rv_run_loop_cycle, or by rv_resource_cancel/rv_resource_release, whichever is first. Other engine
  * terminals are delivered from the engine callback that produces them. Returns RV_ERR_UNSUPPORTED for another
  * element type or a target outside the host's document. */
-RV_EXPORT int32_t rv_image_decode(RvHost*, RvNode* image, RvResourceCompletion, void* context, uint64_t* operation);
+RV_EXPORT int32_t rv_image_decode(RvHost*, RvNode* image, RvResourceCompletion completion, void* context, uint64_t* operation);
 /* Delivers CANCELLED to an in-flight operation, or a pending terminal already reached, before returning. */
 RV_EXPORT int32_t rv_resource_cancel(uint64_t operation);
 /* Ends the operation as rv_resource_cancel does, then unregisters it; the completion and its context are not used

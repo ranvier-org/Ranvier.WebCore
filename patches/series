@@ -30,3 +30,4 @@
 0028-svg-convolve-structural-cache.patch
 0029-svg-feimage-aspect-cache.patch
 0030-svg-symbol-view-box-instances.patch
+0031-image-loader-native-decode.patch
