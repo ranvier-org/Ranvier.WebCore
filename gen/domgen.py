@@ -239,7 +239,8 @@ class World:
         self.dictionary_exclusions = set()
         # True while the members of an interface in sequenceStringSpans are mapped: their string sequences are named Utf8.
         self.span_sequences = False
-        for path in sorted(self.webcore.rglob("*.idl")):
+        # Case-folded path parts order the files the same on every platform; partial interfaces merge in this order.
+        for path in sorted(self.webcore.rglob("*.idl"), key=lambda path: [part.casefold() for part in path.relative_to(self.webcore).parts]):
             relative = path.relative_to(self.webcore).as_posix()
             if relative.startswith("bindings/scripts/test/"):
                 continue
