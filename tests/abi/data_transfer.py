@@ -601,7 +601,7 @@ def run(directory, evidence):
     compare(n, results, spec, oracle, qualified)
     if evidence:
         Path(evidence).write_text(json.dumps({'results': results, 'assertions': n.assertions}, indent=1), encoding='utf-8')
-    print(f'DATA_TRANSFER_PROBE=PASS assertions={n.assertions}')
+    print(f'DATA_TRANSFER_PROBE=PASS {n.assertions} assertions')
 
 
 def at(value, path):

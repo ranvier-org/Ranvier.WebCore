@@ -5153,6 +5153,7 @@ and [<AllowNullLiteral>] DataTransfer =
 and [<AllowNullLiteral>] DataTransferItemList =
     /// <summary>DataTransferItemList.length.</summary>
     abstract member length: int with get
+
     /// <summary>DataTransferItemList.item.</summary>
 #if FABLE_COMPILER
     [<Fable.Core.Emit("($0[$1] ?? null)")>]

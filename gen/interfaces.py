@@ -237,7 +237,7 @@ class InterfaceEmitter:
         if indexed:
             if member.special != 'getter' or needs_adapter or len(member.arguments) != 1:
                 raise SystemExit(f'{owner}.{member.name}: browserIndexedGetters requires a one-argument named getter')
-            lines += ['#if FABLE_COMPILER', '    [<Fable.Core.Emit("($0[$1] ?? null)")>]', '#endif']
+            lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', '    [<Fable.Core.Emit("($0[$1] ?? null)")>]', '#endif']
         matrix_adapter = f'{owner}.{member.name}'
         if matrix_adapter in self.generator.svg_matrix_bindings:
             expression = ("((v,d)=>{const n=globalThis.DOMMatrix.fromMatrix(d??{});"
