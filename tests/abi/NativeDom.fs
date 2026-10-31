@@ -756,6 +756,18 @@ let RV_DOM_PLAYBACK_DIRECTION_ALTERNATE = 2
 let RV_DOM_PLAYBACK_DIRECTION_ALTERNATE_REVERSE = 3
 
 [<Literal>]
+let RV_DOM_SCROLL_AXIS_BLOCK = 0
+
+[<Literal>]
+let RV_DOM_SCROLL_AXIS_INLINE = 1
+
+[<Literal>]
+let RV_DOM_SCROLL_AXIS_X = 2
+
+[<Literal>]
+let RV_DOM_SCROLL_AXIS_Y = 3
+
+[<Literal>]
 let RV_DOM_SCROLL_BEHAVIOR_AUTO = 0
 
 [<Literal>]
@@ -1245,6 +1257,13 @@ type RvDomKeyframeEffectOptions =
 type RvDomDocumentTimelineOptions =
     val mutable size: uint32
     val mutable origin_time: float
+
+/// <summary>The IDL dictionary ScrollTimelineOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomScrollTimelineOptions =
+    val mutable size: uint32
+    val mutable source: nativeint
+    val mutable axis: int
 
 /// <summary>The IDL dictionary DOMCSSCustomPropertyDescriptor; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -10610,6 +10629,15 @@ extern int rv_dom_animation_timeline_get_duration(nativeint target, RvDomUnionDo
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_timeline_create(nativeint target, [<In>] RvDomDocumentTimelineOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_scroll_timeline_create(nativeint target, [<In>] RvDomScrollTimelineOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_scroll_timeline_get_source(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_scroll_timeline_get_axis(nativeint target, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)

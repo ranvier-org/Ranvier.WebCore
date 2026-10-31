@@ -277,6 +277,10 @@
     "WebAnimation": {
       "receiver": "Document",
       "factory": "[](Document& document, AnimationEffect* effect, std::optional<RefPtr<AnimationTimeline>>&& timeline) -> Ref<WebAnimation> { return timeline ? WebAnimation::create(document, effect, timeline->get()) : WebAnimation::create(document, effect); }"
+    },
+    "ScrollTimeline": {
+      "receiver": "Document",
+      "factory": "ScrollTimeline::create"
     }
   },
   "dictionaryCppTypes": {
@@ -718,7 +722,8 @@
     "AnimationEffect",
     "KeyframeEffect",
     "AnimationTimeline",
-    "DocumentTimeline"
+    "DocumentTimeline",
+    "ScrollTimeline"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1232,7 +1237,8 @@
     "WebAnimation.constructor.timeline"
   ],
   "optionalObjectMembers": [
-    "KeyframeAnimationOptions.timeline"
+    "KeyframeAnimationOptions.timeline",
+    "ScrollTimelineOptions.source"
   ],
   "setterExpressions": {
     "WebAnimation.startTime": "[&](auto&& time) { return impl->setBindingsStartTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }({value})",

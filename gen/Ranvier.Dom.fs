@@ -5246,6 +5246,14 @@ and [<AllowNullLiteral>] AnimationTimeline =
 and [<AllowNullLiteral>] DocumentTimeline =
     inherit AnimationTimeline
 
+/// <summary>ScrollTimeline in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ScrollTimeline =
+    inherit AnimationTimeline
+    /// <summary>ScrollTimeline.source.</summary>
+    abstract member source: Element with get
+    /// <summary>ScrollTimeline.axis.</summary>
+    abstract member axis: ScrollAxis with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -5954,6 +5962,13 @@ and [<DomStringEnum; RequireQualifiedAccess>] PlaybackDirection =
     | [<CompiledName("reverse")>] Reverse
     | [<CompiledName("alternate")>] Alternate
     | [<CompiledName("alternate-reverse")>] AlternateReverse
+
+/// <summary>ScrollAxis in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] ScrollAxis =
+    | [<CompiledName("block")>] Block
+    | [<CompiledName("inline")>] Inline
+    | [<CompiledName("x")>] X
+    | [<CompiledName("y")>] Y
 
 /// <summary>AnimationPlayState in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] AnimationPlayState =

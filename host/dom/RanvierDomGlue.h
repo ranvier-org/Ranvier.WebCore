@@ -2902,6 +2902,9 @@ WEBCORE_EXPORT int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffe
 WEBCORE_EXPORT int32_t ranvier_dom_animation_timeline_get_current_time(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
 WEBCORE_EXPORT int32_t ranvier_dom_animation_timeline_get_duration(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
 WEBCORE_EXPORT int32_t ranvier_dom_document_timeline_create(RvNode* target, const RvDomDocumentTimelineOptions* options, RvAnimationTimeline** result);
+WEBCORE_EXPORT int32_t ranvier_dom_scroll_timeline_create(RvNode* target, const RvDomScrollTimelineOptions* options, RvAnimationTimeline** result);
+WEBCORE_EXPORT int32_t ranvier_dom_scroll_timeline_get_source(RvAnimationTimeline* target, RvNode** result);
+WEBCORE_EXPORT int32_t ranvier_dom_scroll_timeline_get_axis(RvAnimationTimeline* target, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
 WEBCORE_EXPORT int32_t ranvier_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result);

@@ -477,10 +477,12 @@
       "feature": "dom-type-query:AnimationTimeline",
       "interfaces": [
         "DocumentTimeline",
+        "ScrollTimeline",
         "AnimationTimeline"
       ],
       "names": [
         "DocumentTimeline",
+        "ScrollTimeline",
         "AnimationTimeline"
       ],
       "extras": [],
@@ -1647,6 +1649,10 @@
     },
     {
       "name": "DocumentTimeline",
+      "base": "AnimationTimeline"
+    },
+    {
+      "name": "ScrollTimeline",
       "base": "AnimationTimeline"
     }
   ],
@@ -4285,6 +4291,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "animation/DocumentTimeline.idl"
+    },
+    {
+      "name": "ScrollTimeline",
+      "idlName": "ScrollTimeline",
+      "base": "AnimationTimeline",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/ScrollTimeline.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -149679,6 +149694,146 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "ScrollTimeline",
+      "member": "constructor",
+      "contractOwner": "ScrollTimeline",
+      "kind": "constructor",
+      "function": "rv_dom_scroll_timeline_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomScrollTimelineOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvAnimationTimeline**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "options",
+          "idlType": "ScrollTimelineOptions",
+          "idl": {
+            "name": "ScrollTimelineOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ScrollTimelineOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ScrollTimeline",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "ScrollTimeline",
+        "root": "AnimationTimeline",
+        "class": "ScrollTimeline",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:ScrollTimeline",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ScrollTimeline",
+      "member": "source",
+      "contractOwner": "ScrollTimeline",
+      "kind": "getter",
+      "function": "rv_dom_scroll_timeline_get_source",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Element",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Element",
+        "root": null,
+        "class": "Element",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ScrollTimeline",
+      "member": "axis",
+      "contractOwner": "ScrollTimeline",
+      "kind": "getter",
+      "function": "rv_dom_scroll_timeline_get_axis",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "ScrollAxis",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "ScrollAxis",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -153642,6 +153797,16 @@
       ],
       {},
       "animation/WebAnimation.idl"
+    ],
+    "ScrollAxis": [
+      [
+        "block",
+        "inline",
+        "x",
+        "y"
+      ],
+      {},
+      "animation/ScrollAxis.idl"
     ],
     "OrientationType": [
       [
@@ -160905,6 +161070,46 @@
           "root": null,
           "class": null,
           "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "ScrollTimelineOptions": [
+      {
+        "name": "source",
+        "field": "source",
+        "ctype": "RvNode* const*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "node",
+          "ctype": null,
+          "interface": "Element",
+          "root": null,
+          "class": "Element",
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "axis",
+        "field": "axis",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"block\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "ScrollAxis",
           "label": null,
           "nullable": false,
           "atom": false,

@@ -2882,6 +2882,9 @@ int32_t rv_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvNode* 
 int32_t rv_dom_animation_timeline_get_current_time(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result) { return ranvier_dom_animation_timeline_get_current_time(target, result); }
 int32_t rv_dom_animation_timeline_get_duration(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result) { return ranvier_dom_animation_timeline_get_duration(target, result); }
 int32_t rv_dom_document_timeline_create(RvNode* target, const RvDomDocumentTimelineOptions* options, RvAnimationTimeline** result) { return ranvier_dom_document_timeline_create(target, options, result); }
+int32_t rv_dom_scroll_timeline_create(RvNode* target, const RvDomScrollTimelineOptions* options, RvAnimationTimeline** result) { return ranvier_dom_scroll_timeline_create(target, options, result); }
+int32_t rv_dom_scroll_timeline_get_source(RvAnimationTimeline* target, RvNode** result) { return ranvier_dom_scroll_timeline_get_source(target, result); }
+int32_t rv_dom_scroll_timeline_get_axis(RvAnimationTimeline* target, int32_t* result) { return ranvier_dom_scroll_timeline_get_axis(target, result); }
 int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result) { return ranvier_dom_css_supports_2(target, property, property_length, value, value_length, result); }
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result) { return ranvier_dom_css_get_highlights(target, result); }

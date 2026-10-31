@@ -464,6 +464,14 @@ enum {
     RV_DOM_PLAYBACK_DIRECTION_ALTERNATE_REVERSE = 3, /* "alternate-reverse" */
 };
 
+/* The values of the IDL enumeration ScrollAxis. */
+enum {
+    RV_DOM_SCROLL_AXIS_BLOCK = 0, /* "block" */
+    RV_DOM_SCROLL_AXIS_INLINE = 1, /* "inline" */
+    RV_DOM_SCROLL_AXIS_X = 2, /* "x" */
+    RV_DOM_SCROLL_AXIS_Y = 3, /* "y" */
+};
+
 /* The values of the IDL enumeration ScrollBehavior. */
 enum {
     RV_DOM_SCROLL_BEHAVIOR_AUTO = 0, /* "auto" */
@@ -996,6 +1004,14 @@ typedef struct RvDomDocumentTimelineOptions {
     uint32_t size;
     double origin_time; /* DOMHighResTimeStamp, default 0 */
 } RvDomDocumentTimelineOptions;
+
+/* The IDL dictionary ScrollTimelineOptions. size is sizeof(RvDomScrollTimelineOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomScrollTimelineOptions {
+    uint32_t size;
+    RvNode* const* source; /* Element?, NULL for absent, a pointer to NULL for null */
+    int32_t axis; /* ScrollAxis, default "block", RV_DOM_SCROLL_AXIS_* */
+} RvDomScrollTimelineOptions;
 
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -8551,6 +8567,15 @@ RV_EXPORT int32_t rv_dom_animation_timeline_get_duration(RvAnimationTimeline* ta
 /* DocumentTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL;
  * options may be NULL for the IDL default; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_timeline_create(RvNode* target, const RvDomDocumentTimelineOptions* options, RvAnimationTimeline** result);
+/* ScrollTimeline */
+
+/* ScrollTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL;
+ * options may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_scroll_timeline_create(RvNode* target, const RvDomScrollTimelineOptions* options, RvAnimationTimeline** result);
+/* ScrollTimeline.source getter: readonly attribute Element? source; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_scroll_timeline_get_source(RvAnimationTimeline* target, RvNode** result);
+/* ScrollTimeline.axis getter: readonly attribute ScrollAxis axis */
+RV_EXPORT int32_t rv_dom_scroll_timeline_get_axis(RvAnimationTimeline* target, int32_t* result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

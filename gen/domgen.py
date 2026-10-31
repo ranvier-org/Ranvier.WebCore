@@ -495,9 +495,9 @@ class World:
                 raise SystemExit(f"{name}.{member.name}: dictionary object members must be required nonnullable object handles")
             optional_object = f"{name}.{member.name}" in self.config.get("optionalObjectMembers", [])
             if optional_object:
-                # Rv<Root>* const*: NULL for absent, a pointer to NULL for null, else the handle.
-                if mapped.kind != "object" or member.required or member.default is not None or not mapped.nullable:
-                    raise SystemExit(f"{name}.{member.name}: optional object members must be optional nullable object handles without a default")
+                # Rv<Root>* const* (or RvNode* const*): NULL for absent, a pointer to NULL for null, else the handle.
+                if mapped.kind not in ("object", "node") or member.required or member.default is not None or not mapped.nullable:
+                    raise SystemExit(f"{name}.{member.name}: optional object members must be optional nullable object or node handles without a default")
                 mapped.optional_handle = True
                 configured_object = True
             if (mapped.kind in ("object", "event") and not configured_object) or mapped.interface == "EventTarget":
@@ -1471,6 +1471,16 @@ class Generator(ComplexGeneratorMixin):
         covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
         ctype = self.field_ctype(member, mapped, dictionary)
         lines = []
+        if getattr(mapped, "optional_handle", False) and mapped.kind == "node":
+            self.headers.add(f"{mapped.cls}.h")
+            lines += [f"if ({covered} && {pointer}->{field}) {{", f"    RefPtr<{mapped.cls}> value;", f"    if (*{pointer}->{field}) {{"]
+            if mapped.cls == "Node":
+                lines.append(f"        value = nodeOf(*{pointer}->{field});")
+            else:
+                lines += [f"        value = dynamicDowncast<{mapped.cls}>(*nodeOf(*{pointer}->{field}));", "        if (!value)",
+                          "            return RV_ERR_WRONG_INTERFACE;"]
+            lines += ["    }", f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
         if getattr(mapped, "optional_handle", False):
             self.headers.add(f"{mapped.cls}.h")
             root = self.world.cpp_class(mapped.root)

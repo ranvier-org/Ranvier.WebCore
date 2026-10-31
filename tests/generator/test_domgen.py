@@ -2424,6 +2424,39 @@ partial interface Element {
         with self.assertRaises(SystemExit):
             generator.run()
 
+    def test_optional_node_member_keeps_absent_and_null_distinct(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary TrackOptions { Element? source; Mode mode = "open"; };
+dictionary RequiredTrackOptions { required Element? source; };
+partial interface Element {
+    boolean track(optional TrackOptions options = {});
+    boolean trackRequired(RequiredTrackOptions options);
+};
+''')
+        config = dict(self.world.config)
+        config['exclude'] = list(config['exclude']) + ['Element.trackRequired']
+        config['optionalObjectMembers'] = ['TrackOptions.source']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertIn('RvNode* const* source; /* Element?, NULL for absent, a pointer to NULL for null */', generator.header())
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}['element_track']
+        # NULL leaves the C++ optional disengaged; a pointer to NULL engages it with null; a node of another interface fails.
+        self.assertIn('options->source) {', body)
+        self.assertIn('if (*options->source) {', body)
+        self.assertIn('value = dynamicDowncast<Element>(*nodeOf(*options->source));', body)
+        self.assertIn('return RV_ERR_WRONG_INTERFACE;', body)
+        self.assertIn('a0.source = std::move(value);', body)
+        config['exclude'] = [name for name in config['exclude'] if name != 'Element.trackRequired']
+        config['optionalObjectMembers'] = ['TrackOptions.source', 'RequiredTrackOptions.source']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
     def test_configured_svg_mathml_shared_style_and_focus_members(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
