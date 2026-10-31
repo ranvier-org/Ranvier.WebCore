@@ -1,0 +1,13 @@
+diff --git a/Source/WebCore/svg/animation/SVGSMILElement.cpp b/Source/WebCore/svg/animation/SVGSMILElement.cpp
+index 231e03b1b8..cb72f21049 100644
+--- a/Source/WebCore/svg/animation/SVGSMILElement.cpp
++++ b/Source/WebCore/svg/animation/SVGSMILElement.cpp
+@@ -886,7 +886,7 @@ void SVGSMILElement::resolveInterval(bool first, SMILTime& beginResult, SMILTime
+         if (!m_endTimes.isEmpty()) {
+             if ((first && tempBegin == tempEnd && tempEnd == lastIntervalTempEnd) || (!first && tempEnd == m_intervalEnd))
+                 tempEnd = findInstanceTime(End, tempBegin, false);
+-            if (tempEnd.isUnresolved() && !m_hasEndEventConditions)
++            if (tempEnd.isUnresolved() && !m_hasEndEventConditions && hasAttributeWithoutSynchronization(SVGNames::endAttr))
+                 break;
+         }
+         tempEnd = resolveActiveEnd(tempBegin, tempEnd);

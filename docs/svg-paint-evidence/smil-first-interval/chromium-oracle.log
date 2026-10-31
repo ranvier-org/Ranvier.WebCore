@@ -1,0 +1,4 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+PAUSED-SEEK a endAttr=false width@8=20 start=7
+PAUSED-SEEK b endAttr=true width@8=20 start=7
+RUNNING c frozen=13.553549766540527 after-new-begin=15.166120529174805 restarted=false
