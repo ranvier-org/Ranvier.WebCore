@@ -526,7 +526,20 @@ class InterfaceEmitter:
             declarations.append((name, '[<AllowNullLiteral>]', body or ['    interface end']))
         for name, children in self.unions.items():
             declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | {label(child)} of {self.type(child)}' for child in children]))
-        for name, fields in self.dictionaries.items():
+        # A dictionary class follows the base it inherits: Fable defines the classes in declaration order.
+        ordered = []
+
+        def visit(name):
+            if name in ordered:
+                return
+            base = self.world.dictionaries[name].base
+            if name in self.world.contract_dictionary_fields and base in self.dictionaries:
+                visit(base)
+            ordered.append(name)
+        for name in self.dictionaries:
+            visit(name)
+        for name in ordered:
+            fields = self.dictionaries[name]
             body = []
             base = self.world.dictionaries[name].base
             inherited = set()

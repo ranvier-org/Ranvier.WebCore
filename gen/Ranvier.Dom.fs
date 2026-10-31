@@ -5741,17 +5741,6 @@ and [<AllowNullLiteral; DomDictionary>] AddEventListenerOptions() =
     member val passive: (bool) option = None with get, set
     member val once: bool = false with get, set
 
-/// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
-    inherit EffectTiming()
-    member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
-    member val composite: CompositeOperation = CompositeOperation.Replace with get, set
-    member val pseudoElement: string = null with get, set
-
-/// <summary>DocumentTimelineOptions in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral; DomDictionary>] DocumentTimelineOptions() =
-    member val originTime: float = 0 with get, set
-
 /// <summary>EffectTiming in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] EffectTiming() =
     member val delay: float = 0 with get, set
@@ -5765,6 +5754,17 @@ and [<AllowNullLiteral; DomDictionary>] EffectTiming() =
 
     member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
     member val easing: string = "linear" with get, set
+
+/// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
+    inherit EffectTiming()
+    member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
+    member val composite: CompositeOperation = CompositeOperation.Replace with get, set
+    member val pseudoElement: string = null with get, set
+
+/// <summary>DocumentTimelineOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] DocumentTimelineOptions() =
+    member val originTime: float = 0 with get, set
 
 /// <summary>GetRootNodeOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetRootNodeOptions() =
