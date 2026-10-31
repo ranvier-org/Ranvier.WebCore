@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 44.
+ * Ranvier native WebCore C ABI, version 46.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -1436,7 +1436,7 @@ RV_EXPORT int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, i
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
 
-/* "screen" for rv_abi_has: the app's display integration sets the screen a host's document reports through Screen,
+/* v46: "screen" for rv_abi_has: the app's display integration sets the screen a host's document reports through Screen,
  * ScreenOrientation and the device-width, device-height and color media features. Until the first call the screen is
  * the host's size in CSS pixels, all of it available, 24 bits deep, landscape-primary unless taller than wide; it
  * then follows rv_host_resize. orientation is an RV_SCREEN_* value; ScreenOrientation.angle follows from it on the

@@ -14,7 +14,7 @@ import sys
 import threading
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
-ABI = 44
+ABI = 46
 COMPONENTS = ['protocol', 'username', 'password', 'hostname', 'port', 'pathname', 'search', 'hash']
 FIELDS = ['href', 'origin', 'protocol', 'username', 'password', 'host', 'hostname', 'port', 'pathname', 'search', 'hash']
 
