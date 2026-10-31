@@ -1,0 +1,362 @@
+{
+  "browser": "156.0.8078.4",
+  "headless": "new (channel chromium)",
+  "fixture": "tests/fixtures/inspector-diagnostics.html",
+  "fontSha256": "63d2abd0041c3e3b4b52ad8d382353b53c51c6785e76ce56ed9dacad2d2e31c4",
+  "viewport": [
+    320,
+    240
+  ],
+  "elements": [
+    "target",
+    "flow",
+    "zoomed",
+    "action"
+  ],
+  "cases": [
+    {
+      "name": "base",
+      "pageScale": 1,
+      "scrollX": 0,
+      "scrollY": 0,
+      "visualScale": 1,
+      "boxes": {
+        "target": {
+          "content": {
+            "x": 31.296875,
+            "y": 24.6875,
+            "width": 50.5,
+            "height": 20.25
+          },
+          "padding": {
+            "x": 21.296875,
+            "y": 17.6875,
+            "width": 68.5,
+            "height": 36.25
+          },
+          "border": {
+            "x": 17.296875,
+            "y": 16.6875,
+            "width": 74.5,
+            "height": 40.25
+          },
+          "margin": {
+            "x": 11.296875,
+            "y": 13.6875,
+            "width": 84.5,
+            "height": 48.25
+          }
+        },
+        "flow": {
+          "content": {
+            "x": 7.25,
+            "y": 128.5,
+            "width": 200,
+            "height": 30
+          },
+          "padding": {
+            "x": 3.25,
+            "y": 124.5,
+            "width": 208,
+            "height": 38
+          },
+          "border": {
+            "x": 1.25,
+            "y": 122.5,
+            "width": 212,
+            "height": 42
+          },
+          "margin": {
+            "x": 0,
+            "y": 120,
+            "width": 213.25,
+            "height": 44.5
+          }
+        },
+        "zoomed": {
+          "content": {
+            "x": 608,
+            "y": 48,
+            "width": 80,
+            "height": 60
+          },
+          "padding": {
+            "x": 604,
+            "y": 44,
+            "width": 88,
+            "height": 68
+          },
+          "border": {
+            "x": 602,
+            "y": 42,
+            "width": 92,
+            "height": 72
+          },
+          "margin": {
+            "x": 600,
+            "y": 40,
+            "width": 96,
+            "height": 76
+          }
+        },
+        "action": {
+          "content": {
+            "x": 62.25,
+            "y": 132.5,
+            "width": 40,
+            "height": 16
+          },
+          "padding": {
+            "x": 59.25,
+            "y": 131.5,
+            "width": 46,
+            "height": 18
+          },
+          "border": {
+            "x": 57.25,
+            "y": 129.5,
+            "width": 50,
+            "height": 22
+          },
+          "margin": {
+            "x": 53.25,
+            "y": 129.5,
+            "width": 54,
+            "height": 22
+          }
+        }
+      }
+    },
+    {
+      "name": "scrolled",
+      "pageScale": 1,
+      "scrollX": 30,
+      "scrollY": 45,
+      "visualScale": 1,
+      "boxes": {
+        "target": {
+          "content": {
+            "x": 1.296875,
+            "y": -20.3125,
+            "width": 50.5,
+            "height": 20.25
+          },
+          "padding": {
+            "x": -8.703125,
+            "y": -27.3125,
+            "width": 68.5,
+            "height": 36.25
+          },
+          "border": {
+            "x": -12.703125,
+            "y": -28.3125,
+            "width": 74.5,
+            "height": 40.25
+          },
+          "margin": {
+            "x": -18.703125,
+            "y": -31.3125,
+            "width": 84.5,
+            "height": 48.25
+          }
+        },
+        "flow": {
+          "content": {
+            "x": -22.75,
+            "y": 83.5,
+            "width": 200,
+            "height": 30
+          },
+          "padding": {
+            "x": -26.75,
+            "y": 79.5,
+            "width": 208,
+            "height": 38
+          },
+          "border": {
+            "x": -28.75,
+            "y": 77.5,
+            "width": 212,
+            "height": 42
+          },
+          "margin": {
+            "x": -30,
+            "y": 75,
+            "width": 213.25,
+            "height": 44.5
+          }
+        },
+        "zoomed": {
+          "content": {
+            "x": 578,
+            "y": 3,
+            "width": 80,
+            "height": 60
+          },
+          "padding": {
+            "x": 574,
+            "y": -1,
+            "width": 88,
+            "height": 68
+          },
+          "border": {
+            "x": 572,
+            "y": -3,
+            "width": 92,
+            "height": 72
+          },
+          "margin": {
+            "x": 570,
+            "y": -5,
+            "width": 96,
+            "height": 76
+          }
+        },
+        "action": {
+          "content": {
+            "x": 32.25,
+            "y": 87.5,
+            "width": 40,
+            "height": 16
+          },
+          "padding": {
+            "x": 29.25,
+            "y": 86.5,
+            "width": 46,
+            "height": 18
+          },
+          "border": {
+            "x": 27.25,
+            "y": 84.5,
+            "width": 50,
+            "height": 22
+          },
+          "margin": {
+            "x": 23.25,
+            "y": 84.5,
+            "width": 54,
+            "height": 22
+          }
+        }
+      }
+    },
+    {
+      "name": "page scale 2",
+      "pageScale": 2,
+      "scrollX": 0,
+      "scrollY": 0,
+      "visualScale": 2,
+      "boxes": {
+        "target": {
+          "content": {
+            "x": 31.296875,
+            "y": 24.6875,
+            "width": 50.5,
+            "height": 20.25
+          },
+          "padding": {
+            "x": 21.296875,
+            "y": 17.6875,
+            "width": 68.5,
+            "height": 36.25
+          },
+          "border": {
+            "x": 17.296875,
+            "y": 16.6875,
+            "width": 74.5,
+            "height": 40.25
+          },
+          "margin": {
+            "x": 11.296875,
+            "y": 13.6875,
+            "width": 84.5,
+            "height": 48.25
+          }
+        },
+        "flow": {
+          "content": {
+            "x": 7.25,
+            "y": 128.5,
+            "width": 200,
+            "height": 30
+          },
+          "padding": {
+            "x": 3.25,
+            "y": 124.5,
+            "width": 208,
+            "height": 38
+          },
+          "border": {
+            "x": 1.25,
+            "y": 122.5,
+            "width": 212,
+            "height": 42
+          },
+          "margin": {
+            "x": 0,
+            "y": 120,
+            "width": 213.25,
+            "height": 44.5
+          }
+        },
+        "zoomed": {
+          "content": {
+            "x": 608,
+            "y": 48,
+            "width": 80,
+            "height": 60
+          },
+          "padding": {
+            "x": 604,
+            "y": 44,
+            "width": 88,
+            "height": 68
+          },
+          "border": {
+            "x": 602,
+            "y": 42,
+            "width": 92,
+            "height": 72
+          },
+          "margin": {
+            "x": 600,
+            "y": 40,
+            "width": 96,
+            "height": 76
+          }
+        },
+        "action": {
+          "content": {
+            "x": 62.25,
+            "y": 132.5,
+            "width": 40,
+            "height": 16
+          },
+          "padding": {
+            "x": 59.25,
+            "y": 131.5,
+            "width": 46,
+            "height": 18
+          },
+          "border": {
+            "x": 57.25,
+            "y": 129.5,
+            "width": 50,
+            "height": 22
+          },
+          "margin": {
+            "x": 53.25,
+            "y": 129.5,
+            "width": 54,
+            "height": 22
+          }
+        }
+      }
+    }
+  ],
+  "unsupported": {
+    "matchedRules": "no web API lists the style rules matching an element",
+    "renderTree": "no web API dumps the render tree",
+    "developerToolsFrontend": "a page cannot observe or attach a developer-tools frontend"
+  }
+}

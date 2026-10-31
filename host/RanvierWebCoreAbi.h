@@ -1505,6 +1505,125 @@ RV_EXPORT int32_t rv_host_set_screen(RvHost*, const RvScreenMetrics* metrics);
 /* v44: "dom-crypto-random" for rv_abi_has: rv_dom_crypto_get_random_values and rv_dom_crypto_random_uuid
  * (RanvierWebCoreDom.h) call the crypto object of a document's Window. */
 
+/* v50: "diagnostics" for rv_abi_has: native inspection of a host's document without a developer-tools frontend,
+ * an inspector protocol or script evaluation. Diagnostics are opt-in per host: until rv_host_set_diagnostics enables
+ * them, every rv_host_inspect_* call returns RV_ERR_UNSUPPORTED before reading the document. The platform facility
+ * "diagnostics" reports the opt-in as its enabled fact; "inspector-frontend" reports the developer-tools frontend,
+ * which no flavor implements.
+ *
+ * An RvDiagnostic is a snapshot: UTF-8 copies of what the engine reported, holding no engine object. It stays
+ * readable after its host disables diagnostics or is destroyed, and is freed only by rv_diagnostic_release. The
+ * rv_diagnostic_* functions run on any thread. */
+typedef struct RvDiagnostic RvDiagnostic;
+
+/* Enables (1) or disables (0) diagnostics for the host. Live snapshots are unaffected. */
+RV_EXPORT int32_t rv_host_set_diagnostics(RvHost*, int32_t enabled);
+
+/* Kinds of rv_diagnostic_kind. */
+enum {
+    RV_DIAGNOSTIC_RENDER_TREE = 1,
+    RV_DIAGNOSTIC_MATCHED_RULES = 2,
+};
+
+/* Flags of rv_host_inspect_render_tree. The layer flags apply to a document dump only. */
+enum {
+    /* Every RenderLayer, including those that paint nothing. */
+    RV_RENDER_TREE_ALL_LAYERS = 1 << 0,
+    /* Annotates the positive, negative and normal-flow layer lists. */
+    RV_RENDER_TREE_LAYER_NESTING = 1 << 1,
+    /* Adds each box's layout and visual overflow rectangles. */
+    RV_RENDER_TREE_OVERFLOW = 1 << 2,
+    /* Adds the extra geometry of SVG renderers. */
+    RV_RENDER_TREE_SVG_GEOMETRY = 1 << 3,
+    /* Adds each element's id and class attributes. */
+    RV_RENDER_TREE_ID_AND_CLASS = 1 << 4,
+    /* Adds the renderers' pending-layout bits. */
+    RV_RENDER_TREE_LAYOUT_STATE = 1 << 5,
+};
+
+/* Writes a new RV_DIAGNOSTIC_RENDER_TREE snapshot to *diagnostic, with style and layout updated first. With target
+ * NULL or the host's document, its text is the engine's render tree dump of the main frame: one line per renderer
+ * and per text run, nested by two-space indentation, with each RenderLayer as a "layer" line. With an element of
+ * the document, it is the element's renderer subtree, one line per renderer in the same format, with no layer or
+ * text-run lines. Positions and sizes are in CSS pixels of the renderer's containing coordinate space. Returns
+ * RV_ERR_UNSUPPORTED for an unknown flag, a layer flag with an element, an element with no renderer or outside the
+ * document, or diagnostics disabled, and leaves *diagnostic unchanged on every error. */
+RV_EXPORT int32_t rv_host_inspect_render_tree(RvHost*, RvNode* target, int32_t flags, RvDiagnostic** diagnostic);
+
+/* Writes a new RV_DIAGNOSTIC_MATCHED_RULES snapshot for an element of the host's document, with style updated
+ * first: one entry per style rule whose selector list matches the element, in the engine's cascade order (user-agent
+ * rules, then user rules, then author rules, each ordered by cascade layer, specificity and position; rules inside
+ * a non-matching @media are absent), then one RV_RULE_ORIGIN_INLINE entry for a non-empty style attribute. Returns
+ * RV_ERR_NOT_ELEMENT for another node, RV_ERR_UNSUPPORTED for an element outside the document or diagnostics
+ * disabled, and leaves *diagnostic unchanged on every error. */
+RV_EXPORT int32_t rv_host_inspect_matched_rules(RvHost*, RvNode* element, RvDiagnostic** diagnostic);
+
+/* Origins of RV_RULE_ORIGIN. */
+enum {
+    RV_RULE_ORIGIN_USER_AGENT = 0,
+    RV_RULE_ORIGIN_USER = 1,
+    RV_RULE_ORIGIN_AUTHOR = 2,
+    RV_RULE_ORIGIN_INLINE = 3,
+};
+
+/* Number fields of rv_diagnostic_entry_number. Specificity is the engine's (a, b, c) of the most specific selector
+ * in the rule's list that matches the element: :where() contributes (0, 0, 0) and :is() the most specific of its
+ * arguments. An inline entry has specificity (0, 0, 0) and no selectors. */
+enum {
+    RV_RULE_ORIGIN = 0,
+    RV_RULE_SPECIFICITY_A = 1,
+    RV_RULE_SPECIFICITY_B = 2,
+    RV_RULE_SPECIFICITY_C = 3,
+    /* Selectors in the rule's selector list. */
+    RV_RULE_SELECTOR_COUNT = 4,
+    /* Selectors of the list that match the element. */
+    RV_RULE_MATCHED_SELECTOR_COUNT = 5,
+};
+
+/* String fields of rv_diagnostic_entry_string, as the engine serialises them; an inline entry's selector fields
+ * are empty. */
+enum {
+    /* The rule's selector list. */
+    RV_RULE_SELECTOR_TEXT = 0,
+    /* The selector the specificity belongs to. */
+    RV_RULE_MATCHED_SELECTOR = 1,
+    /* The rule's declaration block, without braces. */
+    RV_RULE_DECLARATIONS = 2,
+};
+
+/* The snapshot's RV_DIAGNOSTIC_* kind, or RV_ERR_NULL_ARGUMENT. */
+RV_EXPORT int32_t rv_diagnostic_kind(RvDiagnostic* diagnostic);
+/* Copies a render-tree snapshot's text; a matched-rules snapshot's text is empty. */
+RV_EXPORT int32_t rv_diagnostic_text(RvDiagnostic* diagnostic, char* buffer, int32_t capacity, int32_t* length);
+/* The number of entries: 0 for a render-tree snapshot. */
+RV_EXPORT int32_t rv_diagnostic_count(RvDiagnostic* diagnostic);
+/* Copies a string field of entry index. Returns RV_ERR_UNSUPPORTED for an index or field out of range. */
+RV_EXPORT int32_t rv_diagnostic_entry_string(RvDiagnostic* diagnostic, int32_t index, int32_t field, char* buffer, int32_t capacity, int32_t* length);
+/* Writes a number field of entry index. Returns RV_ERR_UNSUPPORTED, leaving *value unchanged, for an index or field
+ * out of range. */
+RV_EXPORT int32_t rv_diagnostic_entry_number(RvDiagnostic* diagnostic, int32_t index, int32_t field, double* value);
+RV_EXPORT void rv_diagnostic_release(RvDiagnostic* diagnostic);
+/* The number of snapshots in the process not yet released. */
+RV_EXPORT int32_t rv_diagnostic_live_count(void);
+
+/* Rectangles of rv_host_inspect_box_model, each four doubles x, y, width, height. */
+enum {
+    RV_BOX_CONTENT = 0,
+    RV_BOX_PADDING = 4,
+    RV_BOX_BORDER = 8,
+    RV_BOX_MARGIN = 12,
+    RV_BOX_VALUES = 16,
+};
+
+/* Writes the element's content, padding, border and margin boxes as RV_BOX_VALUES doubles, with layout updated
+ * first. Each is the bounding rectangle of the box after transforms, in the coordinate space of rv_element_rect
+ * (Element.getBoundingClientRect): CSS pixels of the viewport after scrolling, with the element's zoom applied. The
+ * border box equals rv_element_rect. Without transforms the values are multiples of 1/64 px. Returns
+ * RV_ERR_NOT_ELEMENT for another node, RV_ERR_UNSUPPORTED for an element without a CSS box renderer (display: none
+ * or contents, an inline box, SVG content) or outside the document, or diagnostics disabled, and leaves values
+ * unchanged on every error. */
+RV_EXPORT int32_t rv_host_inspect_box_model(RvHost*, RvNode* element, double* values);
+
 /* v53: "coordinate-spaces" for rv_abi_has: points and box quads converted between named coordinate spaces of one
  * host's document, through every CSS transform, perspective included, and the current scroll, page scale and device
  * scale, with layout updated first and without running script. Spaces:
