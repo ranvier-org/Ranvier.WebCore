@@ -366,7 +366,9 @@ class InterfaceEmitter:
             lines += [f'    [<Fable.Core.Emit("{predicate}")>]',
                       f'    let private is{name} (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         for name, children in self.unions.items():
-            lines += ['', f'    let private box{name} (value: {name}) : obj =']
+            header = f'    let private box{name} (value: {name}) : obj ='
+            # Fantomas (max_line_length 150) breaks a longer binding head into one parameter per line.
+            lines += ['', header] if len(header) <= 150 else ['', f'    let private box{name}', f'        (value: {name})', '        : obj =']
             if name in reference_unions:
                 lines += ['        if isNull (box value) then', '            nullArg "value"', '']
             lines += ['        match value with']
@@ -384,7 +386,9 @@ class InterfaceEmitter:
                 else:
                     lines += [f'        | {name}.{label(child)} value -> {boxed}']
             if any(self.union(member.type) and label(self.world.resolve(member.type)) == name for _, member in self.adapters):
-                lines += ['', f'    let private unbox{name} (value: obj) : {name} =', '        match value with']
+                header = f'    let private unbox{name} (value: obj) : {name} ='
+                lines += (['', header] if len(header) <= 150
+                          else ['', f'    let private unbox{name}', '        (value: obj)', f'        : {name} =']) + ['        match value with']
                 for child in children:
                     resolved = self.world.resolve(child)
                     ftype = self.type(child)

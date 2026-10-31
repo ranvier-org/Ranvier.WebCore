@@ -6152,14 +6152,18 @@ module BrowserUnionAdapters =
         | BooleanOrScrollIntoViewOptions.Boolean value -> box value
         | BooleanOrScrollIntoViewOptions.ScrollIntoViewOptions value -> box value
 
-    let private boxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString (value: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString) : obj =
+    let private boxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString
+        (value: TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString)
+        : obj =
         match value with
         | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.TimelineRangeOffset value -> box value
         | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSNumericValue value -> box value
         | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.CSSOMKeywordValue value -> box value
         | TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.DOMString value -> box value
 
-    let private unboxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString (value: obj) : TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+    let private unboxTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString
+        (value: obj)
+        : TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
         match value with
         | arm when isTimelineRangeOffset arm ->
             TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString.TimelineRangeOffset (unbox<TimelineRangeOffset> arm)
