@@ -28,7 +28,7 @@ for repo in ['ranvier-org/Ranvier.WebCore', 'ranvier-org/Ranvier', 'ranvier-org/
     gh.append({'repository': repo, 'matchingTags': [t for t in tags if any(m in t for m in marks)], 'openPullRequests': prs})
 import glob
 local = {w: subprocess.run(['git','grep','-n','return 49;','--','host/RanvierWebCoreAbi.cpp'], cwd=w, capture_output=True, text=True).stdout.strip() for w in sorted(glob.glob('C:/wk/native-*')) if Path(w, 'host/RanvierWebCoreAbi.cpp').is_file()}
-STACKED = 'G03 final cdf1a4e (Native37/ABI45) merged as b7c8cf9; G04, I08, T03 pending'
+STACKED = '43a0074 (T03 828fb2b Native40/ABI48, I08 2a9cf7d Native39/ABI47, G04 15e1bc9 Native38/ABI46, G03 cdf1a4e Native37/ABI45; source patch 0039 64e0457)'
 abi = subprocess.run(['git','grep','-n','return 49;','--','host/RanvierWebCoreAbi.cpp'], cwd='C:/wk/native-elinternals', capture_output=True, text=True).stdout
 receipt = {'checkedAtUtc': datetime.datetime.now(datetime.UTC).isoformat(), 'purpose': 'I11 component accessibility Native41/ABI49, DOM alpha.44, Views 0.1.34, WebCore backend alpha.34 reservation (ABI46-48 belong to G04, I08, T03)', 'abi': 49, 'stackedOn': STACKED, 'abiNumberInUse': abi.strip(), 'localWorktreesReturning49': {k: v for k, v in local.items() if v}, 'packages': rows, 'github': gh}
 Path('C:/wk/native-elinternals/docs/element-internals-evidence/allocation-absence.json').write_text(json.dumps(receipt, indent=2))

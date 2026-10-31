@@ -1,11 +1,11 @@
 {
-  "checkedAtUtc": "2026-10-31T10:27:40.318205+00:00",
+  "checkedAtUtc": "2026-10-31T11:36:30.883472+00:00",
   "purpose": "I11 component accessibility Native41/ABI49, DOM alpha.44, Views 0.1.34, WebCore backend alpha.34 reservation (ABI46-48 belong to G04, I08, T03)",
   "abi": 49,
-  "stackedOn": "G03 final cdf1a4e (Native37/ABI45) merged as b7c8cf9; G04, I08, T03 pending",
-  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1266:int32_t rv_abi_version(void) { return 49; }",
+  "stackedOn": "43a0074 (T03 828fb2b Native40/ABI48, I08 2a9cf7d Native39/ABI47, G04 15e1bc9 Native38/ABI46, G03 cdf1a4e Native37/ABI45; source patch 0039 64e0457)",
+  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1314:int32_t rv_abi_version(void) { return 49; }",
   "localWorktreesReturning49": {
-    "C:/wk\\native-elinternals": "host/RanvierWebCoreAbi.cpp:1266:int32_t rv_abi_version(void) { return 49; }"
+    "C:/wk\\native-elinternals": "host/RanvierWebCoreAbi.cpp:1314:int32_t rv_abi_version(void) { return 49; }"
   },
   "packages": [
     {
@@ -223,12 +223,6 @@
           "number": 135,
           "title": "feat(mathml): expose typed MathML elements (Native23/ABI31)",
           "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/135"
-        },
-        {
-          "headRefName": "codex/native-api-resource-completion",
-          "number": 133,
-          "title": "feat(resources): add image decode and font readiness without JavaScript (Native22/ABI30)",
-          "url": "https://github.com/ranvier-org/Ranvier.WebCore/pull/133"
         }
       ]
     },
@@ -277,12 +271,6 @@
           "number": 270,
           "title": "feat(dom): add qualified locale preference services",
           "url": "https://github.com/ranvier-org/Ranvier/pull/270"
-        },
-        {
-          "headRefName": "codex/native-api-svg-values",
-          "number": 269,
-          "title": "feat(dom): add SVG geometry and live value contracts (cohort 19)",
-          "url": "https://github.com/ranvier-org/Ranvier/pull/269"
         }
       ]
     },
