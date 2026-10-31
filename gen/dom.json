@@ -1156,5 +1156,8 @@
     ],
     "CanvasGradient": [],
     "CanvasPattern": []
-  }
+  },
+  "unionSetterOverloads": [
+    "CanvasRenderingContext2D.fillStyle"
+  ]
 }

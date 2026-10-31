@@ -16,9 +16,12 @@ ABI = 55
 OK, NULL_ARGUMENT, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -9, -11
 NONE, TWO_D, BITMAP_RENDERER, WEBGL, WEBGL2, WEBGPU = range(6)
 WHITE = [255, 255, 255, 255]
-PAGE = ('<!doctype html><style>html,body{margin:0;background:#fff}canvas{display:block}</style>'
+# #c is sized by CSS; #d, #e and #f lie outside the viewport; #g holds fallback content and no size of its own.
+PAGE = ('<!doctype html><style>html,body{margin:0;background:#fff}canvas{display:block}.away{position:absolute;left:400px;top:0}'
+        '#g{position:absolute;left:0;top:60px}#gf{width:10px;height:10px;background:#00f}</style>'
         '<body id=b><canvas id=c width=40 height=20 style="width:40px;height:20px"></canvas>'
-        '<canvas id=d></canvas><canvas id=e width=10 height=10></canvas><canvas id=f width=10 height=10></canvas><div id=n></div>')
+        '<canvas id=d class=away></canvas><canvas id=e class=away width=10 height=10></canvas>'
+        '<canvas id=f class=away width=10 height=10></canvas><div id=n></div><canvas id=g><div id=gf></div></canvas>')
 
 
 class Settings(ctypes.Structure):
@@ -33,9 +36,19 @@ def settings(**fields):
     return value
 
 
+class Span(ctypes.Structure):
+    _fields_ = [('data', ctypes.POINTER(ctypes.c_uint8)), ('length', ctypes.c_int32)]
+
+
 class Style(ctypes.Structure):
-    _fields_ = [('present', ctypes.c_int32), ('tag', ctypes.c_int32), ('arm0', ctypes.c_char_p),
+    _fields_ = [('present', ctypes.c_int32), ('tag', ctypes.c_int32), ('arm0', Span),
                 ('arm1', ctypes.c_void_p), ('arm2', ctypes.c_void_p)]
+
+
+def span(text):
+    data = text.encode()
+    buffer = (ctypes.c_uint8 * max(len(data), 1)).from_buffer_copy(data or bytes(1))
+    return Span(ctypes.cast(buffer, ctypes.POINTER(ctypes.c_uint8)), len(data)), buffer
 
 
 def verify(directory, evidence_json=None):
@@ -82,12 +95,13 @@ def verify(directory, evidence_json=None):
             value = Style()
             expect(get_style(ctx, ctypes.byref(value)) == OK, 'fillStyle getter')
             expect(value.present == 1 and value.tag == 1, 'fillStyle is a string')
-            text = value.arm0.decode()
+            text = ctypes.string_at(value.arm0.data, value.arm0.length).decode()
             release_style(ctypes.byref(value))
             return text
 
         def set_fill(ctx, text):
-            value = Style(1, 1, text.encode(), None, None)
+            arm, keep = span(text)
+            value = Style(1, 1, arm, None, None)
             expect(set_style(ctx, ctypes.byref(value)) == OK, 'fillStyle setter ' + text)
 
         def read_attributes(ctx):
@@ -103,7 +117,26 @@ def verify(directory, evidence_json=None):
             expect(all(abs(a - b) <= tolerance for a, b in zip(actual, expected)), label + ': ' + str(actual))
 
         p.load(PAGE, standalone=False)
-        c, d, e, f, n, b = (p.node(name) for name in 'cdefnb')
+        c, d, e, f, n, b, g = (p.node(name) for name in 'cdefnbg')
+        element_rect = p.bind('rv_element_rect', I, [P] + [ctypes.POINTER(ctypes.c_double)] * 4)
+
+        def box(element):
+            values = [ctypes.c_double() for _ in range(4)]
+            expect(element_rect(element, *[ctypes.byref(v) for v in values]) == OK, 'element rect')
+            return [v.value for v in values]
+
+        def snapshot(element, x, y):
+            snap = p.bind('rv_element_snapshot', I, [P, P, I, ctypes.POINTER(I), ctypes.POINTER(I)])
+            w, h = I(), I()
+            expect(snap(element, None, 0, ctypes.byref(w), ctypes.byref(h)) == -6, 'snapshot size query')
+            rgba = (ctypes.c_uint8 * (w.value * h.value * 4))()
+            expect(snap(element, rgba, len(rgba), ctypes.byref(w), ctypes.byref(h)) == OK, 'element snapshot')
+            return [w.value, h.value], list(rgba[(y * w.value + x) * 4:(y * w.value + x) * 4 + 4])
+
+        # Without script and without a context, a canvas renders its fallback content (patch 0042 keeps this).
+        report['fallback'] = {'rect': box(g), 'pixel': pixels((5, 65))[0]}
+        expect(report['fallback'] == {'rect': [0.0, 60.0, 10.0, 10.0], 'pixel': [0, 0, 255, 255]},
+               'a canvas without a context renders its fallback content')
 
         # Defaults and the generated dimensions.
         report['defaults'] = [dimension(d, 'width'), dimension(d, 'height')]
@@ -182,6 +215,21 @@ def verify(directory, evidence_json=None):
         near(report['halfAlpha'][0], [127, 128, 0, 255], 'half-alpha green over red')
         near(report['halfAlpha'][1], [0, 128, 127, 255], 'half-alpha green over blue')
         expect(fill_rect(None, 0, 0, 1, 1) == NULL_ARGUMENT and clear_rect(None, 0, 0, 1, 1) == NULL_ARGUMENT, 'rect calls reject NULL')
+
+        snapped = snapshot(c, 30, 5)
+        expect(snapped == ([40, 20], [0, 0, 255, 255]), 'the element snapshot holds the bitmap: ' + str(snapped))
+
+        # A context switches a fallback-rendered canvas to its bitmap, laid out as a replaced element of 300x150.
+        late = context(g)
+        expect(bool(late), 'a context for a fallback-rendered canvas')
+        report['switched'] = {'rect': box(g), 'pixel': pixels((5, 65))[0]}
+        expect(report['switched'] == {'rect': [0.0, 60.0, 300.0, 150.0], 'pixel': WHITE},
+               'the canvas renders its transparent bitmap in place of the fallback')
+        set_fill(late, '#00ff00')
+        expect(fill_rect(late, 0, 0, 300, 150) == OK and pixels((5, 65), (150, 200)) == [[0, 255, 0, 255]] * 2, 'the switched canvas paints')
+        expect(snapshot(g, 150, 100) == ([300, 150], [0, 255, 0, 255]), 'the switched canvas snapshots its bitmap')
+        set_dimension(g, 'width', 300)
+        expect(pixels((5, 65))[0] == WHITE and box(g) == [0.0, 60.0, 300.0, 150.0], 'a later width assignment clears the switched canvas')
 
         # Reset: assigning a dimension clears the bitmap and the drawing state, and keeps the context.
         set_fill(ctx, '#123456')

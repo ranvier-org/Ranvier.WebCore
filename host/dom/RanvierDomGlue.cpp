@@ -42095,7 +42095,7 @@ int32_t ranvier_dom_canvas_rendering_context2_d_set_fill_style(RvCanvasRendering
     int32_t status0 = RV_OK;
     auto a0 = decodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value, status0);
     if (status0 != RV_OK) return status0;
-    return invoke([&]() -> decltype(auto) { return impl->setFillStyle(std::move(*a0)); });
+    return invoke([&]() -> decltype(auto) { return WTF::switchOn(std::move(*a0), [&](auto&& arm) { if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) impl->setFillStyle(std::move(arm)); else impl->setFillStyle(RefPtr { std::move(arm) }); }); });
 }
 
 // CanvasRenderingContext2D.clearRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h) -> undefined

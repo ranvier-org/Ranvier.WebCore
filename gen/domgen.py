@@ -1497,6 +1497,10 @@ class Generator(ComplexGeneratorMixin):
             if implemented_by:
                 self.headers.add(f"{implemented_by}.h")
                 return f"WebCore::{implemented_by}::{name}(*impl{{call_with}}, {value})"
+            if f"{interface}.{member.name}" in self.world.config.get("unionSetterOverloads", []):
+                # The C++ setter is overloaded per union arm, String&& or RefPtr<T>&&: call the overload of the held arm.
+                return (f"WTF::switchOn({value}, [&](auto&& arm) {{ if constexpr (std::is_same_v<std::remove_cvref_t<decltype(arm)>, String>) "
+                        f"impl->{name}(std::move(arm)); else impl->{name}(RefPtr {{ std::move(arm) }}); }})")
             return f"impl->{name}({{call_with_lead}}{value})"
         t = self.world.resolve(member.type).name
         if t == "boolean":

@@ -368,6 +368,8 @@ module Calls =
             "rv_node_convert_points"
             "rv_node_box_quad"
             "rv_host_inspect_cascade"
+            "rv_canvas_get_context"
+            "rv_canvas_context_2d_attributes"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1336,8 +1338,21 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_node_box_quad(nativeint node, int box, nativeint ``to``, int toSpace, double& quad)
+
     [<DllImport(Lib)>]
-    extern int rv_host_inspect_cascade(nativeint host, nativeint element, [<In>] byte[] property, int property_length, nativeint[] diagnostic)
+    extern int rv_host_inspect_cascade(
+        nativeint host,
+        nativeint element,
+        [<In>] byte[] property,
+        int property_length,
+        nativeint[] diagnostic
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_canvas_get_context(nativeint canvas, int ``type``, nativeint settings, nativeint& context)
+
+    [<DllImport(Lib)>]
+    extern int rv_canvas_context_2d_attributes(nativeint context, nativeint settings)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -4389,8 +4404,8 @@ let rv_node_convert_points
             Raw.rv_node_convert_points (from, fromSpace, ``to``, toSpace, &xy, count)
 
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[236] <- Calls.Counts[236] + 1L
-        Calls.Ticks[236] <- Calls.Ticks[236] + spent
+        Calls.Counts[244] <- Calls.Counts[244] + 1L
+        Calls.Ticks[244] <- Calls.Ticks[244] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -4401,17 +4416,22 @@ let rv_node_box_quad (node: nativeint, box: int, ``to``: nativeint, toSpace: int
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
         let result = Raw.rv_node_box_quad (node, box, ``to``, toSpace, &quad)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
-        Calls.Counts[237] <- Calls.Counts[237] + 1L
-        Calls.Ticks[237] <- Calls.Ticks[237] + spent
+        Calls.Counts[245] <- Calls.Counts[245] + 1L
+        Calls.Ticks[245] <- Calls.Ticks[245] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
         Raw.rv_node_box_quad (node, box, ``to``, toSpace, &quad)
 
-let rv_host_inspect_cascade (host: nativeint, element: nativeint, property: byte[], property_length: int, diagnostic: nativeint[]) : int =
+let rv_host_inspect_cascade
+    (host: nativeint, element: nativeint, property: byte[], property_length: int, diagnostic: nativeint[])
+    : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp()
-        let result = Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+
+        let result =
+            Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+
         let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
         Calls.Counts[246] <- Calls.Counts[246] + 1L
         Calls.Ticks[246] <- Calls.Ticks[246] + spent
@@ -4419,6 +4439,30 @@ let rv_host_inspect_cascade (host: nativeint, element: nativeint, property: byte
         result
     else
         Raw.rv_host_inspect_cascade (host, element, property, property_length, diagnostic)
+
+let rv_canvas_get_context (canvas: nativeint, ``type``: int, settings: nativeint, context: byref<nativeint>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_canvas_get_context (canvas, ``type``, settings, &context)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[247] <- Calls.Counts[247] + 1L
+        Calls.Ticks[247] <- Calls.Ticks[247] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_canvas_get_context (canvas, ``type``, settings, &context)
+
+let rv_canvas_context_2d_attributes (context: nativeint, settings: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_canvas_context_2d_attributes (context, settings)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[248] <- Calls.Counts[248] + 1L
+        Calls.Ticks[248] <- Calls.Ticks[248] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_canvas_context_2d_attributes (context, settings)
 
 // END GENERATED
 
