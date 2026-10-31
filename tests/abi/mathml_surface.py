@@ -182,20 +182,22 @@ def verify(native_directory):
         status = p.bind('rv_dom_math_ml_element_get_nonce', p.integer, [p.pointer, p.pointer, p.integer, ctypes.POINTER(ctypes.c_int32)])(n['focusable'], buffer, 1, ctypes.byref(length))
         p.expect(status == -6 and length.value == 7 and buffer.raw == b'#', 'undersized nonce buffer reports the UTF-8 length and stays untouched')
 
-        kept_map = mi_map
-        for owner in [n['math'], n['mi'], n['inline'], n['row']]:
-            p.watch(owner)
+        # Extra references held past host disposal; every other handle is released exactly once.
+        kept_dataset = p.bind('rv_dom_dom_string_map_retain', p.pointer, [p.pointer])(dataset)
+        kept_map = p.bind('rv_dom_style_property_map_read_only_retain', p.pointer, [p.pointer])(mi_map)
+        p.expect(kept_dataset == dataset and kept_map == mi_map, 'retain returns the same dataset and style map handles')
+        watches = [p.watch(owner) for owner in [n['math'], n['mi'], n['inline'], n['row']]]
         p.call('rv_node_remove', [p.pointer], n['math'])
-        for release, value in list(reversed(p.retained)):
-            if value != kept_map:
-                p.bind(release, None, [p.pointer])(value)
-                p.retained.remove((release, value))
+        p.release_all()
         p.dispose_host()
         p.collect()
-        p.expect_expired()
+        alive = p.bind('rv_watch_alive', p.integer, [p.pointer])
+        p.expect([alive(watch) for watch in watches] == [1, 1, 0, 1], 'a retained dataset keeps its removed MathML subtree alive after host disposal')
+        p.expect(p.text('rv_dom_dom_string_map_named_item', [p.pointer, ctypes.c_char_p], kept_dataset, b'newKey') == 'value-λ', 'retained dataset reads after host disposal')
+        p.bind('rv_dom_dom_string_map_release', None, [p.pointer])(kept_dataset)
         p.bind('rv_dom_style_property_map_read_only_release', None, [p.pointer])(kept_map)
-        p.retained.remove(('rv_dom_style_property_map_read_only_release', kept_map))
         p.collect()
+        p.expect_expired()
         print('MATHML_STATE ' + json.dumps(state, sort_keys=True, ensure_ascii=False), flush=True)
         print(f'PASS MathML surface: {p.assertions} assertions', flush=True)
         return p.assertions

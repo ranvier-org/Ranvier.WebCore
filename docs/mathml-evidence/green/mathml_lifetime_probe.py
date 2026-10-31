@@ -58,16 +58,15 @@ for variant in sys.argv[2:]:
             p.retained.append(('rv_node_release', body))
             html = p.node('html')
             keep.append(('rv_dom_dom_string_map_release', p.object('rv_dom_html_element_get_dataset', [p.pointer], [html], 'dom_string_map')))
-        kept = [value for _, value in keep]
+        for entry in keep:
+            p.retained.remove(entry)
         for release, value in list(reversed(p.retained)):
-            if value not in kept:
-                p.bind(release, None, [p.pointer])(value)
-                p.retained.remove((release, value))
+            p.bind(release, None, [p.pointer])(value)
+        p.retained.clear()
         p.dispose_host()
         p.collect()
         for release, value in keep:
             p.bind(release, None, [p.pointer])(value)
-            p.retained.remove((release, value))
         p.collect()
         p.collect()
         alive = p.bind('rv_watch_alive', p.integer, [p.pointer])
