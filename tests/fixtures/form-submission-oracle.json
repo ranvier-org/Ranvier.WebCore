@@ -978,6 +978,13 @@
               ]
             }
           ],
+          "submissions": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
           "submissions": [
             {
               "method": "GET",
@@ -987,13 +994,6 @@
               "newWindow": false
             }
           ]
-        },
-        {
-          "op": "flush",
-          "status": "ok",
-          "value": null,
-          "events": [],
-          "submissions": []
         }
       ]
     },
@@ -1069,6 +1069,13 @@
               ]
             }
           ],
+          "submissions": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
           "submissions": [
             {
               "method": "GET",
@@ -1078,13 +1085,6 @@
               "newWindow": true
             }
           ]
-        },
-        {
-          "op": "flush",
-          "status": "ok",
-          "value": null,
-          "events": [],
-          "submissions": []
         }
       ]
     },

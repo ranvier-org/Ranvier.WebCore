@@ -12,7 +12,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
-from dialog_popover import Runner, OK, UNSUPPORTED, P, I
+from dialog_popover import Runner, OK, UNSUPPORTED, P, I, CALLBACK
 from form_collections import Entries, span_text
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
@@ -96,6 +96,21 @@ class SubmissionRunner(Runner):
             p.bind('rv_dom_dom_form_data_release', None, [P])(data.value)
         return entry
 
+    def drain(self):
+        """Cycles the run loop until three consecutive cycles deliver no event and no submission."""
+        cycle = self.p.bind('rv_run_loop_cycle', I, [I])
+        seen, quiet = (len(self.events), len(self.submissions)), 0
+        for _ in range(200):
+            cycle(1)
+            now = (len(self.events), len(self.submissions))
+            if now == seen:
+                quiet += 1
+                if quiet == 3:
+                    return
+            else:
+                seen, quiet = now, 0
+        raise AssertionError('the run loop kept delivering events or submissions')
+
     def record(self, context, event):
         entry = self.event_fields(event)
         if entry['type'] in self.prevent:
@@ -160,6 +175,79 @@ def replay(native_directory, cases):
     return results, handled
 
 
+def lifecycle(p):
+    """Window capture listeners for the unload events; returns the list they append to and their callbacks."""
+    fired, callbacks = [], []
+    window = p.bind('rv_host_window_event_target', P, [P])(p.host)
+    add = p.bind('rv_event_target_add_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])
+    for kind in ['beforeunload', 'pagehide', 'unload']:
+        callback = CALLBACK(lambda context, event, kind=kind: fired.append(kind) or 0)
+        callbacks.append(callback)
+        p.expect(bool(add(window, kind.encode(), 1, callback, None)), 'window listener ' + kind)
+    return fired, callbacks
+
+
+def teardown(native_directory, cases):
+    """A submission with no handler set, a handler removed while a submission is pending, and a host destroyed while a
+    submission is pending. Asserts that the document stays, its listeners keep receiving events, and no submission
+    reaches a removed handler or outlives its host."""
+    report = {}
+    submitted = [{'type': 'submit', 'target': 'p', 'trusted': True, 'cancelable': True, 'submitter': None}, 'formdata']
+    shape = lambda events: [e if e['type'] == 'submit' else e['type'] for e in events]
+    with SvgProbe(native_directory, *cases['viewport']) as p:
+        runner = SubmissionRunner(p)
+        runner.load(cases['markup'], cases['eventTypes'])
+        fired, callbacks = lifecycle(p)
+        document = p.bind('rv_host_document', P, [P])(p.host)
+        rounds = []
+        for _ in range(2):
+            status = runner.step({'op': 'requestSubmit', 'id': 'p'})['status']
+            runner.drain()
+            rounds.append({'status': status, 'events': shape(runner.events), 'submissions': len(runner.submissions)})
+            runner.events.clear()
+        same = I(-1)
+        current = p.bind('rv_host_document', P, [P])(p.host)
+        p.call('rv_dom_node_is_same_node', [P, P, ctypes.POINTER(I)], current, document, ctypes.byref(same))
+        for item in (current, document):
+            p.bind('rv_node_release', None, [P])(item)
+        p.expect(all(r == {'status': 'ok', 'events': submitted, 'submissions': 0} for r in rounds), 'no handler: events, no submission ' + str(rounds))
+        p.expect(fired == [] and same.value == 1, 'no handler: the document stays ' + str((fired, same.value)))
+        report['noHandler'] = {'rounds': rounds, 'unloadEvents': fired, 'sameDocument': same.value == 1}
+        p.expect(runner.install_handler(), 'handler set')
+        status = runner.step({'op': 'requestSubmit', 'id': 'p'})['status']
+        setter = p.bind('rv_host_set_form_submission_handler', I, [P, HANDLER, P])
+        p.expect(setter(p.host, HANDLER(), None) == OK, 'handler removed with a submission pending')
+        runner.drain()
+        p.expect(status == 'ok' and runner.submissions == [] and fired == [], 'removed handler: no submission ' + str(runner.submissions))
+        report['handlerRemovedWhilePending'] = {'status': status, 'submissions': len(runner.submissions), 'unloadEvents': fired}
+        runner.events.clear()
+        runner.close()
+        assertions = p.assertions
+    with SvgProbe(native_directory, *cases['viewport']) as p:
+        runner = SubmissionRunner(p)
+        runner.load(cases['markup'], cases['eventTypes'])
+        form = runner.node('p')
+        p.watch(form)
+        p.expect(runner.install_handler(), 'handler set')
+        status = runner.step({'op': 'requestSubmit', 'id': 'p'})['status']
+        events = shape(runner.events)
+        remove = p.bind('rv_listener_remove', I, [P])
+        for listener in runner.listeners:
+            p.expect(remove(listener) == OK, 'listener removal before destroy')
+        runner.listeners.clear()
+        p.dispose_host()
+        p.collect()
+        p.expect(status == 'ok' and events == submitted, 'pending at destroy: events ' + str(events))
+        p.expect(runner.submissions == [], 'pending at destroy: no submission after destroy ' + str(runner.submissions))
+        runner.close()
+        p.release_all()
+        p.collect()
+        p.expect_expired()
+        report['pendingAtDestroy'] = {'status': status, 'events': events, 'submissionsAfterDestroy': len(runner.submissions)}
+        report['assertions'] = assertions + p.assertions
+    return report
+
+
 def compare(oracle, native):
     """Per-step status and value differences, and per-case differences of the event sequence and of the submission
     sequence. Events and submissions compare without their step: a scheduled submission starts at a task boundary."""
@@ -183,12 +271,36 @@ if __name__ == '__main__':
     parser.add_argument('--native-directory', required=True)
     parser.add_argument('--report')
     parser.add_argument('--measure', action='store_true', help='record native results and differences without asserting')
+    parser.add_argument('--abi', type=int, default=ABI, help='the expected ABI version of a later runtime')
     args = parser.parse_args()
     cases = json.loads((FIXTURES / 'form-submission-cases.json').read_text(encoding='utf-8'))
     oracle = json.loads((FIXTURES / 'form-submission-oracle.json').read_text(encoding='utf-8'))
     native, handled = replay(args.native_directory, cases)
     differences = compare(oracle, native)
     report = {'browser': oracle['browser'], 'handler': handled, 'differences': differences, 'cases': native}
+    if args.measure:
+        if args.report:
+            Path(args.report).write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+        print(f'measured {len(native)} cases, handler {"present" if handled else "absent"}, {len(differences)} differences', flush=True)
+        sys.exit(0)
+    if not handled:
+        raise AssertionError('rv_host_set_form_submission_handler is absent')
+    qualified = json.loads((FIXTURES / 'form-submission-qualified.json').read_text(encoding='utf-8'))['differences']
+    strip = lambda items: [{k: v for k, v in item.items() if k not in ('reason', 'qualification')} for item in items]
+    unexpected = [d for d in differences if d not in strip(qualified)]
+    absent = [q for q in strip(qualified) if q not in differences]
+    if unexpected or absent:
+        raise AssertionError('differences changed: unexpected ' + json.dumps(unexpected, ensure_ascii=False) + ' absent ' + json.dumps(absent, ensure_ascii=False))
+    assertions = sum(case['assertions'] for case in native) + sum(len(case['steps']) for case in native) + 2 * len(native)
+    with SvgProbe(args.native_directory) as p:
+        p.expect(p.bind('rv_abi_version', I, [])() == args.abi, 'ABI version ' + str(args.abi))
+        p.expect(p.bind('rv_abi_has', I, [ctypes.c_char_p])(b'form-submission') == 1, 'form-submission advertised')
+        assertions += p.assertions
+    lifetime = teardown(args.native_directory, cases)
+    assertions += lifetime['assertions']
+    report['teardown'] = lifetime
+    report['qualified'] = len(qualified)
+    report['assertions'] = assertions
     if args.report:
         Path(args.report).write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
-    print(f'measured {len(native)} cases, handler {"present" if handled else "absent"}, {len(differences)} differences', flush=True)
+    print(f'PASS form_submission: {assertions} assertions, {len(native)} cases, {len(qualified)} qualified differences', flush=True)

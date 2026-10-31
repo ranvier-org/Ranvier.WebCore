@@ -66,6 +66,11 @@
 #include <WebCore/FrameLoader.h>
 #include <WebCore/LocalFrameInlines.h>
 #include <WebCore/PageConfiguration.h>
+#include <WebCore/EmptyFrameLoaderClient.h>
+#include <WebCore/FormData.h>
+#include <WebCore/FormState.h>
+#include <WebCore/FormSubmission.h>
+#include <WebCore/HTMLFormElement.h>
 #include <WebCore/ProcessWarming.h>
 #include <WebCore/Blob.h>
 #include <WebCore/BlobData.h>
@@ -95,6 +100,7 @@
 #include <WebCore/DragItem.h>
 #include <WebCore/HTMLNames.h>
 #include <wtf/SetForScope.h>
+#include <wtf/HashMap.h>
 #include <WebCore/DragEvent.h>
 #include <WebCore/VisiblePosition.h>
 #include <WebCore/DataTransfer.h>
@@ -486,6 +492,19 @@ class RvDragClient final : public DragClient {
     void startDrag(DragItem, DataTransfer&, Frame&, const std::optional<NodeIdentifier>&) final;
 };
 
+// Hands each form submission to the host's form submission handler instead of scheduling it, so the document is never
+// navigated or unloaded; every other navigation keeps the empty client's behaviour.
+class RvFrameLoaderClient final : public EmptyFrameLoaderClient {
+public:
+    explicit RvFrameLoaderClient(FrameLoader& loader)
+        : EmptyFrameLoaderClient(loader)
+    {
+    }
+
+private:
+    bool shouldScheduleFormSubmission(FormSubmission&) final;
+};
+
 // createPage and loadHTML follow WebCore's testing/TestPage.cpp (Copyright (C) 2026 Apple Inc., BSD-2-Clause).
 static Ref<Page> createPage(IntSize viewportSize)
 {
@@ -495,6 +514,10 @@ static Ref<Page> createPage(IntSize viewportSize)
     }();
     UNUSED_VARIABLE(prewarmed);
     auto configuration = pageConfigurationWithEmptyClients(std::nullopt, PAL::SessionID::defaultSessionID());
+    // The empty clients' sandbox, except that forms may submit: a submission reaches RvFrameLoaderClient.
+    configuration.mainFrameCreationParameters = PageConfiguration::LocalMainFrameCreationParameters { CompletionHandler<UniqueRef<LocalFrameLoaderClient>(LocalFrame&, FrameLoader&)> { [](auto&, auto& loader) -> UniqueRef<LocalFrameLoaderClient> {
+        return makeUniqueRefWithoutRefCountedCheck<RvFrameLoaderClient>(loader);
+    } }, SandboxFlags::all() - SandboxFlag::Forms, ReferrerPolicy::EmptyString };
     configuration.chromeClient = makeUniqueRef<RvChromeClient>();
     configuration.editorClient = makeUniqueRef<RvEditorClient>();
     configuration.dragClient = makeUnique<RvDragClient>();
@@ -508,6 +531,9 @@ static Ref<Page> createPage(IntSize viewportSize)
     page->settings().setCSSFontFaceMetricOverrideDescriptorsEnabled(true);
     page->settings().setCSSAnchorPositioningEnabled(true);
     page->settings().setPopoverHintEnabled(true);
+    page->settings().setInteractiveFormValidationEnabled(true);
+    // Markup arrives decoded, so the document's encoding, which form submission and URL query encoding use, is UTF-8.
+    page->settings().setDefaultTextEncodingName("UTF-8"_s);
 #if ENABLE(VIDEO)
     page->settings().setMediaEnabled(false);
 #endif
@@ -633,6 +659,8 @@ struct RvHost {
     std::optional<JSC::DisallowVMEntry> noScript;
     RvResourceHandler resourceHandler { nullptr };
     void* resourceContext { nullptr };
+    RvFormSubmissionHandler formSubmissionHandler { nullptr };
+    void* formSubmissionContext { nullptr };
 #if RANVIER_COMPOSITING
     // rv_host_create sets RV_COMPOSITING_WHEN_NEEDED.
     int32_t compositingMode { RV_COMPOSITING_OFF };
@@ -781,6 +809,46 @@ static RvHost* hostForPage(const Page* page)
             return host;
     }
     return nullptr;
+}
+
+// Each form's planned submission: a later submission of the form replaces a pending one, as a later planned navigation
+// replaces an earlier one. A pending task holds its form, so the address identifies the form until the task runs.
+static HashMap<const HTMLFormElement*, uint64_t>& plannedSubmissions()
+{
+    static NeverDestroyed<HashMap<const HTMLFormElement*, uint64_t>> planned;
+    return planned;
+}
+
+// Copies the submission and posts it to the host's handler, so the submitting call returns before any app code runs.
+bool RvFrameLoaderClient::shouldScheduleFormSubmission(FormSubmission& submission)
+{
+    RefPtr state = submission.state();
+    if (!state)
+        return false;
+    static uint64_t lastPlan;
+    uint64_t plan = ++lastPlan;
+    plannedSubmissions().set(&state->form(), plan);
+    bool post = submission.method() == FormSubmission::Method::Post;
+    auto contentType = !post ? String { } : submission.boundary().isEmpty() ? submission.contentType() : makeString(submission.contentType(), "; boundary="_s, submission.boundary());
+    // FormSubmission::requestURL, which WebCore does not export; a GET entry list is ASCII.
+    URL url = submission.action();
+    if (!post && !url.protocolIsJavaScript())
+        url.setQuery(String { byteCast<Latin1Character>(submission.data().flatten().span()) });
+    RunLoop::mainSingleton().dispatch([document = Ref { state->sourceDocument() }, form = Ref { state->form() }, submitter = RefPtr<Element> { state->submitter() },
+        method = CString { post ? "POST" : "GET" }, url = url.string().utf8(), target = submission.target().string().utf8(),
+        contentType = contentType.utf8(), hasContentType = post, bytes = post ? submission.data().flatten() : Vector<uint8_t> { }, plan] {
+        auto planned = plannedSubmissions().find(form.ptr());
+        if (planned == plannedSubmissions().end() || planned->value != plan)
+            return;
+        plannedSubmissions().remove(planned);
+        auto* host = hostForPage(document->page());
+        if (!host || !host->formSubmissionHandler || &host->document() != document.ptr())
+            return;
+        RvFormSubmission copy { sizeof(RvFormSubmission), method.data(), url.data(), target.data(), hasContentType ? contentType.data() : nullptr,
+            bytes.span().data(), static_cast<int32_t>(bytes.size()), reinterpret_cast<RvNode*>(form.ptr()), reinterpret_cast<RvNode*>(submitter.get()) };
+        host->formSubmissionHandler(host->formSubmissionContext, &copy);
+    });
+    return false;
 }
 
 // A load handed to the host. loader is null once WebCore removes the loader: on completion,
@@ -1206,6 +1274,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "viewport"))
         return 1;
     if (!std::strcmp(feature, "dom-binary-values"))
+        return 1;
+    if (!std::strcmp(feature, "form-submission"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -2685,6 +2755,17 @@ int32_t rv_element_focus(RvNode* target)
     if (!element)
         return RV_ERR_NOT_ELEMENT;
     return dispatchCountingFailures([&] { element->focus({ }); });
+}
+
+int32_t rv_host_set_form_submission_handler(RvHost* host, RvFormSubmissionHandler handler, void* context)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    host->formSubmissionHandler = handler;
+    host->formSubmissionContext = handler ? context : nullptr;
+    return RV_OK;
 }
 
 int32_t rv_host_set_resource_handler(RvHost* host, RvResourceHandler handler, void* context)
