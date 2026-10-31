@@ -805,6 +805,24 @@ type RvDomDOMPointInit =
     val mutable z: float
     val mutable w: float
 
+/// <summary>The IDL dictionary SubmitEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSubmitEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable submitter: nativeint
+
+/// <summary>The IDL dictionary FormDataEventInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomFormDataEventInit =
+    val mutable size: uint32
+    val mutable bubbles: int
+    val mutable cancelable: int
+    val mutable composed: int
+    val mutable form_data: nativeint
+
 /// <summary>The IDL dictionary DOMMatrix2DInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomDOMMatrix2DInit =
@@ -1227,6 +1245,41 @@ type RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble =
     val mutable arm0: RvDomUtf8StringSpan
     val mutable arm1: RvDomSequenceUnrestrictedDouble
 
+[<Literal>]
+let RV_DOM_UNION_FILE_OR_USV_STRING_NULLABLE_FILE = 1
+
+[<Literal>]
+let RV_DOM_UNION_FILE_OR_USV_STRING_NULLABLE_STRING = 2
+
+/// <summary>ABI transport for FileOrUSVString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionFileOrUSVStringNullable =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: nativeint
+    val mutable arm1: RvDomUtf8StringSpan
+
+[<Literal>]
+let RV_DOM_UNION_FILE_OR_USV_STRING_FILE = 1
+
+[<Literal>]
+let RV_DOM_UNION_FILE_OR_USV_STRING_STRING = 2
+
+/// <summary>ABI transport for FileOrUSVString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionFileOrUSVString =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: nativeint
+    val mutable arm1: RvDomUtf8StringSpan
+
+/// <summary>ABI transport for FileOrUSVString sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceFileOrUSVString =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for PointerEvent sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequencePointerEvent =
@@ -1251,6 +1304,20 @@ type RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement =
 /// <summary>ABI transport for PairUSVStringAndSequenceCSSStyleValueNullableElement sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+/// <summary>ABI transport for USVStringAndUnionFileOrUSVString entry; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomPairUSVStringAndUnionFileOrUSVString =
+    val mutable present: int
+    val mutable key: RvDomUtf8StringSpan
+    val mutable value: RvDomUnionFileOrUSVString
+
+/// <summary>ABI transport for PairUSVStringAndUnionFileOrUSVString sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequencePairUSVStringAndUnionFileOrUSVString =
     val mutable present: int
     val mutable count: int
     val mutable items: nativeint
@@ -1355,6 +1422,15 @@ extern void rv_dom_sequence_unrestricted_double_release(RvDomSequenceUnrestricte
 extern void rv_dom_union_dom_string_or_sequence_of_unrestricted_double_release(RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_union_file_or_usv_string_nullable_release(RvDomUnionFileOrUSVStringNullable& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_file_or_usv_string_release(RvDomUnionFileOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVString& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent& value)
 
 [<DllImport(Lib)>]
@@ -1365,6 +1441,12 @@ extern void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairUSVStringAndUnionFileOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_dom_implementation_release(nativeint handle)
@@ -1503,6 +1585,12 @@ extern void rv_dom_html_collection_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_html_collection_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_dom_form_data_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_dom_form_data_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern void rv_dom_validity_state_release(nativeint handle)
@@ -3498,6 +3586,12 @@ extern int rv_dom_html_form_element_item(nativeint target, uint32 index, nativei
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, RvDomUnionRadioNodeListOrElementNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_form_element_submit(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_form_element_request_submit(nativeint target, nativeint submitter)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_form_element_reset(nativeint target)
@@ -7175,6 +7269,60 @@ extern int rv_dom_html_collection_item(nativeint target, uint32 index, nativeint
 extern int rv_dom_html_collection_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_html_form_controls_collection_item(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_form_controls_collection_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, RvDomUnionRadioNodeListOrElementNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_options_collection_get_length(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_options_collection_set_length(nativeint target, uint32 value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_options_collection_get_selected_index(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_options_collection_set_selected_index(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_options_collection_set_item(nativeint target, uint32 index, nativeint option)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_options_collection_add(nativeint target, [<In>] RvDomUnionHTMLOptionElementOrHTMLOptGroupElement[] element, [<In>] RvDomUnionHTMLElementOrLongNullable[] before)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_options_collection_remove(nativeint target, int index)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_options_collection_item(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_html_options_collection_named_item(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_create(nativeint target, nativeint form, nativeint submitter, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_append(nativeint target, byte[] name, int name_length, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_delete(nativeint target, byte[] name, int name_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_get(nativeint target, byte[] name, int name_length, RvDomUnionFileOrUSVStringNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_get_all(nativeint target, byte[] name, int name_length, RvDomSequenceFileOrUSVString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_has(nativeint target, byte[] name, int name_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_set(nativeint target, byte[] name, int name_length, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
 extern int rv_dom_validity_state_get_value_missing(nativeint target, int& result)
 
 [<DllImport(Lib)>]
@@ -7458,6 +7606,18 @@ extern int rv_dom_input_event_get_target_ranges(nativeint target, RvDomSequenceS
 
 [<DllImport(Lib)>]
 extern int rv_dom_composition_event_get_data(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_submit_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomSubmitEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_submit_event_get_submitter(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_form_data_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomFormDataEventInit[] event_init_dict, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_form_data_event_get_form_data(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_svg_graphics_element_get_transform(nativeint target, nativeint& result)
@@ -9141,3 +9301,6 @@ extern int rv_dom_css_style_value_parse_all(nativeint target, byte[] property, i
 
 [<DllImport(Lib)>]
 extern int rv_dom_style_property_map_read_only_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_dom_form_data_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndUnionFileOrUSVString& result)

@@ -129,11 +129,35 @@
       "factory": "CSSOMVariableReferenceValue::create",
       "passReceiver": false,
       "stringInputs": "utf8-lengths"
+    },
+    "SubmitEvent": {
+      "receiver": "Document",
+      "factory": "SubmitEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "FormDataEvent": {
+      "receiver": "Document",
+      "factory": "FormDataEvent::create",
+      "passReceiver": false,
+      "stringInputs": "utf8-lengths"
+    },
+    "DOMFormData": {
+      "receiver": "Document",
+      "factory": "DOMFormData::create"
     }
   },
   "dictionaryCppTypes": {
-    "CSSStyleSheetInit": "CSSStyleSheet::Init"
+    "CSSStyleSheetInit": "CSSStyleSheet::Init",
+    "SubmitEventInit": "SubmitEvent::Init",
+    "FormDataEventInit": "FormDataEvent::Init"
   },
+  "dictionaryObjectMembers": [
+    "FormDataEventInit.formData"
+  ],
+  "opaqueUnionArms": [
+    "File"
+  ],
   "flattenUnionTypedefs": [
     "CSSPerspectiveValue"
   ],
@@ -192,6 +216,10 @@
     "CSSSkewY.ay": {
       "interface": "CSSNumericValue",
       "root": "CSSStyleValue"
+    },
+    "FormDataEvent.formData": {
+      "interface": "DOMFormData",
+      "root": "DOMFormData"
     }
   },
   "nestedDictionaries": [
@@ -214,7 +242,8 @@
     "USVStringOrCSSOMVariableReferenceValue",
     "CSSStyleValueOrUSVString",
     "DOMStringOrSequenceOfUnrestrictedDouble",
-    "CSSNumericValueOrDOMStringOrCSSOMKeywordValue"
+    "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+    "FileOrUSVString"
   ],
   "complexNullableElements": [
     "CSSStyleValue"
@@ -224,12 +253,14 @@
     "CSSOMVariableReferenceValue": "utf8-lengths",
     "StylePropertyMapReadOnly": "utf8-lengths",
     "StylePropertyMap": "utf8-lengths",
-    "DOMMatrix": "utf8-lengths"
+    "DOMMatrix": "utf8-lengths",
+    "DOMFormData": "utf8-lengths"
   },
   "objectContexts": {
     "StylePropertyMapReadOnly": "Document",
     "StylePropertyMap": "Document",
-    "DOMMatrix": "Document"
+    "DOMMatrix": "Document",
+    "DOMFormData": "Document"
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -392,6 +423,9 @@
     "NodeList",
     "RadioNodeList",
     "HTMLCollection",
+    "HTMLFormControlsCollection",
+    "HTMLOptionsCollection",
+    "DOMFormData",
     "ValidityState",
     "Event",
     "UIEvent",
@@ -402,6 +436,8 @@
     "FocusEvent",
     "InputEvent",
     "CompositionEvent",
+    "SubmitEvent",
+    "FormDataEvent",
     "SVGGraphicsElement",
     "SVGGeometryElement",
     "SVGPolygonElement",
@@ -617,6 +653,9 @@
       "q"
     ]
   },
+  "eventInterfaceCasts": [
+    "FormDataEvent"
+  ],
   "castVia": {
     "SVGAnimationElement": "SVGElement",
     "RadioNodeList": "LiveNodeList",
@@ -645,6 +684,7 @@
     "ElementCreationOptions.customElementRegistry",
     "ImportNodeOptions.customElementRegistry",
     "AddEventListenerOptions.signal",
+    "EventInit.trusted",
     "AddEventListenerOptions.webkitTrustedOnly",
     "Document.cookie",
     "Document.domain",
@@ -697,8 +737,6 @@
     "HTMLAnchorElement.attributionSourceId",
     "HTMLAnchorElement.attributionDestination",
     "HTMLAnchorElement.attributionSourceNonce",
-    "HTMLFormElement.submit",
-    "HTMLFormElement.requestSubmit",
     "HTMLFormElement.requestAutocomplete",
     "HTMLImageElement.decode",
     "HTMLInputElement.showPicker",
@@ -790,6 +828,9 @@
   "iterableBindings": {
     "StylePropertyMapReadOnly": {
       "feature": "dom-css-style-map-entries"
+    },
+    "DOMFormData": {
+      "feature": "dom-form-data-entries"
     }
   },
   "windowBindings": {

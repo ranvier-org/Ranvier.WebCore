@@ -51,6 +51,7 @@ typedef struct RvDOMQuad RvDOMQuad;
 typedef struct RvDOMMatrixReadOnly RvDOMMatrixReadOnly;
 typedef struct RvNodeList RvNodeList;
 typedef struct RvHTMLCollection RvHTMLCollection;
+typedef struct RvDOMFormData RvDOMFormData;
 typedef struct RvValidityState RvValidityState;
 typedef struct RvSVGRect RvSVGRect;
 typedef struct RvSVGMatrix RvSVGMatrix;
@@ -113,10 +114,15 @@ typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRo
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequenceUnrestrictedDouble RvDomSequenceUnrestrictedDouble;
 typedef struct RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble;
+typedef struct RvDomUnionFileOrUSVStringNullable RvDomUnionFileOrUSVStringNullable;
+typedef struct RvDomUnionFileOrUSVString RvDomUnionFileOrUSVString;
+typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
+typedef struct RvDomPairUSVStringAndUnionFileOrUSVString RvDomPairUSVStringAndUnionFileOrUSVString;
+typedef struct RvDomSequencePairUSVStringAndUnionFileOrUSVString RvDomSequencePairUSVStringAndUnionFileOrUSVString;
 
 /* Constants of the interfaces. */
 enum {
@@ -542,6 +548,26 @@ typedef struct RvDomDOMPointInit {
     double w; /* unrestricted double, default 1 */
 } RvDomDOMPointInit;
 
+/* The IDL dictionary SubmitEventInit. size is sizeof(RvDomSubmitEventInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomSubmitEventInit {
+    uint32_t size;
+    int32_t bubbles; /* boolean, default false */
+    int32_t cancelable; /* boolean, default false */
+    int32_t composed; /* boolean, default false */
+    RvNode* submitter; /* HTMLElement?, default null */
+} RvDomSubmitEventInit;
+
+/* The IDL dictionary FormDataEventInit. size is sizeof(RvDomFormDataEventInit) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomFormDataEventInit {
+    uint32_t size;
+    int32_t bubbles; /* boolean, default false */
+    int32_t cancelable; /* boolean, default false */
+    int32_t composed; /* boolean, default false */
+    RvDOMFormData* form_data; /* DOMFormData, required */
+} RvDomFormDataEventInit;
+
 /* The IDL dictionary DOMMatrix2DInit. size is sizeof(RvDomDOMMatrix2DInit) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDOMMatrix2DInit {
@@ -629,10 +655,15 @@ typedef struct RvDomUnionShadowRootOrGetComposedRangesOptions RvDomUnionShadowRo
 typedef struct RvDomSequenceStaticRange RvDomSequenceStaticRange;
 typedef struct RvDomSequenceUnrestrictedDouble RvDomSequenceUnrestrictedDouble;
 typedef struct RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble;
+typedef struct RvDomUnionFileOrUSVStringNullable RvDomUnionFileOrUSVStringNullable;
+typedef struct RvDomUnionFileOrUSVString RvDomUnionFileOrUSVString;
+typedef struct RvDomSequenceFileOrUSVString RvDomSequenceFileOrUSVString;
 typedef struct RvDomSequencePointerEvent RvDomSequencePointerEvent;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
+typedef struct RvDomPairUSVStringAndUnionFileOrUSVString RvDomPairUSVStringAndUnionFileOrUSVString;
+typedef struct RvDomSequencePairUSVStringAndUnionFileOrUSVString RvDomSequencePairUSVStringAndUnionFileOrUSVString;
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
@@ -999,6 +1030,40 @@ struct RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_FILE_OR_USV_STRING_NULLABLE_FILE = 1,
+    RV_DOM_UNION_FILE_OR_USV_STRING_NULLABLE_STRING = 2,
+};
+struct RvDomUnionFileOrUSVStringNullable {
+    int32_t present;
+    int32_t tag;
+    void* arm0; /* File: NULL; the tag identifies the arm */
+    RvDomUtf8StringSpan arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_FILE_OR_USV_STRING_FILE = 1,
+    RV_DOM_UNION_FILE_OR_USV_STRING_STRING = 2,
+};
+struct RvDomUnionFileOrUSVString {
+    int32_t present;
+    int32_t tag;
+    void* arm0; /* File: NULL; the tag identifies the arm */
+    RvDomUtf8StringSpan arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceFileOrUSVString {
+    int32_t present;
+    int32_t count;
+    RvDomUnionFileOrUSVString* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequencePointerEvent {
     int32_t present;
     int32_t count;
@@ -1027,6 +1092,22 @@ struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement {
     int32_t present;
     int32_t count;
     RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomPairUSVStringAndUnionFileOrUSVString {
+    int32_t present;
+    RvDomUtf8StringSpan key;
+    RvDomUnionFileOrUSVString value;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequencePairUSVStringAndUnionFileOrUSVString {
+    int32_t present;
+    int32_t count;
+    RvDomPairUSVStringAndUnionFileOrUSVString* items;
 };
 RV_EXPORT void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value);
@@ -1061,10 +1142,15 @@ RV_EXPORT void rv_dom_union_shadow_root_or_get_composed_ranges_options_release(R
 RV_EXPORT void rv_dom_sequence_static_range_release(RvDomSequenceStaticRange* value);
 RV_EXPORT void rv_dom_sequence_unrestricted_double_release(RvDomSequenceUnrestrictedDouble* value);
 RV_EXPORT void rv_dom_union_dom_string_or_sequence_of_unrestricted_double_release(RvDomUnionDOMStringOrSequenceOfUnrestrictedDouble* value);
+RV_EXPORT void rv_dom_union_file_or_usv_string_nullable_release(RvDomUnionFileOrUSVStringNullable* value);
+RV_EXPORT void rv_dom_union_file_or_usv_string_release(RvDomUnionFileOrUSVString* value);
+RV_EXPORT void rv_dom_sequence_file_or_usv_string_release(RvDomSequenceFileOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pointer_event_release(RvDomSequencePointerEvent* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
+RV_EXPORT void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairUSVStringAndUnionFileOrUSVString* value);
+RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value);
 /* Releases a handle to a DOMImplementation. */
 RV_EXPORT void rv_dom_dom_implementation_release(RvDOMImplementation*);
 /* Adds a reference to a DOMImplementation and returns it. */
@@ -1157,6 +1243,10 @@ RV_EXPORT RvNodeList* rv_dom_node_list_retain(RvNodeList*);
 RV_EXPORT void rv_dom_html_collection_release(RvHTMLCollection*);
 /* Adds a reference to a HTMLCollection and returns it. */
 RV_EXPORT RvHTMLCollection* rv_dom_html_collection_retain(RvHTMLCollection*);
+/* Releases a handle to a DOMFormData. */
+RV_EXPORT void rv_dom_dom_form_data_release(RvDOMFormData*);
+/* Adds a reference to a DOMFormData and returns it. */
+RV_EXPORT RvDOMFormData* rv_dom_dom_form_data_retain(RvDOMFormData*);
 /* Releases a handle to a ValidityState. */
 RV_EXPORT void rv_dom_validity_state_release(RvValidityState*);
 /* Adds a reference to a ValidityState and returns it. */
@@ -2621,6 +2711,10 @@ RV_EXPORT int32_t rv_dom_html_form_element_item(RvNode* target, uint32_t index, 
 /* HTMLFormElement.namedItem(DOMString name) -> (RadioNodeList or Element)?; *result owns its contents; release with
  * the matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_html_form_element_named_item(RvNode* target, const char* name, RvDomUnionRadioNodeListOrElementNullable* result);
+/* HTMLFormElement.submit() -> undefined */
+RV_EXPORT int32_t rv_dom_html_form_element_submit(RvNode* target);
+/* HTMLFormElement.requestSubmit(optional HTMLElement? submitter) -> undefined; submitter may be NULL */
+RV_EXPORT int32_t rv_dom_html_form_element_request_submit(RvNode* target, RvNode* submitter);
 /* HTMLFormElement.reset() -> undefined */
 RV_EXPORT int32_t rv_dom_html_form_element_reset(RvNode* target);
 /* HTMLFormElement.checkValidity() -> boolean */
@@ -5587,6 +5681,53 @@ RV_EXPORT int32_t rv_dom_html_collection_get_length(RvHTMLCollection* target, ui
 RV_EXPORT int32_t rv_dom_html_collection_item(RvHTMLCollection* target, uint32_t index, RvNode** result);
 /* HTMLCollection.namedItem(DOMString name) -> Element?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_html_collection_named_item(RvHTMLCollection* target, const char* name, RvNode** result);
+/* HTMLFormControlsCollection */
+
+/* HTMLFormControlsCollection.item(unsigned long index) -> HTMLElement?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_form_controls_collection_item(RvHTMLCollection* target, uint32_t index, RvNode** result);
+/* HTMLFormControlsCollection.namedItem(DOMString name) -> (RadioNodeList or Element)?; *result owns its contents;
+ * release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_html_form_controls_collection_named_item(RvHTMLCollection* target, const char* name, RvDomUnionRadioNodeListOrElementNullable* result);
+/* HTMLOptionsCollection */
+
+/* HTMLOptionsCollection.length getter: attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_html_options_collection_get_length(RvHTMLCollection* target, uint32_t* result);
+/* HTMLOptionsCollection.length setter: attribute unsigned long length */
+RV_EXPORT int32_t rv_dom_html_options_collection_set_length(RvHTMLCollection* target, uint32_t value);
+/* HTMLOptionsCollection.selectedIndex getter: attribute long selectedIndex */
+RV_EXPORT int32_t rv_dom_html_options_collection_get_selected_index(RvHTMLCollection* target, int32_t* result);
+/* HTMLOptionsCollection.selectedIndex setter: attribute long selectedIndex */
+RV_EXPORT int32_t rv_dom_html_options_collection_set_selected_index(RvHTMLCollection* target, int32_t value);
+/* HTMLOptionsCollection.setItem(unsigned long index, HTMLOptionElement? option) -> undefined; option may be NULL */
+RV_EXPORT int32_t rv_dom_html_options_collection_set_item(RvHTMLCollection* target, uint32_t index, RvNode* option);
+/* HTMLOptionsCollection.add((HTMLOptionElement or HTMLOptGroupElement) element, optional (HTMLElement or long)?
+ * before = null) -> undefined; before defaults to null in IDL */
+RV_EXPORT int32_t rv_dom_html_options_collection_add(RvHTMLCollection* target, const RvDomUnionHTMLOptionElementOrHTMLOptGroupElement* element, const RvDomUnionHTMLElementOrLongNullable* before);
+/* HTMLOptionsCollection.remove(long index) -> undefined */
+RV_EXPORT int32_t rv_dom_html_options_collection_remove(RvHTMLCollection* target, int32_t index);
+/* HTMLOptionsCollection.item(unsigned long index) -> HTMLOptionElement?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_options_collection_item(RvHTMLCollection* target, uint32_t index, RvNode** result);
+/* HTMLOptionsCollection.namedItem(DOMString name) -> HTMLOptionElement?; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_html_options_collection_named_item(RvHTMLCollection* target, const char* name, RvNode** result);
+/* DOMFormData */
+
+/* DOMFormData.constructor: target is the Document of the constructed object; form may be NULL; submitter defaults to
+ * null in IDL; submitter may be NULL; *result is a new reference */
+RV_EXPORT int32_t rv_dom_dom_form_data_create(RvNode* target, RvNode* form, RvNode* submitter, RvDOMFormData** result);
+/* DOMFormData.append(USVString name, USVString value) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_form_data_append(RvDOMFormData* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
+/* DOMFormData.delete(USVString name) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_form_data_delete(RvDOMFormData* target, const uint8_t* name, int32_t name_length);
+/* DOMFormData.get(USVString name) -> FormDataEntryValue?; *result owns its contents; release with the matching
+ * rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_dom_form_data_get(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvDomUnionFileOrUSVStringNullable* result);
+/* DOMFormData.getAll(USVString name) -> sequence<FormDataEntryValue>; *result owns its contents; release with the
+ * matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_dom_form_data_get_all(RvDOMFormData* target, const uint8_t* name, int32_t name_length, RvDomSequenceFileOrUSVString* result);
+/* DOMFormData.has(USVString name) -> boolean */
+RV_EXPORT int32_t rv_dom_dom_form_data_has(RvDOMFormData* target, const uint8_t* name, int32_t name_length, int32_t* result);
+/* DOMFormData.set(USVString name, USVString value) -> undefined */
+RV_EXPORT int32_t rv_dom_dom_form_data_set(RvDOMFormData* target, const uint8_t* name, int32_t name_length, const uint8_t* value, int32_t value_length);
 /* ValidityState */
 
 /* ValidityState.valueMissing getter: readonly attribute boolean valueMissing */
@@ -5803,6 +5944,19 @@ RV_EXPORT int32_t rv_dom_input_event_get_target_ranges(RvEvent* target, RvDomSeq
 
 /* CompositionEvent.data getter: readonly attribute USVString data */
 RV_EXPORT int32_t rv_dom_composition_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length);
+/* SubmitEvent */
+
+/* SubmitEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;
+ * event_init_dict may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_submit_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomSubmitEventInit* event_init_dict, RvEvent** result);
+/* SubmitEvent.submitter getter: readonly attribute HTMLElement? submitter; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_submit_event_get_submitter(RvEvent* target, RvNode** result);
+/* FormDataEvent */
+
+/* FormDataEvent.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_form_data_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomFormDataEventInit* event_init_dict, RvEvent** result);
+/* FormDataEvent.formData getter: readonly attribute DOMFormData formData; *result is a new reference */
+RV_EXPORT int32_t rv_dom_form_data_event_get_form_data(RvEvent* target, RvDOMFormData** result);
 /* SVGGraphicsElement */
 
 /* SVGGraphicsElement.transform getter: readonly attribute SVGAnimatedTransformList transform; *result is a new
@@ -7205,6 +7359,11 @@ RV_EXPORT int32_t rv_dom_css_style_value_parse_all(RvNode* target, const uint8_t
 /* StylePropertyMapReadOnly.entries: owned snapshot of the engine key/value iterable; context is an explicit checked
  * Document for the operation; *result owns its contents; release with the matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result);
+/* DOMFormData */
+
+/* DOMFormData.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document for
+ * the operation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* context, RvDomSequencePairUSVStringAndUnionFileOrUSVString* result);
 
 #ifdef __cplusplus
 }
