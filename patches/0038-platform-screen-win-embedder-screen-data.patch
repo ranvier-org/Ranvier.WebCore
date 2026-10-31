@@ -1,0 +1,73 @@
+diff --git a/Source/WebCore/platform/PlatformScreen.cpp b/Source/WebCore/platform/PlatformScreen.cpp
+index 154251118c..981f2538d8 100644
+--- a/Source/WebCore/platform/PlatformScreen.cpp
++++ b/Source/WebCore/platform/PlatformScreen.cpp
+@@ -26,7 +26,7 @@
+ #include "config.h"
+ #include "PlatformScreen.h"
+ 
+-#if PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM))
++#if PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM)) || PLATFORM(WIN)
+ 
+ #include "ScreenProperties.h"
+ #include <wtf/Lock.h>
+@@ -126,4 +126,4 @@ void PlatformScreen::updateSingletonContentsFormatsForTesting(OptionSet<Contents
+ 
+ } // namespace WebCore
+ 
+-#endif // PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM))
++#endif // PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM)) || PLATFORM(WIN)
+diff --git a/Source/WebCore/platform/win/PlatformScreenWin.cpp b/Source/WebCore/platform/win/PlatformScreenWin.cpp
+index 742bb02ce7..1456f1dea3 100644
+--- a/Source/WebCore/platform/win/PlatformScreenWin.cpp
++++ b/Source/WebCore/platform/win/PlatformScreenWin.cpp
+@@ -34,10 +34,23 @@
+ #include "LocalFrame.h"
+ #include "LocalFrameView.h"
+ #include "NotImplemented.h"
++#include "ScreenProperties.h"
+ #include <windows.h>
+ 
+ namespace WebCore {
+ 
++// The screen an embedder set for the widget's display through PlatformScreen::updateSingletonProperties, as WPE and
++// Mac read it, or null.
++static const ScreenData* embedderScreenData(Widget* widget)
++{
++    if (!widget || !widget->root())
++        return nullptr;
++    auto* hostWindow = widget->root()->hostWindow();
++    if (!hostWindow || !hostWindow->displayID())
++        return nullptr;
++    return PlatformScreen::singleton()->screenData(hostWindow->displayID());
++}
++
+ // Returns info for the default monitor if widget is NULL
+ static MONITORINFOEX monitorInfoForWidget(Widget* widget)
+ {
+@@ -63,6 +76,8 @@ static DEVMODE deviceInfoForWidget(Widget* widget)
+ 
+ int screenDepth(Widget* widget)
+ {
++    if (auto* data = embedderScreenData(widget))
++        return data->screenDepth;
+     DEVMODE deviceInfo = deviceInfoForWidget(widget);
+     if (deviceInfo.dmBitsPerPel == 32) {
+         // Some video drivers return 32, but this function is supposed to ignore the alpha
+@@ -91,12 +106,16 @@ bool screenHasInvertedColors()
+ 
+ FloatRect screenRect(Widget* widget)
+ {
++    if (auto* data = embedderScreenData(widget))
++        return data->screenRect;
+     MONITORINFOEX monitorInfo = monitorInfoForWidget(widget);
+     return monitorInfo.rcMonitor;
+ }
+ 
+ FloatRect screenAvailableRect(Widget* widget)
+ {
++    if (auto* data = embedderScreenData(widget))
++        return data->screenAvailableRect;
+     MONITORINFOEX monitorInfo = monitorInfoForWidget(widget);
+     return monitorInfo.rcWork;
+ }
