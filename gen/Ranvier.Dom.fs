@@ -5191,8 +5191,14 @@ and [<AllowNullLiteral>] CanvasRenderingContext2D =
     abstract member arcTo: x1: float * y1: float * x2: float * y2: float * radius: float -> unit
     /// <summary>CanvasRenderingContext2D.rect.</summary>
     abstract member rect: x: float * y: float * w: float * h: float -> unit
+
     /// <summary>CanvasRenderingContext2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRectList: x: float * y: float * w: float * h: float * radii: obj -> unit
+#else
     abstract member roundRect: x: float * y: float * w: float * h: float * radii: (UnrestrictedDoubleOrDOMPointInit) array -> unit
+#endif
 
     /// <summary>CanvasRenderingContext2D.roundRect.</summary>
 #if FABLE_COMPILER
@@ -5234,8 +5240,14 @@ and [<AllowNullLiteral>] Path2D =
     abstract member arcTo: x1: float * y1: float * x2: float * y2: float * radius: float -> unit
     /// <summary>Path2D.rect.</summary>
     abstract member rect: x: float * y: float * w: float * h: float -> unit
+
     /// <summary>Path2D.roundRect.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.roundRect($1, $2, $3, $4, $5)")>]
+    abstract member __ranvier_roundRectList: x: float * y: float * w: float * h: float * radii: obj -> unit
+#else
     abstract member roundRect: x: float * y: float * w: float * h: float * radii: (UnrestrictedDoubleOrDOMPointInit) array -> unit
+#endif
 
     /// <summary>Path2D.roundRect.</summary>
 #if FABLE_COMPILER
@@ -6477,6 +6489,9 @@ module BrowserUnionAdapters =
             and set (value: DOMStringOrCanvasGradientOrCanvasPattern) =
                 this.__ranvier_set_fillStyle (boxDOMStringOrCanvasGradientOrCanvasPattern value)
 
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: (UnrestrictedDoubleOrDOMPointInit) array) : unit =
+            this.__ranvier_roundRectList (x, y, w, h, box (Array.map boxUnrestrictedDoubleOrDOMPointInit radii))
+
         member this.roundRect(x: float, y: float, w: float, h: float) : unit =
             this.__ranvier_roundRect (x, y, w, h, ?radii = None)
 
@@ -6488,6 +6503,9 @@ module BrowserUnionAdapters =
 
 
     type Path2D with
+        member this.roundRect(x: float, y: float, w: float, h: float, radii: (UnrestrictedDoubleOrDOMPointInit) array) : unit =
+            this.__ranvier_roundRectList (x, y, w, h, box (Array.map boxUnrestrictedDoubleOrDOMPointInit radii))
+
         member this.roundRect(x: float, y: float, w: float, h: float) : unit =
             this.__ranvier_roundRect (x, y, w, h, ?radii = None)
 

@@ -96,8 +96,18 @@ class InterfaceEmitter:
         value = self.world.resolve(value)
         return value.name == 'union' and self.world.string_union(value) is None
 
+    def union_sequence(self, value):
+        """A sequence of a union, which the browser receives as an array of the arms' raw values."""
+        value = self.world.resolve(value)
+        return value.name == 'sequence' and bool(value.subtypes) and self.union(value.subtypes[0])
+
     def complex(self, member):
-        return self.union(member.type) or any(self.union(arg.type) for arg in member.arguments)
+        return (self.union(member.type) or any(self.union(arg.type) for arg in member.arguments)
+                or any(self.union_sequence(arg.type) and not arg.variadic for arg in member.arguments))
+
+    def raw_name(self, member):
+        """The browser member an adapter calls; an overload with a union sequence takes its own name."""
+        return f'__ranvier_{member.name}' + ('List' if any(self.union_sequence(a.type) for a in member.arguments) else '')
 
     def choices(self, arguments):
         variants = []
@@ -128,7 +138,7 @@ class InterfaceEmitter:
             ftype = self.type(t)
             if argument.optional and self.world.resolve(t).name in self.world.config.get('callbackObjectRoots', {}):
                 ftype = self.world.resolve(t).name
-            if raw and self.union(argument.type):
+            if raw and (self.union(argument.type) or self.union_sequence(argument.type)):
                 ftype = 'obj'
             if argument.variadic:
                 ftype += ' array'
@@ -264,7 +274,7 @@ class InterfaceEmitter:
             if anonymous_property:
                 expression = self.browser_property_expression(owner, member)
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]',
-                      f'    abstract member __ranvier_{member.name}: {raw_params} -> {raw_result}', '#else']
+                      f'    abstract member {self.raw_name(member)}: {raw_params} -> {raw_result}', '#else']
         for selected in selected_arguments:
             signature = f'{self.parameters(member.arguments, selected)} -> {result}'
             if len(f'    abstract member {identifier(member.name)}: {signature}') > 150:
@@ -434,6 +444,10 @@ class InterfaceEmitter:
                         if argument.variadic:
                             declarations.append(f'[<System.ParamArray>] {name}: {ftype} array')
                             expr = f'{name} |> Array.map box{label(self.world.resolve(argument.type))}' if self.union(argument.type) else name
+                        elif self.union_sequence(argument.type):
+                            declarations.append(f'{"?" if optional else ""}{name}: {ftype}')
+                            element = label(self.world.resolve(self.world.resolve(argument.type).subtypes[0]))
+                            expr = f'box (Array.map box{element} {name})'
                         else:
                             declarations.append(f'{"?" if optional else ""}{name}: {ftype}')
                             expr = f'box {name}' if self.union(argument.type) else name
@@ -453,7 +467,7 @@ class InterfaceEmitter:
                         elif any(previous.optional for previous in member.arguments[:argument_index]):
                             expr = f'{name} = {expr}'
                         passed.append(expr)
-                    raw_call = f'this.__ranvier_{member.name} (' + ', '.join(passed) + ')'
+                    raw_call = f'this.{self.raw_name(member)} (' + ', '.join(passed) + ')'
                     lines += [f'        member this.{identifier(member.name)}(' + ', '.join(declarations) + f') : {result} =']
                     lines += guards
                     if self.union(member.type):
