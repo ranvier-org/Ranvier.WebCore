@@ -2107,6 +2107,95 @@ typedef void (*RvSleepDisablerCallback)(void* context, uint64_t id, int32_t disp
  * the owning thread or before the first rv_host_create. */
 RV_EXPORT int32_t rv_set_sleep_disabler_callback(RvSleepDisablerCallback callback, void* context);
 
+/* Notifications, where rv_abi_has("notifications") is 1. A notification is a Notification EventTarget: its "show",
+ * "click", "close" and "error" events (not bubbling, not cancelable, trusted) run listeners added with
+ * rv_event_target_add_listener, on a later rv_run_loop_cycle. The application presents notifications: WebCore asks
+ * through the host's RvNotificationPresenter, and the presenter reports back with rv_notification_report. Actions,
+ * persistent (service worker) notifications, requireInteraction, image and badge are unsupported. */
+enum {
+    RV_NOTIFICATION_DEFAULT = 0,
+    RV_NOTIFICATION_DENIED = 1,
+    RV_NOTIFICATION_GRANTED = 2,
+};
+
+/* Requests of RvNotificationPresenter. */
+enum {
+    /* Present the notification. */
+    RV_NOTIFICATION_SHOW = 0,
+    /* Notification.close(): remove it; report RV_NOTIFICATION_EVENT_CLOSE once it is gone. */
+    RV_NOTIFICATION_CANCEL = 1,
+    /* Its document stopped: the presenter may keep showing it, and its reports dispatch nothing. */
+    RV_NOTIFICATION_DESTROYED = 2,
+};
+
+/* Events of rv_notification_report. */
+enum {
+    RV_NOTIFICATION_EVENT_SHOW = 0,
+    RV_NOTIFICATION_EVENT_CLICK = 1,
+    RV_NOTIFICATION_EVENT_CLOSE = 2,
+    RV_NOTIFICATION_EVENT_ERROR = 3,
+};
+
+/* NotificationDirection. */
+enum {
+    RV_NOTIFICATION_DIR_AUTO = 0,
+    RV_NOTIFICATION_DIR_LTR = 1,
+    RV_NOTIFICATION_DIR_RTL = 2,
+};
+
+/* String fields of rv_notification_string. */
+enum {
+    RV_NOTIFICATION_TITLE = 0,
+    RV_NOTIFICATION_BODY = 1,
+    RV_NOTIFICATION_TAG = 2,
+    RV_NOTIFICATION_LANG = 3,
+    /* The icon URL, resolved against the document; empty without one. */
+    RV_NOTIFICATION_ICON = 4,
+};
+
+/* NotificationOptions. Each string is UTF-8 with its byte count; a length of -1 or a NULL pointer is the empty
+ * default. silent is -1 for unset, else 0 or 1. size is sizeof(RvNotificationOptions). */
+typedef struct RvNotificationOptions {
+    int32_t size;
+    int32_t dir;
+    int32_t silent;
+    int32_t body_length;
+    int32_t tag_length;
+    int32_t lang_length;
+    int32_t icon_length;
+    int32_t reserved;
+    const uint8_t* body;
+    const uint8_t* tag;
+    const uint8_t* lang;
+    const uint8_t* icon;
+} RvNotificationOptions;
+
+/* Receives the host's presenter requests, only inside rv_run_loop_cycle, in the order WebCore made them.
+ * notification is valid for the call; rv_event_target_retain keeps it. The presenter may call any rv_* function. */
+typedef void (*RvNotificationPresenter)(void* context, RvHost* host, RvEventTarget* notification, int32_t request);
+/* Sets the host's presenter, or with NULL removes it. Without a presenter a granted show fires "error". */
+RV_EXPORT int32_t rv_host_set_notification_presenter(RvHost*, RvNotificationPresenter presenter, void* context);
+/* Sets the host's permission, RV_NOTIFICATION_DEFAULT at creation. A show under DEFAULT or DENIED fires "error". */
+RV_EXPORT int32_t rv_host_set_notification_permission(RvHost*, int32_t permission);
+/* The host's permission. Native documents are not secure contexts, where Notification.permission reads denied; the
+ * host's setting replaces that rule, as it decides each show. */
+RV_EXPORT int32_t rv_host_notification_permission(RvHost*, int32_t* permission);
+/* new Notification(title, options) for the host's current document; options may be NULL. *notification is a new
+ * EventTarget reference, released with rv_event_target_release. The show runs on a later rv_run_loop_cycle. An
+ * options size other than sizeof(RvNotificationOptions) or an unknown dir returns RV_ERR_UNSUPPORTED. */
+RV_EXPORT int32_t rv_notification_create(RvHost*, const uint8_t* title, int32_t title_length, const RvNotificationOptions* options,
+    RvEventTarget** notification);
+/* Notification.close(). The presenter receives RV_NOTIFICATION_CANCEL for a shown notification. */
+RV_EXPORT int32_t rv_notification_close(RvEventTarget* notification);
+/* Dispatches an RV_NOTIFICATION_EVENT_* on a later rv_run_loop_cycle; CLOSE also finishes the notification. A
+ * notification whose document stopped dispatches nothing. */
+RV_EXPORT int32_t rv_notification_report(RvEventTarget* notification, int32_t event);
+/* An RV_NOTIFICATION_* string field as UTF-8 bytes, with the protocol of rv_event_type: *length excludes no
+ * terminator, and a capacity below it returns RV_ERR_BUFFER_TOO_SMALL with the buffer untouched. */
+RV_EXPORT int32_t rv_notification_string(RvEventTarget* notification, int32_t field, uint8_t* buffer, int32_t capacity, int32_t* length);
+/* The notification's RV_NOTIFICATION_DIR_* and silent flag (-1 unset, 0 or 1). */
+RV_EXPORT int32_t rv_notification_flags(RvEventTarget* notification, int32_t* dir, int32_t* silent);
+
 #ifdef __cplusplus
 }
 #endif

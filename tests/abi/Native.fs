@@ -37,6 +37,22 @@ type EventInit =
     val mutable relatedTarget: nativeint
     val mutable customDetailJson: nativeint
 
+/// <summary>The <c>RvNotificationOptions</c> of the header; strings are caller-owned UTF-8 bytes with lengths.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type NotificationOptions =
+    val mutable size: int
+    val mutable dir: int
+    val mutable silent: int
+    val mutable body_length: int
+    val mutable tag_length: int
+    val mutable lang_length: int
+    val mutable icon_length: int
+    val mutable reserved: int
+    val mutable body: nativeint
+    val mutable tag: nativeint
+    val mutable lang: nativeint
+    val mutable icon: nativeint
+
 /// <summary>The <c>RvTextSegments</c> of the header: owned until <c>rv_text_segments_release</c>.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type TextSegments =
@@ -449,6 +465,14 @@ module Calls =
             "rv_wake_lock_state"
             "rv_host_release_wake_locks"
             "rv_set_sleep_disabler_callback"
+            "rv_host_set_notification_presenter"
+            "rv_host_set_notification_permission"
+            "rv_host_notification_permission"
+            "rv_notification_create"
+            "rv_notification_close"
+            "rv_notification_report"
+            "rv_notification_string"
+            "rv_notification_flags"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1528,6 +1552,42 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_set_sleep_disabler_callback(nativeint callback, nativeint context)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_notification_presenter(nativeint host, nativeint presenter, nativeint context)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_notification_permission(nativeint host, int permission)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_notification_permission(nativeint host, int& permission)
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_create(
+        nativeint host,
+        [<In>] byte[] title,
+        int title_length,
+        NotificationOptions& options,
+        nativeint[] notification
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_close(nativeint notification)
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_report(nativeint notification, int ``event``)
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_string(
+        nativeint notification,
+        int field,
+        [<In; Out>] byte[] buffer,
+        int capacity,
+        int[] length
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_notification_flags(nativeint notification, int& dir, int& silent)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -4954,6 +5014,110 @@ let rv_set_sleep_disabler_callback (callback: nativeint, context: nativeint) : i
         result
     else
         Raw.rv_set_sleep_disabler_callback (callback, context)
+
+let rv_host_set_notification_presenter (host: nativeint, presenter: nativeint, context: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_notification_presenter (host, presenter, context)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[269] <- Calls.Counts[269] + 1L
+        Calls.Ticks[269] <- Calls.Ticks[269] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_notification_presenter (host, presenter, context)
+
+let rv_host_set_notification_permission (host: nativeint, permission: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_notification_permission (host, permission)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[270] <- Calls.Counts[270] + 1L
+        Calls.Ticks[270] <- Calls.Ticks[270] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_notification_permission (host, permission)
+
+let rv_host_notification_permission (host: nativeint, permission: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_notification_permission (host, &permission)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[271] <- Calls.Counts[271] + 1L
+        Calls.Ticks[271] <- Calls.Ticks[271] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_notification_permission (host, &permission)
+
+let rv_notification_create
+    (host: nativeint, title: byte[], title_length: int, options: byref<NotificationOptions>, notification: nativeint[])
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_notification_create (host, title, title_length, &options, notification)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[272] <- Calls.Counts[272] + 1L
+        Calls.Ticks[272] <- Calls.Ticks[272] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_create (host, title, title_length, &options, notification)
+
+let rv_notification_close (notification: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_notification_close (notification)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[273] <- Calls.Counts[273] + 1L
+        Calls.Ticks[273] <- Calls.Ticks[273] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_close (notification)
+
+let rv_notification_report (notification: nativeint, ``event``: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_notification_report (notification, ``event``)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[274] <- Calls.Counts[274] + 1L
+        Calls.Ticks[274] <- Calls.Ticks[274] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_report (notification, ``event``)
+
+let rv_notification_string (notification: nativeint, field: int, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_notification_string (notification, field, buffer, capacity, length)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[275] <- Calls.Counts[275] + 1L
+        Calls.Ticks[275] <- Calls.Ticks[275] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_string (notification, field, buffer, capacity, length)
+
+let rv_notification_flags (notification: nativeint, dir: byref<int>, silent: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_notification_flags (notification, &dir, &silent)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[276] <- Calls.Counts[276] + 1L
+        Calls.Ticks[276] <- Calls.Ticks[276] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_notification_flags (notification, &dir, &silent)
 
 // END GENERATED
 
