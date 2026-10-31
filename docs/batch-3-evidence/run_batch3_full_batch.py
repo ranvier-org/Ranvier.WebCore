@@ -1,6 +1,6 @@
 """Full native batch of a batch-3 candidate: every probe of the batch-2 batch (BASELINE results.json) with its exact
-assertion count, abi_layouts raised to 27 (B09 RvNotificationOptions), then the seven probes batch 3 adds with their lane
-counts, then the frames and teardown driver runs.
+assertion count, abi_layouts raised to 27 (B09 RvNotificationOptions) and viewport_scroll fixed at 2156 (cd471f4), then the
+seven probes batch 3 adds with their lane counts, then the frames and teardown driver runs.
 usage: run_batch3_full_batch.py <batch3-candidate-N> <ABI> <teardown records> <baseline results.json>"""
 from pathlib import Path
 import hashlib, json, os, re, shutil, subprocess, sys
@@ -90,7 +90,7 @@ def run(name, command, expected=None, environment=None, executed=None, timeout=3
 # The baseline batch's probes in its order, each with its exact assertion count; then the probes batch 3 adds.
 ADDED = [('canvas_context', 205), ('value_factories', 398), ('font_readiness', 82), ('image_readiness', 23), ('wake_locks', 115),
          ('notifications', 149), ('data_transfer', 851)]
-changes = {'abi_layouts': 27}
+changes = {'abi_layouts': 27, 'viewport_scroll': 2156}
 baseline = [item for item in json.loads(BASELINE.read_text()) if item['name'] not in ['frames', 'teardown'] + [name for name, _ in ADDED]]
 probes = [(item['name'], changes.get(item['name'], item.get('assertions'))) for item in baseline] + ADDED
 for name, expected in probes:
