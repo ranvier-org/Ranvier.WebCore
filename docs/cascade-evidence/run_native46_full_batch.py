@@ -84,8 +84,9 @@ def run(name, command, expected=None, environment=None, executed=None, timeout=3
 
 
 # The baseline batch's probes in its order, each with its exact assertion count; then the probes this group adds.
-baseline = [item for item in json.loads(BASELINE.read_text()) if item['name'] not in ('frames', 'teardown')]
-probes = [(item['name'], item.get('assertions')) for item in baseline] + [('cascade_diagnostics', 5287)]
+# CASCADE_ASSERTIONS is the cascade probe's own count, replacing a baseline entry for it.
+baseline = [item for item in json.loads(BASELINE.read_text()) if item['name'] not in ('frames', 'teardown', 'cascade_diagnostics')]
+probes = [(item['name'], item.get('assertions')) for item in baseline] + [('cascade_diagnostics', int(os.environ.get('CASCADE_ASSERTIONS', '5287')))]
 for name, expected in probes:
     arguments = ['C:/Python314/python.exe', '-I', '-X', 'utf8', str(repo / 'tests/abi' / (name + '.py')), '--native-directory', str(runtime)]
     if name == 'abi_layouts':
