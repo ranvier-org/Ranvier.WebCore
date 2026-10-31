@@ -241,7 +241,14 @@ module Calls =
            "rv_ax_text_rects"
            "rv_ax_text_offset_at"
            "rv_ax_text_child_range"
-           "rv_host_load_svg" |]
+           "rv_host_load_svg"
+           "rv_capability_count"
+           "rv_capability_name_at"
+           "rv_host_capability_fact"
+           "rv_host_capability_value_kind"
+           "rv_host_capability_value_number"
+           "rv_host_capability_value_text"
+           "rv_host_select_svg_view" |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
     let Ticks: int64 array = Array.zeroCreate Names.Length
@@ -925,6 +932,27 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_host_load_svg(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string svg)
+
+    [<DllImport(Lib)>]
+    extern int rv_capability_count(int category)
+
+    [<DllImport(Lib)>]
+    extern int rv_capability_name_at(int category, int index, byte[] buffer, int capacity, int[] length)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_capability_fact(nativeint host, int category, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, int dimension, int& fact)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_capability_value_kind(nativeint host, int category, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, int& kind)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_capability_value_number(nativeint host, int category, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, double& number)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_capability_value_text(nativeint host, int category, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string name, byte[] buffer, int capacity, int[] length)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_select_svg_view(nativeint host, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string fragment, int& selected)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -3185,6 +3213,90 @@ let rv_host_load_svg (host: nativeint, svg: string) : int =
         result
     else
         Raw.rv_host_load_svg (host, svg)
+
+let rv_capability_count (category: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_capability_count (category)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[182] <- Calls.Counts[182] + 1L
+        Calls.Ticks[182] <- Calls.Ticks[182] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_capability_count (category)
+
+let rv_capability_name_at (category: int, index: int, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_capability_name_at (category, index, buffer, capacity, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[183] <- Calls.Counts[183] + 1L
+        Calls.Ticks[183] <- Calls.Ticks[183] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_capability_name_at (category, index, buffer, capacity, length)
+
+let rv_host_capability_fact (host: nativeint, category: int, name: string, dimension: int, fact: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_host_capability_fact (host, category, name, dimension, &fact)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[184] <- Calls.Counts[184] + 1L
+        Calls.Ticks[184] <- Calls.Ticks[184] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_capability_fact (host, category, name, dimension, &fact)
+
+let rv_host_capability_value_kind (host: nativeint, category: int, name: string, kind: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_host_capability_value_kind (host, category, name, &kind)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[185] <- Calls.Counts[185] + 1L
+        Calls.Ticks[185] <- Calls.Ticks[185] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_capability_value_kind (host, category, name, &kind)
+
+let rv_host_capability_value_number (host: nativeint, category: int, name: string, number: byref<double>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_host_capability_value_number (host, category, name, &number)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[186] <- Calls.Counts[186] + 1L
+        Calls.Ticks[186] <- Calls.Ticks[186] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_capability_value_number (host, category, name, &number)
+
+let rv_host_capability_value_text (host: nativeint, category: int, name: string, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_host_capability_value_text (host, category, name, buffer, capacity, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[187] <- Calls.Counts[187] + 1L
+        Calls.Ticks[187] <- Calls.Ticks[187] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_capability_value_text (host, category, name, buffer, capacity, length)
+
+let rv_host_select_svg_view (host: nativeint, fragment: string, selected: byref<int>) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_host_select_svg_view (host, fragment, &selected)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[188] <- Calls.Counts[188] + 1L
+        Calls.Ticks[188] <- Calls.Ticks[188] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_select_svg_view (host, fragment, &selected)
 
 // END GENERATED
 

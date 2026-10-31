@@ -1,6 +1,7 @@
 #include "config.h"
 #include "RanvierWebCoreAbi.h"
 #include "dom/RanvierDomGlue.h"
+#include "RanvierSvgViewGlue.h"
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
@@ -51,6 +52,7 @@
 #include <WebCore/PixelBuffer.h>
 #include <WebCore/Range.h>
 #include <WebCore/Settings.h>
+#include <WebCore/MIMETypeRegistry.h>
 #include <WebCore/Text.h>
 #include <WebCore/TrustedHTML.h>
 #include <WebCore/DocumentLoader.h>
@@ -1100,7 +1102,7 @@ static int32_t fail(const Exception& exception) { return Ranvier::recordExceptio
 
 template<typename T> static int32_t status(const ExceptionOr<T>& result) { return result.hasException() ? fail(result.exception()) : RV_OK; }
 
-int32_t rv_abi_version(void) { return 27; }
+int32_t rv_abi_version(void) { return 28; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1114,6 +1116,10 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "capabilities"))
+        return 1;
+    if (!std::strcmp(feature, "svg-view-selection"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1140,6 +1146,8 @@ int32_t rv_abi_has(const char* feature)
 #endif
     return 0;
 }
+
+#include "RanvierCapabilities.inc"
 
 int64_t rv_process_id(void) { return static_cast<int64_t>(getCurrentProcessID()); }
 
@@ -1257,6 +1265,17 @@ int32_t rv_host_load_svg(RvHost* host, const char* svg)
     if (host->accessibility)
         host->document().axObjectCache();
     return RV_OK;
+}
+
+int32_t rv_host_select_svg_view(RvHost* host, const char* fragment, int32_t* selected)
+{
+    if (!host || !fragment || !selected)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_host_select_svg_view(reinterpret_cast<RvNode*>(&host->document()), fragment, selected);
 }
 
 int32_t rv_host_scripts_enabled(RvHost* host)

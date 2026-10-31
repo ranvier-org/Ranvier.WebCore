@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\r\n  \"status\": \"succeeded\",\r\n  \"verdict\": \"clean\",\r\n  \"analyzed\": true,\r\n  \"scope\": \"project\",\r\n  \"speed\": \"trusted\",\r\n  \"errorCount\": 0,\r\n  \"warningCount\": 0,\r\n  \"diagnosticsFileCount\": 0,\r\n  \"files\": [],\r\n  \"diagnostics\": [],\r\n  \"diagnosticsTruncated\": false,\r\n  \"escalated\": \"fcs-reanalyze\",\r\n  \"via\": \"fcs\",\r\n  \"fresh\": true,\r\n  \"groundTruth\": true,\r\n  \"totalDiagnostics\": 0,\r\n  \"infoCount\": 0,\r\n  \"belowSeverityFloorCount\": 0,\r\n  \"diagnosticsNote\": null,\r\n  \"reason\": null,\r\n  \"projectFileName\": \"C:\\\\wk\\\\native-capabilities\\\\src\\\\Ranvier.WebCore\\\\Ranvier.WebCore.fsproj\",\r\n  \"optionsSource\": \"ionide-proj-info\",\r\n  \"projectsSwept\": 1\r\n}"
+    }
+  ]
+}
