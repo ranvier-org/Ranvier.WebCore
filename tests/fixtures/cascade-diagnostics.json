@@ -1,0 +1,127 @@
+{
+  "fixture": "tests/fixtures/cascade-diagnostics.html",
+  "description": "C25 cascade conformance cases. Each case names an element and a property, the computed value every engine must report, and the expected cascade entries for native diagnostics in cascade input order. An element is an id path: a document id, then ids in the open shadow root of each element before. Sheet and rule indices count in the tree scope defining the rule, and a contributor's layerOrder overrides the document's layer order for a shadow tree's layers. Author entries default to sheet 1, depth 0, not important, unlayered (layer order -1, layer name empty), no shorthand, no conditions, no var() and not the winner. A userAgent block describes the user-agent entries ahead of them, whose text is engine-specific. Values are compared with the fixture only, never across engines.",
+  "layerOrder": {"imported": 0, "one.inner": 1, "one": 2, "two": 3, "": 4},
+  "cases": [
+    {"name": "specificity", "tieBreak": "specificity", "element": "spec", "property": "order", "computed": 1, "contributors": [
+      {"value": "3", "rule": 4, "specificity": [0, 1, 0], "selector": ".s0"},
+      {"value": "2", "rule": 3, "specificity": [0, 2, 0], "selector": ".s0.s1"},
+      {"value": "1", "rule": 2, "specificity": [1, 0, 0], "selector": "#spec", "winner": true}]},
+    {"name": "source order", "tieBreak": "source order", "element": "src", "property": "order", "computed": 5, "contributors": [
+      {"value": "4", "rule": 5, "specificity": [0, 1, 0]},
+      {"value": "5", "rule": 48, "specificity": [0, 1, 0], "winner": true}]},
+    {"name": "specificity over source order", "tieBreak": "specificity", "element": "wh", "property": "order", "computed": 6, "contributors": [
+      {"value": "7", "rule": 7, "specificity": [0, 0, 0], "selector": ":where(#wh)"},
+      {"value": "6", "rule": 6, "specificity": [0, 1, 0], "winner": true}]},
+    {"name": "important over specificity", "tieBreak": "importance", "element": "imp", "property": "order", "computed": 8, "contributors": [
+      {"value": "8", "rule": 8, "specificity": [0, 1, 0], "important": true, "winner": true},
+      {"value": "9", "rule": 9, "specificity": [1, 0, 0]}]},
+    {"name": "unlayered over layers", "tieBreak": "layer order", "element": "lay", "property": "order", "computed": 12, "contributors": [
+      {"value": "11", "rule": 11, "specificity": [1, 0, 0], "layer": "one"},
+      {"value": "10", "rule": 10, "specificity": [1, 0, 0], "layer": "two"},
+      {"value": "12", "rule": 12, "specificity": [0, 1, 0], "winner": true}]},
+    {"name": "important reverses layer order", "tieBreak": "importance across layers", "element": "limp", "property": "order", "computed": 13, "contributors": [
+      {"value": "13", "rule": 13, "specificity": [1, 0, 0], "layer": "one", "important": true, "winner": true},
+      {"value": "14", "rule": 14, "specificity": [1, 0, 0], "layer": "two", "important": true},
+      {"value": "15", "rule": 15, "specificity": [1, 0, 0], "important": true}]},
+    {"name": "anonymous layer after named", "tieBreak": "layer order", "element": "anon", "property": "order", "computed": 17, "contributors": [
+      {"value": "16", "rule": 16, "specificity": [1, 0, 0], "layer": "two"},
+      {"value": "17", "rule": 17, "specificity": [1, 0, 0], "layer": "", "winner": true}]},
+    {"name": "import layer first", "tieBreak": "layer order", "element": "imported", "property": "order", "computed": 31, "contributors": [
+      {"value": "30", "sheet": 0, "rule": 0, "specificity": [1, 0, 0], "layer": "imported"},
+      {"value": "31", "rule": 18, "specificity": [1, 0, 0], "layer": "one", "winner": true}]},
+    {"name": "sublayer before its parent", "tieBreak": "layer order", "element": "nest", "property": "order", "computed": 33, "contributors": [
+      {"value": "32", "rule": 19, "specificity": [1, 0, 0], "layer": "one.inner"},
+      {"value": "33", "rule": 20, "specificity": [1, 0, 0], "layer": "one", "winner": true}]},
+    {"name": "inline over author", "tieBreak": "inline style", "element": "inl", "property": "order", "computed": 19, "contributors": [
+      {"value": "18", "rule": 21, "specificity": [1, 0, 0]},
+      {"origin": "inline", "value": "19", "winner": true}]},
+    {"name": "author important over inline", "tieBreak": "importance across origins", "element": "inl2", "property": "order", "computed": 20, "contributors": [
+      {"value": "20", "rule": 22, "specificity": [1, 0, 0], "important": true, "winner": true},
+      {"origin": "inline", "value": "21"}]},
+    {"name": "inline important over author important", "tieBreak": "inline style", "element": "inl3", "property": "order", "computed": 23, "contributors": [
+      {"value": "22", "rule": 23, "specificity": [1, 0, 0], "important": true},
+      {"origin": "inline", "value": "23", "important": true, "winner": true}]},
+    {"name": "user-agent important over author important", "tieBreak": "importance across origins", "element": "uaimp", "property": "display", "computed": "none",
+      "userAgent": {"winner": true, "important": true, "value": "none"}, "contributors": [
+      {"value": "block", "rule": 24, "specificity": [0, 1, 1], "important": true}]},
+    {"name": "author over user agent", "tieBreak": "origin", "element": "uap", "property": "margin-top", "computed": 3,
+      "userAgent": {"winner": false, "properties": ["margin-top", "margin-block-start"]}, "contributors": [
+      {"value": "3px", "rule": 25, "specificity": [0, 1, 0], "winner": true}]},
+    {"name": "user agent alone", "tieBreak": "origin", "element": "uaonly", "property": "margin-top", "computed": 16,
+      "userAgent": {"winner": true, "properties": ["margin-top", "margin-block-start"]}, "contributors": []},
+    {"name": "presentational hint", "tieBreak": "presentational hint", "element": "hint", "property": "width", "computed": 30, "contributors": [
+      {"origin": "presentational-hint", "value": "30px", "winner": true}]},
+    {"name": "author over presentational hint", "tieBreak": "presentational hint", "element": "hint2", "property": "width", "computed": 33, "contributors": [
+      {"origin": "presentational-hint", "value": "30px"},
+      {"value": "33px", "rule": 26, "specificity": [0, 1, 0], "winner": true}]},
+    {"name": "shorthand longhand", "tieBreak": "shorthand expansion", "element": "sh", "property": "margin-top", "computed": 7, "contributors": [
+      {"value": "7px", "rule": 27, "specificity": [1, 0, 0], "shorthand": "margin", "winner": true}]},
+    {"name": "vertical logical over physical", "tieBreak": "logical pair", "element": "vt", "property": "margin-top", "computed": 71, "contributors": [
+      {"value": "70px", "rule": 44, "specificity": [1, 0, 0], "declaration": 1},
+      {"value": "71px", "rule": 44, "specificity": [1, 0, 0], "declaration": 2, "declared": "margin-inline-start", "winner": true}]},
+    {"name": "vertical physical counterpart", "tieBreak": "logical pair", "element": "vt", "property": "margin-inline-start", "computed": 71, "contributors": [
+      {"value": "70px", "rule": 44, "specificity": [1, 0, 0], "declaration": 1, "declared": "margin-top"},
+      {"value": "71px", "rule": 44, "specificity": [1, 0, 0], "declaration": 2, "winner": true}]},
+    {"name": "horizontal physical over logical", "tieBreak": "logical pair", "element": "hz", "property": "margin-left", "computed": 73, "contributors": [
+      {"value": "72px", "rule": 45, "specificity": [1, 0, 0], "declaration": 0, "declared": "margin-inline-start"},
+      {"value": "73px", "rule": 45, "specificity": [1, 0, 0], "declaration": 1, "winner": true}]},
+    {"name": "logical pair across rules", "tieBreak": "logical pair", "element": "hz2", "property": "margin-left", "computed": 74, "contributors": [
+      {"value": "75px", "rule": 46, "specificity": [0, 1, 0], "declared": "margin-inline-start"},
+      {"value": "74px", "rule": 47, "specificity": [1, 0, 0], "winner": true}]},
+    {"name": "custom property", "tieBreak": "specificity", "element": "cv", "property": "--x", "computed": 41, "contributors": [
+      {"value": "42", "rule": 28, "specificity": [0, 1, 0]},
+      {"value": "41", "rule": 29, "specificity": [1, 0, 0], "winner": true}]},
+    {"name": "unregistered custom property inherits", "tieBreak": "inheritance", "element": "cvkid", "property": "--x", "computed": 41, "contributors": [
+      {"value": "42", "rule": 28, "specificity": [0, 1, 0], "depth": 1},
+      {"value": "41", "rule": 29, "specificity": [1, 0, 0], "depth": 1, "winner": true}]},
+    {"name": "registered inherits true", "tieBreak": "inheritance", "element": "rikid", "property": "--reg-inh", "computed": 43, "contributors": [
+      {"value": "43", "rule": 30, "specificity": [1, 0, 0], "depth": 1, "winner": true}]},
+    {"name": "registered inherits false", "tieBreak": "inheritance", "element": "rnkid", "property": "--reg-no", "computed": 0, "contributors": []},
+    {"name": "registered own declaration", "tieBreak": "inheritance", "element": "rn", "property": "--reg-no", "computed": 44, "contributors": [
+      {"value": "44", "rule": 31, "specificity": [1, 0, 0], "winner": true}]},
+    {"name": "inherit chain", "tieBreak": "inheritance", "element": "ch3", "property": "order", "computed": 50, "contributors": [
+      {"value": "inherit", "rule": 34, "specificity": [1, 0, 0], "winner": true},
+      {"value": "inherit", "rule": 33, "specificity": [1, 0, 0], "depth": 1, "winner": true},
+      {"value": "50", "rule": 32, "specificity": [1, 0, 0], "depth": 2, "winner": true}]},
+    {"name": "unset inherited chain", "tieBreak": "inheritance", "element": "u3", "property": "tab-size", "computed": 5, "contributors": [
+      {"value": "unset", "rule": 36, "specificity": [1, 0, 0], "depth": 1, "winner": true},
+      {"value": "5", "rule": 35, "specificity": [1, 0, 0], "depth": 2, "winner": true}]},
+    {"name": "unset non-inherited", "tieBreak": "inheritance", "element": "nu2", "property": "order", "computed": 0, "contributors": [
+      {"value": "unset", "rule": 38, "specificity": [1, 0, 0], "winner": true}]},
+    {"name": "no declaration, not inherited", "tieBreak": "inheritance", "element": "plain", "property": "order", "computed": 0, "contributors": []},
+    {"name": "no declaration to the root", "tieBreak": "inheritance", "element": "plain", "property": "tab-size", "computed": 8, "contributors": []},
+    {"name": "var reference", "tieBreak": "variables", "element": "var", "property": "order", "computed": 60, "contributors": [
+      {"value": "var(--o)", "rule": 39, "specificity": [1, 0, 0], "declaration": 1, "variable": true, "winner": true}]},
+    {"name": "media and supports conditions", "tieBreak": "conditions", "element": "cond", "property": "order", "computed": 61, "contributors": [
+      {"value": "61", "rule": 40, "specificity": [1, 0, 0], "conditions": ["@media", "@supports"], "winner": true}]},
+    {"name": "container condition", "tieBreak": "conditions", "element": "cq", "property": "order", "computed": 62, "contributors": [
+      {"value": "62", "rule": 42, "specificity": [1, 0, 0], "conditions": ["@container"], "winner": true}]},
+    {"name": "host rules in the shadow tree", "tieBreak": "specificity", "element": "hh", "property": "flex-shrink", "computed": 7, "contributors": [
+      {"value": "5", "sheet": 0, "rule": 0, "specificity": [0, 1, 0], "selector": ":host", "layer": "a", "layerOrder": 0},
+      {"value": "6", "sheet": 0, "rule": 1, "specificity": [0, 1, 0], "selector": ":host"},
+      {"value": "7", "sheet": 0, "rule": 2, "specificity": [0, 2, 0], "selector": ":host(.hh)", "winner": true}]},
+    {"name": "outer rule over a host rule", "tieBreak": "shadow context", "element": "hh", "property": "order", "computed": 69, "contributors": [
+      {"value": "71", "sheet": 0, "rule": 3, "specificity": [0, 1, 0], "selector": ":host"},
+      {"value": "69", "rule": 53, "specificity": [1, 0, 0], "selector": "#hh", "winner": true}]},
+    {"name": "important host rule over an important outer rule", "tieBreak": "shadow context importance", "element": "hh", "property": "tab-size", "computed": 6, "contributors": [
+      {"value": "6", "sheet": 0, "rule": 3, "specificity": [0, 1, 0], "selector": ":host", "important": true, "winner": true},
+      {"value": "3", "rule": 53, "specificity": [1, 0, 0], "selector": "#hh", "important": true}]},
+    {"name": "slotted rules", "tieBreak": "specificity", "element": "sl", "property": "opacity", "computed": 0.25, "contributors": [
+      {"value": "0.5", "sheet": 0, "rule": 5, "specificity": [0, 0, 1], "selector": "::slotted(span)", "specificityNote": "the engine counts the argument only; css-scoping-1 adds the pseudo-element, (0, 0, 2)"},
+      {"value": "0.25", "sheet": 0, "rule": 6, "specificity": [0, 1, 0], "selector": "::slotted(.sl)", "specificityNote": "the engine counts the argument only; css-scoping-1 adds the pseudo-element, (0, 1, 1)", "winner": true}]},
+    {"name": "outer rule over a slotted rule", "tieBreak": "shadow context", "element": "sl", "property": "order", "computed": 68, "contributors": [
+      {"value": "73", "sheet": 0, "rule": 5, "specificity": [0, 0, 1], "selector": "::slotted(span)", "specificityNote": "the engine counts the argument only; css-scoping-1 adds the pseudo-element, (0, 0, 2)"},
+      {"value": "68", "rule": 54, "specificity": [1, 0, 0], "selector": "#sl", "winner": true}]},
+    {"name": "outer part rule over an inner rule", "tieBreak": "shadow context", "element": "hh/pt", "property": "order", "computed": 77, "contributors": [
+      {"value": "75", "sheet": 0, "rule": 7, "specificity": [1, 0, 0], "selector": "#pt"},
+      {"value": "77", "rule": 55, "specificity": [0, 0, 1], "selector": "::part(pp)", "winner": true}]},
+    {"name": "important inner rule over an important part rule", "tieBreak": "shadow context importance", "element": "hh/pt2", "property": "order", "computed": 76, "contributors": [
+      {"value": "76", "sheet": 0, "rule": 8, "specificity": [1, 0, 0], "selector": "#pt2", "important": true, "winner": true},
+      {"value": "78", "rule": 56, "specificity": [1, 0, 1], "selector": "#hh::part(pp2)", "important": true}]},
+    {"name": "inheritance into slotted content", "tieBreak": "inheritance", "element": "inh", "property": "color", "computed": "rgb(1, 2, 3)", "contributors": [
+      {"value": "rgb(1, 2, 3)", "sheet": 0, "rule": 4, "specificity": [0, 0, 1], "selector": "slot", "depth": 1, "winner": true}]},
+    {"name": "custom property inherited from the host", "tieBreak": "inheritance", "element": "inh", "property": "--sh", "computed": 80, "contributors": [
+      {"value": "80", "sheet": 0, "rule": 3, "specificity": [0, 1, 0], "selector": ":host", "depth": 2, "winner": true}]}
+  ]
+}

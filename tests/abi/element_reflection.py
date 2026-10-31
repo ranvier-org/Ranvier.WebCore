@@ -5,6 +5,9 @@ import os
 import pathlib
 import sys
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 TAGS = {
     'HTMLBaseElement': ['base'], 'HTMLBRElement': ['br'], 'HTMLDataElement': ['data'],
@@ -30,9 +33,7 @@ def verify(native_directory):
     collections = []
 
     def bind(name, result, parameters):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, parameters
-        return function
+        return bind_utf8(library, name, result, parameters)
 
     create = bind('rv_host_create', pointer, [integer, integer])
     destroy = bind('rv_host_destroy', None, [pointer])
@@ -65,8 +66,8 @@ def verify(native_directory):
                     getter = lookup[(interface, setter['member'], 'getter')]
                     label = tag + '.' + setter['member']
                     kind = setter['parameters'][1]['ctype']
-                    if kind == 'const char*':
-                        put = bind(setter['function'], integer, [pointer, ctypes.c_char_p])
+                    if kind == 'const uint8_t*':
+                        put = bind(setter['function'], integer, [pointer, Utf8])
                         get = bind(getter['function'], integer, [pointer, pointer, integer, ctypes.POINTER(integer)])
                         value = b'https://example.invalid/reflection' if setter['member'] in ['href', 'src', 'cite'] else 'native-api-λ'.encode()
                         expect(put(node, value) == 0, label + ' setter')

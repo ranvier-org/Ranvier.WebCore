@@ -42,4 +42,4 @@ set(USE_SYSTEM_MALLOC OFF CACHE BOOL "")
 # The glue of the generated DOM functions (gen/domgen.py) compiles into WebCore through patch 0012, where it
 # reaches members WebCore does not export. The host re-exports each function under its rv_ name.
 get_filename_component(_ranvier_root "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
-set(WebCore_EMBEDDER_SOURCES "${_ranvier_root}/host/dom/RanvierDomGlue.cpp;${_ranvier_root}/host/RanvierSvgViewGlue.cpp;${_ranvier_root}/host/RanvierResourceGlue.cpp" CACHE STRING "" FORCE)
+set(WebCore_EMBEDDER_SOURCES "${_ranvier_root}/host/dom/RanvierDomGlue.cpp;${_ranvier_root}/host/RanvierSvgViewGlue.cpp;${_ranvier_root}/host/RanvierResourceGlue.cpp;${_ranvier_root}/host/RanvierEventGlue.cpp;${_ranvier_root}/host/RanvierViewportGlue.cpp;${_ranvier_root}/host/RanvierInspectGlue.cpp" CACHE STRING "" FORCE)

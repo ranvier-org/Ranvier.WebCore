@@ -246,12 +246,18 @@ and [<AllowNullLiteral>] Document =
     abstract member createEvent: ``type``: string -> Event
     /// <summary>Document.createRange.</summary>
     abstract member createRange: unit -> Range
+    /// <summary>Document.createNodeIterator.</summary>
+    abstract member createNodeIterator: root: Node * ?whatToShow: uint32 * ?filter: NodeFilter -> NodeIterator
+    /// <summary>Document.createTreeWalker.</summary>
+    abstract member createTreeWalker: root: Node * ?whatToShow: uint32 * ?filter: NodeFilter -> TreeWalker
     /// <summary>Document.caretRangeFromPoint.</summary>
     abstract member caretRangeFromPoint: ?x: int * ?y: int -> Range
     /// <summary>Document.ariaNotify.</summary>
     abstract member ariaNotify: announcement: string -> unit
     /// <summary>Document.ariaNotify.</summary>
     abstract member ariaNotify: announcement: string * options: AriaNotifyOptions -> unit
+    /// <summary>Document.caretPositionFromPoint.</summary>
+    abstract member caretPositionFromPoint: x: float * y: float * ?options: CaretPositionFromPointOptions -> CaretPosition
     /// <summary>Document.scrollingElement.</summary>
     abstract member scrollingElement: Element with get
     /// <summary>Document.readyState.</summary>
@@ -850,6 +856,10 @@ and [<AllowNullLiteral>] HTMLFormElement =
     abstract member namedItem: name: string -> (RadioNodeListOrElement) option
 #endif
 
+    /// <summary>HTMLFormElement.submit.</summary>
+    abstract member submit: unit -> unit
+    /// <summary>HTMLFormElement.requestSubmit.</summary>
+    abstract member requestSubmit: ?submitter: HTMLElement -> unit
     /// <summary>HTMLFormElement.reset.</summary>
     abstract member reset: unit -> unit
     /// <summary>HTMLFormElement.checkValidity.</summary>
@@ -945,6 +955,8 @@ and [<AllowNullLiteral>] HTMLInputElement =
     abstract member disabled: bool with get, set
     /// <summary>HTMLInputElement.form.</summary>
     abstract member form: HTMLFormElement with get
+    /// <summary>HTMLInputElement.files.</summary>
+    abstract member files: FileList with get, set
     /// <summary>HTMLInputElement.formAction.</summary>
     abstract member formAction: string with get, set
     /// <summary>HTMLInputElement.formEnctype.</summary>
@@ -1727,6 +1739,10 @@ and [<AllowNullLiteral>] MathMLElement =
     inherit GlobalEventHandlers
     inherit HTMLOrSVGElement
     inherit ElementCSSInlineStyle
+
+/// <summary>MathMLMathElement in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MathMLMathElement =
+    inherit MathMLElement
 
 /// <summary>HTMLStyleElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLStyleElement =
@@ -3028,8 +3044,92 @@ and [<AllowNullLiteral>] HTMLCollection =
     abstract member length: uint32 with get
     /// <summary>HTMLCollection.item.</summary>
     abstract member item: index: uint32 -> Element
+
     /// <summary>HTMLCollection.namedItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.namedItem($1)")>]
+    abstract member __ranvier_namedItem: name: string -> Element
+#else
     abstract member namedItem: name: string -> Element
+#endif
+
+/// <summary>HTMLFormControlsCollection in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLFormControlsCollection =
+    inherit HTMLCollection
+
+    /// <summary>HTMLFormControlsCollection.item.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1]")>]
+#endif
+    abstract member item: index: uint32 -> HTMLElement
+
+
+    /// <summary>HTMLFormControlsCollection.namedItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.namedItem($1)")>]
+    abstract member __ranvier_namedItem: name: string -> obj
+#else
+    abstract member namedItem: name: string -> (RadioNodeListOrElement) option
+#endif
+
+/// <summary>HTMLOptionsCollection in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HTMLOptionsCollection =
+    inherit HTMLCollection
+    /// <summary>HTMLOptionsCollection.length.</summary>
+    abstract member length: uint32 with get, set
+
+    /// <summary>HTMLOptionsCollection.setItem.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0[$1] = $2")>]
+#endif
+    abstract member setItem: index: uint32 * option: HTMLOptionElement -> unit
+
+
+    /// <summary>HTMLOptionsCollection.add.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.add($1, $2)")>]
+    abstract member __ranvier_add: element: obj * ?before: obj -> unit
+#else
+    abstract member add: element: HTMLOptionElement -> unit
+    abstract member add: element: HTMLOptionElement * before: HTMLElement -> unit
+    abstract member add: element: HTMLOptionElement * before: int -> unit
+    abstract member add: element: HTMLOptGroupElement -> unit
+    abstract member add: element: HTMLOptGroupElement * before: HTMLElement -> unit
+    abstract member add: element: HTMLOptGroupElement * before: int -> unit
+#endif
+    /// <summary>HTMLOptionsCollection.remove.</summary>
+    abstract member remove: index: int -> unit
+    /// <summary>HTMLOptionsCollection.selectedIndex.</summary>
+    abstract member selectedIndex: int with get, set
+    /// <summary>HTMLOptionsCollection.item.</summary>
+    abstract member item: index: uint32 -> HTMLOptionElement
+    /// <summary>HTMLOptionsCollection.namedItem.</summary>
+    abstract member namedItem: name: string -> HTMLOptionElement
+
+/// <summary>DOMFormData in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DOMFormData =
+    /// <summary>DOMFormData.append.</summary>
+    abstract member append: name: string * value: string -> unit
+    /// <summary>DOMFormData.append.</summary>
+    abstract member append: name: string * blobValue: Blob * ?filename: string -> unit
+    /// <summary>DOMFormData.delete.</summary>
+    abstract member delete: name: string -> unit
+
+    /// <summary>DOMFormData.get.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.get($1)")>]
+    abstract member __ranvier_get: name: string -> obj
+#else
+    abstract member get: name: string -> (FileOrUSVString) option
+#endif
+    /// <summary>DOMFormData.getAll.</summary>
+    abstract member getAll: name: string -> (FileOrUSVString) array
+    /// <summary>DOMFormData.has.</summary>
+    abstract member has: name: string -> bool
+    /// <summary>DOMFormData.set.</summary>
+    abstract member set: name: string * value: string -> unit
+    /// <summary>DOMFormData.set.</summary>
+    abstract member set: name: string * blobValue: Blob * ?filename: string -> unit
 
 /// <summary>ValidityState in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ValidityState =
@@ -3254,6 +3354,138 @@ and [<AllowNullLiteral>] CompositionEvent =
     inherit UIEvent
     /// <summary>CompositionEvent.data.</summary>
     abstract member data: string with get
+
+/// <summary>SubmitEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] SubmitEvent =
+    inherit Event
+    /// <summary>SubmitEvent.submitter.</summary>
+    abstract member submitter: HTMLElement with get
+
+/// <summary>FormDataEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FormDataEvent =
+    inherit Event
+    /// <summary>FormDataEvent.formData.</summary>
+    abstract member formData: DOMFormData with get
+
+/// <summary>ToggleEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ToggleEvent =
+    inherit Event
+    /// <summary>ToggleEvent.oldState.</summary>
+    abstract member oldState: string with get
+    /// <summary>ToggleEvent.newState.</summary>
+    abstract member newState: string with get
+    /// <summary>ToggleEvent.source.</summary>
+    abstract member source: Element with get
+
+/// <summary>CommandEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CommandEvent =
+    inherit Event
+    /// <summary>CommandEvent.source.</summary>
+    abstract member source: Element with get
+    /// <summary>CommandEvent.command.</summary>
+    abstract member command: string with get
+
+/// <summary>ErrorEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ErrorEvent =
+    inherit Event
+    /// <summary>ErrorEvent.message.</summary>
+    abstract member message: string with get
+    /// <summary>ErrorEvent.filename.</summary>
+    abstract member filename: string with get
+    /// <summary>ErrorEvent.lineno.</summary>
+    abstract member lineno: uint32 with get
+    /// <summary>ErrorEvent.colno.</summary>
+    abstract member colno: uint32 with get
+
+/// <summary>ProgressEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ProgressEvent =
+    inherit Event
+    /// <summary>ProgressEvent.lengthComputable.</summary>
+    abstract member lengthComputable: bool with get
+    /// <summary>ProgressEvent.loaded.</summary>
+    abstract member loaded: float with get
+    /// <summary>ProgressEvent.total.</summary>
+    abstract member total: float with get
+
+/// <summary>AnimationEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] AnimationEvent =
+    inherit Event
+    /// <summary>AnimationEvent.animationName.</summary>
+    abstract member animationName: string with get
+    /// <summary>AnimationEvent.elapsedTime.</summary>
+    abstract member elapsedTime: float with get
+    /// <summary>AnimationEvent.pseudoElement.</summary>
+    abstract member pseudoElement: string with get
+
+/// <summary>TransitionEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TransitionEvent =
+    inherit Event
+    /// <summary>TransitionEvent.propertyName.</summary>
+    abstract member propertyName: string with get
+    /// <summary>TransitionEvent.elapsedTime.</summary>
+    abstract member elapsedTime: float with get
+    /// <summary>TransitionEvent.pseudoElement.</summary>
+    abstract member pseudoElement: string with get
+
+/// <summary>ContentVisibilityAutoStateChangeEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ContentVisibilityAutoStateChangeEvent =
+    inherit Event
+    /// <summary>ContentVisibilityAutoStateChangeEvent.skipped.</summary>
+    abstract member skipped: bool with get
+
+/// <summary>AnimationPlaybackEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] AnimationPlaybackEvent =
+    inherit Event
+
+    /// <summary>AnimationPlaybackEvent.currentTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.currentTime")>]
+    abstract member __ranvier_get_currentTime: unit -> obj
+#else
+    abstract member currentTime: (DoubleOrCSSNumericValue) option with get
+#endif
+
+    /// <summary>AnimationPlaybackEvent.timelineTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.timelineTime")>]
+    abstract member __ranvier_get_timelineTime: unit -> obj
+#else
+    abstract member timelineTime: (DoubleOrCSSNumericValue) option with get
+#endif
+
+/// <summary>PageTransitionEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PageTransitionEvent =
+    inherit Event
+    /// <summary>PageTransitionEvent.persisted.</summary>
+    abstract member persisted: bool with get
+
+/// <summary>HashChangeEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HashChangeEvent =
+    inherit Event
+    /// <summary>HashChangeEvent.oldURL.</summary>
+    abstract member oldURL: string with get
+    /// <summary>HashChangeEvent.newURL.</summary>
+    abstract member newURL: string with get
+
+/// <summary>MediaQueryListEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] MediaQueryListEvent =
+    inherit Event
+    /// <summary>MediaQueryListEvent.media.</summary>
+    abstract member media: string with get
+    /// <summary>MediaQueryListEvent.matches.</summary>
+    abstract member matches: bool with get
+
+/// <summary>PopStateEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] PopStateEvent =
+    inherit Event
+    /// <summary>PopStateEvent.hasUAVisualTransition.</summary>
+    abstract member hasUAVisualTransition: bool with get
+
+/// <summary>BeforeUnloadEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] BeforeUnloadEvent =
+    inherit Event
+    /// <summary>BeforeUnloadEvent.returnValue.</summary>
+    abstract member returnValue: string with get, set
 
 /// <summary>SVGGraphicsElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] SVGGraphicsElement =
@@ -4627,6 +4859,273 @@ and [<AllowNullLiteral>] SVGUseElement =
     /// <summary>SVGUseElement.href.</summary>
     abstract member href: SVGAnimatedString with get
 
+/// <summary>NodeIterator in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] NodeIterator =
+    /// <summary>NodeIterator.root.</summary>
+    abstract member root: Node with get
+    /// <summary>NodeIterator.referenceNode.</summary>
+    abstract member referenceNode: Node with get
+    /// <summary>NodeIterator.pointerBeforeReferenceNode.</summary>
+    abstract member pointerBeforeReferenceNode: bool with get
+    /// <summary>NodeIterator.whatToShow.</summary>
+    abstract member whatToShow: uint32 with get
+    /// <summary>NodeIterator.filter.</summary>
+    abstract member filter: (NodeFilter) option with get
+    /// <summary>NodeIterator.nextNode.</summary>
+    abstract member nextNode: unit -> Node
+    /// <summary>NodeIterator.previousNode.</summary>
+    abstract member previousNode: unit -> Node
+    /// <summary>NodeIterator.detach.</summary>
+    abstract member detach: unit -> unit
+
+/// <summary>TreeWalker in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TreeWalker =
+    /// <summary>TreeWalker.root.</summary>
+    abstract member root: Node with get
+    /// <summary>TreeWalker.whatToShow.</summary>
+    abstract member whatToShow: uint32 with get
+    /// <summary>TreeWalker.filter.</summary>
+    abstract member filter: (NodeFilter) option with get
+    /// <summary>TreeWalker.currentNode.</summary>
+    abstract member currentNode: Node with get, set
+    /// <summary>TreeWalker.parentNode.</summary>
+    abstract member parentNode: unit -> Node
+    /// <summary>TreeWalker.firstChild.</summary>
+    abstract member firstChild: unit -> Node
+    /// <summary>TreeWalker.lastChild.</summary>
+    abstract member lastChild: unit -> Node
+    /// <summary>TreeWalker.previousSibling.</summary>
+    abstract member previousSibling: unit -> Node
+    /// <summary>TreeWalker.nextSibling.</summary>
+    abstract member nextSibling: unit -> Node
+    /// <summary>TreeWalker.previousNode.</summary>
+    abstract member previousNode: unit -> Node
+    /// <summary>TreeWalker.nextNode.</summary>
+    abstract member nextNode: unit -> Node
+
+/// <summary>Blob in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Blob =
+
+    /// <summary>Blob.size.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("BigInt($0.size)")>]
+#endif
+    abstract member size: uint64 with get
+
+    /// <summary>Blob.type.</summary>
+    abstract member ``type``: string with get
+
+    /// <summary>Blob.slice.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((o,a0,a1,a2)=>o.slice(a0===void 0?void 0:Number(a0),a1===void 0?void 0:Number(a1),a2))($0,$1,$2,$3)")>]
+#endif
+    abstract member slice: ?start: int64 * ?``end``: int64 * ?contentType: string -> Blob
+
+
+/// <summary>File in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] File =
+    inherit Blob
+    /// <summary>File.name.</summary>
+    abstract member name: string with get
+
+    /// <summary>File.lastModified.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("BigInt($0.lastModified)")>]
+#endif
+    abstract member lastModified: int64 with get
+
+
+/// <summary>FileList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FileList =
+    /// <summary>FileList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>FileList.item.</summary>
+    abstract member item: index: uint32 -> File
+
+/// <summary>CaretPosition in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CaretPosition =
+    /// <summary>CaretPosition.offsetNode.</summary>
+    abstract member offsetNode: Node with get
+    /// <summary>CaretPosition.offset.</summary>
+    abstract member offset: uint32 with get
+    /// <summary>CaretPosition.getClientRect.</summary>
+    abstract member getClientRect: unit -> DOMRect
+
+/// <summary>URL in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] URL =
+
+    /// <summary>URL.href.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.href{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member href: string with get, set
+
+    /// <summary>URL.origin.</summary>
+    abstract member origin: string with get
+
+    /// <summary>URL.protocol.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.protocol{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member protocol: string with get, set
+
+
+    /// <summary>URL.username.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.username{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member username: string with get, set
+
+
+    /// <summary>URL.password.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.password{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member password: string with get, set
+
+
+    /// <summary>URL.host.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.host{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member host: string with get, set
+
+
+    /// <summary>URL.hostname.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.hostname{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member hostname: string with get, set
+
+
+    /// <summary>URL.port.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.port{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member port: string with get, set
+
+
+    /// <summary>URL.pathname.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.pathname{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member pathname: string with get, set
+
+
+    /// <summary>URL.hash.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.hash{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member hash: string with get, set
+
+
+    /// <summary>URL.search.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.search{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}")>]
+#endif
+    abstract member search: string with get, set
+
+    /// <summary>URL.searchParams.</summary>
+    abstract member searchParams: URLSearchParams with get
+    /// <summary>URL.toJSON.</summary>
+    abstract member toJSON: unit -> string
+
+/// <summary>URLSearchParams in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] URLSearchParams =
+    /// <summary>URLSearchParams.size.</summary>
+    abstract member size: uint32 with get
+    /// <summary>URLSearchParams.append.</summary>
+    abstract member append: name: string * value: string -> unit
+    /// <summary>URLSearchParams.delete.</summary>
+    abstract member delete: name: string * ?value: string -> unit
+    /// <summary>URLSearchParams.get.</summary>
+    abstract member get: name: string -> string
+    /// <summary>URLSearchParams.getAll.</summary>
+    abstract member getAll: name: string -> (string) array
+    /// <summary>URLSearchParams.has.</summary>
+    abstract member has: name: string * ?value: string -> bool
+    /// <summary>URLSearchParams.set.</summary>
+    abstract member set: name: string * value: string -> unit
+    /// <summary>URLSearchParams.sort.</summary>
+    abstract member sort: unit -> unit
+    /// <summary>URLSearchParams.toString.</summary>
+    abstract member toString: unit -> string
+
+/// <summary>URLPattern in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] URLPattern =
+
+    /// <summary>URLPattern.test.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.test($1, $2)")>]
+    abstract member __ranvier_test: ?input: obj * ?baseURL: string -> bool
+#else
+    abstract member test: unit -> bool
+    abstract member test: input: string * ?baseURL: string -> bool
+    abstract member test: input: URLPatternInit * ?baseURL: string -> bool
+#endif
+    /// <summary>URLPattern.protocol.</summary>
+    abstract member protocol: string with get
+    /// <summary>URLPattern.username.</summary>
+    abstract member username: string with get
+    /// <summary>URLPattern.password.</summary>
+    abstract member password: string with get
+    /// <summary>URLPattern.hostname.</summary>
+    abstract member hostname: string with get
+    /// <summary>URLPattern.port.</summary>
+    abstract member port: string with get
+    /// <summary>URLPattern.pathname.</summary>
+    abstract member pathname: string with get
+    /// <summary>URLPattern.search.</summary>
+    abstract member search: string with get
+    /// <summary>URLPattern.hash.</summary>
+    abstract member hash: string with get
+    /// <summary>URLPattern.hasRegExpGroups.</summary>
+    abstract member hasRegExpGroups: bool with get
+
+/// <summary>VisualViewport in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] VisualViewport =
+    inherit EventTarget
+    /// <summary>VisualViewport.offsetLeft.</summary>
+    abstract member offsetLeft: float with get
+    /// <summary>VisualViewport.offsetTop.</summary>
+    abstract member offsetTop: float with get
+    /// <summary>VisualViewport.pageLeft.</summary>
+    abstract member pageLeft: float with get
+    /// <summary>VisualViewport.pageTop.</summary>
+    abstract member pageTop: float with get
+    /// <summary>VisualViewport.width.</summary>
+    abstract member width: float with get
+    /// <summary>VisualViewport.height.</summary>
+    abstract member height: float with get
+    /// <summary>VisualViewport.scale.</summary>
+    abstract member scale: float with get
+
+/// <summary>Highlight in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Highlight =
+    /// <summary>Highlight.priority.</summary>
+    abstract member priority: int with get, set
+    /// <summary>Highlight.type.</summary>
+    abstract member ``type``: HighlightType with get, set
+
+/// <summary>HighlightRegistry in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] HighlightRegistry = interface end
+
+/// <summary>FileReader in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FileReader =
+    inherit EventTarget
+    /// <summary>FileReader.readyState.</summary>
+    abstract member readyState: uint16 with get
+    /// <summary>FileReader.readAsArrayBuffer.</summary>
+    abstract member readAsArrayBuffer: blob: Blob -> unit
+    /// <summary>FileReader.readAsBinaryString.</summary>
+    abstract member readAsBinaryString: blob: Blob -> unit
+    /// <summary>FileReader.readAsText.</summary>
+    abstract member readAsText: blob: Blob * ?encoding: string -> unit
+    /// <summary>FileReader.readAsDataURL.</summary>
+    abstract member readAsDataURL: blob: Blob -> unit
+    /// <summary>FileReader.abort.</summary>
+    abstract member abort: unit -> unit
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -4679,18 +5178,6 @@ and [<AllowNullLiteral>] HTMLTrackElement =
 and [<AllowNullLiteral>] HTMLVideoElement =
     inherit HTMLMediaElement
 
-/// <summary>AnimationEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] AnimationEvent =
-    inherit Event
-
-/// <summary>TransitionEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] TransitionEvent =
-    inherit Event
-
-/// <summary>BeforeUnloadEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] BeforeUnloadEvent =
-    inherit Event
-
 /// <summary>CustomElementRegistry in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CustomElementRegistry = interface end
 
@@ -4702,31 +5189,8 @@ and [<AllowNullLiteral>] ClipboardEvent =
 and [<AllowNullLiteral>] DragEvent =
     inherit MouseEvent
 
-/// <summary>ErrorEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ErrorEvent =
-    inherit Event
-
-/// <summary>FileList in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] FileList = interface end
-
-/// <summary>FormDataEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] FormDataEvent =
-    inherit Event
-
 /// <summary>GamepadEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] GamepadEvent =
-    inherit Event
-
-/// <summary>HTMLFormControlsCollection in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLFormControlsCollection =
-    inherit HTMLCollection
-
-/// <summary>HTMLOptionsCollection in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HTMLOptionsCollection =
-    inherit HTMLCollection
-
-/// <summary>HashChangeEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] HashChangeEvent =
     inherit Event
 
 /// <summary>MediaEncryptedEvent in the scoped DOM interface model.</summary>
@@ -4747,20 +5211,8 @@ and [<AllowNullLiteral>] PageRevealEvent =
 and [<AllowNullLiteral>] PageSwapEvent =
     inherit Event
 
-/// <summary>PageTransitionEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] PageTransitionEvent =
-    inherit Event
-
 /// <summary>PictureInPictureEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] PictureInPictureEvent =
-    inherit Event
-
-/// <summary>PopStateEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] PopStateEvent =
-    inherit Event
-
-/// <summary>ProgressEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ProgressEvent =
     inherit Event
 
 /// <summary>PromiseRejectionEvent in the scoped DOM interface model.</summary>
@@ -4779,10 +5231,6 @@ and [<AllowNullLiteral>] SecurityPolicyViolationEvent =
 and [<AllowNullLiteral>] StorageEvent =
     inherit Event
 
-/// <summary>SubmitEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] SubmitEvent =
-    inherit Event
-
 /// <summary>TextTrack in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] TextTrack =
     inherit EventTarget
@@ -4794,10 +5242,6 @@ and [<AllowNullLiteral>] TextTrackList =
 /// <summary>TimeRanges in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] TimeRanges = interface end
 
-/// <summary>ToggleEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ToggleEvent =
-    inherit Event
-
 /// <summary>TouchEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] TouchEvent =
     inherit UIEvent
@@ -4806,6 +5250,8 @@ and [<AllowNullLiteral>] TouchEvent =
 and [<AllowNullLiteral>] ARIAMixin =
     /// <summary>ARIAMixin.ariaActiveDescendantElement.</summary>
     abstract member ariaActiveDescendantElement: Element with get, set
+    /// <summary>ARIAMixin.ariaActionsElements.</summary>
+    abstract member ariaActionsElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaAtomic.</summary>
     abstract member ariaAtomic: string with get, set
     /// <summary>ARIAMixin.ariaAutoComplete.</summary>
@@ -4826,14 +5272,24 @@ and [<AllowNullLiteral>] ARIAMixin =
     abstract member ariaColIndexText: string with get, set
     /// <summary>ARIAMixin.ariaColSpan.</summary>
     abstract member ariaColSpan: string with get, set
+    /// <summary>ARIAMixin.ariaControlsElements.</summary>
+    abstract member ariaControlsElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaCurrent.</summary>
     abstract member ariaCurrent: string with get, set
+    /// <summary>ARIAMixin.ariaDescribedByElements.</summary>
+    abstract member ariaDescribedByElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaDescription.</summary>
     abstract member ariaDescription: string with get, set
+    /// <summary>ARIAMixin.ariaDetailsElements.</summary>
+    abstract member ariaDetailsElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaDisabled.</summary>
     abstract member ariaDisabled: string with get, set
+    /// <summary>ARIAMixin.ariaErrorMessageElements.</summary>
+    abstract member ariaErrorMessageElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaExpanded.</summary>
     abstract member ariaExpanded: string with get, set
+    /// <summary>ARIAMixin.ariaFlowToElements.</summary>
+    abstract member ariaFlowToElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaHasPopup.</summary>
     abstract member ariaHasPopup: string with get, set
     /// <summary>ARIAMixin.ariaHidden.</summary>
@@ -4844,6 +5300,8 @@ and [<AllowNullLiteral>] ARIAMixin =
     abstract member ariaKeyShortcuts: string with get, set
     /// <summary>ARIAMixin.ariaLabel.</summary>
     abstract member ariaLabel: string with get, set
+    /// <summary>ARIAMixin.ariaLabelledByElements.</summary>
+    abstract member ariaLabelledByElements: (Element) array with get, set
     /// <summary>ARIAMixin.ariaLevel.</summary>
     abstract member ariaLevel: string with get, set
     /// <summary>ARIAMixin.ariaLive.</summary>
@@ -5107,6 +5565,16 @@ and [<RequireQualifiedAccess>] ShadowRootOrGetComposedRangesOptions =
     | ShadowRoot of ShadowRoot
     | GetComposedRangesOptions of GetComposedRangesOptions
 
+/// <summary>FileOrUSVString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] FileOrUSVString =
+    | File of File
+    | USVString of string
+
+/// <summary>USVStringOrURLPatternInit in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] USVStringOrURLPatternInit =
+    | USVString of string
+    | URLPatternInit of URLPatternInit
+
 /// <summary>NodeOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] NodeOrDOMString =
     | Node of Node
@@ -5143,6 +5611,10 @@ and [<AllowNullLiteral; DomDictionary>] ImportNodeOptions() =
 and [<AllowNullLiteral; DomDictionary>] AriaNotifyOptions() =
     member val priority: (AriaNotificationPriority) option = None with get, set
     member val interrupt: (AriaNotificationInterrupt) option = None with get, set
+
+/// <summary>CaretPositionFromPointOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] CaretPositionFromPointOptions() =
+    member val shadowRoots: (ShadowRoot) array = [||] with get, set
 
 /// <summary>ShadowRootInit in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] ShadowRootInit() =
@@ -5237,6 +5709,18 @@ and [<AllowNullLiteral; DomDictionary>] DOMMatrix2DInit() =
     member val m41: (float) option = None with get, set
     member val m42: (float) option = None with get, set
 
+/// <summary>URLPatternInit in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] URLPatternInit() =
+    member val protocol: (string) option = None with get, set
+    member val username: (string) option = None with get, set
+    member val password: (string) option = None with get, set
+    member val hostname: (string) option = None with get, set
+    member val port: (string) option = None with get, set
+    member val pathname: (string) option = None with get, set
+    member val search: (string) option = None with get, set
+    member val hash: (string) option = None with get, set
+    member val baseURL: (string) option = None with get, set
+
 /// <summary>FocusOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
     member val preventScroll: bool = false with get, set
@@ -5248,6 +5732,15 @@ and EventListener = Event -> unit
 /// <summary>EventListenerObject in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] EventListenerObject =
     abstract member handleEvent: event: Event -> unit
+
+/// <summary>NodeFilter in the scoped DOM interface model.</summary>
+and NodeFilter = Node -> NodeFilterResult
+
+/// <summary>NodeFilterResult in the scoped DOM interface model.</summary>
+and NodeFilterResult =
+    | Accept = 1
+    | Reject = 2
+    | Skip = 3
 
 /// <summary>AriaNotificationPriority in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] AriaNotificationPriority =
@@ -5281,6 +5774,12 @@ and [<DomStringEnum; RequireQualifiedAccess>] SlotAssignmentMode =
 and [<DomStringEnum; RequireQualifiedAccess>] VisibilityState =
     | [<CompiledName("hidden")>] Hidden
     | [<CompiledName("visible")>] Visible
+
+/// <summary>HighlightType in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] HighlightType =
+    | [<CompiledName("highlight")>] Highlight
+    | [<CompiledName("spelling-error")>] SpellingError
+    | [<CompiledName("grammar-error")>] GrammarError
 
 /// <summary>ScrollBehavior in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] ScrollBehavior =
@@ -5325,6 +5824,10 @@ module BrowserUnionAdapters =
 
     [<Fable.Core.Emit("$0 != null && $0.nodeType === 1")>]
     let private isElement (_: obj) : bool =
+        Fable.Core.Util.jsNative
+
+    [<Fable.Core.Emit("Object.prototype.toString.call($0) === '[object File]'")>]
+    let private isFile (_: obj) : bool =
         Fable.Core.Util.jsNative
 
     [<Fable.Core.Emit("Object.prototype.toString.call($0) === '[object RadioNodeList]'")>]
@@ -5494,6 +5997,35 @@ module BrowserUnionAdapters =
         match value with
         | ShadowRootOrGetComposedRangesOptions.ShadowRoot value -> box value
         | ShadowRootOrGetComposedRangesOptions.GetComposedRangesOptions value -> box value
+
+    let private boxFileOrUSVString (value: FileOrUSVString) : obj =
+        if isNull (box value) then
+            nullArg "value"
+
+        match value with
+        | FileOrUSVString.File value ->
+            if isNull (box value) then
+                nullArg "value"
+
+            if not (isFile (box value)) then
+                invalidArg "value" "Expected a File."
+
+            box value
+        | FileOrUSVString.USVString value -> box (normalizeUSVString value)
+
+    let private unboxFileOrUSVString (value: obj) : FileOrUSVString =
+        match value with
+        | arm when isFile arm -> FileOrUSVString.File (unbox<File> arm)
+        | :? string as arm -> FileOrUSVString.USVString arm
+        | _ -> failwith "Unexpected DOM union result"
+
+    let private boxUSVStringOrURLPatternInit (value: USVStringOrURLPatternInit) : obj =
+        if isNull (box value) then
+            nullArg "value"
+
+        match value with
+        | USVStringOrURLPatternInit.USVString value -> box (normalizeUSVString value)
+        | USVStringOrURLPatternInit.URLPatternInit value -> box value
 
     let private boxNodeOrDOMString (value: NodeOrDOMString) : obj =
         match value with
@@ -5696,6 +6228,80 @@ module BrowserUnionAdapters =
 
         member this.getComposedRanges(options: GetComposedRangesOptions, [<System.ParamArray>] shadowRoots: ShadowRoot array) : (StaticRange) array =
             this.__ranvier_getComposedRanges (?options = Some (box options), shadowRoots = shadowRoots)
+
+
+    type HTMLCollection with
+        member this.namedItem(name: string) : Element =
+            this.__ranvier_namedItem (name)
+
+
+    type HTMLFormControlsCollection with
+        member this.namedItem(name: string) : (RadioNodeListOrElement) option =
+            let value = this.__ranvier_namedItem (name)
+
+            if isNull value then
+                None
+            else
+                Some (unboxRadioNodeListOrElement value)
+
+
+    type HTMLOptionsCollection with
+        member this.add(element: HTMLOptionElement) : unit =
+            this.__ranvier_add (box element, ?before = None)
+
+        member this.add(element: HTMLOptionElement, before: HTMLElement) : unit =
+            this.__ranvier_add (box element, ?before = Some (box before))
+
+        member this.add(element: HTMLOptionElement, before: int) : unit =
+            this.__ranvier_add (box element, ?before = Some (box before))
+
+        member this.add(element: HTMLOptGroupElement) : unit =
+            this.__ranvier_add (box element, ?before = None)
+
+        member this.add(element: HTMLOptGroupElement, before: HTMLElement) : unit =
+            this.__ranvier_add (box element, ?before = Some (box before))
+
+        member this.add(element: HTMLOptGroupElement, before: int) : unit =
+            this.__ranvier_add (box element, ?before = Some (box before))
+
+
+    type DOMFormData with
+        member this.get(name: string) : (FileOrUSVString) option =
+            let value = this.__ranvier_get (name)
+
+            if isNull value then
+                None
+            else
+                Some (unboxFileOrUSVString value)
+
+
+    type AnimationPlaybackEvent with
+        member this.currentTime: (DoubleOrCSSNumericValue) option =
+            let value = this.__ranvier_get_currentTime ()
+
+            if isNull value then
+                None
+            else
+                Some (unboxDoubleOrCSSNumericValue value)
+
+        member this.timelineTime: (DoubleOrCSSNumericValue) option =
+            let value = this.__ranvier_get_timelineTime ()
+
+            if isNull value then
+                None
+            else
+                Some (unboxDoubleOrCSSNumericValue value)
+
+
+    type URLPattern with
+        member this.test() : bool =
+            this.__ranvier_test (?input = None, ?baseURL = None)
+
+        member this.test(input: string, ?baseURL: string) : bool =
+            this.__ranvier_test (?input = Some (box (normalizeUSVString input)), ?baseURL = baseURL)
+
+        member this.test(input: URLPatternInit, ?baseURL: string) : bool =
+            this.__ranvier_test (?input = Some (box input), ?baseURL = baseURL)
 
 
     type ChildNode with

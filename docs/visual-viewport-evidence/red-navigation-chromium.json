@@ -1,0 +1,62 @@
+{
+ "browser": "156.0.8078.4",
+ "cases": [
+  {
+   "case": "initial about:blank, then srcdoc",
+   "sameWindow": true,
+   "sameViewport": false,
+   "held": {
+    "width": 0,
+    "height": 0,
+    "scale": 0,
+    "pageTop": 0
+   },
+   "current": {
+    "width": 200,
+    "height": 100,
+    "scale": 1,
+    "pageTop": 0
+   }
+  },
+  {
+   "case": "loaded srcdoc, then another srcdoc",
+   "sameWindow": true,
+   "sameViewport": false,
+   "heldBefore": {
+    "width": 150,
+    "height": 100,
+    "scale": 1,
+    "pageTop": 0
+   },
+   "held": {
+    "width": 0,
+    "height": 0,
+    "scale": 0,
+    "pageTop": 0
+   },
+   "current": {
+    "width": 120,
+    "height": 100,
+    "scale": 1,
+    "pageTop": 0
+   }
+  },
+  {
+   "case": "document.open replacement",
+   "sameWindow": true,
+   "sameViewport": true,
+   "held": {
+    "width": 120,
+    "height": 100,
+    "scale": 1,
+    "pageTop": 0
+   },
+   "current": {
+    "width": 120,
+    "height": 100,
+    "scale": 1,
+    "pageTop": 0
+   }
+  }
+ ]
+}

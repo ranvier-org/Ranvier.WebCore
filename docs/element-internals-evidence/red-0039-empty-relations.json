@@ -1,0 +1,41 @@
+{
+ "runtime": "artifacts/ei-candidate-2-frozen/runtimes/win-x64/native",
+ "cases": [
+  {
+   "member": "ariaControlsElements",
+   "withTarget": 1,
+   "afterEmpty": 1,
+   "afterNull": 0
+  },
+  {
+   "member": "ariaDescribedByElements",
+   "withTarget": 1,
+   "afterEmpty": 1,
+   "afterNull": 0
+  },
+  {
+   "member": "ariaDetailsElements",
+   "withTarget": 1,
+   "afterEmpty": 1,
+   "afterNull": 0
+  },
+  {
+   "member": "ariaErrorMessageElements",
+   "withTarget": 1,
+   "afterEmpty": 1,
+   "afterNull": 0
+  },
+  {
+   "member": "ariaFlowToElements",
+   "withTarget": 1,
+   "afterEmpty": 1,
+   "afterNull": 0
+  },
+  {
+   "member": "ariaLabelledByElements",
+   "withTarget": 1,
+   "afterEmpty": 1,
+   "afterNull": 0
+  }
+ ]
+}

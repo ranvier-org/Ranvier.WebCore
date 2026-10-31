@@ -5,6 +5,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -23,9 +26,7 @@ def verify(native_directory):
             references.append(self)
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -102,8 +103,8 @@ def verify(native_directory):
         return text('rv_dom_css_position_try_descriptors_get_top', [pointer], declaration)
 
     def edit(declaration, top_value, left_value):
-        call('rv_dom_css_position_try_descriptors_set_top', [pointer, string], declaration, top_value.encode())
-        call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string], declaration, b'left', left_value.encode(), b'')
+        call('rv_dom_css_position_try_descriptors_set_top', [pointer, Utf8], declaration, top_value.encode())
+        call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8], declaration, b'left', left_value.encode(), b'')
         expect(top(declaration) == top_value, 'typed detached top edit')
         expect(text('rv_dom_css_position_try_descriptors_get_left', [pointer], declaration) == left_value, 'base detached left edit')
         expect(declaration_text(declaration) == f'top: {top_value}; left: {left_value};', 'complete detached declaration text')
@@ -134,7 +135,7 @@ def verify(native_directory):
             serial += 1
             identifier = ('detached-' + str(serial)).encode()
             markup = b'<style id="' + identifier + b'">' + css + b'</style>'
-            call('rv_dom_element_set_inner_html', [pointer, string], body, markup)
+            call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
             style = own(bind('rv_document_get_element_by_id', pointer, [pointer, string])(host, identifier), 'rv_node_release')
             sheet = handle('rv_dom_html_style_element_get_sheet', [pointer], style, release='rv_dom_style_sheet_release')
             return style, sheet
@@ -154,7 +155,7 @@ def verify(native_directory):
         expect(top(declaration) == '3px', 'retained typed descriptor after deletion')
         edit(declaration, '29px', '31px')
         expect(rule_text(rule) == '@position-try --retained { top: 29px; left: 31px; }', 'complete retained rule text')
-        call('rv_dom_css_style_declaration_set_css_text', [pointer, string], declaration, b'top:43px;left:47px')
+        call('rv_dom_css_style_declaration_set_css_text', [pointer, Utf8], declaration, b'top:43px;left:47px')
         expect(declaration_text(declaration) == 'top: 43px; left: 47px;', 'base cssText replacement survives detachment')
         expect(top(declaration) == '43px', 'typed read observes base cssText replacement')
         drop(rule)
@@ -194,7 +195,7 @@ def verify(native_directory):
         edit(descriptors(rule_at(children, 0)), '101px', '103px')
 
         style, old_sheet = fixture(b'@position-try --old-sheet {top:107px;left:109px}')
-        call('rv_dom_node_set_text_content', [pointer, string], style, b'.replacement {width:1px}')
+        call('rv_dom_node_set_text_content', [pointer, Utf8], style, b'.replacement {width:1px}')
         old_owner = optional('rv_dom_style_sheet_get_owner_node', old_sheet, 'rv_node_release')
         expect(not old_owner.value, 'text replacement clears old sheet owner node')
         drop(old_owner)
@@ -205,7 +206,7 @@ def verify(native_directory):
 
         css = b'@position-try --shared {top:11px;left:13px;width:37px} .d21-anchor{anchor-name:--d21-anchor;width:10px;height:10px} .d21-survivor{position:absolute;position-anchor:--d21-anchor;top:anchor(bottom);left:anchor(left);width:220px;height:10px;position-try-fallbacks:--shared}'
         markup = b'<style id="cow-first">' + css + b'</style><style id="cow-survivor">' + css + b'</style><div style="position:relative;width:160px;height:80px;overflow:hidden"><div class="d21-anchor"></div><div id="survivor" class="d21-survivor"></div></div>'
-        call('rv_dom_element_set_inner_html', [pointer, string], body, markup)
+        call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
         find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
         first_node = own(find(host, b'cow-first'), 'rv_node_release')
         survivor_node = own(find(host, b'cow-survivor'), 'rv_node_release')
@@ -231,15 +232,15 @@ def verify(native_directory):
             expect(width() == '37px', 'surviving shared fallback produces actual constrained width')
 
         def edit_copy(top_value, left_value, width_value):
-            call('rv_dom_css_position_try_descriptors_set_top', [pointer, string], retained_style, top_value.encode())
-            call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string], retained_style, b'left', left_value.encode(), b'')
-            call('rv_dom_css_position_try_descriptors_set_width', [pointer, string], retained_style, width_value.encode())
+            call('rv_dom_css_position_try_descriptors_set_top', [pointer, Utf8], retained_style, top_value.encode())
+            call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8], retained_style, b'left', left_value.encode(), b'')
+            call('rv_dom_css_position_try_descriptors_set_width', [pointer, Utf8], retained_style, width_value.encode())
             expect(top(retained_style) == top_value, 'COW typed top edit')
             expect(text('rv_dom_css_position_try_descriptors_get_width', [pointer], retained_style) == width_value, 'COW typed width edit')
             expect(declaration_text(retained_style) == f'top: {top_value}; left: {left_value}; width: {width_value};', 'complete COW descriptor text')
 
         fallback_layout()
-        call('rv_dom_node_set_text_content', [pointer, string], first_node, b'.first-replaced {}')
+        call('rv_dom_node_set_text_content', [pointer, Utf8], first_node, b'.first-replaced {}')
         call('rv_node_remove_child', [pointer, pointer], body, first_node)
         for released in [first_node, first_sheet, first_rules]:
             drop(released)
@@ -260,7 +261,7 @@ def verify(native_directory):
         expect(declaration_text(survivor_style) == before_style, 'descriptor-only COW preserves surviving descriptor text')
         fallback_layout()
 
-        typed_setter = bind('rv_dom_css_position_try_descriptors_set_top', integer, [pointer, string])
+        typed_setter = bind('rv_dom_css_position_try_descriptors_set_top', integer, [pointer, Utf8])
         expect(typed_setter(None, b'1px') == null_argument, 'typed setter rejects null target')
         expect(typed_setter(retained_style.value, None) == null_argument, 'typed setter rejects null value')
         normal_sheet_style, normal_sheet = fixture(b'.normal {color:red}')

@@ -1,0 +1,474 @@
+{
+  "group": [
+    "#144 blob URLs, blob: loading and FileReader"
+  ],
+  "status": "green (private Windows x64 slim; not accepted)",
+  "native": "0.1.0-preview.44",
+  "abi": 52,
+  "features": [
+    "blob-urls",
+    "dom:FileReader",
+    "dom-constructor:FileReader"
+  ],
+  "members": [
+    "rv_dom_domurl_create_object_url",
+    "rv_dom_domurl_revoke_object_url",
+    "rv_dom_file_reader_*",
+    "rv_blob_read",
+    "rv_blob_url_read",
+    "rv_blob_read_result",
+    "rv_blob_read_type",
+    "rv_blob_read_error",
+    "rv_file_create_from_path",
+    "rv_file_reader_result",
+    "rv_file_reader_error"
+  ],
+  "hostLoader": "RvLoaderStrategy starts blob: loads in WebCore (BlobRegistryImpl builtin BlobResourceHandle), as data:; the host resource handler never sees a blob: URL; every other scheme is unchanged (the full batch is unchanged)",
+  "sourcePatch": "none",
+  "sourceHeadOfBatch": "43e30584cb9dbe238dedeea12b4e438299d43cc0",
+  "batchRunHead": "43e30584cb9dbe238dedeea12b4e438299d43cc0",
+  "stackedOn": "I11 5eee88a, H08 acf26e3, #142 3e6639d; parent C:/wk/native-strings/artifacts/native43-candidate-3",
+  "red": {
+    "native42": {
+      "file": "red-native42.json",
+      "script": "red_native42.py",
+      "runtime": "C:/wk/native-inspect/artifacts/native42-candidate-3",
+      "result": {
+        "abi": 50,
+        "has": {
+          "blob-urls": 0,
+          "dom:FileReader": 0,
+          "dom-constructor:FileReader": 0
+        },
+        "exports": {
+          "rv_dom_domurl_create_object_url": false,
+          "rv_dom_file_reader_create": false,
+          "rv_blob_read": false,
+          "rv_blob_url_read": false,
+          "rv_file_create_from_path": false,
+          "rv_file_reader_result": false
+        }
+      },
+      "loader": "the host loader handed blob: URLs to the resource handler, which failed them"
+    },
+    "crossHostLeak": {
+      "file": "red-candidate1-cross-host-leak.json",
+      "candidate": "native44-candidate-1 (pre-fix)",
+      "otherRead": {
+        "ok": true,
+        "type": "",
+        "length": 3,
+        "hex": "69736f"
+      },
+      "otherImage": "error",
+      "fix": "rv_blob_url_read refuses a URL the document origin cannot request (LOAD_FAILED, NotFoundError)"
+    },
+    "chromium": "red-chromium-measure.json"
+  },
+  "green": {
+    "blobUrlsAssertions": 697,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "PASS blob_urls: 697 assertions, 2 qualified"
+    ],
+    "probes": 59,
+    "allExitZero": true,
+    "rawAssertions": 77247,
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "form_submission",
+        "exitCode": 0,
+        "assertions": 418
+      },
+      {
+        "name": "text_segmentation",
+        "exitCode": 0,
+        "assertions": 812
+      },
+      {
+        "name": "crypto_random",
+        "exitCode": 0,
+        "assertions": 275
+      },
+      {
+        "name": "visual_viewport",
+        "exitCode": 0,
+        "assertions": 987
+      },
+      {
+        "name": "screen_metrics",
+        "exitCode": 0,
+        "assertions": 222
+      },
+      {
+        "name": "custom_highlights",
+        "exitCode": 0,
+        "assertions": 378
+      },
+      {
+        "name": "abi_layouts",
+        "exitCode": 0,
+        "assertions": 15
+      },
+      {
+        "name": "event_details",
+        "exitCode": 0,
+        "assertions": 391
+      },
+      {
+        "name": "aria_relations",
+        "exitCode": 0,
+        "assertions": 1210
+      },
+      {
+        "name": "inspector_diagnostics",
+        "exitCode": 0,
+        "assertions": 929
+      },
+      {
+        "name": "string_nul",
+        "exitCode": 0,
+        "assertions": 192
+      },
+      {
+        "name": "native_types",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "blob_urls",
+        "exitCode": 0,
+        "assertions": 697
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null
+      }
+    ],
+    "teardownCases": 100,
+    "blobTeardownCases": 4,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "readerCases": [
+      "abortInLoad",
+      "abortInLoadstart",
+      "abortSync",
+      "arrayBuffer",
+      "big",
+      "binaryString",
+      "dataUrl",
+      "dataUrlEmpty",
+      "empty",
+      "readInLoadend",
+      "readWhileLoading",
+      "text",
+      "textBogusLabel",
+      "textBomWins",
+      "textLatin1",
+      "textUtf16"
+    ],
+    "repeats": 30,
+    "repeatsDistinct": [
+      "1 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "10 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "11 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "12 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "13 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "14 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "15 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "16 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "17 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "18 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "19 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "2 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "20 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "21 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "22 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "23 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "24 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "25 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "26 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "27 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "28 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "29 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "3 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "30 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "4 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "5 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "6 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "7 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "8 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a",
+      "9 75326987024961f916f2180c2e44becf7ab66950f57409062191d43b156b2d7a"
+    ]
+  },
+  "qualified": {
+    "reader.text.final.result.value": "readAsText without an encoding: WebKit decodes with the blob type's charset parameter (latin1 here), as the File API's 'get an encoding' step specifies; Chromium decodes UTF-8. With an explicit encoding both agree (textLatin1, textUtf16, textBogusLabel, textBomWins).",
+    "teardown.promise": "A blob read in flight when its document goes away: the native read delivers RV_RESOURCE_INVALIDATED, the H05 operation contract; Chromium leaves the removed document's Blob.text() promise pending."
+  },
+  "measured": {
+    "format": "blob:null/<UUID v4> natively and in Chromium about:blank; blob:<origin>/<UUID v4> for an http origin",
+    "fileReader": "event order and final state equal Chromium for every read method; abort() fires abort and loadend before it returns; abort in load is ignored; readAs while LOADING throws InvalidStateError; readAs in loadend is allowed; progress events are collapsed and never counted",
+    "fileBacked": "name, size, type, text, slice and URL read equal Chromium; a file deleted between create and read fires error and loadend (no loadstart) with NotFoundError, as Chromium",
+    "isolation": "a URL of host A neither loads as an image nor reads in host B, in both directions; it stops after A's document is replaced or A is destroyed (Chromium: two about:blank pages are isolated; same-origin http pages share URLs)",
+    "teardown": "document replacement: a read in flight is INVALIDATED (qualified), a FileReader in flight fires nothing and is DONE (Chromium iframe removal alike); host destroy: INVALIDATED, no FileReader event",
+    "iframe": "browser-only: the host has no subframes (EmptyFrameLoaderClient::createFrame returns null); natively Unsupported",
+    "gif": "not a gap: the earlier test GIF was malformed (Chromium tolerant); a canonical GIF decodes natively (gif-decode-check.txt)"
+  },
+  "files": {
+    "absence_blob.py": "1eded3a6f42782149c747abb1ad3dfcddd329c1d3460a0fbe1bd48e448a27d23",
+    "allocation-absence.json": "6f5b675f512eaebbe72e0752d2bc82a242cd8b6be76a918a647cec4edc9feb6c",
+    "batch-green.json": "36fc96dd1767aeea507ab14118a8d2819ce568a30708c6b75f3456e61375e871",
+    "blob-urls-probe.log": "f4d99c27f43e8e71ba398beb01e1162a9f42752c4e7c7c95ce071a29706f116d",
+    "blob-urls-repeat30.txt": "bd6c70aa1054e064af06ffa8c4a6cef5cd6420f70ce67f5e4cdb4e9275200590",
+    "build_native44_candidate.py": "8cb788b4a226930eeda63a7ea54fd5ad568ede261004931f6f23bf6eaa4a8453",
+    "gif-decode-check.txt": "2102b3d19860f78e05080b6bdd6cefcac64c0ea4b778e383c90a4174c9096bdc",
+    "make_native44_evidence.py": "1da531be4fc6f3ffd92e791b17e856a52489a04e152c38c4ce1e50b4faf74865",
+    "oracle-repeat30.txt": "5fb9470841849fcd609d3430d7b8803a98fa505086263b4fa53e847511ced907",
+    "red-candidate1-cross-host-leak.json": "d8ba459c11f6217c8b90e78739496b642cfb37522808fc958a6cbe8472b1bb29",
+    "red-chromium-measure.json": "67fecaf86c124a66fbd2c8312dde638cfb6814600584b214f1b094d97c606015",
+    "red-native42.json": "54c0c59f389203f8bb59a9edbe8ff1bf010f0d54066cff7092e2c5662dd796ab",
+    "red_native42.py": "aca911383d8b651281a3c41964f2b7b3808c28e05a203a63096f15da02d2744e",
+    "run_native44_full_batch.py": "2b2af2e4e378fdf1bef5f7215d95c615fab9c66ae6ea19069fab1863465d1ca2",
+    "runtime-receipt.json": "ce9351518f5379d776f55e29c6585ff80cad196e61dda69f7c02f7b81b6f8c37",
+    "source-patches.json": "c270176d92d9f45278f3914a664a5adbb5d18bb45f2c8f9058c85b6eae094a27",
+    "teardown-probes.json": "5fad4b8d5278bae9152c6f9ca3e9b91843516a136dc0ce25656222b108ed4f0b"
+  }
+}

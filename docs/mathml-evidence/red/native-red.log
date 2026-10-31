@@ -1,0 +1,11 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-mathml\tests\abi\mathml_surface.py", line 205, in <module>
+    verify(parser.parse_args().native_directory)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-mathml\tests\abi\mathml_surface.py", line 36, in verify
+    p.expect(has(feature) == 1, 'compiled typed MathML capability ' + feature.decode())
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-mathml\tests\abi\svg_paint_probe.py", line 49, in expect
+    raise AssertionError(label)
+AssertionError: compiled typed MathML capability dom:MathMLMathElement

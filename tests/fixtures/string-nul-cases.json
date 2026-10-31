@@ -1,0 +1,31 @@
+{
+  "comment": "U+0000 round-trip cases for tests/abi/string_nul.py and tests/abi/string_nul_browser.mjs. category A is a string inside a union or sequence, B a dictionary string field, C a plain string argument, R a string inside a container result.",
+  "cases": [
+    {"id": "setAttribute value", "category": "C", "op": "setAttribute", "value": "a\u0000b"},
+    {"id": "setAttribute value trailing", "category": "C", "op": "setAttribute", "value": "\u00e9\u0000"},
+    {"id": "textContent", "category": "C", "op": "textContent", "value": "x\u0000y\u0000z"},
+    {"id": "textContent null", "category": "C", "op": "textContentNull"},
+    {"id": "createTextNode", "category": "C", "op": "createTextNode", "value": "\u0000lead"},
+    {"id": "appendData", "category": "C", "op": "appendData", "value": "\u0000tail"},
+    {"id": "id", "category": "C", "op": "id", "value": "i\u0000d"},
+    {"id": "setAttributeNS null namespace", "category": "C", "op": "setAttributeNS", "value": "n\u0000s"},
+    {"id": "createComment", "category": "C", "op": "createComment", "value": "c\u0000omment"},
+    {"id": "createHTMLDocument absent title", "category": "C", "op": "createHTMLDocumentAbsent"},
+    {"id": "append string", "category": "A", "op": "append", "value": "p\u0000q"},
+    {"id": "prepend string", "category": "A", "op": "prepend", "value": "\u0000"},
+    {"id": "replaceChildren strings", "category": "A", "op": "replaceChildren", "value": "r\u0000s"},
+    {"id": "classList add", "category": "A", "op": "classListAdd", "value": "a\u0000b"},
+    {"id": "classList remove", "category": "A", "op": "classListRemove", "value": "a\u0000b"},
+    {"id": "hidden until-found suffix", "category": "A", "op": "hidden", "value": "until-found\u0000x"},
+    {"id": "hidden until-found", "category": "A", "op": "hidden", "value": "until-found"},
+    {"id": "ToggleEvent states", "category": "B", "op": "toggleEvent", "value": "o\u0000ld", "other": "n\u0000ew"},
+    {"id": "CommandEvent command", "category": "B", "op": "commandEvent", "value": "--c\u0000md"},
+    {"id": "CompositionEvent data", "category": "B", "op": "compositionEvent", "value": "\u0000"},
+    {"id": "ErrorEvent message", "category": "B", "op": "errorEvent", "value": "m\u0000sg"},
+    {"id": "Blob type with U+0000", "category": "B", "op": "blobType", "value": "text/plain\u0000x"},
+    {"id": "Blob type", "category": "B", "op": "blobType", "value": "Text/Plain"},
+    {"id": "HighlightRegistry name (T03)", "category": "C", "op": "highlightRegistry", "value": "h\u0000l"},
+    {"id": "getAttributeNames", "category": "R", "op": "getAttributeNames", "value": "data-\u00e9"},
+    {"id": "hidden getter string", "category": "R", "op": "hiddenGetter"}
+  ]
+}

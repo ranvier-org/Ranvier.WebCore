@@ -30,7 +30,8 @@ class PackageContract(unittest.TestCase):
         sources = {(path.parent / item.get('Include')).resolve()
                    for item in project.findall('.//Compile')}
         self.assertEqual(sources, {(ROOT / 'tests/abi/Native.fs').resolve(),
-                                   (ROOT / 'tests/abi/NativeDom.fs').resolve()})
+                                   (ROOT / 'tests/abi/NativeDom.fs').resolve(),
+                                   (ROOT / 'tests/abi/Traversal.fs').resolve()})
         references = project.findall('.//PackageReference')
         native = [r for r in references if r.get('Include') == 'Ranvier.WebCore.Native']
         self.assertEqual(native, [], 'managed interop must allow selecting the GPU native flavor')

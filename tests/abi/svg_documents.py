@@ -5,6 +5,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -16,9 +19,7 @@ def verify(native_directory):
     assertions = 0
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -79,7 +80,7 @@ def verify(native_directory):
         call('rv_host_paint_rgba', [pointer, pointer, integer], host, pixels, len(pixels))
         close_pixel = list(pixels[(15 * 200 + 15) * 4:(15 * 200 + 15) * 4 + 4])
         expect(close_pixel == [255, 0, 0, 255], 'actual standalone SVG rendered content')
-        expect(text('rv_dom_element_get_attribute', [pointer, ctypes.c_char_p], guard, b'x') == '10', 'SVG and foreignObject scripts stay disabled')
+        expect(text('rv_dom_element_get_attribute', [pointer, Utf8], guard, b'x') == '10', 'SVG and foreignObject scripts stay disabled')
         expect(bind('rv_host_scripts_enabled', integer, [pointer])(host) == 0, 'SVG document scripts disabled')
         expect(bind('rv_host_vm_entry_disallowed', integer, [pointer])(host) == 1, 'SVG document VM-entry guard retained')
         errors = []
@@ -106,7 +107,7 @@ def verify(native_directory):
         expect(current.value == 10, 'retained SVG value survives document replacement')
         call('rv_host_load_svg', [pointer, ctypes.c_char_p], host, svg)
         expect(document() != first_document, 'SVG reload produces a new document')
-        expect(text('rv_dom_element_get_attribute', [pointer, ctypes.c_char_p], node('guard'), b'x') == '10', 'SVG after HTML uses XML parser again')
+        expect(text('rv_dom_element_get_attribute', [pointer, Utf8], node('guard'), b'x') == '10', 'SVG after HTML uses XML parser again')
         for release, value in list(reversed(retained)):
             if release == 'rv_node_release':
                 bind(release, None, [pointer])(value)

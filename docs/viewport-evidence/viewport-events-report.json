@@ -1,0 +1,535 @@
+{
+  "browser": "156.0.8078.4",
+  "metrics": [
+    {
+      "case": "320x240@1",
+      "native": {
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "outerWidth": 320,
+        "outerHeight": 240,
+        "devicePixelRatio": 1.0,
+        "paintWidth": 320,
+        "paintHeight": 240
+      },
+      "chromium": {
+        "width": 320,
+        "height": 240,
+        "scale": 1,
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "devicePixelRatio": 1,
+        "paintWidth": 320,
+        "paintHeight": 240
+      }
+    },
+    {
+      "case": "320x240@1.25",
+      "native": {
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "outerWidth": 320,
+        "outerHeight": 240,
+        "devicePixelRatio": 1.25,
+        "paintWidth": 400,
+        "paintHeight": 300
+      },
+      "chromium": {
+        "width": 320,
+        "height": 240,
+        "scale": 1.25,
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "devicePixelRatio": 1.25,
+        "paintWidth": 400,
+        "paintHeight": 300
+      }
+    },
+    {
+      "case": "320x240@1.5",
+      "native": {
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "outerWidth": 320,
+        "outerHeight": 240,
+        "devicePixelRatio": 1.5,
+        "paintWidth": 480,
+        "paintHeight": 360
+      },
+      "chromium": {
+        "width": 320,
+        "height": 240,
+        "scale": 1.5,
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "devicePixelRatio": 1.5,
+        "paintWidth": 480,
+        "paintHeight": 360
+      }
+    },
+    {
+      "case": "320x240@2",
+      "native": {
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "outerWidth": 320,
+        "outerHeight": 240,
+        "devicePixelRatio": 2.0,
+        "paintWidth": 640,
+        "paintHeight": 480
+      },
+      "chromium": {
+        "width": 320,
+        "height": 240,
+        "scale": 2,
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "devicePixelRatio": 2,
+        "paintWidth": 640,
+        "paintHeight": 480
+      }
+    },
+    {
+      "case": "320x240@0.75",
+      "native": {
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "outerWidth": 320,
+        "outerHeight": 240,
+        "devicePixelRatio": 0.75,
+        "paintWidth": 240,
+        "paintHeight": 180
+      },
+      "chromium": {
+        "width": 320,
+        "height": 240,
+        "scale": 0.75,
+        "innerWidth": 320,
+        "innerHeight": 240,
+        "devicePixelRatio": 0.75,
+        "paintWidth": 240,
+        "paintHeight": 180
+      }
+    },
+    {
+      "case": "333x221@1",
+      "native": {
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "outerWidth": 333,
+        "outerHeight": 221,
+        "devicePixelRatio": 1.0,
+        "paintWidth": 333,
+        "paintHeight": 221
+      },
+      "chromium": {
+        "width": 333,
+        "height": 221,
+        "scale": 1,
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "devicePixelRatio": 1,
+        "paintWidth": 333,
+        "paintHeight": 221
+      }
+    },
+    {
+      "case": "333x221@1.25",
+      "native": {
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "outerWidth": 333,
+        "outerHeight": 221,
+        "devicePixelRatio": 1.25,
+        "paintWidth": 416,
+        "paintHeight": 276
+      },
+      "chromium": {
+        "width": 333,
+        "height": 221,
+        "scale": 1.25,
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "devicePixelRatio": 1.25,
+        "paintWidth": 416,
+        "paintHeight": 276
+      }
+    },
+    {
+      "case": "333x221@1.5",
+      "native": {
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "outerWidth": 333,
+        "outerHeight": 221,
+        "devicePixelRatio": 1.5,
+        "paintWidth": 499,
+        "paintHeight": 331
+      },
+      "chromium": {
+        "width": 333,
+        "height": 221,
+        "scale": 1.5,
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "devicePixelRatio": 1.5,
+        "paintWidth": 500,
+        "paintHeight": 332
+      }
+    },
+    {
+      "case": "333x221@2",
+      "native": {
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "outerWidth": 333,
+        "outerHeight": 221,
+        "devicePixelRatio": 2.0,
+        "paintWidth": 666,
+        "paintHeight": 442
+      },
+      "chromium": {
+        "width": 333,
+        "height": 221,
+        "scale": 2,
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "devicePixelRatio": 2,
+        "paintWidth": 666,
+        "paintHeight": 442
+      }
+    },
+    {
+      "case": "333x221@0.75",
+      "native": {
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "outerWidth": 333,
+        "outerHeight": 221,
+        "devicePixelRatio": 0.75,
+        "paintWidth": 249,
+        "paintHeight": 165
+      },
+      "chromium": {
+        "width": 333,
+        "height": 221,
+        "scale": 0.75,
+        "innerWidth": 333,
+        "innerHeight": 221,
+        "devicePixelRatio": 0.75,
+        "paintWidth": 250,
+        "paintHeight": 166
+      }
+    }
+  ],
+  "steps": [
+    {
+      "name": "resize 400x300",
+      "native": [
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 400,
+          "devicePixelRatio": 1.0,
+          "visibilityState": 1
+        }
+      ],
+      "chromium": [
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 400,
+          "innerHeight": 300,
+          "devicePixelRatio": 1,
+          "scrollX": 0,
+          "scrollY": 0,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ]
+    },
+    {
+      "name": "scroll 0,100",
+      "native": [
+        {
+          "source": "window",
+          "type": "scroll",
+          "target": "document",
+          "innerWidth": 400,
+          "devicePixelRatio": 1.0,
+          "visibilityState": 1
+        },
+        {
+          "source": "window",
+          "type": "scrollend",
+          "target": "document",
+          "innerWidth": 400,
+          "devicePixelRatio": 1.0,
+          "visibilityState": 1
+        }
+      ],
+      "chromium": [
+        {
+          "source": "window",
+          "type": "scroll",
+          "target": "document",
+          "innerWidth": 400,
+          "innerHeight": 300,
+          "devicePixelRatio": 1,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        },
+        {
+          "source": "window",
+          "type": "scrollend",
+          "target": "document",
+          "innerWidth": 400,
+          "innerHeight": 300,
+          "devicePixelRatio": 1,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ]
+    },
+    {
+      "name": "scale 1.25",
+      "native": [
+        {
+          "source": "media:(resolution: 1dppx)",
+          "type": "change",
+          "target": "other",
+          "innerWidth": 400,
+          "devicePixelRatio": 1.25,
+          "visibilityState": 1
+        }
+      ],
+      "chromium": []
+    },
+    {
+      "name": "resize 401x300 at 1.25",
+      "native": [
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 401,
+          "devicePixelRatio": 1.25,
+          "visibilityState": 1
+        }
+      ],
+      "chromium": [
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 401,
+          "innerHeight": 300,
+          "devicePixelRatio": 1.25,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        },
+        {
+          "source": "media:(resolution: 1dppx)",
+          "type": "change",
+          "target": "other",
+          "innerWidth": 401,
+          "innerHeight": 300,
+          "devicePixelRatio": 1.25,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ]
+    },
+    {
+      "name": "resize 401x301 and scale 1.5",
+      "native": [
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 401,
+          "devicePixelRatio": 1.5,
+          "visibilityState": 1
+        },
+        {
+          "source": "media:(resolution: 1.25dppx)",
+          "type": "change",
+          "target": "other",
+          "innerWidth": 401,
+          "devicePixelRatio": 1.5,
+          "visibilityState": 1
+        }
+      ],
+      "chromium": [
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 401,
+          "innerHeight": 301,
+          "devicePixelRatio": 1.5,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        },
+        {
+          "source": "media:(resolution: 1.25dppx)",
+          "type": "change",
+          "target": "other",
+          "innerWidth": 401,
+          "innerHeight": 301,
+          "devicePixelRatio": 1.5,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ]
+    },
+    {
+      "name": "blur",
+      "native": [
+        {
+          "source": "window",
+          "type": "blur",
+          "target": "window",
+          "innerWidth": 401,
+          "devicePixelRatio": 1.5,
+          "visibilityState": 1
+        }
+      ],
+      "chromium": [
+        {
+          "source": "window",
+          "type": "blur",
+          "target": "window",
+          "innerWidth": 401,
+          "innerHeight": 301,
+          "devicePixelRatio": 1.5,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": false
+        }
+      ]
+    },
+    {
+      "name": "focus",
+      "native": [
+        {
+          "source": "window",
+          "type": "focus",
+          "target": "window",
+          "innerWidth": 401,
+          "devicePixelRatio": 1.5,
+          "visibilityState": 1
+        }
+      ],
+      "chromium": [
+        {
+          "source": "window",
+          "type": "focus",
+          "target": "window",
+          "innerWidth": 401,
+          "innerHeight": 301,
+          "devicePixelRatio": 1.5,
+          "scrollX": 0,
+          "scrollY": 100,
+          "visibilityState": "visible",
+          "hasFocus": true
+        }
+      ]
+    },
+    {
+      "name": "one update: resize, scroll, scale 2",
+      "native": [
+        "window:resize",
+        "window:scroll",
+        "window:scrollend",
+        "media:(resolution: 1.5dppx):change"
+      ]
+    },
+    {
+      "name": "hide, resize, show",
+      "native": [
+        {
+          "source": "window",
+          "type": "visibilitychange",
+          "target": "document",
+          "innerWidth": 360,
+          "devicePixelRatio": 2.0,
+          "visibilityState": 0
+        },
+        {
+          "source": "window",
+          "type": "visibilitychange",
+          "target": "document",
+          "innerWidth": 300,
+          "devicePixelRatio": 2.0,
+          "visibilityState": 1
+        },
+        {
+          "source": "window",
+          "type": "resize",
+          "target": "window",
+          "innerWidth": 300,
+          "devicePixelRatio": 2.0,
+          "visibilityState": 1
+        }
+      ]
+    }
+  ],
+  "differences": [
+    {
+      "case": "333x221@1.5",
+      "nativePaint": [
+        499,
+        331
+      ],
+      "chromiumPaint": [
+        500,
+        332
+      ]
+    },
+    {
+      "case": "333x221@0.75",
+      "nativePaint": [
+        249,
+        165
+      ],
+      "chromiumPaint": [
+        250,
+        166
+      ]
+    },
+    {
+      "step": "scale 1.25",
+      "native": [
+        "media:(resolution: 1dppx):change"
+      ],
+      "chromium": []
+    },
+    {
+      "step": "resize 401x300 at 1.25",
+      "native": [
+        "window:resize"
+      ],
+      "chromium": [
+        "window:resize",
+        "media:(resolution: 1dppx):change"
+      ]
+    }
+  ],
+  "assertions": 364
+}

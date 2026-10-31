@@ -1,0 +1,415 @@
+{
+  "group": [
+    "G05 #50"
+  ],
+  "native": "0.1.0-preview.29",
+  "abi": 37,
+  "feature": "dom-window-scrolling",
+  "sourceHeadOfBatch": "fe8cf8f15f4e4e22abefbd5b6fc892c4a0a88164",
+  "candidate": "artifacts/native29-candidate-1 (forms-candidate-4 objects; RanvierDomGlue regenerated; four host units)",
+  "red": {
+    "runtime": "native-forms/artifacts/native28-frozen (Native28/ABI36)",
+    "abiVersion": 36,
+    "result": "AssertionError ABI version 37; rv_dom_window scroll members absent: rv_dom_window_get_scroll_x, rv_dom_window_get_scroll_y, rv_dom_window_scroll_to, rv_dom_window_scroll_by, rv_dom_window_scroll, rv_dom_window_get_page_x_offset",
+    "logs": [
+      "red-native28-probe.log",
+      "red-measure.json"
+    ]
+  },
+  "green": {
+    "viewportScrollAssertions": 3232,
+    "probes": 41,
+    "allExitZero": true,
+    "rawAssertions": 47641,
+    "teardownCases": 72
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "fixture": "tests/fixtures/viewport-scroll-oracle.json",
+    "scales": [
+      1,
+      1.5,
+      2
+    ],
+    "stepsPerCase": 16,
+    "cases": 6
+  },
+  "qualifications": [
+    "Both engines keep whole-pixel scroll offsets at device scales 1, 1.5 and 2: every Chromium 156 value in the oracle is an integer, and the pinned WebKit stores ScrollPosition as IntPoint.",
+    "The native engine truncates a fractional CSS scroll target toward zero; Chromium rounds to the nearest pixel (20.5 -> 20 vs 21, 10.75 -> 10 vs 11, 7.7 -> 7 vs 8, scrollTop = 11.6 -> 11 vs 12). The same 13 of 16 steps differ on the viewport (Window and scrolling-element routes) and on a scrolling box at every scale; the step list and values are under qualifiedSteps.",
+    "Event differences follow from the positions: a step whose truncated position is unchanged dispatches no scroll or scrollend natively (scrollTo(10.75, 20.75) after (10, 20); scrollTo(10.4, 20.4) after (10, 20); scrollBy({top: 0.6}) from (5, 6)), and a step that moves natively but not in Chromium dispatches scroll and scrollend natively (scrollBy(-0.3, -0.3) from (5, 6) -> (4, 5); scrollBy(-0.5, -0.5) from the maximum -> one pixel less).",
+    "Element.scrollTop/scrollLeft are WebIDL long in the pinned WebKit (webkit.org/b/188045): the setter takes int32, and the caller converts a CSS value with ToInt32 truncation.",
+    "A smooth scrollTo dispatched 3 scroll events then scrollend natively and 4 then scrollend in Chromium; the count follows each engine's animation frames. The final position differs by the truncation rule ((0, 50) vs (1, 51)).",
+    "Clamping at 0 and at the maximum is equal (viewport 1680x1761, box 900x901 at every scale), as are maxima, scrollWidth/scrollHeight minus client size, and every unqualified step's value and events."
+  ],
+  "qualifiedSteps": {
+    "scrollTo(10.25, 20.5)": {
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        21
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollTo(10.75, 20.75)": {
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        11,
+        21
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollTo(10.4, 20.4) from 10.75, 20.75": {
+      "native": [
+        10,
+        20
+      ],
+      "chromium": [
+        10,
+        20
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollTo({left: 3.3, top: 7.7, behavior: instant})": {
+      "native": [
+        3,
+        7
+      ],
+      "chromium": [
+        3,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollTo({top: 9.6}) keeps left": {
+      "native": [
+        3,
+        9
+      ],
+      "chromium": [
+        3,
+        10
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scroll(5.5, 6.5)": {
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollBy(0.4, 0.4)": {
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollBy(0.4, 0.4) again": {
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        7
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollBy({top: 0.6})": {
+      "native": [
+        5,
+        6
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollBy(-0.3, -0.3)": {
+      "native": [
+        4,
+        5
+      ],
+      "chromium": [
+        6,
+        8
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollBy(-0.5, -0.5) from the maximum": {
+      "native": [
+        1679,
+        1760
+      ],
+      "chromium": [
+        1680,
+        1761
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollTop = 33.3, scrollLeft = 11.6": {
+      "native": [
+        11,
+        33
+      ],
+      "chromium": [
+        12,
+        33
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    },
+    "scrollTo({left: 0.5, top: 50.5, behavior: smooth})": {
+      "native": [
+        0,
+        50
+      ],
+      "chromium": [
+        1,
+        51
+      ],
+      "nativeEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "chromiumEvents": [
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scroll",
+        "window:scrollend"
+      ],
+      "cases": [
+        "viewport@1 window",
+        "viewport@1 scrollingElement",
+        "box@1 box",
+        "viewport@1.5 window",
+        "viewport@1.5 scrollingElement",
+        "box@1.5 box",
+        "viewport@2 window",
+        "viewport@2 scrollingElement",
+        "box@2 box"
+      ]
+    }
+  },
+  "files": {
+    "allocation-absence.json": "d6668e21a35c6664e5cd6c184daab69a77fad123e0443ca3bc6749bce5ed0ccb",
+    "batch-green.json": "8f3664fc1f5667343cac39b3315a9c066978c864f2a7feb539fa5fba51fcbd82",
+    "build_native29_candidate.py": "57ec5dab4306449a9698210bcec327d5aa304aa29f64ef814841c9fe31a35508",
+    "make_native29_evidence.py": "9d4902d8da7acf0d863610e540c0e82833f065be9af774303f8e5148a063c830",
+    "measure_scroll_red.py": "b18c90737ebd94a28c34f25cabe5e672c65920b567e012b31a5737548b917d5c",
+    "red-measure.json": "a0ed9105cd69b5ce1d6f5ac9594b326c0aa9ab487f9f11ca1d0fddb65c6f391a",
+    "red-native28-probe.log": "e1f5509619fac32dc7516ddc83e44d02b93cc6873694cf2b06c2dac43244c6d3",
+    "run_native29_batch.py": "1af7daa8a1211e10388325c9fa7fa6e6556bb450444acdf797a04b3a99cbb6c4",
+    "runtime-receipt.json": "9ca8eeff96717f8a362f88f3c35e6a7cae8aeaf7ed7f86fefc685717ee3e9994",
+    "teardown-probes.json": "5d702a9113a1fc2e84e7f5a74e9bb493141cd2b10af5c9af9699ee2284fe766d",
+    "viewport-scroll-report.json": "23b8d6845ca14a89800894f51b42bad4fe449595ce17ea01e741a0b1f6a050c5"
+  }
+}

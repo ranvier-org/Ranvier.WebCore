@@ -33,3 +33,8 @@
 0031-svg-href-attribute-synchronization.patch
 0032-svg-smil-first-interval-end.patch
 0033-image-loader-native-decode.patch
+0034-svg-string-list-null-attribute.patch
+0035-caret-position-text-control-shadow-roots.patch
+0037-frame-loader-client-form-submission-hook.patch
+0038-platform-screen-win-embedder-screen-data.patch
+0039-element-array-attribute-empty-relations.patch

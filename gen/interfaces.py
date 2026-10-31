@@ -10,6 +10,7 @@ NUMBERS = {'byte': 'sbyte', 'octet': 'byte', 'short': 'int16', 'unsigned short':
            'float': 'float32', 'unrestricted float': 'float32', 'double': 'float', 'unrestricted double': 'float'}
 KEYWORDS = set('abstract and as assert base begin class default delegate do done downcast downto elif else end exception extern false finally fixed for fun function global if in inherit inline interface internal lazy let match member module mutable namespace new not null of open or override private public rec return select sig static struct then to true try type upcast use val void when while with yield break checked component const constraint continue event external include mixin parallel process protected pure sealed tailcall trait virtual is'.split())
 STRINGS = {'DOMString', 'USVString', 'ByteString'}
+WIDE_INTEGERS = {'long long', 'unsigned long long'}
 
 
 def identifier(name):
@@ -36,6 +37,7 @@ class InterfaceEmitter:
         self.dictionaries = {}
         self.callbacks = set()
         self.adapters = []
+        self.shadowed = set()
         self.attribute_access = {}
         self.enums = set()
         self.matrix_flag_adapters_used = set()
@@ -51,6 +53,8 @@ class InterfaceEmitter:
             result = NUMBERS[value.name]
         elif value.name == 'boolean':
             result = 'bool'
+        elif value.name in self.world.config.get('byteSpanTypes', []):
+            result = 'byte array'
         elif value.name == 'undefined':
             result = 'unit'
         elif value.name in ('sequence', 'FrozenArray'):
@@ -63,19 +67,28 @@ class InterfaceEmitter:
         elif value.name in self.world.dictionaries:
             result = value.name
             if result not in self.dictionaries:
+                # The placeholder ends a recursive reference; a member type outside the contract removes the dictionary.
                 self.dictionaries[result] = []
-                self.dictionaries[result] = [(member, self.type(member.type)) for member, _ in self.world.dictionary_fields(result)]
+                try:
+                    self.dictionaries[result] = [(member, self.type(member.type)) for member, _ in self.world.dictionary_fields(result)]
+                except self.generator.unsupported_type:
+                    del self.dictionaries[result]
+                    raise
         elif value.name == 'EventListener':
             result = value.name
             self.callbacks.add(result)
         elif value.name in self.world.enums:
             result = value.name
             self.enums.add(result)
+        elif value.name in self.world.config.get('callbackObjectRoots', {}):
+            result = value.name
+            self.callbacks.add(result)
         elif self.world.public_name(value.name) in self.names:
             result = self.world.public_name(value.name)
         else:
             raise self.generator.unsupported_type(f'interface surface type {value.name} outside scope')
-        if value.nullable and value.name in NUMBERS | {'boolean': ''} or value.nullable and value.name == 'union':
+        if (value.nullable and value.name in NUMBERS | {'boolean': ''} or value.nullable and value.name == 'union'
+                or value.nullable and value.name in self.world.config.get('callbackObjectRoots', {})):
             result = f'({result}) option'
         return result
 
@@ -94,7 +107,18 @@ class InterfaceEmitter:
             if argument.optional and self.union(t):
                 alternatives = [None] + alternatives
             variants.append(alternatives)
-        return itertools.product(*variants)
+        # An omitted optional union omits the later optional arguments too: F# cannot tell `test(baseURL)` from
+        # `test(input)`. A variadic argument stays, since its array keeps the call distinct.
+        combinations = []
+        for combination in itertools.product(*variants):
+            if None in combination:
+                first = combination.index(None)
+                combination = combination[:first] + tuple(
+                    None if argument.optional and not argument.variadic else chosen
+                    for argument, chosen in zip(arguments[first:], combination[first:]))
+            if combination not in combinations:
+                combinations.append(combination)
+        return combinations
 
     def parameters(self, arguments, selected, raw=False):
         params = []
@@ -102,6 +126,8 @@ class InterfaceEmitter:
             if t is None:
                 continue
             ftype = self.type(t)
+            if argument.optional and self.world.resolve(t).name in self.world.config.get('callbackObjectRoots', {}):
+                ftype = self.world.resolve(t).name
             if raw and self.union(argument.type):
                 ftype = 'obj'
             if argument.variadic:
@@ -165,7 +191,7 @@ class InterfaceEmitter:
                 self.type(argument.type)
         except self.generator.unsupported_type:
             return []
-        needs_adapter = self.complex(member)
+        needs_adapter = self.complex(member) or (owner, member.kind, member.name, len(member.arguments)) in self.shadowed
         matrix_adapter = f'{owner}.{member.name}'
         lines = ([''] if needs_adapter or anonymous_property or matrix_adapter in self.world.config.get('browserMatrixFlagAdapters', []) or matrix_adapter in self.generator.svg_matrix_bindings else []) + [f'    /// <summary>{owner}.{member.name}.</summary>']
         if member.kind == 'attribute':
@@ -177,9 +203,12 @@ class InterfaceEmitter:
             signature = f'    abstract member {identifier(member.name)}: {result} with {access}'
             if not needs_adapter:
                 source = self.sources.get(owner, owner)
-                if setter and self.world.resolve(member.type).name == 'USVString' and self.world.config.get('interfaceStringInputs', {}).get(source) == 'utf8-lengths':
+                if setter and self.world.resolve(member.type).name == 'USVString' and source in self.world.config.get('browserWellFormedSetters', []):
                     expression = '$0.' + member.name + "{{=((v)=>String(v==null?'null':v).toWellFormed())($1)}}"
                     return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif', signature, '']
+                if getter and not setter and self.world.resolve(member.type).name in WIDE_INTEGERS:
+                    # A browser returns a JavaScript number; Fable represents int64 and uint64 as BigInt.
+                    return [''] + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("BigInt($0.{member.name})")>]', '#endif', signature, '']
                 if owner in ('Document', 'ShadowRoot', 'DocumentOrShadowRoot') and member.name == 'styleSheets' and getter:
                     expression = ("((r)=>{const s=r.styleSheets;if(r.nodeType===9){"
                                   "const k=Symbol.for('Ranvier.Dom.StyleSheetList.documents.v1');"
@@ -219,6 +248,14 @@ class InterfaceEmitter:
                           f'new m.constructor([{fields}]):m;}})($0)')
             lines += ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
             self.matrix_flag_adapters_used.add(matrix_adapter)
+        wide = [i for i, a in enumerate(member.arguments) if self.world.resolve(a.type).name in WIDE_INTEGERS]
+        if wide and not needs_adapter and not anonymous_property and not member.arguments[-1].variadic:
+            # Fable passes int64 arguments as BigInt, which a browser's number conversion rejects.
+            names = [f'a{i}' for i in range(len(member.arguments))]
+            passed = [f"{n}===void 0?void 0:Number({n})" if i in wide else n for i, n in enumerate(names)]
+            expression = (f"((o,{','.join(names)})=>o.{member.name}({','.join(passed)}))"
+                          f"($0,{','.join(f'${i + 1}' for i in range(len(member.arguments)))})")
+            lines = ([''] if lines[0] != '' else []) + lines + ['#if FABLE_COMPILER', f'    [<Fable.Core.Emit("{expression}")>]', '#endif']
         if needs_adapter:
             raw_params = self.parameters(member.arguments, [a.type for a in member.arguments], raw=True)
             raw_result = 'obj' if self.union(member.type) else result
@@ -233,7 +270,7 @@ class InterfaceEmitter:
         if needs_adapter:
             lines += ['#endif']
             self.adapters.append((owner, member))
-        if anonymous_property or matrix_adapter in self.generator.svg_matrix_bindings:
+        if anonymous_property or matrix_adapter in self.generator.svg_matrix_bindings or (wide and not needs_adapter and lines[-1] != ''):
             lines += ['']
         return lines
 
@@ -268,7 +305,7 @@ class InterfaceEmitter:
         if not self.adapters:
             return []
         lines = ['', '#if FABLE_COMPILER', '[<AutoOpen>]', 'module BrowserUnionAdapters =']
-        span_unions = set(self.world.config.get('complexStringSpans', []))
+        span_unions = set(self.world.config.get('browserWellFormedUnions', []))
         reference_unions = span_unions | set(self.world.config.get('validatedReferenceUnions', []))
         if any(self.world.resolve(child).name == 'undefined' for children in self.unions.values() for child in children):
             lines += ['    [<Fable.Core.Emit("$0 === undefined")>]',
@@ -344,6 +381,17 @@ class InterfaceEmitter:
                 if member.kind == 'attribute':
                     getter, setter = self.attribute_access[(owner, self.world.member_key(member))]
                     union_name = label(self.world.resolve(member.type))
+                    if getter and not setter:
+                        # A get-only adapter is a property with a body, as Fantomas formats it.
+                        lines += [f'        member this.{identifier(member.name)}: {result} =',
+                                  f'            let value = this.__ranvier_get_{member.name} ()']
+                        if self.world.resolve(member.type).nullable:
+                            lines += ['', '            if isNull value then', '                None', '            else',
+                                      f'                Some (unbox{union_name} value)']
+                        else:
+                            lines += [f'            unbox{union_name} value']
+                        lines += ['']
+                        continue
                     lines += [f'        member this.{identifier(member.name)}']
                     if getter:
                         lines += [f'            with get (): {result} =',
@@ -415,9 +463,29 @@ class InterfaceEmitter:
                     lines += ['']
         return lines + ['#endif']
 
+    def shadowed_members(self):
+        """Inherited members redeclared by a descendant's browser adapter. F# prefers an intrinsic member to any
+        extension, so under Fable such an inherited member is also an extension, which the descendant's overrides."""
+        found = set()
+        for name in self.names:
+            source = self.sources[name]
+            if source not in self.world.interfaces or self.world.interfaces[source].mixin:
+                continue
+            for member in self.world.members(source):
+                if member.kind != 'operation' or not self.complex(member) or self.world.contract_owner(source, member) != name:
+                    continue
+                for ancestor in self.world.chain(source)[1:]:
+                    for candidate in self.world.members(ancestor):
+                        if candidate.kind == 'operation' and candidate.name == member.name and len(candidate.arguments) == len(member.arguments):
+                            owner = self.world.contract_owner(ancestor, candidate)
+                            if owner in self.names:
+                                found.add((owner, candidate.kind, candidate.name, len(candidate.arguments)))
+        return found
+
     def emit(self):
         for name in self.world.contract_dictionary_fields:
             self.type(idl.Type(name))
+        self.shadowed = self.shadowed_members()
         bodies = []
         for name in self.names:
             members = []
@@ -440,6 +508,8 @@ class InterfaceEmitter:
             source = self.sources[name]
             base = self.world.public_name(self.world.interfaces[source].base)
             mixins = [self.world.public_name(mixin) for mixin in self.world.contract_mixins(source)]
+            if source in self.world.config.get('callbackObjectRoots', {}):
+                continue
             body = ([f'    inherit {base}'] if base in self.names else []) + [f'    inherit {mixin}' for mixin in mixins] + members
             declarations.append((name, '[<AllowNullLiteral>]', body or ['    interface end']))
         for name, children in self.unions.items():
@@ -476,6 +546,12 @@ class InterfaceEmitter:
             if name == 'EventListener':
                 declarations.append((name, '', ['    Event -> unit']))
                 declarations.append(('EventListenerObject', '[<AllowNullLiteral>]', ['    abstract member handleEvent: event: Event -> unit']))
+            elif name in self.world.config.get('callbackObjectRoots', {}):
+                callback = self.world.config['callbackObjectRoots'][name]
+                result = callback['resultEnum']
+                declarations.append((name, '', ['    ' + callback['contract']]))
+                declarations.append((result['name'], '',
+                                     [f'    | {case} = {value}' for case, value in result['cases'].items()]))
         for name, (values, _, _) in self.world.enums.items():
             if name in self.enums:
                 declarations.append((name, '[<RequireQualifiedAccess>]', [f'    | [<CompiledName("{value}")>] {case_name(value)}' for value in values]))
@@ -496,11 +572,11 @@ class InterfaceEmitter:
                         body = []
                     else:
                         lines += [attrs, f'type {name} =']
-                elif body == ['    interface end'] or body == ['    class end'] or attrs == '':
+                elif body == ['    interface end'] or body == ['    class end'] or (attrs == '' and len(body) == 1):
                     lines += [f'{prefix}{" " + attrs if attrs else ""} {name} = {body[0].strip()}']
                     body = []
                 else:
-                    lines += [f'{prefix} {attrs} {name} =']
+                    lines += [f'{prefix}{" " + attrs if attrs else ""} {name} =']
             lines += body + ['']
         lines += self.extensions()
         missing_matrix_adapters = set(self.world.config.get('browserMatrixFlagAdapters', [])) - self.matrix_flag_adapters_used

@@ -1,0 +1,147 @@
+{
+  "group": [
+    "D16 #24"
+  ],
+  "native": "0.1.0-preview.30",
+  "abi": 38,
+  "features": [
+    "dom:ToggleEvent",
+    "dom:CommandEvent",
+    "dom-constructor:ToggleEvent",
+    "dom-constructor:CommandEvent"
+  ],
+  "hostSettings": {
+    "PopoverHintEnabled": true
+  },
+  "sourceHeadOfBatch": "923fdcd2726ff68f205a4bb20b4b2c4d1da4f046",
+  "candidate": "artifacts/native30-candidate-1 (forms-candidate-4 objects; RanvierDomGlue regenerated; four host units)",
+  "red": {
+    "runtime": "native-scroll/artifacts/native29-frozen (Native29/ABI37)",
+    "missing": [
+      "rv_dom_command_event_create",
+      "rv_dom_command_event_get_command",
+      "rv_dom_command_event_get_source",
+      "rv_dom_toggle_event_create",
+      "rv_dom_toggle_event_get_new_state",
+      "rv_dom_toggle_event_get_old_state",
+      "rv_dom_toggle_event_get_source"
+    ],
+    "valueDifferences": 13,
+    "file": "red-native29.json",
+    "popoverHint": "reflected \"manual\" (PopoverHintEnabled off)"
+  },
+  "green": {
+    "dialogPopoverAssertions": 845,
+    "probes": 42,
+    "allExitZero": true,
+    "rawAssertions": 48486,
+    "teardownCases": 76,
+    "teardownCasesAdded": 4,
+    "teardownAllCollected": true,
+    "probeTeardown": {
+      "modalAtDestroy": {
+        "open": [
+          0,
+          1
+        ],
+        "close": 0,
+        "openAfterClose": [
+          0,
+          0
+        ],
+        "requestClose": 0,
+        "showModal": -3,
+        "heldToggleEvent": {
+          "oldState": "closed",
+          "newState": "open",
+          "source": "cmodal"
+        }
+      },
+      "popoverPastReplacement": {
+        "eventsAtReplacement": [],
+        "oldMatchesPopoverOpen": true,
+        "oldHide": -3,
+        "oldShow": 0,
+        "eventsAfterOldCalls": [],
+        "newDocument": [
+          [
+            "beforetoggle",
+            "p",
+            "open"
+          ],
+          [
+            "toggle",
+            "p",
+            "open"
+          ]
+        ]
+      },
+      "assertions": 50
+    }
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "fixture": "tests/fixtures/dialog-popover-oracle.json",
+    "cases": 13,
+    "steps": 245,
+    "stableOverRuns": 3
+  },
+  "repeats": {
+    "runs": 30,
+    "native30Candidate1": "pass 30 fail 0",
+    "native32Candidate2": "pass 30 fail 0 (C:/wk/native-caret/artifacts/native32-candidate-2)",
+    "log": "repeat-30.log",
+    "determinism": "the probe drains the run loop after every step; queued toggles compare as per-element close count, final newState and oldState chain"
+  },
+  "unorderedQualifications": [
+    {
+      "qualification": "coalesced-toggles",
+      "reason": "A pending toggle task absorbs the next toggle of the same element (HTML \"queue a popover toggle event task\" and the dialog equivalent), so the toggle count depends on when tasks run. The probe drains the run loop after every step and compares, per element, the close count, the last newState and the oldState/newState chain, never the toggle count. With the drain the native engine coalesces nothing in these cases; Chromium coalesces the open and Escape-close of m in \"close request after user activation\" into one closed>closed toggle."
+    }
+  ],
+  "valueDifferences": 0,
+  "qualifications": [
+    {
+      "qualification": "close-watcher-activation",
+      "case": "close requests and closedby",
+      "kind": "dispatched",
+      "reason": "Escape after a scripted showModal: the native cancel event is not cancelable. A close watcher makes cancel cancelable only with history-action user activation. Playwright evaluate runs with a user gesture, so Chromium has activation on every step (navigator.userActivation.isActive true before each press); the native host has none. Under equal activation (trusted click first, case \"close request after user activation\") the first Escape cancel is cancelable on both."
+    },
+    {
+      "qualification": "toggle-before-close",
+      "case": "close requests and closedby",
+      "kind": "queuedOrder",
+      "reason": "On the close-request path (Escape, light dismiss, closedby) WebKit queues the dialog toggle task before the close event task; Chromium fires close first, then toggle. 3 of 3 dialogs differ; close() fires toggle first on both. Consecutive toggles are merged before the comparison."
+    },
+    {
+      "qualification": "hint-light-dismiss-order",
+      "case": "popover hint stacking",
+      "kind": "dispatched",
+      "reason": "Light dismiss with an auto popover (p2) and a hint popover (ph) open: native fires beforetoggle on p2 then ph; Chromium on ph then p2. Both close both; stacking, hint-closes-hint, auto-closes-hint and Escape-closes-hint-first match. 1 of 14 beforetoggle events is reordered."
+    },
+    {
+      "qualification": "close-watcher-activation",
+      "case": "close request after user activation",
+      "kind": "dispatched",
+      "reason": "After a trusted click both engines make the first Escape cancel cancelable. The second Escape follows a scripted showModal: native has consumed the activation (cancel not cancelable); Chromium gains a fresh gesture from Playwright evaluate."
+    },
+    {
+      "qualification": "toggle-before-close",
+      "case": "close request after user activation",
+      "kind": "queuedOrder",
+      "reason": "Close-request path order: native fires toggle before close, Chromium close before toggle, for each of the 3 close requests."
+    }
+  ],
+  "files": {
+    "allocation-absence.json": "865242794cf914d3003842fd623ce0c5eba5d1c8502fc2b04fd8907a1c9cd361",
+    "batch-green.json": "cbfac4ad3d73588e269844ca86164d7d4dcd27c27ae7f8dfde885eb47838cb07",
+    "build_native30_candidate.py": "68aa56799a04827c73bac7d821918148b1b0112ab3868ed4d4335f8b4016d17c",
+    "dialog-popover-report.json": "14dd7c3d2cbe31543742584240ca6ffb1eeffbd67b4d65de978a3efb23b2bb61",
+    "make_native30_evidence.py": "0400f6625c0fb50e810deede74c21f0f0ed63b4acc8e56841d8f3c2ca139ed88",
+    "red-native29.json": "2ba24fa634c302990b4428b0654cc1798a2523351427bb8a3f766a7216609e43",
+    "repeat-30.log": "34001840e81c29675912701ed5b612e2f06bc0269bfea77f0a73413bf2fa24e2",
+    "run_native30_batch.py": "b690f2fa2bd126eb1e8ed4bf8b95e52c6bf3f3f5a7f7e2068d1a162b5177e0d2",
+    "runtime-receipt.json": "f2ead3f8dede326f955b2334778074b62e8ec18b66d6a6e22529d7bf93538862",
+    "teardown-probes.json": "7e662891644708a5d29e2dc546ea97014070953446d370590f9679d234314c3f"
+  }
+}

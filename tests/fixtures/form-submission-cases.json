@@ -1,0 +1,285 @@
+{
+ "description": "D14 form submission cases. Each case runs on a fresh page of markup at viewport 800x600. A step records its status, value, the events delivered to the document capture listeners and the submissions the application receives during the step. Chromium answers every submission request with 204 No Content, so the document stays.",
+ "viewport": [
+  800,
+  600
+ ],
+ "eventTypes": [
+  "submit",
+  "formdata",
+  "invalid"
+ ],
+ "markup": "<!doctype html><html><head><meta charset=\"utf-8\"><style>html,body{margin:0}input,button{position:absolute;width:60px;height:20px;padding:0;border:0;margin:0}</style></head><body><form id=\"g\" action=\"https://app.test/search\" method=\"get\"><input id=\"q\" name=\"q\" value=\"a b&amp;c=d\" style=\"left:0;top:0\"><input id=\"cb\" type=\"checkbox\" name=\"cb\" value=\"on\" checked style=\"left:70px;top:0\"><input id=\"off\" type=\"checkbox\" name=\"off\" style=\"left:140px;top:0\"><input id=\"dis\" name=\"dis\" value=\"x\" disabled style=\"left:210px;top:0\"><button id=\"go\" name=\"go\" value=\"one\" style=\"left:280px;top:0\">Go</button><button id=\"over\" name=\"o\" value=\"v\" formaction=\"https://app.test/other?k=1\" formmethod=\"post\" formenctype=\"text/plain\" style=\"left:350px;top:0\">Over</button><button id=\"plainbtn\" type=\"button\" style=\"left:420px;top:0\">Plain</button></form><form id=\"p\" action=\"https://app.test/post\" method=\"post\"><input id=\"name\" name=\"name\" value=\"&#233; &#20013;+\" style=\"left:0;top:40px\"><textarea id=\"ta\" name=\"ta\" style=\"position:absolute;left:70px;top:40px;width:60px;height:20px\">line1\nline2</textarea><select id=\"s\" name=\"s\" style=\"position:absolute;left:140px;top:40px\"><option value=\"1\">One</option><option value=\"2\" selected>Two</option></select><input id=\"pgo\" type=\"submit\" name=\"pgo\" value=\"Send\" style=\"left:280px;top:40px\"></form><form id=\"v\" action=\"https://app.test/valid\" method=\"post\"><input id=\"req\" name=\"req\" required style=\"left:0;top:80px\"><input id=\"num\" name=\"num\" type=\"number\" min=\"5\" value=\"3\" style=\"left:70px;top:80px\"><button id=\"vgo\" style=\"left:280px;top:80px\">V</button><button id=\"vskip\" formnovalidate style=\"left:350px;top:80px\">Skip</button></form><form id=\"nv\" action=\"https://app.test/novalidate\" method=\"post\" novalidate><input id=\"nreq\" name=\"nreq\" required style=\"left:0;top:120px\"><button id=\"nvgo\" style=\"left:280px;top:120px\">N</button></form><form id=\"m\" action=\"https://app.test/multi\" method=\"post\" enctype=\"multipart/form-data\"><input id=\"mt\" name=\"mt\" value=\"text\" style=\"left:0;top:160px\"><button id=\"mgo\" style=\"left:280px;top:160px\">M</button></form><form id=\"t\" action=\"https://app.test/target\" method=\"get\" target=\"_blank\"><input id=\"tt\" name=\"tt\" value=\"1\" style=\"left:0;top:200px\"><button id=\"tgo\" style=\"left:280px;top:200px\">T</button></form><form id=\"one\" action=\"https://app.test/one\"><input id=\"only\" name=\"only\" value=\"v\" style=\"left:0;top:240px\"></form><input id=\"outside\" form=\"g\" name=\"outside\" value=\"o\" style=\"left:0;top:280px\"></body></html>",
+ "cases": [
+  {
+   "name": "get submission and submitter",
+   "steps": [
+    {
+     "op": "requestSubmit",
+     "id": "g",
+     "submitter": "go"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "g"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "submit",
+     "id": "g"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "submitter overrides",
+   "steps": [
+    {
+     "op": "requestSubmit",
+     "id": "g",
+     "submitter": "over"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "click",
+     "id": "over"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "click",
+     "id": "plainbtn"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "g",
+     "submitter": "plainbtn"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "g",
+     "submitter": "pgo"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "post urlencoded encoding",
+   "steps": [
+    {
+     "op": "click",
+     "id": "pgo"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "setAttribute",
+     "id": "p",
+     "name": "accept-charset",
+     "value": "UTF-8"
+    },
+    {
+     "op": "submit",
+     "id": "p"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "cancellation",
+   "steps": [
+    {
+     "op": "prevent",
+     "type": "submit"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "g",
+     "submitter": "go"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "g",
+     "submitter": "go"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "p"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "constraint validation",
+   "steps": [
+    {
+     "op": "checkValidity",
+     "id": "v"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "v"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "v",
+     "submitter": "vskip"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "submit",
+     "id": "v"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "nv"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "setValue",
+     "id": "req",
+     "value": "filled"
+    },
+    {
+     "op": "setValue",
+     "id": "num",
+     "value": "7"
+    },
+    {
+     "op": "checkValidity",
+     "id": "v"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "v",
+     "submitter": "vgo"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "implicit submission and trusted clicks",
+   "steps": [
+    {
+     "op": "focus",
+     "id": "only"
+    },
+    {
+     "op": "press",
+     "key": "Enter"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "focus",
+     "id": "q"
+    },
+    {
+     "op": "press",
+     "key": "Enter"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "mouse",
+     "x": 300,
+     "y": 10
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "multipart and target",
+   "steps": [
+    {
+     "op": "requestSubmit",
+     "id": "m"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "t"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  },
+  {
+   "name": "formdata edits and reentrancy",
+   "steps": [
+    {
+     "op": "appendOnFormData",
+     "name": "added",
+     "value": "yes"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "one"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "submitTwice",
+     "id": "one"
+    },
+    {
+     "op": "flush"
+    },
+    {
+     "op": "removeOnSubmit",
+     "id": "only"
+    },
+    {
+     "op": "requestSubmit",
+     "id": "one"
+    },
+    {
+     "op": "flush"
+    }
+   ]
+  }
+ ]
+}

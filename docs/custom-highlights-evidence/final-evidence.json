@@ -1,0 +1,426 @@
+{
+  "group": [
+    "T03 #74"
+  ],
+  "native": "0.1.0-preview.40",
+  "abi": 48,
+  "features": [
+    "dom-custom-highlights",
+    "dom:Highlight",
+    "dom:HighlightRegistry",
+    "dom-constructor:Highlight"
+  ],
+  "members": [
+    "CSS.highlights (rv_dom_css_get_highlights)",
+    "new Highlight(...ranges)",
+    "Highlight size/has/values/add/delete/clear",
+    "Highlight.priority",
+    "Highlight.type",
+    "HighlightRegistry size/has/get/entries/set/delete/clear",
+    "::highlight(name) painting"
+  ],
+  "excluded": [
+    "HighlightRegistry.highlightsFromPoint (absent from the pinned WebKit; browser-only, the managed service answers Unsupported)"
+  ],
+  "sourceHeadOfBatch": "77a50ce8daf91fbc14e1dcfcdbc06d263ba341d5",
+  "batchRunHead": "77a50ce",
+  "stackedOn": "I08 2a9cf7d (Native39/ABI47), G04 15e1bc9 (Native38/ABI46, patch 0038), G03 cdf1a4e (Native37/ABI45), B22 c78a71a (Native36/ABI44), T06 901ced5 (Native35/ABI43)",
+  "red": {
+    "files": [
+      "red-chromium.json",
+      "red-native.json",
+      "red-chromium.mjs"
+    ],
+    "native35": "Highlight and HighlightRegistry compiled in and ungated; no export; gen/idl.py skipped setlike and maplike"
+  },
+  "generator": {
+    "proof": "generator-noop-proof.json",
+    "note": "setlikeBindings and maplikeBindings are opt-in; with no binding configured every generated output is unchanged"
+  },
+  "green": {
+    "customHighlightsAssertions": 378,
+    "repeats": 31,
+    "repeatsDistinct": [
+      "1 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "10 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "11 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "12 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "13 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "14 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "15 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "16 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "17 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "18 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "19 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "2 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "20 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "21 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "22 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "23 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "24 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "25 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "26 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "27 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "28 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "29 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "3 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "30 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "4 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "5 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "6 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "7 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "8 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "9 PASS custom_highlights: 378 assertions, 4 qualified differences, 15 paint steps",
+      "native40-candidate-9-frozen custom_highlights 30/30"
+    ],
+    "probes": 54,
+    "allExitZero": true,
+    "rawAssertions": 74216,
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "form_submission",
+        "exitCode": 0,
+        "assertions": 418
+      },
+      {
+        "name": "text_segmentation",
+        "exitCode": 0,
+        "assertions": 812
+      },
+      {
+        "name": "crypto_random",
+        "exitCode": 0,
+        "assertions": 275
+      },
+      {
+        "name": "visual_viewport",
+        "exitCode": 0,
+        "assertions": 987
+      },
+      {
+        "name": "screen_metrics",
+        "exitCode": 0,
+        "assertions": 222
+      },
+      {
+        "name": "custom_highlights",
+        "exitCode": 0,
+        "assertions": 378
+      },
+      {
+        "name": "abi_layouts",
+        "exitCode": 0,
+        "assertions": 12
+      },
+      {
+        "name": "event_details",
+        "exitCode": 0,
+        "assertions": 391
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null
+      }
+    ],
+    "teardownCases": 92,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "apiKeys": 24,
+    "paintSteps": 15,
+    "repeats": "oracle regenerated 30 times, identical 30/30"
+  },
+  "measured": {
+    "paintOrder": "equal-priority overlap paints the highlight later in registry iteration order (highlightNames); priority 1 paints above 0; delete then set moves a name last",
+    "liveRanges": "Range.setEnd and Text.insertData repaint the highlighted cells; a StaticRange paints its offsets",
+    "teardown": "document replacement and rv_host_destroy clear the document registry and empty every highlight registered in it; an unregistered highlight keeps its ranges; every handle stays usable until released",
+    "registryClear": "registry.clear() unregisters names one by one and leaves each highlight its ranges, as Chromium does (WebKit HighlightRegistry::clear empties them)",
+    "order": "a range added again and a name set again keep their positions; the constructor adds a repeated range once; values() and entries() are snapshot copies"
+  },
+  "assertionCount": "custom_highlights counts 378 on every run. Before f079f62 the Ahem font wait counted assertions on each iteration (385 on native40-candidate-3); no case was removed.",
+  "qualifications": {
+    "highlight.iterationLive": {
+      "native": null,
+      "chromium": [
+        "r1",
+        "s1",
+        "r4"
+      ],
+      "reason": "The ABI has no live iterator: Highlight.values() returns a snapshot copy, so a set mutated during iteration leaves the snapshot unchanged (highlight.iterationSnapshot and highlight.afterIteration equal Chromium)."
+    },
+    "paint.redReplaced": {
+      "native": "kwkwBRBRYGYGYGYw",
+      "chromium": "kwkwBRBRBRBGYGYw",
+      "reason": "As paint.redSetAgain: replacing the highlight of the registered name 'red' keeps its map position; Chromium paints it on top, native keeps the registry iteration order (green on top)."
+    },
+    "paint.redSetAgain": {
+      "native": "kwkwBRBRYGYGYGYw",
+      "chromium": "kwkwBRBRBRBGYGYw",
+      "reason": "Chromium paints a re-set name as the most recently registered while keeping its map position, so Chromium's paint order disagrees with its own iteration order (keys stay [red, green]). Native paints equal-priority highlights in registry iteration order, so the later-registered green stays on top."
+    },
+    "registry.iterationLive": {
+      "native": null,
+      "chromium": [
+        "a",
+        "b",
+        "d"
+      ],
+      "reason": "The ABI has no live iterator: HighlightRegistry.entries() returns a snapshot copy, so a map mutated during iteration leaves the snapshot unchanged (registry.iterationSnapshot and registry.afterIteration equal Chromium)."
+    }
+  },
+  "files": {
+    "absence_t03.py": "f4b7ddb048fafc8c66caa34528167a9dac5abac5990a312d68ead58ce2447ce0",
+    "allocation-absence.json": "c75ba64bd2378c3f1dae7048599241aa25627155224759ba484d6056ce0aabb6",
+    "batch-green.json": "d9ca059b0cb9f37011c1d16dc8e8ee6ba6dab3dffa00651049c8850706fc329d",
+    "build_native40_candidate.py": "32584408a0bff6ecc36d26516622ce5d5e7343a963f7f9e67a025fc36652de04",
+    "custom-highlights-probe.log": "acf82db6ac4885c3cd6786609c750510c25878bd5476464ffb80d938a66a65b3",
+    "custom-highlights-repeat30-candidate3.txt": "44a202937df8647316e72632cd081eb3ce9c6788f924d51fd421dcd05217fa13",
+    "custom-highlights-repeat30.txt": "badacbf584f176524f1121ef7e02710ece560727413add57b09fa62e9b6e548b",
+    "generator-noop-proof.json": "e744770ea9333ff93624c58cc57ec2e38d0f3fd396c4d287d096941179bc65fe",
+    "make_native40_evidence.py": "3c6864fa5d8966b5ba7b7aed20bc52392b7b0df086277049be379d51db6f6ea0",
+    "red-chromium.json": "4100e003acaef5b34695b72268df1ead575a69a85090573721126a97597b08b6",
+    "red-chromium.mjs": "13674b50a00b3cc67c90b0c1a7d44583f8e25a52808bb9af5e5028ecbf89d5fb",
+    "red-native.json": "07069ea5b5056e013036415ad917313848825b2c5abec0d92319c5c9e89a1f1e",
+    "run_native40_full_batch.py": "6252bb540917d9c907b73d7a38d4d847dd1d82917fc9ba213848ea1febc34e91",
+    "runtime-receipt.json": "63fb43bb02a5a7af4dfab450f247fedb615ac7d89f2cf70445b641b6cdeeee96",
+    "source-patches.json": "b53dbd4e95c764f933be6c3654f0c20ae667ebeb2a49d324341720d9e8c2d86c",
+    "teardown-probes.json": "460e29e309ead18dc3a7a49941d8dd12e4b2fd4c3363d24bc57b1a1c845d9d43"
+  }
+}

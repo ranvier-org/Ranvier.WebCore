@@ -1,0 +1,36 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+0000-skia-strike-ref.patch applies
+0001-angle-stub.patch applies
+0002-network-stub.patch applies
+0003-crypto-stub.patch applies
+0004-gpu-stub.patch applies
+0005-web-api-stub.patch applies
+0006-sqlite-stub.patch applies
+0007-browser-api-stub.patch applies
+0008-inspector-stub.patch applies
+0009-jsc-inspector-stub.patch applies
+0010-embedder-clients.patch applies
+0011-ax-embedder-notifications.patch applies
+0012-embedder-sources.patch applies
+0013-unbundled-strings.patch applies
+0014-constructed-sheet-replacement.patch applies
+0015-keyframe-offset-invalidation.patch applies
+0016-counter-style-name.patch applies
+0017-detached-cssom-context.patch applies
+0018-cssom-custom-property-priority.patch applies
+0019-declared-style-map-cow.patch applies
+0020-background-typed-list-separators.patch applies
+0021-typed-custom-property-priority.patch applies
+0022-css-transform-matrix-conversion.patch applies
+0023-embedder-chrome-client-classification.patch applies
+0024-svg-current-translate-owner.patch applies
+0025-svg-screen-ctm-pan.patch applies
+0026-svg-text-length-query-transforms.patch applies
+0027-svg-view-reset-target.patch applies
+0028-svg-convolve-structural-cache.patch applies
+0029-svg-feimage-aspect-cache.patch applies
+0030-svg-symbol-view-box-instances.patch applies
+0031-svg-href-attribute-synchronization.patch applies
+0032-svg-smil-first-interval-end.patch applies
+0034-svg-string-list-null-attribute.patch applies
+EXIT_CODE=0

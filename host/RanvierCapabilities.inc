@@ -19,7 +19,8 @@ static constexpr const char* capabilityFacilityNames[] = {
     "jsc-inspector", "jit", "dfg-jit", "ftl-jit", "webassembly", "webassembly-bbq-jit", "webassembly-omg-jit",
     "accessibility", "accessibility-uia", "accessibility-events", "clipboard", "clipboard-read-callback",
     "clipboard-write-callback", "drop", "drag-out", "popups", "tooltip", "input", "ime", "frame", "scroll",
-    "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications"
+    "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications", "diagnostics",
+    "inspector-frontend", "cascade-diagnostics"
 };
 
 static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
@@ -232,6 +233,10 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     else if (!std::strcmp(name, "accessibility")) { result.facts[1] = 1; result.boolean(host.accessibility); }
     else if (!std::strcmp(name, "accessibility-events")) { result.facts[1] = rv_abi_has(name); result.boolean(!!host.axCallback); }
     else if (!std::strcmp(name, "accessibility-uia")) result.facts[1] = rv_abi_has(name);
+    else if (!std::strcmp(name, "diagnostics")) { result.facts[1] = 1; result.boolean(host.diagnostics); }
+    else if (!std::strcmp(name, "cascade-diagnostics")) { result.facts[1] = 1; result.boolean(host.diagnostics); }
+    // No flavor ships a developer-tools frontend (WebInspectorUI) or connects one to the page's inspector controller.
+    else if (!std::strcmp(name, "inspector-frontend")) { result.facts[1] = 0; result.facts[4] = 0; }
     else if (capabilityContains(capabilityHostFacilityNames, name)) result.facts[1] = 1;
     if (result.kind == 1) result.facts[2] = result.number ? 1 : 0;
     return result;

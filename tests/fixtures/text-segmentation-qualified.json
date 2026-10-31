@@ -1,0 +1,1442 @@
+{
+ "comment": "Measured differences between the runtime (ICU 77.1, Unicode 16.0) and Chromium 156.0.8078.4, each with the runtime value. text_segmentation.py fails on any other difference on the measured ICU.",
+ "measuredIcu": "icu=77.1",
+ "differences": {
+  "cases[11].word": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "Die",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "Straße",
+     true
+    ],
+    [
+     10,
+     " ",
+     false
+    ],
+    [
+     11,
+     "ist",
+     true
+    ],
+    [
+     14,
+     " ",
+     false
+    ],
+    [
+     15,
+     "3,5",
+     true
+    ],
+    [
+     18,
+     " ",
+     false
+    ],
+    [
+     19,
+     "km",
+     true
+    ],
+    [
+     21,
+     " ",
+     false
+    ],
+    [
+     22,
+     "lang",
+     true
+    ],
+    [
+     26,
+     ".",
+     false
+    ],
+    [
+     27,
+     " ",
+     false
+    ],
+    [
+     28,
+     "Z.B",
+     true
+    ],
+    [
+     31,
+     ".",
+     false
+    ],
+    [
+     32,
+     " ",
+     false
+    ],
+    [
+     33,
+     "hier",
+     true
+    ],
+    [
+     37,
+     ".",
+     false
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "Die",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "Straße",
+     true
+    ],
+    [
+     10,
+     " ",
+     false
+    ],
+    [
+     11,
+     "ist",
+     true
+    ],
+    [
+     14,
+     " ",
+     false
+    ],
+    [
+     15,
+     "3,5",
+     true
+    ],
+    [
+     18,
+     " ",
+     false
+    ],
+    [
+     19,
+     "km",
+     true
+    ],
+    [
+     21,
+     " ",
+     false
+    ],
+    [
+     22,
+     "lang",
+     true
+    ],
+    [
+     26,
+     ".",
+     false
+    ],
+    [
+     27,
+     " ",
+     false
+    ],
+    [
+     28,
+     "Z",
+     true
+    ],
+    [
+     29,
+     ".",
+     false
+    ],
+    [
+     30,
+     "B",
+     true
+    ],
+    [
+     31,
+     ".",
+     false
+    ],
+    [
+     32,
+     " ",
+     false
+    ],
+    [
+     33,
+     "hier",
+     true
+    ],
+    [
+     37,
+     ".",
+     false
+    ]
+   ]
+  },
+  "cases[4].word": {
+   "note": "ICU puts a word boundary inside the grapheme cluster of conjoining jamo and a syllable; the engine joins the two segments so no grapheme splits, where Chromium splits it.",
+   "native": [
+    [
+     0,
+     "한국어",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "텍스트",
+     true
+    ],
+    [
+     7,
+     " ",
+     false
+    ],
+    [
+     8,
+     "ᄀᄀᄀ각",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "한국어",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "텍스트",
+     true
+    ],
+    [
+     7,
+     " ",
+     false
+    ],
+    [
+     8,
+     "ᄀᄀᄀ",
+     true
+    ],
+    [
+     11,
+     "각",
+     true
+    ]
+   ]
+  },
+  "cases[5].word": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "Don't",
+     true
+    ],
+    [
+     5,
+     " ",
+     false
+    ],
+    [
+     6,
+     "stop",
+     true
+    ],
+    [
+     10,
+     ".",
+     false
+    ],
+    [
+     11,
+     " ",
+     false
+    ],
+    [
+     12,
+     "It's",
+     true
+    ],
+    [
+     16,
+     " ",
+     false
+    ],
+    [
+     17,
+     "3.14",
+     true
+    ],
+    [
+     21,
+     ",",
+     false
+    ],
+    [
+     22,
+     " ",
+     false
+    ],
+    [
+     23,
+     "not",
+     true
+    ],
+    [
+     26,
+     " ",
+     false
+    ],
+    [
+     27,
+     "3,14",
+     true
+    ],
+    [
+     31,
+     "!",
+     false
+    ],
+    [
+     32,
+     " ",
+     false
+    ],
+    [
+     33,
+     "Mr",
+     true
+    ],
+    [
+     35,
+     ".",
+     false
+    ],
+    [
+     36,
+     " ",
+     false
+    ],
+    [
+     37,
+     "Smith",
+     true
+    ],
+    [
+     42,
+     " ",
+     false
+    ],
+    [
+     43,
+     "left",
+     true
+    ],
+    [
+     47,
+     " ",
+     false
+    ],
+    [
+     48,
+     "at",
+     true
+    ],
+    [
+     50,
+     " ",
+     false
+    ],
+    [
+     51,
+     "5",
+     true
+    ],
+    [
+     52,
+     " ",
+     false
+    ],
+    [
+     53,
+     "p.m",
+     true
+    ],
+    [
+     56,
+     ".",
+     false
+    ],
+    [
+     57,
+     " ",
+     false
+    ],
+    [
+     58,
+     "Then",
+     true
+    ],
+    [
+     62,
+     "?",
+     false
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "Don't",
+     true
+    ],
+    [
+     5,
+     " ",
+     false
+    ],
+    [
+     6,
+     "stop",
+     true
+    ],
+    [
+     10,
+     ".",
+     false
+    ],
+    [
+     11,
+     " ",
+     false
+    ],
+    [
+     12,
+     "It's",
+     true
+    ],
+    [
+     16,
+     " ",
+     false
+    ],
+    [
+     17,
+     "3.14",
+     true
+    ],
+    [
+     21,
+     ",",
+     false
+    ],
+    [
+     22,
+     " ",
+     false
+    ],
+    [
+     23,
+     "not",
+     true
+    ],
+    [
+     26,
+     " ",
+     false
+    ],
+    [
+     27,
+     "3,14",
+     true
+    ],
+    [
+     31,
+     "!",
+     false
+    ],
+    [
+     32,
+     " ",
+     false
+    ],
+    [
+     33,
+     "Mr",
+     true
+    ],
+    [
+     35,
+     ".",
+     false
+    ],
+    [
+     36,
+     " ",
+     false
+    ],
+    [
+     37,
+     "Smith",
+     true
+    ],
+    [
+     42,
+     " ",
+     false
+    ],
+    [
+     43,
+     "left",
+     true
+    ],
+    [
+     47,
+     " ",
+     false
+    ],
+    [
+     48,
+     "at",
+     true
+    ],
+    [
+     50,
+     " ",
+     false
+    ],
+    [
+     51,
+     "5",
+     true
+    ],
+    [
+     52,
+     " ",
+     false
+    ],
+    [
+     53,
+     "p",
+     true
+    ],
+    [
+     54,
+     ".",
+     false
+    ],
+    [
+     55,
+     "m",
+     true
+    ],
+    [
+     56,
+     ".",
+     false
+    ],
+    [
+     57,
+     " ",
+     false
+    ],
+    [
+     58,
+     "Then",
+     true
+    ],
+    [
+     62,
+     "?",
+     false
+    ]
+   ]
+  },
+  "cases[6].word": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "e",
+     true
+    ],
+    [
+     1,
+     "-",
+     false
+    ],
+    [
+     2,
+     "mail",
+     true
+    ],
+    [
+     6,
+     " ",
+     false
+    ],
+    [
+     7,
+     "me",
+     true
+    ],
+    [
+     9,
+     " ",
+     false
+    ],
+    [
+     10,
+     "at",
+     true
+    ],
+    [
+     12,
+     " ",
+     false
+    ],
+    [
+     13,
+     "a.b",
+     true
+    ],
+    [
+     16,
+     "@",
+     false
+    ],
+    [
+     17,
+     "c.example",
+     true
+    ],
+    [
+     26,
+     " ",
+     false
+    ],
+    [
+     27,
+     "or",
+     true
+    ],
+    [
+     29,
+     " ",
+     false
+    ],
+    [
+     30,
+     "visit",
+     true
+    ],
+    [
+     35,
+     " ",
+     false
+    ],
+    [
+     36,
+     "https",
+     true
+    ],
+    [
+     41,
+     ":",
+     false
+    ],
+    [
+     42,
+     "/",
+     false
+    ],
+    [
+     43,
+     "/",
+     false
+    ],
+    [
+     44,
+     "ex.test",
+     true
+    ],
+    [
+     51,
+     "/",
+     false
+    ],
+    [
+     52,
+     "x",
+     true
+    ],
+    [
+     53,
+     "?",
+     false
+    ],
+    [
+     54,
+     "y",
+     true
+    ],
+    [
+     55,
+     "=",
+     false
+    ],
+    [
+     56,
+     "1",
+     true
+    ],
+    [
+     57,
+     ".",
+     false
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "e",
+     true
+    ],
+    [
+     1,
+     "-",
+     false
+    ],
+    [
+     2,
+     "mail",
+     true
+    ],
+    [
+     6,
+     " ",
+     false
+    ],
+    [
+     7,
+     "me",
+     true
+    ],
+    [
+     9,
+     " ",
+     false
+    ],
+    [
+     10,
+     "at",
+     true
+    ],
+    [
+     12,
+     " ",
+     false
+    ],
+    [
+     13,
+     "a",
+     true
+    ],
+    [
+     14,
+     ".",
+     false
+    ],
+    [
+     15,
+     "b",
+     true
+    ],
+    [
+     16,
+     "@",
+     false
+    ],
+    [
+     17,
+     "c",
+     true
+    ],
+    [
+     18,
+     ".",
+     false
+    ],
+    [
+     19,
+     "example",
+     true
+    ],
+    [
+     26,
+     " ",
+     false
+    ],
+    [
+     27,
+     "or",
+     true
+    ],
+    [
+     29,
+     " ",
+     false
+    ],
+    [
+     30,
+     "visit",
+     true
+    ],
+    [
+     35,
+     " ",
+     false
+    ],
+    [
+     36,
+     "https",
+     true
+    ],
+    [
+     41,
+     ":",
+     false
+    ],
+    [
+     42,
+     "/",
+     false
+    ],
+    [
+     43,
+     "/",
+     false
+    ],
+    [
+     44,
+     "ex",
+     true
+    ],
+    [
+     46,
+     ".",
+     false
+    ],
+    [
+     47,
+     "test",
+     true
+    ],
+    [
+     51,
+     "/",
+     false
+    ],
+    [
+     52,
+     "x",
+     true
+    ],
+    [
+     53,
+     "?",
+     false
+    ],
+    [
+     54,
+     "y",
+     true
+    ],
+    [
+     55,
+     "=",
+     false
+    ],
+    [
+     56,
+     "1",
+     true
+    ],
+    [
+     57,
+     ".",
+     false
+    ]
+   ]
+  },
+  "locales[0].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[15].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[1].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[2].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[3].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[4].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[5].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[6].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[7].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[8].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  },
+  "locales[9].words": {
+   "note": "UAX #29 WB6/WB7 keep a full stop between letters inside one word (MidNumLet), as the engine's ICU does; Chromium breaks there.",
+   "native": [
+    [
+     0,
+     "a.b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ],
+   "chromium": [
+    [
+     0,
+     "a",
+     true
+    ],
+    [
+     1,
+     ".",
+     false
+    ],
+    [
+     2,
+     "b",
+     true
+    ],
+    [
+     3,
+     " ",
+     false
+    ],
+    [
+     4,
+     "c",
+     true
+    ]
+   ]
+  }
+ },
+ "resolvedLocales": {
+  "note": "The engine reports ICU's valid locale; the Windows slim ICU data keeps only English locale resources, so most tags resolve to root. Chromium falls back to the browser default (en-GB here) for unknown tags.",
+  "native": {
+   "en": "en",
+   "en-US": "en_US",
+   "th": "root",
+   "ja-JP": "ja",
+   "zh-Hant-TW": "zh_Hant",
+   "de-u-co-phonebk": "de",
+   "xx": "root",
+   "xx-YY": "root",
+   "zz-Latn-QQ": "root",
+   "und": "root",
+   "en-US-u-lb-strict": "en_US"
+  }
+ }
+}

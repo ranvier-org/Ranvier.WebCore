@@ -1,0 +1,140 @@
+{
+  "group": [
+    "WebCore #142 length-delimited generated string inputs"
+  ],
+  "native": "0.1.0-preview.43",
+  "abi": 51,
+  "abiBreaking": "every generated rv_dom_* string input: plain arguments const uint8_t* plus int32_t length (-1 null or absent), union and sequence strings RvDomUtf8StringSpan, dictionary string fields RvDomUtf8StringInput",
+  "exceptions": [],
+  "generatedFunctions": 2672,
+  "nulTerminatedGeneratedInputs": 0,
+  "handWrittenExports": "unchanged, NUL-terminated; follow-up ranvier-org/Ranvier.WebCore#145",
+  "sourceHeadOfBatch": "e32fd4b41a34ef389194cd4a88f478b0b14fc6c3",
+  "stackedOn": "H08 acf26e3 (Native42/ABI50) on I11 5eee88a (Native41/ABI49, patch 0039), T03 828fb2b (Native40/ABI48), I08 2a9cf7d (Native39/ABI47); parent candidate native42-candidate-3",
+  "baseline": {
+    "batch": "C:\\wk\\native-inspect\\artifacts\\native42-candidate-3-batch",
+    "head": "acf26e3",
+    "rawAssertions": 76358,
+    "teardownCases": 96
+  },
+  "red": {
+    "file": "red/string-nul-red.json",
+    "script": "red/string_nul_red.py",
+    "abi": 47,
+    "cases": 25,
+    "differ": 19,
+    "byCategory": {
+      "A": {
+        "cases": 7,
+        "differ": 6
+      },
+      "B": {
+        "cases": 6,
+        "differ": 5
+      },
+      "C": {
+        "cases": 10,
+        "differ": 8
+      },
+      "R": {
+        "cases": 2,
+        "differ": 0
+      }
+    }
+  },
+  "green": {
+    "stringNulAssertions": 192,
+    "stringNulRepeats": 30,
+    "stringNulRepeatsDistinct": [
+      "PASS string_nul: 192 assertions"
+    ],
+    "teardownStringResultsRepeats": "30/30 (teardown-string-results-repeat30.json): 2 records each, all collected",
+    "probes": 58,
+    "allExitZero": true,
+    "rawAssertions": 76550,
+    "baselineProbesSameCount": true,
+    "baselineProbesSameOutput": [
+      "css_supports",
+      "computed_style",
+      "fragment_rectangles",
+      "table_surface",
+      "element_reflection",
+      "area_surface",
+      "cssom_surface",
+      "keyframe_rules",
+      "counter_style_rules",
+      "detached_cssom_context",
+      "svg_mathml_surface",
+      "style_property_maps",
+      "declared_style_maps",
+      "style_map_entries",
+      "typed_style_values",
+      "custom_properties",
+      "geometry_values",
+      "matrix_values",
+      "css_transforms",
+      "svg_geometry",
+      "svg_surfaces",
+      "svg_documents",
+      "svg_view_controls",
+      "svg_animation_variants",
+      "capabilities",
+      "svg_view_selection",
+      "svg_paint_servers",
+      "svg_filters",
+      "svg_clip_mask_marker",
+      "svg_resources",
+      "mathml_surface",
+      "svg_tests_lists",
+      "image_decode",
+      "font_load",
+      "event_construction",
+      "tree_traversal",
+      "focus_input",
+      "viewport_events",
+      "form_collections",
+      "form_navigation",
+      "viewport_scroll",
+      "dialog_popover",
+      "binary_values",
+      "caret_hit",
+      "url_values",
+      "url_wpt",
+      "form_submission",
+      "text_segmentation",
+      "crypto_random",
+      "visual_viewport",
+      "screen_metrics",
+      "custom_highlights",
+      "abi_layouts",
+      "event_details",
+      "aria_relations",
+      "inspector_diagnostics"
+    ],
+    "baselineProbesOtherOutput": {
+      "frames": "timing values only",
+      "teardown": "two added string results records"
+    },
+    "teardownCases": 98,
+    "teardownAllCollected": true
+  },
+  "files": {
+    "absence_str1.py": "f5da3c3ea583176f824811540d6c28b027499b405d38b1795975c7d3bee1d021",
+    "allocation-absence.json": "7bc930e1eaeba4b6b8acc01b23b1c84edaf54c7b57f7952050761fc73acee3cf",
+    "baseline-comparison.json": "8f02940b4fd2928696970761a663d5457d9bf877fcac6627c6b82be517ca756f",
+    "batch-green.json": "94dc6b60ba019ce91651c27b037148178436f30a72bbc715df2ba3110a7d8cf9",
+    "build_native43_candidate.py": "4b1344e77619775187ce6ab50a35a1d8f7130da230c43c3a5f7536120af40092",
+    "make_native43_evidence.py": "10be82820738e472168046024d74bf74252ae86d949b572cd2953e5ebea7c2f5",
+    "oracle-repeat30.txt": "71ca794ff8b3c7a19f080fef285d3c0d1880ca72cab2f846894d73658fca4609",
+    "red/string-nul-red.json": "65d840e1ab34341f1002e17dc6912ffa059277b5ef772f1ad926b46989817ca3",
+    "red/string_nul_red.py": "37f61fb9fadf94f0c3c6cbadb52c876419e64faacfc3ad8523589743e339a5d9",
+    "repeat_probe.py": "60da2590c796b8092c5e264d0325a4df86bbeb00e20c8eb7b4364ba9a7ec43bb",
+    "run_native43_full_batch.py": "3b2df27ed5c4c3a5a47524edf7e35cf57a607b2b11a336cd7681ddfe6eb9e645",
+    "runtime-receipt.json": "450e0d937c61fb3336accb460d3057e5136a9131981e7f7aa08808abeb538704",
+    "source-patches.json": "07ee73cd82ef553771902fa7203d81261a19b6e1c0f387223583b351601d01bb",
+    "string-nul-probe.log": "b3ac980b355ff1be9ac8266b3ffc9cc1482ff4d2cb61601e966016f629a718ba",
+    "string-nul-repeat30.json": "05783b773de9c940a7c21bb1cd3bb56d161d60c8a6738ac5c977df091ef54815",
+    "teardown-probes.json": "4e9ff0feb505df85b8e12bfba9b89ad7ea4514971718893e4829b036e6eff6d7",
+    "teardown-string-results-repeat30.json": "532f39ce0287ef6d27d3f6e287eb61e0a2c416c1f107cca571c030152d4a8aeb"
+  }
+}

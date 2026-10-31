@@ -1,0 +1,11 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Traceback (most recent call last):
+  File "C:\wk\native-focus-input\tests\abi\focus_input.py", line 295, in <module>
+    verify(options.native_directory, options.evidence_json)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-focus-input\tests\abi\focus_input.py", line 59, in verify
+    expect(bind('rv_abi_version', i32, [])() == 34, 'ABI version 34')
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\wk\native-focus-input\tests\abi\focus_input.py", line 43, in expect
+    raise AssertionError(message)
+AssertionError: ABI version 34

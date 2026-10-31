@@ -1,0 +1,42 @@
+{
+  "status": "focused private unallocated S13 checkpoint (stacked on PR132 ef65663)",
+  "counts": {
+    "interfaces": 249,
+    "functions": 2455,
+    "roots": 50,
+    "dictionaries": 22,
+    "stubs": 0
+  },
+  "nativeAssertions": 371,
+  "red": {
+    "runtime": "Native21 0032 frozen (Host 1fb9599e)",
+    "failure": "compiled typed MathML capability dom:MathMLMathElement"
+  },
+  "runtime": {
+    "RanvierWebCoreHost.dll": "8ac23a25618dbea13afc900c01bd6e6d0340e82c9bdb1024ba14f92292f63fec",
+    "WebCore.dll": "5db81b8ec5f819b37e0583c3f4cdf4a3af475a8ed450936a00c9199677c42aa5",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42"
+  },
+  "parentRuntime": "C:/wk/native-svg-paint/artifacts/native21-candidate-0032 (56 replacements, pre-H05 header overlay)",
+  "qualifications": [
+    "Not a native qualification: the shared contract (alpha.13 dataset missing-key semantics) normalises a missing key to \"\" on native and Fable; raw Chromium returns undefined. Presence is asserted through the data-* attribute.",
+    "NotExposed in measured Chromium 156 (no global interface); native exposes it as a typed model interface with capability dom:MathMLMathElement and no own members.",
+    "Host always enables MathML; generated members return RV_ERR_UNSUPPORTED when the setting is off, but the disabled-setting behaviour is unexercised."
+  ],
+  "files": {
+    "red/native-red.log": "edac1b5a1c34298919d5ee2025ed27076508e8c862422bc9206cc81d6efc2fb3",
+    "green/build_mathml_candidate.py": "d3e2b4f7a04cfbdcf3dabed484c733ccb9073af03b18f51ab75c9d1ca9dfedc1",
+    "green/mathml-surface-browser.json": "6f9fb86adff6b0ec41395e58e2a8c12d8136dff6990f6e87b2d524cf2af9241b",
+    "green/mathml-surface-oracle.json": "d6199af458c844aaceab5642b7a1517c865ab7af1be543e9118d86b5cbc67db8",
+    "green/mathml-surface.html": "85ff96ba16a6a4c9102608f8a98367b966f8d911dc768b54e93e61c0dbe9f514",
+    "green/mathml_lifetime_probe.py": "2f78d042bb5b82c7557a2f11e4950beb7e8242762684fa7de9e0b49d561c616b",
+    "green/mathml_surface.py": "e69e7c5fdbabae76ea5c0836883dcccfbde1dd19efb3161dd21bbfba8d0d22f2",
+    "green/mathml_surface_browser.mjs": "a3ec643cecedeb61911743f1b765efe3c4e3163e775325e70cb3834328ee4581",
+    "green/native.log": "6fe43f97e12e65686c359c25ca600523dbf84c1416000460234aa2208455bd6c",
+    "green/svg_paint_probe.py": "367b88fd49fa79aa4f74b71767b111b78fdb61c2bb90de902ca20418802b3647",
+    "green/Teardown.fs": "8ff68a276218b84022ace6a4b3740aa6ec72da765e694b99780d946fec94ba83",
+    "teardown/teardown-probes.json": "ef3fbe77d1d4c161f9086ab437538ff654258d1706e41884fa8ae250fe93e151",
+    "teardown/teardown.log": "8a8acbceab30ac4f08f97e9d23180ff0e26f0a6ea0f41b42ab114c5714a5c9aa"
+  },
+  "lifetime": "A retained dataset keeps its removed MathML subtree alive across host disposal and frees it after release. Issue #134 was a false alarm (probe bookkeeping excluded handles by pointer value) and is closed; Teardown.fs now keeps six release-after-destroy cases (node, dataset, style map; attached and removed), all -1 after collection (54 cases)"
+}

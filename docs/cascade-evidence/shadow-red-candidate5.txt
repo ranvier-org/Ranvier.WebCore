@@ -1,0 +1,26 @@
+host rules in the shadow tree flex-shrink 7
+    {'origin': 2, 'value': '5', 'a': 0, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': 0, 'layer': '', 'winner': 0, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': ':host'}
+    {'origin': 2, 'value': '6', 'a': 0, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 0, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': ':host'}
+    {'origin': 2, 'value': '7', 'a': 0, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 1, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': ':host(.hh)'}
+outer rule over a host rule order 69
+    {'origin': 2, 'value': '71', 'a': 0, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 0, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': ':host'}
+    {'origin': 2, 'value': '69', 'a': 1, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 1, 'depth': 0, 'sheet': 1, 'rule': 53, 'matchedSelector': '#hh', 'selector': '#hh'}
+important host rule over an important outer rule tab-size 6
+    {'origin': 2, 'value': '6', 'a': 0, 'b': 0, 'c': 0, 'important': 1, 'layerOrder': -1, 'layer': '', 'winner': 1, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': ':host'}
+    {'origin': 2, 'value': '3', 'a': 1, 'b': 0, 'c': 0, 'important': 1, 'layerOrder': -1, 'layer': '', 'winner': 0, 'depth': 0, 'sheet': 1, 'rule': 53, 'matchedSelector': '#hh', 'selector': '#hh'}
+slotted rules opacity 0.25
+    {'origin': 2, 'value': '0.5', 'a': 0, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 0, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': '::slotted(span)'}
+    {'origin': 2, 'value': '0.25', 'a': 0, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 1, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': '::slotted(.sl)'}
+outer rule over a slotted rule order 68
+    {'origin': 2, 'value': '73', 'a': 0, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 0, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': '::slotted(span)'}
+    {'origin': 2, 'value': '68', 'a': 1, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 1, 'depth': 0, 'sheet': 1, 'rule': 54, 'matchedSelector': '#sl', 'selector': '#sl'}
+outer part rule over an inner rule order 77
+    {'origin': 2, 'value': '75', 'a': 1, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 0, 'depth': 0, 'sheet': 0, 'rule': 7, 'matchedSelector': '#pt', 'selector': '#pt'}
+    {'origin': 2, 'value': '77', 'a': 0, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 1, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': '::part(pp)'}
+important inner rule over an important part rule order 76
+    {'origin': 2, 'value': '76', 'a': 1, 'b': 0, 'c': 0, 'important': 1, 'layerOrder': -1, 'layer': '', 'winner': 1, 'depth': 0, 'sheet': 0, 'rule': 8, 'matchedSelector': '#pt2', 'selector': '#pt2'}
+    {'origin': 2, 'value': '78', 'a': 0, 'b': 0, 'c': 0, 'important': 1, 'layerOrder': -1, 'layer': '', 'winner': 0, 'depth': 0, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': '#hh::part(pp2)'}
+inheritance into slotted content color rgb(1, 2, 3)
+    {'origin': 2, 'value': 'rgb(1, 2, 3)', 'a': 0, 'b': 0, 'c': 1, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 1, 'depth': 1, 'sheet': 0, 'rule': 4, 'matchedSelector': 'slot', 'selector': 'slot'}
+custom property inherited from the host --sh 80
+    {'origin': 2, 'value': '80', 'a': 0, 'b': 0, 'c': 0, 'important': 0, 'layerOrder': -1, 'layer': '', 'winner': 1, 'depth': 2, 'sheet': -1, 'rule': -1, 'matchedSelector': '', 'selector': ':host'}

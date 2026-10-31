@@ -1,0 +1,4837 @@
+{
+"comment": "WPT 15b31607c5102637a3401608427e6a05aaaf3849 URL corpus: every case where the runtime and Chromium 156.0.8078.4 record different outcomes, with both outcomes and whether each passes the WPT harness rule (tests/abi/url_wpt_score.py). bothFail lists the cases neither engine passes.",
+"counts": {
+"urltestdata": {
+"cases": 896,
+"native": 896,
+"chromium": 787
+},
+"setters_tests": {
+"cases": 278,
+"native": 278,
+"chromium": 238
+},
+"urlpatterntestdata": {
+"cases": 369,
+"native": 369,
+"chromium": 369
+}
+},
+"disagree": {
+"url[9]": {
+"native": {
+"href": "a: foo.com",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": " foo.com",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///A:/%20foo.com",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A:/%20foo.com",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[41]": {
+"native": {
+"href": "http://x/hello",
+"origin": "http://x",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "x",
+"hostname": "x",
+"port": "",
+"pathname": "/hello",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://x/hello",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "x",
+"hostname": "x",
+"port": "",
+"pathname": "/hello",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[62]": {
+"native": {
+"href": "c:/foo",
+"origin": "null",
+"protocol": "c:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/foo",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[83]": {
+"native": {
+"href": "file:///example.com/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/example.com/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://example.com/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "example.com",
+"hostname": "example.com",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[114]": {
+"native": {
+"href": "file:///c:/foo/bar.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/c:/foo/bar.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/foo/bar.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/foo/bar.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[115]": {
+"native": {
+"href": "file:///c:////foo/bar.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/c:////foo/bar.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:////foo/bar.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:////foo/bar.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[128]": {
+"native": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[129]": {
+"native": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[130]": {
+"native": {
+"href": "file:///test",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/test",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost/test",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "/test",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[133]": {
+"native": {
+"href": "file:///w|m",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/w|m",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///W:/m",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/W:/m",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[134]": {
+"native": {
+"href": "file:///w||m",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/w||m",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///W:/%7Cm",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/W:/%7Cm",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[135]": {
+"native": {
+"href": "file:///w:/m",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/w:/m",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///W:/m",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/W:/m",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[137]": {
+"native": {
+"href": "file:///C||/m/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C||/m/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/%7C/m/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/%7C/m/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[206]": {
+"native": {
+"href": "file:///example.com/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/example.com/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://example.com/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "example.com",
+"hostname": "example.com",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[266]": {
+"native": {
+"href": "file:///...",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/...",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://.../",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "...",
+"hostname": "...",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[267]": {
+"native": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://../",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "..",
+"hostname": "..",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[268]": {
+"native": {
+"href": "file:///a",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://a/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "a",
+"hostname": "a",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[269]": {
+"native": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://./",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": ".",
+"hostname": ".",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[270]": {
+"native": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://./",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": ".",
+"hostname": ".",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[272]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "http://example%20example.com/",
+"origin": "http://example%20example.com",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "example%20example.com",
+"hostname": "example%20example.com",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[276]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "http://goo%20%20goo.com/",
+"origin": "http://goo%20%20goo.com",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "goo%20%20goo.com",
+"hostname": "goo%20%20goo.com",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[280]": {
+"native": {
+"href": "non-special:opaque %20?hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque %20",
+"search": "?hi",
+"hash": "",
+"searchParams": "hi="
+},
+"chromium": {
+"href": "non-special:opaque  ?hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque  ",
+"search": "?hi",
+"hash": "",
+"searchParams": "hi="
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[281]": {
+"native": {
+"href": "non-special:opaque %20#hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque %20",
+"search": "",
+"hash": "#hi",
+"searchParams": ""
+},
+"chromium": {
+"href": "non-special:opaque  #hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque  ",
+"search": "",
+"hash": "#hi",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[284]": {
+"native": {
+"href": "non-special:opaque  %20#hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque  %20",
+"search": "",
+"hash": "#hi",
+"searchParams": ""
+},
+"chromium": {
+"href": "non-special:opaque   #hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque   ",
+"search": "",
+"hash": "#hi",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[285]": {
+"native": {
+"href": "non-special:opaque  %20#hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque  %20",
+"search": "",
+"hash": "#hi",
+"searchParams": ""
+},
+"chromium": {
+"href": "non-special:opaque   #hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque   ",
+"search": "",
+"hash": "#hi",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[286]": {
+"native": {
+"href": "non-special:opaque  %20#hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque  %20",
+"search": "",
+"hash": "#hi",
+"searchParams": ""
+},
+"chromium": {
+"href": "non-special:opaque   #hi",
+"origin": "null",
+"protocol": "non-special:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "opaque   ",
+"search": "",
+"hash": "#hi",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[300]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "http://a.com/",
+"origin": "http://a.com",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "a.com",
+"hostname": "a.com",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[301]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "http://a.com/",
+"origin": "http://a.com",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "a.com",
+"hostname": "a.com",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[314]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "http://192.168.0.1%20hello/",
+"origin": "http://192.168.0.1%20hello",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "192.168.0.1%20hello",
+"hostname": "192.168.0.1%20hello",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[315]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "https://x%20x:12/",
+"origin": "https://x%20x:12",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "x%20x:12",
+"hostname": "x%20x",
+"port": "12",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[319]": {
+"native": {
+"href": "h://.",
+"origin": "null",
+"protocol": "h:",
+"username": "",
+"password": "",
+"host": ".",
+"hostname": ".",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///H://",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/H://",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[328]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "http://[::1]/",
+"origin": "http://[::1]",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "[::1]",
+"hostname": "[::1]",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[329]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "http://[::1]/",
+"origin": "http://[::1]",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "[::1]",
+"hostname": "[::1]",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[346]": {
+"native": {
+"href": "notspecial://host/?'",
+"origin": "null",
+"protocol": "notspecial:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "?'",
+"hash": "",
+"searchParams": "%27="
+},
+"chromium": {
+"href": "notspecial://host/?%27",
+"origin": "null",
+"protocol": "notspecial:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "?%27",
+"hash": "",
+"searchParams": "%27="
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[432]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "http://a%20b/",
+"origin": "http://a%20b",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "a%20b",
+"hostname": "a%20b",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[476]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "http://ho%20st/",
+"origin": "http://ho%20st",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "ho%20st",
+"hostname": "ho%20st",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[490]": {
+"native": {
+"href": "http://!\"$&'()*+,-.;=_`{}~/",
+"origin": "http://!\"$&'()*+,-.;=_`{}~",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "!\"$&'()*+,-.;=_`{}~",
+"hostname": "!\"$&'()*+,-.;=_`{}~",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "http://!\"$&'()%2A+,-.;=_`{}~/",
+"origin": "http://!\"$&'()%2A+,-.;=_`{}~",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "!\"$&'()%2A+,-.;=_`{}~",
+"hostname": "!\"$&'()%2A+,-.;=_`{}~",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[553]": {
+"native": {
+"href": "file:///d:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/d:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///D:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/D:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[554]": {
+"native": {
+"href": "file:///d:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/d:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///D:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/D:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[563]": {
+"native": {
+"href": "file:////",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[564]": {
+"native": {
+"href": "file:////",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[565]": {
+"native": {
+"href": "file:////?fox",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//",
+"search": "?fox",
+"hash": "",
+"searchParams": "fox="
+},
+"chromium": {
+"error": "TypeError"
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[566]": {
+"native": {
+"href": "file:////#guppy",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//",
+"search": "",
+"hash": "#guppy",
+"searchParams": ""
+},
+"chromium": {
+"error": "TypeError"
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[568]": {
+"native": {
+"href": "file:////",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost//",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "//",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[570]": {
+"native": {
+"href": "file:////localhost//cat",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//localhost//cat",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost//cat",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "//cat",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[571]": {
+"native": {
+"href": "file://///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "///",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "///",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[572]": {
+"native": {
+"href": "file://///mouse",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "///mouse",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://mouse/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "mouse",
+"hostname": "mouse",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[574]": {
+"native": {
+"href": "file:////pig",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//pig",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost//pig",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "//pig",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[575]": {
+"native": {
+"href": "file:////pig",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//pig",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost//pig",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "//pig",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[580]": {
+"native": {
+"href": "file://host/C:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[581]": {
+"native": {
+"href": "file://host/C:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[582]": {
+"native": {
+"href": "file://host/C:#",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:#",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[583]": {
+"native": {
+"href": "file://host/C:?",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:?",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[584]": {
+"native": {
+"href": "file://host/C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[585]": {
+"native": {
+"href": "file://host/C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[586]": {
+"native": {
+"href": "file://host/C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[588]": {
+"native": {
+"href": "file://host/dir/C|a",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/dir/C|a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/a",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[589]": {
+"native": {
+"href": "file:///c:/foo/bar",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/c:/foo/bar",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/foo/bar",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/foo/bar",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[590]": {
+"native": {
+"href": "file:///c:/foo/bar",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/c:/foo/bar",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/foo/bar",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/foo/bar",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[591]": {
+"native": {
+"href": "file:///c:/foo/bar",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/c:/foo/bar",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/foo/bar",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/foo/bar",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[592]": {
+"native": {
+"href": "file://host/c:/foo/bar",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/c:/foo/bar",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/foo/bar",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/foo/bar",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[598]": {
+"native": {
+"href": "file://host/C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[599]": {
+"native": {
+"href": "file://host/C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[600]": {
+"native": {
+"href": "file://host/C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[601]": {
+"native": {
+"href": "file://host/C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///C:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/C:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[609]": {
+"native": {
+"href": "file:///?q=v",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "?q=v",
+"hash": "",
+"searchParams": "q=v"
+},
+"chromium": {
+"error": "TypeError"
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[610]": {
+"native": {
+"href": "file:///#frag",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "#frag",
+"searchParams": ""
+},
+"chromium": {
+"error": "TypeError"
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[615]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "file:///Y:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/Y:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[616]": {
+"native": {
+"href": "file:///y:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/y:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///Y:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/Y:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[617]": {
+"native": {
+"href": "file:///y:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/y:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///Y:/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/Y:/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[619]": {
+"native": {
+"href": "file:///y:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/y:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///Y:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/Y:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[620]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "file:///Y:",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/Y:",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[621]": {
+"native": {
+"href": "file://///foo",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "///foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost///foo",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "///foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[622]": {
+"native": {
+"href": "file://////foo",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "////foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost////foo",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "////foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[623]": {
+"native": {
+"href": "file:////foo",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://foo/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "foo",
+"hostname": "foo",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[625]": {
+"native": {
+"href": "file:////one/two",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//one/two",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://one/two",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "one",
+"hostname": "one",
+"port": "",
+"pathname": "/two",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[628]": {
+"native": {
+"href": "file:////one/two",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//one/two",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://one/two",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "one",
+"hostname": "one",
+"port": "",
+"pathname": "/two",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[630]": {
+"native": {
+"href": "file:////p",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//p",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://.//p",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": ".",
+"hostname": ".",
+"port": "",
+"pathname": "//p",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[631]": {
+"native": {
+"href": "file:////p",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//p",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://.//p",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": ".",
+"hostname": ".",
+"port": "",
+"pathname": "//p",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[632]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "https://[0:1:2:3:4:5:c000:201]/",
+"origin": "https://[0:1:2:3:4:5:c000:201]",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "[0:1:2:3:4:5:c000:201]",
+"hostname": "[0:1:2:3:4:5:c000:201]",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[697]": {
+"native": {
+"href": "blob:ftp://host/path",
+"origin": "null",
+"protocol": "blob:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "ftp://host/path",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "blob:ftp://host/path",
+"origin": "ftp://host",
+"protocol": "blob:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "ftp://host/path",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[698]": {
+"native": {
+"href": "blob:ws://example.org/",
+"origin": "null",
+"protocol": "blob:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "ws://example.org/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "blob:ws://example.org/",
+"origin": "ws://example.org",
+"protocol": "blob:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "ws://example.org/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[699]": {
+"native": {
+"href": "blob:wss://example.org/",
+"origin": "null",
+"protocol": "blob:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "wss://example.org/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "blob:wss://example.org/",
+"origin": "wss://example.org",
+"protocol": "blob:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "wss://example.org/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[718]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "file:///A:test-a-colon.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A:test-a-colon.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[719]": {
+"native": {
+"error": "TypeError"
+},
+"chromium": {
+"href": "file:///A:/test-a-colon-b.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A:/test-a-colon-b.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[720]": {
+"native": {
+"href": "a:/test-a-colon-slash.html",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/test-a-colon-slash.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///A:/test-a-colon-slash.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A:/test-a-colon-slash.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[721]": {
+"native": {
+"href": "a:///test-a-colon-slash-slash.html",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/test-a-colon-slash-slash.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///A:/.//test-a-colon-slash-slash.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//test-a-colon-slash-slash.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[722]": {
+"native": {
+"href": "a:/test-a-colon-slash-b.html",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/test-a-colon-slash-b.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///A:/test-a-colon-slash-b.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A:/test-a-colon-slash-b.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[723]": {
+"native": {
+"href": "a://b/test-a-colon-slash-slash-b.html",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "b",
+"hostname": "b",
+"port": "",
+"pathname": "/test-a-colon-slash-slash-b.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///A:/.//test-a-colon-slash-slash-b.html",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//test-a-colon-slash-slash-b.html",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[732]": {
+"native": {
+"href": "file:///usr/bin",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/usr/bin",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://localhost/usr/bin",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "/usr/bin",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[741]": {
+"native": {
+"href": "foo://%20!%22$%&'()*+,-.%3B%3C%3D%3E%40%5B%5C%5D%5E_%60%7B%7C%7D~@host/",
+"origin": "null",
+"protocol": "foo:",
+"username": "%20!%22$%&'()*+,-.%3B%3C%3D%3E%40%5B%5C%5D%5E_%60%7B%7C%7D~",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "foo://%20!%22$%&%27()*+,-.%3B%3C%3D%3E%40%5B%5C%5D%5E_%60%7B%7C%7D~@host/",
+"origin": "null",
+"protocol": "foo:",
+"username": "%20!%22$%&%27()*+,-.%3B%3C%3D%3E%40%5B%5C%5D%5E_%60%7B%7C%7D~",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[742]": {
+"native": {
+"href": "wss://%20!%22$%&'()*+,-.%3B%3C%3D%3E%40%5B%5D%5E_%60%7B%7C%7D~@host/",
+"origin": "wss://host",
+"protocol": "wss:",
+"username": "%20!%22$%&'()*+,-.%3B%3C%3D%3E%40%5B%5D%5E_%60%7B%7C%7D~",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "wss://%20!%22$%&%27()*+,-.%3B%3C%3D%3E%40%5B%5D%5E_%60%7B%7C%7D~@host/",
+"origin": "wss://host",
+"protocol": "wss:",
+"username": "%20!%22$%&%27()*+,-.%3B%3C%3D%3E%40%5B%5D%5E_%60%7B%7C%7D~",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[743]": {
+"native": {
+"href": "foo://joe:%20!%22$%&'()*+,-.%3A%3B%3C%3D%3E%40%5B%5C%5D%5E_%60%7B%7C%7D~@host/",
+"origin": "null",
+"protocol": "foo:",
+"username": "joe",
+"password": "%20!%22$%&'()*+,-.%3A%3B%3C%3D%3E%40%5B%5C%5D%5E_%60%7B%7C%7D~",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "foo://joe:%20!%22$%&%27()*+,-.%3A%3B%3C%3D%3E%40%5B%5C%5D%5E_%60%7B%7C%7D~@host/",
+"origin": "null",
+"protocol": "foo:",
+"username": "joe",
+"password": "%20!%22$%&%27()*+,-.%3A%3B%3C%3D%3E%40%5B%5C%5D%5E_%60%7B%7C%7D~",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[744]": {
+"native": {
+"href": "wss://joe:%20!%22$%&'()*+,-.%3A%3B%3C%3D%3E%40%5B%5D%5E_%60%7B%7C%7D~@host/",
+"origin": "wss://host",
+"protocol": "wss:",
+"username": "joe",
+"password": "%20!%22$%&'()*+,-.%3A%3B%3C%3D%3E%40%5B%5D%5E_%60%7B%7C%7D~",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "wss://joe:%20!%22$%&%27()*+,-.%3A%3B%3C%3D%3E%40%5B%5D%5E_%60%7B%7C%7D~@host/",
+"origin": "wss://host",
+"protocol": "wss:",
+"username": "joe",
+"password": "%20!%22$%&%27()*+,-.%3A%3B%3C%3D%3E%40%5B%5D%5E_%60%7B%7C%7D~",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[746]": {
+"native": {
+"href": "wss://!\"$&'()*+,-.;=_`{}~/",
+"origin": "wss://!\"$&'()*+,-.;=_`{}~",
+"protocol": "wss:",
+"username": "",
+"password": "",
+"host": "!\"$&'()*+,-.;=_`{}~",
+"hostname": "!\"$&'()*+,-.;=_`{}~",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "wss://!\"$&'()%2A+,-.;=_`{}~/",
+"origin": "wss://!\"$&'()%2A+,-.;=_`{}~",
+"protocol": "wss:",
+"username": "",
+"password": "",
+"host": "!\"$&'()%2A+,-.;=_`{}~",
+"hostname": "!\"$&'()%2A+,-.;=_`{}~",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[747]": {
+"native": {
+"href": "foo://host/%20!%22$%&'()*+,-./:;%3C=%3E@[\\]%5E_%60%7B|%7D~",
+"origin": "null",
+"protocol": "foo:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/%20!%22$%&'()*+,-./:;%3C=%3E@[\\]%5E_%60%7B|%7D~",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "foo://host/%20!%22$%&'()*+,-./:;%3C=%3E@[\\]%5E_%60%7B%7C%7D~",
+"origin": "null",
+"protocol": "foo:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/%20!%22$%&'()*+,-./:;%3C=%3E@[\\]%5E_%60%7B%7C%7D~",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[748]": {
+"native": {
+"href": "wss://host/%20!%22$%&'()*+,-./:;%3C=%3E@[/]%5E_%60%7B|%7D~",
+"origin": "wss://host",
+"protocol": "wss:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/%20!%22$%&'()*+,-./:;%3C=%3E@[/]%5E_%60%7B|%7D~",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "wss://host/%20!%22$%&'()*+,-./:;%3C=%3E@[/]%5E_%60%7B%7C%7D~",
+"origin": "wss://host",
+"protocol": "wss:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/%20!%22$%&'()*+,-./:;%3C=%3E@[/]%5E_%60%7B%7C%7D~",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[749]": {
+"native": {
+"href": "foo://host/dir/?%20!%22$%&'()*+,-./:;%3C=%3E?@[\\]^_`{|}~",
+"origin": "null",
+"protocol": "foo:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/dir/",
+"search": "?%20!%22$%&'()*+,-./:;%3C=%3E?@[\\]^_`{|}~",
+"hash": "",
+"searchParams": "+%21%22%24%25=&%27%28%29*+%2C-.%2F%3A%3B%3C=%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D%7E"
+},
+"chromium": {
+"href": "foo://host/dir/?%20!%22$%&%27()*+,-./:;%3C=%3E?@[\\]^_`{|}~",
+"origin": "null",
+"protocol": "foo:",
+"username": "",
+"password": "",
+"host": "host",
+"hostname": "host",
+"port": "",
+"pathname": "/dir/",
+"search": "?%20!%22$%&%27()*+,-./:;%3C=%3E?@[\\]^_`{|}~",
+"hash": "",
+"searchParams": "+%21%22%24%25=&%27%28%29*+%2C-.%2F%3A%3B%3C=%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D%7E"
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[856]": {
+"native": {
+"href": "w://x:0",
+"origin": "null",
+"protocol": "w:",
+"username": "",
+"password": "",
+"host": "x:0",
+"hostname": "x",
+"port": "0",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file:///W://x:0",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/W://x:0",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[858]": {
+"native": {
+"href": "android://x:0/a",
+"origin": "null",
+"protocol": "android:",
+"username": "",
+"password": "",
+"host": "x:0",
+"hostname": "x",
+"port": "0",
+"pathname": "/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "android://x:0/a",
+"origin": "null",
+"protocol": "android:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//x:0/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[859]": {
+"native": {
+"href": "drivefs://x:0/a",
+"origin": "null",
+"protocol": "drivefs:",
+"username": "",
+"password": "",
+"host": "x:0",
+"hostname": "x",
+"port": "0",
+"pathname": "/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "drivefs://x:0/a",
+"origin": "null",
+"protocol": "drivefs:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//x:0/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[860]": {
+"native": {
+"href": "chromeos-steam://x:0/a",
+"origin": "null",
+"protocol": "chromeos-steam:",
+"username": "",
+"password": "",
+"host": "x:0",
+"hostname": "x",
+"port": "0",
+"pathname": "/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "chromeos-steam://x:0/a",
+"origin": "null",
+"protocol": "chromeos-steam:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//x:0/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[861]": {
+"native": {
+"href": "steam://x:0/a",
+"origin": "null",
+"protocol": "steam:",
+"username": "",
+"password": "",
+"host": "x:0",
+"hostname": "x",
+"port": "0",
+"pathname": "/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "steam://x:0/a",
+"origin": "null",
+"protocol": "steam:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//x:0/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[862]": {
+"native": {
+"href": "materialized-view://x:0/a",
+"origin": "null",
+"protocol": "materialized-view:",
+"username": "",
+"password": "",
+"host": "x:0",
+"hostname": "x",
+"port": "0",
+"pathname": "/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "materialized-view://x:0/a",
+"origin": "null",
+"protocol": "materialized-view:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "//x:0/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[880]": {
+"native": {
+"href": "file://////",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "////",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://a/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "a",
+"hostname": "a",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[889]": {
+"native": {
+"href": "foo://foo/\\a",
+"origin": "null",
+"protocol": "foo:",
+"username": "",
+"password": "",
+"host": "foo",
+"hostname": "foo",
+"port": "",
+"pathname": "/\\a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "foo://foo/a",
+"origin": "null",
+"protocol": "foo:",
+"username": "",
+"password": "",
+"host": "foo",
+"hostname": "foo",
+"port": "",
+"pathname": "/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[890]": {
+"native": {
+"href": "foo://foo/\\/a",
+"origin": "null",
+"protocol": "foo:",
+"username": "",
+"password": "",
+"host": "foo",
+"hostname": "foo",
+"port": "",
+"pathname": "/\\/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "foo:/\\/a",
+"origin": "null",
+"protocol": "foo:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/\\/a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[891]": {
+"native": {
+"href": "foo://foo/\\\\a",
+"origin": "null",
+"protocol": "foo:",
+"username": "",
+"password": "",
+"host": "foo",
+"hostname": "foo",
+"port": "",
+"pathname": "/\\\\a",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"chromium": {
+"href": "file://a/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "a",
+"hostname": "a",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"url[894]": {
+"native": {
+"href": "data:text/plain,test#%00%01%1F%20!%22#$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_%60az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "text/plain,test",
+"search": "",
+"hash": "#%00%01%1F%20!%22#$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_%60az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"searchParams": ""
+},
+"chromium": {
+"href": "data:text/plain,test#%00%01%09%0A%0D%1F%20!%22#$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_%60az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "text/plain,test",
+"search": "",
+"hash": "#%00%01%09%0A%0D%1F%20!%22#$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_%60az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"searchParams": ""
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[0]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a://example.net",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A://example.net",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A://example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[1]": {
+"native": {
+"threw": null,
+"url": {
+"href": "b://example.net",
+"origin": "null",
+"protocol": "b:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A://example.net",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A://example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[3]": {
+"native": {
+"threw": null,
+"url": {
+"href": "b://example.net",
+"origin": "null",
+"protocol": "b:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A://example.net",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A://example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[4]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a://example.net",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A://example.net",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A://example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[5]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a://example.net",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A://example.net",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A://example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[6]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a://example.net",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A://example.net",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A://example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[7]": {
+"native": {
+"threw": null,
+"url": {
+"href": "bc0+-.://example.net",
+"origin": "null",
+"protocol": "bc0+-.:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A://example.net",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A://example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[8]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a://example.net",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A://example.net",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A://example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[9]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a://example.net",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A://example.net",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A://example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[13]": {
+"native": {
+"threw": null,
+"url": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "http://localhost/",
+"origin": "http://localhost",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[20]": {
+"native": {
+"threw": null,
+"url": {
+"href": "mailto:me@example.net",
+"origin": "null",
+"protocol": "mailto:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "me@example.net",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "http://me@example.net/",
+"origin": "http://example.net",
+"protocol": "http:",
+"username": "me",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[21]": {
+"native": {
+"threw": null,
+"url": {
+"href": "ssh://me@example.net",
+"origin": "null",
+"protocol": "ssh:",
+"username": "me",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "http://me@example.net/",
+"origin": "http://example.net",
+"protocol": "http:",
+"username": "me",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[22]": {
+"native": {
+"threw": null,
+"url": {
+"href": "ssh://me@example.net",
+"origin": "null",
+"protocol": "ssh:",
+"username": "me",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "https://me@example.net/",
+"origin": "https://example.net",
+"protocol": "https:",
+"username": "me",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[23]": {
+"native": {
+"threw": null,
+"url": {
+"href": "ssh://me@example.net",
+"origin": "null",
+"protocol": "ssh:",
+"username": "me",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file://me%40example.net/",
+"origin": "null",
+"protocol": ":",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[24]": {
+"native": {
+"threw": null,
+"url": {
+"href": "ssh://example.net",
+"origin": "null",
+"protocol": "ssh:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file://example.net/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[25]": {
+"native": {
+"threw": null,
+"url": {
+"href": "nonsense:///test",
+"origin": "null",
+"protocol": "nonsense:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/test",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "https://test/",
+"origin": "https://test",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "test",
+"hostname": "test",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[29]": {
+"native": {
+"threw": null,
+"url": {
+"href": "https://test/",
+"origin": "https://test",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "test",
+"hostname": "test",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "http://test/",
+"origin": "http://test",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "test",
+"hostname": "test",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.protocol[30]": {
+"native": {
+"threw": null,
+"url": {
+"href": "https://test/",
+"origin": "https://test",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "test",
+"hostname": "test",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "http://test/",
+"origin": "http://test",
+"protocol": "http:",
+"username": "",
+"password": "",
+"host": "test",
+"hostname": "test",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.username[8]": {
+"native": {
+"threw": null,
+"url": {
+"href": "http://%00%01%09%0A%0D%1F%20!%22%23$%&'()*+,-.%2F09%3A%3B%3C%3D%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9@example.net/",
+"origin": "http://example.net",
+"protocol": "http:",
+"username": "%00%01%09%0A%0D%1F%20!%22%23$%&'()*+,-.%2F09%3A%3B%3C%3D%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "http://%00%01%09%0A%0D%1F%20!%22%23$%&%27()*+,-.%2F09%3A%3B%3C%3D%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9@example.net/",
+"origin": "http://example.net",
+"protocol": "http:",
+"username": "%00%01%09%0A%0D%1F%20!%22%23$%&%27()*+,-.%2F09%3A%3B%3C%3D%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.password[7]": {
+"native": {
+"threw": null,
+"url": {
+"href": "http://:%00%01%09%0A%0D%1F%20!%22%23$%&'()*+,-.%2F09%3A%3B%3C%3D%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9@example.net/",
+"origin": "http://example.net",
+"protocol": "http:",
+"username": "",
+"password": "%00%01%09%0A%0D%1F%20!%22%23$%&'()*+,-.%2F09%3A%3B%3C%3D%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "http://:%00%01%09%0A%0D%1F%20!%22%23$%&%27()*+,-.%2F09%3A%3B%3C%3D%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9@example.net/",
+"origin": "http://example.net",
+"protocol": "http:",
+"username": "",
+"password": "%00%01%09%0A%0D%1F%20!%22%23$%&%27()*+,-.%2F09%3A%3B%3C%3D%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.host[18]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a://example.net/foo",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file://example.net/A:/foo",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/A:/foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.host[49]": {
+"native": {
+"threw": null,
+"url": {
+"href": "file://y/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "y",
+"hostname": "y",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file://x/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "x",
+"hostname": "x",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.host[50]": {
+"native": {
+"threw": null,
+"url": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file://localhost/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.host[60]": {
+"native": {
+"threw": null,
+"url": {
+"href": "https://*/",
+"origin": "https://*",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "*",
+"hostname": "*",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "https://%2A/",
+"origin": "https://%2A",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "%2A",
+"hostname": "%2A",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.hostname[14]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a://example.net/foo",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file://example.net/A:/foo",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/A:/foo",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.hostname[30]": {
+"native": {
+"threw": null,
+"url": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file://localhost/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.hostname[42]": {
+"native": {
+"threw": null,
+"url": {
+"href": "https://*/",
+"origin": "https://*",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "*",
+"hostname": "*",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "https://%2A/",
+"origin": "https://%2A",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "%2A",
+"hostname": "%2A",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.port[17]": {
+"native": {
+"threw": null,
+"url": {
+"href": "file:///",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file://localhost/",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "localhost",
+"hostname": "localhost",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.pathname[13]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a:/%00%01%1F%20!%22%23$%&'()*+,-./09:;%3C=%3E%3F@AZ[\\]%5E_%60az%7B|%7D~%7F%C2%80%C2%81%C3%89%C3%A9",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/%00%01%1F%20!%22%23$%&'()*+,-./09:;%3C=%3E%3F@AZ[\\]%5E_%60az%7B|%7D~%7F%C2%80%C2%81%C3%89%C3%A9",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///%00%01%1F%20!%22%23$%&'()*+,-./09:;%3C=%3E%3F@AZ[/]%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/%00%01%1F%20!%22%23$%&'()*+,-./09:;%3C=%3E%3F@AZ[/]%5E_%60az%7B%7C%7D~%7F%C2%80%C2%81%C3%89%C3%A9",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.search[4]": {
+"native": {
+"threw": null,
+"url": {
+"href": "https://example.net/?#nav",
+"origin": "https://example.net",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "#nav",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "https://example.net/#nav",
+"origin": "https://example.net",
+"protocol": "https:",
+"username": "",
+"password": "",
+"host": "example.net",
+"hostname": "example.net",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "#nav",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.search[8]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a:/?%00%01%1F%20!%22%23$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_`az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "?%00%01%1F%20!%22%23$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_`az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"hash": "",
+"searchParams": "%00%01%1F+%21%22%23%24%25=&%27%28%29*+%2C-.%2F09%3A%3B%3C=%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D%7E%7F%C2%80%C2%81%C3%89%C3%A9"
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A:/?%00%01%1F%20!%22%23$%&%27()*+,-./09:;%3C=%3E?@AZ[\\]^_`az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A:/",
+"search": "?%00%01%1F%20!%22%23$%&%27()*+,-./09:;%3C=%3E?@AZ[\\]^_`az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"hash": "",
+"searchParams": "%00%01%1F+%21%22%23%24%25=&%27%28%29*+%2C-.%2F09%3A%3B%3C=%3E%3F%40AZ%5B%5C%5D%5E_%60az%7B%7C%7D%7E%7F%C2%80%C2%81%C3%89%C3%A9"
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.search[10]": {
+"native": {
+"threw": null,
+"url": {
+"href": "data:space%20",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space%20",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "data:space ",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space ",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.search[11]": {
+"native": {
+"threw": null,
+"url": {
+"href": "sc:space%20",
+"origin": "null",
+"protocol": "sc:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space%20",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "sc:space ",
+"origin": "null",
+"protocol": "sc:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space ",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.search[12]": {
+"native": {
+"threw": null,
+"url": {
+"href": "data:space %20#fragment",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space %20",
+"search": "",
+"hash": "#fragment",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "data:space  #fragment",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space  ",
+"search": "",
+"hash": "#fragment",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.search[13]": {
+"native": {
+"threw": null,
+"url": {
+"href": "sc:space %20#fragment",
+"origin": "null",
+"protocol": "sc:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space %20",
+"search": "",
+"hash": "#fragment",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "sc:space  #fragment",
+"origin": "null",
+"protocol": "sc:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space  ",
+"search": "",
+"hash": "#fragment",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.hash[11]": {
+"native": {
+"threw": null,
+"url": {
+"href": "a:/#%00%01%1F%20!%22#$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_%60az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"origin": "null",
+"protocol": "a:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/",
+"search": "",
+"hash": "#%00%01%1F%20!%22#$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_%60az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "file:///A:/#%00%01%1F%20!%22#$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_%60az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"origin": "file://",
+"protocol": "file:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "/A:/",
+"search": "",
+"hash": "#%00%01%1F%20!%22#$%&'()*+,-./09:;%3C=%3E?@AZ[\\]^_%60az{|}~%7F%C2%80%C2%81%C3%89%C3%A9",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.hash[16]": {
+"native": {
+"threw": null,
+"url": {
+"href": "data:space                                                                                                                                 %20",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space                                                                                                                                 %20",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "data:space                                                                                                                                  ",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space                                                                                                                                  ",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.hash[17]": {
+"native": {
+"threw": null,
+"url": {
+"href": "sc:space   %20",
+"origin": "null",
+"protocol": "sc:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space   %20",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "sc:space    ",
+"origin": "null",
+"protocol": "sc:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space    ",
+"search": "",
+"hash": "",
+"searchParams": ""
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.hash[18]": {
+"native": {
+"threw": null,
+"url": {
+"href": "data:space %20?query",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space %20",
+"search": "?query",
+"hash": "",
+"searchParams": "query="
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "data:space  ?query",
+"origin": "null",
+"protocol": "data:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space  ",
+"search": "?query",
+"hash": "",
+"searchParams": "query="
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"setters.hash[19]": {
+"native": {
+"threw": null,
+"url": {
+"href": "sc:space %20?query",
+"origin": "null",
+"protocol": "sc:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space %20",
+"search": "?query",
+"hash": "",
+"searchParams": "query="
+}
+},
+"chromium": {
+"threw": null,
+"url": {
+"href": "sc:space  ?query",
+"origin": "null",
+"protocol": "sc:",
+"username": "",
+"password": "",
+"host": "",
+"hostname": "",
+"port": "",
+"pathname": "space  ",
+"search": "?query",
+"hash": "",
+"searchParams": "query="
+}
+},
+"nativePasses": true,
+"chromiumPasses": false
+},
+"urlpattern[347]": {
+"native": {
+"ctor": {
+"error": "TypeError"
+},
+"bindingConversion": true
+},
+"chromium": {
+"ctor": {
+"error": "TypeError"
+}
+},
+"nativePasses": true,
+"chromiumPasses": true
+}
+},
+"bothFail": []
+}

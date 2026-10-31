@@ -1,0 +1,4 @@
+PASS SVG/MathML shared members: 95 assertions; retained handles released
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0
