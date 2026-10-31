@@ -1,0 +1,6429 @@
+{
+  "browser": "156.0.8078.4",
+  "missing": [
+    "rv_dom_command_event_create",
+    "rv_dom_command_event_get_command",
+    "rv_dom_command_event_get_source",
+    "rv_dom_toggle_event_create",
+    "rv_dom_toggle_event_get_new_state",
+    "rv_dom_toggle_event_get_old_state",
+    "rv_dom_toggle_event_get_source"
+  ],
+  "differences": [
+    {
+      "case": "dialog show and close",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false
+        }
+      ]
+    },
+    {
+      "case": "modal dialog top layer and focus",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        }
+      ]
+    },
+    {
+      "case": "dialog requestClose",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "prevented": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "prevented": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        }
+      ]
+    },
+    {
+      "case": "close requests and closedby",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "toggle",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "cancel",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "toggle",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "cn",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "cancel",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "cb",
+          "trusted": true,
+          "cancelable": false
+        }
+      ]
+    },
+    {
+      "case": "form method dialog",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "d",
+          "trusted": true,
+          "cancelable": false
+        }
+      ]
+    },
+    {
+      "case": "popover methods",
+      "step": 2,
+      "op": "prop",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        "hint"
+      ],
+      "native": [
+        "ok",
+        "manual"
+      ]
+    },
+    {
+      "case": "popover methods",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "tog"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "tog"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        }
+      ]
+    },
+    {
+      "case": "popover stacking and light dismiss",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "pm",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "pm",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "pm",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "pm",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "pm",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "pm",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "pm",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "pm",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        }
+      ]
+    },
+    {
+      "case": "popover beforetoggle cancel",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null,
+          "prevented": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null,
+          "prevented": false
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent",
+          "prevented": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent",
+          "prevented": false
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        }
+      ]
+    },
+    {
+      "case": "popovertarget invokers",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "tog"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "tog"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "tog"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "tog"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "show"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "show"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "hide"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "hide"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "tog"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "tog"
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        }
+      ]
+    },
+    {
+      "case": "command invokers",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "show-modal",
+          "source": "cmodal"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "cmodal"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "cmodal"
+        },
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "close",
+          "source": "cclose"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "cclose"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "cclose"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "show-modal",
+          "source": "cmodal"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "cmodal"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "cmodal"
+        },
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "request-close",
+          "source": "creq"
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "creq"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "creq"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "command",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "command": "toggle-popover",
+          "source": "ctoggle"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "ctoggle"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "ctoggle"
+        },
+        {
+          "type": "command",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "command": "show-popover",
+          "source": "cshowp"
+        },
+        {
+          "type": "command",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "command": "hide-popover",
+          "source": "chidep"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "chidep"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": "chidep"
+        },
+        {
+          "type": "command",
+          "target": "plain",
+          "trusted": true,
+          "cancelable": true,
+          "command": "--spin",
+          "source": "ccustom"
+        },
+        {
+          "type": "command",
+          "target": "d",
+          "trusted": true,
+          "cancelable": true,
+          "command": "show-popover",
+          "source": "cdialogp"
+        },
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "show-modal",
+          "source": "cmodal",
+          "prevented": true
+        }
+      ],
+      "native": [
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "command",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "command",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "command",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "command",
+          "target": "plain",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "command",
+          "target": "d",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "command",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "command": "absent",
+          "source": "absent",
+          "prevented": true
+        }
+      ]
+    },
+    {
+      "case": "constructed toggle and command events",
+      "step": 0,
+      "op": "construct",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        {
+          "type": "toggle",
+          "bubbles": false,
+          "cancelable": false,
+          "trusted": false,
+          "oldState": "",
+          "newState": "",
+          "source": null
+        }
+      ],
+      "native": [
+        "absent",
+        null
+      ]
+    },
+    {
+      "case": "constructed toggle and command events",
+      "step": 1,
+      "op": "construct",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        {
+          "type": "beforetoggle",
+          "bubbles": false,
+          "cancelable": true,
+          "trusted": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": "tog"
+        }
+      ],
+      "native": [
+        "absent",
+        null
+      ]
+    },
+    {
+      "case": "constructed toggle and command events",
+      "step": 2,
+      "op": "construct",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        {
+          "type": "command",
+          "bubbles": false,
+          "cancelable": false,
+          "trusted": false,
+          "command": "",
+          "source": null
+        }
+      ],
+      "native": [
+        "absent",
+        null
+      ]
+    },
+    {
+      "case": "constructed toggle and command events",
+      "step": 3,
+      "op": "construct",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        {
+          "type": "command",
+          "bubbles": true,
+          "cancelable": true,
+          "trusted": false,
+          "command": "--spin",
+          "source": "ccustom"
+        }
+      ],
+      "native": [
+        "absent",
+        null
+      ]
+    },
+    {
+      "case": "constructed toggle and command events",
+      "step": 4,
+      "op": "dispatch",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        true
+      ],
+      "native": [
+        "absent",
+        null
+      ]
+    },
+    {
+      "case": "constructed toggle and command events",
+      "step": 6,
+      "op": "dispatch",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        true
+      ],
+      "native": [
+        "absent",
+        null
+      ]
+    },
+    {
+      "case": "constructed toggle and command events",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "command",
+          "target": "plain",
+          "trusted": false,
+          "cancelable": true,
+          "command": "show-modal",
+          "source": "cmodal"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": false,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        }
+      ],
+      "native": []
+    },
+    {
+      "case": "popover hint stacking",
+      "step": 0,
+      "op": "prop",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        "hint"
+      ],
+      "native": [
+        "ok",
+        "manual"
+      ]
+    },
+    {
+      "case": "popover hint stacking",
+      "step": 6,
+      "op": "matches",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        false
+      ],
+      "native": [
+        "ok",
+        true
+      ]
+    },
+    {
+      "case": "popover hint stacking",
+      "step": 11,
+      "op": "matches",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        false
+      ],
+      "native": [
+        "ok",
+        true
+      ]
+    },
+    {
+      "case": "popover hint stacking",
+      "step": 15,
+      "op": "matches",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        false
+      ],
+      "native": [
+        "ok",
+        true
+      ]
+    },
+    {
+      "case": "popover hint stacking",
+      "step": 21,
+      "op": "matches",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        false
+      ],
+      "native": [
+        "ok",
+        true
+      ]
+    },
+    {
+      "case": "popover hint stacking",
+      "step": 22,
+      "op": "matches",
+      "kind": "value",
+      "chromium": [
+        "ok",
+        true
+      ],
+      "native": [
+        "ok",
+        false
+      ]
+    },
+    {
+      "case": "popover hint stacking",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph2",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "ph",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "ph2",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "ph2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p2",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "beforetoggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "p",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        }
+      ]
+    },
+    {
+      "case": "close request after user activation",
+      "kind": "events",
+      "chromium": [
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "closed",
+          "newState": "open",
+          "source": null
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "open",
+          "newState": "closed",
+          "source": null
+        }
+      ],
+      "native": [
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "cancel",
+          "target": "m",
+          "trusted": true,
+          "cancelable": true
+        },
+        {
+          "type": "beforetoggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "toggle",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false,
+          "oldState": "absent",
+          "newState": "absent",
+          "source": "absent"
+        },
+        {
+          "type": "close",
+          "target": "m",
+          "trusted": true,
+          "cancelable": false
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "dialog show and close",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "show",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "hasAttr",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "d",
+          "selector": ":modal",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "d",
+          "selector": ":open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "show",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showModal",
+          "id": "d",
+          "status": "InvalidStateError",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "close",
+          "id": "d",
+          "value": null,
+          "status": "ok",
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "first",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "close",
+          "id": "d",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "first",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "d",
+          "name": "open",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "hasAttr",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "close",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "first",
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "d",
+          "name": "returnValue",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "manual",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        }
+      ],
+      "assertions": 42
+    },
+    {
+      "name": "modal dialog top layer and focus",
+      "steps": [
+        {
+          "op": "focus",
+          "id": "before",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "active",
+          "status": "ok",
+          "value": "before",
+          "events": []
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "m",
+          "selector": ":modal",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "active",
+          "status": "ok",
+          "value": "mauto",
+          "events": []
+        },
+        {
+          "op": "hit",
+          "x": 400,
+          "y": 250,
+          "status": "ok",
+          "value": "m",
+          "events": []
+        },
+        {
+          "op": "hit",
+          "x": 20,
+          "y": 10,
+          "status": "ok",
+          "value": "m",
+          "events": []
+        },
+        {
+          "op": "hit",
+          "x": 700,
+          "y": 550,
+          "status": "ok",
+          "value": "m",
+          "events": []
+        },
+        {
+          "op": "focus",
+          "id": "before",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "active",
+          "status": "ok",
+          "value": "mauto",
+          "events": []
+        },
+        {
+          "op": "show",
+          "id": "m",
+          "status": "InvalidStateError",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showModal",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "d",
+          "selector": ":modal",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "hit",
+          "x": 400,
+          "y": 250,
+          "status": "ok",
+          "value": "d",
+          "events": []
+        },
+        {
+          "op": "close",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "close",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "m",
+          "selector": ":modal",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "active",
+          "status": "ok",
+          "value": "before",
+          "events": []
+        },
+        {
+          "op": "hit",
+          "x": 20,
+          "y": 10,
+          "status": "ok",
+          "value": "before",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        }
+      ],
+      "assertions": 39
+    },
+    {
+      "name": "dialog requestClose",
+      "steps": [
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "requestClose",
+          "id": "m",
+          "value": null,
+          "status": "ok",
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "r1",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "prevent",
+          "type": "cancel",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "requestClose",
+          "id": "m",
+          "value": null,
+          "status": "ok",
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "prevented": true
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "r1",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "close",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "requestClose",
+          "id": "m",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        }
+      ],
+      "assertions": 34
+    },
+    {
+      "name": "close requests and closedby",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "none",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "none",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "cb",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "any",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "cn",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "none",
+          "events": []
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "closerequest",
+          "events": []
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "showModal",
+          "id": "cn",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "cn",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "close",
+          "id": "cn",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "cn",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "show",
+          "id": "cb",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "mouse",
+          "x": 700,
+          "y": 100,
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "cancel",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "cb",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "cb",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "set",
+          "id": "m",
+          "name": "closedBy",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "any",
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "m",
+          "name": "closedBy",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "closedBy",
+          "status": "ok",
+          "value": "none",
+          "events": []
+        }
+      ],
+      "assertions": 41
+    },
+    {
+      "name": "form method dialog",
+      "steps": [
+        {
+          "op": "show",
+          "id": "d",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "click",
+          "id": "dsubmit",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "d",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "ok",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "d",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        }
+      ],
+      "assertions": 22
+    },
+    {
+      "name": "popover methods",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "p",
+          "name": "popover",
+          "status": "ok",
+          "value": "auto",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "pm",
+          "name": "popover",
+          "status": "ok",
+          "value": "manual",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "ph",
+          "name": "popover",
+          "status": "ok",
+          "value": "manual",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "plain",
+          "name": "popover",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "togglePopover",
+          "id": "p",
+          "status": "ok",
+          "value": false,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "togglePopover",
+          "id": "p",
+          "force": true,
+          "status": "ok",
+          "value": true,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "togglePopover",
+          "id": "p",
+          "force": true,
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "hidePopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "hidePopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "plain",
+          "status": "NotSupportedError",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "hidePopover",
+          "id": "plain",
+          "status": "NotSupportedError",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "togglePopover",
+          "id": "plain",
+          "status": "NotSupportedError",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "source": "tog",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "hidePopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "plain",
+          "name": "popover",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "plain",
+          "name": "popover",
+          "status": "ok",
+          "value": "manual",
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "plain",
+          "name": "popover",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "plain",
+          "name": "popover",
+          "status": "ok",
+          "value": "manual",
+          "events": []
+        }
+      ],
+      "assertions": 50
+    },
+    {
+      "name": "popover stacking and light dismiss",
+      "steps": [
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "showPopover",
+          "id": "p2",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "pm",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "pm",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "pm",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "hit",
+          "x": 650,
+          "y": 520,
+          "status": "ok",
+          "value": "p2",
+          "events": []
+        },
+        {
+          "op": "mouse",
+          "x": 400,
+          "y": 300,
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p2",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "pm",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "pm",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "hidePopover",
+          "id": "pm",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "pm",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "pm",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "hidePopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        }
+      ],
+      "assertions": 42
+    },
+    {
+      "name": "popover beforetoggle cancel",
+      "steps": [
+        {
+          "op": "prevent",
+          "type": "beforetoggle",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent",
+              "prevented": true
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prevent",
+          "type": "beforetoggle",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "hidePopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent",
+              "prevented": false
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        }
+      ],
+      "assertions": 26
+    },
+    {
+      "name": "popovertarget invokers",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "status": "ok",
+          "value": "p",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetAction",
+          "status": "ok",
+          "value": "toggle",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "show",
+          "name": "popoverTargetAction",
+          "status": "ok",
+          "value": "show",
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "tog",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "tog",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "show",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "click",
+          "id": "show",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "hide",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "mouse",
+          "x": 20,
+          "y": 50,
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "tog",
+          "name": "popoverTargetAction",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetAction",
+          "status": "ok",
+          "value": "toggle",
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "status": "ok",
+          "value": "pm",
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "tog",
+          "name": "popoverTargetElement",
+          "status": "ok",
+          "value": null,
+          "events": []
+        }
+      ],
+      "assertions": 48
+    },
+    {
+      "name": "command invokers",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "cmodal",
+          "name": "command",
+          "status": "ok",
+          "value": "show-modal",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "cmodal",
+          "name": "commandForElement",
+          "status": "ok",
+          "value": "m",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "cbad",
+          "name": "command",
+          "status": "ok",
+          "value": "",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "ccustom",
+          "name": "command",
+          "status": "ok",
+          "value": "--spin",
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "cmodal",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "m",
+          "selector": ":modal",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "cclose",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "bycmd",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "click",
+          "id": "cmodal",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "click",
+          "id": "creq",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "returnValue",
+          "status": "ok",
+          "value": "req",
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "click",
+          "id": "ctoggle",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "cshowp",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "click",
+          "id": "chidep",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "ccustom",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "plain",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "click",
+          "id": "cbad",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "cdialogp",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "d",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "prevent",
+          "type": "command",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "click",
+          "id": "cmodal",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "command",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "command": "absent",
+              "source": "absent",
+              "prevented": true
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "ccustom",
+          "name": "command",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "ccustom",
+          "name": "command",
+          "status": "ok",
+          "value": "close",
+          "events": []
+        },
+        {
+          "op": "set",
+          "id": "ccustom",
+          "name": "commandForElement",
+          "value": null,
+          "status": "ok",
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "ccustom",
+          "name": "commandForElement",
+          "status": "ok",
+          "value": "d",
+          "events": []
+        }
+      ],
+      "assertions": 59
+    },
+    {
+      "name": "constructed toggle and command events",
+      "steps": [
+        {
+          "op": "construct",
+          "interface": "ToggleEvent",
+          "type": "toggle",
+          "init": {},
+          "status": "absent",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "construct",
+          "interface": "ToggleEvent",
+          "type": "beforetoggle",
+          "init": {
+            "oldState": "closed",
+            "newState": "open",
+            "source": "tog",
+            "cancelable": true
+          },
+          "status": "absent",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "construct",
+          "interface": "CommandEvent",
+          "type": "command",
+          "init": {},
+          "status": "absent",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "construct",
+          "interface": "CommandEvent",
+          "type": "command",
+          "init": {
+            "command": "--spin",
+            "source": "ccustom",
+            "bubbles": true,
+            "cancelable": true
+          },
+          "status": "absent",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "dispatch",
+          "id": "plain",
+          "interface": "CommandEvent",
+          "type": "command",
+          "init": {
+            "command": "show-modal",
+            "source": "cmodal",
+            "cancelable": true
+          },
+          "status": "absent",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "dispatch",
+          "id": "p",
+          "interface": "ToggleEvent",
+          "type": "beforetoggle",
+          "init": {
+            "oldState": "closed",
+            "newState": "open",
+            "cancelable": true
+          },
+          "status": "absent",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        }
+      ],
+      "assertions": 19
+    },
+    {
+      "name": "popover hint stacking",
+      "steps": [
+        {
+          "op": "prop",
+          "id": "ph2",
+          "name": "popover",
+          "status": "ok",
+          "value": "manual",
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "showPopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "ph",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "ph2",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "ph2",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "ph2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "p2",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "ph2",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "mouse",
+          "x": 400,
+          "y": 300,
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p2",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "p2",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showPopover",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "showPopover",
+          "id": "ph",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "matches",
+          "id": "ph",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": true,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "matches",
+          "id": "p",
+          "selector": ":popover-open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": []
+        }
+      ],
+      "assertions": 47
+    },
+    {
+      "name": "close request after user activation",
+      "steps": [
+        {
+          "op": "mouse",
+          "x": 780,
+          "y": 590,
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "press",
+          "key": "Escape",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        },
+        {
+          "op": "showModal",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "mouse",
+          "x": 780,
+          "y": 590,
+          "status": "ok",
+          "value": null,
+          "events": []
+        },
+        {
+          "op": "requestClose",
+          "id": "m",
+          "value": null,
+          "status": "ok",
+          "events": [
+            {
+              "type": "cancel",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "beforetoggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            }
+          ]
+        },
+        {
+          "op": "prop",
+          "id": "m",
+          "name": "open",
+          "status": "ok",
+          "value": false,
+          "events": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "toggle",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "oldState": "absent",
+              "newState": "absent",
+              "source": "absent"
+            },
+            {
+              "type": "close",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false
+            }
+          ]
+        }
+      ],
+      "assertions": 33
+    }
+  ]
+}
