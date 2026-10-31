@@ -54,6 +54,8 @@ typedef struct RvNodeList RvNodeList;
 typedef struct RvHTMLCollection RvHTMLCollection;
 typedef struct RvDOMFormData RvDOMFormData;
 typedef struct RvValidityState RvValidityState;
+typedef struct RvTouch RvTouch;
+typedef struct RvTouchList RvTouchList;
 typedef struct RvSVGRect RvSVGRect;
 typedef struct RvSVGMatrix RvSVGMatrix;
 typedef struct RvSVGPoint RvSVGPoint;
@@ -103,6 +105,7 @@ typedef struct RvDomSequenceElement RvDomSequenceElement;
 typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
 typedef struct RvDomUnionBooleanOrImportNodeOptions RvDomUnionBooleanOrImportNodeOptions;
+typedef struct RvDomSequenceTouch RvDomSequenceTouch;
 typedef struct RvDomSequenceElementNullable RvDomSequenceElementNullable;
 typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
 typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
@@ -1014,6 +1017,7 @@ typedef struct RvDomSequenceElement RvDomSequenceElement;
 typedef struct RvDomSequenceShadowRoot RvDomSequenceShadowRoot;
 typedef struct RvDomUnionDOMStringOrElementCreationOptions RvDomUnionDOMStringOrElementCreationOptions;
 typedef struct RvDomUnionBooleanOrImportNodeOptions RvDomUnionBooleanOrImportNodeOptions;
+typedef struct RvDomSequenceTouch RvDomSequenceTouch;
 typedef struct RvDomSequenceElementNullable RvDomSequenceElementNullable;
 typedef struct RvDomSequenceDOMString RvDomSequenceDOMString;
 typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrollIntoViewOptions;
@@ -1137,6 +1141,14 @@ struct RvDomUnionBooleanOrImportNodeOptions {
     int32_t tag;
     int32_t arm0;
     const RvDomImportNodeOptions* arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceTouch {
+    int32_t present;
+    int32_t count;
+    RvTouch** items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1699,6 +1711,7 @@ RV_EXPORT void rv_dom_sequence_element_release(RvDomSequenceElement* value);
 RV_EXPORT void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value);
 RV_EXPORT void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUnionDOMStringOrElementCreationOptions* value);
 RV_EXPORT void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions* value);
+RV_EXPORT void rv_dom_sequence_touch_release(RvDomSequenceTouch* value);
 RV_EXPORT void rv_dom_sequence_element_nullable_release(RvDomSequenceElementNullable* value);
 RV_EXPORT void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString* value);
 RV_EXPORT void rv_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value);
@@ -1858,6 +1871,14 @@ RV_EXPORT RvDOMFormData* rv_dom_dom_form_data_retain(RvDOMFormData*);
 RV_EXPORT void rv_dom_validity_state_release(RvValidityState*);
 /* Adds a reference to a ValidityState and returns it. */
 RV_EXPORT RvValidityState* rv_dom_validity_state_retain(RvValidityState*);
+/* Releases a handle to a Touch. */
+RV_EXPORT void rv_dom_touch_release(RvTouch*);
+/* Adds a reference to a Touch and returns it. */
+RV_EXPORT RvTouch* rv_dom_touch_retain(RvTouch*);
+/* Releases a handle to a TouchList. */
+RV_EXPORT void rv_dom_touch_list_release(RvTouchList*);
+/* Adds a reference to a TouchList and returns it. */
+RV_EXPORT RvTouchList* rv_dom_touch_list_retain(RvTouchList*);
 /* Releases a handle to a SVGRect. */
 RV_EXPORT void rv_dom_svg_rect_release(RvSVGRect*);
 /* Adds a reference to a SVGRect and returns it. */
@@ -2313,6 +2334,10 @@ RV_EXPORT int32_t rv_dom_document_get_style_sheets(RvNode* target, RvStyleSheetL
 RV_EXPORT int32_t rv_dom_document_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result);
 /* Document.adoptedStyleSheets setter: attribute sequence<CSSStyleSheet> adoptedStyleSheets */
 RV_EXPORT int32_t rv_dom_document_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value);
+/* Document.pointerLockElement getter: readonly attribute Element? pointerLockElement; *result is a new reference, or
+ * NULL; RV_ERR_UNSUPPORTED while the setting PointerLockEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds
+ * without POINTER_LOCK */
+RV_EXPORT int32_t rv_dom_document_get_pointer_lock_element(RvNode* target, RvNode** result);
 /* Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) ->
  * Element; options defaults to {} in IDL; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_create_element(RvNode* target, const uint8_t* local_name, int32_t local_name_length, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
@@ -2387,6 +2412,9 @@ RV_EXPORT int32_t rv_dom_document_query_command_supported(RvNode* target, const 
 RV_EXPORT int32_t rv_dom_document_query_command_value(RvNode* target, const uint8_t* command_id, int32_t command_id_length, char* buffer, int32_t capacity, int32_t* length);
 /* Document.getSelection() -> DOMSelection?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_document_get_selection(RvNode* target, RvDOMSelection** result);
+/* Document.createTouchList(Touch touches) -> TouchList; *result is a new reference; RV_ERR_UNSUPPORTED where WebKit
+ * builds without TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_document_create_touch_list(RvNode* target, const RvDomSequenceTouch* touches, RvTouchList** result);
 /* Document.prepend((Node or DOMString) nodes) -> undefined */
 RV_EXPORT int32_t rv_dom_document_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes);
 /* Document.append((Node or DOMString) nodes) -> undefined */
@@ -6617,6 +6645,61 @@ RV_EXPORT int32_t rv_dom_pointer_event_get_coalesced_events(RvEvent* target, RvD
 /* PointerEvent.getPredictedEvents() -> sequence<PointerEvent>; *result owns its contents; release with the matching
  * rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_pointer_event_get_predicted_events(RvEvent* target, RvDomSequencePointerEvent* result);
+/* Touch */
+
+/* Touch.clientX getter: readonly attribute double clientX; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_get_client_x(RvTouch* target, double* result);
+/* Touch.clientY getter: readonly attribute double clientY; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_get_client_y(RvTouch* target, double* result);
+/* Touch.screenX getter: readonly attribute double screenX; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_get_screen_x(RvTouch* target, double* result);
+/* Touch.screenY getter: readonly attribute double screenY; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_get_screen_y(RvTouch* target, double* result);
+/* Touch.pageX getter: readonly attribute double pageX; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_get_page_x(RvTouch* target, double* result);
+/* Touch.pageY getter: readonly attribute double pageY; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_get_page_y(RvTouch* target, double* result);
+/* Touch.target getter: readonly attribute EventTarget? target; *result is a new reference, or NULL;
+ * RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_get_target(RvTouch* target, RvNode** result);
+/* Touch.identifier getter: readonly attribute long identifier; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_get_identifier(RvTouch* target, int32_t* result);
+/* TouchList */
+
+/* TouchList.length getter: readonly attribute unsigned long length; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_list_get_length(RvTouchList* target, uint32_t* result);
+/* TouchList.item(unsigned long index) -> Touch?; *result is a new reference, or NULL; RV_ERR_UNSUPPORTED where WebKit
+ * builds without TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_list_item(RvTouchList* target, uint32_t index, RvTouch** result);
+/* TouchEvent */
+
+/* TouchEvent.touches getter: readonly attribute TouchList? touches; *result is a new reference, or NULL;
+ * RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_event_get_touches(RvEvent* target, RvTouchList** result);
+/* TouchEvent.targetTouches getter: readonly attribute TouchList? targetTouches; *result is a new reference, or NULL;
+ * RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_event_get_target_touches(RvEvent* target, RvTouchList** result);
+/* TouchEvent.changedTouches getter: readonly attribute TouchList? changedTouches; *result is a new reference, or
+ * NULL; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_event_get_changed_touches(RvEvent* target, RvTouchList** result);
+/* TouchEvent.ctrlKey getter: readonly attribute boolean ctrlKey; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_event_get_ctrl_key(RvEvent* target, int32_t* result);
+/* TouchEvent.shiftKey getter: readonly attribute boolean shiftKey; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_event_get_shift_key(RvEvent* target, int32_t* result);
+/* TouchEvent.altKey getter: readonly attribute boolean altKey; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_event_get_alt_key(RvEvent* target, int32_t* result);
+/* TouchEvent.metaKey getter: readonly attribute boolean metaKey; RV_ERR_UNSUPPORTED where WebKit builds without
+ * TOUCH_EVENTS */
+RV_EXPORT int32_t rv_dom_touch_event_get_meta_key(RvEvent* target, int32_t* result);
 /* WheelEvent */
 
 /* WheelEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL;

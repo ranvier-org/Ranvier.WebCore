@@ -605,6 +605,9 @@
     "UIEvent",
     "MouseEvent",
     "PointerEvent",
+    "Touch",
+    "TouchList",
+    "TouchEvent",
     "WheelEvent",
     "KeyboardEvent",
     "FocusEvent",
@@ -801,8 +804,7 @@
       "SubmitEvent",
       "TextTrack",
       "TextTrackList",
-      "TimeRanges",
-      "TouchEvent"
+      "TimeRanges"
     ],
     "aliases": {
       "CSSAnimationEvent": "AnimationEvent",
@@ -931,7 +933,6 @@
     "Document.wasDiscarded",
     "Document.fullscreen",
     "Document.fullscreenElement",
-    "Document.pointerLockElement",
     "Document.immersiveElement",
     "Document.immersiveEnabled",
     "Document.captureEvents",

@@ -1,0 +1,41 @@
+{
+ "runtime": "pointer-candidate-2",
+ "captureOn": "#t",
+ "moveOver": "#u",
+ "events": {
+  "pen": [
+   [
+    "gotpointercapture",
+    "t",
+    1073741827
+   ],
+   [
+    "pointermove",
+    "u",
+    1073741827
+   ],
+   [
+    "mousemove",
+    "u",
+    null
+   ]
+  ],
+  "mouse": [
+   [
+    "gotpointercapture",
+    "t",
+    1
+   ],
+   [
+    "pointermove",
+    "t",
+    1
+   ],
+   [
+    "mousemove",
+    "t",
+    null
+   ]
+  ]
+ }
+}

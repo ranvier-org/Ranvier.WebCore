@@ -1,0 +1,785 @@
+{
+ "browser": "156.0.8078.4",
+ "maxTouchPoints": 1,
+ "touch": [
+  {
+   "type": "pointerdown",
+   "trusted": true,
+   "pointerType": "touch",
+   "primary": true,
+   "x": 50,
+   "y": 50,
+   "buttons": 1,
+   "pressure": 0.4000000059604645,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 8,
+   "height": 12,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 2
+  },
+  {
+   "type": "touchstart",
+   "trusted": true,
+   "touches": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    }
+   ],
+   "changed": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    }
+   ],
+   "targetTouches": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    }
+   ]
+  },
+  {
+   "type": "pointerdown",
+   "trusted": true,
+   "pointerType": "touch",
+   "primary": false,
+   "x": 100,
+   "y": 60,
+   "buttons": 1,
+   "pressure": 0.800000011920929,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 4,
+   "height": 4,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 3
+  },
+  {
+   "type": "touchstart",
+   "trusted": true,
+   "touches": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    },
+    {
+     "id": 1,
+     "x": 100,
+     "y": 60,
+     "rx": 2,
+     "ry": 2,
+     "angle": 0,
+     "force": 0.800000011920929,
+     "target": "t"
+    }
+   ],
+   "changed": [
+    {
+     "id": 1,
+     "x": 100,
+     "y": 60,
+     "rx": 2,
+     "ry": 2,
+     "angle": 0,
+     "force": 0.800000011920929,
+     "target": "t"
+    }
+   ],
+   "targetTouches": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    },
+    {
+     "id": 1,
+     "x": 100,
+     "y": 60,
+     "rx": 2,
+     "ry": 2,
+     "angle": 0,
+     "force": 0.800000011920929,
+     "target": "t"
+    }
+   ]
+  },
+  {
+   "type": "gotpointercapture",
+   "trusted": true,
+   "pointerType": "touch",
+   "primary": false,
+   "x": 120,
+   "y": 70,
+   "buttons": 1,
+   "pressure": 0.8999999761581421,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 4,
+   "height": 4,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 3
+  },
+  {
+   "type": "pointermove",
+   "trusted": true,
+   "pointerType": "touch",
+   "primary": false,
+   "x": 120,
+   "y": 70,
+   "buttons": 1,
+   "pressure": 0.8999999761581421,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 4,
+   "height": 4,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 20,
+   "movementY": 10,
+   "pointerId": 3
+  },
+  {
+   "type": "touchmove",
+   "trusted": true,
+   "touches": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    },
+    {
+     "id": 1,
+     "x": 120,
+     "y": 70,
+     "rx": 2,
+     "ry": 2,
+     "angle": 0,
+     "force": 0.8999999761581421,
+     "target": "t"
+    }
+   ],
+   "changed": [
+    {
+     "id": 1,
+     "x": 120,
+     "y": 70,
+     "rx": 2,
+     "ry": 2,
+     "angle": 0,
+     "force": 0.8999999761581421,
+     "target": "t"
+    }
+   ],
+   "targetTouches": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    },
+    {
+     "id": 1,
+     "x": 120,
+     "y": 70,
+     "rx": 2,
+     "ry": 2,
+     "angle": 0,
+     "force": 0.8999999761581421,
+     "target": "t"
+    }
+   ]
+  },
+  {
+   "type": "pointerup",
+   "trusted": true,
+   "pointerType": "touch",
+   "primary": false,
+   "x": 120,
+   "y": 70,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 3
+  },
+  {
+   "type": "lostpointercapture",
+   "trusted": true,
+   "pointerType": "touch",
+   "primary": false,
+   "x": 120,
+   "y": 70,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 3
+  },
+  {
+   "type": "touchend",
+   "trusted": true,
+   "touches": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    }
+   ],
+   "changed": [
+    {
+     "id": 1,
+     "x": 120,
+     "y": 70,
+     "rx": 2,
+     "ry": 2,
+     "angle": 0,
+     "force": 0.8999999761581421,
+     "target": "t"
+    }
+   ],
+   "targetTouches": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    }
+   ]
+  },
+  {
+   "type": "gotpointercapture",
+   "trusted": true,
+   "pointerType": "touch",
+   "primary": true,
+   "x": 50,
+   "y": 50,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 8,
+   "height": 12,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 2
+  },
+  {
+   "type": "pointercancel",
+   "trusted": true,
+   "pointerType": "touch",
+   "primary": true,
+   "x": 50,
+   "y": 50,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 8,
+   "height": 12,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 2
+  },
+  {
+   "type": "lostpointercapture",
+   "trusted": true,
+   "pointerType": "touch",
+   "primary": true,
+   "x": 50,
+   "y": 50,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 8,
+   "height": 12,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 2
+  },
+  {
+   "type": "touchcancel",
+   "trusted": true,
+   "touches": [],
+   "changed": [
+    {
+     "id": 0,
+     "x": 50,
+     "y": 50,
+     "rx": 4,
+     "ry": 6,
+     "angle": 30,
+     "force": 0.4000000059604645,
+     "target": "t"
+    }
+   ],
+   "targetTouches": []
+  }
+ ],
+ "pen": [
+  {
+   "type": "pointermove",
+   "trusted": true,
+   "pointerType": "pen",
+   "primary": true,
+   "x": 60,
+   "y": 40,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 4
+  },
+  {
+   "type": "mousemove",
+   "x": 60,
+   "y": 40,
+   "buttons": 0,
+   "movementX": -40,
+   "movementY": -20
+  },
+  {
+   "type": "pointerdown",
+   "trusted": true,
+   "pointerType": "pen",
+   "primary": true,
+   "x": 60,
+   "y": 40,
+   "buttons": 1,
+   "pressure": 0.6000000238418579,
+   "tangentialPressure": 0.20000000298023224,
+   "tiltX": 30,
+   "tiltY": -20,
+   "twist": 45,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 0.9719114296335162,
+   "azimuthAngle": 5.720701576706406,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 4
+  },
+  {
+   "type": "mousedown",
+   "x": 60,
+   "y": 40,
+   "buttons": 1,
+   "movementX": 0,
+   "movementY": 0
+  },
+  {
+   "type": "pointermove",
+   "trusted": true,
+   "pointerType": "pen",
+   "primary": true,
+   "x": 70,
+   "y": 45,
+   "buttons": 1,
+   "pressure": 0.699999988079071,
+   "tangentialPressure": 0,
+   "tiltX": 10,
+   "tiltY": 0,
+   "twist": 90,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.3962634015954636,
+   "azimuthAngle": 0,
+   "movementX": 10,
+   "movementY": 5,
+   "pointerId": 4
+  },
+  {
+   "type": "mousemove",
+   "x": 70,
+   "y": 45,
+   "buttons": 1,
+   "movementX": 10,
+   "movementY": 5
+  },
+  {
+   "type": "pointerup",
+   "trusted": true,
+   "pointerType": "pen",
+   "primary": true,
+   "x": 70,
+   "y": 45,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 4
+  },
+  {
+   "type": "mouseup",
+   "x": 70,
+   "y": 45,
+   "buttons": 0,
+   "movementX": 0,
+   "movementY": 0
+  }
+ ],
+ "mouse": [
+  {
+   "type": "pointermove",
+   "trusted": true,
+   "pointerType": "mouse",
+   "primary": true,
+   "x": 30,
+   "y": 30,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 1
+  },
+  {
+   "type": "mousemove",
+   "x": 30,
+   "y": 30,
+   "buttons": 0,
+   "movementX": 0,
+   "movementY": 0
+  },
+  {
+   "type": "pointermove",
+   "trusted": true,
+   "pointerType": "mouse",
+   "primary": true,
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 20,
+   "movementY": 15,
+   "pointerId": 1
+  },
+  {
+   "type": "mousemove",
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "movementX": 20,
+   "movementY": 15
+  },
+  {
+   "type": "pointerdown",
+   "trusted": true,
+   "pointerType": "mouse",
+   "primary": true,
+   "x": 50,
+   "y": 45,
+   "buttons": 1,
+   "pressure": 0.5,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 1
+  },
+  {
+   "type": "mousedown",
+   "x": 50,
+   "y": 45,
+   "buttons": 1,
+   "movementX": 0,
+   "movementY": 0
+  },
+  {
+   "type": "pointerup",
+   "trusted": true,
+   "pointerType": "mouse",
+   "primary": true,
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 1
+  },
+  {
+   "type": "mouseup",
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "movementX": 0,
+   "movementY": 0
+  }
+ ],
+ "lockWithoutGesture": "resolved",
+ "lockWithoutGestureEvents": [
+  {
+   "type": "pointerlockchange",
+   "element": "t"
+  }
+ ],
+ "lockWithGesture": "resolved",
+ "locked": [
+  {
+   "type": "pointermove",
+   "trusted": true,
+   "pointerType": "mouse",
+   "primary": true,
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 10,
+   "movementY": 15,
+   "pointerId": 1
+  },
+  {
+   "type": "mousemove",
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "movementX": 10,
+   "movementY": 15
+  },
+  {
+   "type": "pointerdown",
+   "trusted": true,
+   "pointerType": "mouse",
+   "primary": true,
+   "x": 50,
+   "y": 45,
+   "buttons": 1,
+   "pressure": 0.5,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 1
+  },
+  {
+   "type": "mousedown",
+   "x": 50,
+   "y": 45,
+   "buttons": 1,
+   "movementX": 0,
+   "movementY": 0
+  },
+  {
+   "type": "pointerlockchange",
+   "element": "t"
+  },
+  {
+   "type": "pointerup",
+   "trusted": true,
+   "pointerType": "mouse",
+   "primary": true,
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 0,
+   "movementY": 0,
+   "pointerId": 1
+  },
+  {
+   "type": "mouseup",
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "movementX": 0,
+   "movementY": 0
+  },
+  {
+   "type": "pointermove",
+   "trusted": true,
+   "pointerType": "mouse",
+   "primary": true,
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "pressure": 0,
+   "tangentialPressure": 0,
+   "tiltX": 0,
+   "tiltY": 0,
+   "twist": 0,
+   "width": 1,
+   "height": 1,
+   "altitudeAngle": 1.5707963267948966,
+   "azimuthAngle": 0,
+   "movementX": 30,
+   "movementY": 20,
+   "pointerId": 1
+  },
+  {
+   "type": "mousemove",
+   "x": 50,
+   "y": 45,
+   "buttons": 0,
+   "movementX": 30,
+   "movementY": 20
+  }
+ ],
+ "unlocked": [
+  {
+   "type": "pointerlockchange",
+   "element": null
+  }
+ ]
+}

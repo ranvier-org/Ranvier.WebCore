@@ -153,6 +153,9 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom:UIEvent",
     "dom:MouseEvent",
     "dom:PointerEvent",
+    "dom:Touch",
+    "dom:TouchList",
+    "dom:TouchEvent",
     "dom:WheelEvent",
     "dom:KeyboardEvent",
     "dom:FocusEvent",
@@ -387,6 +390,9 @@ static constexpr const char* capabilityAbiNames[] = {
     "font-readiness",
     "event-construction",
     "input-state",
+    "pointer-input",
+    "touch-input",
+    "pointer-lock",
     "viewport",
     "dom-binary-values",
     "accessibility-relations",
@@ -568,6 +574,13 @@ static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
 #else
     {"build:ENABLE_PDFJS", -1},
 #endif
+#if defined(RV_CAP_ENABLE_POINTER_LOCK)
+    {"build:ENABLE_POINTER_LOCK", RV_CAP_ENABLE_POINTER_LOCK},
+#elif defined(ENABLE_POINTER_LOCK)
+    {"build:ENABLE_POINTER_LOCK", ENABLE_POINTER_LOCK},
+#else
+    {"build:ENABLE_POINTER_LOCK", -1},
+#endif
 #if defined(RV_CAP_ENABLE_REMOTE_INSPECTOR)
     {"build:ENABLE_REMOTE_INSPECTOR", RV_CAP_ENABLE_REMOTE_INSPECTOR},
 #elif defined(ENABLE_REMOTE_INSPECTOR)
@@ -588,6 +601,13 @@ static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
     {"build:ENABLE_SPELLCHECK", ENABLE_SPELLCHECK},
 #else
     {"build:ENABLE_SPELLCHECK", -1},
+#endif
+#if defined(RV_CAP_ENABLE_TOUCH_EVENTS)
+    {"build:ENABLE_TOUCH_EVENTS", RV_CAP_ENABLE_TOUCH_EVENTS},
+#elif defined(ENABLE_TOUCH_EVENTS)
+    {"build:ENABLE_TOUCH_EVENTS", ENABLE_TOUCH_EVENTS},
+#else
+    {"build:ENABLE_TOUCH_EVENTS", -1},
 #endif
 #if defined(RV_CAP_ENABLE_VIDEO)
     {"build:ENABLE_VIDEO", RV_CAP_ENABLE_VIDEO},

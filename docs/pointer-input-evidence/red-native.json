@@ -1,0 +1,356 @@
+{
+ "abi": 54,
+ "abi_has": {
+  "input": 1,
+  "input-state": 1,
+  "pointer-input": 0,
+  "touch": 0,
+  "pen": 0,
+  "pointer-lock": 0
+ },
+ "exports": {
+  "rv_host_pointer": false,
+  "rv_host_touch": false,
+  "rv_host_pen": false,
+  "rv_host_pointer_lock_state": false,
+  "rv_host_pointer_lock_resolve": false,
+  "rv_host_pointer_lock_lose": false,
+  "rv_element_request_pointer_lock": false,
+  "rv_document_exit_pointer_lock": false,
+  "rv_dom_document_get_pointer_lock_element": false,
+  "rv_dom_shadow_root_get_pointer_lock_element": true,
+  "rv_dom_touch_get_identifier": false,
+  "rv_dom_touch_event_get_changed_touches": false,
+  "rv_dom_touch_list_item": false,
+  "rv_dom_pointer_event_get_tilt_x": true,
+  "rv_dom_mouse_event_get_movement_x": true,
+  "rv_dom_element_set_pointer_capture": true
+ },
+ "mouse_move_press_move_release": {
+  "status": [
+   0,
+   1,
+   1,
+   0
+  ],
+  "events": [
+   {
+    "type": "pointermove",
+    "pointerId": 1,
+    "width": 1.0,
+    "height": 1.0,
+    "pressure": 0.0,
+    "tangentialPressure": 0.0,
+    "tiltX": 0,
+    "tiltY": 0,
+    "twist": 0,
+    "altitudeAngle": [
+     "status",
+     -9
+    ],
+    "azimuthAngle": [
+     "status",
+     -9
+    ],
+    "isPrimary": 1,
+    "movementX": 0.0,
+    "movementY": 0.0,
+    "pointerType": "mouse"
+   },
+   {
+    "type": "mousemove",
+    "pointerId": [
+     "status",
+     -11
+    ],
+    "width": [
+     "status",
+     -11
+    ],
+    "height": [
+     "status",
+     -11
+    ],
+    "pressure": [
+     "status",
+     -11
+    ],
+    "tangentialPressure": [
+     "status",
+     -11
+    ],
+    "tiltX": [
+     "status",
+     -11
+    ],
+    "tiltY": [
+     "status",
+     -11
+    ],
+    "twist": [
+     "status",
+     -11
+    ],
+    "altitudeAngle": [
+     "status",
+     -11
+    ],
+    "azimuthAngle": [
+     "status",
+     -11
+    ],
+    "isPrimary": [
+     "status",
+     -11
+    ],
+    "movementX": 0.0,
+    "movementY": 0.0,
+    "pointerType": -11
+   },
+   {
+    "type": "pointerdown",
+    "pointerId": 1,
+    "width": 1.0,
+    "height": 1.0,
+    "pressure": 0.0,
+    "tangentialPressure": 0.0,
+    "tiltX": 0,
+    "tiltY": 0,
+    "twist": 0,
+    "altitudeAngle": [
+     "status",
+     -9
+    ],
+    "azimuthAngle": [
+     "status",
+     -9
+    ],
+    "isPrimary": 1,
+    "movementX": 0.0,
+    "movementY": 0.0,
+    "pointerType": "mouse"
+   },
+   {
+    "type": "mousedown",
+    "pointerId": [
+     "status",
+     -11
+    ],
+    "width": [
+     "status",
+     -11
+    ],
+    "height": [
+     "status",
+     -11
+    ],
+    "pressure": [
+     "status",
+     -11
+    ],
+    "tangentialPressure": [
+     "status",
+     -11
+    ],
+    "tiltX": [
+     "status",
+     -11
+    ],
+    "tiltY": [
+     "status",
+     -11
+    ],
+    "twist": [
+     "status",
+     -11
+    ],
+    "altitudeAngle": [
+     "status",
+     -11
+    ],
+    "azimuthAngle": [
+     "status",
+     -11
+    ],
+    "isPrimary": [
+     "status",
+     -11
+    ],
+    "movementX": 0.0,
+    "movementY": 0.0,
+    "pointerType": -11
+   },
+   {
+    "type": "pointermove",
+    "pointerId": 1,
+    "width": 1.0,
+    "height": 1.0,
+    "pressure": 0.0,
+    "tangentialPressure": 0.0,
+    "tiltX": 0,
+    "tiltY": 0,
+    "twist": 0,
+    "altitudeAngle": [
+     "status",
+     -9
+    ],
+    "azimuthAngle": [
+     "status",
+     -9
+    ],
+    "isPrimary": 1,
+    "movementX": 0.0,
+    "movementY": 0.0,
+    "pointerType": "mouse"
+   },
+   {
+    "type": "mousemove",
+    "pointerId": [
+     "status",
+     -11
+    ],
+    "width": [
+     "status",
+     -11
+    ],
+    "height": [
+     "status",
+     -11
+    ],
+    "pressure": [
+     "status",
+     -11
+    ],
+    "tangentialPressure": [
+     "status",
+     -11
+    ],
+    "tiltX": [
+     "status",
+     -11
+    ],
+    "tiltY": [
+     "status",
+     -11
+    ],
+    "twist": [
+     "status",
+     -11
+    ],
+    "altitudeAngle": [
+     "status",
+     -11
+    ],
+    "azimuthAngle": [
+     "status",
+     -11
+    ],
+    "isPrimary": [
+     "status",
+     -11
+    ],
+    "movementX": 0.0,
+    "movementY": 0.0,
+    "pointerType": -11
+   },
+   {
+    "type": "pointerup",
+    "pointerId": 1,
+    "width": 1.0,
+    "height": 1.0,
+    "pressure": 0.0,
+    "tangentialPressure": 0.0,
+    "tiltX": 0,
+    "tiltY": 0,
+    "twist": 0,
+    "altitudeAngle": [
+     "status",
+     -9
+    ],
+    "azimuthAngle": [
+     "status",
+     -9
+    ],
+    "isPrimary": 1,
+    "movementX": 0.0,
+    "movementY": 0.0,
+    "pointerType": "mouse"
+   },
+   {
+    "type": "mouseup",
+    "pointerId": [
+     "status",
+     -11
+    ],
+    "width": [
+     "status",
+     -11
+    ],
+    "height": [
+     "status",
+     -11
+    ],
+    "pressure": [
+     "status",
+     -11
+    ],
+    "tangentialPressure": [
+     "status",
+     -11
+    ],
+    "tiltX": [
+     "status",
+     -11
+    ],
+    "tiltY": [
+     "status",
+     -11
+    ],
+    "twist": [
+     "status",
+     -11
+    ],
+    "altitudeAngle": [
+     "status",
+     -11
+    ],
+    "azimuthAngle": [
+     "status",
+     -11
+    ],
+    "isPrimary": [
+     "status",
+     -11
+    ],
+    "movementX": 0.0,
+    "movementY": 0.0,
+    "pointerType": -11
+   }
+  ]
+ },
+ "maxTouchPoints": [
+  0,
+  0
+ ],
+ "shadow_pointer_lock_element_status_null_target": -9,
+ "touch_events_seen": [],
+ "build_flags_win_slim": {
+  "ENABLE_TOUCH_EVENTS": "OFF",
+  "ENABLE_IOS_TOUCH_EVENTS": "OFF",
+  "ENABLE_POINTER_LOCK": "OFF"
+ },
+ "port_defaults": {
+  "OptionsGTK.cmake:TOUCH_EVENTS": "ON",
+  "OptionsWPE.cmake:TOUCH_EVENTS": "ON",
+  "OptionsMac.cmake:POINTER_LOCK": "ON",
+  "OptionsWPE.cmake:POINTER_LOCK": "WebKitFeatures default OFF"
+ },
+ "findings": [
+  "no touch/pen/pointer-lock injection or lock exports; abi_has pointer-input/touch/pen/pointer-lock = 0",
+  "rv_host_mouse pointer events: pointerType mouse, pointerId 1, width/height 1, tilt/twist 0 for every event",
+  "pressure 0 on pointerdown while the left button is held (spec 0.5): rv_host_mouse leaves PlatformMouseEvent buttons 0",
+  "movementX/Y 0 after a 20,15 move: rv_host_mouse leaves movementDelta 0",
+  "touchstart/touchmove/touchend never delivered; maxTouchPoints 0; Touch/TouchEvent/TouchList contract-only (TOUCH_EVENTS off on win)",
+  "ShadowRoot.pointerLockElement RV_ERR_UNSUPPORTED (POINTER_LOCK off on win); requestPointerLock/exitPointerLock excluded"
+ ]
+}

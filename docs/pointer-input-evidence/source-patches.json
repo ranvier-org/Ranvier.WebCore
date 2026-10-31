@@ -1,0 +1,38 @@
+{
+  "build": "C:\\wk\\pointer-build",
+  "flags": {
+    "ENABLE_TOUCH_EVENTS": "ON",
+    "ENABLE_POINTER_LOCK": "ON"
+  },
+  "fullRebuild": "Every WebCore and JavaScriptCore object compiled in C:/wk/pointer-build; none borrowed. Once this config lands, every later candidate needs a full rebuild: both flags are in cmakeconfig.h.",
+  "patches": {
+    "0044-pointer-event-pen-geometry.patch": "a741cfd1be40aba536cdf820b07d15dd0cd0e5ebea8e1b9ab25554629d0ad62f",
+    "0045-touch-pointer-events-win.patch": "7a172723db052b587f188b095310cede112443f6f33669de5a5772c51387b67e",
+    "0046-pointer-capture-pen-mouse-path.patch": "cd25edf3a7b5d69db9e869d1c87c730f427dcb7554db81ef92510355aec76242",
+    "0047-navigator-embedder-max-touch-points.patch": "984f160513f533c8a5f13436b6524ffbd30aa82dbdc1256f852fdbcdbcb890b2"
+  },
+  "srcDiffStatLines": 89,
+  "reusedFromNative46Candidate6": {
+    "brotlicommon.dll": "6e476586cd2a7ab303b47d823cedff98408925d8951daef60a32c13a292de6c8",
+    "brotlidec.dll": "d42e2160f76f29a91f8be01b009b585c45496219794e16eab90b3599b6f70a7f",
+    "harfbuzz-icu.dll": "27662b477f7cb0c20cee64543a06296a48a00a17b6c7b57629bb166a30d5b164",
+    "harfbuzz.dll": "b519b2abc7f446ca45bff77aae1708f45afc9f557698bcd7295837cce0f12bfa",
+    "icudt77.dll": "b00d2fb856f548608c137e771257a70d0722654535c6c00b371c0fab3e2b802c",
+    "icuin77.dll": "e3785739e1fcf2e38053bbb85ef5f0f5dab63f865cbda762da5258566085a240",
+    "icuuc77.dll": "189c623f996c41488c262867bae04a5bb33dd485bd423e0a8bec05c455a90902",
+    "jpeg62.dll": "394811c1b1bf1fd914248a145ba3fcad1f5f27c7009754ce08e48ccb0266b785",
+    "libpng16.dll": "8b46592c5ea338dd6b23ca380d6db64a7849c2a534fc465a006ec668645d8185",
+    "libsharpyuv.dll": "df165de83480692f494c23061ef9c40c10abe19a89b1fa9fae2f1cd5152c07a7",
+    "libwebp.dll": "550c5a4860f61d32a274fdd7b5c8cbe266eee28b3a3ca888195248ea1d5e0f71",
+    "libwebpdemux.dll": "1c522d2684cd3fcd29491097eff8b18137458f0cc68983162448fda1e79c3163",
+    "libwebpmux.dll": "ee3bd0439191fe0c7983bb9c7977d25cd1a096784197ea643d992b92bc81ae29",
+    "libxml2.dll": "a89b639819e10d1c5f76717c405c1ee669d0af2f3e50af443345582d6832b7a5",
+    "zlib1.dll": "65933d64d3c9ab80281884551c4a338e5225a9ec44825c36452f13326a91fc93"
+  },
+  "hostUnits": [
+    "RanvierWebCoreAbi",
+    "RanvierWebCoreDom",
+    "RanvierWebCoreUia",
+    "RanvierWebCoreD3D11"
+  ]
+}

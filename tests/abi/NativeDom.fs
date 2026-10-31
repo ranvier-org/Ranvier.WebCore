@@ -1305,6 +1305,13 @@ type RvDomUnionBooleanOrImportNodeOptions =
     val mutable arm0: int
     val mutable arm1: nativeint
 
+/// <summary>ABI transport for Touch sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceTouch =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for Element sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceElementNullable =
@@ -1886,6 +1893,9 @@ extern void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUni
 extern void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_sequence_touch_release(RvDomSequenceTouch& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_element_nullable_release(RvDomSequenceElementNullable& value)
 
 [<DllImport(Lib)>]
@@ -2202,6 +2212,18 @@ extern void rv_dom_validity_state_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_validity_state_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_touch_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_touch_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_touch_list_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_touch_list_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern void rv_dom_svg_rect_release(nativeint handle)
@@ -2837,6 +2859,9 @@ extern int rv_dom_document_get_adopted_style_sheets(nativeint target, RvDomSeque
 extern int rv_dom_document_set_adopted_style_sheets(nativeint target, [<In>] RvDomSequenceCSSStyleSheet[] value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_document_get_pointer_lock_element(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_document_create_element(nativeint target, byte[] local_name, int local_name_length, [<In>] RvDomUnionDOMStringOrElementCreationOptions[] options, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -2922,6 +2947,9 @@ extern int rv_dom_document_query_command_value(nativeint target, byte[] command_
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_selection(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_create_touch_list(nativeint target, [<In>] RvDomSequenceTouch[] touches, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_prepend(nativeint target, [<In>] RvDomSequenceNodeOrDOMString[] nodes)
@@ -8298,6 +8326,57 @@ extern int rv_dom_pointer_event_get_coalesced_events(nativeint target, RvDomSequ
 
 [<DllImport(Lib)>]
 extern int rv_dom_pointer_event_get_predicted_events(nativeint target, RvDomSequencePointerEvent& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_client_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_client_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_screen_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_screen_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_page_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_page_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_target(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_identifier(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_list_get_length(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_list_item(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_touches(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_target_touches(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_changed_touches(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_ctrl_key(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_shift_key(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_alt_key(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_meta_key(nativeint target, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_wheel_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomWheelEventInit[] event_init_dict, nativeint& result)

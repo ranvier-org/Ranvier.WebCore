@@ -304,6 +304,8 @@ and [<AllowNullLiteral>] Document =
     abstract member visibilityState: VisibilityState with get
     /// <summary>Document.getSelection.</summary>
     abstract member getSelection: unit -> DOMSelection
+    /// <summary>Document.createTouchList.</summary>
+    abstract member createTouchList: [<System.ParamArray>] touches: Touch array -> TouchList
     /// <summary>Document.rootElement.</summary>
     abstract member rootElement: SVGSVGElement with get
     /// <summary>Document.getElementById.</summary>
@@ -321,6 +323,8 @@ and [<AllowNullLiteral>] Document =
 #endif
     abstract member styleSheets: StyleSheetList with get
 
+    /// <summary>Document.pointerLockElement.</summary>
+    abstract member pointerLockElement: Element with get
 
 /// <summary>HTMLDocument in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLDocument =
@@ -3283,6 +3287,50 @@ and [<AllowNullLiteral>] PointerEvent =
     /// <summary>PointerEvent.getPredictedEvents.</summary>
     abstract member getPredictedEvents: unit -> (PointerEvent) array
 
+/// <summary>Touch in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Touch =
+    /// <summary>Touch.clientX.</summary>
+    abstract member clientX: float with get
+    /// <summary>Touch.clientY.</summary>
+    abstract member clientY: float with get
+    /// <summary>Touch.screenX.</summary>
+    abstract member screenX: float with get
+    /// <summary>Touch.screenY.</summary>
+    abstract member screenY: float with get
+    /// <summary>Touch.pageX.</summary>
+    abstract member pageX: float with get
+    /// <summary>Touch.pageY.</summary>
+    abstract member pageY: float with get
+    /// <summary>Touch.target.</summary>
+    abstract member target: EventTarget with get
+    /// <summary>Touch.identifier.</summary>
+    abstract member identifier: int with get
+
+/// <summary>TouchList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TouchList =
+    /// <summary>TouchList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>TouchList.item.</summary>
+    abstract member item: index: uint32 -> Touch
+
+/// <summary>TouchEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TouchEvent =
+    inherit UIEvent
+    /// <summary>TouchEvent.touches.</summary>
+    abstract member touches: TouchList with get
+    /// <summary>TouchEvent.targetTouches.</summary>
+    abstract member targetTouches: TouchList with get
+    /// <summary>TouchEvent.changedTouches.</summary>
+    abstract member changedTouches: TouchList with get
+    /// <summary>TouchEvent.ctrlKey.</summary>
+    abstract member ctrlKey: bool with get
+    /// <summary>TouchEvent.shiftKey.</summary>
+    abstract member shiftKey: bool with get
+    /// <summary>TouchEvent.altKey.</summary>
+    abstract member altKey: bool with get
+    /// <summary>TouchEvent.metaKey.</summary>
+    abstract member metaKey: bool with get
+
 /// <summary>WheelEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] WheelEvent =
     inherit MouseEvent
@@ -5327,10 +5375,6 @@ and [<AllowNullLiteral>] TextTrackList =
 
 /// <summary>TimeRanges in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] TimeRanges = interface end
-
-/// <summary>TouchEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] TouchEvent =
-    inherit UIEvent
 
 /// <summary>ARIAMixin in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ARIAMixin =

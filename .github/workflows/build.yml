@@ -501,6 +501,18 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/focus_input.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify touch frames, touch lists and touch pointer events
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/touch_input.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify pen and mouse pointer fidelity and pen capture
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/pen_input.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify pointer lock requests, relative movement and loss
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/pointer_lock.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify window metrics, visibility, media queries and viewport event order
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/viewport_events.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"

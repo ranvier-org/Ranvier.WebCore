@@ -41,3 +41,7 @@
 0040-empty-chrome-client-pointer-overridable.patch
 0041-data-transfer-in-memory-file-access.patch
 0042-canvas-renders-embedder-context.patch
+0044-pointer-event-pen-geometry.patch
+0045-touch-pointer-events-win.patch
+0046-pointer-capture-pen-mouse-path.patch
+0047-navigator-embedder-max-touch-points.patch

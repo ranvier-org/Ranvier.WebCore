@@ -2238,6 +2238,114 @@ RV_EXPORT int32_t rv_notification_report(RvEventTarget* notification, int32_t ev
 RV_EXPORT int32_t rv_notification_string(RvEventTarget* notification, int32_t field, uint8_t* buffer, int32_t capacity, int32_t* length);
 /* The notification's RV_NOTIFICATION_DIR_* and silent flag (-1 unset, 0 or 1). */
 RV_EXPORT int32_t rv_notification_flags(RvEventTarget* notification, int32_t* dir, int32_t* silent);
+/* Pointer input ("pointer-input"): mouse, pen and touch samples, and pointer lock ("pointer-lock"). */
+
+/* Types of RvPointerSample.pointerType, as PointerEvent.pointerType. */
+enum {
+    RV_POINTER_TYPE_MOUSE = 0,
+    RV_POINTER_TYPE_PEN = 1,
+    RV_POINTER_TYPE_TOUCH = 2,
+};
+
+/* Actions of RvPointerSample.action. The first three equal RV_MOUSE_*. RV_POINTER_CANCEL ends a pen or touch contact
+ * the platform withdrew; RV_POINTER_STATIONARY is a touch contact that did not change. */
+enum {
+    RV_POINTER_MOVE = 0,
+    RV_POINTER_DOWN = 1,
+    RV_POINTER_UP = 2,
+    RV_POINTER_CANCEL = 3,
+    RV_POINTER_STATIONARY = 4,
+};
+
+/* One sample of a pointing device. */
+typedef struct RvPointerSample {
+    /* sizeof(RvPointerSample), set by the caller. */
+    int32_t size;
+    int32_t pointerType;
+    /* The device's id for the contact or pen, 0 or more. PointerEvent.pointerId is 1 for the mouse, 2 + id for a
+     * touch contact and 2^30 + id for a pen. */
+    int32_t id;
+    int32_t action;
+    /* CSS pixels of the host surface, as rv_host_mouse's x and y. */
+    double x;
+    double y;
+    /* MouseEvent.button of a down or up (RV_BUTTON_*), RV_BUTTON_NONE otherwise; MouseEvent.buttons after the sample. */
+    int32_t button;
+    int32_t buttons;
+    int32_t modifiers;
+    /* 1 for a single press, 2 for a double; 0 for other actions. */
+    int32_t clickCount;
+    /* 0 to 1. A NaN pressure gives the engine's value for a device without pressure: 0.5 with a button down, else 0. */
+    float pressure;
+    /* -1 to 1, a pen's barrel pressure. */
+    float tangentialPressure;
+    /* Degrees: tilt -90 to 90, twist 0 to 359. */
+    int32_t tiltX;
+    int32_t tiltY;
+    int32_t twist;
+    /* The contact's size in CSS pixels, 1 for a point. */
+    float width;
+    float height;
+    /* The movement since the device's previous sample in CSS pixels, as MouseEvent.movementX and movementY: under
+     * pointer lock the only position change the page receives. */
+    double movementX;
+    double movementY;
+} RvPointerSample;
+
+/* Native input from a mouse, a pen or a touch screen, handled as the user's like rv_host_mouse. A mouse or pen
+ * delivers one sample. A touch frame delivers one sample per active contact, each with its action, and dispatches
+ * touchstart, touchmove, touchend or touchcancel with touches, targetTouches and changedTouches, and a pointer event
+ * per changed contact. Under pointer lock, mouse and pen samples go to the lock target with clientX and clientY held
+ * at the lock position. Returns 1 when the page or WebCore handled the input, 0 when not, or a negative status:
+ * RV_ERR_UNSUPPORTED for a bad size, type, action or count, a touch frame with a repeated id or without a changed
+ * contact, or touch input where WebKit builds without TOUCH_EVENTS (macOS). */
+RV_EXPORT int32_t rv_host_pointer(RvHost* host, const RvPointerSample* samples, int32_t count);
+/* Sets Navigator.maxTouchPoints of the host's documents: the contacts the app's touch screen reports, 0 (the initial
+ * value) for none. RV_ERR_UNSUPPORTED for a negative value. */
+RV_EXPORT int32_t rv_host_set_max_touch_points(RvHost* host, int32_t value);
+
+/* A touch contact's geometry ("touch-input"), which WebKit exposes only as the prefixed Touch.webkitRadiusX,
+ * webkitRadiusY, webkitRotationAngle and webkitForce: radii in CSS pixels, the angle in degrees, force 0 to 1. */
+typedef struct RvTouch RvTouch;
+typedef struct RvTouchGeometry {
+    /* sizeof(RvTouchGeometry), set by the caller. */
+    int32_t size;
+    float rotationAngle;
+    double radiusX;
+    double radiusY;
+    float force;
+} RvTouchGeometry;
+
+/* Writes the geometry of a Touch from rv_dom_touch_list_item. RV_ERR_UNSUPPORTED when geometry->size is smaller than
+ * RvTouchGeometry, or where WebKit builds without TOUCH_EVENTS. */
+RV_EXPORT int32_t rv_touch_geometry(RvTouch* touch, RvTouchGeometry* geometry);
+
+/* States of rv_host_pointer_lock_state. */
+enum {
+    RV_POINTER_LOCK_NONE = 0,
+    /* The page asked for the lock: the app answers with rv_host_pointer_lock_resolve. */
+    RV_POINTER_LOCK_PENDING = 1,
+    RV_POINTER_LOCK_LOCKED = 2,
+};
+
+/* Writes the host's pointer-lock state and, when element is not NULL, a new reference to the lock target or NULL. The
+ * app reads it after each input call, as it does rv_host_cursor: while LOCKED it hides the cursor and sends relative
+ * movement. */
+RV_EXPORT int32_t rv_host_pointer_lock_state(RvHost* host, int32_t* state, RvNode** element);
+/* Grants (1) or denies (0) the pending request: a grant fires pointerlockchange, a denial pointerlockerror, on the next
+ * rv_run_loop_cycle. RV_ERR_UNSUPPORTED when no request is pending. */
+RV_EXPORT int32_t rv_host_pointer_lock_resolve(RvHost* host, int32_t granted);
+/* Ends a held lock as the platform does on Escape or a lost window, with pointerlockchange; RV_OK without a lock.
+ * rv_host_set_focused(host, 0) does the same, and denies a pending request. */
+RV_EXPORT int32_t rv_host_pointer_lock_lose(RvHost* host);
+/* Element.requestPointerLock, with unadjustedMovement 1 or 0. The engine requires a user gesture: a call inside a
+ * listener of trusted input. A request the engine refuses returns RV_ERR_DOM_EXCEPTION with rv_last_exception naming
+ * NotAllowedError (no gesture), WrongDocumentError (a disconnected element, or a host whose window is unfocused, which
+ * also fires pointerlockerror), InvalidStateError or NotSupportedError (unadjusted movement, which no host provides);
+ * an accepted request makes the state PENDING. */
+RV_EXPORT int32_t rv_element_request_pointer_lock(RvNode* element, int32_t unadjustedMovement);
+/* Document.exitPointerLock: pointerlockchange on the next rv_run_loop_cycle when the document holds the lock. */
+RV_EXPORT int32_t rv_document_exit_pointer_lock(RvNode* document);
 
 #ifdef __cplusplus
 }

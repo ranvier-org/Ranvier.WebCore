@@ -484,6 +484,14 @@ module Calls =
             "rv_notification_report"
             "rv_notification_string"
             "rv_notification_flags"
+            "rv_host_pointer"
+            "rv_host_set_max_touch_points"
+            "rv_touch_geometry"
+            "rv_host_pointer_lock_state"
+            "rv_host_pointer_lock_resolve"
+            "rv_host_pointer_lock_lose"
+            "rv_element_request_pointer_lock"
+            "rv_document_exit_pointer_lock"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1620,6 +1628,30 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_notification_flags(nativeint notification, int& dir, int& silent)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_pointer(nativeint host, nativeint samples, int count)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_set_max_touch_points(nativeint host, int value)
+
+    [<DllImport(Lib)>]
+    extern int rv_touch_geometry(nativeint touch, nativeint geometry)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_pointer_lock_state(nativeint host, int& state, nativeint[] element)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_pointer_lock_resolve(nativeint host, int granted)
+
+    [<DllImport(Lib)>]
+    extern int rv_host_pointer_lock_lose(nativeint host)
+
+    [<DllImport(Lib)>]
+    extern int rv_element_request_pointer_lock(nativeint element, int unadjustedMovement)
+
+    [<DllImport(Lib)>]
+    extern int rv_document_exit_pointer_lock(nativeint document)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -5234,6 +5266,102 @@ let rv_notification_flags (notification: nativeint, dir: byref<int>, silent: byr
         result
     else
         Raw.rv_notification_flags (notification, &dir, &silent)
+
+let rv_host_pointer (host: nativeint, samples: nativeint, count: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_pointer (host, samples, count)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[284] <- Calls.Counts[284] + 1L
+        Calls.Ticks[284] <- Calls.Ticks[284] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_pointer (host, samples, count)
+
+let rv_host_set_max_touch_points (host: nativeint, value: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_set_max_touch_points (host, value)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[285] <- Calls.Counts[285] + 1L
+        Calls.Ticks[285] <- Calls.Ticks[285] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_set_max_touch_points (host, value)
+
+let rv_touch_geometry (touch: nativeint, geometry: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_touch_geometry (touch, geometry)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[286] <- Calls.Counts[286] + 1L
+        Calls.Ticks[286] <- Calls.Ticks[286] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_touch_geometry (touch, geometry)
+
+let rv_host_pointer_lock_state (host: nativeint, state: byref<int>, element: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_pointer_lock_state (host, &state, element)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[287] <- Calls.Counts[287] + 1L
+        Calls.Ticks[287] <- Calls.Ticks[287] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_pointer_lock_state (host, &state, element)
+
+let rv_host_pointer_lock_resolve (host: nativeint, granted: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_pointer_lock_resolve (host, granted)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[288] <- Calls.Counts[288] + 1L
+        Calls.Ticks[288] <- Calls.Ticks[288] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_pointer_lock_resolve (host, granted)
+
+let rv_host_pointer_lock_lose (host: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_host_pointer_lock_lose (host)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[289] <- Calls.Counts[289] + 1L
+        Calls.Ticks[289] <- Calls.Ticks[289] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_host_pointer_lock_lose (host)
+
+let rv_element_request_pointer_lock (element: nativeint, unadjustedMovement: int) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_element_request_pointer_lock (element, unadjustedMovement)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[290] <- Calls.Counts[290] + 1L
+        Calls.Ticks[290] <- Calls.Ticks[290] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_element_request_pointer_lock (element, unadjustedMovement)
+
+let rv_document_exit_pointer_lock (document: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_document_exit_pointer_lock (document)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[291] <- Calls.Counts[291] + 1L
+        Calls.Ticks[291] <- Calls.Ticks[291] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_document_exit_pointer_lock (document)
 
 // END GENERATED
 
