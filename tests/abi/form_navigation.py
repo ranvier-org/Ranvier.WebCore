@@ -9,6 +9,9 @@ import os
 from pathlib import Path
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 P, I = ctypes.c_void_p, ctypes.c_int32
 CALLBACK = ctypes.CFUNCTYPE(I, P, P)
 MARKUP = ('<!doctype html><body><form id="f" {action}><input name="a" value="1">'
@@ -27,16 +30,14 @@ def run(directory):
     library = ctypes.CDLL(str(directory / 'RanvierWebCoreHost.dll'))
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     create, destroy = bind('rv_host_create', P, [I, I]), bind('rv_host_destroy', None, [P])
-    load = bind('rv_host_load_html', I, [P, ctypes.c_char_p])
+    load = bind('rv_host_load_html', I, [P, Utf8])
     document_of = bind('rv_host_document', P, [P])
-    by_id = bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p])
+    by_id = bind('rv_document_get_element_by_id', P, [P, Utf8])
     release = bind('rv_node_release', None, [P])
-    listen = bind('rv_node_add_event_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])
+    listen = bind('rv_node_add_event_listener', P, [P, Utf8, I, CALLBACK, P])
     remove = bind('rv_listener_remove', I, [P])
     cycle = bind('rv_run_loop_cycle', I, [I])
     same = bind('rv_dom_node_is_same_node', I, [P, P, ctypes.POINTER(I)])

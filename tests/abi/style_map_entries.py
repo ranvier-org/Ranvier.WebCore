@@ -97,12 +97,12 @@ def verify(native_directory):
         release(ctypes.byref(empty))
         expect(empty.present == 0 and empty.count == 0 and not empty.items, 'empty snapshot release resets')
         for name, value in [('height', '20px'), ('animation-name', 'first, second'), ('--c13-π', 'var(--other, red)')]:
-            call('rv_element_set_style', [pointer, string, string, integer], body, name.encode('utf-8'), value.encode('utf-8'), 0)
+            call('rv_element_set_style', [pointer, string, Utf8, integer], body, name.encode('utf-8'), value.encode('utf-8'), 0)
         before = snapshot(inline, document)
         try:
             actual = decoded(before)
             expect(actual == [('height', ['20px']), ('animation-name', ['first', 'second']), ('--c13-π', ['var(--other, red)'])], 'declared snapshot preserves order, lists and Unicode key')
-            call('rv_element_set_style', [pointer, string, string, integer], body, b'height', b'25px', 0)
+            call('rv_element_set_style', [pointer, string, Utf8, integer], body, b'height', b'25px', 0)
             expect(decoded(before) == actual, 'snapshot preserves reified values after later mutation')
             after = snapshot(inline, document)
             try:
@@ -135,7 +135,7 @@ def verify(native_directory):
 
         markup = '<style id="entry-sheet">.entry{height:8px;animation-name:first,second;--c13-π:var(--other, red)}</style>'
         call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup.encode('utf-8'))
-        style = bind('rv_document_get_element_by_id', pointer, [pointer, string])(host, b'entry-sheet')
+        style = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])(host, b'entry-sheet')
         expect(bool(style), 'declared entry fixture style')
         retained.append(('rv_node_release', style))
         sheet = handle('rv_dom_html_style_element_get_sheet', [pointer], [style], 'rv_dom_style_sheet_release')

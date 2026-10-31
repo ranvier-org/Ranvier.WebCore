@@ -1,0 +1,96 @@
+{
+  "checkedAtUtc": "2026-10-31T12:50:48.516059+00:00",
+  "checkedBy": "root, for str2 (lane DNS unavailable)",
+  "packages": [
+    {
+      "package": "Ranvier.WebCore",
+      "version": "0.1.0-preview.47",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native",
+      "version": "0.1.0-preview.47",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.win-x64",
+      "version": "0.1.0-preview.47",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.win-arm64",
+      "version": "0.1.0-preview.47",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.win-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.linux-x64",
+      "version": "0.1.0-preview.47",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-x64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.linux-arm64",
+      "version": "0.1.0-preview.47",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.linux-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.WebCore.Native.osx-arm64",
+      "version": "0.1.0-preview.47",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.webcore.native.osx-arm64/index.json"
+    },
+    {
+      "package": "Ranvier.Dom",
+      "version": "0.1.0-alpha.50",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.dom/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Dom",
+      "version": "0.1.0-alpha.50",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.dom/index.json"
+    },
+    {
+      "package": "Ranvier.Dom.Traced",
+      "version": "0.1.0-alpha.50",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.dom.traced/index.json"
+    },
+    {
+      "package": "Fable.Ranvier.Dom.Traced",
+      "version": "0.1.0-alpha.50",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/fable.ranvier.dom.traced/index.json"
+    },
+    {
+      "package": "Ranvier.View",
+      "version": "0.1.40",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view/index.json"
+    },
+    {
+      "package": "Ranvier.View.Dom",
+      "version": "0.1.40",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.dom/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore",
+      "version": "0.1.0-alpha.40",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore/index.json"
+    },
+    {
+      "package": "Ranvier.View.WebCore.Sdl",
+      "version": "0.1.0-alpha.40",
+      "published": false,
+      "source": "https://api.nuget.org/v3-flatcontainer/ranvier.view.webcore.sdl/index.json"
+    }
+  ]
+}

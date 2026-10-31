@@ -91,7 +91,7 @@ def verify(native_directory):
         css = b'.probe {width:30px; height:10px} #never {color:red}'
         markup = b'<style id="first">' + css + b'</style><style id="copy">' + css + b'</style><div id="item" class="probe"></div>'
         call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
-        find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
+        find = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
         nodes = {}
         for name in ['first', 'copy', 'item']:
             nodes[name] = find(host, name.encode())

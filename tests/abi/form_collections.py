@@ -18,7 +18,7 @@ FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 P, I, U = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint32
 CALLBACK = ctypes.CFUNCTYPE(I, P, P)
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE = 0, -1, -2, -3, -11
-ABI = 54
+ABI = 55
 FILE_ARM, STRING_ARM = 1, 2
 
 
@@ -119,7 +119,7 @@ class Case:
         self.n = native
         self.host = native.bind('rv_host_create', P, [I, I])(320, 200)
         native.expect(bool(self.host), 'host')
-        native.expect(native.call('rv_host_load_html', [P, ctypes.c_char_p], self.host, markup.encode()) == OK, 'load')
+        native.expect(native.call('rv_host_load_html', [P, Utf8], self.host, markup.encode()) == OK, 'load')
         self.document = native.bind('rv_host_document', P, [P])(self.host)
         self.created, self.vars, self.events, self.listeners, self.callbacks, self.owned = {}, {}, [], [], [], []
 
@@ -138,7 +138,7 @@ class Case:
             return None
         if identifier in self.created:
             return self.created[identifier]
-        node = self.n.bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p])(self.host, identifier.encode())
+        node = self.n.bind('rv_document_get_element_by_id', P, [P, Utf8])(self.host, identifier.encode())
         self.n.expect(bool(node), 'node ' + identifier)
         self.owned.append(node)
         return node
@@ -251,7 +251,7 @@ class Case:
 
         callback = CALLBACK(on_event)
         self.callbacks.append(callback)
-        listener = n.bind('rv_node_add_event_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])(self.node(step['form']), step['type'].encode(), 0, callback, None)
+        listener = n.bind('rv_node_add_event_listener', P, [P, Utf8, I, CALLBACK, P])(self.node(step['form']), step['type'].encode(), 0, callback, None)
         n.expect(bool(listener), 'listener')
         self.listeners.append(listener)
 
@@ -484,7 +484,7 @@ def errors(native, markup):
         n.ok('rv_dom_submit_event_create', [P, P, I, ctypes.POINTER(SubmitEventInit), ctypes.POINTER(P)], case.document, kind, length, None, ctypes.byref(event))
         n.expect(n.call('rv_dom_form_data_event_get_form_data', [P, ctypes.POINTER(P)], event.value, ctypes.byref(P())) == WRONG_INTERFACE, 'formData of a SubmitEvent')
         n.bind('rv_event_release', None, [P])(event.value)
-        text_node = n.bind('rv_document_create_comment', P, [P, ctypes.c_char_p])(case.host, b'c')
+        text_node = n.bind('rv_document_create_comment', P, [P, Utf8])(case.host, b'c')
         sinit.submitter = text_node
         n.expect(n.call('rv_dom_submit_event_create', [P, P, I, ctypes.POINTER(SubmitEventInit), ctypes.POINTER(P)],
                         case.document, kind, length, ctypes.byref(sinit), ctypes.byref(P())) == WRONG_INTERFACE, 'SubmitEvent submitter that is not an HTMLElement')
@@ -510,7 +510,7 @@ def errors(native, markup):
         case.release_collection(elements)
         submitted = []
         callback = CALLBACK(lambda context, event: submitted.append(1) or 0)
-        listener = n.bind('rv_node_add_event_listener', P, [P, ctypes.c_char_p, I, CALLBACK, P])(form, b'submit', 0, callback, None)
+        listener = n.bind('rv_node_add_event_listener', P, [P, Utf8, I, CALLBACK, P])(form, b'submit', 0, callback, None)
         case.listeners.append(listener)
         for _ in range(2):
             n.ok('rv_dom_html_form_element_request_submit', [P, P], form, None)

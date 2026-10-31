@@ -105,7 +105,7 @@ let private probeWith
     =
     let host = rv_host_create (64, 64)
 
-    rv_host_load_html (host, html) |> check "load_html"
+    rv_host_load_html (host, utf8 html, utf8Length html) |> check "load_html"
 
     let document = rv_host_document host
     let body = rv_document_body host
@@ -209,7 +209,7 @@ and private removedFrom (focus: bool) (valueAttribute: bool) (host: nativeint) (
     let input = rv_document_create_element (host, "input")
 
     if valueAttribute then
-        rv_element_set_attribute (input, "value", "x") |> check "set_attribute"
+        rv_element_set_attribute (input, "value", utf8 "x", utf8Length "x") |> check "set_attribute"
 
     rv_node_append_child (container, input) |> check "append_child"
 
@@ -224,7 +224,7 @@ and private removedFrom (focus: bool) (valueAttribute: bool) (host: nativeint) (
 let private image (source: string) (remove: bool) (host: nativeint) (_: nativeint) (body: nativeint) =
     let element = rv_document_create_element (host, "img")
 
-    rv_element_set_attribute (element, "src", source) |> check "set_attribute"
+    rv_element_set_attribute (element, "src", utf8 source, utf8Length source) |> check "set_attribute"
 
     rv_node_append_child (body, element) |> check "append_child"
 
@@ -244,7 +244,7 @@ let private svgPaint =
     + "' width='4' height='4'/></svg></body></html>"
 
 let private element (host: nativeint) (id: string) =
-    let node = rv_document_get_element_by_id (host, id)
+    let node = rv_document_get_element_by_id (host, utf8 id, utf8Length id)
 
     if node = 0n then
         failwithf "missing SVG element %s" id
@@ -262,7 +262,7 @@ let private handleOf (name: string) (getter: nativeint -> nativeint ref -> int) 
 /// Loads the SVG paint fixture, retains a typed value handle from each S08-S11 group, and, when <c>replace</c> is set,
 /// replaces the document before the host is destroyed. The handles stay readable and writable after collection.
 let private svgPaintHandles (replace: bool) (host: nativeint) (_: nativeint) (_: nativeint) =
-    rv_host_load_html (host, svgPaint) |> check "load SVG paint"
+    rv_host_load_html (host, utf8 svgPaint, utf8Length svgPaint) |> check "load SVG paint"
     cycle ()
     let take id = element host id
     let gradient = take "gradient"
@@ -308,7 +308,7 @@ let private svgPaintHandles (replace: bool) (host: nativeint) (_: nativeint) (_:
         rv_node_release node
 
     if replace then
-        rv_host_load_html (host, html) |> check "replace SVG paint document"
+        rv_host_load_html (host, utf8 html, utf8Length html) |> check "replace SVG paint document"
         cycle ()
 
     afterCollection.Add(fun () ->
@@ -399,7 +399,7 @@ let private releaseName (kind: string) (remove: bool) =
 
 let private runReleaseAfterDestroy (kind: string) (remove: bool) =
     let host = rv_host_create (64, 64)
-    rv_host_load_html (host, html) |> check "load_html"
+    rv_host_load_html (host, utf8 html, utf8Length html) |> check "load_html"
     let document = rv_host_document host
     let body = rv_document_body host
     let div = rv_document_create_element (host, "div")
@@ -440,14 +440,10 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                 else
                     rv_host_match_media (host, "(min-width: 10px)")
 
+            let eventType = if kind = "window target" then "resize" else "change"
+
             let listener =
-                rv_event_target_add_listener (
-                    held.Value,
-                    (if kind = "window target" then "resize" else "change"),
-                    0,
-                    viewportCallback,
-                    0n
-                )
+                rv_event_target_add_listener (held.Value, utf8 eventType, utf8Length eventType, 0, viewportCallback, 0n)
 
             if listener = 0n then
                 failwithf "no %s listener" kind
@@ -460,11 +456,11 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                     failwithf "%s listener ran after host destroy" kind
         | "scrolled document" ->
             held.Value <- rv_node_retain document
-            rv_element_set_style (body, "height", "2000px", 0) |> check "tall body"
+            rv_element_set_style (body, "height", utf8 "2000px", utf8Length "2000px", 0) |> check "tall body"
             let window = rv_host_window_event_target host
 
             let listener =
-                rv_event_target_add_listener (window, "scroll", 0, viewportCallback, 0n)
+                rv_event_target_add_listener (window, utf8 "scroll", utf8Length "scroll", 0, viewportCallback, 0n)
 
             if listener = 0n then
                 failwith "no scroll listener"
@@ -494,10 +490,10 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                 if viewportCalls <> 0 then
                     failwith "scroll listener ran after host destroy"
         | "coordinate spaces" ->
-            rv_element_set_style (div, "width", "40px", 0) |> check "div width"
-            rv_element_set_style (div, "height", "20px", 0) |> check "div height"
+            rv_element_set_style (div, "width", utf8 "40px", utf8Length "40px", 0) |> check "div width"
+            rv_element_set_style (div, "height", utf8 "20px", utf8Length "20px", 0) |> check "div height"
 
-            rv_element_set_style (div, "transform", "rotate(30deg)", 0)
+            rv_element_set_style (div, "transform", utf8 "rotate(30deg)", utf8Length "rotate(30deg)", 0)
             |> check "div transform"
 
             held.Value <- rv_node_retain div
@@ -525,7 +521,7 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
                 rv_node_release held.Value
         | "aria relations" ->
-            rv_element_set_attribute (div, "id", "label") |> check "label id"
+            rv_element_set_attribute (div, "id", utf8 "label", utf8Length "label") |> check "label id"
             rv_dom_node_set_text_content (div, utf8 "Label", utf8Length "Label") |> check "label text"
             let button = rv_document_create_element (host, "button")
             rv_node_append_child (body, button) |> check "append button"
@@ -569,7 +565,7 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
             |> check "Window.visualViewport"
 
             let listener =
-                rv_event_target_add_listener (held.Value, "resize", 0, viewportCallback, 0n)
+                rv_event_target_add_listener (held.Value, utf8 "resize", utf8Length "resize", 0, viewportCallback, 0n)
 
             if listener = 0n then
                 failwith "no visualViewport resize listener"
@@ -690,7 +686,7 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
             let empty = [||]: byte array
             rv_dom_blob_slice (file, 1L, 3L, empty, 0, &held.contents) |> check "Blob.slice"
             let input = rv_document_create_element (host, "input")
-            rv_element_set_attribute (input, "type", "file") |> check "type=file"
+            rv_element_set_attribute (input, "type", utf8 "file", utf8Length "file") |> check "type=file"
             rv_node_append_child (div, input) |> check "append input"
             let list = [| 0n |]
             rv_file_list_create ([| file |], 1, list) |> check "FileList"
@@ -718,6 +714,72 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                 rv_dom_file_list_release list[0]
                 rv_dom_blob_release file
                 rv_dom_blob_release held.Value
+        | "resize entries" ->
+            // A resize observer released with a notification pending: nothing is delivered after release, through
+            // rv_host_destroy, and the released observer keeps neither the target nor the document.
+            let mutable delivered = 0
+            let callback = ResizeEntriesCallback(fun _ _ _ count -> delivered <- delivered + count)
+            let pointer = Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate callback
+            let observer = rv_host_observe_resize_entries (host, pointer, 0n)
+
+            if observer = 0n then
+                failwith "rv_host_observe_resize_entries"
+
+            rv_observer_observe_box (observer, div, 1) |> check "observe border box"
+            rv_host_update host |> check "update"
+            rv_element_set_style (div, "width", utf8 "33px", utf8Length "33px", 0) |> check "resize"
+            rv_observer_release observer
+            rv_host_update host |> check "update after release"
+            held.Value <- rv_node_retain div
+
+            fun () ->
+                if delivered <> 1 then
+                    failwithf "resize entries delivered: %d" delivered
+
+                GC.KeepAlive callback
+                rv_node_release held.Value
+        | "intersection entries" ->
+            // An intersection observer whose callback retains its target, with records taken and the target removed
+            // before release: the held target outlives rv_host_destroy, and nothing is delivered after release.
+            let delivered = ref 0
+            let taken = ref -1
+
+            let callback =
+                IntersectionEntriesCallback(fun _ _ entries count ->
+                    delivered.Value <- delivered.Value + count
+
+                    if count > 0 && held.Value = 0n then
+                        held.Value <- rv_node_retain (Runtime.InteropServices.Marshal.ReadIntPtr(entries, 8)))
+
+            let sink = IntersectionEntriesCallback(fun _ _ _ count -> taken.Value <- count)
+            let pointer = Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate callback
+            let observer = [| 0n |]
+
+            rv_host_observe_intersection_entries (host, pointer, 0n, document, null, 0, null, 0, null, 0, observer)
+            |> check "observe intersection entries"
+
+            rv_observer_observe (observer[0], div) |> check "observe target"
+            rv_host_update host |> check "update"
+
+            rv_observer_take_records (observer[0], Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate sink, 0n)
+            |> check "take records"
+
+            rv_node_remove div |> check "remove target"
+            rv_observer_release observer[0]
+            rv_host_update host |> check "update after release"
+
+            fun () ->
+                if delivered.Value <> 1 || taken.Value <> 0 || held.Value = 0n then
+                    failwith (
+                        "intersection entries delivered "
+                        + string delivered.Value
+                        + ", taken "
+                        + string taken.Value
+                    )
+
+                GC.KeepAlive callback
+                GC.KeepAlive sink
+                rv_node_release held.Value
         | "blob reads" ->
             // A FileReader and an engine read in flight, and a revoked object URL, when the host is destroyed.
             let data = Array.zeroCreate<byte> (1 <<< 20)
@@ -1050,8 +1112,8 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
         | "string results" ->
             // The container results that carry owned UTF-8 spans, read and released past host destroy.
             held.Value <- rv_node_retain div
-            rv_element_set_attribute (div, "data-held", "1") |> check "data-held"
-            rv_element_set_attribute (div, "hidden", "until-found") |> check "hidden"
+            rv_element_set_attribute (div, "data-held", utf8 "1", utf8Length "1") |> check "data-held"
+            rv_element_set_attribute (div, "hidden", utf8 "until-found", utf8Length "until-found") |> check "hidden"
             let mutable sheet = 0n
             rv_dom_css_style_sheet_create (document, null, &sheet) |> check "CSSStyleSheet"
             let css = "@layer first, second; @view-transition { navigation: auto; types: one two; }"
@@ -1229,7 +1291,7 @@ let run (outDir: string) =
                 probe "control" cycleBefore (fun _ _ _ -> 0n)
 
                 probe "document title" cycleBefore (fun _ document _ ->
-                    rv_node_set_string (document, titleProperty, "Probe") |> check "set title"
+                    rv_node_set_string (document, titleProperty, utf8 "Probe", utf8Length "Probe") |> check "set title"
 
                     0n)
 
@@ -1240,7 +1302,7 @@ let run (outDir: string) =
                 probe "focused input, value written" cycleBefore (fun host document body ->
                     let input = focused "input" host document body
 
-                    rv_node_set_string (input, valueProperty, "x") |> check "set value"
+                    rv_node_set_string (input, valueProperty, utf8 "x", utf8Length "x") |> check "set value"
 
                     input)
 
@@ -1261,6 +1323,26 @@ let run (outDir: string) =
                     "image with a missing file source, removed"
                     cycleBefore
                     (image "file:///C:/ranvier-missing.png" true)
+
+                probe "U+0000 inputs, document replaced" cycleBefore (fun host _ _ ->
+                    let markup = "<!doctype html><body><p id=p>a\u0000b</p>"
+                    rv_host_load_html (host, utf8 markup, utf8Length markup) |> check "load U+0000 markup"
+                    let first = rv_document_get_element_by_id (host, utf8 "p", utf8Length "p")
+
+                    rv_element_set_attribute (first, "id", utf8 "a\u0000b", utf8Length "a\u0000b")
+                    |> check "U+0000 id"
+
+                    rv_node_release first
+                    let paragraph = rv_document_get_element_by_id (host, utf8 "a\u0000b", utf8Length "a\u0000b")
+
+                    if paragraph = 0n then
+                        failwith "U+0000 id not found"
+
+                    rv_node_set_text_content (paragraph, utf8 "c\u0000d", utf8Length "c\u0000d")
+                    |> check "U+0000 text"
+
+                    rv_host_load_html (host, utf8 html, utf8Length html) |> check "replace U+0000 document"
+                    paragraph)
 
                 probe "SVG paint handles retained past host destroy" cycleBefore (svgPaintHandles false)
                 probe "SVG paint handles retained past document replacement" cycleBefore (svgPaintHandles true)
@@ -1284,6 +1366,8 @@ let run (outDir: string) =
                     "error event"
                     "blob slice"
                     "blob reads"
+                    "resize entries"
+                    "intersection entries"
                     "caret position"
                     "crypto"
                     "diagnostics"

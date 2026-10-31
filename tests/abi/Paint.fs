@@ -30,7 +30,7 @@ let private check' (host: Host) (box: Node) colour =
     let w, h = host.PaintSize
     let image = host.Paint ()
 
-    rv_element_set_style (box.Handle, "background", colour, 0)
+    rv_element_set_style (box.Handle, "background", utf8 colour, utf8Length colour, 0)
     |> check "restyle box"
 
     host.Update ()

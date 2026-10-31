@@ -1,0 +1,195 @@
+{
+ "description": "G01/G15 media query conformance. Each step sets the viewport in CSS pixels, the device scale and the supplied media preferences (an absent preference is the engine default), then lists the queries that match; the rest do not. Every list whose matches differ from the previous step fires one change event. A step marked chromium false has no Chromium equivalent: Chromium has a pointing device by default.",
+ "queries": [
+  "(min-width: 300px)",
+  "(max-width: 250px)",
+  "(orientation: portrait)",
+  "(resolution: 2dppx)",
+  "(pointer: fine)",
+  "(pointer: coarse)",
+  "(pointer: none)",
+  "(hover: hover)",
+  "(any-pointer: fine)",
+  "(any-pointer: coarse)",
+  "(any-hover: hover)",
+  "(prefers-color-scheme: dark)",
+  "(prefers-reduced-motion: reduce)",
+  "(prefers-contrast: more)",
+  "(prefers-contrast: no-preference)",
+  "(forced-colors: none)",
+  "(color)",
+  "screen and (min-width: 300px) and (prefers-reduced-motion: no-preference)"
+ ],
+ "page": "<!doctype html><style>html,body{margin:0}#t{order:1;font-size:16px}@media (prefers-color-scheme: dark){#t{order:2}}@media (pointer: coarse){#t{order:3}}</style><div id=\"t\">Text</div>",
+ "styleOrder": {
+  "engine defaults": 1,
+  "desktop pointer": 1,
+  "dark, reduced motion and more contrast": 2,
+  "narrow high-density viewport": 2,
+  "touch input": 3,
+  "light and no preference again": 3
+ },
+ "steps": [
+  {
+   "name": "engine defaults",
+   "chromium": false,
+   "viewport": [
+    320,
+    240
+   ],
+   "scale": 1,
+   "preferences": {},
+   "matches": [
+    "(min-width: 300px)",
+    "(pointer: none)",
+    "(prefers-contrast: no-preference)",
+    "(forced-colors: none)",
+    "(color)",
+    "screen and (min-width: 300px) and (prefers-reduced-motion: no-preference)"
+   ]
+  },
+  {
+   "name": "desktop pointer",
+   "viewport": [
+    320,
+    240
+   ],
+   "scale": 1,
+   "preferences": {
+    "pointer": "fine",
+    "hover": "hover",
+    "anyPointer": "fine",
+    "anyHover": "hover",
+    "colorScheme": "light",
+    "reducedMotion": "no-preference",
+    "contrast": "no-preference"
+   },
+   "matches": [
+    "(min-width: 300px)",
+    "(pointer: fine)",
+    "(hover: hover)",
+    "(any-pointer: fine)",
+    "(any-hover: hover)",
+    "(prefers-contrast: no-preference)",
+    "(forced-colors: none)",
+    "(color)",
+    "screen and (min-width: 300px) and (prefers-reduced-motion: no-preference)"
+   ]
+  },
+  {
+   "name": "dark, reduced motion and more contrast",
+   "viewport": [
+    320,
+    240
+   ],
+   "scale": 1,
+   "preferences": {
+    "pointer": "fine",
+    "hover": "hover",
+    "anyPointer": "fine",
+    "anyHover": "hover",
+    "colorScheme": "dark",
+    "reducedMotion": "reduce",
+    "contrast": "more"
+   },
+   "matches": [
+    "(min-width: 300px)",
+    "(pointer: fine)",
+    "(hover: hover)",
+    "(any-pointer: fine)",
+    "(any-hover: hover)",
+    "(prefers-color-scheme: dark)",
+    "(prefers-reduced-motion: reduce)",
+    "(prefers-contrast: more)",
+    "(forced-colors: none)",
+    "(color)"
+   ]
+  },
+  {
+   "name": "narrow high-density viewport",
+   "viewport": [
+    200,
+    400
+   ],
+   "scale": 2,
+   "preferences": {
+    "pointer": "fine",
+    "hover": "hover",
+    "anyPointer": "fine",
+    "anyHover": "hover",
+    "colorScheme": "dark",
+    "reducedMotion": "reduce",
+    "contrast": "more"
+   },
+   "matches": [
+    "(max-width: 250px)",
+    "(orientation: portrait)",
+    "(resolution: 2dppx)",
+    "(pointer: fine)",
+    "(hover: hover)",
+    "(any-pointer: fine)",
+    "(any-hover: hover)",
+    "(prefers-color-scheme: dark)",
+    "(prefers-reduced-motion: reduce)",
+    "(prefers-contrast: more)",
+    "(forced-colors: none)",
+    "(color)"
+   ]
+  },
+  {
+   "name": "touch input",
+   "viewport": [
+    200,
+    400
+   ],
+   "scale": 2,
+   "preferences": {
+    "pointer": "coarse",
+    "hover": "none",
+    "anyPointer": "coarse",
+    "anyHover": "none",
+    "colorScheme": "dark",
+    "reducedMotion": "reduce",
+    "contrast": "more"
+   },
+   "matches": [
+    "(max-width: 250px)",
+    "(orientation: portrait)",
+    "(resolution: 2dppx)",
+    "(pointer: coarse)",
+    "(any-pointer: coarse)",
+    "(prefers-color-scheme: dark)",
+    "(prefers-reduced-motion: reduce)",
+    "(prefers-contrast: more)",
+    "(forced-colors: none)",
+    "(color)"
+   ]
+  },
+  {
+   "name": "light and no preference again",
+   "viewport": [
+    320,
+    240
+   ],
+   "scale": 1,
+   "preferences": {
+    "pointer": "coarse",
+    "hover": "none",
+    "anyPointer": "coarse",
+    "anyHover": "none",
+    "colorScheme": "light",
+    "reducedMotion": "no-preference",
+    "contrast": "no-preference"
+   },
+   "matches": [
+    "(min-width: 300px)",
+    "(pointer: coarse)",
+    "(any-pointer: coarse)",
+    "(prefers-contrast: no-preference)",
+    "(forced-colors: none)",
+    "(color)",
+    "screen and (min-width: 300px) and (prefers-reduced-motion: no-preference)"
+   ]
+  }
+ ]
+}

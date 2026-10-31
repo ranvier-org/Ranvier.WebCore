@@ -53,7 +53,7 @@ def verify(native_directory):
         markup = b'<style id="first">' + css + b'</style><style id="copy">' + css + b'</style>'
         markup += b'<style>#probe {width:12px;animation:c11-raw 100s linear -25s 1 normal both paused}</style><div id="probe"></div>'
         call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
-        find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
+        find = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
         first, copy, probe = [find(host, name) for name in [b'first', b'copy', b'probe']]
         for node in [first, copy, probe]:
             expect(bool(node), 'fixture element')
@@ -115,7 +115,7 @@ def verify(native_directory):
         expect(text('rv_dom_css_keyframe_rule_get_key_text', middle) == '75%', 'failed calls preserve detached offset')
         call('rv_dom_css_keyframes_rule_set_name', [pointer, Utf8], frames, b'c11-renamed')
         expect(width() == '12px', 'renaming keyframes invalidates the old animation name')
-        call('rv_element_set_style', [pointer, string, string, integer], probe, b'animation-name', b'c11-renamed', 0)
+        call('rv_element_set_style', [pointer, string, Utf8, integer], probe, b'animation-name', b'c11-renamed', 0)
         expect(width() == '40px', 'new animation name resolves the renamed keyframes')
         call('rv_dom_css_style_sheet_delete_rule', [pointer, unsigned], sheet, 0)
         expect(width() == '12px', 'deleting the complete keyframes rule invalidates its animation')

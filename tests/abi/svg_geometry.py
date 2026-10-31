@@ -80,7 +80,7 @@ def verify(native_directory):
         call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
 
         def node(identifier):
-            value = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])(host, identifier.encode())
+            value = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])(host, identifier.encode())
             expect(bool(value), 'find ' + identifier)
             retained.append(('rv_node_release', value))
             return value

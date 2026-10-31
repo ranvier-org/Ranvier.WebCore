@@ -68,7 +68,8 @@ def paint(native, manifest):
     lib = ctypes.CDLL(str(host))
     lib.rv_host_create.restype = ctypes.c_void_p
     lib.rv_host_create.argtypes = [ctypes.c_int32, ctypes.c_int32]
-    lib.rv_host_load_html.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+    # The markup is UTF-8 bytes and their byte count.
+    lib.rv_host_load_html.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int32]
     lib.rv_host_paint_rgba.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int32]
     lib.rv_host_destroy.argtypes = [ctypes.c_void_p]
     abi = lib.rv_abi_version()
@@ -76,7 +77,8 @@ def paint(native, manifest):
     assert abi == manifest['abi']
     host = lib.rv_host_create(32, 32)
     assert host
-    assert lib.rv_host_load_html(host, b'<body style="margin:0;background:#f00"><div style="width:8px;height:8px;background:#00f"></div>') == 0
+    markup = b'<body style="margin:0;background:#f00"><div style="width:8px;height:8px;background:#00f"></div>'
+    assert lib.rv_host_load_html(host, markup, len(markup)) == 0
     rgba = ctypes.create_string_buffer(32 * 32 * 4)
     assert lib.rv_host_paint_rgba(host, rgba, len(rgba)) == 0
     pixel = lambda x, y: tuple(rgba.raw[(y * 32 + x) * 4:(y * 32 + x) * 4 + 4])

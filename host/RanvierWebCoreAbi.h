@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 54.
+ * Ranvier native WebCore C ABI, version 55.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -26,7 +26,14 @@
  * Strings in (ABI 51, breaking): every generated rv_dom_* string input carries UTF-8 bytes with an explicit byte
  * count, so a string may hold U+0000. A plain argument is a pointer and a length, -1 for null or absent; a string
  * inside a union or sequence is an RvDomUtf8StringSpan; a dictionary string field is an RvDomUtf8StringInput, present
- * 0 for its default. The hand-written functions of this header take NUL-terminated UTF-8.
+ * 0 for its default.
+ *
+ * Hand-written strings in (ABI 55, breaking): a free-text input of this header, such as markup, text, a value, an ID, a
+ * class token or an event type, is a const uint8_t* and an int32_t byte count in the same form, so it may hold U+0000.
+ * A length below -1, a NULL pointer with a positive length, invalid UTF-8, or -1 for a string that cannot be null
+ * returns RV_ERR_NULL_ARGUMENT, or NULL from a function that returns a handle. RvClipboardWrite delivers its data the
+ * same way. Identifiers and protocol strings stay const char* NUL-terminated UTF-8: element and attribute names,
+ * selectors, MIME and data types, style property names, the RvEventInit strings, URLs and capability names.
  */
 #pragma once
 
@@ -129,7 +136,7 @@ RV_EXPORT int64_t rv_process_id(void);
 
 RV_EXPORT RvHost* rv_host_create(int32_t width, int32_t height);
 RV_EXPORT void rv_host_destroy(RvHost*);
-RV_EXPORT int32_t rv_host_load_html(RvHost*, const char* html);
+RV_EXPORT int32_t rv_host_load_html(RvHost*, const uint8_t* html, int32_t html_length);
 RV_EXPORT int32_t rv_host_scripts_enabled(RvHost*);
 RV_EXPORT int32_t rv_host_vm_entry_disallowed(RvHost*);
 
@@ -137,13 +144,13 @@ RV_EXPORT RvNode* rv_document_body(RvHost*);
 /* The document's head element, or NULL when it has none. */
 RV_EXPORT RvNode* rv_document_head(RvHost*);
 /* The first element in tree order whose ID is elementId, or NULL. */
-RV_EXPORT RvNode* rv_document_get_element_by_id(RvHost*, const char* elementId);
+RV_EXPORT RvNode* rv_document_get_element_by_id(RvHost*, const uint8_t* elementId, int32_t elementId_length);
 RV_EXPORT RvNode* rv_document_create_element(RvHost*, const char* tagName);
-RV_EXPORT RvNode* rv_document_create_text(RvHost*, const char* data);
+RV_EXPORT RvNode* rv_document_create_text(RvHost*, const uint8_t* data, int32_t data_length);
 
 RV_EXPORT int32_t rv_node_append_child(RvNode* parent, RvNode* child);
-RV_EXPORT int32_t rv_node_set_text_content(RvNode*, const char* text);
-RV_EXPORT int32_t rv_element_set_attribute(RvNode*, const char* name, const char* value);
+RV_EXPORT int32_t rv_node_set_text_content(RvNode*, const uint8_t* text, int32_t text_length);
+RV_EXPORT int32_t rv_element_set_attribute(RvNode*, const char* name, const uint8_t* value, int32_t value_length);
 RV_EXPORT void rv_node_release(RvNode*);
 
 /* Lays out and paints the viewport into rgba (width*height*4 bytes, unpremultiplied RGBA8, sRGB). */
@@ -201,7 +208,7 @@ enum {
 /* Registers a WebCore EventListener on target that calls callback(context, event). capture contains
  * RV_LISTENER_* bits. Explicit passive true ignores preventDefault; explicit false permits it for
  * cancelable events. Returns NULL on a NULL argument or the wrong thread. */
-RV_EXPORT RvListener* rv_node_add_event_listener(RvNode* target, const char* type, int32_t capture,
+RV_EXPORT RvListener* rv_node_add_event_listener(RvNode* target, const uint8_t* type, int32_t type_length, int32_t capture,
     RvEventCallback callback, void* context);
 /* Unregisters the listener and frees the handle. The callback will not run after this returns, also
  * when the listener is removed by another listener of the dispatch in progress. */
@@ -224,7 +231,7 @@ RV_EXPORT RvNodeFilter* rv_node_filter_create(RvNode* target, RvNodeFilterCallba
 RV_EXPORT int32_t rv_node_filter_context(RvNodeFilter* filter, void** context);
 
 /* Dispatches a new untrusted Event. *defaultPrevented is set to 1 when a listener cancelled it. */
-RV_EXPORT int32_t rv_node_dispatch_event(RvNode* target, const char* type, int32_t bubbles, int32_t cancelable,
+RV_EXPORT int32_t rv_node_dispatch_event(RvNode* target, const uint8_t* type, int32_t type_length, int32_t bubbles, int32_t cancelable,
     int32_t* defaultPrevented);
 /* Runs HTMLElement::click(): a simulated click with the element's default action. */
 RV_EXPORT int32_t rv_element_click(RvNode*);
@@ -240,13 +247,13 @@ RV_EXPORT void rv_event_stop_propagation(RvEvent*);
 /* v3: the DOM subset of one Ranvier component. */
 
 RV_EXPORT RvNode* rv_host_document(RvHost*);
-RV_EXPORT RvNode* rv_document_create_comment(RvHost*, const char* data);
+RV_EXPORT RvNode* rv_document_create_comment(RvHost*, const uint8_t* data, int32_t data_length);
 RV_EXPORT RvNode* rv_document_create_fragment(RvHost*);
 /* Document.importNode in the host's document. */
 RV_EXPORT RvNode* rv_document_import_node(RvHost*, RvNode*, int32_t deep);
 /* The children of a fragment parsed from markup with context as the HTML fragment parsing context
  * element, through Range.createContextualFragment. */
-RV_EXPORT RvNode* rv_node_parse_fragment(RvNode* context, const char* markup);
+RV_EXPORT RvNode* rv_node_parse_fragment(RvNode* context, const uint8_t* markup, int32_t markup_length);
 
 /* 1 element, 3 text, 8 comment, 9 document, 11 fragment, as Node.nodeType. */
 RV_EXPORT int32_t rv_node_type(RvNode*);
@@ -255,7 +262,7 @@ RV_EXPORT RvNode* rv_node_relative(RvNode*, int32_t relation);
 RV_EXPORT int32_t rv_node_get_string(RvNode*, int32_t property, char* buffer, int32_t capacity, int32_t* length);
 /* Writes RV_STRING_TEXT_CONTENT, RV_STRING_INNER_HTML, RV_STRING_DATA, RV_STRING_VALUE or RV_STRING_TITLE.
  * RV_STRING_VALUE reads and writes the value of <input>, <textarea>, <select> and <option>. */
-RV_EXPORT int32_t rv_node_set_string(RvNode*, int32_t property, const char* value);
+RV_EXPORT int32_t rv_node_set_string(RvNode*, int32_t property, const uint8_t* value, int32_t value_length);
 /* Inserts child before reference, or appends it when reference is NULL. */
 RV_EXPORT int32_t rv_node_insert_before(RvNode* parent, RvNode* child, RvNode* reference);
 RV_EXPORT int32_t rv_node_remove_child(RvNode* parent, RvNode* child);
@@ -277,7 +284,7 @@ RV_EXPORT RvEvent* rv_event_retain(RvEvent*);
 RV_EXPORT void rv_event_release(RvEvent*);
 /* A new untrusted event from Document.createEvent and Event.initEvent. RV_EVENT_INPUT creates a
  * UIEvent, RV_EVENT_POINTER a MouseEvent: the document's createEvent has no other constructors. */
-RV_EXPORT RvEvent* rv_host_create_event(RvHost*, int32_t eventInterface, const char* type, int32_t bubbles, int32_t cancelable);
+RV_EXPORT RvEvent* rv_host_create_event(RvHost*, int32_t eventInterface, const uint8_t* type, int32_t type_length, int32_t bubbles, int32_t cancelable);
 /* Dispatches a created event. *defaultPrevented is set to 1 when a listener cancelled it. */
 RV_EXPORT int32_t rv_node_dispatch(RvNode* target, RvEvent*, int32_t* defaultPrevented);
 RV_EXPORT int32_t rv_event_interface(RvEvent*);
@@ -454,10 +461,10 @@ RV_EXPORT int32_t rv_host_mouse(RvHost*, int32_t action, int32_t x, int32_t y, i
 RV_EXPORT int32_t rv_host_wheel(RvHost*, int32_t x, int32_t y, float deltaX, float deltaY, int32_t modifiers);
 /* key and code are KeyboardEvent.key and KeyboardEvent.code values, such as "a" and "KeyA", or "Enter" for
  * both. A platform sends RV_KEY_DOWN, then RV_KEY_CHAR with text for a key that produces characters, then
- * RV_KEY_UP; text is NULL or empty for the others. RV_KEY_DOWN runs the key's editing command (Backspace,
+ * RV_KEY_UP; text is length -1 or empty for the others. RV_KEY_DOWN runs the key's editing command (Backspace,
  * Delete, the arrows, Home, End, Enter, Control+A), and Tab moves focus; RV_KEY_CHAR inserts text into the
  * focused editable element. */
-RV_EXPORT int32_t rv_host_key(RvHost*, int32_t action, const char* key, const char* code, const char* text, int32_t modifiers, int32_t repeat);
+RV_EXPORT int32_t rv_host_key(RvHost*, int32_t action, const char* key, const char* code, const uint8_t* text, int32_t text_length, int32_t modifiers, int32_t repeat);
 /* Sets whether the host's window has keyboard focus and is active, as the platform window's focus changes.
  * A host starts unfocused: no caret blinks and :focus-visible does not match until it is focused. */
 RV_EXPORT int32_t rv_host_set_focused(RvHost*, int32_t focused);
@@ -569,9 +576,9 @@ RV_EXPORT int32_t rv_host_scroll_to(RvHost*, int32_t x, int32_t y);
  * composition is the underlined text being composed; selectionStart and selectionEnd are UTF-16 offsets of
  * the selection within it. Setting it replaces the selection or the previous composition, and empty text
  * removes it. */
-RV_EXPORT int32_t rv_host_ime_set_composition(RvHost*, const char* text, int32_t selectionStart, int32_t selectionEnd);
+RV_EXPORT int32_t rv_host_ime_set_composition(RvHost*, const uint8_t* text, int32_t text_length, int32_t selectionStart, int32_t selectionEnd);
 /* Replaces the composition, or the selection when there is none, with text, as typed text. */
-RV_EXPORT int32_t rv_host_ime_commit(RvHost*, const char* text);
+RV_EXPORT int32_t rv_host_ime_commit(RvHost*, const uint8_t* text, int32_t text_length);
 RV_EXPORT int32_t rv_host_ime_cancel(RvHost*);
 /* Writes the bounds of the composition's first line, or of the caret, in CSS pixels of the viewport, where an
  * input method places its candidate window, and returns 1; returns 0 and writes zeros when there is neither. */
@@ -588,10 +595,10 @@ enum {
 };
 
 /* Applies the operation to a class token and returns 1 when the element has the class afterwards, else 0. */
-RV_EXPORT int32_t rv_element_class(RvNode*, const char* token, int32_t operation);
+RV_EXPORT int32_t rv_element_class(RvNode*, const uint8_t* token, int32_t token_length, int32_t operation);
 /* Sets an inline style property, as CSSStyleDeclaration.setProperty with "important" priority when important
  * is 1. An empty value removes the property, and an invalid one leaves it unchanged, as in CSS. */
-RV_EXPORT int32_t rv_element_set_style(RvNode*, const char* property, const char* value, int32_t important);
+RV_EXPORT int32_t rv_element_set_style(RvNode*, const char* property, const uint8_t* value, int32_t value_length, int32_t important);
 /* Copies an inline style property's value, empty when the element does not set it. */
 RV_EXPORT int32_t rv_element_get_style(RvNode*, const char* property, char* buffer, int32_t capacity, int32_t* length);
 /* Copies a property of the element's computed style, as getComputedStyle, with style updated first. */
@@ -710,6 +717,125 @@ RV_EXPORT int32_t rv_observer_unobserve(RvObserver*, RvNode* element);
 /* Disconnects the observer and frees it, before rv_host_destroy. Its callback will not run after this returns. */
 RV_EXPORT void rv_observer_release(RvObserver*);
 
+/* v55: "resize-entries" for rv_abi_has. A ResizeObserver delivering ResizeObserverEntry data: the content rectangle and
+ * the logical content and border box sizes. */
+typedef struct RvResizeEntry {
+    /* sizeof(RvResizeEntry). */
+    int32_t size;
+    /* 1 when devicePixelInlineSize and devicePixelBlockSize hold the device-pixel content box. Always 0: the engine
+     * has no device-pixel-content-box (webkit.org/b/219005, Ranvier.WebCore#146). */
+    int32_t hasDevicePixel;
+    /* The observed element, valid for the callback; rv_node_retain keeps it. */
+    RvNode* target;
+    /* ResizeObserverEntry.contentRect in CSS pixels: the content box at its offset inside the padding box. */
+    double contentX;
+    double contentY;
+    double contentWidth;
+    double contentHeight;
+    /* contentBoxSize[0] and borderBoxSize[0] in CSS pixels, in the element's writing mode: inline is the width of a
+     * horizontal writing mode and the height of a vertical one. */
+    double contentInlineSize;
+    double contentBlockSize;
+    double borderInlineSize;
+    double borderBlockSize;
+    /* devicePixelContentBoxSize[0] in device pixels when hasDevicePixel is 1, else 0. */
+    double devicePixelInlineSize;
+    double devicePixelBlockSize;
+} RvResizeEntry;
+
+/* Box options of rv_observer_observe_box: ResizeObserverOptions.box. */
+enum {
+    RV_RESIZE_BOX_CONTENT = 0,
+    RV_RESIZE_BOX_BORDER = 1,
+    RV_RESIZE_BOX_DEVICE_PIXEL_CONTENT = 2,
+};
+
+/* Called on the host thread during rv_host_update, once per observer with pending notifications, before intersection
+ * observers. entries holds count entries in observation order; the array, its entries and their targets are valid only
+ * during the call, so the callback copies what it keeps. Each target is reported when first observed, also at 0 by 0,
+ * and again when its observed box changes size. Observers deliver in the order of their first observation. The
+ * callback may call any function of this ABI. A size change it makes to an element deeper than the shallowest
+ * delivered target is reported in the same rv_host_update; a shallower one is reported in the next, after the
+ * window's error event "ResizeObserver loop completed with undelivered notifications.". */
+typedef void (*RvResizeEntriesCallback)(void* context, RvObserver* observer, const RvResizeEntry* entries, int32_t count);
+/* A ResizeObserver delivering entries, observed with rv_observer_observe (content box) or rv_observer_observe_box,
+ * stopped with rv_observer_unobserve and freed with rv_observer_release. NULL for a NULL host or callback. */
+RV_EXPORT RvObserver* rv_host_observe_resize_entries(RvHost*, RvResizeEntriesCallback callback, void* context);
+/* ResizeObserver.observe(element, { box }). Observing an observed element with another box replaces its observation
+ * and reports it again; with the same box it changes nothing. RV_ERR_UNSUPPORTED for
+ * RV_RESIZE_BOX_DEVICE_PIXEL_CONTENT, which the engine lacks (Ranvier.WebCore#146), for another box value, and for an
+ * intersection observer. */
+RV_EXPORT int32_t rv_observer_observe_box(RvObserver*, RvNode* element, int32_t box);
+/* ResizeObserver.disconnect() or IntersectionObserver.disconnect(): unobserves every target and drops pending
+ * notifications. The observer stays valid, observes again, and is freed with rv_observer_release. */
+RV_EXPORT int32_t rv_observer_disconnect(RvObserver*);
+
+/* v55: "intersection-entries" for rv_abi_has. An IntersectionObserver with a viewport, document or element root,
+ * root and scroll margins, delivering IntersectionObserverEntry data, and its queued records. */
+typedef struct RvIntersectionEntry {
+    /* sizeof(RvIntersectionEntry). */
+    int32_t size;
+    /* IntersectionObserverEntry.isIntersecting, 1 or 0. */
+    int32_t isIntersecting;
+    /* The observed element, valid for the call; rv_node_retain keeps it. */
+    RvNode* target;
+    /* IntersectionObserverEntry.time: milliseconds on the clock of rv_host_now. */
+    double time;
+    /* 1 when rootX to rootHeight hold IntersectionObserverEntry.rootBounds. Always 1: a host's frames share one
+     * origin, and rootBounds is null only for a cross-origin target. */
+    int32_t hasRootBounds;
+    int32_t reserved;
+    /* rootBounds, boundingClientRect and intersectionRect in CSS pixels of the client space (RV_SPACE_CLIENT). The
+     * root bounds include the root margin and the scroll margin; Chromium's exclude the scroll margin. A target outside the root's containing block chain, a disconnected
+     * target and a target of a disconnected root report all three as 0, 0, 0, 0. */
+    double rootX;
+    double rootY;
+    double rootWidth;
+    double rootHeight;
+    double boundsX;
+    double boundsY;
+    double boundsWidth;
+    double boundsHeight;
+    double intersectionX;
+    double intersectionY;
+    double intersectionWidth;
+    double intersectionHeight;
+    /* IntersectionObserverEntry.intersectionRatio, from 0 to 1. */
+    double intersectionRatio;
+} RvIntersectionEntry;
+
+/* Called on the host thread during rv_host_update, after resize observers, once per observer with queued entries,
+ * and from rv_observer_take_records. entries holds count entries in the order of their targets' observation; the
+ * array, its entries and their targets are valid only during the call, so the callback copies what it keeps. A
+ * target is reported when first observed and again when its intersection crosses one of the observer's thresholds.
+ * Observers deliver in the order they gained their first target; an observer that lost all its targets moves to
+ * the end when it observes again. The callback may call any function of this ABI. */
+typedef void (*RvIntersectionEntriesCallback)(void* context, RvObserver* observer, const RvIntersectionEntry* entries, int32_t count);
+/* new IntersectionObserver(callback, { root, rootMargin, scrollMargin, threshold }), written to *observer and freed
+ * with rv_observer_release. root is NULL for the implicit root (the host's viewport), the host's document node, or
+ * an element of the host's document, connected or not. rootMargin and scrollMargin are UTF-8 CSS margins, such as
+ * "10px" or "10% 0px"; a NULL margin with length 0 is "0px". With the implicit root, scrollMargin grows the
+ * scrollports of the scroll containers between a target and the root; with an explicit root the engine clips by
+ * those scrollports unchanged (Chromium grows them too). thresholds holds count ratios from 0 to 1, in any order, or is NULL
+ * with count 0 for 0 alone. Returns RV_ERR_NULL_ARGUMENT for a NULL host, callback or observer, a negative length
+ * or count, or a NULL margin or thresholds with a length or count above 0; RV_ERR_DOM_EXCEPTION for an invalid
+ * margin (rv_last_exception names SyntaxError) or a threshold outside 0 to 1 (RangeError); RV_ERR_NOT_ELEMENT for a
+ * root that is neither an element nor a document; RV_ERR_WRONG_HOST for a root of another live host; and
+ * RV_ERR_DETACHED for a root of a document the host does not show, such as one rv_host_load_html replaced. *observer
+ * is NULL on every error. */
+RV_EXPORT int32_t rv_host_observe_intersection_entries(RvHost*, RvIntersectionEntriesCallback callback, void* context, RvNode* root,
+    const uint8_t* rootMargin, int32_t rootMargin_length, const uint8_t* scrollMargin, int32_t scrollMargin_length,
+    const double* thresholds, int32_t thresholdCount, RvObserver** observer);
+/* IntersectionObserver.takeRecords(): removes the observer's queued entries and passes them to sink, called once
+ * before this returns, with count 0 when none are queued. rv_host_update queues and delivers entries within one
+ * call, so an observer holds queued entries only while another observer's callback of the same update runs. An
+ * observer of rv_host_observe_intersection passes its entries to sink in the same form. Returns RV_ERR_UNSUPPORTED
+ * for a resize observer, without calling sink. */
+RV_EXPORT int32_t rv_observer_take_records(RvObserver*, RvIntersectionEntriesCallback sink, void* context);
+/* Writes the host's document's performance.now(): the clock of RvIntersectionEntry.time, in whole milliseconds from the
+ * time origin of the host's window. A document rv_host_load_html loads keeps that origin. */
+RV_EXPORT int32_t rv_host_now(RvHost*, double* milliseconds);
+
 /* Paints the element and its descendants alone, without what lies behind or over them, at the host's device
  * scale, into unpremultiplied RGBA8, such as for a drag image. Writes the image's size in device pixels to
  * *width and *height; when length is below width * height * 4 it returns RV_ERR_BUFFER_TOO_SMALL with the
@@ -792,9 +918,10 @@ enum {
 
 typedef struct RvClipboardRequest RvClipboardRequest;
 
-/* App style: called once per copied type, such as "text/plain" and "text/html", in order. first is 1 for the
- * first type of a copy or cut, when the app replaces what its clipboard held. */
-typedef void (*RvClipboardWrite)(void* context, const char* type, const char* data, int32_t first);
+/* App style: called once per copied type, such as "text/plain" and "text/html", in order. type is NUL-terminated;
+ * data is data_length UTF-8 bytes without a terminator, valid for the call. first is 1 for the first type of a copy or
+ * cut, when the app replaces what its clipboard held. */
+typedef void (*RvClipboardWrite)(void* context, const char* type, const uint8_t* data, int32_t data_length, int32_t first);
 /* App style: called at a paste; the app offers each type it holds with rv_clipboard_offer before it returns. */
 typedef void (*RvClipboardRead)(void* context, RvClipboardRequest* request);
 
@@ -802,7 +929,7 @@ typedef void (*RvClipboardRead)(void* context, RvClipboardRequest* request);
  * RV_CLIPBOARD_NATIVE returns RV_ERR_UNSUPPORTED where WebCore has no platform clipboard (Linux). */
 RV_EXPORT int32_t rv_host_set_clipboard(RvHost*, int32_t style, RvClipboardWrite write, RvClipboardRead read, void* context);
 /* Offers one type of the clipboard's content to a paste, during RvClipboardRead. */
-RV_EXPORT int32_t rv_clipboard_offer(RvClipboardRequest*, const char* type, const char* data);
+RV_EXPORT int32_t rv_clipboard_offer(RvClipboardRequest*, const char* type, const uint8_t* data, int32_t data_length);
 /* Runs an editing command on the selection of the host's document, as a menu would; Control+C, X and V in
  * rv_host_key run the same commands. Copy, cut and paste fire their DOM events first, and a page that
  * cancels one supplies or takes the data itself. Returns 1 when the command ran, 0 when it does not apply,
@@ -844,7 +971,7 @@ typedef struct RvDragData RvDragData;
 RV_EXPORT int32_t rv_host_set_drag(RvHost*, int32_t style);
 /* The data of a drag, of types such as "text/plain", "text/html" and "text/uri-list" (file URLs for files). */
 RV_EXPORT RvDragData* rv_drag_data_create(void);
-RV_EXPORT int32_t rv_drag_data_add(RvDragData*, const char* type, const char* data);
+RV_EXPORT int32_t rv_drag_data_add(RvDragData*, const char* type, const uint8_t* data, int32_t data_length);
 RV_EXPORT void rv_drag_data_release(RvDragData*);
 /* Forwards a drag from outside the page at x, y CSS pixels of the viewport, with the RV_DROP_* operations
  * the source allows. As the element under the point changes the host fires dragleave and dragenter, then
@@ -1178,7 +1305,7 @@ RV_EXPORT int32_t rv_ax_action(RvAxNode*, int32_t action);
 /* Sets the value of an editable text field. An <input> or <textarea> fires input and change, as after a user's
  * edit; other editable content takes the text as WebCore's platform accessibility sets it. Returns 1 when set,
  * 0 when the node's value is not editable, or a negative status. */
-RV_EXPORT int32_t rv_ax_set_value(RvAxNode*, const char* value);
+RV_EXPORT int32_t rv_ax_set_value(RvAxNode*, const uint8_t* value, int32_t value_length);
 /* Sets the value of a range, such as a slider, clamped to its minimum and maximum; a range <input> fires input
  * and change. Returns as rv_ax_set_value. */
 RV_EXPORT int32_t rv_ax_set_number(RvAxNode*, double value);
@@ -1232,7 +1359,7 @@ RV_EXPORT int32_t rv_ax_text_offset_at(RvAxNode*, int32_t x, int32_t y);
 RV_EXPORT int32_t rv_ax_text_child_range(RvAxNode* ancestor, RvAxNode* child, int32_t* start, int32_t* end);
 
 /* Replaces the main frame with UTF-8 image/svg+xml, with scripts disabled. Malformed XML loads the engine's parser-error document. */
-RV_EXPORT int32_t rv_host_load_svg(RvHost*, const char* svg);
+RV_EXPORT int32_t rv_host_load_svg(RvHost*, const uint8_t* svg, int32_t svg_length);
 
 /* Passive capability queries. Categories: ABI=0, renderer setting=1, image format=2,
  * font format=3, platform facility=4. Dimensions: exported=0, implemented=1, enabled=2,
@@ -1338,7 +1465,7 @@ typedef struct RvEventInit {
  * current document. Returns NULL for an unknown kind, a size other than sizeof(RvEventInit), a non-UTF-8 string,
  * detail JSON the engine's parser rejects, or a call off the owning thread. The engine exposes MouseEvent clientX and
  * clientY as integers. */
-RV_EXPORT RvEvent* rv_host_construct_event(RvHost*, int32_t kind, const char* type, const RvEventInit* init);
+RV_EXPORT RvEvent* rv_host_construct_event(RvHost*, int32_t kind, const uint8_t* type, int32_t type_length, const RvEventInit* init);
 /* CustomEvent.detail serialized as JSON in the event's realm, with the exact-byte UTF-8 protocol of rv_event_type:
  * length and capacity exclude the terminator. A null detail writes "null". Returns RV_ERR_UNSUPPORTED, leaving
  * *length unchanged, for an event that is not a CustomEvent, a detail JSON.stringify cannot serialize, or a detail
@@ -1360,7 +1487,7 @@ RV_EXPORT RvNode* rv_event_target_as_node(RvEventTarget*);
 /* 1 when both handles refer to the same target, else 0. */
 RV_EXPORT int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* right);
 /* rv_node_add_event_listener for any EventTarget; remove the listener with rv_listener_remove. */
-RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const char* type, int32_t flags, RvEventCallback callback, void* context);
+RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const uint8_t* type, int32_t type_length, int32_t flags, RvEventCallback callback, void* context);
 /* rv_node_dispatch for any EventTarget. */
 RV_EXPORT int32_t rv_event_target_dispatch(RvEventTarget*, RvEvent*, int32_t* defaultPrevented);
 /* The event's target, or with current set its currentTarget, as a new EventTarget reference; NULL when it has none. */
@@ -1409,6 +1536,51 @@ RV_EXPORT RvEventTarget* rv_host_match_media(RvHost*, const char* query);
 /* MediaQueryList.matches and MediaQueryList.media; RV_ERR_WRONG_INTERFACE for another target. */
 RV_EXPORT int32_t rv_media_query_matches(RvEventTarget*, int32_t* matches);
 RV_EXPORT int32_t rv_media_query_media(RvEventTarget*, char* buffer, int32_t capacity, int32_t* length);
+
+/* v55: "media-preferences" for rv_abi_has. The user preferences and input devices the host supplies to media query
+ * evaluation. Every field's RV_MEDIA_DEFAULT (0) keeps the engine's own value: light, no motion or contrast
+ * preference, no pointing device, no hover, and text at its page size. */
+enum {
+    RV_MEDIA_DEFAULT = 0,
+    /* color_scheme: prefers-color-scheme. */
+    RV_MEDIA_LIGHT = 1,
+    RV_MEDIA_DARK = 2,
+    /* reduced_motion and contrast: no-preference, or the preference itself (reduce, more). */
+    RV_MEDIA_NO_PREFERENCE = 1,
+    RV_MEDIA_PREFERENCE = 2,
+    /* pointer and any_pointer: none, coarse or fine; any_pointer also takes both. */
+    RV_MEDIA_POINTER_NONE = 1,
+    RV_MEDIA_POINTER_COARSE = 2,
+    RV_MEDIA_POINTER_FINE = 3,
+    RV_MEDIA_POINTER_COARSE_AND_FINE = 4,
+    /* hover and any_hover. */
+    RV_MEDIA_HOVER_NONE = 1,
+    RV_MEDIA_HOVER = 2,
+};
+typedef struct RvMediaPreferences {
+    uint32_t size;
+    int32_t color_scheme;
+    int32_t reduced_motion;
+    int32_t contrast;
+    /* The primary pointing device, for pointer and hover. */
+    int32_t pointer;
+    int32_t hover;
+    /* Every available pointing device, for any-pointer and any-hover. */
+    int32_t any_pointer;
+    int32_t any_hover;
+    /* The platform's text scale: laid-out text is this many times its font size, from 0.25 to 8; 0 for 1. The
+     * computed font-size and media queries do not read it. */
+    float text_scale;
+} RvMediaPreferences;
+/* Supplies the host's media preferences, all fields at once. Style, layout and every MediaQueryList of the host's
+ * document see them at the next rv_host_update, which fires each list's change event once when its matches changed,
+ * in the order the lists were created. forced-colors stays none, prefers-contrast less and custom never match, and
+ * scripting reports the build: the engine has no input for them. Returns RV_ERR_UNSUPPORTED, applying nothing, for a
+ * size smaller than RvMediaPreferences or a value out of range. */
+RV_EXPORT int32_t rv_host_set_media_preferences(RvHost*, const RvMediaPreferences* preferences);
+/* Writes the preferences last supplied, RV_MEDIA_DEFAULT for each field never supplied. Returns RV_ERR_UNSUPPORTED
+ * when preferences->size is smaller than RvMediaPreferences. */
+RV_EXPORT int32_t rv_host_media_preferences(RvHost*, RvMediaPreferences* preferences);
 
 /* v39: "dom-binary-values" for rv_abi_has. RvBlob is the generated handle of Blob and File, and RvFileList of
  * FileList (RanvierWebCoreDom.h). The host's blob registry holds the bytes of every Blob and File it creates in

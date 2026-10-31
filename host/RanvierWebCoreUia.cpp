@@ -398,7 +398,7 @@ public:
     {
         if (!value) return E_INVALIDARG;
         std::string bytes = utf8(value);
-        return read([&](RvAxNode* n) -> HRESULT { int states = rv_ax_states(n); if (states & RV_AX_DISABLED) return UIA_E_ELEMENTNOTENABLED; if (!(states & RV_AX_EDITABLE) || states & RV_AX_PROTECTED) return UIA_E_INVALIDOPERATION; int result = rv_ax_set_value(n, bytes.c_str()); return result == 0 ? UIA_E_INVALIDOPERATION : status(result); });
+        return read([&](RvAxNode* n) -> HRESULT { int states = rv_ax_states(n); if (states & RV_AX_DISABLED) return UIA_E_ELEMENTNOTENABLED; if (!(states & RV_AX_EDITABLE) || states & RV_AX_PROTECTED) return UIA_E_INVALIDOPERATION; int result = rv_ax_set_value(n, reinterpret_cast<const uint8_t*>(bytes.data()), static_cast<int32_t>(bytes.size())); return result == 0 ? UIA_E_INVALIDOPERATION : status(result); });
     }
     HRESULT STDMETHODCALLTYPE get_Value(BSTR* out) override { return read([&](RvAxNode* n) -> HRESULT { return axString(n, RV_AX_VALUE, out); }); }
     HRESULT STDMETHODCALLTYPE get_IsReadOnly(BOOL* out) override { if (!out) return E_POINTER; return read([&](RvAxNode* n) -> HRESULT { *out = !(rv_ax_states(n) & RV_AX_EDITABLE); return S_OK; }); }

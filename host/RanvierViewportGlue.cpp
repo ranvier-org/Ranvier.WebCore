@@ -1,6 +1,8 @@
 #include "config.h"
 #include "RanvierViewportGlue.h"
 #include "Document.h"
+#include "IntersectionObserver.h"
+#include "IntersectionObserverEntry.h"
 #include "EventTarget.h"
 #include "EventTargetInlines.h"
 #include "EventTargetInterfaces.h"
@@ -11,9 +13,12 @@
 #include "Node.h"
 #include "DocumentPage.h"
 #include "Page.h"
+#include "Performance.h"
 #include "RenderBoxInlines.h"
 #include "RenderObjectInlines.h"
 #include "RenderView.h"
+#include "ResizeObserver.h"
+#include "ResizeObserverOptions.h"
 #include <cmath>
 #include <cstring>
 
@@ -272,4 +277,27 @@ int32_t ranvier_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace,
         return status;
     std::copy(std::begin(points), std::end(points), quad);
     return RV_OK;
+}
+
+void ranvier_resize_observe_box(ResizeObserver& observer, Element& element, bool border)
+{
+    observer.observe(element, ResizeObserverOptions { border ? ResizeObserverBoxOptions::BorderBox : ResizeObserverBoxOptions::ContentBox });
+}
+
+int32_t ranvier_document_now(RvNode* documentHandle, double* milliseconds)
+{
+    RefPtr document = documentOf(documentHandle);
+    if (!document || !milliseconds)
+        return RV_ERR_NULL_ARGUMENT;
+    RefPtr window = document->window();
+    if (!window)
+        return RV_ERR_DETACHED;
+    *milliseconds = protect(window->performance())->now();
+    return RV_OK;
+}
+
+Vector<Ref<IntersectionObserverEntry>> ranvier_intersection_take_records(IntersectionObserver& observer)
+{
+    auto taken = observer.takeRecords();
+    return WTF::move(taken.records);
 }

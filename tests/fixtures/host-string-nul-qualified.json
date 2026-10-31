@@ -1,0 +1,13 @@
+{
+  "comment": "Differences between Chromium 156 and WebKit that tests/abi/host_string_nul.py asserts at the WebKit value. Each WebKit value holds the whole input, so it differs from the value a NUL-terminated input would give.",
+  "differences": {
+    "T8": {
+      "webkit": "a\u0000b",
+      "reason": "Document.title strips and collapses ASCII whitespace, which excludes U+0000: WebKit keeps it; Chromium reads 'a b'."
+    },
+    "L1": {
+      "webkit": "a\ufffdb",
+      "reason": "CSS Syntax input preprocessing replaces U+0000 with U+FFFD, which WebKit applies to the custom property value; Chromium keeps U+0000."
+    }
+  }
+}

@@ -56,7 +56,7 @@ def verify(native_directory):
         markup += b'<li id="decimal" value="1" style="list-style:decimal inside"><span id="decimal-payload" style="display:inline-block">X</span></li>'
         markup += b'</ol><div id="reference"><span style="display:inline-block">WWWW</span><span id="reference-payload" style="display:inline-block">X</span></div></div>'
         call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
-        find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
+        find = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])
         nodes = {}
         for name in ['first', 'copy', 'item', 'payload', 'decimal', 'decimal-payload', 'reference', 'reference-payload']:
             value = find(host, name.encode())
@@ -96,7 +96,7 @@ def verify(native_directory):
         expect(text('rv_dom_css_counter_style_rule_get_name', copy) == 'c19-original', 'other identical stylesheet retains its name')
         expect(text('rv_dom_css_rule_get_css_text', copy) == copied_text, 'copy-on-write preserves complete other rule')
         expect(abs(advance('item', 'payload') - decimal) < 0.75, 'old counter name stops producing custom output')
-        call('rv_element_set_style', [pointer, string, string, integer], nodes['item'], b'list-style-type', b'c19-renamed', 0)
+        call('rv_element_set_style', [pointer, string, Utf8, integer], nodes['item'], b'list-style-type', b'c19-renamed', 0)
         expect(abs(advance('item', 'payload') - literal) < 0.75, 'new counter name produces custom output')
         previous = text('rv_dom_css_rule_get_css_text', rule)
         call('rv_dom_css_counter_style_rule_set_name', [pointer, Utf8], rule, b'123')

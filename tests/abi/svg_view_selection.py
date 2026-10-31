@@ -7,6 +7,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(directory,evidence_json=None):
     directory=Path(directory).resolve()
@@ -28,9 +31,7 @@ def verify(directory,evidence_json=None):
         assertions+=1
         if not condition: raise AssertionError(message)
     def bind(name,result,arguments):
-        function=getattr(library,name)
-        function.restype,function.argtypes=result,arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
     pointer,integer,single=ctypes.c_void_p,ctypes.c_int32,ctypes.c_float
     try:
         expect(has(b'svg-view-selection') == 1, 'S06 requires an actual current SVG document view-selection provider')
@@ -40,14 +41,14 @@ def verify(directory,evidence_json=None):
         sentinel=integer(42)
         expect(select(host,b'zoom',ctypes.byref(sentinel)) == -9 and sentinel.value == 42,'HTML document rejected before mutation')
         markup=(Path(__file__).resolve().parents[1]/'fixtures/svg-view-selection.svg').read_bytes()
-        load=bind('rv_host_load_svg',integer,[pointer,ctypes.c_char_p])
+        load=bind('rv_host_load_svg',integer,[pointer,Utf8])
         expect(load(host,markup) == 0,'Load SVG document')
         document=bind('rv_host_document',pointer,[pointer])(host)
         retained.append(('rv_node_release',document))
         root=bind('rv_node_relative',pointer,[pointer,integer])(document,1)
         retained.append(('rv_node_release',root))
         expect(bool(root),'Main SVG root')
-        red=bind('rv_document_get_element_by_id',pointer,[pointer,ctypes.c_char_p])(host,b'red')
+        red=bind('rv_document_get_element_by_id',pointer,[pointer,Utf8])(host,b'red')
         retained.append(('rv_node_release',red))
         def use_current():
             value=integer(42)
@@ -100,9 +101,9 @@ def verify(directory,evidence_json=None):
         selected_paint=paint()
         expect(selected_paint != baseline,'Named view changes actual rendered pixels')
         selected_state=applied_state('named',selected_paint)
-        active_view=bind('rv_document_get_element_by_id',pointer,[pointer,ctypes.c_char_p])(host,b'zoom')
+        active_view=bind('rv_document_get_element_by_id',pointer,[pointer,Utf8])(host,b'zoom')
         retained.append(('rv_node_release',active_view))
-        expect(bind('rv_element_set_attribute',integer,[pointer,ctypes.c_char_p,ctypes.c_char_p])(active_view,b'viewBox',b'20 20 20 20') == 0,'Edit live active view')
+        expect(bind('rv_element_set_attribute',integer,[pointer,ctypes.c_char_p,Utf8])(active_view,b'viewBox',b'20 20 20 20') == 0,'Edit live active view')
         expect(use_current() == 1 and view_box() == [20,20,20,20],'Pinned WebCore actively selected view edits update retained currentView')
         expect(bind('rv_host_update',integer,[pointer])(host) >= 0,'Normal update after active view edit')
         edited_paint=paint()
@@ -120,9 +121,9 @@ def verify(directory,evidence_json=None):
         expect(use_current() == 0,'Empty fragment resets active view')
         cleared_paint=paint()
         expect(cleared_paint == baseline,'Reset restores actual default pixels')
-        view=bind('rv_document_get_element_by_id',pointer,[pointer,ctypes.c_char_p])(host,b'zoom')
+        view=bind('rv_document_get_element_by_id',pointer,[pointer,Utf8])(host,b'zoom')
         retained.append(('rv_node_release',view))
-        expect(bind('rv_element_set_attribute',integer,[pointer,ctypes.c_char_p,ctypes.c_char_p])(view,b'viewBox',b'30 30 25 25') == 0,'Edit formerly active view after reset with a distinct value')
+        expect(bind('rv_element_set_attribute',integer,[pointer,ctypes.c_char_p,Utf8])(view,b'viewBox',b'30 30 25 25') == 0,'Edit formerly active view after reset with a distinct value')
         expect(use_current() == 0,'Cleared former view edit must not reactivate currentView')
         expect(paint() == baseline,'Cleared former view edit must not change default paint')
         for fragment in [b'no-such-view',b'svgView(viewBox(bad))']:
@@ -146,7 +147,7 @@ def verify(directory,evidence_json=None):
         expect(use_current() == 0 and paint() == baseline,'Clearing after active-view removal restores default rendering')
         expect(load(host,markup) == 0,'Replacement SVG document')
         choose(b'other',1)
-        expect(bind('rv_host_load_html',integer,[pointer,ctypes.c_char_p])(host,b'<body>replacement') == 0,'Replacement HTML document')
+        expect(bind('rv_host_load_html',integer,[pointer,Utf8])(host,b'<body>replacement') == 0,'Replacement HTML document')
         expect(select(host,b'zoom',ctypes.byref(sentinel)) == -9 and sentinel.value == 42,'Queries use current document after replacement')
         for release,value in reversed(retained):
             if value: bind(release,None,[pointer])(value)

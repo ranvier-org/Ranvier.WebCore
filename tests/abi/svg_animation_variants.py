@@ -5,6 +5,9 @@ import os
 from pathlib import Path
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -16,9 +19,7 @@ def verify(native_directory):
     assertions = 0
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -56,9 +57,9 @@ def verify(native_directory):
     expect(bool(host), 'animation variants host')
     try:
         markup = (Path(__file__).resolve().parents[1] / 'fixtures/svg-animation-variants.svg').read_bytes()
-        call('rv_host_load_svg', [pointer, ctypes.c_char_p], host, markup)
+        call('rv_host_load_svg', [pointer, Utf8], host, markup)
         def node(identifier):
-            result = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])(host, identifier.encode())
+            result = bind('rv_document_get_element_by_id', pointer, [pointer, Utf8])(host, identifier.encode())
             expect(bool(result), 'actual concrete SVG node ' + identifier)
             retained.append(('rv_node_release', result))
             return result

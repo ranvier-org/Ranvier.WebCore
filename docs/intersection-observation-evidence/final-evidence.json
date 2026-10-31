@@ -1,0 +1,414 @@
+{
+  "group": [
+    "G11 #56"
+  ],
+  "status": "lane-green (private Windows x64 slim; not accepted)",
+  "native": "0.1.0-preview.49 (placeholder; root renumbers at batch integration)",
+  "abi": "57 (placeholder)",
+  "features": [
+    "intersection-entries"
+  ],
+  "members": [
+    "RvIntersectionEntry",
+    "RvIntersectionEntriesCallback",
+    "rv_host_observe_intersection_entries",
+    "rv_observer_take_records",
+    "rv_host_now",
+    "rv_observer_disconnect (G10, rehearsed from native-resize 3615444)"
+  ],
+  "engine": "WebCore IntersectionObserver with Init.root (element or document), rootMargin and scrollMargin; takeRecords and Performance::now through RanvierViewportGlue (compiled into WebCore); no source patch",
+  "sourceHeadOfBatch": "79b2f036dacd4960193574391a8c976143630267",
+  "batchRunHead": "79b2f03",
+  "stackedOn": "C25 f13cdbb > G10 rehearsal 3615444 (parent C:/wk/native-cascade/artifacts/native46-candidate-5)",
+  "red": {
+    "chromium": "red_chromium.mjs -> red-chromium.json",
+    "native": "red_native.py -> red-native.json (coords-candidate-5, ABI53: target, isIntersecting and ratio of a viewport root only; no element roots, scrollMargin, rectangles, times or takeRecords)"
+  },
+  "green": {
+    "intersectionObservationAssertions": 1414,
+    "scenarios": 16,
+    "qualifiedScenarios": 2,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "PASS intersection_observation: 1414 assertions, 2 qualified"
+    ],
+    "probes": 63,
+    "allExitZero": true,
+    "rawAssertions": 91767,
+    "baselineRawAssertions": 89337,
+    "baselineProbesUnchanged": true,
+    "grownBaselineProbes": {
+      "abi_layouts": [
+        15,
+        23
+      ]
+    },
+    "addedProbes": {
+      "resize_observation": 1008,
+      "intersection_observation": 1414
+    },
+    "baselineProbesPresent": true,
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "form_submission",
+        "exitCode": 0,
+        "assertions": 418
+      },
+      {
+        "name": "text_segmentation",
+        "exitCode": 0,
+        "assertions": 812
+      },
+      {
+        "name": "crypto_random",
+        "exitCode": 0,
+        "assertions": 275
+      },
+      {
+        "name": "visual_viewport",
+        "exitCode": 0,
+        "assertions": 987
+      },
+      {
+        "name": "screen_metrics",
+        "exitCode": 0,
+        "assertions": 222
+      },
+      {
+        "name": "custom_highlights",
+        "exitCode": 0,
+        "assertions": 378
+      },
+      {
+        "name": "abi_layouts",
+        "exitCode": 0,
+        "assertions": 23
+      },
+      {
+        "name": "event_details",
+        "exitCode": 0,
+        "assertions": 391
+      },
+      {
+        "name": "aria_relations",
+        "exitCode": 0,
+        "assertions": 1210
+      },
+      {
+        "name": "inspector_diagnostics",
+        "exitCode": 0,
+        "assertions": 929
+      },
+      {
+        "name": "string_nul",
+        "exitCode": 0,
+        "assertions": 192
+      },
+      {
+        "name": "native_types",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "blob_urls",
+        "exitCode": 0,
+        "assertions": 697
+      },
+      {
+        "name": "coordinate_spaces",
+        "exitCode": 0,
+        "assertions": 6803
+      },
+      {
+        "name": "cascade_diagnostics",
+        "exitCode": 0,
+        "assertions": 5287
+      },
+      {
+        "name": "resize_observation",
+        "exitCode": 0,
+        "assertions": 1008
+      },
+      {
+        "name": "intersection_observation",
+        "exitCode": 0,
+        "assertions": 1414
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null
+      }
+    ],
+    "teardownCases": 108,
+    "intersectionTeardownCases": 2,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "scenarios": 16,
+    "qualified": 2,
+    "repeats": 31,
+    "summary": "ORACLE_REPEAT identical=30/30"
+  },
+  "qualified": "Engine differences the probe records instead of failing; each still holds its WebKit value. observerOrder: the order between observers in one update. WebKit (Document::updateIntersectionObservers) delivers in the order observers gained their first target and moves an observer that lost all its targets to the end when it observes again; Chromium 156's order varies between updates. rootBounds: with a scrollMargin, WebKit reports the root bounds of a document or implicit root grown by the scroll margin, while Chromium reports them without it; both clip by the grown scrollport, so isIntersecting, the intersection rectangle and the ratio agree. elementRootScrollMargin: with an explicit root (the document here), WebKit clips targets by the scroll containers between target and root without the scroll margin (IntersectionObserver::computeIntersectionState passes no scrollMargin when root() is set), so #v, clipped 10px below #c, is not intersecting; Chromium grows those scrollports and reports it at 0.2. The recorded WebKit entries are asserted.",
+  "measured": {
+    "time": "entry times lie within rv_host_now read before and after the rendering update that queued them and never decrease; rv_host_now is whole milliseconds and keeps its origin over rv_host_load_html; one frozen time per update",
+    "takeRecords": "empty outside delivery in both engines; inside the first delivering callback the other observer entries are taken and its callback does not run",
+    "teardown": "a target retained from an entry outlives removal and observer release; a released target is collected with no queued records; an observer of a replaced document never delivers; release inside a callback; host destroy"
+  },
+  "files": {
+    "allocation-absence.json": "c5b0053208735fbdb98e7e2a0e4707d707366577adff781360295b8ea08b8368",
+    "batch-green.json": "0568db8dd69ff7fcd4aee0db99d960f2aa69999eecf135e565c1912611fa85db",
+    "build_intersect_candidate.py": "c005cebb8fffa5d4ee75fa952523d76c3bfbfb6dfbd6a8a1af97ea4207f34a7e",
+    "intersection-observation-probe.log": "b024b45cc45be1ee02ec7514dd09069f3d5c993ef5029a6a0f532294e7ddb8c9",
+    "intersection-observation-repeat30.txt": "2b92da1d570765e32197ecfb75d5823c0b9a20c495d6edd340da01746892ada2",
+    "make_intersect_evidence.py": "ee64c42a17f15b0c3a7143ab017ce4ae9812aff42299c515b879d0d309228b8a",
+    "oracle-repeat30.txt": "3c841b760d3aa7892157e1cf474b4b416b0e689bfc8bc785d27b077c36475358",
+    "oracle_repeat.py": "04c047439262ee4ecadc9ecff607c616b16a1171b5c55e93fc8da1d65193b19e",
+    "red-chromium.json": "5f9b1c670f5c1164575ea8bfdcb72cc494e92db5ffe3ffcdc933e55d5712997e",
+    "red-native.json": "6a07a1de8c6b7f33fc067f5c10828e1f963d6689e86374c1ba08fb4dfded67ef",
+    "red_chromium.mjs": "ee6d02498cbe9a49ce6d476277d4a8fc2418940693116616d17d279fffd53627",
+    "red_native.py": "5447c486b35dbce61d5c699056d548bb1530be6c591f891d067e44d6f8c8d54e",
+    "repeat30.sh": "325dc1b8a3b361dda2332f85dfc314e67074569e4c3a78db15ade7cb30a48106",
+    "run_intersect_full_batch.py": "bf9a6cb3f2cb7015301db189a9439f18f1cede02aabcdf69e39a9d46d013e953",
+    "runtime-receipt.json": "263ea6a01bfb64f52009464bf9f5a4fbb0b13630ad0c8957ac6479e661efb69e",
+    "source-patches.json": "ca9f038c8d74165f7691b36f6d1a9d4d29f5518e8def26f58be4dbb3e29c7afe",
+    "teardown-probes.json": "6230fb01d218d310d96aba5ddc9a5efb7645043b33aa04ca3fbd314f9567845d"
+  }
+}
