@@ -5536,12 +5536,6 @@ and [<AllowNullLiteral; DomDictionary>] URLPatternInit() =
     member val hash: (string) option = None with get, set
     member val baseURL: (string) option = None with get, set
 
-/// <summary>URLPatternResult in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral; DomDictionary>] URLPatternResult() = class end
-
-/// <summary>URLPatternComponentResult in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral; DomDictionary>] URLPatternComponentResult() = class end
-
 /// <summary>FocusOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
     member val preventScroll: bool = false with get, set

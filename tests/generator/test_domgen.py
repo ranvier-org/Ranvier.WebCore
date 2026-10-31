@@ -1651,6 +1651,10 @@ interface Matcher {
         self.assertIn('void rv_dom_match_result_release(RvDomMatchResult* value) { ranvier_dom_match_result_release(value); }',
                       generator.host())
         self.assertIn('extern void rv_dom_match_result_release(nativeint value)', generator.fsharp())
+        contract = generator.interfaces()
+        self.assertNotIn('MatchResult()', contract)
+        self.assertNotIn('PartResult()', contract)
+        self.assertIn('PartInit()', contract)
         model = json.loads(generator.api_model())
         self.assertEqual({'struct': 'RvDomMatchResult', 'releaseFunction': 'rv_dom_match_result_release'},
                          model['resultDictionaries']['MatchResult'])
