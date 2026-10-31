@@ -66,6 +66,10 @@
 #include <WebCore/FrameLoader.h>
 #include <WebCore/LocalFrameInlines.h>
 #include <WebCore/PageConfiguration.h>
+#include <WebCore/PlatformScreen.h>
+#include <WebCore/ScreenOrientationManager.h>
+#include <WebCore/ScreenOrientationType.h>
+#include <WebCore/ScreenProperties.h>
 #include <WebCore/ProcessWarming.h>
 #include <WebCore/Blob.h>
 #include <WebCore/BlobData.h>
@@ -487,7 +491,39 @@ class RvDragClient final : public DragClient {
 };
 
 // createPage and loadHTML follow WebCore's testing/TestPage.cpp (Copyright (C) 2026 Apple Inc., BSD-2-Clause).
-static Ref<Page> createPage(IntSize viewportSize)
+// The orientation a host's screen reports, which rv_host_set_screen sets. Locking is not supported: the page's
+// ScreenOrientationLockingAPIEnabled setting stays off, and a lock that reaches the manager fails.
+class RvScreenOrientationManager final : public ScreenOrientationManager, public RefCounted<RvScreenOrientationManager> {
+    WTF_MAKE_TZONE_ALLOCATED_INLINE(RvScreenOrientationManager);
+public:
+    static Ref<RvScreenOrientationManager> create() { return adoptRef(*new RvScreenOrientationManager); }
+    void ref() const final { RefCounted::ref(); }
+    void deref() const final { RefCounted::deref(); }
+
+    void setOrientation(ScreenOrientationType orientation)
+    {
+        if (orientation == m_orientation)
+            return;
+        m_orientation = orientation;
+        for (Ref observer : copyToVector(m_observers))
+            observer->screenOrientationDidChange(orientation);
+    }
+
+private:
+    ScreenOrientationType currentOrientation() final { return m_orientation; }
+    void lock(ScreenOrientationLockType, CompletionHandler<void(std::optional<Exception>&&)>&& completion) final
+    {
+        completion(Exception { ExceptionCode::NotSupportedError, "Screen orientation locking is not supported."_s });
+    }
+    void unlock() final { }
+    void addObserver(ScreenOrientationManagerObserver& observer) final { m_observers.add(observer); }
+    void removeObserver(ScreenOrientationManagerObserver& observer) final { m_observers.remove(observer); }
+
+    ScreenOrientationType m_orientation { ScreenOrientationType::LandscapePrimary };
+    WeakHashSet<ScreenOrientationManagerObserver> m_observers;
+};
+
+static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& orientation)
 {
     static bool prewarmed = [] {
         ProcessWarming::prewarmGlobally();
@@ -498,6 +534,7 @@ static Ref<Page> createPage(IntSize viewportSize)
     configuration.chromeClient = makeUniqueRef<RvChromeClient>();
     configuration.editorClient = makeUniqueRef<RvEditorClient>();
     configuration.dragClient = makeUnique<RvDragClient>();
+    configuration.screenOrientationManager = orientation;
     Ref page = Page::create(WTF::move(configuration));
     page->settings().setScriptEnabled(false);
     page->settings().setScrollAnimatorEnabled(false);
@@ -508,6 +545,7 @@ static Ref<Page> createPage(IntSize viewportSize)
     page->settings().setCSSFontFaceMetricOverrideDescriptorsEnabled(true);
     page->settings().setCSSAnchorPositioningEnabled(true);
     page->settings().setPopoverHintEnabled(true);
+    page->settings().setScreenOrientationAPIEnabled(true);
 #if ENABLE(VIDEO)
     page->settings().setMediaEnabled(false);
 #endif
@@ -676,6 +714,12 @@ struct RvHost {
 
     Document& document() { return *page->localTopDocument(); }
     LocalFrame& frame() { return *page->localMainFrame(); }
+
+    RefPtr<RvScreenOrientationManager> orientation;
+    // The display the page's screen data belongs to, unique to the host.
+    PlatformDisplayID displayID { 0 };
+    // The app's screen, from rv_host_set_screen; until then the screen follows the host size.
+    std::optional<ScreenData> screen;
 
     void requestFrame()
     {
@@ -1191,6 +1235,8 @@ int32_t rv_abi_has(const char* feature)
 {
     if (!feature)
         return 0;
+    if (!std::strcmp(feature, "screen"))
+        return 1;
     if (!std::strcmp(feature, "capabilities"))
         return 1;
     if (!std::strcmp(feature, "svg-view-selection"))
@@ -1249,6 +1295,57 @@ static void applyCompositingMode(RvHost& host, int32_t mode)
 }
 #endif
 
+// The screen of a host without one from rv_host_set_screen: the host's size in CSS pixels, all of it available,
+// 24 bits deep, landscape-primary unless taller than wide.
+static ScreenData defaultScreen(const RvHost& host)
+{
+    ScreenData data;
+    data.screenRect = FloatRect { { }, host.size };
+    data.screenAvailableRect = data.screenRect;
+    data.screenDepth = 24;
+    data.screenDepthPerComponent = 8;
+    return data;
+}
+
+// Sets the screen data of every live host's display, which WebCore's PlatformScreen reports.
+static void publishScreens()
+{
+    ScreenProperties properties;
+    for (auto* live : liveHosts) {
+        auto data = live->screen.value_or(defaultScreen(*live));
+        if (!live->screen)
+            live->orientation->setOrientation(data.screenRect.height() > data.screenRect.width()
+                ? ScreenOrientationType::PortraitPrimary : ScreenOrientationType::LandscapePrimary);
+        properties.screenDataMap.set(live->displayID, WTF::move(data));
+        if (!properties.primaryDisplayID)
+            properties.primaryDisplayID = live->displayID;
+    }
+    PlatformScreen::updateSingletonProperties(WTF::move(properties));
+}
+
+int32_t rv_host_set_screen(RvHost* host, const RvScreenMetrics* metrics)
+{
+    if (!host || !metrics)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (metrics->size < sizeof(RvScreenMetrics) || metrics->width <= 0 || metrics->height <= 0 || metrics->avail_width < 0
+        || metrics->avail_height < 0 || metrics->color_depth <= 0 || metrics->color_depth > 64
+        || metrics->orientation < RV_SCREEN_PORTRAIT_PRIMARY || metrics->orientation > RV_SCREEN_LANDSCAPE_SECONDARY)
+        return RV_ERR_UNSUPPORTED;
+    ScreenData data;
+    data.screenRect = FloatRect { 0, 0, static_cast<float>(metrics->width), static_cast<float>(metrics->height) };
+    data.screenAvailableRect = FloatRect { static_cast<float>(metrics->avail_left), static_cast<float>(metrics->avail_top),
+        static_cast<float>(metrics->avail_width), static_cast<float>(metrics->avail_height) };
+    data.screenDepth = metrics->color_depth;
+    data.screenDepthPerComponent = metrics->color_depth / 3;
+    host->screen = WTF::move(data);
+    publishScreens();
+    host->page->screenPropertiesDidChange();
+    host->orientation->setOrientation(static_cast<ScreenOrientationType>(metrics->orientation));
+    return RV_OK;
+}
+
 RvHost* rv_host_create(int32_t width, int32_t height)
 {
     static bool initialized;
@@ -1264,13 +1361,19 @@ RvHost* rv_host_create(int32_t width, int32_t height)
     }
     if (!onOwningThread() || width <= 0 || height <= 0)
         return nullptr;
-    auto* host = new RvHost { createPage({ width, height }), { width, height }, std::nullopt };
+    Ref orientation = RvScreenOrientationManager::create();
+    auto* host = new RvHost { createPage({ width, height }, orientation), { width, height }, std::nullopt };
+    host->orientation = WTF::move(orientation);
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = host;
+    static PlatformDisplayID nextDisplayID = 0x52560000;
+    host->displayID = ++nextDisplayID;
+    host->page->windowScreenDidChange(host->displayID, std::nullopt);
     host->noScript.emplace(host->document().vm());
 #if RANVIER_COMPOSITING
     applyCompositingMode(*host, RV_COMPOSITING_WHEN_NEEDED);
 #endif
     liveHosts.append(host);
+    publishScreens();
     return host;
 }
 
@@ -1329,6 +1432,7 @@ void rv_host_destroy(RvHost* host)
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = nullptr;
     liveHosts.removeFirst(host);
     delete host;
+    publishScreens();
 }
 
 int32_t rv_host_load_html(RvHost* host, const char* html)
@@ -2725,6 +2829,10 @@ int32_t rv_host_resize(RvHost* host, int32_t width, int32_t height)
         return RV_ERR_PAINT_FAILED;
     host->size = { width, height };
     view->resize(host->size);
+    if (!host->screen) {
+        publishScreens();
+        host->page->screenPropertiesDidChange();
+    }
     host->dirty = { { }, host->size };
     host->requestFrame();
     return RV_OK;
