@@ -1,0 +1,1419 @@
+{
+  "browser": "156.0.8078.4",
+  "handler": true,
+  "differences": [
+    {
+      "case": "submitter overrides",
+      "kind": "submissions",
+      "chromium": [
+        {
+          "method": "POST",
+          "url": "https://app.test/other?k=1",
+          "contentType": "text/plain",
+          "body": "q=a+b%26c%3Dd&cb=on&o=v&outside=o",
+          "newWindow": false
+        },
+        {
+          "method": "POST",
+          "url": "https://app.test/other?k=1",
+          "contentType": "text/plain",
+          "body": "q=a+b%26c%3Dd&cb=on&o=v&outside=o",
+          "newWindow": false
+        }
+      ],
+      "native": [
+        {
+          "method": "POST",
+          "url": "https://app.test/other?k=1",
+          "contentType": "text/plain",
+          "body": "q=a b&c=d\r\ncb=on\r\no=v\r\noutside=o\r\n",
+          "newWindow": false
+        },
+        {
+          "method": "POST",
+          "url": "https://app.test/other?k=1",
+          "contentType": "text/plain",
+          "body": "q=a b&c=d\r\ncb=on\r\no=v\r\noutside=o\r\n",
+          "newWindow": false
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "get submission and submitter",
+      "steps": [
+        {
+          "op": "requestSubmit",
+          "id": "g",
+          "submitter": "go",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "g",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "go"
+            },
+            {
+              "type": "formdata",
+              "target": "g",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "q",
+                  "a b&c=d"
+                ],
+                [
+                  "cb",
+                  "on"
+                ],
+                [
+                  "go",
+                  "one"
+                ],
+                [
+                  "outside",
+                  "o"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/search?q=a+b%26c%3Dd&cb=on&go=one&outside=o",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "g",
+              "submitter": "go"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "g",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "g",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "g",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "q",
+                  "a b&c=d"
+                ],
+                [
+                  "cb",
+                  "on"
+                ],
+                [
+                  "outside",
+                  "o"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/search?q=a+b%26c%3Dd&cb=on&outside=o",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "g",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "submit",
+          "id": "g",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "formdata",
+              "target": "g",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "q",
+                  "a b&c=d"
+                ],
+                [
+                  "cb",
+                  "on"
+                ],
+                [
+                  "outside",
+                  "o"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/search?q=a+b%26c%3Dd&cb=on&outside=o",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "g",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        }
+      ],
+      "assertions": 33
+    },
+    {
+      "name": "submitter overrides",
+      "steps": [
+        {
+          "op": "requestSubmit",
+          "id": "g",
+          "submitter": "over",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "g",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "over"
+            },
+            {
+              "type": "formdata",
+              "target": "g",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "q",
+                  "a b&c=d"
+                ],
+                [
+                  "cb",
+                  "on"
+                ],
+                [
+                  "o",
+                  "v"
+                ],
+                [
+                  "outside",
+                  "o"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/other?k=1",
+              "contentType": "text/plain",
+              "body": "q=a b&c=d\r\ncb=on\r\no=v\r\noutside=o\r\n",
+              "newWindow": false,
+              "form": "g",
+              "submitter": "over"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "click",
+          "id": "over",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "g",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "over"
+            },
+            {
+              "type": "formdata",
+              "target": "g",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "q",
+                  "a b&c=d"
+                ],
+                [
+                  "cb",
+                  "on"
+                ],
+                [
+                  "o",
+                  "v"
+                ],
+                [
+                  "outside",
+                  "o"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/other?k=1",
+              "contentType": "text/plain",
+              "body": "q=a b&c=d\r\ncb=on\r\no=v\r\noutside=o\r\n",
+              "newWindow": false,
+              "form": "g",
+              "submitter": "over"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "click",
+          "id": "plainbtn",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "g",
+          "submitter": "plainbtn",
+          "status": "TypeError",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "g",
+          "submitter": "pgo",
+          "status": "NotFoundError",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        }
+      ],
+      "assertions": 40
+    },
+    {
+      "name": "post urlencoded encoding",
+      "steps": [
+        {
+          "op": "click",
+          "id": "pgo",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "pgo"
+            },
+            {
+              "type": "formdata",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "name",
+                  "é 中+"
+                ],
+                [
+                  "ta",
+                  "line1\nline2"
+                ],
+                [
+                  "s",
+                  "2"
+                ],
+                [
+                  "pgo",
+                  "Send"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/post",
+              "contentType": "application/x-www-form-urlencoded",
+              "body": "name=%C3%A9+%E4%B8%AD%2B&ta=line1%0D%0Aline2&s=2&pgo=Send",
+              "newWindow": false,
+              "form": "p",
+              "submitter": "pgo"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "setAttribute",
+          "id": "p",
+          "name": "accept-charset",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "submit",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "formdata",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "name",
+                  "é 中+"
+                ],
+                [
+                  "ta",
+                  "line1\nline2"
+                ],
+                [
+                  "s",
+                  "2"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/post",
+              "contentType": "application/x-www-form-urlencoded",
+              "body": "name=%C3%A9+%E4%B8%AD%2B&ta=line1%0D%0Aline2&s=2",
+              "newWindow": false,
+              "form": "p",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        }
+      ],
+      "assertions": 27
+    },
+    {
+      "name": "cancellation",
+      "steps": [
+        {
+          "op": "prevent",
+          "type": "submit",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "g",
+          "submitter": "go",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "g",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "go",
+              "prevented": true
+            }
+          ],
+          "submissions": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "g",
+          "submitter": "go",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "g",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "go"
+            },
+            {
+              "type": "formdata",
+              "target": "g",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "q",
+                  "a b&c=d"
+                ],
+                [
+                  "cb",
+                  "on"
+                ],
+                [
+                  "go",
+                  "one"
+                ],
+                [
+                  "outside",
+                  "o"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/search?q=a+b%26c%3Dd&cb=on&go=one&outside=o",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "g",
+              "submitter": "go"
+            }
+          ]
+        },
+        {
+          "op": "requestSubmit",
+          "id": "p",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "p",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "name",
+                  "é 中+"
+                ],
+                [
+                  "ta",
+                  "line1\nline2"
+                ],
+                [
+                  "s",
+                  "2"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/post",
+              "contentType": "application/x-www-form-urlencoded",
+              "body": "name=%C3%A9+%E4%B8%AD%2B&ta=line1%0D%0Aline2&s=2",
+              "newWindow": false,
+              "form": "p",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        }
+      ],
+      "assertions": 30
+    },
+    {
+      "name": "constraint validation",
+      "steps": [
+        {
+          "op": "checkValidity",
+          "id": "v",
+          "status": "ok",
+          "value": false,
+          "events": [
+            {
+              "type": "invalid",
+              "target": "req",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "invalid",
+              "target": "num",
+              "trusted": true,
+              "cancelable": true
+            }
+          ],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "v",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "invalid",
+              "target": "req",
+              "trusted": true,
+              "cancelable": true
+            },
+            {
+              "type": "invalid",
+              "target": "num",
+              "trusted": true,
+              "cancelable": true
+            }
+          ],
+          "submissions": []
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "v",
+          "submitter": "vskip",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "v",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "vskip"
+            },
+            {
+              "type": "formdata",
+              "target": "v",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "req",
+                  ""
+                ],
+                [
+                  "num",
+                  "3"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/valid",
+              "contentType": "application/x-www-form-urlencoded",
+              "body": "req=&num=3",
+              "newWindow": false,
+              "form": "v",
+              "submitter": "vskip"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "submit",
+          "id": "v",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "formdata",
+              "target": "v",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "req",
+                  ""
+                ],
+                [
+                  "num",
+                  "3"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/valid",
+              "contentType": "application/x-www-form-urlencoded",
+              "body": "req=&num=3",
+              "newWindow": false,
+              "form": "v",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "nv",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "nv",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "nv",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "nreq",
+                  ""
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/novalidate",
+              "contentType": "application/x-www-form-urlencoded",
+              "body": "nreq=",
+              "newWindow": false,
+              "form": "nv",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "setValue",
+          "id": "req",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "setValue",
+          "id": "num",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "checkValidity",
+          "id": "v",
+          "status": "ok",
+          "value": true,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "v",
+          "submitter": "vgo",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "v",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "vgo"
+            },
+            {
+              "type": "formdata",
+              "target": "v",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "req",
+                  "filled"
+                ],
+                [
+                  "num",
+                  "7"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/valid",
+              "contentType": "application/x-www-form-urlencoded",
+              "body": "req=filled&num=7",
+              "newWindow": false,
+              "form": "v",
+              "submitter": "vgo"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        }
+      ],
+      "assertions": 49
+    },
+    {
+      "name": "implicit submission and trusted clicks",
+      "steps": [
+        {
+          "op": "focus",
+          "id": "only",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "press",
+          "key": "Enter",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "one",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "one",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "only",
+                  "v"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/one?only=v",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "one",
+              "submitter": "only"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "focus",
+          "id": "q",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "press",
+          "key": "Enter",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "g",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "go"
+            },
+            {
+              "type": "formdata",
+              "target": "g",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "q",
+                  "a b&c=d"
+                ],
+                [
+                  "cb",
+                  "on"
+                ],
+                [
+                  "go",
+                  "one"
+                ],
+                [
+                  "outside",
+                  "o"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/search?q=a+b%26c%3Dd&cb=on&go=one&outside=o",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "g",
+              "submitter": "go"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "mouse",
+          "x": 300,
+          "y": 10,
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "g",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": "go"
+            },
+            {
+              "type": "formdata",
+              "target": "g",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "q",
+                  "a b&c=d"
+                ],
+                [
+                  "cb",
+                  "on"
+                ],
+                [
+                  "go",
+                  "one"
+                ],
+                [
+                  "outside",
+                  "o"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/search?q=a+b%26c%3Dd&cb=on&go=one&outside=o",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "g",
+              "submitter": "go"
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        }
+      ],
+      "assertions": 35
+    },
+    {
+      "name": "multipart and target",
+      "steps": [
+        {
+          "op": "requestSubmit",
+          "id": "m",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "m",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "m",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "mt",
+                  "text"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "POST",
+              "url": "https://app.test/multi",
+              "contentType": "multipart/form-data; boundary=BOUNDARY",
+              "body": "--BOUNDARY\r\nContent-Disposition: form-data; name=\"mt\"\r\n\r\ntext\r\n--BOUNDARY--\r\n",
+              "newWindow": false,
+              "form": "m",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "t",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "t",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "t",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "tt",
+                  "1"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/target?tt=1",
+              "contentType": null,
+              "body": null,
+              "newWindow": true,
+              "form": "t",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        }
+      ],
+      "assertions": 26
+    },
+    {
+      "name": "formdata edits and reentrancy",
+      "steps": [
+        {
+          "op": "appendOnFormData",
+          "name": "added",
+          "value": null,
+          "status": "ok",
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "one",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "one",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "one",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "only",
+                  "v"
+                ],
+                [
+                  "added",
+                  "yes"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/one?only=v&added=yes",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "one",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "submitTwice",
+          "id": "one",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "one",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "one",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "only",
+                  "v"
+                ],
+                [
+                  "added",
+                  "yes"
+                ]
+              ]
+            },
+            {
+              "type": "submit",
+              "target": "one",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "one",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "only",
+                  "v"
+                ],
+                [
+                  "added",
+                  "yes"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/one?only=v&added=yes",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "one",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "removeOnSubmit",
+          "id": "only",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        },
+        {
+          "op": "requestSubmit",
+          "id": "one",
+          "status": "ok",
+          "value": null,
+          "events": [
+            {
+              "type": "submit",
+              "target": "one",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            {
+              "type": "formdata",
+              "target": "one",
+              "trusted": true,
+              "cancelable": false,
+              "entries": [
+                [
+                  "added",
+                  "yes"
+                ]
+              ]
+            }
+          ],
+          "submissions": [
+            {
+              "method": "GET",
+              "url": "https://app.test/one?added=yes",
+              "contentType": null,
+              "body": null,
+              "newWindow": false,
+              "form": "one",
+              "submitter": null
+            }
+          ]
+        },
+        {
+          "op": "flush",
+          "status": "ok",
+          "value": null,
+          "events": [],
+          "submissions": []
+        }
+      ],
+      "assertions": 42
+    }
+  ],
+  "teardown": {
+    "noHandler": {
+      "rounds": [
+        {
+          "status": "ok",
+          "events": [
+            {
+              "type": "submit",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            "formdata"
+          ],
+          "submissions": 0
+        },
+        {
+          "status": "ok",
+          "events": [
+            {
+              "type": "submit",
+              "target": "p",
+              "trusted": true,
+              "cancelable": true,
+              "submitter": null
+            },
+            "formdata"
+          ],
+          "submissions": 0
+        }
+      ],
+      "unloadEvents": [],
+      "sameDocument": true
+    },
+    "handlerRemovedWhilePending": {
+      "status": "ok",
+      "submissions": 0,
+      "unloadEvents": []
+    },
+    "pendingAtDestroy": {
+      "status": "ok",
+      "events": [
+        {
+          "type": "submit",
+          "target": "p",
+          "trusted": true,
+          "cancelable": true,
+          "submitter": null
+        },
+        "formdata"
+      ],
+      "submissionsAfterDestroy": 0
+    },
+    "assertions": 57
+  },
+  "qualified": 1,
+  "assertions": 418
+}

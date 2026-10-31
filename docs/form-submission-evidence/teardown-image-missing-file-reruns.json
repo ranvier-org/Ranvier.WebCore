@@ -1,0 +1,54 @@
+{
+  "probe": "image with a missing file source",
+  "cycleBeforeDisposal": "single",
+  "fields": [
+    "documentRefsAfterCycle",
+    "targetRefsAfterCycle",
+    "documentRefsAfterCollection",
+    "targetRefsAfterCollection"
+  ],
+  "batch2": [
+    0,
+    1,
+    -1,
+    -1
+  ],
+  "reruns": [
+    [
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      -1,
+      -1
+    ]
+  ]
+}
