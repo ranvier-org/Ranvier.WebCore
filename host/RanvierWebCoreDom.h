@@ -87,6 +87,8 @@ typedef struct RvCaretPosition RvCaretPosition;
 typedef struct RvDOMURL RvDOMURL;
 typedef struct RvURLSearchParams RvURLSearchParams;
 typedef struct RvURLPattern RvURLPattern;
+typedef struct RvHighlight RvHighlight;
+typedef struct RvHighlightRegistry RvHighlightRegistry;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -137,11 +139,14 @@ typedef struct RvDomSequenceUSVStringOrURLPatternInit RvDomSequenceUSVStringOrUR
 typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
+typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomPairUSVStringAndUnionFileOrUSVString RvDomPairUSVStringAndUnionFileOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionFileOrUSVString RvDomSequencePairUSVStringAndUnionFileOrUSVString;
+typedef struct RvDomPairDOMStringAndHighlight RvDomPairDOMStringAndHighlight;
+typedef struct RvDomSequencePairDOMStringAndHighlight RvDomSequencePairDOMStringAndHighlight;
 
 /* Constants of the interfaces. */
 enum {
@@ -375,6 +380,13 @@ enum {
 enum {
     RV_DOM_ENDING_TYPE_TRANSPARENT = 0, /* "transparent" */
     RV_DOM_ENDING_TYPE_NATIVE = 1, /* "native" */
+};
+
+/* The values of the IDL enumeration HighlightType. */
+enum {
+    RV_DOM_HIGHLIGHT_TYPE_HIGHLIGHT = 0, /* "highlight" */
+    RV_DOM_HIGHLIGHT_TYPE_SPELLING_ERROR = 1, /* "spelling-error" */
+    RV_DOM_HIGHLIGHT_TYPE_GRAMMAR_ERROR = 2, /* "grammar-error" */
 };
 
 /* The values of the IDL enumeration OrientationType. */
@@ -942,11 +954,14 @@ typedef struct RvDomSequenceUSVStringOrURLPatternInit RvDomSequenceUSVStringOrUR
 typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
+typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomPairUSVStringAndUnionFileOrUSVString RvDomPairUSVStringAndUnionFileOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionFileOrUSVString RvDomSequencePairUSVStringAndUnionFileOrUSVString;
+typedef struct RvDomPairDOMStringAndHighlight RvDomPairDOMStringAndHighlight;
+typedef struct RvDomSequencePairDOMStringAndHighlight RvDomSequencePairDOMStringAndHighlight;
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
@@ -1488,6 +1503,14 @@ struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceAbstractRange {
+    int32_t present;
+    int32_t count;
+    RvAbstractRange** items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1524,6 +1547,22 @@ struct RvDomSequencePairUSVStringAndUnionFileOrUSVString {
     int32_t present;
     int32_t count;
     RvDomPairUSVStringAndUnionFileOrUSVString* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomPairDOMStringAndHighlight {
+    int32_t present;
+    RvDomUtf8StringSpan key;
+    RvHighlight* value;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequencePairDOMStringAndHighlight {
+    int32_t present;
+    int32_t count;
+    RvDomPairDOMStringAndHighlight* items;
 };
 RV_EXPORT void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value);
 RV_EXPORT void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value);
@@ -1575,11 +1614,14 @@ RV_EXPORT void rv_dom_sequence_usv_string_or_url_pattern_init_release(RvDomSeque
 RV_EXPORT void rv_dom_union_undefined_or_usv_string_release(RvDomUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomPairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
+RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairUSVStringAndUnionFileOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value);
+RV_EXPORT void rv_dom_pair_dom_string_and_highlight_release(RvDomPairDOMStringAndHighlight* value);
+RV_EXPORT void rv_dom_sequence_pair_dom_string_and_highlight_release(RvDomSequencePairDOMStringAndHighlight* value);
 /* Releases an owned URLPatternResult result, its strings and nested values, and the struct. */
 RV_EXPORT void rv_dom_url_pattern_result_release(RvDomURLPatternResult* value);
 /* Releases an owned URLPatternInit result, its strings and nested values, and the struct. */
@@ -1826,6 +1868,14 @@ RV_EXPORT RvURLSearchParams* rv_dom_url_search_params_retain(RvURLSearchParams*)
 RV_EXPORT void rv_dom_url_pattern_release(RvURLPattern*);
 /* Adds a reference to a URLPattern and returns it. */
 RV_EXPORT RvURLPattern* rv_dom_url_pattern_retain(RvURLPattern*);
+/* Releases a handle to a Highlight. */
+RV_EXPORT void rv_dom_highlight_release(RvHighlight*);
+/* Adds a reference to a Highlight and returns it. */
+RV_EXPORT RvHighlight* rv_dom_highlight_retain(RvHighlight*);
+/* Releases a handle to a HighlightRegistry. */
+RV_EXPORT void rv_dom_highlight_registry_release(RvHighlightRegistry*);
+/* Adds a reference to a HighlightRegistry and returns it. */
+RV_EXPORT RvHighlightRegistry* rv_dom_highlight_registry_retain(RvHighlightRegistry*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -8067,12 +8117,26 @@ RV_EXPORT int32_t rv_dom_visual_viewport_get_width(RvEventTarget* target, double
 RV_EXPORT int32_t rv_dom_visual_viewport_get_height(RvEventTarget* target, double* result);
 /* VisualViewport.scale getter: readonly attribute double scale; RV_ERR_DETACHED once the object's window has no frame */
 RV_EXPORT int32_t rv_dom_visual_viewport_get_scale(RvEventTarget* target, double* result);
+/* Highlight */
+
+/* Highlight.constructor: target is the Document of the constructed object; *result is a new reference */
+RV_EXPORT int32_t rv_dom_highlight_create(RvNode* target, const RvDomSequenceAbstractRange* initial_ranges, RvHighlight** result);
+/* Highlight.priority getter: attribute long priority */
+RV_EXPORT int32_t rv_dom_highlight_get_priority(RvHighlight* target, int32_t* result);
+/* Highlight.priority setter: attribute long priority */
+RV_EXPORT int32_t rv_dom_highlight_set_priority(RvHighlight* target, int32_t value);
+/* Highlight.type getter: attribute HighlightType type */
+RV_EXPORT int32_t rv_dom_highlight_get_type(RvHighlight* target, int32_t* result);
+/* Highlight.type setter: attribute HighlightType type */
+RV_EXPORT int32_t rv_dom_highlight_set_type(RvHighlight* target, int32_t value);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
 RV_EXPORT int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result);
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
 RV_EXPORT int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result);
+/* CSS.highlights: namespace attribute getter with Document context; *result is a new reference */
+RV_EXPORT int32_t rv_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result);
 /* CSS.registerProperty: namespace operation with Document context and explicit UTF-8 byte lengths */
 RV_EXPORT int32_t rv_dom_css_register_property(RvNode* target, const RvDomDOMCSSCustomPropertyDescriptor* descriptor);
 /* DOMWindow */
@@ -8205,6 +8269,38 @@ RV_EXPORT int32_t rv_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* co
 /* URLSearchParams.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document
  * for the operation; *result owns its contents; release with the matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_url_search_params_entries(RvURLSearchParams* target, RvNode* context, RvDomSequencePairUSVStringAndUSVString* result);
+/* Highlight */
+
+/* Highlight.size: setlike<AbstractRange> */
+RV_EXPORT int32_t rv_dom_highlight_size(RvHighlight* target, uint32_t* result);
+/* Highlight.has: setlike<AbstractRange> */
+RV_EXPORT int32_t rv_dom_highlight_has(RvHighlight* target, RvAbstractRange* value, int32_t* result);
+/* Highlight.values: setlike<AbstractRange>; *result is a snapshot copy in iteration order, unchanged by later
+ * mutation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_highlight_values(RvHighlight* target, RvDomSequenceAbstractRange* result);
+/* Highlight.add: setlike<AbstractRange> */
+RV_EXPORT int32_t rv_dom_highlight_add(RvHighlight* target, RvAbstractRange* value);
+/* Highlight.delete: setlike<AbstractRange> */
+RV_EXPORT int32_t rv_dom_highlight_delete(RvHighlight* target, RvAbstractRange* value, int32_t* result);
+/* Highlight.clear: setlike<AbstractRange> */
+RV_EXPORT int32_t rv_dom_highlight_clear(RvHighlight* target);
+/* HighlightRegistry */
+
+/* HighlightRegistry.size: maplike<DOMString, Highlight> */
+RV_EXPORT int32_t rv_dom_highlight_registry_size(RvHighlightRegistry* target, uint32_t* result);
+/* HighlightRegistry.has: maplike<DOMString, Highlight> */
+RV_EXPORT int32_t rv_dom_highlight_registry_has(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, int32_t* result);
+/* HighlightRegistry.get: maplike<DOMString, Highlight>; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_highlight_registry_get(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, RvHighlight** result);
+/* HighlightRegistry.entries: maplike<DOMString, Highlight>; *result is a snapshot copy in iteration order, unchanged
+ * by later mutation; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_highlight_registry_entries(RvHighlightRegistry* target, RvDomSequencePairDOMStringAndHighlight* result);
+/* HighlightRegistry.set: maplike<DOMString, Highlight> */
+RV_EXPORT int32_t rv_dom_highlight_registry_set(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, RvHighlight* value);
+/* HighlightRegistry.delete: maplike<DOMString, Highlight> */
+RV_EXPORT int32_t rv_dom_highlight_registry_delete(RvHighlightRegistry* target, const uint8_t* key, int32_t key_length, int32_t* result);
+/* HighlightRegistry.clear: maplike<DOMString, Highlight> */
+RV_EXPORT int32_t rv_dom_highlight_registry_clear(RvHighlightRegistry* target);
 
 #ifdef __cplusplus
 }

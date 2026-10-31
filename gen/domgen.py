@@ -244,6 +244,11 @@ class World:
                 elif name not in self.dictionaries or not self.skipped(relative):
                     self.dictionaries[name] = dictionary
             self.callbacks |= document.callbacks
+        # A setlike or maplike declaration is a member only of an interface gen/dom.json binds it for.
+        bound = {'setlike': set(config.get('setlikeBindings', {})), 'maplike': set(config.get('maplikeBindings', {}))}
+        for interface in [*self.interfaces.values(), *(p for ps in self.partials.values() for p in ps)]:
+            interface.members = [member for member in interface.members
+                                 if member.kind not in bound or interface.name in bound[member.kind]]
         self.scope = config["interfaces"]
         missing = [name for name in self.scope if name not in self.interfaces]
         if missing:
@@ -632,6 +637,9 @@ class Generator(ComplexGeneratorMixin):
             self.static_context(name, binding)
         for name, binding in self.world.config.get('iterableBindings', {}).items():
             self.iterable_snapshot(name, binding)
+        for kind in ('setlike', 'maplike'):
+            for name, binding in self.world.config.get(f'{kind}Bindings', {}).items():
+                self.collection_like(name, kind, binding)
         missing_const_getters = set(self.world.config.get('constGetterBindings', {})) - self.const_getters_used
         if missing_const_getters:
             raise SystemExit(f'configured const getters did not match selected object getters: {sorted(missing_const_getters)}')
@@ -866,6 +874,50 @@ class Generator(ComplexGeneratorMixin):
         self.finish(function, name, member, [], [], mapped, call, ['document'])
         self.namespace_features.append((function.feature, []))
 
+    def collection_like(self, name, kind, binding):
+        """The operations of a setlike or maplike declaration, over the engine's backing state through the C++
+        adapter class binding['adapter'] (host/dom/<adapter>.h): size, has, values or get and entries, then add or
+        set, delete and clear unless the declaration is readonly. values and entries return a snapshot copy."""
+        if name not in self.world.scope:
+            raise SystemExit(f'{name}: {kind} binding requires a scoped interface')
+        members = [member for member in self.world.members(name) if member.kind == kind]
+        if len(members) != 1:
+            raise SystemExit(f'{name}: {kind} binding requires one {kind} declaration')
+        declaration = members[0]
+        adapter = binding.get('adapter', '')
+        if not re.fullmatch(r'Ranvier[A-Za-z]+', adapter) or not (ROOT / 'host' / 'dom' / f'{adapter}.h').is_file():
+            raise SystemExit(f'{name}: {kind} binding requires an adapter class with a header in host/dom')
+        value = declaration.type.subtypes[-1]
+        key = declaration.type.subtypes[0]
+        boolean, size, void = idl.Type('boolean'), idl.Type('unsigned long'), idl.Type('undefined')
+        if kind == 'setlike':
+            reads = [('size', 'size', [], size), ('has', 'has', [idl.Argument('value', value)], boolean),
+                     ('values', 'values', [], idl.Type('sequence', subtypes=[value]))]
+            writes = [('add', 'add', [idl.Argument('value', value)], void),
+                      ('delete', 'remove', [idl.Argument('value', value)], boolean), ('clear', 'clear', [], void)]
+        else:
+            nullable = idl.Type(value.name, True, list(value.subtypes), dict(value.attrs))
+            reads = [('size', 'size', [], size), ('has', 'has', [idl.Argument('key', key)], boolean),
+                     ('get', 'get', [idl.Argument('key', key)], nullable),
+                     ('entries', 'entries', [], idl.Type('sequence', subtypes=[idl.Type('pair', subtypes=[key, value])]))]
+            writes = [('set', 'set', [idl.Argument('key', key), idl.Argument('value', value)], void),
+                      ('delete', 'remove', [idl.Argument('key', key)], boolean), ('clear', 'clear', [], void)]
+        self.headers.add(f'{adapter}.h')
+        for operation, implemented, arguments, returns in reads + ([] if declaration.readonly else writes):
+            member = idl.Member('operation', operation, returns, arguments=arguments, attrs=dict(declaration.attrs),
+                                file=declaration.file, owner=declaration.owner)
+            snapshot = '; *result is a snapshot copy in iteration order, unchanged by later mutation' if operation in ('values', 'entries') else ''
+            function = Function(name, member, 'operation', f'{snake(name)}_{snake(operation)}', [],
+                                f'{name}.{operation}: {declaration.type}{snapshot}')
+            function.string_spans = binding.get('stringInputs') == 'utf8-lengths'
+            try:
+                args = [self.world.map(argument.type) for argument in arguments]
+                result = self.world.map(returns)
+                placeholders = ''.join(f', {{arg{i}}}' for i in range(len(args)))
+                self.finish(function, name, member, arguments, args, result, f'WebCore::{adapter}::{implemented}(*impl{placeholders})', [])
+            except Unsupported as error:
+                raise SystemExit(f'{name}.{operation}: {error}') from error
+
     def static_context(self, name, binding):
         if name not in self.world.scope:
             raise SystemExit(f'{name}: static binding requires a scoped interface')
@@ -946,8 +998,8 @@ class Generator(ComplexGeneratorMixin):
                 self.skip(name, member, "namespace member outside configured binding")
                 continue
             reason = self.member_reason(name, member)
-            if reason or member.kind != "operation":
-                raise SystemExit(f"{name}.{member.name}: {reason or 'namespace attributes are not configured operations'}")
+            if reason or (member.kind != "operation" and not (member.kind == "attribute" and member.readonly)):
+                raise SystemExit(f"{name}.{member.name}: {reason or 'namespace members are configured operations or readonly attributes'}")
             operations.setdefault(member.name, []).append(member)
         if selected != set(operations):
             raise SystemExit(f"{name}: missing configured namespace operations {sorted(selected - set(operations))}")
@@ -955,7 +1007,10 @@ class Generator(ComplexGeneratorMixin):
         for operation, overloads in operations.items():
             for member in overloads:
                 suffix = "" if len(overloads) == 1 else f"_{len(member.arguments)}"
-                function = Function(name, member, "namespace_operation", f"{snake(public)}_{snake(operation)}{suffix}", [],
+                attribute = member.kind == "attribute"
+                function = Function(name, member, "namespace_operation",
+                                    f"{snake(public)}_{'get_' if attribute else ''}{snake(operation)}{suffix}", [],
+                                    f"{public}.{operation}: namespace attribute getter with {receiver} context" if attribute else
                                     f"{public}.{operation}: namespace operation with {receiver} context and explicit UTF-8 byte lengths")
                 function.namespace = public
                 function.receiver = receiver
@@ -968,7 +1023,8 @@ class Generator(ComplexGeneratorMixin):
                     placeholders = ", ".join(f"{{arg{i}}}" for i in range(len(args)))
                     implemented_by = member.attrs.get("ImplementedBy", cpp)
                     self.headers.add(f"{implemented_by}.h")
-                    call = f"{implemented_by}::{member.attrs.get('ImplementedAs', member.name)}({{call_with_lead}}{placeholders})"
+                    arguments_text = "{call_with_bare}" if attribute else f"{{call_with_lead}}{placeholders}"
+                    call = f"{implemented_by}::{member.attrs.get('ImplementedAs', member.name)}({arguments_text})"
                     self.finish(function, receiver, member, member.arguments, args, result, call, call_with)
                 except Unsupported as error:
                     raise SystemExit(f"{name}.{member.name}: {error}") from error
@@ -1491,7 +1547,8 @@ class Generator(ComplexGeneratorMixin):
         if receiver not in self.world.scope:
             raise SystemExit(f"{interface}: constructor receiver {receiver} is outside scope")
         try:
-            args = [self.world.map(argument.type) for argument in member.arguments]
+            args = [self.world.map(idl.Type('sequence', subtypes=[argument.type]) if argument.variadic else argument.type)
+                    for argument in member.arguments]
             returns = self.world.map(idl.Type(interface))
             arguments = ", ".join(f"{{arg{i}}}" for i in range(len(args)))
             if configured.get('passReceiver', True):
@@ -1861,11 +1918,14 @@ class Generator(ComplexGeneratorMixin):
             body += [f"if (!({attached}))", "    return RV_ERR_DETACHED;"]
             notes.append("RV_ERR_DETACHED once the object's window has no frame")
         body += getattr(function, 'context_checks', [])
-        body += prepare
-        expression = call
-        expression = expression.replace("{call_with}", "".join(", document.get()" for _ in call_with))
-        expression = expression.replace("{call_with_bare}", ", ".join("document.get()" for _ in call_with))
-        expression = expression.replace("{call_with_lead}", "".join("document.get(), " for _ in call_with))
+
+        def with_context(text):
+            text = text.replace("{call_with}", "".join(", document.get()" for _ in call_with))
+            text = text.replace("{call_with_bare}", ", ".join("document.get()" for _ in call_with))
+            return text.replace("{call_with_lead}", "".join("document.get(), " for _ in call_with))
+        # An enumeration setter names its getter's call in a decltype, which takes the same context.
+        body += [with_context(line) for line in prepare]
+        expression = with_context(call)
         for index, value in enumerate(passed):
             expression = expression.replace(f"{{arg{index}}}", value)
         if sink is None:
