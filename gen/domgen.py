@@ -425,7 +425,7 @@ class World:
                     raise Unsupported(f"interface {t.name} outside gen/dom.json")
                 return Mapped("event", t.nullable, interface=t.name, cls=self.cpp_class(t.name))
             root = chain[-1]
-            if root not in self.scope:
+            if root not in self.scope and not (root == "EventTarget" and t.name in self.config.get("eventTargetObjects", {})):
                 raise Unsupported(f"interface {t.name} outside gen/dom.json")
             return Mapped("object", t.nullable, interface=t.name, root=root, cls=self.cpp_class(t.name))
         if t.name == "union":
@@ -551,7 +551,11 @@ class Generator(ComplexGeneratorMixin):
             chain = self.world.chain(name)
             if "Node" not in chain and "Event" not in chain:
                 root = chain[-1]
-                if root not in self.world.scope:
+                if root == "EventTarget" and name in self.world.config.get("eventTargetObjects", {}):
+                    # An event target handle is the RvEventTarget of the hand-written event ABI.
+                    if chain != [name, root]:
+                        raise SystemExit(f"{name}: an event target object must derive directly from EventTarget")
+                elif root not in self.world.scope:
                     raise SystemExit(f"{name}: gen/dom.json lists an interface without its base {root}, which names the handle")
                 if root == name:
                     self.handles.append(name)
@@ -1642,6 +1646,10 @@ class Generator(ComplexGeneratorMixin):
                          'Ref document = contextDocument.releaseNonNull();']
             else:
                 body.append("Ref document = impl->document();")
+        attached = self.world.config.get("eventTargetObjects", {}).get(interface, {}).get("attached")
+        if attached:
+            body += [f"if (!({attached}))", "    return RV_ERR_DETACHED;"]
+            notes.append("RV_ERR_DETACHED once the object's window has no frame")
         body += getattr(function, 'context_checks', [])
         body += prepare
         expression = call

@@ -7471,6 +7471,27 @@ RV_EXPORT int32_t rv_dom_file_get_last_modified(RvBlob* target, int64_t* result)
 RV_EXPORT int32_t rv_dom_file_list_get_length(RvFileList* target, uint32_t* result);
 /* FileList.item(unsigned long index) -> File?; *result is a new reference, or NULL */
 RV_EXPORT int32_t rv_dom_file_list_item(RvFileList* target, uint32_t index, RvBlob** result);
+/* VisualViewport */
+
+/* VisualViewport.offsetLeft getter: readonly attribute double offsetLeft; RV_ERR_DETACHED once the object's window
+ * has no frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_offset_left(RvEventTarget* target, double* result);
+/* VisualViewport.offsetTop getter: readonly attribute double offsetTop; RV_ERR_DETACHED once the object's window has
+ * no frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_offset_top(RvEventTarget* target, double* result);
+/* VisualViewport.pageLeft getter: readonly attribute double pageLeft; RV_ERR_DETACHED once the object's window has no
+ * frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_page_left(RvEventTarget* target, double* result);
+/* VisualViewport.pageTop getter: readonly attribute double pageTop; RV_ERR_DETACHED once the object's window has no
+ * frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_page_top(RvEventTarget* target, double* result);
+/* VisualViewport.width getter: readonly attribute double width; RV_ERR_DETACHED once the object's window has no frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_width(RvEventTarget* target, double* result);
+/* VisualViewport.height getter: readonly attribute double height; RV_ERR_DETACHED once the object's window has no
+ * frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_height(RvEventTarget* target, double* result);
+/* VisualViewport.scale getter: readonly attribute double scale; RV_ERR_DETACHED once the object's window has no frame */
+RV_EXPORT int32_t rv_dom_visual_viewport_get_scale(RvEventTarget* target, double* result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
@@ -7503,6 +7524,9 @@ RV_EXPORT int32_t rv_dom_window_scroll_to_2(RvNode* target, double x, double y);
 RV_EXPORT int32_t rv_dom_window_scroll_by_1(RvNode* target, const RvDomScrollToOptions* option);
 /* Window.scrollBy: checked Document context; nullable string byte length -1 means null */
 RV_EXPORT int32_t rv_dom_window_scroll_by_2(RvNode* target, double x, double y);
+/* Window.visualViewport getter: checked Document context; *result is a new reference; RV_ERR_UNSUPPORTED while the
+ * setting VisualViewportAPIEnabled is off */
+RV_EXPORT int32_t rv_dom_window_get_visual_viewport(RvNode* target, RvEventTarget** result);
 /* DOMMatrixReadOnly */
 
 /* DOMMatrixReadOnly.fromMatrix: static operation with checked Document context and UTF-8 byte lengths; other defaults

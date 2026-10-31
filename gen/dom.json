@@ -8,7 +8,8 @@
     "Members whose types or extended attributes the generator does not map are left out on their own and listed",
     "in gen/dom-report.txt.",
     "callbackObjectRoots lists callback interfaces passed as refcounted object handles; contract names the shared",
-    "contract's function type, and resultEnum the integer enumeration it returns."
+    "contract's function type, and resultEnum the integer enumeration it returns.",
+    "eventTargetObjects lists interfaces derived directly from EventTarget whose handles are RvEventTarget references; attached is the C++ condition under which their members answer, else RV_ERR_DETACHED."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -286,7 +287,13 @@
     "DOMFormData": "Document"
   },
   "creationGatedInterfaces": {
-    "CaretPosition": "Document.caretPositionFromPoint"
+    "CaretPosition": "Document.caretPositionFromPoint",
+    "VisualViewport": "DOMWindow.visualViewport"
+  },
+  "eventTargetObjects": {
+    "VisualViewport": {
+      "attached": "impl->frame()"
+    }
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -568,7 +575,8 @@
     "TreeWalker",
     "Blob",
     "File",
-    "FileList"
+    "FileList",
+    "VisualViewport"
   ],
   "skipDirectories": [
     "Modules/",
@@ -884,6 +892,14 @@
           "scrollBy"
         ],
         "feature": "dom-window-scrolling",
+        "stringInputs": "utf8-lengths"
+      },
+      {
+        "receiver": "Document",
+        "members": [
+          "visualViewport"
+        ],
+        "feature": "visual-viewport",
         "stringInputs": "utf8-lengths"
       }
     ]

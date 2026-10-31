@@ -9438,6 +9438,27 @@ extern int rv_dom_file_list_get_length(nativeint target, uint32& result)
 extern int rv_dom_file_list_item(nativeint target, uint32 index, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_offset_left(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_offset_top(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_page_left(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_page_top(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_width(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_height(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_visual_viewport_get_scale(nativeint target, float& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
@@ -9472,6 +9493,9 @@ extern int rv_dom_window_scroll_by_1(nativeint target, [<In>] RvDomScrollToOptio
 
 [<DllImport(Lib)>]
 extern int rv_dom_window_scroll_by_2(nativeint target, float x, float y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_window_get_visual_viewport(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_matrix_read_only_from_matrix(nativeint target, [<In>] RvDomDOMMatrixInit[] other, nativeint& result)
