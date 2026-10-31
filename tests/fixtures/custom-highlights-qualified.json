@@ -1,0 +1,33 @@
+{
+ "measured": "Native40 candidate-3 against Chromium 156.0.8078.4 (tests/fixtures/custom-highlights-oracle.json)",
+ "differences": {
+  "highlight.iterationLive": {
+   "native": null,
+   "chromium": [
+    "r1",
+    "s1",
+    "r4"
+   ],
+   "reason": "The ABI has no live iterator: Highlight.values() returns a snapshot copy, so a set mutated during iteration leaves the snapshot unchanged (highlight.iterationSnapshot and highlight.afterIteration equal Chromium)."
+  },
+  "paint.redReplaced": {
+   "native": "kwkwBRBRYGYGYGYw",
+   "chromium": "kwkwBRBRBRBGYGYw",
+   "reason": "As paint.redSetAgain: replacing the highlight of the registered name 'red' keeps its map position; Chromium paints it on top, native keeps the registry iteration order (green on top)."
+  },
+  "paint.redSetAgain": {
+   "native": "kwkwBRBRYGYGYGYw",
+   "chromium": "kwkwBRBRBRBGYGYw",
+   "reason": "Chromium paints a re-set name as the most recently registered while keeping its map position, so Chromium's paint order disagrees with its own iteration order (keys stay [red, green]). Native paints equal-priority highlights in registry iteration order, so the later-registered green stays on top."
+  },
+  "registry.iterationLive": {
+   "native": null,
+   "chromium": [
+    "a",
+    "b",
+    "d"
+   ],
+   "reason": "The ABI has no live iterator: HighlightRegistry.entries() returns a snapshot copy, so a map mutated during iteration leaves the snapshot unchanged (registry.iterationSnapshot and registry.afterIteration equal Chromium)."
+  }
+ }
+}

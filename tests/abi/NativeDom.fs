@@ -651,6 +651,15 @@ let RV_DOM_ENDING_TYPE_TRANSPARENT = 0
 let RV_DOM_ENDING_TYPE_NATIVE = 1
 
 [<Literal>]
+let RV_DOM_HIGHLIGHT_TYPE_HIGHLIGHT = 0
+
+[<Literal>]
+let RV_DOM_HIGHLIGHT_TYPE_SPELLING_ERROR = 1
+
+[<Literal>]
+let RV_DOM_HIGHLIGHT_TYPE_GRAMMAR_ERROR = 2
+
+[<Literal>]
 let RV_DOM_ORIENTATION_TYPE_PORTRAIT_PRIMARY = 0
 
 [<Literal>]
@@ -1694,6 +1703,13 @@ type RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString =
     val mutable count: int
     val mutable items: nativeint
 
+/// <summary>ABI transport for AbstractRange sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceAbstractRange =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for CSSStyleValue sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceCSSStyleValue =
@@ -1725,6 +1741,20 @@ type RvDomPairUSVStringAndUnionFileOrUSVString =
 /// <summary>ABI transport for PairUSVStringAndUnionFileOrUSVString sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequencePairUSVStringAndUnionFileOrUSVString =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+/// <summary>ABI transport for DOMStringAndHighlight entry; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomPairDOMStringAndHighlight =
+    val mutable present: int
+    val mutable key: RvDomUtf8StringSpan
+    val mutable value: nativeint
+
+/// <summary>ABI transport for PairDOMStringAndHighlight sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequencePairDOMStringAndHighlight =
     val mutable present: int
     val mutable count: int
     val mutable items: nativeint
@@ -1880,6 +1910,9 @@ extern void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvD
 extern void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
 
 [<DllImport(Lib)>]
@@ -1893,6 +1926,12 @@ extern void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPai
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_pair_dom_string_and_highlight_release(RvDomPairDOMStringAndHighlight& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_pair_dom_string_and_highlight_release(RvDomSequencePairDOMStringAndHighlight& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_url_pattern_result_release(nativeint value)
@@ -2262,6 +2301,18 @@ extern void rv_dom_url_pattern_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_url_pattern_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_highlight_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_highlight_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_highlight_registry_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_highlight_registry_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -10091,10 +10142,28 @@ extern int rv_dom_visual_viewport_get_height(nativeint target, float& result)
 extern int rv_dom_visual_viewport_get_scale(nativeint target, float& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_highlight_create(nativeint target, [<In>] RvDomSequenceAbstractRange[] initial_ranges, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_get_priority(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_set_priority(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_get_type(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_set_type(nativeint target, int value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_1(nativeint target, byte[] condition_text, int condition_text_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_css_get_highlights(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_register_property(nativeint target, [<In>] RvDomDOMCSSCustomPropertyDescriptor[] descriptor)
@@ -10209,3 +10278,42 @@ extern int rv_dom_dom_form_data_entries(nativeint target, nativeint context, RvD
 
 [<DllImport(Lib)>]
 extern int rv_dom_url_search_params_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndUSVString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_size(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_has(nativeint target, nativeint value, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_values(nativeint target, RvDomSequenceAbstractRange& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_add(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_delete(nativeint target, nativeint value, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_clear(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_registry_size(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_registry_has(nativeint target, byte[] key, int key_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_registry_get(nativeint target, byte[] key, int key_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_registry_entries(nativeint target, RvDomSequencePairDOMStringAndHighlight& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_registry_set(nativeint target, byte[] key, int key_length, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_registry_delete(nativeint target, byte[] key, int key_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_highlight_registry_clear(nativeint target)
