@@ -770,6 +770,72 @@ RV_EXPORT int32_t rv_observer_observe_box(RvObserver*, RvNode* element, int32_t 
  * notifications. The observer stays valid, observes again, and is freed with rv_observer_release. */
 RV_EXPORT int32_t rv_observer_disconnect(RvObserver*);
 
+/* v57: "intersection-entries" for rv_abi_has. An IntersectionObserver with a viewport, document or element root,
+ * root and scroll margins, delivering IntersectionObserverEntry data, and its queued records. */
+typedef struct RvIntersectionEntry {
+    /* sizeof(RvIntersectionEntry). */
+    int32_t size;
+    /* IntersectionObserverEntry.isIntersecting, 1 or 0. */
+    int32_t isIntersecting;
+    /* The observed element, valid for the call; rv_node_retain keeps it. */
+    RvNode* target;
+    /* IntersectionObserverEntry.time: milliseconds on the clock of rv_host_now. */
+    double time;
+    /* 1 when rootX to rootHeight hold IntersectionObserverEntry.rootBounds. Always 1: a host's frames share one
+     * origin, and rootBounds is null only for a cross-origin target. */
+    int32_t hasRootBounds;
+    int32_t reserved;
+    /* rootBounds, boundingClientRect and intersectionRect in CSS pixels of the client space (RV_SPACE_CLIENT). The
+     * root bounds include the root margin and the scroll margin; Chromium's exclude the scroll margin. A target outside the root's containing block chain, a disconnected
+     * target and a target of a disconnected root report all three as 0, 0, 0, 0. */
+    double rootX;
+    double rootY;
+    double rootWidth;
+    double rootHeight;
+    double boundsX;
+    double boundsY;
+    double boundsWidth;
+    double boundsHeight;
+    double intersectionX;
+    double intersectionY;
+    double intersectionWidth;
+    double intersectionHeight;
+    /* IntersectionObserverEntry.intersectionRatio, from 0 to 1. */
+    double intersectionRatio;
+} RvIntersectionEntry;
+
+/* Called on the host thread during rv_host_update, after resize observers, once per observer with queued entries,
+ * and from rv_observer_take_records. entries holds count entries in the order of their targets' observation; the
+ * array, its entries and their targets are valid only during the call, so the callback copies what it keeps. A
+ * target is reported when first observed and again when its intersection crosses one of the observer's thresholds.
+ * Observers deliver in the order they gained their first target; an observer that lost all its targets moves to
+ * the end when it observes again. The callback may call any function of this ABI. */
+typedef void (*RvIntersectionEntriesCallback)(void* context, RvObserver* observer, const RvIntersectionEntry* entries, int32_t count);
+/* new IntersectionObserver(callback, { root, rootMargin, scrollMargin, threshold }), written to *observer and freed
+ * with rv_observer_release. root is NULL for the implicit root (the host's viewport), the host's document node, or
+ * an element of the host's document, connected or not. rootMargin and scrollMargin are UTF-8 CSS margins, such as
+ * "10px" or "10% 0px"; a NULL margin with length 0 is "0px". With the implicit root, scrollMargin grows the
+ * scrollports of the scroll containers between a target and the root; with an explicit root the engine clips by
+ * those scrollports unchanged (Chromium grows them too). thresholds holds count ratios from 0 to 1, in any order, or is NULL
+ * with count 0 for 0 alone. Returns RV_ERR_NULL_ARGUMENT for a NULL host, callback or observer, a negative length
+ * or count, or a NULL margin or thresholds with a length or count above 0; RV_ERR_DOM_EXCEPTION for an invalid
+ * margin (rv_last_exception names SyntaxError) or a threshold outside 0 to 1 (RangeError); RV_ERR_NOT_ELEMENT for a
+ * root that is neither an element nor a document; RV_ERR_WRONG_HOST for a root of another live host; and
+ * RV_ERR_DETACHED for a root of a document the host does not show, such as one rv_host_load_html replaced. *observer
+ * is NULL on every error. */
+RV_EXPORT int32_t rv_host_observe_intersection_entries(RvHost*, RvIntersectionEntriesCallback callback, void* context, RvNode* root,
+    const uint8_t* rootMargin, int32_t rootMargin_length, const uint8_t* scrollMargin, int32_t scrollMargin_length,
+    const double* thresholds, int32_t thresholdCount, RvObserver** observer);
+/* IntersectionObserver.takeRecords(): removes the observer's queued entries and passes them to sink, called once
+ * before this returns, with count 0 when none are queued. rv_host_update queues and delivers entries within one
+ * call, so an observer holds queued entries only while another observer's callback of the same update runs. An
+ * observer of rv_host_observe_intersection passes its entries to sink in the same form. Returns RV_ERR_UNSUPPORTED
+ * for a resize observer, without calling sink. */
+RV_EXPORT int32_t rv_observer_take_records(RvObserver*, RvIntersectionEntriesCallback sink, void* context);
+/* Writes the host's document's performance.now(): the clock of RvIntersectionEntry.time, in whole milliseconds from the
+ * time origin of the host's window. A document rv_host_load_html loads keeps that origin. */
+RV_EXPORT int32_t rv_host_now(RvHost*, double* milliseconds);
+
 /* Paints the element and its descendants alone, without what lies behind or over them, at the host's device
  * scale, into unpremultiplied RGBA8, such as for a drag image. Writes the image's size in device pixels to
  * *width and *height; when length is below width * height * 4 it returns RV_ERR_BUFFER_TOO_SMALL with the

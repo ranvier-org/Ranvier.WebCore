@@ -1,0 +1,970 @@
+{
+ "browser": "156.0.8078.4",
+ "steps": [
+  {
+   "name": "initial",
+   "result": null,
+   "log": [
+    {
+     "kind": "raf",
+     "now": 113
+    },
+    {
+     "kind": "ro",
+     "now": 113.20000004768372
+    },
+    {
+     "kind": "io",
+     "name": "docroot",
+     "now": 113.70000004768372,
+     "entries": [
+      {
+       "target": "far",
+       "time": 113.60000002384186,
+       "rootBounds": [
+        -32,
+        -24,
+        384,
+        288
+       ],
+       "boundingClientRect": [
+        10,
+        400,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "element",
+     "now": 113.79999995231628,
+     "entries": [
+      {
+       "target": "u",
+       "time": 113.60000002384186,
+       "rootBounds": [
+        90,
+        10,
+        220,
+        120
+       ],
+       "boundingClientRect": [
+        110,
+        170,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      },
+      {
+       "target": "x",
+       "time": 113.60000002384186,
+       "rootBounds": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "boundingClientRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "scroll0",
+     "now": 113.79999995231628,
+     "entries": [
+      {
+       "target": "v",
+       "time": 113.60000002384186,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        120,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "implicit",
+     "now": 113.79999995231628,
+     "entries": [
+      {
+       "target": "far",
+       "time": 113.60000002384186,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        400,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "scroll20",
+     "now": 113.79999995231628,
+     "entries": [
+      {
+       "target": "v",
+       "time": 113.60000002384186,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        120,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        10,
+        120,
+        50,
+        10
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 0.20000000298023224
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "elementPct",
+     "now": 113.79999995231628,
+     "entries": [
+      {
+       "target": "u",
+       "time": 113.60000002384186,
+       "rootBounds": [
+        100,
+        10,
+        200,
+        120
+       ],
+       "boundingClientRect": [
+        110,
+        170,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    }
+   ],
+   "before": 54.299999952316284,
+   "after": 155.89999997615814
+  },
+  {
+   "name": "scroll window 0,200",
+   "result": {
+    "interrupted": false
+   },
+   "log": [
+    {
+     "kind": "io",
+     "name": "docroot",
+     "now": 174.79999995231628,
+     "entries": [
+      {
+       "target": "far",
+       "time": 174.79999995231628,
+       "rootBounds": [
+        -32,
+        -24,
+        384,
+        288
+       ],
+       "boundingClientRect": [
+        10,
+        200,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        10,
+        200,
+        50,
+        50
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 1
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "scroll20",
+     "now": 174.79999995231628,
+     "entries": [
+      {
+       "target": "v",
+       "time": 174.79999995231628,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        -80,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "implicit",
+     "now": 174.79999995231628,
+     "entries": [
+      {
+       "target": "far",
+       "time": 174.79999995231628,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        200,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        10,
+        200,
+        50,
+        40
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 0.800000011920929
+      }
+     ]
+    }
+   ],
+   "before": 159.5,
+   "after": 222.39999997615814
+  },
+  {
+   "name": "scroll #s to 100",
+   "log": [
+    {
+     "kind": "io",
+     "name": "element",
+     "now": 241.60000002384186,
+     "entries": [
+      {
+       "target": "u",
+       "time": 241.60000002384186,
+       "rootBounds": [
+        90,
+        -190,
+        220,
+        120
+       ],
+       "boundingClientRect": [
+        110,
+        -130,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        110,
+        -130,
+        50,
+        50
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 1
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "elementPct",
+     "now": 241.60000002384186,
+     "entries": [
+      {
+       "target": "u",
+       "time": 241.60000002384186,
+       "rootBounds": [
+        100,
+        -190,
+        200,
+        120
+       ],
+       "boundingClientRect": [
+        110,
+        -130,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        110,
+        -130,
+        50,
+        50
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 1
+      }
+     ]
+    }
+   ],
+   "before": 223.60000002384186,
+   "after": 290.60000002384186
+  },
+  {
+   "name": "scroll #s to 165 (u 0.9)",
+   "log": [
+    {
+     "kind": "io",
+     "name": "element",
+     "now": 307.60000002384186,
+     "entries": [
+      {
+       "target": "u",
+       "time": 307.60000002384186,
+       "rootBounds": [
+        90,
+        -190,
+        220,
+        120
+       ],
+       "boundingClientRect": [
+        110,
+        -195,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        110,
+        -190,
+        50,
+        45
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 0.8999999761581421
+      }
+     ]
+    }
+   ],
+   "before": 291.60000002384186,
+   "after": 357.2000000476837
+  },
+  {
+   "name": "takeRecords of the other observer inside the first callback: window 0,0",
+   "log": [
+    {
+     "kind": "io",
+     "name": "docroot",
+     "now": 375.10000002384186,
+     "entries": [
+      {
+       "target": "far",
+       "time": 375.10000002384186,
+       "rootBounds": [
+        -32,
+        -24,
+        384,
+        288
+       ],
+       "boundingClientRect": [
+        10,
+        400,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "taken",
+     "from": "implicit",
+     "entries": [
+      {
+       "target": "far",
+       "time": 375.10000002384186,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        400,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "scroll20",
+     "now": 375.2000000476837,
+     "entries": [
+      {
+       "target": "v",
+       "time": 375.10000002384186,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        120,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        10,
+        120,
+        50,
+        10
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 0.20000000298023224
+      }
+     ]
+    }
+   ],
+   "before": 358.39999997615814,
+   "after": 423.60000002384186
+  },
+  {
+   "name": "takeRecords synchronously after a layout change",
+   "result": [],
+   "log": [
+    {
+     "kind": "io",
+     "name": "docroot",
+     "now": 441.2000000476837,
+     "entries": [
+      {
+       "target": "far",
+       "time": 441.2000000476837,
+       "rootBounds": [
+        -32,
+        -24,
+        384,
+        288
+       ],
+       "boundingClientRect": [
+        10,
+        200,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        10,
+        200,
+        50,
+        50
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 1
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "scroll20",
+     "now": 441.2000000476837,
+     "entries": [
+      {
+       "target": "v",
+       "time": 441.2000000476837,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        -80,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "implicit",
+     "now": 441.2000000476837,
+     "entries": [
+      {
+       "target": "far",
+       "time": 441.2000000476837,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        200,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        10,
+        200,
+        50,
+        40
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 0.800000011920929
+      }
+     ]
+    }
+   ],
+   "before": 424.5,
+   "after": 489.10000002384186
+  },
+  {
+   "name": "unobserve far on implicit, scroll 0,0",
+   "log": [
+    {
+     "kind": "io",
+     "name": "docroot",
+     "now": 508.2000000476837,
+     "entries": [
+      {
+       "target": "far",
+       "time": 508.10000002384186,
+       "rootBounds": [
+        -32,
+        -24,
+        384,
+        288
+       ],
+       "boundingClientRect": [
+        10,
+        400,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "scroll20",
+     "now": 508.2000000476837,
+     "entries": [
+      {
+       "target": "v",
+       "time": 508.10000002384186,
+       "rootBounds": [
+        0,
+        0,
+        320,
+        240
+       ],
+       "boundingClientRect": [
+        10,
+        120,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        10,
+        120,
+        50,
+        10
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 0.20000000298023224
+      }
+     ]
+    }
+   ],
+   "before": 490.7000000476837,
+   "after": 556.8999999761581
+  },
+  {
+   "name": "remove intersecting #u from the DOM",
+   "log": [
+    {
+     "kind": "io",
+     "name": "element",
+     "now": 574.7999999523163,
+     "entries": [
+      {
+       "target": "u",
+       "time": 574.7999999523163,
+       "rootBounds": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "boundingClientRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    },
+    {
+     "kind": "io",
+     "name": "elementPct",
+     "now": 574.7999999523163,
+     "entries": [
+      {
+       "target": "u",
+       "time": 574.7999999523163,
+       "rootBounds": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "boundingClientRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    }
+   ],
+   "before": 557.7999999523163,
+   "after": 623.3999999761581
+  },
+  {
+   "name": "disconnect element; takeRecords after",
+   "result": 0,
+   "log": [],
+   "before": 624.5,
+   "after": 691
+  },
+  {
+   "name": "observe x with non-ancestor root again, change x",
+   "log": [
+    {
+     "kind": "io",
+     "name": "element",
+     "now": 709,
+     "entries": [
+      {
+       "target": "x",
+       "time": 708.8999999761581,
+       "rootBounds": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "boundingClientRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    }
+   ],
+   "before": 691.7000000476837,
+   "after": 756.1000000238419
+  },
+  {
+   "name": "reinsert #u, scroll #s to 100",
+   "log": [
+    {
+     "kind": "io",
+     "name": "elementPct",
+     "now": 774.2999999523163,
+     "entries": [
+      {
+       "target": "u",
+       "time": 774.2999999523163,
+       "rootBounds": [
+        100,
+        10,
+        200,
+        120
+       ],
+       "boundingClientRect": [
+        110,
+        70,
+        50,
+        50
+       ],
+       "intersectionRect": [
+        110,
+        70,
+        50,
+        50
+       ],
+       "isIntersecting": true,
+       "intersectionRatio": 1
+      }
+     ]
+    }
+   ],
+   "before": 757.2000000476837,
+   "after": 824.2999999523163
+  },
+  {
+   "name": "root #s removed from DOM while u intersects",
+   "log": [
+    {
+     "kind": "io",
+     "name": "elementPct",
+     "now": 841.3999999761581,
+     "entries": [
+      {
+       "target": "u",
+       "time": 841.3999999761581,
+       "rootBounds": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "boundingClientRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "intersectionRect": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "isIntersecting": false,
+       "intersectionRatio": 0
+      }
+     ]
+    }
+   ],
+   "before": 825.2999999523163,
+   "after": 891.2999999523163
+  },
+  {
+   "name": "observe then unobserve before a rendering update",
+   "log": [],
+   "before": 892.1000000238419,
+   "after": 956.2999999523163
+  }
+ ],
+ "members": {
+  "scrollMargin": true,
+  "takeRecords": true,
+  "delay": true,
+  "trackVisibility": true
+ },
+ "margins": {
+  "implicit": [
+   "0px 0px 0px 0px",
+   "0px 0px 0px 0px",
+   [
+    0,
+    0.5,
+    1
+   ],
+   null
+  ],
+  "docroot": [
+   "10% 10% 10% 10%",
+   "0px 0px 0px 0px",
+   [
+    0,
+    0.5,
+    1
+   ],
+   "#document"
+  ],
+  "element": [
+   "10px 10px 10px 10px",
+   "0px 0px 0px 0px",
+   [
+    0,
+    0.5,
+    1
+   ],
+   "s"
+  ],
+  "elementPct": [
+   "10% 0px 10% 0px",
+   "0px 0px 0px 0px",
+   [
+    0
+   ],
+   "s"
+  ],
+  "scroll20": [
+   "0px 0px 0px 0px",
+   "20px 20px 20px 20px",
+   [
+    0,
+    0.20000000298023224
+   ],
+   null
+  ],
+  "scroll0": [
+   "0px 0px 0px 0px",
+   "0px 0px 0px 0px",
+   [
+    0,
+    0.20000000298023224
+   ],
+   null
+  ]
+ }
+}

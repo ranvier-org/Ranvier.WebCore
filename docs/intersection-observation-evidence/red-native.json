@@ -1,0 +1,387 @@
+{
+ "abi": 53,
+ "exports": {
+  "rv_host_observe_intersection": true,
+  "rv_host_observe_intersection_entries": false,
+  "rv_observer_take_records": false,
+  "rv_observer_disconnect": false,
+  "rv_host_observe_resize_entries": false,
+  "rv_host_now": false,
+  "rv_host_performance_now": false
+ },
+ "invalid": {
+  "bogus margin": false,
+  "threshold 2": false,
+  "em margin": false,
+  "descending thresholds": true
+ },
+ "steps": [
+  {
+   "name": "initial",
+   "result": null,
+   "updates": [
+    0,
+    0
+   ],
+   "log": [
+    [
+     "ro",
+     "r"
+    ],
+    [
+     "scroll",
+     "v",
+     0,
+     0.0
+    ],
+    [
+     "implicit",
+     "far",
+     0,
+     0.0
+    ],
+    [
+     "pct",
+     "far",
+     0,
+     0.0
+    ],
+    [
+     "px",
+     "far",
+     0,
+     0.0
+    ]
+   ],
+   "rects": {
+    "far": [
+     10.0,
+     400.0,
+     50.0,
+     50.0
+    ],
+    "u": [
+     110.0,
+     170.0,
+     50.0,
+     50.0
+    ],
+    "v": [
+     10.0,
+     120.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "name": "scroll window 0,200",
+   "result": 0,
+   "updates": [
+    0,
+    0
+   ],
+   "log": [
+    [
+     "frame-callback"
+    ],
+    [
+     "implicit",
+     "far",
+     1,
+     0.8
+    ],
+    [
+     "pct",
+     "far",
+     1,
+     1.0
+    ],
+    [
+     "px",
+     "far",
+     1,
+     1.0
+    ]
+   ],
+   "rects": {
+    "far": [
+     10.0,
+     200.0,
+     50.0,
+     50.0
+    ],
+    "u": [
+     110.0,
+     -30.0,
+     50.0,
+     50.0
+    ],
+    "v": [
+     10.0,
+     -80.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "name": "scroll window 0,165",
+   "result": 0,
+   "updates": [
+    0,
+    0
+   ],
+   "log": [
+    [
+     "frame-callback"
+    ],
+    [
+     "implicit",
+     "far",
+     1,
+     0.1
+    ],
+    [
+     "pct",
+     "far",
+     1,
+     0.58
+    ]
+   ],
+   "rects": {
+    "far": [
+     10.0,
+     235.0,
+     50.0,
+     50.0
+    ],
+    "u": [
+     110.0,
+     5.0,
+     50.0,
+     50.0
+    ],
+    "v": [
+     10.0,
+     -45.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "name": "unobserve far on implicit, scroll 0,0",
+   "result": 0,
+   "updates": [
+    0,
+    0
+   ],
+   "log": [
+    [
+     "frame-callback"
+    ],
+    [
+     "pct",
+     "far",
+     0,
+     0.0
+    ],
+    [
+     "px",
+     "far",
+     0,
+     0.0
+    ]
+   ],
+   "rects": {
+    "far": [
+     10.0,
+     400.0,
+     50.0,
+     50.0
+    ],
+    "u": [
+     110.0,
+     170.0,
+     50.0,
+     50.0
+    ],
+    "v": [
+     10.0,
+     120.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "name": "observe then unobserve before update",
+   "result": 0,
+   "updates": [
+    0,
+    0
+   ],
+   "log": [
+    [
+     "frame-callback"
+    ]
+   ],
+   "rects": {
+    "far": [
+     10.0,
+     400.0,
+     50.0,
+     50.0
+    ],
+    "u": [
+     110.0,
+     170.0,
+     50.0,
+     50.0
+    ],
+    "v": [
+     10.0,
+     120.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "name": "observe far again on implicit, scroll 0,200",
+   "result": 0,
+   "updates": [
+    0,
+    0
+   ],
+   "log": [
+    [
+     "frame-callback"
+    ],
+    [
+     "pct",
+     "far",
+     1,
+     1.0
+    ],
+    [
+     "px",
+     "far",
+     1,
+     1.0
+    ],
+    [
+     "implicit",
+     "far",
+     1,
+     0.8
+    ]
+   ],
+   "rects": {
+    "far": [
+     10.0,
+     200.0,
+     50.0,
+     50.0
+    ],
+    "u": [
+     110.0,
+     -30.0,
+     50.0,
+     50.0
+    ],
+    "v": [
+     10.0,
+     -80.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "name": "remove intersecting far",
+   "result": 0,
+   "updates": [
+    0,
+    0
+   ],
+   "log": [
+    [
+     "frame-callback"
+    ],
+    [
+     "pct",
+     "far",
+     0,
+     0.0
+    ],
+    [
+     "px",
+     "far",
+     0,
+     0.0
+    ],
+    [
+     "implicit",
+     "far",
+     0,
+     0.0
+    ]
+   ],
+   "rects": {
+    "far": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "u": [
+     110.0,
+     -30.0,
+     50.0,
+     50.0
+    ],
+    "v": [
+     10.0,
+     -80.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "name": "release pct, scroll 0,0",
+   "result": null,
+   "updates": [
+    0,
+    0
+   ],
+   "log": [
+    [
+     "frame-callback"
+    ]
+   ],
+   "rects": {
+    "far": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "u": [
+     110.0,
+     170.0,
+     50.0,
+     50.0
+    ],
+    "v": [
+     10.0,
+     120.0,
+     50.0,
+     50.0
+    ]
+   }
+  }
+ ]
+}

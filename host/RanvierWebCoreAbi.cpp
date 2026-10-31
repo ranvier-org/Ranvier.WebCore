@@ -1342,6 +1342,8 @@ static_assert(sizeof(void*) != 8 || (sizeof(RvEventInit) == 112 && offsetof(RvEv
 static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_left) == 12 && offsetof(RvScreenMetrics, orientation) == 32);
 
 
+static_assert(sizeof(RvIntersectionEntry) == 136 && offsetof(RvIntersectionEntry, target) == 8 && offsetof(RvIntersectionEntry, time) == 16
+    && offsetof(RvIntersectionEntry, hasRootBounds) == 24 && offsetof(RvIntersectionEntry, rootX) == 32 && offsetof(RvIntersectionEntry, intersectionRatio) == 128);
 static_assert(sizeof(RvResizeEntry) == 96 && offsetof(RvResizeEntry, target) == 8 && offsetof(RvResizeEntry, contentX) == 16 && offsetof(RvResizeEntry, devicePixelBlockSize) == 88);
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
 
@@ -1397,7 +1399,7 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
 #endif
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text", "svg-document", "resize-entries" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text", "svg-document", "resize-entries", "intersection-entries" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -4188,8 +4190,43 @@ struct RvObserver {
     RvResizeCallback resizeCallback { nullptr };
     RvResizeEntriesCallback entriesCallback { nullptr };
     RvIntersectionCallback intersectionCallback { nullptr };
+    RvIntersectionEntriesCallback intersectionEntriesCallback { nullptr };
     void* context { nullptr };
 };
+
+// The entries' targets stay alive while the source vector does.
+static Vector<RvIntersectionEntry> intersectionEntries(const Vector<Ref<IntersectionObserverEntry>>& entries)
+{
+    Vector<RvIntersectionEntry> copies;
+    copies.reserveInitialCapacity(entries.size());
+    for (auto& entry : entries) {
+        RvIntersectionEntry copy { };
+        copy.size = sizeof(RvIntersectionEntry);
+        copy.isIntersecting = entry->isIntersecting() ? 1 : 0;
+        copy.target = reinterpret_cast<RvNode*>(&entry->target());
+        copy.time = entry->time();
+        if (auto* root = entry->rootBounds()) {
+            copy.hasRootBounds = 1;
+            copy.rootX = root->x();
+            copy.rootY = root->y();
+            copy.rootWidth = root->width();
+            copy.rootHeight = root->height();
+        }
+        auto& bounds = entry->boundingClientRect();
+        copy.boundsX = bounds.x();
+        copy.boundsY = bounds.y();
+        copy.boundsWidth = bounds.width();
+        copy.boundsHeight = bounds.height();
+        auto& intersection = entry->intersectionRect();
+        copy.intersectionX = intersection.x();
+        copy.intersectionY = intersection.y();
+        copy.intersectionWidth = intersection.width();
+        copy.intersectionHeight = intersection.height();
+        copy.intersectionRatio = entry->intersectionRatio();
+        copies.append(copy);
+    }
+    return copies;
+}
 
 // WebCore registers a resize observer with its document only when it has a callback object; a native callback
 // function is never delivered to.
@@ -4268,6 +4305,12 @@ private:
 
     CallbackResult<void> invoke(IntersectionObserver&, const Vector<Ref<IntersectionObserverEntry>>& entries, IntersectionObserver&) final
     {
+        if (owner && owner->intersectionEntriesCallback) {
+            auto copies = intersectionEntries(entries);
+            // The entries keep their targets alive for the call; the callback may release the observer.
+            owner->intersectionEntriesCallback(owner->context, owner, copies.span().data(), static_cast<int32_t>(copies.size()));
+            return { };
+        }
         for (auto& entry : entries) {
             if (!owner)
                 break;
@@ -4339,6 +4382,93 @@ RvObserver* rv_host_observe_intersection(RvHost* host, RvIntersectionCallback ca
     delivery->owner = observer;
     observer->delivery = WTF::move(delivery);
     return observer;
+}
+
+static std::optional<String> marginOf(const uint8_t* text, int32_t length)
+{
+    if (!text)
+        return "0px"_s;
+    auto margin = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(text), static_cast<size_t>(length) });
+    if (margin.isNull())
+        return std::nullopt;
+    return margin;
+}
+
+int32_t rv_host_observe_intersection_entries(RvHost* host, RvIntersectionEntriesCallback callback, void* context, RvNode* root,
+    const uint8_t* rootMargin, int32_t rootMargin_length, const uint8_t* scrollMargin, int32_t scrollMargin_length,
+    const double* thresholds, int32_t thresholdCount, RvObserver** observer)
+{
+    if (observer)
+        *observer = nullptr;
+    if (!host || !callback || !observer || rootMargin_length < 0 || scrollMargin_length < 0 || thresholdCount < 0
+        || (rootMargin_length && !rootMargin) || (scrollMargin_length && !scrollMargin) || (thresholdCount && !thresholds))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    Ref document = host->document();
+    IntersectionObserver::Init init;
+    if (root) {
+        Ref rootNode = *node(root);
+        if (!is<Element>(rootNode) && !is<Document>(rootNode))
+            return RV_ERR_NOT_ELEMENT;
+        if (&rootNode->document() != document.ptr()) {
+            RefPtr page = rootNode->document().page();
+            return page && hostForPage(page.get()) ? RV_ERR_WRONG_HOST : RV_ERR_DETACHED;
+        }
+        if (RefPtr element = dynamicDowncast<Element>(rootNode))
+            init.root = Variant<Ref<Element>, Ref<Document>> { Ref { *element } };
+        else
+            init.root = Variant<Ref<Element>, Ref<Document>> { document.copyRef() };
+    }
+    auto parsedRootMargin = marginOf(rootMargin, rootMargin_length);
+    auto parsedScrollMargin = marginOf(scrollMargin, scrollMargin_length);
+    if (!parsedRootMargin || !parsedScrollMargin)
+        return fail(Exception { ExceptionCode::SyntaxError, "The margin is not valid UTF-8."_s });
+    init.rootMargin = WTF::move(*parsedRootMargin);
+    init.scrollMargin = WTF::move(*parsedScrollMargin);
+    if (thresholdCount)
+        init.threshold = Vector<double> { std::span { thresholds, static_cast<size_t>(thresholdCount) } };
+    else
+        init.threshold = 0.0;
+    Ref delivery = RvIntersectionDelivery::create(document.get());
+    auto created = IntersectionObserver::create(document.get(), delivery.copyRef(), WTF::move(init));
+    if (created.hasException())
+        return fail(created.exception());
+    auto* result = new RvObserver;
+    result->intersection = created.releaseReturnValue();
+    result->intersectionEntriesCallback = callback;
+    result->context = context;
+    delivery->owner = result;
+    result->delivery = WTF::move(delivery);
+    *observer = result;
+    return RV_OK;
+}
+
+int32_t rv_observer_take_records(RvObserver* observer, RvIntersectionEntriesCallback sink, void* context)
+{
+    if (!observer || !sink)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!observer->intersection)
+        return RV_ERR_UNSUPPORTED;
+    auto records = ranvier_intersection_take_records(*observer->intersection);
+    auto copies = intersectionEntries(records);
+    sink(context, observer, copies.span().data(), static_cast<int32_t>(copies.size()));
+    return RV_OK;
+}
+
+int32_t rv_host_now(RvHost* host, double* milliseconds)
+{
+    if (!host || !milliseconds)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_document_now(reinterpret_cast<RvNode*>(&host->document()), milliseconds);
 }
 
 int32_t rv_observer_observe(RvObserver* observer, RvNode* target)

@@ -24,6 +24,11 @@ LAYOUTS = {
                        ('contentHeight', D), ('contentInlineSize', D), ('contentBlockSize', D), ('borderInlineSize', D),
                        ('borderBlockSize', D), ('devicePixelInlineSize', D), ('devicePixelBlockSize', D)], 96,
                       [0, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88], 'ResizeEntry'),
+    'RvIntersectionEntry': ([('size', I), ('isIntersecting', I), ('target', P), ('time', D), ('hasRootBounds', I), ('reserved', I),
+                             ('rootX', D), ('rootY', D), ('rootWidth', D), ('rootHeight', D), ('boundsX', D), ('boundsY', D),
+                             ('boundsWidth', D), ('boundsHeight', D), ('intersectionX', D), ('intersectionY', D),
+                             ('intersectionWidth', D), ('intersectionHeight', D), ('intersectionRatio', D)], 136,
+                            [0, 4, 8, 16, 24, 28, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128], 'IntersectionEntry'),
     # Views mirrors RvWindowMetrics as WindowMetrics in Ranvier.View.WebCore/Viewport.fs; its fixture checks the mirror.
     'RvWindowMetrics': ([('size', I), ('innerWidth', I), ('innerHeight', I), ('outerWidth', I), ('outerHeight', I),
                          ('devicePixelRatio', D)], 32, [0, 4, 8, 12, 16, 24], None),
