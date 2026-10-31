@@ -810,6 +810,12 @@ let RV_DOM_HIGHLIGHT_TYPE_SPELLING_ERROR = 1
 let RV_DOM_HIGHLIGHT_TYPE_GRAMMAR_ERROR = 2
 
 [<Literal>]
+let RV_DOM_IMAGE_DATA_PIXEL_FORMAT_RGBA_UNORM8 = 0
+
+[<Literal>]
+let RV_DOM_IMAGE_DATA_PIXEL_FORMAT_RGBA_FLOAT16 = 1
+
+[<Literal>]
 let RV_DOM_IMAGE_SMOOTHING_QUALITY_LOW = 0
 
 [<Literal>]
@@ -847,6 +853,12 @@ let RV_DOM_PLAYBACK_DIRECTION_ALTERNATE = 2
 
 [<Literal>]
 let RV_DOM_PLAYBACK_DIRECTION_ALTERNATE_REVERSE = 3
+
+[<Literal>]
+let RV_DOM_PREDEFINED_COLOR_SPACE_SRGB = 0
+
+[<Literal>]
+let RV_DOM_PREDEFINED_COLOR_SPACE_SRGB_LINEAR = 1
 
 [<Literal>]
 let RV_DOM_SCROLL_BEHAVIOR_AUTO = 0
@@ -1437,6 +1449,11 @@ type RvDomKeyframeEffectOptions =
 type RvDomDocumentTimelineOptions =
     val mutable size: uint32
     val mutable origin_time: float
+
+/// <summary>The IDL dictionary ImageDataSettings; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomImageDataSettings =
+    val mutable size: uint32
 
 /// <summary>The IDL dictionary DOMCSSCustomPropertyDescriptor; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -2929,6 +2946,12 @@ extern void rv_dom_canvas_pattern_release(nativeint handle)
 extern nativeint rv_dom_canvas_pattern_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_image_data_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_image_data_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern void rv_dom_path2_d_release(nativeint handle)
 
 [<DllImport(Lib)>]
@@ -2939,6 +2962,12 @@ extern void rv_dom_image_bitmap_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_image_bitmap_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_image_bitmap_rendering_context_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_image_bitmap_rendering_context_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern void rv_dom_text_metrics_release(nativeint handle)
@@ -11497,6 +11526,30 @@ extern int rv_dom_canvas_rendering_context2_d_stroke_text(nativeint target, byte
 extern int rv_dom_canvas_rendering_context2_d_measure_text(nativeint target, byte[] text, int text_length, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_draw_image_3(nativeint target, [<In>] RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue[] image, float dx, float dy)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_draw_image_5(nativeint target, [<In>] RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue[] image, float dx, float dy, float dw, float dh)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_draw_image_9(nativeint target, [<In>] RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue[] image, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_create_image_data_3(nativeint target, int sw, int sh, [<In>] RvDomImageDataSettings[] settings, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_create_image_data_1(nativeint target, nativeint imagedata, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_get_image_data(nativeint target, int sx, int sy, int sw, int sh, [<In>] RvDomImageDataSettings[] settings, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_put_image_data_3(nativeint target, nativeint imagedata, int dx, int dy)
+
+[<DllImport(Lib)>]
+extern int rv_dom_canvas_rendering_context2_d_put_image_data_7(nativeint target, nativeint imagedata, int dx, int dy, int dirty_x, int dirty_y, int dirty_width, int dirty_height)
+
+[<DllImport(Lib)>]
 extern int rv_dom_canvas_rendering_context2_d_set_line_dash(nativeint target, [<In>] RvDomSequenceUnrestrictedDouble[] segments)
 
 [<DllImport(Lib)>]
@@ -11542,6 +11595,12 @@ extern int rv_dom_canvas_gradient_add_color_stop(nativeint target, nativeint con
 extern int rv_dom_canvas_pattern_set_transform(nativeint target, [<In>] RvDomDOMMatrix2DInit[] transform)
 
 [<DllImport(Lib)>]
+extern int rv_dom_image_data_get_width(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_image_data_get_height(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_path2_d_create_0(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -11585,6 +11644,18 @@ extern int rv_dom_path2_d_arc(nativeint target, float x, float y, float radius, 
 
 [<DllImport(Lib)>]
 extern int rv_dom_path2_d_ellipse(nativeint target, float x, float y, float radius_x, float radius_y, float rotation, float start_angle, float end_angle, int anticlockwise)
+
+[<DllImport(Lib)>]
+extern int rv_dom_image_bitmap_get_width(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_image_bitmap_get_height(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_image_bitmap_close(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap(nativeint target, nativeint bitmap)
 
 [<DllImport(Lib)>]
 extern int rv_dom_text_metrics_get_width(nativeint target, float& result)

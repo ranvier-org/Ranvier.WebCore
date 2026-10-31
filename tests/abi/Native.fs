@@ -500,6 +500,17 @@ module Calls =
             "rv_host_pointer_lock_lose"
             "rv_element_request_pointer_lock"
             "rv_document_exit_pointer_lock"
+            "rv_image_data_create"
+            "rv_image_data_layout"
+            "rv_image_data_read"
+            "rv_image_data_write"
+            "rv_canvas_encode"
+            "rv_canvas_to_data_url"
+            "rv_canvas_to_blob"
+            "rv_canvas_get_bitmap_context"
+            "rv_image_bitmap_create"
+            "rv_image_bitmap_result"
+            "rv_image_bitmap_error"
         |]
 
     let Counts: int64 array = Array.zeroCreate Names.Length
@@ -1719,6 +1730,69 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_document_exit_pointer_lock(nativeint document)
+
+    [<DllImport(Lib)>]
+    extern int rv_image_data_create(
+        uint32 width,
+        uint32 height,
+        [<In>] byte[] bytes,
+        int64 length,
+        int colorSpace,
+        int pixelFormat,
+        nativeint[] result
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_image_data_layout(nativeint data, nativeint layout)
+
+    [<DllImport(Lib)>]
+    extern int rv_image_data_read(nativeint data, int64 offset, [<In; Out>] byte[] buffer, int64 length)
+
+    [<DllImport(Lib)>]
+    extern int rv_image_data_write(nativeint data, int64 offset, [<In>] byte[] bytes, int64 length)
+
+    [<DllImport(Lib)>]
+    extern int rv_canvas_encode(
+        nativeint canvas,
+        int encoding,
+        float quality,
+        [<In; Out>] byte[] buffer,
+        int64 capacity,
+        int64& length
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_canvas_to_data_url(
+        nativeint canvas,
+        int encoding,
+        float quality,
+        byte[] buffer,
+        int capacity,
+        int[] length
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_canvas_to_blob(nativeint canvas, int encoding, float quality, nativeint[] blob)
+
+    [<DllImport(Lib)>]
+    extern int rv_canvas_get_bitmap_context(nativeint canvas, nativeint[] context)
+
+    [<DllImport(Lib)>]
+    extern int rv_image_bitmap_create(
+        nativeint host,
+        int kind,
+        nativeint source,
+        nativeint options,
+        nativeint completion,
+        nativeint context,
+        uint64& operation
+    )
+
+    [<DllImport(Lib)>]
+    extern int rv_image_bitmap_result(uint64 operation, nativeint[] bitmap)
+
+    [<DllImport(Lib)>]
+    extern int rv_image_bitmap_error(uint64 operation, byte[] buffer, int capacity, int[] length)
 
 let rv_abi_version () : int =
     if Calls.On then
@@ -5569,6 +5643,164 @@ let rv_document_exit_pointer_lock (document: nativeint) : int =
         result
     else
         Raw.rv_document_exit_pointer_lock (document)
+
+let rv_image_data_create
+    (width: uint32, height: uint32, bytes: byte[], length: int64, colorSpace: int, pixelFormat: int, result: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_image_data_create (width, height, bytes, length, colorSpace, pixelFormat, result)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[300] <- Calls.Counts[300] + 1L
+        Calls.Ticks[300] <- Calls.Ticks[300] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_image_data_create (width, height, bytes, length, colorSpace, pixelFormat, result)
+
+let rv_image_data_layout (data: nativeint, layout: nativeint) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_image_data_layout (data, layout)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[301] <- Calls.Counts[301] + 1L
+        Calls.Ticks[301] <- Calls.Ticks[301] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_image_data_layout (data, layout)
+
+let rv_image_data_read (data: nativeint, offset: int64, buffer: byte[], length: int64) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_image_data_read (data, offset, buffer, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[302] <- Calls.Counts[302] + 1L
+        Calls.Ticks[302] <- Calls.Ticks[302] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_image_data_read (data, offset, buffer, length)
+
+let rv_image_data_write (data: nativeint, offset: int64, bytes: byte[], length: int64) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_image_data_write (data, offset, bytes, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[303] <- Calls.Counts[303] + 1L
+        Calls.Ticks[303] <- Calls.Ticks[303] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_image_data_write (data, offset, bytes, length)
+
+let rv_canvas_encode
+    (canvas: nativeint, encoding: int, quality: float, buffer: byte[], capacity: int64, length: byref<int64>)
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_canvas_encode (canvas, encoding, quality, buffer, capacity, &length)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[304] <- Calls.Counts[304] + 1L
+        Calls.Ticks[304] <- Calls.Ticks[304] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_canvas_encode (canvas, encoding, quality, buffer, capacity, &length)
+
+let rv_canvas_to_data_url
+    (canvas: nativeint, encoding: int, quality: float, buffer: byte[], capacity: int, length: int[])
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_canvas_to_data_url (canvas, encoding, quality, buffer, capacity, length)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[305] <- Calls.Counts[305] + 1L
+        Calls.Ticks[305] <- Calls.Ticks[305] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_canvas_to_data_url (canvas, encoding, quality, buffer, capacity, length)
+
+let rv_canvas_to_blob (canvas: nativeint, encoding: int, quality: float, blob: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_canvas_to_blob (canvas, encoding, quality, blob)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[306] <- Calls.Counts[306] + 1L
+        Calls.Ticks[306] <- Calls.Ticks[306] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_canvas_to_blob (canvas, encoding, quality, blob)
+
+let rv_canvas_get_bitmap_context (canvas: nativeint, context: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_canvas_get_bitmap_context (canvas, context)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[307] <- Calls.Counts[307] + 1L
+        Calls.Ticks[307] <- Calls.Ticks[307] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_canvas_get_bitmap_context (canvas, context)
+
+let rv_image_bitmap_create
+    (
+        host: nativeint,
+        kind: int,
+        source: nativeint,
+        options: nativeint,
+        completion: nativeint,
+        context: nativeint,
+        operation: byref<uint64>
+    ) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+
+        let result =
+            Raw.rv_image_bitmap_create (host, kind, source, options, completion, context, &operation)
+
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[308] <- Calls.Counts[308] + 1L
+        Calls.Ticks[308] <- Calls.Ticks[308] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_image_bitmap_create (host, kind, source, options, completion, context, &operation)
+
+let rv_image_bitmap_result (operation: uint64, bitmap: nativeint[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_image_bitmap_result (operation, bitmap)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[309] <- Calls.Counts[309] + 1L
+        Calls.Ticks[309] <- Calls.Ticks[309] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_image_bitmap_result (operation, bitmap)
+
+let rv_image_bitmap_error (operation: uint64, buffer: byte[], capacity: int, length: int[]) : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp()
+        let result = Raw.rv_image_bitmap_error (operation, buffer, capacity, length)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp() - started
+        Calls.Counts[310] <- Calls.Counts[310] + 1L
+        Calls.Ticks[310] <- Calls.Ticks[310] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_image_bitmap_error (operation, buffer, capacity, length)
 
 // END GENERATED
 

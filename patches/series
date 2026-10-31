@@ -47,3 +47,5 @@
 0046-pointer-capture-pen-mouse-path.patch
 0047-navigator-embedder-max-touch-points.patch
 0048-fontface-loaded-rejection.patch
+0049-image-bitmap-crop-completion-handler.patch
+0050-image-bitmap-unaccelerated-buffers.patch

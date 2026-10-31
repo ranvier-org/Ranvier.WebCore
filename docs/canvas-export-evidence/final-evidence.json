@@ -1,0 +1,443 @@
+{
+  "group": [
+    "R07 #96"
+  ],
+  "status": "green (private Windows x64 slim; not accepted)",
+  "native": "0.1.0-preview.46",
+  "abi": 55,
+  "abiNote": "placeholder ABI55 on the R06 base with B06 and the R12 encoder merged; root assigns NativeNN/ABI at integration",
+  "features": [
+    "canvas-export",
+    "image-bitmaps",
+    "dom:ImageBitmapRenderingContext"
+  ],
+  "members": [
+    "rv_canvas_encode",
+    "rv_canvas_to_data_url",
+    "rv_canvas_to_blob",
+    "rv_canvas_get_bitmap_context",
+    "rv_image_bitmap_create",
+    "rv_image_bitmap_result",
+    "rv_image_bitmap_error",
+    "RvImageBitmapOptions",
+    "RV_IMAGE_BITMAP_SOURCE_*",
+    "RV_IMAGE_BITMAP_ORIENTATION_*",
+    "RV_IMAGE_BITMAP_PREMULTIPLY_*",
+    "RV_IMAGE_BITMAP_COLOR_SPACE_CONVERSION_*",
+    "RV_IMAGE_BITMAP_RESIZE_*",
+    "rv_dom_image_bitmap_get_width/height",
+    "rv_dom_image_bitmap_close",
+    "rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap",
+    "rv_dom_image_bitmap_rendering_context_release/retain"
+  ],
+  "engine": "HTMLCanvasElement buffers, Blob and the bitmaprenderer context from host/RanvierCanvasExportGlue.cpp, encoding through Ranvier::Internal::encodeImage (R12), and ImageBitmap::createCompletionHandler as a resource operation in host/RanvierResourceGlue.cpp",
+  "sourcePatches": {
+    "0049-image-bitmap-crop-completion-handler.patch": {
+      "sha256": "412e58f31374f0e35697ccd7fdfef77044890b1e5a6c208011e93534453e1006",
+      "files": [
+        "Source/WebCore/html/ImageBitmap.cpp",
+        "Source/WebCore/html/ImageBitmap.h"
+      ]
+    },
+    "0050-image-bitmap-unaccelerated-buffers.patch": {
+      "sha256": "38c4076f0592b5cb46963da5d6b77b1544ddfa6f07cc453fbd45f86c82aa807b",
+      "files": [
+        "Source/WebCore/html/ImageBitmap.cpp"
+      ]
+    }
+  },
+  "ownPatchUnits": [
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/InspectorGeneratedStub.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-JSBindings-9.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-Modules-1.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-16.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-23.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-24.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-html-26.cpp.obj",
+    "Source/WebCore/CMakeFiles/WebCore.dir/inspector/stub/InspectorStub.cpp.obj"
+  ],
+  "patch0043Owner": {
+    "candidate": "C:\\wk\\native-media-caps\\artifacts\\media-candidate-2",
+    "unit": "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-Modules-6.cpp.obj",
+    "object": "C:/wk/native-media-caps/artifacts/media-candidate-2/001-UnifiedSource-Modules-6.cpp.obj"
+  },
+  "hostGlue": {
+    "RanvierResourceGlue": {
+      "parentObject": "C:/wk/native-blob/artifacts/native44-candidate-6/091-RanvierResourceGlue.cpp.obj",
+      "recompiled": true
+    },
+    "RanvierCanvasPixelsGlue": {
+      "parentObject": "C:/wk/native-canvas-pixels/artifacts/pixels-candidate-3/090-RanvierCanvasPixelsGlue.cpp.obj",
+      "recompiled": false
+    },
+    "RanvierInspectGlue": {
+      "parentObject": "C:/wk/native-canvas-pixels/artifacts/pixels-candidate-3/091-RanvierInspectGlue.cpp.obj",
+      "recompiled": false
+    },
+    "RanvierCanvasGlue": {
+      "parentObject": "C:/wk/native-canvas/artifacts/canvas-candidate-5/090-RanvierCanvasGlue.cpp.obj",
+      "recompiled": false
+    },
+    "RanvierViewportGlue": {
+      "parentObject": "C:/wk/native-coords/artifacts/coords-candidate-5/090-RanvierViewportGlue.cpp.obj",
+      "recompiled": false
+    },
+    "RanvierEventGlue": {
+      "parentObject": "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierEventGlue.cpp.obj",
+      "recompiled": false
+    },
+    "RanvierSvgViewGlue": {
+      "parentObject": "C:/wk/native-forms/artifacts/forms-candidate-4/RanvierSvgViewGlue.cpp.obj",
+      "recompiled": false
+    }
+  },
+  "sourceHeadOfBatch": "f3dc0f4b838e3b613cdab58eb9890309e3fdd695",
+  "batchRunHead": "f3dc0f4",
+  "red": {
+    "exports": {
+      "rv_canvas_encode": false,
+      "rv_canvas_to_data_url": false,
+      "rv_canvas_to_blob": false,
+      "rv_canvas_get_bitmap_context": false,
+      "rv_image_bitmap_create": false,
+      "rv_image_bitmap_result": false,
+      "rv_image_bitmap_error": false,
+      "rv_dom_image_bitmap_get_width": false,
+      "rv_dom_image_bitmap_get_height": false,
+      "rv_dom_image_bitmap_close": false,
+      "rv_dom_image_bitmap_rendering_context_get_canvas": false,
+      "rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap": false,
+      "rv_dom_image_bitmap_rendering_context_release": false,
+      "rv_image_encoding_supported": false
+    },
+    "abiHas": {
+      "canvas-context": 1,
+      "canvas-pixels": 1,
+      "canvas-export": 0,
+      "image-bitmaps": 0,
+      "dom:ImageBitmap": 1,
+      "dom:ImageBitmapRenderingContext": 0,
+      "image-encoding-png": 0
+    },
+    "abi": 55,
+    "bitmapRendererStatus": -9,
+    "patch0049": "red-patch-0049-compile.log",
+    "patch0050": "red-patch-0050.log"
+  },
+  "green": {
+    "canvasExportAssertions": 284,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "canvas_export: 284 assertions PASS"
+    ],
+    "probes": 65,
+    "allExitZero": true,
+    "rawAssertions": 91900,
+    "baselineRawAssertions": 91245,
+    "baselineProbesChanged": {
+      "abi_layouts": [
+        15,
+        21
+      ]
+    },
+    "mediaCapabilitiesAssertions": 365,
+    "teardownCases": 104,
+    "teardownAllCollected": true
+  },
+  "measured": {
+    "webpEncoded": true,
+    "toDataURL": {
+      "prefix": "data:image/png;base64,",
+      "jpegPrefix": "data:image/jpeg;base64,",
+      "zeroSize": "data:,"
+    },
+    "blobType": "image/png",
+    "bitmap": [
+      4,
+      2
+    ],
+    "decodedBlob": [
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      255,
+      255,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      255,
+      255
+    ],
+    "wholePixels": [
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      255,
+      255,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      255,
+      255
+    ],
+    "crop": {
+      "size": [
+        2,
+        2
+      ],
+      "pixels": [
+        255,
+        0,
+        0,
+        255,
+        0,
+        0,
+        255,
+        255
+      ]
+    },
+    "flipY": [
+      0,
+      0,
+      255,
+      255,
+      255,
+      0,
+      0,
+      255
+    ],
+    "resized": [
+      8,
+      4
+    ],
+    "fromImage": {
+      "size": [
+        2,
+        2
+      ],
+      "pixels": [
+        255,
+        0,
+        0,
+        255,
+        0,
+        255,
+        0,
+        255,
+        0,
+        0,
+        255,
+        255,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "errors": {
+      "zeroCrop": "RangeError",
+      "zeroCanvas": "InvalidStateError",
+      "badBlob": "InvalidStateError",
+      "closedSource": "InvalidStateError",
+      "drawClosed": "InvalidStateError"
+    },
+    "closed": [
+      0,
+      0
+    ],
+    "transfer": {
+      "sourceAfter": [
+        0,
+        0
+      ],
+      "canvasData": true
+    },
+    "transferClosed": "InvalidStateError",
+    "assertions": 284
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "file": "red-chromium.json",
+    "compared": {
+      "toDataURL": {
+        "native": {
+          "prefix": "data:image/png;base64,",
+          "jpegPrefix": "data:image/jpeg;base64,",
+          "zeroSize": "data:,"
+        },
+        "chromium": {
+          "prefix": "data:image/png;base64,",
+          "defaultIsPng": true,
+          "jpegPrefix": "data:image/jpeg;base64,",
+          "webpPrefix": "data:image/webp;base64,",
+          "unknownFallsBackToPng": true,
+          "upperCase": "data:image/jpeg;base64,",
+          "zeroSize": "data:,"
+        }
+      },
+      "bitmap": {
+        "native": [
+          4,
+          2
+        ],
+        "chromium": {
+          "width": 4,
+          "height": 2
+        }
+      },
+      "flipY": {
+        "native": [
+          0,
+          0,
+          255,
+          255,
+          255,
+          0,
+          0,
+          255
+        ],
+        "chromium": [
+          0,
+          0,
+          255,
+          255,
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      "resized": {
+        "native": [
+          8,
+          4
+        ],
+        "chromium": [
+          8,
+          4
+        ]
+      },
+      "errors": {
+        "native": {
+          "zeroCrop": "RangeError",
+          "zeroCanvas": "InvalidStateError",
+          "badBlob": "InvalidStateError",
+          "closedSource": "InvalidStateError",
+          "drawClosed": "InvalidStateError"
+        },
+        "chromium": {
+          "zeroCrop": "RangeError",
+          "zeroCanvas": "InvalidStateError",
+          "badBlob": "InvalidStateError",
+          "closedSource": "InvalidStateError",
+          "drawClosed": "InvalidStateError"
+        }
+      },
+      "closed": {
+        "native": [
+          0,
+          0
+        ],
+        "chromium": {
+          "width": 0,
+          "height": 0
+        }
+      },
+      "transfer": {
+        "native": {
+          "sourceAfter": [
+            0,
+            0
+          ],
+          "canvasData": true
+        },
+        "chromium": {
+          "sourceAfter": [
+            0,
+            0
+          ],
+          "canvasData": true
+        }
+      },
+      "transferClosed": {
+        "native": "InvalidStateError",
+        "chromium": "InvalidStateError"
+      }
+    }
+  },
+  "qualifications": [
+    "An encoding the flavor cannot encode, RGBA8 and an unknown value return RV_ERR_UNSUPPORTED; Chromium falls back to PNG (red-chromium.json toDataURL.unknownFallsBackToPng, toBlobUnknown).",
+    "WEBP depends on the flavor encoder: the probe asserts a RIFF/WEBP image or RV_ERR_UNSUPPORTED from the encoder status; the \"image-encoding-*\" platform facilities report unknown on this runtime (finding for R12 integration).",
+    "toBlob completes during rv_canvas_to_blob: there is no callback, and a zero-size canvas gives a NULL Blob as the browser callback gets null.",
+    "createImageBitmap sources: <img>, SVG <image>, <canvas>, ImageBitmap, ImageData and Blob. HTMLVideoElement, OffscreenCanvas and VideoFrame are outside slim (ENABLE_VIDEO, ENABLE_OFFSCREEN_CANVAS, ENABLE_WEB_CODECS OFF); CSSStyleImageValue is not a source kind.",
+    "ImageBitmap transfer is transferFromImageBitmap, which detaches the source; postMessage transfer needs a script realm.",
+    "ImageBitmap buffers are unaccelerated where canvases are (patch 0050); GPU work is paused.",
+    "ImageBitmapRenderingContext.canvas is not generated: its single-arm union typedef ImageBitmapCanvas would name a second HTMLCanvasElement type in the F# model (generator defect, queued by root: a single-arm union generates a duplicate F# type for its arm); the app holds the canvas it passed to rv_canvas_get_bitmap_context."
+  ],
+  "files": {
+    "batch-green.json": "a6a9d0d2606563f7e590a5013a4a1dcc91f849e79ea1a580150673e621483a3b",
+    "build_export_candidate.py": "488107b24102828299edc67cf6e12ef67dbcd111113f47906c86b8a4047c00e1",
+    "canvas-export-probe.log": "3c82d5056cdef2ceff1ea9759ba6cb3e7560a4847d8f27c58872f72e1cfaf0e9",
+    "canvas-export-repeat30.txt": "dbf0cd2ebd434c4a1dd4a7fe4788991c91284a970c227365ab1fd3181b550366",
+    "canvas-export-report.json": "47834c96de067d16b16b9c7cca3cad357581ee1a185dfc04e00a70ccc261ffc4",
+    "make_export_evidence.py": "3ddd2b5cab13d48b0a9968db67fd46ed9a31a7eca8e1f1adbe07c89ea7f31065",
+    "proposed-0049-image-bitmap-crop-completion-handler.diff": "412e58f31374f0e35697ccd7fdfef77044890b1e5a6c208011e93534453e1006",
+    "proposed-0050-image-bitmap-unaccelerated-buffers.diff": "38c4076f0592b5cb46963da5d6b77b1544ddfa6f07cc453fbd45f86c82aa807b",
+    "red-chromium.json": "a96723c0e4ed61e1d350fd9aceb7d9886a41d41d7b1de14110d84c21b4b3909c",
+    "red-native.json": "2f3dbe81b1f819ef61ce81af2c454bf8ad8dc2e1bda30eb56f14c48f1c46e94e",
+    "red-patch-0049-compile.log": "54cb7773b1a77b75f078f754235d49913115fc31787e2f3af8da95cb92518988",
+    "red-patch-0050.log": "e8593fbe470a62c5c7e15e05a04a0edf79a0aad572d346ff96642b7729ccfd0d",
+    "red_bitmap_buffer.py": "f01642c242b330ca1a0375270cd513b2293efe934e06973b109d7b5471bba3f4",
+    "red_chromium.mjs": "5182ac41be5405b8a6f94761ead09fe4833dff97f487045eb333f69ca4e424f8",
+    "red_native.py": "bf51fb9162cefd7cf2d11e98171856a354df1cc842237cad051a96d1b2f0c43c",
+    "repeat30.sh": "af0830f77f4213a22060d0fbc8b850c731b00594300bcc2427c631e02108ffbf",
+    "run_export_full_batch.py": "09ff9f3f7e94d0a543c61241ca1ea85f4cced271b523d89a5a79d90e48e9512b",
+    "runtime-receipt.json": "56cd80cb3f638362458586c91a94215290e169c09abf344c37fb3e113b932229",
+    "source-patches.json": "015ec37d5367499ad4b0224d1e3921946fe195d5c0df4bdd4d2db08aea54d52b",
+    "teardown-probes.json": "5483c939d925c8cc0f30c1cba7ddaad63258da92a314e64be68ea35fcde86432"
+  }
+}

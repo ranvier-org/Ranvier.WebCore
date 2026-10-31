@@ -101,8 +101,10 @@ typedef struct RvDataTransferItem RvDataTransferItem;
 typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
 typedef struct RvCanvasGradient RvCanvasGradient;
 typedef struct RvCanvasPattern RvCanvasPattern;
+typedef struct RvImageData RvImageData;
 typedef struct RvPath2D RvPath2D;
 typedef struct RvImageBitmap RvImageBitmap;
+typedef struct RvImageBitmapRenderingContext RvImageBitmapRenderingContext;
 typedef struct RvTextMetrics RvTextMetrics;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
@@ -521,6 +523,12 @@ enum {
     RV_DOM_HIGHLIGHT_TYPE_GRAMMAR_ERROR = 2, /* "grammar-error" */
 };
 
+/* The values of the IDL enumeration ImageDataPixelFormat. */
+enum {
+    RV_DOM_IMAGE_DATA_PIXEL_FORMAT_RGBA_UNORM8 = 0, /* "rgba-unorm8" */
+    RV_DOM_IMAGE_DATA_PIXEL_FORMAT_RGBA_FLOAT16 = 1, /* "rgba-float16" */
+};
+
 /* The values of the IDL enumeration ImageSmoothingQuality. */
 enum {
     RV_DOM_IMAGE_SMOOTHING_QUALITY_LOW = 0, /* "low" */
@@ -548,6 +556,12 @@ enum {
     RV_DOM_PLAYBACK_DIRECTION_REVERSE = 1, /* "reverse" */
     RV_DOM_PLAYBACK_DIRECTION_ALTERNATE = 2, /* "alternate" */
     RV_DOM_PLAYBACK_DIRECTION_ALTERNATE_REVERSE = 3, /* "alternate-reverse" */
+};
+
+/* The values of the IDL enumeration PredefinedColorSpace. */
+enum {
+    RV_DOM_PREDEFINED_COLOR_SPACE_SRGB = 0, /* "srgb" */
+    RV_DOM_PREDEFINED_COLOR_SPACE_SRGB_LINEAR = 1, /* "srgb-linear" */
 };
 
 /* The values of the IDL enumeration ScrollBehavior. */
@@ -1186,6 +1200,12 @@ typedef struct RvDomDocumentTimelineOptions {
     uint32_t size;
     double origin_time; /* DOMHighResTimeStamp, default 0 */
 } RvDomDocumentTimelineOptions;
+
+/* The IDL dictionary ImageDataSettings. size is sizeof(RvDomImageDataSettings) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomImageDataSettings {
+    uint32_t size;
+} RvDomImageDataSettings;
 
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
@@ -2445,6 +2465,10 @@ RV_EXPORT RvCanvasGradient* rv_dom_canvas_gradient_retain(RvCanvasGradient*);
 RV_EXPORT void rv_dom_canvas_pattern_release(RvCanvasPattern*);
 /* Adds a reference to a CanvasPattern and returns it. */
 RV_EXPORT RvCanvasPattern* rv_dom_canvas_pattern_retain(RvCanvasPattern*);
+/* Releases a handle to a ImageData. */
+RV_EXPORT void rv_dom_image_data_release(RvImageData*);
+/* Adds a reference to a ImageData and returns it. */
+RV_EXPORT RvImageData* rv_dom_image_data_retain(RvImageData*);
 /* Releases a handle to a Path2D. */
 RV_EXPORT void rv_dom_path2_d_release(RvPath2D*);
 /* Adds a reference to a Path2D and returns it. */
@@ -2453,6 +2477,10 @@ RV_EXPORT RvPath2D* rv_dom_path2_d_retain(RvPath2D*);
 RV_EXPORT void rv_dom_image_bitmap_release(RvImageBitmap*);
 /* Adds a reference to a ImageBitmap and returns it. */
 RV_EXPORT RvImageBitmap* rv_dom_image_bitmap_retain(RvImageBitmap*);
+/* Releases a handle to a ImageBitmapRenderingContext. */
+RV_EXPORT void rv_dom_image_bitmap_rendering_context_release(RvImageBitmapRenderingContext*);
+/* Adds a reference to a ImageBitmapRenderingContext and returns it. */
+RV_EXPORT RvImageBitmapRenderingContext* rv_dom_image_bitmap_rendering_context_retain(RvImageBitmapRenderingContext*);
 /* Releases a handle to a TextMetrics. */
 RV_EXPORT void rv_dom_text_metrics_release(RvTextMetrics*);
 /* Adds a reference to a TextMetrics and returns it. */
@@ -9312,6 +9340,29 @@ RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_fill_text(RvCanvasRendering
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_stroke_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, double x, double y, const double* max_width);
 /* CanvasRenderingContext2D.measureText(DOMString text) -> TextMetrics; *result is a new reference */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_measure_text(RvCanvasRenderingContext2D* target, const uint8_t* text, int32_t text_length, RvTextMetrics** result);
+/* CanvasRenderingContext2D.drawImage(CanvasImageSource image, unrestricted double dx, unrestricted double dy) ->
+ * undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_draw_image_3(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy);
+/* CanvasRenderingContext2D.drawImage(CanvasImageSource image, unrestricted double dx, unrestricted double dy,
+ * unrestricted double dw, unrestricted double dh) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_draw_image_5(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy, double dw, double dh);
+/* CanvasRenderingContext2D.drawImage(CanvasImageSource image, unrestricted double sx, unrestricted double sy,
+ * unrestricted double sw, unrestricted double sh, unrestricted double dx, unrestricted double dy, unrestricted double
+ * dw, unrestricted double dh) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_draw_image_9(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double sx, double sy, double sw, double sh, double dx, double dy, double dw, double dh);
+/* CanvasRenderingContext2D.createImageData(long sw, long sh, optional ImageDataSettings settings = {}) -> ImageData;
+ * settings defaults to {} in IDL; settings may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_create_image_data_3(RvCanvasRenderingContext2D* target, int32_t sw, int32_t sh, const RvDomImageDataSettings* settings, RvImageData** result);
+/* CanvasRenderingContext2D.createImageData(ImageData imagedata) -> ImageData; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_create_image_data_1(RvCanvasRenderingContext2D* target, RvImageData* imagedata, RvImageData** result);
+/* CanvasRenderingContext2D.getImageData(long sx, long sy, long sw, long sh, optional ImageDataSettings settings = {})
+ * -> ImageData; settings defaults to {} in IDL; settings may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_image_data(RvCanvasRenderingContext2D* target, int32_t sx, int32_t sy, int32_t sw, int32_t sh, const RvDomImageDataSettings* settings, RvImageData** result);
+/* CanvasRenderingContext2D.putImageData(ImageData imagedata, long dx, long dy) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_put_image_data_3(RvCanvasRenderingContext2D* target, RvImageData* imagedata, int32_t dx, int32_t dy);
+/* CanvasRenderingContext2D.putImageData(ImageData imagedata, long dx, long dy, long dirtyX, long dirtyY, long
+ * dirtyWidth, long dirtyHeight) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_put_image_data_7(RvCanvasRenderingContext2D* target, RvImageData* imagedata, int32_t dx, int32_t dy, int32_t dirty_x, int32_t dirty_y, int32_t dirty_width, int32_t dirty_height);
 /* CanvasRenderingContext2D.setLineDash(sequence<unrestricted double> segments) -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_set_line_dash(RvCanvasRenderingContext2D* target, const RvDomSequenceUnrestrictedDouble* segments);
 /* CanvasRenderingContext2D.getLineDash() -> sequence<unrestricted double>; *result owns its contents; release with
@@ -9360,6 +9411,12 @@ RV_EXPORT int32_t rv_dom_canvas_gradient_add_color_stop(RvCanvasGradient* target
 /* CanvasPattern.setTransform(optional DOMMatrix2DInit transform = {}) -> undefined; transform defaults to {} in IDL;
  * transform may be NULL for the IDL default */
 RV_EXPORT int32_t rv_dom_canvas_pattern_set_transform(RvCanvasPattern* target, const RvDomDOMMatrix2DInit* transform);
+/* ImageData */
+
+/* ImageData.width getter: readonly attribute unsigned long width */
+RV_EXPORT int32_t rv_dom_image_data_get_width(RvImageData* target, uint32_t* result);
+/* ImageData.height getter: readonly attribute unsigned long height */
+RV_EXPORT int32_t rv_dom_image_data_get_height(RvImageData* target, uint32_t* result);
 /* Path2D */
 
 /* Path2D.constructor: target is the Document of the constructed object; *result is a new reference */
@@ -9403,6 +9460,18 @@ RV_EXPORT int32_t rv_dom_path2_d_arc(RvPath2D* target, double x, double y, doubl
  * radiusY, unrestricted double rotation, unrestricted double startAngle, unrestricted double endAngle, optional
  * boolean anticlockwise = false) -> undefined; anticlockwise defaults to false in IDL */
 RV_EXPORT int32_t rv_dom_path2_d_ellipse(RvPath2D* target, double x, double y, double radius_x, double radius_y, double rotation, double start_angle, double end_angle, int32_t anticlockwise);
+/* ImageBitmap */
+
+/* ImageBitmap.width getter: readonly attribute unsigned long width */
+RV_EXPORT int32_t rv_dom_image_bitmap_get_width(RvImageBitmap* target, uint32_t* result);
+/* ImageBitmap.height getter: readonly attribute unsigned long height */
+RV_EXPORT int32_t rv_dom_image_bitmap_get_height(RvImageBitmap* target, uint32_t* result);
+/* ImageBitmap.close() -> undefined */
+RV_EXPORT int32_t rv_dom_image_bitmap_close(RvImageBitmap* target);
+/* ImageBitmapRenderingContext */
+
+/* ImageBitmapRenderingContext.transferFromImageBitmap(ImageBitmap? bitmap) -> undefined; bitmap may be NULL */
+RV_EXPORT int32_t rv_dom_image_bitmap_rendering_context_transfer_from_image_bitmap(RvImageBitmapRenderingContext* target, RvImageBitmap* bitmap);
 /* TextMetrics */
 
 /* TextMetrics.width getter: readonly attribute double width */

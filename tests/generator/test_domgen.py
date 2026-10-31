@@ -759,6 +759,25 @@ interface Shape {
         generator.run()
         return generator
 
+    def draw_generator(self, conversions=()):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+interface Gradient {};
+interface Pattern {};
+typedef (Gradient or Pattern) PaintSource;
+interface Surface {
+    undefined draw(PaintSource source, unrestricted double x);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Surface', 'Gradient', 'Pattern']
+        config['unionArgumentConversions'] = list(conversions)
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        return generator
+
     def test_same_arity_overloads_take_the_first_differing_argument_name_or_type(self):
         generator = self.path_generator()
         names = sorted(function.name for function in generator.functions if function.interface == 'Shape')
@@ -776,6 +795,12 @@ interface Shape {
         self.assertIn('RV_DOM_MODE_CLOSED = 1', generator.header())
         absent = self.path_generator('    undefined pick(optional Mode mode);')
         self.assertEqual('optional enumeration Mode argument without a default', dict(absent.excluded)['Shape.pick'])
+
+    def test_union_argument_conversions_convert_the_held_arm_into_the_engine_typedef(self):
+        glue = self.draw_generator(['PaintSource']).glue()
+        self.assertIn('impl->draw(WTF::switchOn(std::move(*a0), [](auto&& arm) -> PaintSource { return PaintSource { std::move(arm) }; }), x)', glue)
+        plain = self.draw_generator().glue()
+        self.assertIn('impl->draw(std::move(*a0), x)', plain)
 
     def test_opaque_union_arm_returns_a_tag_with_a_null_payload_and_no_decoder(self):
         generator = self.form_data_generator()

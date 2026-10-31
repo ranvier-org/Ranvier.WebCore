@@ -801,8 +801,10 @@
     "CanvasRenderingContext2D",
     "CanvasGradient",
     "CanvasPattern",
+    "ImageData",
     "Path2D",
     "ImageBitmap",
+    "ImageBitmapRenderingContext",
     "TextMetrics"
   ],
   "skipDirectories": [
@@ -1305,6 +1307,10 @@
       "fillStyle",
       "fillRect",
       "clearRect",
+      "createImageData",
+      "getImageData",
+      "putImageData",
+      "drawImage",
       "strokeRect",
       "beginPath",
       "closePath",
@@ -1371,7 +1377,20 @@
     "CanvasPattern": [
       "setTransform"
     ],
-    "ImageBitmap": []
+    "ImageBitmap": [
+      "width",
+      "height",
+      "close"
+    ],
+    "ImageBitmapRenderingContext": [
+      "transferFromImageBitmap"
+    ],
+    "ImageData": [
+      "width",
+      "height",
+      "colorSpace",
+      "pixelFormat"
+    ]
   },
   "unionSetterOverloads": [
     "CanvasRenderingContext2D.fillStyle",
@@ -1447,6 +1466,7 @@
     "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
   },
   "unionArgumentConversions": [
+    "CanvasImageSource",
     "CanvasRenderingContext2D.createPattern"
   ]
 }
