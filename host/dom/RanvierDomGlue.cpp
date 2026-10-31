@@ -42795,7 +42795,8 @@ int32_t ranvier_dom_dom_matrix_read_only_from_float32_array(RvNode* target, cons
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr a0 = JSC::Float32Array::tryCreate(std::span<const float> { array32, static_cast<size_t>(array32_count) });
+    RefPtr buffer0 = JSC::ArrayBuffer::tryCreate(array32_count ? std::span<const uint8_t> { reinterpret_cast<const uint8_t*>(array32), static_cast<size_t>(array32_count) * sizeof(float) } : std::span<const uint8_t> { });
+    RefPtr a0 = buffer0 ? JSC::Float32Array::tryCreate(WTF::move(buffer0), 0, static_cast<size_t>(array32_count)) : nullptr;
     if (!a0)
         return Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array could not be allocated."_s });
     return deliver([&]() -> decltype(auto) { return DOMMatrixReadOnly::fromFloat32Array(a0.releaseNonNull()); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrixReadOnly>(value, result); });
@@ -42811,7 +42812,8 @@ int32_t ranvier_dom_dom_matrix_read_only_from_float64_array(RvNode* target, cons
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr a0 = JSC::Float64Array::tryCreate(std::span<const double> { array64, static_cast<size_t>(array64_count) });
+    RefPtr buffer0 = JSC::ArrayBuffer::tryCreate(array64_count ? std::span<const uint8_t> { reinterpret_cast<const uint8_t*>(array64), static_cast<size_t>(array64_count) * sizeof(double) } : std::span<const uint8_t> { });
+    RefPtr a0 = buffer0 ? JSC::Float64Array::tryCreate(WTF::move(buffer0), 0, static_cast<size_t>(array64_count)) : nullptr;
     if (!a0)
         return Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array could not be allocated."_s });
     return deliver([&]() -> decltype(auto) { return DOMMatrixReadOnly::fromFloat64Array(a0.releaseNonNull()); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrixReadOnly>(value, result); });
@@ -42889,7 +42891,8 @@ int32_t ranvier_dom_dom_matrix_from_float32_array(RvNode* target, const float* a
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr a0 = JSC::Float32Array::tryCreate(std::span<const float> { array32, static_cast<size_t>(array32_count) });
+    RefPtr buffer0 = JSC::ArrayBuffer::tryCreate(array32_count ? std::span<const uint8_t> { reinterpret_cast<const uint8_t*>(array32), static_cast<size_t>(array32_count) * sizeof(float) } : std::span<const uint8_t> { });
+    RefPtr a0 = buffer0 ? JSC::Float32Array::tryCreate(WTF::move(buffer0), 0, static_cast<size_t>(array32_count)) : nullptr;
     if (!a0)
         return Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array could not be allocated."_s });
     return deliver([&]() -> decltype(auto) { return DOMMatrix::fromFloat32Array(a0.releaseNonNull()); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });
@@ -42905,7 +42908,8 @@ int32_t ranvier_dom_dom_matrix_from_float64_array(RvNode* target, const double* 
     RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
-    RefPtr a0 = JSC::Float64Array::tryCreate(std::span<const double> { array64, static_cast<size_t>(array64_count) });
+    RefPtr buffer0 = JSC::ArrayBuffer::tryCreate(array64_count ? std::span<const uint8_t> { reinterpret_cast<const uint8_t*>(array64), static_cast<size_t>(array64_count) * sizeof(double) } : std::span<const uint8_t> { });
+    RefPtr a0 = buffer0 ? JSC::Float64Array::tryCreate(WTF::move(buffer0), 0, static_cast<size_t>(array64_count)) : nullptr;
     if (!a0)
         return Ranvier::recordException(Exception { ExceptionCode::RangeError, "The array could not be allocated."_s });
     return deliver([&]() -> decltype(auto) { return DOMMatrix::fromFloat64Array(a0.releaseNonNull()); }, [&](auto&& value) { return storeTrackedHandle<DOMMatrixReadOnly, DOMMatrix>(value, result); });

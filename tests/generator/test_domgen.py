@@ -2641,7 +2641,8 @@ interface MatrixProbe { static MatrixProbe fromFloat32Array(Float32Array array32
         self.assertEqual(functions['rv_dom_matrix_probe_from_float32_array']['parameters'][1:3],
                          [{'ctype': 'const float*', 'name': 'array32'}, {'ctype': 'int32_t', 'name': 'array32_count'}])
         self.assertNotIn('rv_dom_matrix_probe_to_float64_array', functions)
-        self.assertIn('RefPtr a0 = JSC::Float32Array::tryCreate(std::span<const float> { array32, static_cast<size_t>(array32_count) });', generator.glue())
+        self.assertIn('RefPtr a0 = buffer0 ? JSC::Float32Array::tryCreate(WTF::move(buffer0), 0, static_cast<size_t>(array32_count)) : nullptr;', generator.glue())
+        self.assertIn('static_cast<size_t>(array32_count) * sizeof(float)', generator.glue())
 
     def test_idl_default_dictionary_assigns_own_literal_defaults_before_reading_fields(self):
         extra = '''

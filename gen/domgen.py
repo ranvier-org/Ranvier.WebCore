@@ -1826,7 +1826,9 @@ class Generator(ComplexGeneratorMixin):
                     raise Unsupported('optional or variadic typed array input')
                 params += [(f'const {mapped.ctype}*', name), ('int32_t', f'{name}_count')]
                 checks.append(f'({name}_count >= 0 && ({name}_count == 0 || {name}))')
-                prepare += [f'RefPtr a{index} = JSC::{mapped.label}::tryCreate(std::span<const {mapped.ctype}> {{ {name}, static_cast<size_t>({name}_count) }});',
+                bytes = f'std::span<const uint8_t> {{ reinterpret_cast<const uint8_t*>({name}), static_cast<size_t>({name}_count) * sizeof({mapped.ctype}) }}'
+                prepare += [f'RefPtr buffer{index} = JSC::ArrayBuffer::tryCreate({name}_count ? {bytes} : std::span<const uint8_t> {{ }});',
+                            f'RefPtr a{index} = buffer{index} ? JSC::{mapped.label}::tryCreate(WTF::move(buffer{index}), 0, static_cast<size_t>({name}_count)) : nullptr;',
                             f'if (!a{index})',
                             f'    return Ranvier::recordException(Exception {{ ExceptionCode::RangeError, "The array could not be allocated."_s }});']
                 passed.append(f'a{index}.releaseNonNull()')

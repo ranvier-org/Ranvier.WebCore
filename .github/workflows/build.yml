@@ -560,6 +560,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/event_details.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify DOM node, event and matrix value factories against the Chromium oracle
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/value_factories.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify U+0000 round trips of generated string inputs against the Chromium oracle
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/string_nul.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
