@@ -165,6 +165,11 @@
 #include <wtf/RunLoop.h>
 #include <wtf/HexNumber.h>
 #include <wtf/text/MakeString.h>
+#include <wtf/text/TextBreakIterator.h>
+#include <unicode/ubrk.h>
+#include <unicode/uloc.h>
+#include <unicode/uchar.h>
+#include <unicode/uversion.h>
 
 #if PLATFORM(GTK) || PLATFORM(WPE)
 #include <WebCore/PlatformDisplaySurfaceless.h>
@@ -771,6 +776,8 @@ void RvChromeClient::wantUpdate()
 
 static bool onOwningThread() { return isMainThread(); }
 
+static bool segmentationInitialized;
+
 // The hosts alive on the owning thread, for routing a page's loads to its host.
 static Vector<RvHost*> liveHosts;
 
@@ -1207,6 +1214,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "dom-binary-values"))
         return 1;
+    if (!std::strcmp(feature, "text-segmentation"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1261,6 +1270,7 @@ RvHost* rv_host_create(int32_t width, int32_t height)
             PlatformDisplay::setSharedDisplay(PlatformDisplaySurfaceless::create());
 #endif
         initialized = true;
+        segmentationInitialized = true;
     }
     if (!onOwningThread() || width <= 0 || height <= 0)
         return nullptr;
@@ -5301,4 +5311,137 @@ int32_t rv_ax_text_offset_at(RvAxNode* handle, int32_t x, int32_t y)
         return -1;
     auto point = makeBoundaryPoint(frame->visiblePositionForPoint(view->rootViewToContents(IntPoint { x, y })));
     return inScope(*scope, point) ? textOffset(*scope, point) : -1;
+}
+
+// Text segmentation.
+
+static int32_t textSegmentFailure(RvTextSegments* result, int32_t status)
+{
+    rv_text_segments_release(result);
+    return status;
+}
+
+static char* copyLocale(const char* value)
+{
+    auto length = std::strlen(value ? value : "");
+    auto* copy = static_cast<char*>(std::malloc(length + 1));
+    RELEASE_ASSERT(copy);
+    std::memcpy(copy, value ? value : "", length);
+    copy[length] = 0;
+    return copy;
+}
+
+int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t* text, int32_t length, RvTextSegments* result)
+{
+    if (!result || length < 0 || (length && !text))
+        return RV_ERR_NULL_ARGUMENT;
+    *result = { };
+    if (!segmentationInitialized || !onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (granularity < RV_SEGMENT_GRAPHEME || granularity > RV_SEGMENT_LINE)
+        return RV_ERR_UNSUPPORTED;
+    char icuLocale[ULOC_FULLNAME_CAPACITY] = { };
+    if (locale && *locale) {
+        UErrorCode status = U_ZERO_ERROR;
+        int32_t parsed = 0;
+        auto tagLength = static_cast<int32_t>(std::strlen(locale));
+        uloc_forLanguageTag(locale, icuLocale, sizeof(icuLocale), &parsed, &status);
+        if (U_FAILURE(status) || status == U_STRING_NOT_TERMINATED_WARNING || parsed != tagLength)
+            return fail(Exception { ExceptionCode::RangeError, "Incorrect locale information provided"_s });
+    }
+    static constexpr UBreakIteratorType types[] = { UBRK_CHARACTER, UBRK_WORD, UBRK_SENTENCE, UBRK_LINE };
+    auto type = types[granularity];
+    auto* units = reinterpret_cast<const UChar*>(text);
+    UErrorCode status = U_ZERO_ERROR;
+    // An ICU iterator of the same type reports the locale, and serves words and sentences, whose WTF iterators
+    // ignore the locale.
+    UBreakIterator* icu = ubrk_open(type, icuLocale, length ? units : u"", length, &status);
+    if (U_FAILURE(status) || !icu)
+        return textSegmentFailure(result, RV_ERR_UNSUPPORTED);
+    status = U_ZERO_ERROR;
+    result->locale = copyLocale(ubrk_getLocaleByType(icu, ULOC_VALID_LOCALE, &status));
+    Vector<int32_t> starts;
+    Vector<int32_t> wordLike;
+    if (length) {
+        if (granularity == RV_SEGMENT_GRAPHEME || granularity == RV_SEGMENT_LINE) {
+            StringView view { std::span<const char16_t> { reinterpret_cast<const char16_t*>(text), static_cast<size_t>(length) } };
+            TextBreakIterator::Mode mode = TextBreakIterator::CaretMode { };
+            if (granularity == RV_SEGMENT_LINE)
+                mode = TextBreakIterator::LineMode { TextBreakIterator::LineMode::Behavior::Default };
+            CachedTextBreakIterator iterator(view, { }, mode, AtomString { String::fromLatin1(icuLocale) });
+            unsigned position = 0;
+            while (position < static_cast<unsigned>(length)) {
+                starts.append(static_cast<int32_t>(position));
+                auto next = iterator.following(position);
+                if (!next || *next <= position || *next > static_cast<unsigned>(length))
+                    break;
+                position = *next;
+            }
+        } else {
+            for (int32_t start = ubrk_first(icu), end = ubrk_next(icu); end != UBRK_DONE; start = end, end = ubrk_next(icu)) {
+                starts.append(start);
+                if (granularity == RV_SEGMENT_WORD)
+                    wordLike.append(ubrk_getRuleStatus(icu) >= UBRK_WORD_NONE_LIMIT ? 1 : 0);
+            }
+        }
+    }
+    ubrk_close(icu);
+    if (length && granularity != RV_SEGMENT_GRAPHEME) {
+        // A boundary inside a grapheme cluster joins its two segments, so no segment splits a grapheme; a joined
+        // word is word-like when either part is.
+        StringView view { std::span<const char16_t> { reinterpret_cast<const char16_t*>(text), static_cast<size_t>(length) } };
+        CachedTextBreakIterator graphemes(view, { }, TextBreakIterator::CaretMode { }, AtomString { String::fromLatin1(icuLocale) });
+        Vector<int32_t> keptStarts;
+        Vector<int32_t> keptWordLike;
+        for (size_t index = 0; index < starts.size(); ++index) {
+            if (index && !graphemes.isBoundary(static_cast<unsigned>(starts[index]))) {
+                if (granularity == RV_SEGMENT_WORD)
+                    keptWordLike.last() |= wordLike[index];
+                continue;
+            }
+            keptStarts.append(starts[index]);
+            if (granularity == RV_SEGMENT_WORD)
+                keptWordLike.append(wordLike[index]);
+        }
+        starts = WTF::move(keptStarts);
+        wordLike = WTF::move(keptWordLike);
+    }
+    result->count = static_cast<int32_t>(starts.size());
+    if (!starts.isEmpty()) {
+        result->starts = static_cast<int32_t*>(std::malloc(starts.size() * sizeof(int32_t)));
+        RELEASE_ASSERT(result->starts);
+        std::memcpy(result->starts, starts.span().data(), starts.size() * sizeof(int32_t));
+        if (granularity == RV_SEGMENT_WORD) {
+            result->word_like = static_cast<int32_t*>(std::malloc(wordLike.size() * sizeof(int32_t)));
+            RELEASE_ASSERT(result->word_like);
+            std::memcpy(result->word_like, wordLike.span().data(), wordLike.size() * sizeof(int32_t));
+        }
+    }
+    return RV_OK;
+}
+
+int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    UVersionInfo icu { };
+    UVersionInfo unicode { };
+    u_getVersion(icu);
+    u_getUnicodeVersion(unicode);
+    auto text = makeString("icu="_s, icu[0], '.', icu[1], " unicode="_s, unicode[0], '.', unicode[1]).utf8();
+    *length = static_cast<int32_t>(text.length());
+    if (capacity < *length)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    std::memcpy(buffer, text.data(), text.length());
+    return RV_OK;
+}
+
+void rv_text_segments_release(RvTextSegments* segments)
+{
+    if (!segments)
+        return;
+    std::free(segments->starts);
+    std::free(segments->word_like);
+    std::free(segments->locale);
+    *segments = { };
 }

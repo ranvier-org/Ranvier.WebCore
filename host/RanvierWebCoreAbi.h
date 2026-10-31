@@ -1377,6 +1377,37 @@ RV_EXPORT int32_t rv_blob_read_bytes(RvBlob* blob, uint8_t* buffer, int64_t capa
  * Returns RV_ERR_WRONG_INTERFACE for an item that is a Blob and not a File. */
 RV_EXPORT int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFileList** result);
 
+/* "text-segmentation" for rv_abi_has: graphemes, words, sentences and line-break opportunities of UTF-16 text,
+ * with the engine's ICU. Graphemes and lines use WebKit's caret and line iterators (line-break normal; CSS loose,
+ * strict and anywhere are out of scope); words and sentences use ICU's iterators for the locale. Every word,
+ * sentence and line boundary is a grapheme boundary: a rule boundary inside a grapheme cluster joins its two segments. */
+enum {
+    RV_SEGMENT_GRAPHEME = 0,
+    RV_SEGMENT_WORD = 1,
+    RV_SEGMENT_SENTENCE = 2,
+    RV_SEGMENT_LINE = 3,
+};
+/* The segments of a text. Segment i starts at starts[i], in UTF-16 code units, and ends where segment i + 1 starts,
+ * the last at the text's length. word_like holds one flag per segment for RV_SEGMENT_WORD, 1 where ICU's rule status
+ * is UBRK_WORD_NONE_LIMIT or above (Intl.Segmenter's isWordLike), and is NULL otherwise. locale is ICU's valid
+ * locale for the request, NUL-terminated UTF-8. The buffers are owned until rv_text_segments_release. */
+typedef struct RvTextSegments {
+    int32_t count;
+    int32_t* starts;
+    int32_t* word_like;
+    char* locale;
+} RvTextSegments;
+/* Segments length UTF-16 code units of text at granularity for locale, a BCP 47 language tag; NULL or "" is the
+ * root locale. text may be NULL for length 0, which gives zero segments. A locale that is not a well-formed tag
+ * returns RV_ERR_DOM_EXCEPTION with a RangeError. Runs on the owning thread after the first rv_host_create, and
+ * keeps working after every host is destroyed. */
+RV_EXPORT int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t* text, int32_t length, RvTextSegments* result);
+/* Frees the buffers of segments and zeroes it; on any thread. */
+RV_EXPORT void rv_text_segments_release(RvTextSegments* segments);
+/* The ICU and Unicode versions behind rv_text_segment, such as "icu=77.1 unicode=16.0", as rv_node_get_string
+ * copies a string. Windows packages carry ICU; Linux and macOS packages use the system's. */
+RV_EXPORT int32_t rv_text_segmentation_version(char* buffer, int32_t capacity, int32_t* length);
+
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
 
