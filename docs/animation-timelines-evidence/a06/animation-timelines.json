@@ -1,0 +1,107 @@
+{
+ "oracle": "Chromium 156.0.8078.4",
+ "assertions": 202,
+ "failures": [],
+ "vmEntryCrashArmed": true,
+ "results": {
+  "a06": {
+   "documentTimeline": {
+    "interfaceName": "DocumentTimeline",
+    "currentTimeIsNumber": true,
+    "duration": null
+   },
+   "origins": [
+    {
+     "origin": 100,
+     "offsetClose": true,
+     "duration": null,
+     "interfaceName": "DocumentTimeline",
+     "distinct": true
+    },
+    {
+     "origin": 0,
+     "offsetClose": true,
+     "duration": null,
+     "interfaceName": "DocumentTimeline",
+     "distinct": true
+    },
+    {
+     "origin": -50,
+     "offsetClose": true,
+     "duration": null,
+     "interfaceName": "DocumentTimeline",
+     "distinct": true
+    },
+    {
+     "origin": 1000000000.0,
+     "offsetClose": true,
+     "duration": null,
+     "interfaceName": "DocumentTimeline",
+     "distinct": true
+    }
+   ],
+   "futureNegative": true,
+   "defaultEqual": true,
+   "inactive": {
+    "currentTime": null,
+    "duration": null,
+    "identity": true,
+    "animation": {
+     "playState": "running",
+     "currentTime": 0.0,
+     "startTime": null
+    }
+   },
+   "gates": {
+    "maximumFrameRate": false,
+    "frameRate": false
+   },
+   "beforeFrame": {
+    "pending": [
+     true,
+     true
+    ],
+    "startTime": [
+     null,
+     null
+    ]
+   },
+   "synchronized": {
+    "sameStart": true,
+    "started": true,
+    "ownStartOffsetClose": false,
+    "currentClose": false,
+    "playState": [
+     "running",
+     "running",
+     "running"
+    ],
+    "pending": [
+     false,
+     false
+    ]
+   },
+   "teardown": {
+    "before": true,
+    "timeline": null,
+    "own": null
+   }
+  },
+  "diagnostics": {
+   "startTime": [
+    4.0,
+    4.0,
+    4.0
+   ],
+   "currentTime": [
+    3.0,
+    3.0,
+    -97.0
+   ],
+   "timelines": [
+    7.0,
+    -93.0
+   ]
+  }
+ }
+}

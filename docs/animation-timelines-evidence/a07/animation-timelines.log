@@ -1,0 +1,4 @@
+PASS animation timelines: 725 assertions against Chromium 156.0.8078.4; VM-entry crash armed: True
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+
+EXIT_CODE=0

@@ -159,6 +159,7 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', '-X', 'utf8', tests / 'web_animation_discovery.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'animation_lifecycle.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'animation_events.py', '--native-directory', out])
+    run([sys.executable, '-I', '-X', 'utf8', tests / 'animation_timelines.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'form_navigation.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'form_submission.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'event_details.py', '--native-directory', out])

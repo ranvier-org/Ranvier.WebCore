@@ -1,0 +1,70 @@
+{
+ "comment": "WebKit animation timeline results that differ from the Chromium oracle by engine behaviour. The probe asserts the native value here and that the oracle still records the Chromium value, so either engine changing is caught.",
+ "checks": {
+  "a06.synchronized.ownStartOffsetClose": {
+   "reason": "The pinned WebKit gives every pending animation on a monotonic timeline the document timeline time as its start time (AnimationTimelinesController::processPendingAnimations), so an animation on DocumentTimeline({originTime}) starts at the document time, not at the document time minus originTime as Chromium and the specification give.",
+   "webkit": false,
+   "chromium": true
+  },
+  "a06.synchronized.currentClose": {
+   "reason": "Follows from the start time above: the animation on the later-origin timeline reads a current time smaller by originTime.",
+   "webkit": false,
+   "chromium": true
+  },
+  "a07.removed.a.opacity": {
+   "reason": "Once the source leaves the tree the timeline is inactive and the animation current time reads null in both engines; the pinned WebKit keeps the last effect value until the target style is next invalidated (a07.restyled matches Chromium), Chromium drops it at once.",
+   "webkit": "0.5",
+   "chromium": "1"
+  },
+  "a07.removed.b.opacity": {
+   "reason": "Once the source leaves the tree the timeline is inactive and the animation current time reads null in both engines; the pinned WebKit keeps the last effect value until the target style is next invalidated (a07.restyled matches Chromium), Chromium drops it at once.",
+   "webkit": "0.25",
+   "chromium": "1"
+  },
+  "a08.setRanges[1].rangeStart.rangeName": {
+   "reason": "A CSSNumericValue range: WebKit keeps it as an offset with the range name \"omitted\" (30% of the cover range); Chromium reads it as range \"none\" at 0% and keeps the previous progress.",
+   "webkit": "omitted",
+   "chromium": "none"
+  },
+  "a08.setRanges[1].rangeStart.offset.value": {
+   "reason": "A CSSNumericValue range: WebKit keeps it as an offset with the range name \"omitted\" (30% of the cover range); Chromium reads it as range \"none\" at 0% and keeps the previous progress.",
+   "webkit": 30.0,
+   "chromium": 0
+  },
+  "a08.setRanges[1].currentTime.value": {
+   "reason": "A CSSNumericValue range: WebKit keeps it as an offset with the range name \"omitted\" (30% of the cover range); Chromium reads it as range \"none\" at 0% and keeps the previous progress.",
+   "webkit": 20.0,
+   "chromium": 50
+  },
+  "a08.setRanges[2].rangeStart.rangeName": {
+   "reason": "The CSSKeywordValue \"normal\": WebKit reads a range offset with neither a name nor an offset; Chromium reads range \"none\" at 0%.",
+   "webkit": null,
+   "chromium": "none"
+  },
+  "a08.setRanges[2].rangeStart.offset.value": {
+   "reason": "The CSSKeywordValue \"normal\": WebKit reads a range offset with neither a name nor an offset; Chromium reads range \"none\" at 0%.",
+   "webkit": null,
+   "chromium": 0
+  },
+  "a08.setRanges[2].rangeStart.offset.unit": {
+   "reason": "The CSSKeywordValue \"normal\": WebKit reads a range offset with neither a name nor an offset; Chromium reads range \"none\" at 0%.",
+   "webkit": null,
+   "chromium": "percent"
+  },
+  "a08.setRanges[2].rangeEnd.offset.value": {
+   "reason": "The range string \"exit\" without an offset: WebKit gives the end its default 100%, as the specification does; Chromium reads 1%.",
+   "webkit": 100.0,
+   "chromium": 1
+  },
+  "a08.setRanges[3].rangeStartError": {
+   "reason": "An unparsable range string: Animation.rangeStart has no exception path in the pinned WebKit (setBindingsRangeStart is void), so the value is ignored and the previous one stays; Chromium throws TypeError.",
+   "webkit": null,
+   "chromium": "TypeError"
+  },
+  "a08.setRanges[3].rangeEnd.offset.value": {
+   "reason": "The range string \"exit\" without an offset: WebKit gives the end its default 100%, as the specification does; Chromium reads 1%.",
+   "webkit": 100.0,
+   "chromium": 1
+  }
+ }
+}

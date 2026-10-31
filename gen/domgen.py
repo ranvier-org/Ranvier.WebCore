@@ -547,10 +547,16 @@ class World:
                             and f"{name}.{member.name}" in self.config.get("dictionaryEventTargetMembers", []))
             optional_object = f"{name}.{member.name}" in self.config.get("optionalObjectMembers", [])
             if optional_object:
-                # Rv<Root>* const*: NULL for absent, a pointer to NULL for null, else the handle.
-                if mapped.kind != "object" or member.required or member.default is not None or not mapped.nullable:
-                    raise SystemExit(f"{name}.{member.name}: optional object members must be optional nullable object handles without a default")
+                # Rv<Root>* const* (or RvNode* const*): NULL for absent, a pointer to NULL for null, else the handle.
+                if mapped.kind not in ("object", "node") or member.required or member.default is not None or not mapped.nullable:
+                    raise SystemExit(f"{name}.{member.name}: optional object members must be optional nullable object or node handles without a default")
                 mapped.optional_handle = True
+                configured_object = True
+            if f"{name}.{member.name}" in self.config.get("absentObjectMembers", []):
+                # Rv<Root>*: NULL for absent, else the handle; the IDL member is optional, nonnullable and has no default.
+                if mapped.kind != "object" or member.required or member.default is not None or mapped.nullable:
+                    raise SystemExit(f"{name}.{member.name}: absent object members must be optional nonnullable object handles without a default")
+                mapped.absent_handle = True
                 configured_object = True
             if (mapped.kind in ("object", "event") and not configured_object) or (mapped.interface == "EventTarget" and not event_target):
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
@@ -1594,6 +1600,24 @@ class Generator(ComplexGeneratorMixin):
         covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
         ctype = self.field_ctype(member, mapped, dictionary)
         lines = []
+        if getattr(mapped, "absent_handle", False):
+            self.headers.add(f"{mapped.cls}.h")
+            root = self.world.cpp_class(mapped.root)
+            source = f"reinterpret_cast<{root}*>({pointer}->{field})"
+            cast = source if root == mapped.cls else self.cast_expression(mapped.cls, root, f"*{source}")
+            lines += [f"if ({covered} && {pointer}->{field}) {{", f"    RefPtr<{mapped.cls}> value = {cast};", "    if (!value)",
+                      "        return RV_ERR_WRONG_INTERFACE;", f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
+        if getattr(mapped, "optional_handle", False) and mapped.kind == "node":
+            self.headers.add(f"{mapped.cls}.h")
+            lines += [f"if ({covered} && {pointer}->{field}) {{", f"    RefPtr<{mapped.cls}> value;", f"    if (*{pointer}->{field}) {{"]
+            if mapped.cls == "Node":
+                lines.append(f"        value = nodeOf(*{pointer}->{field});")
+            else:
+                lines += [f"        value = dynamicDowncast<{mapped.cls}>(*nodeOf(*{pointer}->{field}));", "        if (!value)",
+                          "            return RV_ERR_WRONG_INTERFACE;"]
+            lines += ["    }", f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
         if getattr(mapped, "optional_handle", False):
             self.headers.add(f"{mapped.cls}.h")
             root = self.world.cpp_class(mapped.root)
@@ -1930,7 +1954,8 @@ class Generator(ComplexGeneratorMixin):
                     notes.append(f"{name} may be NULL for the IDL default")
                 cpp = self.dictionary_cpp(mapped.interface)
                 objects = [(field_member, field_mapped) for field_member, field_mapped in fields
-                           if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)]
+                           if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)
+                           and not getattr(field_mapped, "absent_handle", False)]
                 reference = mapped.interface in self.world.config.get("referenceDictionaries", [])
                 target = f"a{index}"
                 if reference:
@@ -1952,9 +1977,19 @@ class Generator(ComplexGeneratorMixin):
                     prepare.append(f"{cpp} a{index} {{ }};")
                     if mapped.interface in self.world.config.get("idlDefaultDictionaries", []):
                         prepare += self.idl_defaults(mapped.interface, f"a{index}")
+                for field_member, field_mapped in fields:
+                    label = f"{mapped.interface}.{field_member.name}"
+                    if label in self.world.config.get("unionFieldDefaults", []):
+                        # The C++ struct leaves the member empty; the IDL default applies whether or not options is NULL.
+                        default = field_member.default or ""
+                        if (field_mapped.kind != "union" or not default.startswith('"')
+                                or not any(child.kind == "string" for child in field_mapped.subtypes)):
+                            raise SystemExit(f"{label}: unionFieldDefaults takes a union member with a string arm and a string default")
+                        prepare.append(f"{target}.{field_member.attrs.get('ImplementedAs', field_member.name)} = String {{ {default}_s }};")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
-                    if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False):
+                    if (field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)
+                            and not getattr(field_mapped, "absent_handle", False)):
                         continue
                     prepare += ["    " + line for line in self.dictionary_field(name, struct, target, field_member, field_mapped, mapped.interface)]
                 prepare.append("}")

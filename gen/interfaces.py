@@ -396,6 +396,19 @@ class InterfaceEmitter:
         strict_interfaces = {child.name for name, children in self.unions.items() if name in reference_unions
                              for child in children if self.world.public_name(child.name) in self.names}
         result_interfaces.update(strict_interfaces)
+        # A dictionary arm of a result union is a plain object: neither a typed CSS value nor a node.
+        result_dictionaries = set()
+        for _, member in self.adapters:
+            t = self.resolve(member.type)
+            if self.union(t):
+                result_dictionaries.update(child.name for child in (self.resolve(c) for c in t.subtypes)
+                                           if child.name in self.world.dictionaries)
+        result_interfaces -= result_dictionaries
+        for name in sorted(result_dictionaries):
+            predicate = ("((v)=>{if(v==null||typeof v!=='object'||v.nodeType!==undefined)return false;"
+                         "try{globalThis.CSSStyleValue.prototype.toString.call(v);return false;}catch{return true;}})($0)")
+            lines += [f'    [<Fable.Core.Emit("{predicate}")>]',
+                      f'    let private is{name} (_: obj) : bool =', '        Fable.Core.Util.jsNative', '']
         for name in sorted(result_interfaces):
             browser_name = self.world.interfaces[name].attrs.get('InterfaceName', self.world.public_name(name))
             predicate = '$0 != null && $0.nodeType === 1' if name == 'Element' else f'Object.prototype.toString.call($0) === \'[object {browser_name}]\''
@@ -437,7 +450,10 @@ class InterfaceEmitter:
                     lines += [f'        | {name}.{label(child)} value -> {boxed}']
             if any((self.union(member.type) and label(self.resolve(member.type)) == name)
                    or any(label(union) == name for _, _, union in self.result_union_fields(member.type)) for _, member in self.adapters):
-                lines += ['', f'    let private unbox{name} (value: obj) : {name} =', '        match value with']
+                head = f'    let private unbox{name} (value: obj) : {name} ='
+                # Fantomas puts the parameter and the return type on their own lines past the line length.
+                lines += (['', head] if len(head) <= 150
+                          else ['', f'    let private unbox{name}', '        (value: obj)', f'        : {name} =']) + ['        match value with']
                 for child in children:
                     resolved = self.resolve(child)
                     ftype = self.type(child)
@@ -570,7 +586,7 @@ class InterfaceEmitter:
                             lines += [f'            unbox{union_name} value']
                     elif self.result_union_fields(member.type):
                         name = self.result_union_fields(member.type)[0][0]
-                        t = self.world.resolve(member.type)
+                        t = self.resolve(member.type)
                         if t.name in ('sequence', 'FrozenArray'):
                             lines += [f'            {raw_call} |> unbox<obj array> |> Array.map resultDict{name}']
                         else:

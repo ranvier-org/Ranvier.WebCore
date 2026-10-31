@@ -1,0 +1,678 @@
+{
+ "browser": "Chromium 156.0.8078.4",
+ "a06": {
+  "isDocumentTimeline": true,
+  "currentTimeType": "number",
+  "duration": null,
+  "ownMinusOrigin": true,
+  "defaultEqual": true,
+  "futureNegative": true,
+  "ownDuration": null,
+  "ownIsNew": true,
+  "detachedCurrentTime": null,
+  "detachedSame": true,
+  "detachedAnimation": {
+   "playState": "running",
+   "currentTime": 0,
+   "startTime": null,
+   "pending": true
+  },
+  "gates": {
+   "maximumFrameRate": false,
+   "frameRate": false,
+   "customAnimate": "undefined"
+  },
+  "synchronized": {
+   "sameStart": true,
+   "ownStartOffset": 100,
+   "sameCurrent": false,
+   "started": true,
+   "playState": [
+    "running",
+    "running"
+   ]
+  },
+  "iframe": {
+   "beforeType": "number",
+   "afterRemove": null,
+   "docTimelineSame": true
+  }
+ },
+ "a07": {
+  "axes": [
+   "block",
+   "inline",
+   "x",
+   "y"
+  ],
+  "sourceIsS": true,
+  "defaultSource": true,
+  "nullSource": null,
+  "duration": {
+   "value": 100,
+   "unit": "percent"
+  },
+  "isTimeline": true,
+  "animTimeline": true,
+  "points": [
+   {
+    "top": 0,
+    "left": 0,
+    "nested": 0,
+    "block": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "inline": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "x": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "y": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "nestedBlock": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "nullSource": null,
+    "visible": null,
+    "def": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "anim": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "animStart": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "animState": "running",
+    "opacity": "0"
+   },
+   {
+    "top": 150,
+    "left": 100,
+    "nested": 80,
+    "block": {
+     "value": 50,
+     "unit": "percent"
+    },
+    "inline": {
+     "value": 50,
+     "unit": "percent"
+    },
+    "x": {
+     "value": 50,
+     "unit": "percent"
+    },
+    "y": {
+     "value": 50,
+     "unit": "percent"
+    },
+    "nestedBlock": {
+     "value": 50,
+     "unit": "percent"
+    },
+    "nullSource": null,
+    "visible": null,
+    "def": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "anim": {
+     "value": 50,
+     "unit": "percent"
+    },
+    "animStart": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "animState": "running",
+    "opacity": "0.5"
+   },
+   {
+    "top": 300,
+    "left": 200,
+    "nested": 160,
+    "block": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "inline": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "x": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "y": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "nestedBlock": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "nullSource": null,
+    "visible": null,
+    "def": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "anim": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "animStart": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "animState": "finished",
+    "opacity": "1"
+   },
+   {
+    "top": 75,
+    "left": 50,
+    "nested": 40,
+    "block": {
+     "value": 25,
+     "unit": "percent"
+    },
+    "inline": {
+     "value": 25,
+     "unit": "percent"
+    },
+    "x": {
+     "value": 25,
+     "unit": "percent"
+    },
+    "y": {
+     "value": 25,
+     "unit": "percent"
+    },
+    "nestedBlock": {
+     "value": 25,
+     "unit": "percent"
+    },
+    "nullSource": null,
+    "visible": null,
+    "def": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "anim": {
+     "value": 25,
+     "unit": "percent"
+    },
+    "animStart": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "animState": "running",
+    "opacity": "0.25"
+   }
+  ],
+  "resized": {
+   "scrollTop": 75,
+   "block": {
+    "value": 50,
+    "unit": "percent"
+   },
+   "opacity": "0.5"
+  }
+ },
+ "a08": {
+  "subjectIsT": true,
+  "source": "v",
+  "axis": "block",
+  "ctorNoSubject": null,
+  "rangeStart": {
+   "rangeName": "entry",
+   "offset": {
+    "value": 0,
+    "unit": "percent"
+   }
+  },
+  "rangeEnd": {
+   "rangeName": "exit",
+   "offset": {
+    "value": 100,
+    "unit": "percent"
+   }
+  },
+  "rangeStartC": {
+   "rangeName": "contain",
+   "offset": {
+    "value": 10,
+    "unit": "percent"
+   }
+  },
+  "rangeEndC": {
+   "rangeName": "contain",
+   "offset": {
+    "value": 90,
+    "unit": "percent"
+   }
+  },
+  "points": [
+   {
+    "top": 0,
+    "scrollTop": 0,
+    "current": {
+     "value": -66.66666666666667,
+     "unit": "percent"
+    },
+    "inset": {
+     "value": -84.6153846153846,
+     "unit": "percent"
+    },
+    "inset2": {
+     "value": -100.00000000000003,
+     "unit": "percent"
+    },
+    "start": {
+     "value": 100,
+     "unit": "px"
+    },
+    "end": {
+     "value": 250,
+     "unit": "px"
+    },
+    "insetStart": {
+     "value": 110,
+     "unit": "px"
+    },
+    "insetEnd": {
+     "value": 240,
+     "unit": "px"
+    },
+    "inset2Start": {
+     "value": 120,
+     "unit": "px"
+    },
+    "inset2End": {
+     "value": 240,
+     "unit": "px"
+    },
+    "anim": {
+     "value": -66.66666666666667,
+     "unit": "percent"
+    },
+    "animC": {
+     "value": -103.33333333333334,
+     "unit": "percent"
+    },
+    "animCState": "running"
+   },
+   {
+    "top": 50,
+    "scrollTop": 50,
+    "current": {
+     "value": -33.333333333333336,
+     "unit": "percent"
+    },
+    "inset": {
+     "value": -46.15384615384615,
+     "unit": "percent"
+    },
+    "inset2": {
+     "value": -58.333333333333336,
+     "unit": "percent"
+    },
+    "start": {
+     "value": 100,
+     "unit": "px"
+    },
+    "end": {
+     "value": 250,
+     "unit": "px"
+    },
+    "insetStart": {
+     "value": 110,
+     "unit": "px"
+    },
+    "insetEnd": {
+     "value": 240,
+     "unit": "px"
+    },
+    "inset2Start": {
+     "value": 120,
+     "unit": "px"
+    },
+    "inset2End": {
+     "value": 240,
+     "unit": "px"
+    },
+    "anim": {
+     "value": -33.333333333333336,
+     "unit": "percent"
+    },
+    "animC": {
+     "value": -70,
+     "unit": "percent"
+    },
+    "animCState": "running"
+   },
+   {
+    "top": 100,
+    "scrollTop": 100,
+    "current": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "inset": {
+     "value": -7.692307692307692,
+     "unit": "percent"
+    },
+    "inset2": {
+     "value": -16.666666666666668,
+     "unit": "percent"
+    },
+    "start": {
+     "value": 100,
+     "unit": "px"
+    },
+    "end": {
+     "value": 250,
+     "unit": "px"
+    },
+    "insetStart": {
+     "value": 110,
+     "unit": "px"
+    },
+    "insetEnd": {
+     "value": 240,
+     "unit": "px"
+    },
+    "inset2Start": {
+     "value": 120,
+     "unit": "px"
+    },
+    "inset2End": {
+     "value": 240,
+     "unit": "px"
+    },
+    "anim": {
+     "value": 0,
+     "unit": "percent"
+    },
+    "animC": {
+     "value": -36.666666666666664,
+     "unit": "percent"
+    },
+    "animCState": "running"
+   },
+   {
+    "top": 150,
+    "scrollTop": 150,
+    "current": {
+     "value": 33.333333333333336,
+     "unit": "percent"
+    },
+    "inset": {
+     "value": 30.769230769230766,
+     "unit": "percent"
+    },
+    "inset2": {
+     "value": 25.000000000000007,
+     "unit": "percent"
+    },
+    "start": {
+     "value": 100,
+     "unit": "px"
+    },
+    "end": {
+     "value": 250,
+     "unit": "px"
+    },
+    "insetStart": {
+     "value": 110,
+     "unit": "px"
+    },
+    "insetEnd": {
+     "value": 240,
+     "unit": "px"
+    },
+    "inset2Start": {
+     "value": 120,
+     "unit": "px"
+    },
+    "inset2End": {
+     "value": 240,
+     "unit": "px"
+    },
+    "anim": {
+     "value": 33.333333333333336,
+     "unit": "percent"
+    },
+    "animC": {
+     "value": -3.333333333333324,
+     "unit": "percent"
+    },
+    "animCState": "running"
+   },
+   {
+    "top": 200,
+    "scrollTop": 200,
+    "current": {
+     "value": 66.66666666666667,
+     "unit": "percent"
+    },
+    "inset": {
+     "value": 69.23076923076923,
+     "unit": "percent"
+    },
+    "inset2": {
+     "value": 66.66666666666667,
+     "unit": "percent"
+    },
+    "start": {
+     "value": 100,
+     "unit": "px"
+    },
+    "end": {
+     "value": 250,
+     "unit": "px"
+    },
+    "insetStart": {
+     "value": 110,
+     "unit": "px"
+    },
+    "insetEnd": {
+     "value": 240,
+     "unit": "px"
+    },
+    "inset2Start": {
+     "value": 120,
+     "unit": "px"
+    },
+    "inset2End": {
+     "value": 240,
+     "unit": "px"
+    },
+    "anim": {
+     "value": 66.66666666666667,
+     "unit": "percent"
+    },
+    "animC": {
+     "value": 26.66666666666666,
+     "unit": "percent"
+    },
+    "animCState": "finished"
+   },
+   {
+    "top": 250,
+    "scrollTop": 250,
+    "current": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "inset": {
+     "value": 107.69230769230766,
+     "unit": "percent"
+    },
+    "inset2": {
+     "value": 108.33333333333333,
+     "unit": "percent"
+    },
+    "start": {
+     "value": 100,
+     "unit": "px"
+    },
+    "end": {
+     "value": 250,
+     "unit": "px"
+    },
+    "insetStart": {
+     "value": 110,
+     "unit": "px"
+    },
+    "insetEnd": {
+     "value": 240,
+     "unit": "px"
+    },
+    "inset2Start": {
+     "value": 120,
+     "unit": "px"
+    },
+    "inset2End": {
+     "value": 240,
+     "unit": "px"
+    },
+    "anim": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "animC": {
+     "value": 26.66666666666666,
+     "unit": "percent"
+    },
+    "animCState": "finished"
+   },
+   {
+    "top": 300,
+    "scrollTop": 300,
+    "current": {
+     "value": 133.33333333333334,
+     "unit": "percent"
+    },
+    "inset": {
+     "value": 146.15384615384613,
+     "unit": "percent"
+    },
+    "inset2": {
+     "value": 150.00000000000003,
+     "unit": "percent"
+    },
+    "start": {
+     "value": 100,
+     "unit": "px"
+    },
+    "end": {
+     "value": 250,
+     "unit": "px"
+    },
+    "insetStart": {
+     "value": 110,
+     "unit": "px"
+    },
+    "insetEnd": {
+     "value": 240,
+     "unit": "px"
+    },
+    "inset2Start": {
+     "value": 120,
+     "unit": "px"
+    },
+    "inset2End": {
+     "value": 240,
+     "unit": "px"
+    },
+    "anim": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "animC": {
+     "value": 26.66666666666666,
+     "unit": "percent"
+    },
+    "animCState": "finished"
+   },
+   {
+    "top": 400,
+    "scrollTop": 400,
+    "current": {
+     "value": 200,
+     "unit": "percent"
+    },
+    "inset": {
+     "value": 223.07692307692304,
+     "unit": "percent"
+    },
+    "inset2": {
+     "value": 233.33333333333334,
+     "unit": "percent"
+    },
+    "start": {
+     "value": 100,
+     "unit": "px"
+    },
+    "end": {
+     "value": 250,
+     "unit": "px"
+    },
+    "insetStart": {
+     "value": 110,
+     "unit": "px"
+    },
+    "insetEnd": {
+     "value": 240,
+     "unit": "px"
+    },
+    "inset2Start": {
+     "value": 120,
+     "unit": "px"
+    },
+    "inset2End": {
+     "value": 240,
+     "unit": "px"
+    },
+    "anim": {
+     "value": 100,
+     "unit": "percent"
+    },
+    "animC": {
+     "value": 26.66666666666666,
+     "unit": "percent"
+    },
+    "animCState": "finished"
+   }
+  ],
+  "setRange": {
+   "rangeStart": {
+    "rangeName": "cover",
+    "offset": {
+     "value": 20,
+     "unit": "percent"
+    }
+   },
+   "rangeEnd": {
+    "rangeName": "cover",
+    "offset": {
+     "value": 80,
+     "unit": "percent"
+    }
+   },
+   "bad": "TypeError",
+   "afterBad": "normal"
+  }
+ }
+}

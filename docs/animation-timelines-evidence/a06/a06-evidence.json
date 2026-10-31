@@ -1,0 +1,69 @@
+{
+ "sourceHead": "b95e555fff1d405ed2367d9bc45b08ea851b9ea7",
+ "sourceDirty": [
+  " M tests/abi/Teardown.fs",
+  "?? tests/abi/animation_timelines.py",
+  "?? tests/abi/animation_timelines_browser.mjs",
+  "?? tests/fixtures/animation-timelines-cases.json",
+  "?? tests/fixtures/animation-timelines-oracle.json",
+  "?? tests/fixtures/animation-timelines-qualified.json"
+ ],
+ "runtimeReceipt": "C:\\wk\\native-waapi\\artifacts\\waapi-candidate-3-frozen\\runtime-receipt.json",
+ "runtimeReceiptSha256": "fdcabd3836598b7b0d5f47f3c64ecb5ebf82efb57c17c902798e99ae32fa1bad",
+ "baselineBatch": "C:\\wk\\native-waapi\\artifacts\\waapi-candidate-3-batch\\results.json",
+ "baselineBatchSha256": "d748817afc046b0324245810295eba472211ec27c8c7ef69e05d77f90d10ed67",
+ "baselineRaw": 92029,
+ "runs": {
+  "animation_timelines": {
+   "assertions": 202,
+   "log": "C:\\wk\\waapi-tl-artifacts\\a06-native\\animation-timelines.log",
+   "logSha256": "2f1373237d3cdd8bc47493f804c481c3153f7281e591203cba02265f7e42ec56",
+   "probeSha256": "14682764999308ebc115287361099a84fa1e458e75c9551c02ae73a9216324ec"
+  },
+  "repeat": {
+   "runs": 30,
+   "passed": 30,
+   "file": "C:\\wk\\waapi-tl-artifacts\\a06-native\\animation-timelines-repeat.txt"
+  },
+  "frames": {
+   "exitCode": 0,
+   "log": "C:\\wk\\waapi-tl-artifacts\\a06-native\\frames.log",
+   "logSha256": "07cdf8082af0106aa573c4e968710492d8d73246a5041245e8a42565e97fb680",
+   "driverSha256": "858edc88f6437083c5fc3efa30ff064a91eceefe54c4db5ab40650d2e47f91b0"
+  },
+  "teardown": {
+   "exitCode": 0,
+   "log": "C:\\wk\\waapi-tl-artifacts\\a06-native\\teardown.log",
+   "logSha256": "940897794b438f96c08e8823e050378ccd37ade94fa8e07827ec023a07db62e7",
+   "driverSha256": "858edc88f6437083c5fc3efa30ff064a91eceefe54c4db5ab40650d2e47f91b0",
+   "records": 108,
+   "allCollected": true,
+   "documentTimeline": [
+    {
+     "probe": "div, document timeline released after host destroy",
+     "cycleBeforeDisposal": "none",
+     "documentRefsAfterDisposal": -1,
+     "targetRefsAfterDisposal": -1,
+     "documentRefsAfterCycle": -1,
+     "targetRefsAfterCycle": -1,
+     "documentRefsAfterLongCycle": -1,
+     "targetRefsAfterLongCycle": -1,
+     "documentRefsAfterCollection": -1,
+     "targetRefsAfterCollection": -1
+    },
+    {
+     "probe": "removed div, document timeline released after host destroy",
+     "cycleBeforeDisposal": "none",
+     "documentRefsAfterDisposal": 1,
+     "targetRefsAfterDisposal": 1,
+     "documentRefsAfterCycle": 1,
+     "targetRefsAfterCycle": 1,
+     "documentRefsAfterLongCycle": 1,
+     "targetRefsAfterLongCycle": 1,
+     "documentRefsAfterCollection": -1,
+     "targetRefsAfterCollection": -1
+    }
+   ]
+  }
+ }
+}

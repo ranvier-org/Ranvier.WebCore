@@ -2601,6 +2601,121 @@ partial interface Element {
         with self.assertRaises(SystemExit):
             generator.run()
 
+    def test_optional_node_member_keeps_absent_and_null_distinct(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary TrackOptions { Element? source; Mode mode = "open"; };
+dictionary RequiredTrackOptions { required Element? source; };
+partial interface Element {
+    boolean track(optional TrackOptions options = {});
+    boolean trackRequired(RequiredTrackOptions options);
+};
+''')
+        config = dict(self.world.config)
+        config['exclude'] = list(config['exclude']) + ['Element.trackRequired']
+        config['optionalObjectMembers'] = ['TrackOptions.source']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertIn('RvNode* const* source; /* Element?, NULL for absent, a pointer to NULL for null */', generator.header())
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}['element_track']
+        # NULL leaves the C++ optional disengaged; a pointer to NULL engages it with null; a node of another interface fails.
+        self.assertIn('options->source) {', body)
+        self.assertIn('if (*options->source) {', body)
+        self.assertIn('value = dynamicDowncast<Element>(*nodeOf(*options->source));', body)
+        self.assertIn('return RV_ERR_WRONG_INTERFACE;', body)
+        self.assertIn('a0.source = std::move(value);', body)
+        config['exclude'] = [name for name in config['exclude'] if name != 'Element.trackRequired']
+        config['optionalObjectMembers'] = ['TrackOptions.source', 'RequiredTrackOptions.source']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
+    def test_absent_object_member_is_null_for_absent_in_inputs_and_results(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary RangeOffset { DOMString rangeName; DOMStringMap offset; };
+dictionary NullableOffset { DOMStringMap? offset; };
+partial interface Element {
+    attribute (RangeOffset or DOMString) range;
+    undefined place(optional RangeOffset where = {});
+    undefined placeNullable(optional NullableOffset where = {});
+};
+''')
+        config = dict(self.world.config)
+        config['exclude'] = list(config['exclude']) + ['Element.placeNullable']
+        config['absentObjectMembers'] = ['RangeOffset.offset']
+        config['resultDictionaries'] = ['RangeOffset']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertIn('RvDOMStringMap* offset; /* DOMStringMap, NULL for absent */', generator.header())
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}
+        # Input: NULL leaves the member absent; a handle of another interface fails.
+        self.assertIn('where->offset) {', body['element_place'])
+        self.assertIn('a0.offset = std::move(value);', body['element_place'])
+        self.assertIn('element_get_range', body)
+        self.assertIn('element_set_range', body)
+        # Result: the dictionary arm owns a new reference, NULL for absent, dropped by its release.
+        glue = generator.glue()
+        self.assertIn('if (*field)', glue)
+        self.assertIn('storeHandle<DOMStringMap>(*field, &result->offset);', glue)
+        self.assertIn('if (value->offset) reinterpret_cast<DOMStringMap*>(value->offset)->deref();', glue)
+        # Fable: the dictionary arm of the result union is told apart from the string arm by a plain-object predicate.
+        self.assertIn('let private isRangeOffset (_: obj) : bool =', generator.interfaces())
+        config['exclude'] = [name for name in config['exclude'] if name != 'Element.placeNullable']
+        config['absentObjectMembers'] = ['RangeOffset.offset', 'NullableOffset.offset']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
+    def test_sequence_of_a_union_with_a_typedef_union_uses_the_registered_flat_transport(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+typedef (DOMString or Mode) Modish;
+partial interface Element {
+    undefined flat((Node or DOMString or Mode) value);
+    undefined nested(sequence<(Node or Modish)> values);
+};
+''')
+        generator = domgen.Generator(domgen.World(self.source, dict(self.world.config)))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        glue = generator.glue()
+        # One C transport for both spellings, and one C++ alternative list: the decoder's.
+        self.assertIn('Vector<Variant<Ref<Node>, String, Mode>>', glue)
+        self.assertNotIn('Variant<Ref<Node>, Variant<String, Mode>>', glue)
+
+    def test_union_field_default_applies_before_the_options_are_read(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary PadOptions { (DOMString or sequence<DOMString>) inset = "auto"; DOMString label = "x"; };
+partial interface Element { undefined pad(optional PadOptions options = {}); };
+''')
+        config = dict(self.world.config)
+        config['unionFieldDefaults'] = ['PadOptions.inset']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}['element_pad']
+        # The default holds for NULL options and for a size that stops before the field; a present field replaces it.
+        self.assertIn('a0.inset = String { "auto"_s };', body)
+        self.assertLess(body.index('a0.inset = String { "auto"_s };'), body.index('if (options) {'))
+        config['unionFieldDefaults'] = ['PadOptions.label']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
     def test_configured_svg_mathml_shared_style_and_focus_members(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

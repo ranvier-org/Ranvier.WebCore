@@ -25,7 +25,9 @@
     "customConstructors replaces a [Custom] constructor with the IDL signature its custom binding implements; presenceArguments",
     "gives an optional nullable argument a name_present flag, so absent and null stay distinct. constructors overloads gives",
     "an overload, by argument count, its own factory settings.",
-    "optionalObjectMembers lists optional nullable object dictionary members passed as Rv<Root>* const*: NULL absent, a pointer to NULL null.",
+    "optionalObjectMembers lists optional nullable object or node dictionary members passed as Rv<Root>* const* (RvNode* const*): NULL absent, a pointer to NULL null.",
+    "absentObjectMembers lists optional nonnullable object dictionary members without a default, passed as Rv<Root>*: NULL absent; in a result dictionary the member is a new reference, or NULL, that the dictionary's release drops.",
+    "unionFieldDefaults lists dictionary union members with a string arm whose IDL string default the glue assigns, for a C++ struct that leaves the member empty; a present field replaces it.",
     "setterExpressions maps Interface.member to the C++ a setter calls with {value}, for a member whose C++ type differs from its IDL type.",
     "browserArgumentConversions maps Interface.member.argument to the JavaScript function the Fable provider applies to an argument: Keyframe sequences become the browser's keyframe objects.",
     "customOperations replaces a [Custom] operation with the signature its native binding implements, and callExpressions names the C++ an operation calls.",
@@ -337,6 +339,14 @@
       "receiver": "Document",
       "factory": "Path2D::create",
       "passReceiver": false
+    },
+    "ScrollTimeline": {
+      "receiver": "Document",
+      "factory": "ScrollTimeline::create"
+    },
+    "ViewTimeline": {
+      "receiver": "Document",
+      "factory": "ViewTimeline::create"
     }
   },
   "dictionaryCppTypes": {
@@ -798,6 +808,8 @@
     "KeyframeEffect",
     "AnimationTimeline",
     "DocumentTimeline",
+    "ScrollTimeline",
+    "ViewTimeline",
     "CSSAnimation",
     "CSSTransition",
     "DataTransfer",
@@ -1049,8 +1061,6 @@
     "CSSTransitionEvent.animation",
     "TransitionEventInit.animation",
     "UIEventInit.view",
-    "KeyframeAnimationOptions.rangeStart",
-    "KeyframeAnimationOptions.rangeEnd",
     "DataTransferItem.getAsString",
     "DataTransferItem.webkitGetAsEntry"
   ],
@@ -1275,6 +1285,7 @@
     "URLPatternResult",
     "URLPatternComponentResult",
     "URLPatternInit",
+    "TimelineRangeOffset",
     "EffectTiming",
     "ComputedEffectTiming",
     "ComputedKeyframe",
@@ -1297,7 +1308,8 @@
     "WebAnimation.startTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsStartTime()) return CSSNumberish { *time }; return std::nullopt; }()",
     "WebAnimation.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsCurrentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
     "AnimationTimeline.currentTime": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }()",
-    "AnimationTimeline.duration": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->duration()) return CSSNumberish { *time }; return std::nullopt; }()"
+    "AnimationTimeline.duration": "[&]() -> std::optional<CSSNumberish> { if (auto time = impl->duration()) return CSSNumberish { *time }; return std::nullopt; }()",
+    "ViewTimeline.subject": "RefPtr<Element> { const_cast<Element*>(impl->subject()) }"
   },
   "setlikeBindings": {
     "Highlight": {
@@ -1466,7 +1478,8 @@
     "WebAnimation.constructor.timeline"
   ],
   "optionalObjectMembers": [
-    "KeyframeAnimationOptions.timeline"
+    "KeyframeAnimationOptions.timeline",
+    "ScrollTimelineOptions.source"
   ],
   "setterExpressions": {
     "WebAnimation.startTime": "[&](auto&& time) { return impl->setBindingsStartTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }({value})",
@@ -1476,7 +1489,7 @@
     "Animatable.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "Element.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
-    "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}",
+    "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;for(const k of ['rangeStart','rangeEnd']){const u=o[k];if(u!==undefined)r[k]=u!=null&&typeof u==='object'&&Array.isArray(u.fields)?u.fields[0]:u;}return r;}",
     "AnimationEffect.updateTiming.timing": "(t)=>{if(t==null)return t;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing'])if(t[k]!==undefined)r[k]=t[k];const d=t.duration;if(d!==undefined)r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
   },
   "unionArgumentConversions": [
@@ -1504,5 +1517,11 @@
   ],
   "browserResultConversions": {
     "KeyframeEffect.getKeyframes": "(l)=>l.map((k)=>({offset:k.offset,computedOffset:k.computedOffset,easing:k.easing,composite:k.composite,properties:Object.keys(k).filter((n)=>!['offset','computedOffset','easing','composite'].includes(n)).map((n)=>({name:n,value:k[n]}))}))"
-  }
+  },
+  "absentObjectMembers": [
+    "TimelineRangeOffset.offset"
+  ],
+  "unionFieldDefaults": [
+    "ViewTimelineOptions.inset"
+  ]
 }

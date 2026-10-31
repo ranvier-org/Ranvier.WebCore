@@ -423,6 +423,17 @@ A05 makes CSSAnimation and CSSTransition subtypes of an `eventTargetObjects` int
 `rv_dom_web_animation_get_interface_name` reports WebAnimation, CSSAnimation or CSSTransition. It returns
 `RV_ERR_WRONG_INTERFACE` for an event target that is not an animation.
 
+Animation timelines (A07, A08) extend two keys:
+
+- `optionalObjectMembers` also takes node handles: `ScrollTimelineOptions.source` is `RvNode* const*`. NULL is absent
+  (the document's scrolling element) and a pointer to NULL is a null source (an inactive timeline).
+- `absentObjectMembers` passes an optional nonnullable object member without a default as `Rv<Root>*`, NULL for
+  absent: `TimelineRangeOffset.offset` is an `RvCSSStyleValue*`. In a result dictionary (`resultDictionaries`
+  `TimelineRangeOffset`, the dictionary arm of `Animation.rangeStart` and `rangeEnd`) the member is a new reference, or
+  NULL, which the dictionary's release drops.
+- `unionFieldDefaults` assigns `ViewTimelineOptions.inset` its IDL default "auto" before the options are read: the C++
+  struct leaves the member empty, and a present field replaces it.
+
 The Animation handle is an `RvEventTarget` (`eventTargetObjects`): `finish`, `cancel` and `remove` events reach
 `rv_event_target_add_listener`, and `rv_animation_as_event_target` maps the hand-written CSS-animation handle to it.
 `tests/abi/web_animations.py` replays `tests/fixtures/web-animations-cases.json` against the Chromium oracle.

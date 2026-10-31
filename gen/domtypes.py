@@ -79,12 +79,16 @@ class ComplexGeneratorMixin:
         fields = self.use_dictionary(name)
         # Every member is checked before the dictionary registers, so a dictionary left out emits no encoder.
         for member, mapped in fields:
+            if mapped.kind == 'object' and getattr(mapped, 'absent_handle', False):
+                continue
             if mapped.kind in ('node', 'event', 'object', 'opaque'):
                 raise self.unsupported_type(f'dictionary {name}: {mapped.kind} member {member.name} in a result')
             if mapped.kind in ('union', 'sequence') and not self.transport_can_return(mapped):
                 raise self.unsupported_type(f'dictionary {name}: member {member.name} cannot be returned')
         self.result_dicts[name] = struct
         for member, mapped in fields:
+            if mapped.kind == 'object' and getattr(mapped, 'absent_handle', False):
+                continue
             if mapped.kind == 'enum':
                 # An enumeration member is its value's index, as an enumeration result.
                 self.enums_used[mapped.enum] = self.world.enums[mapped.enum]
@@ -131,6 +135,13 @@ class ComplexGeneratorMixin:
                     release += [f'    std::free(const_cast<uint8_t*>(value->{field}.data));']
                 elif mapped.kind == 'enum':
                     encode += [f'        storeEnumeration(*field, &result->{field}, enumeration{mapped.enum});']
+                elif mapped.kind == 'object':
+                    # An absent object member: a new reference, or NULL for absent; the release drops it.
+                    root = self.world.cpp_class(mapped.root)
+                    store = 'storeTrackedHandle' if root in self.tracked_roots else 'storeHandle'
+                    encode += [f'        if (*field)', f'            {store}<{root}, {mapped.cls}>(*field, &result->{field});' if store == 'storeTrackedHandle'
+                               else f'            storeHandle<{root}>(*field, &result->{field});']
+                    release += [line.replace('    ', '    ', 1) for line in self.clear_value(mapped, f'value->{field}')]
                 elif mapped.kind == 'dict':
                     child = self.result_dicts[mapped.interface]
                     encode += [f'        result->{field} = encodeDict{child}(*field);']
@@ -195,7 +206,9 @@ class ComplexGeneratorMixin:
         if kind == 'pair':
             return 'KeyValuePair<' + ', '.join(self.transport_cpp(child) for child in mapped.subtypes) + '>'
         if kind == 'union':
-            value = 'Variant<' + ', '.join(self.union_alternatives(mapped)[0]) + '>'
+            # The registered union of this transport name: its decoder and encoder define the C++ alternatives.
+            registered = self.complex_used.get(mapped.ctype, mapped)
+            value = 'Variant<' + ', '.join(self.union_alternatives(registered)[0]) + '>'
         else:
             value = f'Vector<{self.transport_cpp(mapped.subtypes[0])}>'
         return f'std::optional<{value}>' if mapped.nullable else value
