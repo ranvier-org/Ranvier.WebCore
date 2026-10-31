@@ -19,7 +19,7 @@ from form_collections import Native, P, I
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, NOT_ELEMENT, UNSUPPORTED = 0, -1, -2, -4, -9
-ABI = 53
+ABI = 57
 BOXES = {None: None, 'content-box': 0, 'border-box': 1, 'device-pixel-content-box': 2}
 D = ctypes.c_double
 

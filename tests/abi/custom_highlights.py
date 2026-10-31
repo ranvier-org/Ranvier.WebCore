@@ -21,7 +21,7 @@ from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED = 0, -1, -2, -9
-ABI = 54
+ABI = 57
 TYPES = ['highlight', 'spelling-error', 'grammar-error']
 COLOURS = {(0, 0, 0): 'k', (255, 255, 255): 'w', (0, 0, 255): 'B', (255, 0, 0): 'R', (255, 255, 0): 'Y', (0, 128, 0): 'G'}
 

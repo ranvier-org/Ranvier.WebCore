@@ -57,7 +57,7 @@ def verify(directory, evidence):
     def bind(name, returns, arguments):
         return bind_utf8(library, name, returns, arguments)
 
-    expect(bind('rv_abi_version', i32, [])() == 54, 'ABI version 54')
+    expect(bind('rv_abi_version', i32, [])() == 57, 'ABI version 57')
     expect(bind('rv_abi_has', i32, [ctypes.c_char_p])(b'input-state') == 1, 'input-state advertised')
     window_target = bind('rv_host_window_event_target', p, [p])
     max_touch_points = bind('rv_host_max_touch_points', i32, [p, ctypes.POINTER(i32)])
