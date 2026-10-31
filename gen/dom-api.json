@@ -450,10 +450,12 @@
       "function": "rv_dom_animation_effect_get_interface_name",
       "feature": "dom-type-query:AnimationEffect",
       "interfaces": [
+        "CustomEffect",
         "KeyframeEffect",
         "AnimationEffect"
       ],
       "names": [
+        "CustomEffect",
         "KeyframeEffect",
         "AnimationEffect"
       ],
@@ -1703,6 +1705,10 @@
     },
     {
       "name": "KeyframeEffect",
+      "base": "AnimationEffect"
+    },
+    {
+      "name": "CustomEffect",
       "base": "AnimationEffect"
     },
     {
@@ -4450,6 +4456,15 @@
       "source": "animation/KeyframeEffect.idl"
     },
     {
+      "name": "CustomEffect",
+      "idlName": "CustomEffect",
+      "base": "AnimationEffect",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/CustomEffect.idl"
+    },
+    {
       "name": "AnimationTimeline",
       "idlName": "AnimationTimeline",
       "base": null,
@@ -6765,6 +6780,243 @@
           "mapping": {
             "kind": "number",
             "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ]
+    },
+    "EffectTiming": {
+      "base": null,
+      "contractOnly": false,
+      "omittedFields": [],
+      "fields": [
+        {
+          "name": "delay",
+          "required": false,
+          "default": "0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "endDelay",
+          "required": false,
+          "default": "0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "fill",
+          "required": false,
+          "default": "\"auto\"",
+          "idl": {
+            "name": "FillMode",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "FillMode",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "iterationStart",
+          "required": false,
+          "default": "0.0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "iterations",
+          "required": false,
+          "default": "1.0",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "duration",
+          "required": false,
+          "default": "\"auto\"",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "unrestricted double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "UnrestrictedDoubleOrCSSNumericValueOrDOMString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        },
+        {
+          "name": "direction",
+          "required": false,
+          "default": "\"normal\"",
+          "idl": {
+            "name": "PlaybackDirection",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "PlaybackDirection",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "easing",
+          "required": false,
+          "default": "\"linear\"",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
             "interface": null,
             "root": null,
             "class": null,
@@ -153845,6 +154097,138 @@
       "contextParameter": "context"
     },
     {
+      "interface": "CustomEffect",
+      "member": "constructor",
+      "contractOwner": "CustomEffect",
+      "kind": "constructor",
+      "function": "rv_dom_custom_effect_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCustomEffectCallback*",
+          "name": "callback"
+        },
+        {
+          "ctype": "const RvDomUnionUnrestrictedDoubleOrEffectTiming*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvAnimationEffect**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "callback",
+          "idlType": "CustomEffectCallback",
+          "idl": {
+            "name": "CustomEffectCallback",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CustomEffectCallback",
+            "root": "CustomEffectCallback",
+            "class": "CustomEffectCallback",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "(unrestricted double or EffectTiming)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "unrestricted double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "EffectTiming",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUnrestrictedDoubleOrEffectTiming",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "UnrestrictedDoubleOrEffectTiming",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "EffectTiming",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CustomEffect",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CustomEffect",
+        "root": "AnimationEffect",
+        "class": "CustomEffect",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:CustomEffect",
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "AnimationTimeline",
       "member": "currentTime",
       "contractOwner": "AnimationTimeline",
@@ -154056,6 +154440,136 @@
       },
       "receiver": "Document",
       "feature": "dom-constructor:DocumentTimeline",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "DocumentTimeline",
+      "member": "animate",
+      "contractOwner": "DocumentTimeline",
+      "kind": "operation",
+      "function": "rv_dom_document_timeline_animate",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCustomEffectCallback*",
+          "name": "callback"
+        },
+        {
+          "ctype": "const RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvEventTarget**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "callback",
+          "idlType": "CustomEffectCallback",
+          "idl": {
+            "name": "CustomEffectCallback",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CustomEffectCallback",
+            "root": "CustomEffectCallback",
+            "class": "CustomEffectCallback",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "(unrestricted double or CustomAnimationOptions)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "unrestricted double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CustomAnimationOptions",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "UnrestrictedDoubleOrCustomAnimationOptions",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "CustomAnimationOptions",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "WebAnimation",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "WebAnimation",
+        "root": "EventTarget",
+        "class": "WebAnimation",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
       "stringInputs": "utf8-lengths"
     },
     {
@@ -175466,6 +175980,86 @@
     },
     {
       "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUnrestrictedDoubleOrEffectTiming",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UnrestrictedDoubleOrEffectTiming",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "EffectTiming",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_unrestricted_double_or_effect_timing_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UnrestrictedDoubleOrCustomAnimationOptions",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "CustomAnimationOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_unrestricted_double_or_custom_animation_options_release"
+    },
+    {
+      "mapping": {
         "kind": "sequence",
         "ctype": "RvDomSequenceCSSNumericValueOrCSSOMKeywordish",
         "interface": null,
@@ -183145,6 +183739,217 @@
         "mapping": {
           "kind": "number",
           "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "CustomAnimationOptions": [
+      {
+        "name": "delay",
+        "field": "delay",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "endDelay",
+        "field": "end_delay",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "fill",
+        "field": "fill",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"auto\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "FillMode",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "iterationStart",
+        "field": "iteration_start",
+        "ctype": "double",
+        "required": false,
+        "default": "0.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "iterations",
+        "field": "iterations",
+        "ctype": "double",
+        "required": false,
+        "default": "1.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "duration",
+        "field": "duration",
+        "ctype": "const RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*",
+        "required": false,
+        "default": "\"auto\"",
+        "mapping": {
+          "kind": "union",
+          "ctype": "RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "UnrestrictedDoubleOrCSSNumericValueOrDOMString",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "number",
+              "ctype": "double",
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "CSSNumericValue",
+              "root": "CSSStyleValue",
+              "class": "CSSNumericValue",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "string",
+              "ctype": null,
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": [],
+              "stringTransport": "utf8-lengths"
+            }
+          ]
+        }
+      },
+      {
+        "name": "direction",
+        "field": "direction",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "PlaybackDirection",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "easing",
+        "field": "easing",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"linear\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "id",
+        "field": "id",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
           "interface": null,
           "root": null,
           "class": null,

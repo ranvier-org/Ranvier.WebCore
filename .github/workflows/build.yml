@@ -596,6 +596,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/animation_timelines.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify Web Animations custom effects against the Chromium oracle
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/custom_effects.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify ARIA element reflection and accessibility relations against the Chromium oracle
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/aria_relations.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"

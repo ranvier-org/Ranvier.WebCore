@@ -80,6 +80,9 @@
 #include "ContentVisibilityAutoStateChangeEvent.h"
 #include "ContextDestructionObserverInlines.h"
 #include "Crypto.h"
+#include "CustomAnimationOptions.h"
+#include "CustomEffect.h"
+#include "CustomEffectCallback.h"
 #include "CustomEvent.h"
 #include "DOMCSSCustomPropertyDescriptor.h"
 #include "DOMCSSNamespace.h"
@@ -240,6 +243,7 @@
 #include "RadioNodeList.h"
 #include "Range.h"
 #include "RanvierCollectionLike.h"
+#include "RanvierCustomEffects.h"
 #include "RanvierKeyframes.h"
 #include "SVGAElement.h"
 #include "SVGAngle.h"
@@ -3815,6 +3819,163 @@ template<typename V> int32_t encodeRvDomSequenceComputedKeyframe(V&& input, RvDo
     return RV_OK;
 }
 
+std::optional<Variant<double, EffectTiming>> decodeRvDomUnionUnrestrictedDoubleOrEffectTiming(const RvDomUnionUnrestrictedDoubleOrEffectTiming* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, EffectTiming> { Variant<double, EffectTiming> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        EffectTiming arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, delay) + sizeof(source->arm1->delay))
+                    assignValue(arm1.delay, source->arm1->delay);
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, end_delay) + sizeof(source->arm1->end_delay))
+                    assignValue(arm1.endDelay, source->arm1->end_delay);
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, fill) + sizeof(source->arm1->fill) && !assignEnumeration(arm1.fill, source->arm1->fill, enumerationFillMode))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, iteration_start) + sizeof(source->arm1->iteration_start))
+                    assignValue(arm1.iterationStart, source->arm1->iteration_start);
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, iterations) + sizeof(source->arm1->iterations))
+                    assignValue(arm1.iterations, source->arm1->iterations);
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, duration) + sizeof(source->arm1->duration) && source->arm1->duration) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(source->arm1->duration, status);
+                    if (status != RV_OK) return status;
+                    arm1.duration = std::move(*value);
+                }
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, direction) + sizeof(source->arm1->direction) && !assignEnumeration(arm1.direction, source->arm1->direction, enumerationPlaybackDirection))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomEffectTiming, easing) + sizeof(source->arm1->easing)) {
+                    if (source->arm1->easing.present != 0 && source->arm1->easing.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->easing.present) {
+                        if (source->arm1->easing.length < 0 || (source->arm1->easing.length > 0 && !source->arm1->easing.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.easing, source->arm1->easing.data, source->arm1->easing.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<double, EffectTiming> { Variant<double, EffectTiming> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrEffectTiming(RvDomUnionUnrestrictedDoubleOrEffectTiming* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        releaseDictRvDomEffectTiming(const_cast<RvDomEffectTiming*>(value->arm1));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUnrestrictedDoubleOrEffectTiming(V&& value, RvDomUnionUnrestrictedDoubleOrEffectTiming* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = static_cast<double>(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = encodeDictRvDomEffectTiming(std::get<I>(value));
+            }
+        } else encodeArmsRvDomUnionUnrestrictedDoubleOrEffectTiming<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUnrestrictedDoubleOrEffectTiming(V&& input, RvDomUnionUnrestrictedDoubleOrEffectTiming* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUnrestrictedDoubleOrEffectTiming(value, result);
+    return RV_OK;
+}
+
+std::optional<Variant<double, CustomAnimationOptions>> decodeRvDomUnionUnrestrictedDoubleOrCustomAnimationOptions(const RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, CustomAnimationOptions> { Variant<double, CustomAnimationOptions> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        CustomAnimationOptions arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, delay) + sizeof(source->arm1->delay))
+                    assignValue(arm1.delay, source->arm1->delay);
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, end_delay) + sizeof(source->arm1->end_delay))
+                    assignValue(arm1.endDelay, source->arm1->end_delay);
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, fill) + sizeof(source->arm1->fill) && !assignEnumeration(arm1.fill, source->arm1->fill, enumerationFillMode))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, iteration_start) + sizeof(source->arm1->iteration_start))
+                    assignValue(arm1.iterationStart, source->arm1->iteration_start);
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, iterations) + sizeof(source->arm1->iterations))
+                    assignValue(arm1.iterations, source->arm1->iterations);
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, duration) + sizeof(source->arm1->duration) && source->arm1->duration) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(source->arm1->duration, status);
+                    if (status != RV_OK) return status;
+                    arm1.duration = std::move(*value);
+                }
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, direction) + sizeof(source->arm1->direction) && !assignEnumeration(arm1.direction, source->arm1->direction, enumerationPlaybackDirection))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, easing) + sizeof(source->arm1->easing)) {
+                    if (source->arm1->easing.present != 0 && source->arm1->easing.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->easing.present) {
+                        if (source->arm1->easing.length < 0 || (source->arm1->easing.length > 0 && !source->arm1->easing.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.easing, source->arm1->easing.data, source->arm1->easing.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomCustomAnimationOptions, id) + sizeof(source->arm1->id)) {
+                    if (source->arm1->id.present != 0 && source->arm1->id.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->id.present) {
+                        if (source->arm1->id.length < 0 || (source->arm1->id.length > 0 && !source->arm1->id.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.id, source->arm1->id.data, source->arm1->id.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<double, CustomAnimationOptions> { Variant<double, CustomAnimationOptions> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrCustomAnimationOptions(RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
 std::optional<Vector<Variant<Ref<CSSNumericValue>, String, Ref<CSSOMKeywordValue>>>> decodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(const RvDomSequenceCSSNumericValueOrCSSOMKeywordish* source, int32_t& status)
 {
     if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -4682,7 +4843,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:Touch", "dom:TouchList", "dom:TouchEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:FontFace", "dom:FontFaceSet", "dom:WebAnimation", "dom:AnimationEffect", "dom:KeyframeEffect", "dom:AnimationTimeline", "dom:DocumentTimeline", "dom:ScrollTimeline", "dom:ViewTimeline", "dom:CSSAnimation", "dom:CSSTransition", "dom:DataTransfer", "dom:DataTransferItemList", "dom:DataTransferItem", "dom:ClipboardEvent", "dom:DragEvent", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom:ImageData", "dom:Path2D", "dom:ImageBitmap", "dom:ImageBitmapRenderingContext", "dom:TextMetrics", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-type-query:AnimationEffect", "dom-type-query:AnimationTimeline", "dom-type-query:WebAnimation", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:FontFace", "dom-constructor:WebAnimation", "dom-constructor:KeyframeEffect", "dom-constructor:KeyframeEffect", "dom-constructor:DocumentTimeline", "dom-constructor:ScrollTimeline", "dom-constructor:ViewTimeline", "dom-constructor:DataTransfer", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:Touch", "dom:TouchList", "dom:TouchEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:FontFace", "dom:FontFaceSet", "dom:WebAnimation", "dom:AnimationEffect", "dom:KeyframeEffect", "dom:CustomEffect", "dom:AnimationTimeline", "dom:DocumentTimeline", "dom:ScrollTimeline", "dom:ViewTimeline", "dom:CSSAnimation", "dom:CSSTransition", "dom:DataTransfer", "dom:DataTransferItemList", "dom:DataTransferItem", "dom:ClipboardEvent", "dom:DragEvent", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom:ImageData", "dom:Path2D", "dom:ImageBitmap", "dom:ImageBitmapRenderingContext", "dom:TextMetrics", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-type-query:AnimationEffect", "dom-type-query:AnimationTimeline", "dom-type-query:WebAnimation", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:FontFace", "dom-constructor:WebAnimation", "dom-constructor:KeyframeEffect", "dom-constructor:KeyframeEffect", "dom-constructor:CustomEffect", "dom-constructor:DocumentTimeline", "dom-constructor:ScrollTimeline", "dom-constructor:ViewTimeline", "dom-constructor:DataTransfer", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-constructor:Path2D", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -5055,6 +5216,16 @@ void ranvier_dom_union_unrestricted_double_or_keyframe_effect_options_release(Rv
 void ranvier_dom_sequence_computed_keyframe_release(RvDomSequenceComputedKeyframe* value)
 {
     if (isMainThread()) clearRvDomSequenceComputedKeyframe(value);
+}
+
+void ranvier_dom_union_unrestricted_double_or_effect_timing_release(RvDomUnionUnrestrictedDoubleOrEffectTiming* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrEffectTiming(value);
+}
+
+void ranvier_dom_union_unrestricted_double_or_custom_animation_options_release(RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrCustomAnimationOptions(value);
 }
 
 void ranvier_dom_sequence_css_numeric_value_or_cssom_keywordish_release(RvDomSequenceCSSNumericValueOrCSSOMKeywordish* value)
@@ -6261,6 +6432,20 @@ RvTextMetrics* ranvier_dom_text_metrics_retain(RvTextMetrics* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<TextMetrics*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_custom_effect_callback_release(RvCustomEffectCallback* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<CustomEffectCallback*>(handle)->deref();
+}
+
+RvCustomEffectCallback* ranvier_dom_custom_effect_callback_retain(RvCustomEffectCallback* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<CustomEffectCallback*>(handle)->ref();
     return handle;
 }
 
@@ -45661,6 +45846,29 @@ int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvN
     return invoke([&]() -> decltype(auto) { return Ranvier::keyframesCall(*global, std::move(*a0), [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return impl->setBindingsKeyframes(*global, document.get(), std::move(keyframesObject)); }); });
 }
 
+// CustomEffect.constructor: target is the Document of the constructed object; RV_ERR_WRONG_HOST for a callback of another host's document; options defaults to {} in IDL; *result is a new reference; RV_ERR_UNSUPPORTED while the setting WebAnimationsCustomEffectsEnabled is off
+int32_t ranvier_dom_custom_effect_create(RvNode* target, RvCustomEffectCallback* callback, const RvDomUnionUnrestrictedDoubleOrEffectTiming* options, RvAnimationEffect** result)
+{
+    if (!target || !callback || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.webAnimationsCustomEffectsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<CustomEffectCallback> a0 = reinterpret_cast<CustomEffectCallback*>(callback);
+    if (a0 && !Ranvier::customEffectCallbackMatches(*a0, *impl))
+        return RV_ERR_WRONG_HOST;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionUnrestrictedDoubleOrEffectTiming(options, status1);
+    if (!options) { a1 = Variant<double, EffectTiming> { WTF::InPlaceIndex<1>, EffectTiming { } }; status1 = RV_OK; }
+    if (status1 != RV_OK) return status1;
+    return deliver([&]() -> decltype(auto) { return CustomEffect::create(*impl, HandleArg<CustomEffectCallback> { a0.get() }, std::move(*a1)); }, [&](auto&& value) { return storeHandle<AnimationEffect>(value, result); });
+}
+
 // AnimationTimeline.currentTime getter: readonly attribute CSSNumberish? currentTime; *result owns its contents; release with the matching rv_dom_*_release
 int32_t ranvier_dom_animation_timeline_get_current_time(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result)
 {
@@ -45699,6 +45907,32 @@ int32_t ranvier_dom_document_timeline_create(RvNode* target, const RvDomDocument
             assignValue(a0.originTime, options->origin_time);
     }
     return deliver([&]() -> decltype(auto) { return DocumentTimeline::create(*impl, std::move(a0)); }, [&](auto&& value) { return storeHandle<AnimationTimeline>(value, result); });
+}
+
+// DocumentTimeline.animate(CustomEffectCallback callback, optional (unrestricted double or CustomAnimationOptions) options = {}) -> WebAnimation; RV_ERR_WRONG_HOST for a callback of another host's document; options defaults to {} in IDL; *result is a new reference; RV_ERR_UNSUPPORTED while the setting WebAnimationsCustomEffectsEnabled is off
+int32_t ranvier_dom_document_timeline_animate(RvAnimationTimeline* target, RvCustomEffectCallback* callback, const RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions* options, RvEventTarget** result)
+{
+    if (!target || !callback || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<DocumentTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<Document> settingsDocument = impl->document();
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.webAnimationsCustomEffectsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<CustomEffectCallback> a0 = reinterpret_cast<CustomEffectCallback*>(callback);
+    if (a0 && !Ranvier::customEffectCallbackMatches(*a0, *impl))
+        return RV_ERR_WRONG_HOST;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionUnrestrictedDoubleOrCustomAnimationOptions(options, status1);
+    if (!options) { a1 = Variant<double, CustomAnimationOptions> { WTF::InPlaceIndex<1>, CustomAnimationOptions { } }; status1 = RV_OK; }
+    if (status1 != RV_OK) return status1;
+    return deliver([&]() -> decltype(auto) { return impl->animate(HandleArg<CustomEffectCallback> { a0.get() }, std::move(*a1)); }, [&](auto&& value) { return storeHandle<EventTarget>(value, result); });
 }
 
 // ScrollTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
@@ -49390,6 +49624,8 @@ int32_t ranvier_dom_animation_effect_get_interface_name(RvAnimationEffect* targe
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     auto* impl = reinterpret_cast<AnimationEffect*>(target);
+    if (dynamicDowncast<CustomEffect>(*impl))
+        return copyString("CustomEffect"_s, buffer, capacity, length);
     if (dynamicDowncast<KeyframeEffect>(*impl))
         return copyString("KeyframeEffect"_s, buffer, capacity, length);
     return copyString("AnimationEffect"_s, buffer, capacity, length);

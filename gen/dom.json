@@ -30,6 +30,9 @@
     "unionFieldDefaults lists dictionary union members with a string arm whose IDL string default the glue assigns, for a C++ struct that leaves the member empty; a present field replaces it.",
     "setterExpressions maps Interface.member to the C++ a setter calls with {value}, for a member whose C++ type differs from its IDL type.",
     "browserArgumentConversions maps Interface.member.argument to the JavaScript function the Fable provider applies to an argument: Keyframe sequences become the browser's keyframe objects.",
+    "settingsDocuments maps an interface to the C++ that reads the Document whose settings gate its [EnabledBySetting] members; null returns RV_ERR_DETACHED.",
+    "callbackObjectRoots also lists callback functions (callback X = ...), whose handles the host creates; the generator binds their release and retain.",
+    "argumentHostChecks maps an object handle root to the C++ predicate (argument, receiver) that tells whether an argument belongs to the receiver's host: another host returns RV_ERR_WRONG_HOST.",
     "customOperations replaces a [Custom] operation with the signature its native binding implements, and callExpressions names the C++ an operation calls.",
     "syntheticDictionaries lists the dictionaries of syntheticIdl, which no WebKit IDL file defines.",
     "contextDocuments names the C++ document of an object whose operations take a checked context Document: another document returns RV_ERR_WRONG_HOST.",
@@ -347,6 +350,10 @@
     "ViewTimeline": {
       "receiver": "Document",
       "factory": "ViewTimeline::create"
+    },
+    "CustomEffect": {
+      "receiver": "Document",
+      "factory": "CustomEffect::create"
     }
   },
   "dictionaryCppTypes": {
@@ -493,7 +500,8 @@
     "DataTransferItem": "Document",
     "KeyframeEffect": "Document",
     "AnimationEffect": "Document",
-    "CanvasGradient": "Document"
+    "CanvasGradient": "Document",
+    "CustomEffect": "Document"
   },
   "finiteNumberInputs": [
     "CanvasGradient.addColorStop",
@@ -806,6 +814,7 @@
     "WebAnimation",
     "AnimationEffect",
     "KeyframeEffect",
+    "CustomEffect",
     "AnimationTimeline",
     "DocumentTimeline",
     "ScrollTimeline",
@@ -852,7 +861,8 @@
       "EventListenerOptions",
       "AddEventListenerOptions",
       "KeyframeEffectOptions",
-      "DocumentTimelineOptions"
+      "DocumentTimelineOptions",
+      "EffectTiming"
     ],
     "interfaces": [
       "SVGElement",
@@ -1061,6 +1071,8 @@
     "CSSTransitionEvent.animation",
     "TransitionEventInit.animation",
     "UIEventInit.view",
+    "CustomAnimationOptions.frameRate",
+    "DocumentTimeline.maximumFrameRate",
     "DataTransferItem.getAsString",
     "DataTransferItem.webkitGetAsEntry"
   ],
@@ -1218,6 +1230,9 @@
           "Skip": 3
         }
       }
+    },
+    "CustomEffectCallback": {
+      "contract": "float -> unit"
     }
   },
   "byteSpanTypes": [
@@ -1523,5 +1538,14 @@
   ],
   "unionFieldDefaults": [
     "ViewTimelineOptions.inset"
-  ]
+  ],
+  "settingsDocuments": {
+    "DocumentTimeline": "impl->document()"
+  },
+  "argumentHostChecks": {
+    "CustomEffectCallback": {
+      "check": "Ranvier::customEffectCallbackMatches",
+      "header": "RanvierCustomEffects.h"
+    }
+  }
 }

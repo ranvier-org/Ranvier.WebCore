@@ -1525,6 +1525,20 @@ type RvDomDocumentTimelineOptions =
     val mutable size: uint32
     val mutable origin_time: float
 
+/// <summary>The IDL dictionary CustomAnimationOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomCustomAnimationOptions =
+    val mutable size: uint32
+    val mutable delay: float
+    val mutable end_delay: float
+    val mutable fill: int
+    val mutable iteration_start: float
+    val mutable iterations: float
+    val mutable duration: nativeint
+    val mutable direction: int
+    val mutable easing: RvDomUtf8StringInput
+    val mutable id: RvDomUtf8StringInput
+
 /// <summary>The IDL dictionary ScrollTimelineOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomScrollTimelineOptions =
@@ -2291,6 +2305,34 @@ type RvDomSequenceComputedKeyframe =
     val mutable count: int
     val mutable items: nativeint
 
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_EFFECT_TIMING_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_EFFECT_TIMING_EFFECT_TIMING = 2
+
+/// <summary>ABI transport for UnrestrictedDoubleOrEffectTiming; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUnrestrictedDoubleOrEffectTiming =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
+    val mutable arm1: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_CUSTOM_ANIMATION_OPTIONS_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_CUSTOM_ANIMATION_OPTIONS_CUSTOM_ANIMATION_OPTIONS = 2
+
+/// <summary>ABI transport for UnrestrictedDoubleOrCustomAnimationOptions; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
+    val mutable arm1: nativeint
+
 /// <summary>ABI transport for CSSNumericValueOrCSSOMKeywordish sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceCSSNumericValueOrCSSOMKeywordish =
@@ -2634,6 +2676,12 @@ extern void rv_dom_union_unrestricted_double_or_keyframe_effect_options_release(
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_computed_keyframe_release(RvDomSequenceComputedKeyframe& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_unrestricted_double_or_effect_timing_release(RvDomUnionUnrestrictedDoubleOrEffectTiming& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_unrestricted_double_or_custom_animation_options_release(RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_css_numeric_value_or_cssom_keywordish_release(RvDomSequenceCSSNumericValueOrCSSOMKeywordish& value)
@@ -3171,6 +3219,12 @@ extern void rv_dom_text_metrics_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_text_metrics_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_custom_effect_callback_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_custom_effect_callback_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
@@ -11423,6 +11477,9 @@ extern int rv_dom_keyframe_effect_get_keyframes(nativeint target, RvDomSequenceC
 extern int rv_dom_keyframe_effect_set_keyframes(nativeint target, nativeint context, [<In>] RvDomSequenceKeyframeNullable[] keyframes)
 
 [<DllImport(Lib)>]
+extern int rv_dom_custom_effect_create(nativeint target, nativeint callback, [<In>] RvDomUnionUnrestrictedDoubleOrEffectTiming[] options, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_animation_timeline_get_current_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
 
 [<DllImport(Lib)>]
@@ -11430,6 +11487,9 @@ extern int rv_dom_animation_timeline_get_duration(nativeint target, RvDomUnionDo
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_timeline_create(nativeint target, [<In>] RvDomDocumentTimelineOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_timeline_animate(nativeint target, nativeint callback, [<In>] RvDomUnionUnrestrictedDoubleOrCustomAnimationOptions[] options, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_scroll_timeline_create(nativeint target, [<In>] RvDomScrollTimelineOptions[] options, nativeint& result)

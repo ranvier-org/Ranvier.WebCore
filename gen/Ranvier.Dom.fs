@@ -5372,6 +5372,10 @@ and [<AllowNullLiteral>] KeyframeEffect =
 #endif
     abstract member setKeyframes: keyframes: (Keyframe) array -> unit
 
+/// <summary>CustomEffect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] CustomEffect =
+    inherit AnimationEffect
+
 /// <summary>AnimationTimeline in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] AnimationTimeline =
 
@@ -5394,6 +5398,16 @@ and [<AllowNullLiteral>] AnimationTimeline =
 /// <summary>DocumentTimeline in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DocumentTimeline =
     inherit AnimationTimeline
+
+    /// <summary>DocumentTimeline.animate.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.animate($1, $2)")>]
+    abstract member __ranvier_animate: callback: CustomEffectCallback * ?options: obj -> WebAnimation
+#else
+    abstract member animate: callback: CustomEffectCallback -> WebAnimation
+    abstract member animate: callback: CustomEffectCallback * options: float -> WebAnimation
+    abstract member animate: callback: CustomEffectCallback * options: CustomAnimationOptions -> WebAnimation
+#endif
 
 /// <summary>ScrollTimeline in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ScrollTimeline =
@@ -6297,6 +6311,11 @@ and [<RequireQualifiedAccess>] UnrestrictedDoubleOrDOMString =
     | UnrestrictedDouble of float
     | DOMString of string
 
+/// <summary>UnrestrictedDoubleOrCustomAnimationOptions in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrCustomAnimationOptions =
+    | UnrestrictedDouble of float
+    | CustomAnimationOptions of CustomAnimationOptions
+
 /// <summary>DOMStringOrCanvasGradientOrCanvasPattern in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] DOMStringOrCanvasGradientOrCanvasPattern =
     | DOMString of string
@@ -6572,6 +6591,21 @@ and [<AllowNullLiteral; DomDictionary>] ComputedKeyframe() =
     member val composite: string = Unchecked.defaultof<_> with get, set
     member val properties: (KeyframeProperty) array = [||] with get, set
 
+/// <summary>CustomAnimationOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] CustomAnimationOptions() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val id: string = "" with get, set
+
 /// <summary>ImageDataSettings in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] ImageDataSettings() = class end
 
@@ -6579,6 +6613,9 @@ and [<AllowNullLiteral; DomDictionary>] ImageDataSettings() = class end
 and [<AllowNullLiteral; DomDictionary>] FocusOptions() =
     member val preventScroll: bool = false with get, set
     member val focusVisible: (bool) option = None with get, set
+
+/// <summary>CustomEffectCallback in the scoped DOM interface model.</summary>
+and CustomEffectCallback = float -> unit
 
 /// <summary>EventListener in the scoped DOM interface model.</summary>
 and EventListener = Event -> unit
@@ -7042,6 +7079,11 @@ module BrowserUnionAdapters =
         | UnrestrictedDoubleOrDOMString.UnrestrictedDouble value -> box value
         | UnrestrictedDoubleOrDOMString.DOMString value -> box value
 
+    let private boxUnrestrictedDoubleOrCustomAnimationOptions (value: UnrestrictedDoubleOrCustomAnimationOptions) : obj =
+        match value with
+        | UnrestrictedDoubleOrCustomAnimationOptions.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrCustomAnimationOptions.CustomAnimationOptions value -> box value
+
     let private boxDOMStringOrCanvasGradientOrCanvasPattern (value: DOMStringOrCanvasGradientOrCanvasPattern) : obj =
         match value with
         | DOMStringOrCanvasGradientOrCanvasPattern.DOMString value -> box value
@@ -7464,6 +7506,17 @@ module BrowserUnionAdapters =
                 None
             else
                 Some (unboxDoubleOrCSSNumericValue value)
+
+
+    type DocumentTimeline with
+        member this.animate(callback: CustomEffectCallback) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = None)
+
+        member this.animate(callback: CustomEffectCallback, options: float) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = Some (box options))
+
+        member this.animate(callback: CustomEffectCallback, options: CustomAnimationOptions) : WebAnimation =
+            this.__ranvier_animate (callback, ?options = Some (box options))
 
 
     type CanvasRenderingContext2D with
