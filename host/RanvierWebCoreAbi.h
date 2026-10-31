@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 33.
+ * Ranvier native WebCore C ABI, version 36.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
