@@ -1123,6 +1123,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "image-decode"))
         return 1;
+    if (!std::strcmp(feature, "font-load"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1293,6 +1295,17 @@ int32_t rv_image_decode(RvHost* host, RvNode* image, RvResourceCompletion comple
     if (!liveHosts.contains(host))
         return RV_ERR_UNSUPPORTED;
     return ranvier_resource_decode_image(reinterpret_cast<RvNode*>(&host->document()), image, completion, context, operation);
+}
+
+int32_t rv_font_load(RvHost* host, const char* family, const uint8_t* data, int32_t length, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !family || (!data && length) || length < 0 || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_resource_load_font(reinterpret_cast<RvNode*>(&host->document()), family, data, length, completion, context, operation);
 }
 
 int32_t rv_resource_cancel(uint64_t operation)

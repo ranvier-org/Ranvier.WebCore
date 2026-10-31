@@ -250,6 +250,7 @@ module Calls =
            "rv_host_capability_value_text"
            "rv_host_select_svg_view"
            "rv_image_decode"
+           "rv_font_load"
            "rv_resource_cancel"
            "rv_resource_release" |]
 
@@ -959,6 +960,17 @@ module Raw =
 
     [<DllImport(Lib)>]
     extern int rv_image_decode(nativeint host, nativeint image, nativeint completion, nativeint context, uint64& operation)
+
+    [<DllImport(Lib)>]
+    extern int rv_font_load(
+        nativeint host,
+        [<MarshalAs(UnmanagedType.LPUTF8Str)>] string family,
+        [<In>] byte[] data,
+        int length,
+        nativeint completion,
+        nativeint context,
+        uint64& operation
+    )
 
     [<DllImport(Lib)>]
     extern int rv_resource_cancel(uint64 operation)
@@ -3322,13 +3334,27 @@ let rv_image_decode (host: nativeint, image: nativeint, completion: nativeint, c
     else
         Raw.rv_image_decode (host, image, completion, context, &operation)
 
+let rv_font_load
+    (host: nativeint, family: string, data: byte[], length: int, completion: nativeint, context: nativeint, operation: byref<uint64>)
+    : int =
+    if Calls.On then
+        let started = System.Diagnostics.Stopwatch.GetTimestamp ()
+        let result = Raw.rv_font_load (host, family, data, length, completion, context, &operation)
+        let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
+        Calls.Counts[190] <- Calls.Counts[190] + 1L
+        Calls.Ticks[190] <- Calls.Ticks[190] + spent
+        Calls.Elapsed <- Calls.Elapsed + spent
+        result
+    else
+        Raw.rv_font_load (host, family, data, length, completion, context, &operation)
+
 let rv_resource_cancel (operation: uint64) : int =
     if Calls.On then
         let started = System.Diagnostics.Stopwatch.GetTimestamp ()
         let result = Raw.rv_resource_cancel (operation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
-        Calls.Counts[190] <- Calls.Counts[190] + 1L
-        Calls.Ticks[190] <- Calls.Ticks[190] + spent
+        Calls.Counts[191] <- Calls.Counts[191] + 1L
+        Calls.Ticks[191] <- Calls.Ticks[191] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else
@@ -3339,8 +3365,8 @@ let rv_resource_release (operation: uint64) : int =
         let started = System.Diagnostics.Stopwatch.GetTimestamp ()
         let result = Raw.rv_resource_release (operation)
         let spent = System.Diagnostics.Stopwatch.GetTimestamp () - started
-        Calls.Counts[191] <- Calls.Counts[191] + 1L
-        Calls.Ticks[191] <- Calls.Ticks[191] + spent
+        Calls.Counts[192] <- Calls.Counts[192] + 1L
+        Calls.Ticks[192] <- Calls.Ticks[192] + spent
         Calls.Elapsed <- Calls.Elapsed + spent
         result
     else

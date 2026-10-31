@@ -1210,6 +1210,13 @@ typedef void (*RvResourceCompletion)(void* context, int32_t outcome, int32_t wid
  * terminals are delivered from the engine callback that produces them. Returns RV_ERR_UNSUPPORTED for another
  * element type or a target outside the host's document. */
 RV_EXPORT int32_t rv_image_decode(RvHost*, RvNode* image, RvResourceCompletion completion, void* context, uint64_t* operation);
+/* Font readiness ("font-load"), without JavaScript or a promise: builds a FontFace for family from length bytes,
+ * which are copied before the call returns, and writes an operation token. SUCCEEDED follows the face's own loaded
+ * state and adds it to the host document's FontFaceSet; DECODE_FAILED reports bytes the engine cannot use as a font,
+ * including empty bytes. A succeeded font stays in the document's fonts until rv_resource_release, rv_host_destroy
+ * or a new document removes it. width and height are 0. Delivery, cancel and release follow rv_image_decode.
+ * Returns RV_ERR_UNSUPPORTED for an empty or non-UTF-8 family. */
+RV_EXPORT int32_t rv_font_load(RvHost*, const char* family, const uint8_t* data, int32_t length, RvResourceCompletion completion, void* context, uint64_t* operation);
 /* Delivers CANCELLED to an in-flight operation, or a pending terminal already reached, before returning. */
 RV_EXPORT int32_t rv_resource_cancel(uint64_t operation);
 /* Ends the operation as rv_resource_cancel does, then unregisters it; the completion and its context are not used
