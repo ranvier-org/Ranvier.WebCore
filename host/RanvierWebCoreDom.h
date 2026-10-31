@@ -106,6 +106,7 @@ typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrol
 typedef struct RvDomSequenceKeyframeProperty RvDomSequenceKeyframeProperty;
 typedef struct RvDomSequenceKeyframeNullable RvDomSequenceKeyframeNullable;
 typedef struct RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString;
+typedef struct RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString;
 typedef struct RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions;
 typedef struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable;
 typedef struct RvDomUnionTogglePopoverOptionsOrBoolean RvDomUnionTogglePopoverOptionsOrBoolean;
@@ -151,6 +152,8 @@ typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSeque
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionUnsignedLongOrAnimationFrameRatePreset RvDomUnionUnsignedLongOrAnimationFrameRatePreset;
 typedef struct RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions;
+typedef struct RvDomSequenceCSSNumericValueOrCSSOMKeywordish RvDomSequenceCSSNumericValueOrCSSOMKeywordish;
+typedef struct RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -614,6 +617,15 @@ typedef struct RvDomKeyframe {
     const RvDomSequenceKeyframeProperty* properties; /* sequence<KeyframeProperty>, default [] */
 } RvDomKeyframe;
 
+/* The IDL dictionary TimelineRangeOffset. size is sizeof(RvDomTimelineRangeOffset) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. As a result, the glue allocates it,
+ * sets size, owns every field and nested value, and rv_dom_timeline_range_offset_release frees it. */
+typedef struct RvDomTimelineRangeOffset {
+    uint32_t size;
+    RvDomUtf8StringInput range_name; /* DOMString */
+    RvCSSStyleValue* offset; /* CSSNumericValue, NULL for absent */
+} RvDomTimelineRangeOffset;
+
 /* The IDL dictionary KeyframeAnimationOptions. size is sizeof(RvDomKeyframeAnimationOptions) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomKeyframeAnimationOptions {
@@ -631,6 +643,8 @@ typedef struct RvDomKeyframeAnimationOptions {
     RvDomUtf8StringInput pseudo_element; /* CSSOMString?, default null */
     RvDomUtf8StringInput id; /* DOMString, default "" */
     RvAnimationTimeline* const* timeline; /* AnimationTimeline?, NULL for absent, a pointer to NULL for null */
+    const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* range_start; /* (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString), default "normal" */
+    const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* range_end; /* (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString), default "normal" */
 } RvDomKeyframeAnimationOptions;
 
 /* The IDL dictionary GetAnimationsOptions. size is sizeof(RvDomGetAnimationsOptions) as the caller compiles it; a field past
@@ -1013,6 +1027,15 @@ typedef struct RvDomScrollTimelineOptions {
     int32_t axis; /* ScrollAxis, default "block", RV_DOM_SCROLL_AXIS_* */
 } RvDomScrollTimelineOptions;
 
+/* The IDL dictionary ViewTimelineOptions. size is sizeof(RvDomViewTimelineOptions) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomViewTimelineOptions {
+    uint32_t size;
+    RvNode* subject; /* Element, NULL for absent */
+    int32_t axis; /* ScrollAxis, default "block", RV_DOM_SCROLL_AXIS_* */
+    const RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* inset; /* (DOMString or sequence<(CSSNumericValue or CSSOMKeywordish)>), default "auto" */
+} RvDomViewTimelineOptions;
+
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDOMCSSCustomPropertyDescriptor {
@@ -1069,6 +1092,7 @@ typedef struct RvDomUnionBooleanOrScrollIntoViewOptions RvDomUnionBooleanOrScrol
 typedef struct RvDomSequenceKeyframeProperty RvDomSequenceKeyframeProperty;
 typedef struct RvDomSequenceKeyframeNullable RvDomSequenceKeyframeNullable;
 typedef struct RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString;
+typedef struct RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString;
 typedef struct RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions;
 typedef struct RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable;
 typedef struct RvDomUnionTogglePopoverOptionsOrBoolean RvDomUnionTogglePopoverOptionsOrBoolean;
@@ -1114,6 +1138,8 @@ typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSeque
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionUnsignedLongOrAnimationFrameRatePreset RvDomUnionUnsignedLongOrAnimationFrameRatePreset;
 typedef struct RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions;
+typedef struct RvDomSequenceCSSNumericValueOrCSSOMKeywordish RvDomSequenceCSSNumericValueOrCSSOMKeywordish;
+typedef struct RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1259,6 +1285,23 @@ struct RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString {
     double arm0;
     RvCSSStyleValue* arm1;
     RvDomUtf8StringSpan arm2;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_TIMELINE_RANGE_OFFSET_OR_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORD_VALUE_OR_DOM_STRING_TIMELINE_RANGE_OFFSET = 1,
+    RV_DOM_UNION_TIMELINE_RANGE_OFFSET_OR_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORD_VALUE_OR_DOM_STRING_CSS_NUMERIC_VALUE = 2,
+    RV_DOM_UNION_TIMELINE_RANGE_OFFSET_OR_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORD_VALUE_OR_DOM_STRING_CSSOM_KEYWORD_VALUE = 3,
+    RV_DOM_UNION_TIMELINE_RANGE_OFFSET_OR_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORD_VALUE_OR_DOM_STRING_STRING = 4,
+};
+struct RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString {
+    int32_t present;
+    int32_t tag;
+    const RvDomTimelineRangeOffset* arm0;
+    RvCSSStyleValue* arm1;
+    RvCSSStyleValue* arm2;
+    RvDomUtf8StringSpan arm3;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1756,6 +1799,27 @@ struct RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceCSSNumericValueOrCSSOMKeywordish {
+    int32_t present;
+    int32_t count;
+    RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORDISH_STRING = 1,
+    RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORDISH_SEQUENCE_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORDISH = 2,
+};
+struct RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish {
+    int32_t present;
+    int32_t tag;
+    RvDomUtf8StringSpan arm0;
+    RvDomSequenceCSSNumericValueOrCSSOMKeywordish arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1823,6 +1887,7 @@ RV_EXPORT void rv_dom_union_boolean_or_scroll_into_view_options_release(RvDomUni
 RV_EXPORT void rv_dom_sequence_keyframe_property_release(RvDomSequenceKeyframeProperty* value);
 RV_EXPORT void rv_dom_sequence_keyframe_nullable_release(RvDomSequenceKeyframeNullable* value);
 RV_EXPORT void rv_dom_union_unrestricted_double_or_css_numeric_value_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* value);
+RV_EXPORT void rv_dom_union_timeline_range_offset_or_css_numeric_value_or_cssom_keyword_value_or_dom_string_release(RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value);
 RV_EXPORT void rv_dom_union_unrestricted_double_or_keyframe_animation_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions* value);
 RV_EXPORT void rv_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value);
 RV_EXPORT void rv_dom_union_toggle_popover_options_or_boolean_release(RvDomUnionTogglePopoverOptionsOrBoolean* value);
@@ -1868,6 +1933,8 @@ RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 RV_EXPORT void rv_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDomUnionUnsignedLongOrAnimationFrameRatePreset* value);
 RV_EXPORT void rv_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* value);
+RV_EXPORT void rv_dom_sequence_css_numeric_value_or_cssom_keywordish_release(RvDomSequenceCSSNumericValueOrCSSOMKeywordish* value);
+RV_EXPORT void rv_dom_union_dom_string_or_sequence_of_css_numeric_value_or_cssom_keywordish_release(RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -1881,6 +1948,8 @@ RV_EXPORT void rv_dom_url_pattern_result_release(RvDomURLPatternResult* value);
 RV_EXPORT void rv_dom_url_pattern_init_release(RvDomURLPatternInit* value);
 /* Releases an owned URLPatternComponentResult result, its strings and nested values, and the struct. */
 RV_EXPORT void rv_dom_url_pattern_component_result_release(RvDomURLPatternComponentResult* value);
+/* Releases an owned TimelineRangeOffset result, its strings and nested values, and the struct. */
+RV_EXPORT void rv_dom_timeline_range_offset_release(RvDomTimelineRangeOffset* value);
 /* Releases a handle to a DOMImplementation. */
 RV_EXPORT void rv_dom_dom_implementation_release(RvDOMImplementation*);
 /* Adds a reference to a DOMImplementation and returns it. */
@@ -8495,6 +8564,18 @@ RV_EXPORT int32_t rv_dom_web_animation_set_start_time(RvEventTarget* target, con
 RV_EXPORT int32_t rv_dom_web_animation_get_current_time(RvEventTarget* target, RvDomUnionDoubleOrCSSNumericValueNullable* result);
 /* WebAnimation.currentTime setter: attribute CSSNumberish? currentTime */
 RV_EXPORT int32_t rv_dom_web_animation_set_current_time(RvEventTarget* target, const RvDomUnionDoubleOrCSSNumericValueNullable* value);
+/* WebAnimation.rangeStart getter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or
+ * DOMString) rangeStart; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_web_animation_get_range_start(RvEventTarget* target, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result);
+/* WebAnimation.rangeStart setter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or
+ * DOMString) rangeStart */
+RV_EXPORT int32_t rv_dom_web_animation_set_range_start(RvEventTarget* target, const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value);
+/* WebAnimation.rangeEnd getter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString)
+ * rangeEnd; *result owns its contents; release with the matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_web_animation_get_range_end(RvEventTarget* target, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result);
+/* WebAnimation.rangeEnd setter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString)
+ * rangeEnd */
+RV_EXPORT int32_t rv_dom_web_animation_set_range_end(RvEventTarget* target, const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value);
 /* WebAnimation.playbackRate getter: attribute double playbackRate */
 RV_EXPORT int32_t rv_dom_web_animation_get_playback_rate(RvEventTarget* target, double* result);
 /* WebAnimation.playbackRate setter: attribute double playbackRate */
@@ -8576,6 +8657,17 @@ RV_EXPORT int32_t rv_dom_scroll_timeline_create(RvNode* target, const RvDomScrol
 RV_EXPORT int32_t rv_dom_scroll_timeline_get_source(RvAnimationTimeline* target, RvNode** result);
 /* ScrollTimeline.axis getter: readonly attribute ScrollAxis axis */
 RV_EXPORT int32_t rv_dom_scroll_timeline_get_axis(RvAnimationTimeline* target, int32_t* result);
+/* ViewTimeline */
+
+/* ViewTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options
+ * may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_view_timeline_create(RvNode* target, const RvDomViewTimelineOptions* options, RvAnimationTimeline** result);
+/* ViewTimeline.subject getter: readonly attribute Element? subject; *result is a new reference, or NULL */
+RV_EXPORT int32_t rv_dom_view_timeline_get_subject(RvAnimationTimeline* target, RvNode** result);
+/* ViewTimeline.startOffset getter: readonly attribute CSSNumericValue startOffset; *result is a new reference */
+RV_EXPORT int32_t rv_dom_view_timeline_get_start_offset(RvAnimationTimeline* target, RvCSSStyleValue** result);
+/* ViewTimeline.endOffset getter: readonly attribute CSSNumericValue endOffset; *result is a new reference */
+RV_EXPORT int32_t rv_dom_view_timeline_get_end_offset(RvAnimationTimeline* target, RvCSSStyleValue** result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

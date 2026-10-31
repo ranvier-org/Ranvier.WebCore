@@ -2457,6 +2457,45 @@ partial interface Element {
         with self.assertRaises(SystemExit):
             generator.run()
 
+    def test_absent_object_member_is_null_for_absent_in_inputs_and_results(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+dictionary RangeOffset { DOMString rangeName; DOMStringMap offset; };
+dictionary NullableOffset { DOMStringMap? offset; };
+partial interface Element {
+    attribute (RangeOffset or DOMString) range;
+    undefined place(optional RangeOffset where = {});
+    undefined placeNullable(optional NullableOffset where = {});
+};
+''')
+        config = dict(self.world.config)
+        config['exclude'] = list(config['exclude']) + ['Element.placeNullable']
+        config['absentObjectMembers'] = ['RangeOffset.offset']
+        config['resultDictionaries'] = ['RangeOffset']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        self.assertIn('RvDOMStringMap* offset; /* DOMStringMap, NULL for absent */', generator.header())
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}
+        # Input: NULL leaves the member absent; a handle of another interface fails.
+        self.assertIn('where->offset) {', body['element_place'])
+        self.assertIn('a0.offset = std::move(value);', body['element_place'])
+        self.assertIn('element_get_range', body)
+        self.assertIn('element_set_range', body)
+        # Result: the dictionary arm owns a new reference, NULL for absent, dropped by its release.
+        glue = generator.glue()
+        self.assertIn('if (*field)', glue)
+        self.assertIn('storeHandle<DOMStringMap>(*field, &result->offset);', glue)
+        self.assertIn('if (value->offset) reinterpret_cast<DOMStringMap*>(value->offset)->deref();', glue)
+        config['exclude'] = [name for name in config['exclude'] if name != 'Element.placeNullable']
+        config['absentObjectMembers'] = ['RangeOffset.offset', 'NullableOffset.offset']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
     def test_configured_svg_mathml_shared_style_and_focus_members(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''

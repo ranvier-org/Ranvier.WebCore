@@ -500,6 +500,12 @@ class World:
                     raise SystemExit(f"{name}.{member.name}: optional object members must be optional nullable object or node handles without a default")
                 mapped.optional_handle = True
                 configured_object = True
+            if f"{name}.{member.name}" in self.config.get("absentObjectMembers", []):
+                # Rv<Root>*: NULL for absent, else the handle; the IDL member is optional, nonnullable and has no default.
+                if mapped.kind != "object" or member.required or member.default is not None or mapped.nullable:
+                    raise SystemExit(f"{name}.{member.name}: absent object members must be optional nonnullable object handles without a default")
+                mapped.absent_handle = True
+                configured_object = True
             if (mapped.kind in ("object", "event") and not configured_object) or mapped.interface == "EventTarget":
                 raise Unsupported(f"dictionary {name}: member {member.name} of type {member.type}")
             found.append((member, mapped))
@@ -1471,6 +1477,14 @@ class Generator(ComplexGeneratorMixin):
         covered = f"{pointer}->size >= offsetof({struct}, {field}) + sizeof({pointer}->{field})"
         ctype = self.field_ctype(member, mapped, dictionary)
         lines = []
+        if getattr(mapped, "absent_handle", False):
+            self.headers.add(f"{mapped.cls}.h")
+            root = self.world.cpp_class(mapped.root)
+            source = f"reinterpret_cast<{root}*>({pointer}->{field})"
+            cast = source if root == mapped.cls else self.cast_expression(mapped.cls, root, f"*{source}")
+            lines += [f"if ({covered} && {pointer}->{field}) {{", f"    RefPtr<{mapped.cls}> value = {cast};", "    if (!value)",
+                      "        return RV_ERR_WRONG_INTERFACE;", f"    {target}.{cpp_field} = std::move(value);", "}"]
+            return lines
         if getattr(mapped, "optional_handle", False) and mapped.kind == "node":
             self.headers.add(f"{mapped.cls}.h")
             lines += [f"if ({covered} && {pointer}->{field}) {{", f"    RefPtr<{mapped.cls}> value;", f"    if (*{pointer}->{field}) {{"]
@@ -1801,14 +1815,16 @@ class Generator(ComplexGeneratorMixin):
                     notes.append(f"{name} may be NULL for the IDL default")
                 cpp = self.dictionary_cpp(mapped.interface)
                 objects = [(field_member, field_mapped) for field_member, field_mapped in fields
-                           if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)]
+                           if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)
+                           and not getattr(field_mapped, "absent_handle", False)]
                 if objects:
                     prepare += self.dictionary_object_prefix(name, struct, cpp, f"a{index}", mapped.interface, objects, argument)
                 else:
                     prepare.append(f"{cpp} a{index} {{ }};")
                 prepare.append(f"if ({name}) {{")
                 for field_member, field_mapped in fields:
-                    if field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False):
+                    if (field_mapped.kind == "object" and not getattr(field_mapped, "optional_handle", False)
+                            and not getattr(field_mapped, "absent_handle", False)):
                         continue
                     prepare += ["    " + line for line in self.dictionary_field(name, struct, f"a{index}", field_member, field_mapped, mapped.interface)]
                 prepare.append("}")

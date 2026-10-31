@@ -25,7 +25,8 @@
     "customConstructors replaces a [Custom] constructor with the IDL signature its custom binding implements; presenceArguments",
     "gives an optional nullable argument a name_present flag, so absent and null stay distinct. constructors overloads gives",
     "an overload, by argument count, its own factory settings.",
-    "optionalObjectMembers lists optional nullable object dictionary members passed as Rv<Root>* const*: NULL absent, a pointer to NULL null.",
+    "optionalObjectMembers lists optional nullable object or node dictionary members passed as Rv<Root>* const* (RvNode* const*): NULL absent, a pointer to NULL null.",
+    "absentObjectMembers lists optional nonnullable object dictionary members without a default, passed as Rv<Root>*: NULL absent; in a result dictionary the member is a new reference, or NULL, that the dictionary's release drops.",
     "setterExpressions maps Interface.member to the C++ a setter calls with {value}, for a member whose C++ type differs from its IDL type.",
     "browserArgumentConversions maps Interface.member.argument to the JavaScript function the Fable provider applies to an argument: Keyframe sequences become the browser's keyframe objects."
   ],
@@ -281,6 +282,10 @@
     "ScrollTimeline": {
       "receiver": "Document",
       "factory": "ScrollTimeline::create"
+    },
+    "ViewTimeline": {
+      "receiver": "Document",
+      "factory": "ViewTimeline::create"
     }
   },
   "dictionaryCppTypes": {
@@ -723,7 +728,8 @@
     "KeyframeEffect",
     "AnimationTimeline",
     "DocumentTimeline",
-    "ScrollTimeline"
+    "ScrollTimeline",
+    "ViewTimeline"
   ],
   "skipDirectories": [
     "Modules/",
@@ -959,8 +965,6 @@
     "CSSTransitionEvent.animation",
     "TransitionEventInit.animation",
     "UIEventInit.view",
-    "KeyframeAnimationOptions.rangeStart",
-    "KeyframeAnimationOptions.rangeEnd",
     "AnimationEffect.getTiming",
     "AnimationEffect.getComputedTiming",
     "AnimationEffect.updateTiming"
@@ -1165,7 +1169,8 @@
   "resultDictionaries": [
     "URLPatternResult",
     "URLPatternComponentResult",
-    "URLPatternInit"
+    "URLPatternInit",
+    "TimelineRangeOffset"
   ],
   "sequenceStringSpans": [
     "URLSearchParams"
@@ -1249,5 +1254,8 @@
     "Element.animate.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "KeyframeEffect.setKeyframes.keyframes": "(k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;})",
     "Element.animate.options": "(o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;}"
-  }
+  },
+  "absentObjectMembers": [
+    "TimelineRangeOffset.offset"
+  ]
 }

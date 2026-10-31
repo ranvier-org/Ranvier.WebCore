@@ -322,6 +322,7 @@
 #include "StyleSheetList.h"
 #include "SubmitEvent.h"
 #include "Text.h"
+#include "TimelineRangeOffset.h"
 #include "ToggleEvent.h"
 #include "TreeWalker.h"
 #include "TrustedScriptURL.h"
@@ -332,6 +333,8 @@
 #include "URLPatternResult.h"
 #include "URLSearchParams.h"
 #include "ValidityState.h"
+#include "ViewTimeline.h"
+#include "ViewTimelineOptions.h"
 #include "VisualViewport.h"
 #include "WebAnimation.h"
 #include "WheelEvent.h"
@@ -780,6 +783,8 @@ RvDomURLPatternInit* encodeDictRvDomURLPatternInit(const URLPatternInit& value);
 void releaseDictRvDomURLPatternInit(RvDomURLPatternInit* value);
 RvDomURLPatternComponentResult* encodeDictRvDomURLPatternComponentResult(const URLPatternComponentResult& value);
 void releaseDictRvDomURLPatternComponentResult(RvDomURLPatternComponentResult* value);
+RvDomTimelineRangeOffset* encodeDictRvDomTimelineRangeOffset(const TimelineRangeOffset& value);
+void releaseDictRvDomTimelineRangeOffset(RvDomTimelineRangeOffset* value);
 RvDomUtf8StringSpan copyOwnedDomStringSpan(const String& value)
 {
     if (value.isNull()) return { nullptr, -1 };
@@ -1380,6 +1385,108 @@ template<typename V> int32_t encodeRvDomUnionUnrestrictedDoubleOrCSSNumericValue
     return RV_OK;
 }
 
+std::optional<Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String>> decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        TimelineRangeOffset arm0 { };
+        if (source->arm0) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm0->size >= offsetof(RvDomTimelineRangeOffset, range_name) + sizeof(source->arm0->range_name)) {
+                    if (source->arm0->range_name.present != 0 && source->arm0->range_name.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm0->range_name.present) {
+                        if (source->arm0->range_name.length < 0 || (source->arm0->range_name.length > 0 && !source->arm0->range_name.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm0.rangeName, source->arm0->range_name.data, source->arm0->range_name.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm0->size >= offsetof(RvDomTimelineRangeOffset, offset) + sizeof(source->arm0->offset) && source->arm0->offset) {
+                    RefPtr<CSSNumericValue> value = dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(source->arm0->offset));
+                    if (!value)
+                        return RV_ERR_WRONG_INTERFACE;
+                    arm0.offset = std::move(value);
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { WTF::InPlaceIndex<0>, std::move(arm0) } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSNumericValue> arm1 = source->arm1 ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(source->arm1)) : nullptr;
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+    }
+    case 3: {
+        if (!source->arm2) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSOMKeywordValue> arm2 = source->arm2 ? dynamicDowncast<CSSOMKeywordValue>(*reinterpret_cast<CSSStyleValue*>(source->arm2)) : nullptr;
+        if (source->arm2 && !arm2) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { WTF::InPlaceIndex<2>, Ref { *arm2 } } };
+    }
+    case 4: {
+        if (source->arm3.length < 0 || (source->arm3.length > 0 && !source->arm3.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm3 = source->arm3.length < 0 ? String() : source->arm3.length ? String::fromUTF8(std::span<const uint8_t> { source->arm3.data, static_cast<size_t>(source->arm3.length) }) : emptyString();
+        if (source->arm3.length >= 0 && arm3.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { Variant<TimelineRangeOffset, Ref<CSSNumericValue>, Ref<CSSOMKeywordValue>, String> { WTF::InPlaceIndex<3>, arm3 } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        releaseDictRvDomTimelineRangeOffset(const_cast<RvDomTimelineRangeOffset*>(value->arm0));
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<CSSStyleValue*>(value->arm1)->deref();
+        break;
+    case 3:
+        if (value->arm2) reinterpret_cast<CSSStyleValue*>(value->arm2)->deref();
+        break;
+    case 4:
+        std::free(const_cast<uint8_t*>(value->arm3.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(V&& value, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result)
+{
+    if constexpr (I < 4) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = encodeDictRvDomTimelineRangeOffset(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm1);
+            }
+            else if constexpr (I == 2) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm2);
+            }
+            else if constexpr (I == 3) {
+                result->arm3 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(V&& input, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, result);
+    return RV_OK;
+}
+
 std::optional<Variant<double, KeyframeAnimationOptions>> decodeRvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions(const RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -1448,6 +1555,18 @@ std::optional<Variant<double, KeyframeAnimationOptions>> decodeRvDomUnionUnrestr
                     if (*source->arm1->timeline && !value)
                         return RV_ERR_WRONG_INTERFACE;
                     arm1.timeline = std::move(value);
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, range_start) + sizeof(source->arm1->range_start) && source->arm1->range_start) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(source->arm1->range_start, status);
+                    if (status != RV_OK) return status;
+                    arm1.rangeStart = std::move(*value);
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, range_end) + sizeof(source->arm1->range_end) && source->arm1->range_end) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(source->arm1->range_end, status);
+                    if (status != RV_OK) return status;
+                    arm1.rangeEnd = std::move(*value);
                 }
                 return RV_OK;
             };
@@ -3456,6 +3575,100 @@ void clearRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(RvDomUnionUnrestri
     *value = { };
 }
 
+std::optional<Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> decodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(const RvDomSequenceCSSNumericValueOrCSSOMKeywordish* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        auto item = decodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(&source->items[i], status);
+        if (status != RV_OK) return std::nullopt;
+        result.append(std::move(*item));
+    }
+    return Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>> { std::move(result) };
+}
+
+void clearRvDomSequenceCSSNumericValueOrCSSOMKeywordish(RvDomSequenceCSSNumericValueOrCSSOMKeywordish* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        clearRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(&value->items[i]);
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(V&& input, RvDomSequenceCSSNumericValueOrCSSOMKeywordish* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue*>(std::calloc(value.size(), sizeof(RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        encodeRvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+std::optional<Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>>> decodeRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(const RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (source->arm0.length < 0 || (source->arm0.length > 0 && !source->arm0.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm0 = source->arm0.length < 0 ? String() : source->arm0.length ? String::fromUTF8(std::span<const uint8_t> { source->arm0.data, static_cast<size_t>(source->arm0.length) }) : emptyString();
+        if (source->arm0.length >= 0 && arm0.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> { Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> { WTF::InPlaceIndex<0>, arm0 } };
+    }
+    case 2: {
+        auto arm1 = decodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(&source->arm1, status);
+        if (status != RV_OK) return std::nullopt;
+        return Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> { Variant<String, Vector<Variant<Ref<CSSNumericValue>, Variant<String, Ref<CSSOMKeywordValue>>>>> { WTF::InPlaceIndex<1>, std::move(*arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        std::free(const_cast<uint8_t*>(value->arm0.data));
+        break;
+    case 2:
+        clearRvDomSequenceCSSNumericValueOrCSSOMKeywordish(&value->arm1);
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(V&& value, RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+            else if constexpr (I == 1) {
+                encodeRvDomSequenceCSSNumericValueOrCSSOMKeywordish(std::get<I>(value), &result->arm1);
+            }
+        } else encodeArmsRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(V&& input, RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(value, result);
+    return RV_OK;
+}
+
 void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
 {
     if (!value) return;
@@ -3728,6 +3941,29 @@ void releaseDictRvDomURLPatternComponentResult(RvDomURLPatternComponentResult* v
     std::free(const_cast<RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString*>(value->groups));
     std::free(value);
 }
+
+RvDomTimelineRangeOffset* encodeDictRvDomTimelineRangeOffset(const TimelineRangeOffset& value)
+{
+    auto* result = static_cast<RvDomTimelineRangeOffset*>(std::calloc(1, sizeof(RvDomTimelineRangeOffset)));
+    RELEASE_ASSERT(result);
+    result->size = sizeof(RvDomTimelineRangeOffset);
+    if (auto* field = resultField(value.rangeName)) {
+        result->range_name = copyOwnedDomStringInput(asString(*field));
+    }
+    if (auto* field = resultField(value.offset)) {
+        if (*field)
+            storeHandle<CSSStyleValue>(*field, &result->offset);
+    }
+    return result;
+}
+
+void releaseDictRvDomTimelineRangeOffset(RvDomTimelineRangeOffset* value)
+{
+    if (!value) return;
+    std::free(const_cast<uint8_t*>(value->range_name.data));
+if (value->offset) reinterpret_cast<CSSStyleValue*>(value->offset)->deref();
+    std::free(value);
+}
 }
 
 using namespace WebCore;
@@ -3738,7 +3974,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:WebAnimation", "dom:AnimationEffect", "dom:KeyframeEffect", "dom:AnimationTimeline", "dom:DocumentTimeline", "dom:ScrollTimeline", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-type-query:AnimationEffect", "dom-type-query:AnimationTimeline", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:WebAnimation", "dom-constructor:KeyframeEffect", "dom-constructor:KeyframeEffect", "dom-constructor:DocumentTimeline", "dom-constructor:ScrollTimeline", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:WebAnimation", "dom:AnimationEffect", "dom:KeyframeEffect", "dom:AnimationTimeline", "dom:DocumentTimeline", "dom:ScrollTimeline", "dom:ViewTimeline", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-type-query:AnimationEffect", "dom-type-query:AnimationTimeline", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:WebAnimation", "dom-constructor:KeyframeEffect", "dom-constructor:KeyframeEffect", "dom-constructor:DocumentTimeline", "dom-constructor:ScrollTimeline", "dom-constructor:ViewTimeline", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -3857,6 +4093,11 @@ void ranvier_dom_sequence_keyframe_nullable_release(RvDomSequenceKeyframeNullabl
 void ranvier_dom_union_unrestricted_double_or_css_numeric_value_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* value)
 {
     if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(value);
+}
+
+void ranvier_dom_union_timeline_range_offset_or_css_numeric_value_or_cssom_keyword_value_or_dom_string_release(RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value)
+{
+    if (isMainThread()) clearRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value);
 }
 
 void ranvier_dom_union_unrestricted_double_or_keyframe_animation_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions* value)
@@ -4084,6 +4325,16 @@ void ranvier_dom_union_unrestricted_double_or_keyframe_effect_options_release(Rv
     if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(value);
 }
 
+void ranvier_dom_sequence_css_numeric_value_or_cssom_keywordish_release(RvDomSequenceCSSNumericValueOrCSSOMKeywordish* value)
+{
+    if (isMainThread()) clearRvDomSequenceCSSNumericValueOrCSSOMKeywordish(value);
+}
+
+void ranvier_dom_union_dom_string_or_sequence_of_css_numeric_value_or_cssom_keywordish_release(RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish* value)
+{
+    if (isMainThread()) clearRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(value);
+}
+
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
 {
     if (isMainThread()) clearRvDomSequenceCSSStyleValue(value);
@@ -4132,6 +4383,11 @@ void ranvier_dom_url_pattern_init_release(RvDomURLPatternInit* value)
 void ranvier_dom_url_pattern_component_result_release(RvDomURLPatternComponentResult* value)
 {
     if (isMainThread()) releaseDictRvDomURLPatternComponentResult(value);
+}
+
+void ranvier_dom_timeline_range_offset_release(RvDomTimelineRangeOffset* value)
+{
+    if (isMainThread()) releaseDictRvDomTimelineRangeOffset(value);
 }
 
 void ranvier_dom_dom_implementation_release(RvDOMImplementation* handle)
@@ -42635,6 +42891,64 @@ int32_t ranvier_dom_web_animation_set_current_time(RvEventTarget* target, const 
     return invoke([&]() -> decltype(auto) { return [&](auto&& time) { return impl->setBindingsCurrentTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }(std::move(*a0)); });
 }
 
+// WebAnimation.rangeStart getter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString) rangeStart; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_web_animation_get_range_start(RvEventTarget* target, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsRangeStart(); }, [&](auto&& value) { return encodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, result); });
+}
+
+// WebAnimation.rangeStart setter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString) rangeStart
+int32_t ranvier_dom_web_animation_set_range_start(RvEventTarget* target, const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setBindingsRangeStart(std::move(*a0)); });
+}
+
+// WebAnimation.rangeEnd getter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString) rangeEnd; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_web_animation_get_range_end(RvEventTarget* target, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsRangeEnd(); }, [&](auto&& value) { return encodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, result); });
+}
+
+// WebAnimation.rangeEnd setter: attribute (TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString) rangeEnd
+int32_t ranvier_dom_web_animation_set_range_end(RvEventTarget* target, const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString* value)
+{
+    if (!target || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return impl->setBindingsRangeEnd(std::move(*a0)); });
+}
+
 // WebAnimation.playbackRate getter: attribute double playbackRate
 int32_t ranvier_dom_web_animation_get_playback_rate(RvEventTarget* target, double* result)
 {
@@ -43089,6 +43403,75 @@ int32_t ranvier_dom_scroll_timeline_get_axis(RvAnimationTimeline* target, int32_
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->axis(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationScrollAxis); });
+}
+
+// ViewTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_view_timeline_create(RvNode* target, const RvDomViewTimelineOptions* options, RvAnimationTimeline** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    ViewTimelineOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomViewTimelineOptions, subject) + sizeof(options->subject) && options->subject) {
+            RefPtr value = dynamicDowncast<Element>(*nodeOf(options->subject));
+            if (!value)
+                return RV_ERR_WRONG_INTERFACE;
+            a0.subject = value.get();
+        }
+        if (options->size >= offsetof(RvDomViewTimelineOptions, axis) + sizeof(options->axis) && !assignEnumeration(a0.axis, options->axis, enumerationScrollAxis))
+            return RV_ERR_UNSUPPORTED;
+        if (options->size >= offsetof(RvDomViewTimelineOptions, inset) + sizeof(options->inset) && options->inset) {
+            int32_t status = RV_OK;
+            auto value = decodeRvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish(options->inset, status);
+            if (status != RV_OK) return status;
+            a0.inset = std::move(*value);
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return ViewTimeline::create(*impl, std::move(a0)); }, [&](auto&& value) { return storeHandle<AnimationTimeline>(value, result); });
+}
+
+// ViewTimeline.subject getter: readonly attribute Element? subject; *result is a new reference, or NULL
+int32_t ranvier_dom_view_timeline_get_subject(RvAnimationTimeline* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ViewTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->subject(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// ViewTimeline.startOffset getter: readonly attribute CSSNumericValue startOffset; *result is a new reference
+int32_t ranvier_dom_view_timeline_get_start_offset(RvAnimationTimeline* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ViewTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->startOffset(); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
+}
+
+// ViewTimeline.endOffset getter: readonly attribute CSSNumericValue endOffset; *result is a new reference
+int32_t ranvier_dom_view_timeline_get_end_offset(RvAnimationTimeline* target, RvCSSStyleValue** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ViewTimeline>(*reinterpret_cast<AnimationTimeline*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->endOffset(); }, [&](auto&& value) { return storeHandle<CSSStyleValue>(value, result); });
 }
 
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
@@ -44432,6 +44815,8 @@ int32_t ranvier_dom_animation_timeline_get_interface_name(RvAnimationTimeline* t
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     auto* impl = reinterpret_cast<AnimationTimeline*>(target);
+    if (dynamicDowncast<ViewTimeline>(*impl))
+        return copyString("ViewTimeline"_s, buffer, capacity, length);
     if (dynamicDowncast<DocumentTimeline>(*impl))
         return copyString("DocumentTimeline"_s, buffer, capacity, length);
     if (dynamicDowncast<ScrollTimeline>(*impl))

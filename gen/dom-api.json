@@ -476,11 +476,13 @@
       "function": "rv_dom_animation_timeline_get_interface_name",
       "feature": "dom-type-query:AnimationTimeline",
       "interfaces": [
+        "ViewTimeline",
         "DocumentTimeline",
         "ScrollTimeline",
         "AnimationTimeline"
       ],
       "names": [
+        "ViewTimeline",
         "DocumentTimeline",
         "ScrollTimeline",
         "AnimationTimeline"
@@ -1654,6 +1656,10 @@
     {
       "name": "ScrollTimeline",
       "base": "AnimationTimeline"
+    },
+    {
+      "name": "ViewTimeline",
+      "base": "ScrollTimeline"
     }
   ],
   "contractInterfaces": [
@@ -4300,6 +4306,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "animation/ScrollTimeline.idl"
+    },
+    {
+      "name": "ViewTimeline",
+      "idlName": "ViewTimeline",
+      "base": "ScrollTimeline",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/ViewTimeline.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -148204,6 +148219,486 @@
     },
     {
       "interface": "WebAnimation",
+      "member": "rangeStart",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_range_start",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "TimelineRangeOffset",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSOMKeywordValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "TimelineRangeOffset",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSOMKeywordValue",
+            "root": "CSSStyleValue",
+            "class": "CSSOMKeywordValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "rangeStart",
+      "contractOwner": "WebAnimation",
+      "kind": "setter",
+      "function": "rv_dom_web_animation_set_range_start",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "(TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "TimelineRangeOffset",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSOMKeywordValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "TimelineRangeOffset",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSOMKeywordValue",
+                "root": "CSSStyleValue",
+                "class": "CSSOMKeywordValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "rangeEnd",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_range_end",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "TimelineRangeOffset",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSOMKeywordValue",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "TimelineRangeOffset",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSOMKeywordValue",
+            "root": "CSSStyleValue",
+            "class": "CSSOMKeywordValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "rangeEnd",
+      "contractOwner": "WebAnimation",
+      "kind": "setter",
+      "function": "rv_dom_web_animation_set_range_end",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "(TimelineRangeOffset or CSSNumericValue or CSSOMKeywordValue or DOMString)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "TimelineRangeOffset",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSOMKeywordValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "TimelineRangeOffset",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSOMKeywordValue",
+                "root": "CSSStyleValue",
+                "class": "CSSOMKeywordValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
       "member": "playbackRate",
       "contractOwner": "WebAnimation",
       "kind": "getter",
@@ -149827,6 +150322,182 @@
         "root": null,
         "class": null,
         "enum": "ScrollAxis",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ViewTimeline",
+      "member": "constructor",
+      "contractOwner": "ViewTimeline",
+      "kind": "constructor",
+      "function": "rv_dom_view_timeline_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomViewTimelineOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvAnimationTimeline**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "options",
+          "idlType": "ViewTimelineOptions",
+          "idl": {
+            "name": "ViewTimelineOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ViewTimelineOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ViewTimeline",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "ViewTimeline",
+        "root": "AnimationTimeline",
+        "class": "ViewTimeline",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:ViewTimeline",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ViewTimeline",
+      "member": "subject",
+      "contractOwner": "ViewTimeline",
+      "kind": "getter",
+      "function": "rv_dom_view_timeline_get_subject",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Element",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Element",
+        "root": null,
+        "class": "Element",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ViewTimeline",
+      "member": "startOffset",
+      "contractOwner": "ViewTimeline",
+      "kind": "getter",
+      "function": "rv_dom_view_timeline_get_start_offset",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ViewTimeline",
+      "member": "endOffset",
+      "contractOwner": "ViewTimeline",
+      "kind": "getter",
+      "function": "rv_dom_view_timeline_get_end_offset",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvCSSStyleValue**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CSSNumericValue",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CSSNumericValue",
+        "root": "CSSStyleValue",
+        "class": "CSSNumericValue",
+        "enum": null,
         "label": null,
         "nullable": false,
         "atom": false,
@@ -154319,6 +154990,71 @@
     {
       "mapping": {
         "kind": "union",
+        "ctype": "RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "TimelineRangeOffset",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSOMKeywordValue",
+            "root": "CSSStyleValue",
+            "class": "CSSOMKeywordValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_timeline_range_offset_or_css_numeric_value_or_cssom_keyword_value_or_dom_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
         "ctype": "RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions",
         "interface": null,
         "root": null,
@@ -156337,6 +157073,190 @@
     {
       "mapping": {
         "kind": "sequence",
+        "ctype": "RvDomSequenceCSSNumericValueOrCSSOMKeywordish",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "CSSNumericValueOrCSSOMKeywordish sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "union",
+            "ctype": "RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionDOMStringOrCSSOMKeywordValue",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "DOMStringOrCSSOMKeywordValue",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "string",
+                    "ctype": null,
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [],
+                    "stringTransport": "utf8-lengths"
+                  },
+                  {
+                    "kind": "object",
+                    "ctype": null,
+                    "interface": "CSSOMKeywordValue",
+                    "root": "CSSStyleValue",
+                    "class": "CSSOMKeywordValue",
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_css_numeric_value_or_cssom_keywordish_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceCSSNumericValueOrCSSOMKeywordish",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "CSSNumericValueOrCSSOMKeywordish sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "union",
+                "ctype": "RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+                "nullable": false,
+                "atom": false,
+                "subtypes": [
+                  {
+                    "kind": "object",
+                    "ctype": null,
+                    "interface": "CSSNumericValue",
+                    "root": "CSSStyleValue",
+                    "class": "CSSNumericValue",
+                    "enum": null,
+                    "label": null,
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": []
+                  },
+                  {
+                    "kind": "union",
+                    "ctype": "RvDomUnionDOMStringOrCSSOMKeywordValue",
+                    "interface": null,
+                    "root": null,
+                    "class": null,
+                    "enum": null,
+                    "label": "DOMStringOrCSSOMKeywordValue",
+                    "nullable": false,
+                    "atom": false,
+                    "subtypes": [
+                      {
+                        "kind": "string",
+                        "ctype": null,
+                        "interface": null,
+                        "root": null,
+                        "class": null,
+                        "enum": null,
+                        "label": null,
+                        "nullable": false,
+                        "atom": false,
+                        "subtypes": [],
+                        "stringTransport": "utf8-lengths"
+                      },
+                      {
+                        "kind": "object",
+                        "ctype": null,
+                        "interface": "CSSOMKeywordValue",
+                        "root": "CSSStyleValue",
+                        "class": "CSSOMKeywordValue",
+                        "enum": null,
+                        "label": null,
+                        "nullable": false,
+                        "atom": false,
+                        "subtypes": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_dom_string_or_sequence_of_css_numeric_value_or_cssom_keywordish_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
         "ctype": "RvDomSequenceCSSStyleValue",
         "interface": null,
         "root": null,
@@ -156738,6 +157658,10 @@
     "URLPatternComponentResult": {
       "struct": "RvDomURLPatternComponentResult",
       "releaseFunction": "rv_dom_url_pattern_component_result_release"
+    },
+    "TimelineRangeOffset": {
+      "struct": "RvDomTimelineRangeOffset",
+      "releaseFunction": "rv_dom_timeline_range_offset_release"
     }
   },
   "dictionaries": {
@@ -157354,6 +158278,46 @@
         }
       }
     ],
+    "TimelineRangeOffset": [
+      {
+        "name": "rangeName",
+        "field": "range_name",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "offset",
+        "field": "offset",
+        "ctype": "RvCSSStyleValue*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "object",
+          "ctype": null,
+          "interface": "CSSNumericValue",
+          "root": "CSSStyleValue",
+          "class": "CSSNumericValue",
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
     "KeyframeAnimationOptions": [
       {
         "name": "delay",
@@ -157638,6 +158602,144 @@
           "nullable": true,
           "atom": false,
           "subtypes": []
+        }
+      },
+      {
+        "name": "rangeStart",
+        "field": "range_start",
+        "ctype": "const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString*",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "union",
+          "ctype": "RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "dict",
+              "ctype": null,
+              "interface": "TimelineRangeOffset",
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "CSSNumericValue",
+              "root": "CSSStyleValue",
+              "class": "CSSNumericValue",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "CSSOMKeywordValue",
+              "root": "CSSStyleValue",
+              "class": "CSSOMKeywordValue",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "string",
+              "ctype": null,
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": [],
+              "stringTransport": "utf8-lengths"
+            }
+          ]
+        }
+      },
+      {
+        "name": "rangeEnd",
+        "field": "range_end",
+        "ctype": "const RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString*",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "union",
+          "ctype": "RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "dict",
+              "ctype": null,
+              "interface": "TimelineRangeOffset",
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "CSSNumericValue",
+              "root": "CSSStyleValue",
+              "class": "CSSNumericValue",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "CSSOMKeywordValue",
+              "root": "CSSStyleValue",
+              "class": "CSSOMKeywordValue",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "string",
+              "ctype": null,
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": [],
+              "stringTransport": "utf8-lengths"
+            }
+          ]
         }
       }
     ],
@@ -161114,6 +162216,155 @@
           "nullable": false,
           "atom": false,
           "subtypes": []
+        }
+      }
+    ],
+    "ViewTimelineOptions": [
+      {
+        "name": "subject",
+        "field": "subject",
+        "ctype": "RvNode*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "node",
+          "ctype": null,
+          "interface": "Element",
+          "root": null,
+          "class": "Element",
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "axis",
+        "field": "axis",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"block\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "ScrollAxis",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "inset",
+        "field": "inset",
+        "ctype": "const RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish*",
+        "required": false,
+        "default": "\"auto\"",
+        "mapping": {
+          "kind": "union",
+          "ctype": "RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "DOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "string",
+              "ctype": null,
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": [],
+              "stringTransport": "utf8-lengths"
+            },
+            {
+              "kind": "sequence",
+              "ctype": "RvDomSequenceCSSNumericValueOrCSSOMKeywordish",
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": "CSSNumericValueOrCSSOMKeywordish sequence",
+              "nullable": false,
+              "atom": false,
+              "subtypes": [
+                {
+                  "kind": "union",
+                  "ctype": "RvDomUnionCSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+                  "interface": null,
+                  "root": null,
+                  "class": null,
+                  "enum": null,
+                  "label": "CSSNumericValueOrDOMStringOrCSSOMKeywordValue",
+                  "nullable": false,
+                  "atom": false,
+                  "subtypes": [
+                    {
+                      "kind": "object",
+                      "ctype": null,
+                      "interface": "CSSNumericValue",
+                      "root": "CSSStyleValue",
+                      "class": "CSSNumericValue",
+                      "enum": null,
+                      "label": null,
+                      "nullable": false,
+                      "atom": false,
+                      "subtypes": []
+                    },
+                    {
+                      "kind": "union",
+                      "ctype": "RvDomUnionDOMStringOrCSSOMKeywordValue",
+                      "interface": null,
+                      "root": null,
+                      "class": null,
+                      "enum": null,
+                      "label": "DOMStringOrCSSOMKeywordValue",
+                      "nullable": false,
+                      "atom": false,
+                      "subtypes": [
+                        {
+                          "kind": "string",
+                          "ctype": null,
+                          "interface": null,
+                          "root": null,
+                          "class": null,
+                          "enum": null,
+                          "label": null,
+                          "nullable": false,
+                          "atom": false,
+                          "subtypes": [],
+                          "stringTransport": "utf8-lengths"
+                        },
+                        {
+                          "kind": "object",
+                          "ctype": null,
+                          "interface": "CSSOMKeywordValue",
+                          "root": "CSSStyleValue",
+                          "class": "CSSOMKeywordValue",
+                          "enum": null,
+                          "label": null,
+                          "nullable": false,
+                          "atom": false,
+                          "subtypes": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       }
     ],

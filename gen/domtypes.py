@@ -79,6 +79,8 @@ class ComplexGeneratorMixin:
         fields = self.use_dictionary(name)
         self.result_dicts[name] = struct
         for member, mapped in fields:
+            if mapped.kind == 'object' and getattr(mapped, 'absent_handle', False):
+                continue
             if mapped.kind in ('node', 'event', 'object', 'opaque', 'enum'):
                 raise self.unsupported_type(f'dictionary {name}: {mapped.kind} member {member.name} in a result')
             if mapped.kind in ('union', 'sequence'):
@@ -120,6 +122,13 @@ class ComplexGeneratorMixin:
                 if mapped.kind == 'string':
                     encode += [f'        result->{field} = copyOwnedDomStringInput(asString(*field));']
                     release += [f'    std::free(const_cast<uint8_t*>(value->{field}.data));']
+                elif mapped.kind == 'object':
+                    # An absent object member: a new reference, or NULL for absent; the release drops it.
+                    root = self.world.cpp_class(mapped.root)
+                    store = 'storeTrackedHandle' if root in self.tracked_roots else 'storeHandle'
+                    encode += [f'        if (*field)', f'            {store}<{root}, {mapped.cls}>(*field, &result->{field});' if store == 'storeTrackedHandle'
+                               else f'            storeHandle<{root}>(*field, &result->{field});']
+                    release += [line.replace('    ', '    ', 1) for line in self.clear_value(mapped, f'value->{field}')]
                 elif mapped.kind == 'dict':
                     child = self.result_dicts[mapped.interface]
                     encode += [f'        result->{field} = encodeDict{child}(*field);']

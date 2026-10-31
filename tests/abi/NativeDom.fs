@@ -905,6 +905,13 @@ type RvDomKeyframe =
     val mutable composite: RvDomUtf8StringInput
     val mutable properties: nativeint
 
+/// <summary>The IDL dictionary TimelineRangeOffset; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomTimelineRangeOffset =
+    val mutable size: uint32
+    val mutable range_name: RvDomUtf8StringInput
+    val mutable offset: nativeint
+
 /// <summary>The IDL dictionary KeyframeAnimationOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomKeyframeAnimationOptions =
@@ -922,6 +929,8 @@ type RvDomKeyframeAnimationOptions =
     val mutable pseudo_element: RvDomUtf8StringInput
     val mutable id: RvDomUtf8StringInput
     val mutable timeline: nativeint
+    val mutable range_start: nativeint
+    val mutable range_end: nativeint
 
 /// <summary>The IDL dictionary GetAnimationsOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1265,6 +1274,14 @@ type RvDomScrollTimelineOptions =
     val mutable source: nativeint
     val mutable axis: int
 
+/// <summary>The IDL dictionary ViewTimelineOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomViewTimelineOptions =
+    val mutable size: uint32
+    val mutable subject: nativeint
+    val mutable axis: int
+    val mutable inset: nativeint
+
 /// <summary>The IDL dictionary DOMCSSCustomPropertyDescriptor; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomDOMCSSCustomPropertyDescriptor =
@@ -1440,6 +1457,28 @@ type RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString =
     val mutable arm0: float
     val mutable arm1: nativeint
     val mutable arm2: RvDomUtf8StringSpan
+
+[<Literal>]
+let RV_DOM_UNION_TIMELINE_RANGE_OFFSET_OR_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORD_VALUE_OR_DOM_STRING_TIMELINE_RANGE_OFFSET = 1
+
+[<Literal>]
+let RV_DOM_UNION_TIMELINE_RANGE_OFFSET_OR_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORD_VALUE_OR_DOM_STRING_CSS_NUMERIC_VALUE = 2
+
+[<Literal>]
+let RV_DOM_UNION_TIMELINE_RANGE_OFFSET_OR_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORD_VALUE_OR_DOM_STRING_CSSOM_KEYWORD_VALUE = 3
+
+[<Literal>]
+let RV_DOM_UNION_TIMELINE_RANGE_OFFSET_OR_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORD_VALUE_OR_DOM_STRING_STRING = 4
+
+/// <summary>ABI transport for TimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: nativeint
+    val mutable arm1: nativeint
+    val mutable arm2: nativeint
+    val mutable arm3: RvDomUtf8StringSpan
 
 [<Literal>]
 let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_KEYFRAME_ANIMATION_OPTIONS_NUMBER = 1
@@ -1947,6 +1986,27 @@ type RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions =
     val mutable arm0: float
     val mutable arm1: nativeint
 
+/// <summary>ABI transport for CSSNumericValueOrCSSOMKeywordish sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceCSSNumericValueOrCSSOMKeywordish =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORDISH_STRING = 1
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_SEQUENCE_OF_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORDISH_SEQUENCE_CSS_NUMERIC_VALUE_OR_CSSOM_KEYWORDISH = 2
+
+/// <summary>ABI transport for DOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: RvDomUtf8StringSpan
+    val mutable arm1: RvDomSequenceCSSNumericValueOrCSSOMKeywordish
+
 /// <summary>ABI transport for CSSStyleValue sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceCSSStyleValue =
@@ -2037,6 +2097,9 @@ extern void rv_dom_sequence_keyframe_nullable_release(RvDomSequenceKeyframeNulla
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_unrestricted_double_or_css_numeric_value_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_timeline_range_offset_or_css_numeric_value_or_cssom_keyword_value_or_dom_string_release(RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_unrestricted_double_or_keyframe_animation_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions& value)
@@ -2174,6 +2237,12 @@ extern void rv_dom_union_unsigned_long_or_animation_frame_rate_preset_release(Rv
 extern void rv_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_sequence_css_numeric_value_or_cssom_keywordish_release(RvDomSequenceCSSNumericValueOrCSSOMKeywordish& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_dom_string_or_sequence_of_css_numeric_value_or_cssom_keywordish_release(RvDomUnionDOMStringOrSequenceOfCSSNumericValueOrCSSOMKeywordish& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
 
 [<DllImport(Lib)>]
@@ -2202,6 +2271,9 @@ extern void rv_dom_url_pattern_init_release(nativeint value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_url_pattern_component_result_release(nativeint value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_timeline_range_offset_release(nativeint value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_dom_implementation_release(nativeint handle)
@@ -10547,6 +10619,18 @@ extern int rv_dom_web_animation_get_current_time(nativeint target, RvDomUnionDou
 extern int rv_dom_web_animation_set_current_time(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValueNullable[] value)
 
 [<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_range_start(nativeint target, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_set_range_start(nativeint target, [<In>] RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_range_end(nativeint target, RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_set_range_end(nativeint target, [<In>] RvDomUnionTimelineRangeOffsetOrCSSNumericValueOrCSSOMKeywordValueOrDOMString[] value)
+
+[<DllImport(Lib)>]
 extern int rv_dom_web_animation_get_playback_rate(nativeint target, float& result)
 
 [<DllImport(Lib)>]
@@ -10638,6 +10722,18 @@ extern int rv_dom_scroll_timeline_get_source(nativeint target, nativeint& result
 
 [<DllImport(Lib)>]
 extern int rv_dom_scroll_timeline_get_axis(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_timeline_create(nativeint target, [<In>] RvDomViewTimelineOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_timeline_get_subject(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_timeline_get_start_offset(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_view_timeline_get_end_offset(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
