@@ -1,9 +1,9 @@
 {
-  "checkedAtUtc": "2026-10-31T09:38:05.653029+00:00",
-  "purpose": "I08 event detail adapters Native39/ABI47, DOM alpha.42, Views 0.1.32, WebCore backend alpha.32 reservation (rehearsal on 23dd017; re-run after T06/B22/G03/G04 finals)",
+  "checkedAtUtc": "2026-10-31T10:51:50.348956+00:00",
+  "purpose": "I08 event detail adapters Native39/ABI47, DOM alpha.42, Views 0.1.32, WebCore backend alpha.32 reservation, re-run on the G04-merged head",
   "abi": 47,
-  "stackedOn": "23dd017 (D14 Native34/ABI42)",
-  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1248:int32_t rv_abi_version(void) { return 42; }",
+  "stackedOn": "176b606 (G04 15e1bc9 Native38/ABI46, G03 cdf1a4e Native37/ABI45, B22 c78a71a Native36/ABI44, T06 901ced5 Native35/ABI43, D14 23dd017)",
+  "abiNumberInUse": "host/RanvierWebCoreAbi.cpp:1311:int32_t rv_abi_version(void) { return 47; }",
   "packages": [
     {
       "package": "Ranvier.WebCore",
@@ -280,12 +280,6 @@
           "number": 269,
           "title": "feat(dom): add SVG geometry and live value contracts (cohort 19)",
           "url": "https://github.com/ranvier-org/Ranvier/pull/269"
-        },
-        {
-          "headRefName": "codex/native-api-timing",
-          "number": 268,
-          "title": "feat(dom): add shared monotonic user timing",
-          "url": "https://github.com/ranvier-org/Ranvier/pull/268"
         }
       ]
     },
