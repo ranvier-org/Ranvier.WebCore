@@ -1,0 +1,399 @@
+{
+  "group": [
+    "I11 #106"
+  ],
+  "native": "0.1.0-preview.41",
+  "abi": 49,
+  "features": [
+    "accessibility-relations",
+    "dom:Element (ARIAMixin element arrays)"
+  ],
+  "members": [
+    "Element.ariaActionsElements",
+    "Element.ariaControlsElements",
+    "Element.ariaDescribedByElements",
+    "Element.ariaDetailsElements",
+    "Element.ariaErrorMessageElements",
+    "Element.ariaFlowToElements",
+    "Element.ariaLabelledByElements",
+    "rv_ax_relations (activedescendant, controls, describedby, details, errormessage, flowto, labelledby, owns)"
+  ],
+  "excluded": [
+    "Element.ariaOwnsElements (not in Chromium 156)"
+  ],
+  "blocked": {
+    "ElementInternals": "deferred with D07: HTMLElement::attachInternals needs a custom element reaction queue and a defined or precustomized custom element, which a scriptless host cannot define (CustomElementRegistry.define takes a JavaScript constructor); browser side deferred too, to keep one shared contract. Chromium measured in red-chromium.json."
+  },
+  "sourceHeadOfBatch": "6d4eec100569dd66aa5c934bbba8c710cc3b1fdf",
+  "stackedOn": "T03 828fb2b (Native40/ABI48), I08 2a9cf7d (Native39/ABI47), G04 15e1bc9 (Native38/ABI46, patch 0038), G03 cdf1a4e (Native37/ABI45)",
+  "sourcePatch0039": {
+    "file": "Source/WebCore/dom/Element.cpp",
+    "patch": "patches/0039-element-array-attribute-empty-relations.patch",
+    "red": "red-0039-empty-relations.json (6 kinds stale after [])",
+    "green": "green-0039-empty-relations.json",
+    "unit": "UnifiedSource-dom-9"
+  },
+  "red": {
+    "files": [
+      "red-chromium.json",
+      "red-native.json",
+      "red-0039-empty-relations.json"
+    ]
+  },
+  "green": {
+    "ariaRelationsAssertions": 1210,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "PASS aria_relations: 1210 assertions"
+    ],
+    "probes": 55,
+    "allExitZero": true,
+    "rawAssertions": 75429,
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "form_submission",
+        "exitCode": 0,
+        "assertions": 418
+      },
+      {
+        "name": "text_segmentation",
+        "exitCode": 0,
+        "assertions": 812
+      },
+      {
+        "name": "crypto_random",
+        "exitCode": 0,
+        "assertions": 275
+      },
+      {
+        "name": "screen_metrics",
+        "exitCode": 0,
+        "assertions": 222
+      },
+      {
+        "name": "event_details",
+        "exitCode": 0,
+        "assertions": 391
+      },
+      {
+        "name": "custom_highlights",
+        "exitCode": 0,
+        "assertions": 378
+      },
+      {
+        "name": "visual_viewport",
+        "exitCode": 0,
+        "assertions": 987
+      },
+      {
+        "name": "abi_layouts",
+        "exitCode": 0,
+        "assertions": 15
+      },
+      {
+        "name": "aria_relations",
+        "exitCode": 0,
+        "assertions": 1210
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null
+      }
+    ],
+    "teardownCases": 94,
+    "teardownCasesAdded": 2,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "steps": 24
+  },
+  "isolation": {
+    "domApi": "+14 functions (7 getters, 7 setters), 0 removed or changed, +1 container RvDomSequenceElementNullable",
+    "abiLayouts": "12 -> 15 assertions (RvWindowMetrics added)"
+  },
+  "qualifications": [
+    {
+      "name": "duplicate element kept",
+      "step": "elements labelledby [l2, l1, l2]",
+      "native": [
+        "l2",
+        "l1",
+        "l2"
+      ],
+      "chromium": [
+        "l2",
+        "l1"
+      ],
+      "note": "both relations list l2, l1"
+    },
+    {
+      "name": "ariaActionsElements gated",
+      "native": "RV_ERR_UNSUPPORTED (ARIAActionsSupportEnabled off in every WebKit configuration)",
+      "chromium": "reflects"
+    },
+    {
+      "name": "array identity",
+      "native": "each read is a new snapshot; repeated reads give the same elements",
+      "chromium": "the same frozen array"
+    }
+  ],
+  "files": {
+    "0039-proposed.diff": "1b8cc6d547652f5f4fc994acc947432291a0133498e0ad137c7aa21c960dead2",
+    "absence_i11.py": "0cca64ac0264747aed5d262bd63bf72a30e130495a4fd4593521650a99c879ed",
+    "allocation-absence.json": "43bc4bbb9e49e92c6cdadd2a445475af3d8b635c927acf4c5489dac307dd81d8",
+    "aria-relations-probe.log": "aaa0c76ce0fcbb30475b0d0805776e5cd909156187582b329d15473d9cbb5470",
+    "aria-relations-repeat30.txt": "535668f3ba9dcbd8535bb34f9d15576bcb4a892a2b3afa9caf2f6a2040327e2b",
+    "batch-green.json": "dd2028345da0b09084bd529dae77721ec8d733f5f8a20d95fb765e69d8c826f0",
+    "build_ei_candidate.py": "2a4063b871e0fbab4ba879ca587db7c0354aaea0e2179bf75bde2e17c05de2d3",
+    "green-0039-empty-relations.json": "31ce3c099f19be3eb8fc20bdea7a91f622c8dd1ed03dc86ec41534b580f4c7a9",
+    "make_ei_evidence.py": "d997b29fd44f5cec5a64bfc196354c02d7368b3df10f9e54a943842580bcbf7f",
+    "pe_exports.py": "4fa7d17aabd5b788b916a9d95eb90831c0201174b48c951ca742f93164919d96",
+    "red-0039-empty-relations.json": "1716e0aec277c30c99fbfeae375aedae203ecc03fba50803cc06833238c840cd",
+    "red-chromium.json": "942d30c69fce68b02ee9371856fc31308ab00d7262150e9eea200da103273b73",
+    "red-native.json": "a1f61fadb803452d734c41ebc84f5c4cee02ec8de1654c7f3359113f72f7e7d2",
+    "red_chromium.mjs": "e016390dac72109a72659e8ac4a941f6423de1881eae14daa37086dca83fd15b",
+    "red_empty_relations.py": "899bfedd3cb71e6c1c13c462657ee1ecc8148e363d695daeb12c1a0c63b8d8c7",
+    "red_native.py": "bdae28343770b64c74768d8df81cccdfda989960f8aff54561da174896221fe4",
+    "run_ei_full_batch.py": "d91815afca705c263fff33390a931447e8b443106cfc5834f591d8c1850614c6",
+    "runtime-receipt.json": "71470ed45248e1d1dbe5ad0f950d592d4ab87edc0435bdb9214b4b68d9d9d2a0",
+    "source-patches.json": "4918a20bdd2a9b30bca774307c291848c4b0fe075ffd49d33bc1b6a86d7445d8",
+    "teardown-probes.json": "927b87a07b055c41e03ebf2da87397d5a5333325584137db053b5d280d5ddc8c"
+  }
+}
