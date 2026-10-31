@@ -1,0 +1,9 @@
+native (linux-arm64, ubuntu-24.04-arm, /mnt/rw)	UNKNOWN STEP	2026-10-30T07:49:31.8350856Z ##[group]Run python -I tests/abi/svg_surfaces.py --native-directory "/mnt/rw/out/slim/runtimes/linux-arm64/native" --webkit-source "/mnt/rw/src"
+native (linux-arm64, ubuntu-24.04-arm, /mnt/rw)	UNKNOWN STEP	2026-10-30T07:49:31.8351863Z [36;1mpython -I tests/abi/svg_surfaces.py --native-directory "/mnt/rw/out/slim/runtimes/linux-arm64/native" --webkit-source "/mnt/rw/src"[0m
+native (linux-arm64, ubuntu-24.04-arm, /mnt/rw)	UNKNOWN STEP	2026-10-30T07:49:32.0662587Z Traceback (most recent call last):
+native (linux-arm64, ubuntu-24.04-arm, /mnt/rw)	UNKNOWN STEP	2026-10-30T07:49:32.0670986Z   File "/home/runner/work/Ranvier.WebCore/Ranvier.WebCore/tests/abi/svg_surfaces.py", line 412, in <module>
+native (linux-arm64, ubuntu-24.04-arm, /mnt/rw)	UNKNOWN STEP	2026-10-30T07:49:32.0672758Z   File "/home/runner/work/Ranvier.WebCore/Ranvier.WebCore/tests/abi/svg_surfaces.py", line 124, in verify
+native (linux-arm64, ubuntu-24.04-arm, /mnt/rw)	UNKNOWN STEP	2026-10-30T07:49:32.0673304Z     expect(current.value == 60, 'actual Ahem font readiness')
+native (linux-arm64, ubuntu-24.04-arm, /mnt/rw)	UNKNOWN STEP	2026-10-30T07:49:32.0674608Z   File "/home/runner/work/Ranvier.WebCore/Ranvier.WebCore/tests/abi/svg_surfaces.py", line 35, in expect
+native (linux-arm64, ubuntu-24.04-arm, /mnt/rw)	UNKNOWN STEP	2026-10-30T07:49:32.0675114Z     raise AssertionError(label)
+native (linux-arm64, ubuntu-24.04-arm, /mnt/rw)	UNKNOWN STEP	2026-10-30T07:49:32.0675401Z AssertionError: actual Ahem font readiness
