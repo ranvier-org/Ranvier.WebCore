@@ -1,12 +1,13 @@
 """Private batch-6 candidate (Web Animations A02-A10 on batch 5) on the flag-enabled build C:/wk/pointer-build, whose
 objects are borrowed read-only. It starts from batch5-candidate-1: every WebCore unit links batch5-candidate-1's object
 (its recompiled 0040-0050 units, or the build's own object), except the units that patch 0051 reaches, which are
-recompiled from C:/wk/src, and UnifiedSource-dom-10, which is compiled from a private unified source whose EventLoop.cpp
-is an overlay copy of C:/wk/src's with patch 0052 applied (0052 is not yet in C:/wk/src). Every host glue unit of this
+recompiled from C:/wk/src. Every host glue unit of this
 tree is compiled (config/common.cmake WebCore_EMBEDDER_SOURCES), WebCore is relinked, and the five host units are
 recompiled and relinked. The other runtime libraries are batch5-candidate-1's.
-The overlay mechanism is the one of C:/wk/waapi-fx-artifacts/a11/build_fx_candidate-overlay.py (FX_OVERLAY), applied to
-the pointer-build commands that batch5-candidate-1 used.
+Environment: BATCH6_OVERLAY_PATCH=<patch of EventLoop.cpp> compiles UnifiedSource-dom-10 from a private unified source whose
+EventLoop.cpp is an overlay copy of C:/wk/src's with that patch applied (the mechanism of
+C:/wk/waapi-fx-artifacts/a11/build_fx_candidate-overlay.py); batch6-candidate-1 was built so with patch 0052, which batch 6
+then dropped.
 usage: build_batch6_candidate.py <batch6-candidate-N> [repo]
 Every linked object must be newer than each recorded dependency, or be recompiled here."""
 import ast
@@ -29,7 +30,7 @@ out = repo / 'artifacts' / sys.argv[1]
 build = Path('C:/wk/pointer-build')
 slim = Path('C:/wk/build-win-slim')
 src = Path('C:/wk/src')
-OVERLAY_PATCH = '0052'
+OVERLAY = os.environ.get('BATCH6_OVERLAY_PATCH')
 OVERLAY_UNIT = 'Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-dom-10.cpp.obj'
 OVERLAY_MEMBER = 'Source/WebCore/dom/EventLoop.cpp'
 RECOMPILED_PATCHES = ['0051']
@@ -73,23 +74,18 @@ def carries(patch, name):
     return index == len(hunk)
 
 
-# The series: 0040-0052. C:/wk/src carries 0040-0051; 0052 is applied to the overlay copy only.
+# The series: 0040-0051, each carried by C:/wk/src.
 series = [line for line in (repo / 'patches/series').read_text().splitlines() if line[:4].isdigit() and line[:4] >= '0040']
-assert [name[:4] for name in series] == [f'{n:04d}' for n in range(40, 53)], series
+assert [name[:4] for name in series] == [f'{n:04d}' for n in range(40, 52)], series
 patch_receipt = {}
 for name in series:
     path = repo / 'patches' / name
     patch_receipt[name] = {'sha256': sha(path), 'files': patch_files(path)}
-    if name[:4] == OVERLAY_PATCH:
-        assert patch_receipt[name]['files'] == [OVERLAY_MEMBER], patch_receipt[name]
-        assert not src_diff(OVERLAY_MEMBER), 'C:/wk/src already changes ' + OVERLAY_MEMBER
-        continue
     for target in patch_receipt[name]['files']:
         assert carries(path, target), target + ' does not carry ' + name
-overlay_patch = repo / 'patches' / next(name for name in series if name[:4] == OVERLAY_PATCH)
+overlay_patch = Path(OVERLAY) if OVERLAY else None
 overlay_root = out / 'overlay'
 overlay_file = overlay_root / OVERLAY_MEMBER
-overlay_file.parent.mkdir(parents=True, exist_ok=True)
 
 
 def apply_hunks(patch, name, text):
@@ -105,12 +101,16 @@ def apply_hunks(patch, name, text):
     return text
 
 
-source_text = (src / OVERLAY_MEMBER).read_bytes().decode('utf-8')
-assert '\r\n' not in source_text
-overlay_file.write_bytes(apply_hunks(overlay_patch, OVERLAY_MEMBER, source_text).encode('utf-8'))
-overlay_diff = subprocess.run(['git', 'diff', '--no-index', '--', (src / OVERLAY_MEMBER).as_posix(), overlay_file.as_posix()],
-                              capture_output=True, text=True).stdout
-assert diff_lines(overlay_diff) == hunk_lines(overlay_patch, OVERLAY_MEMBER), 'overlay differs from the patch'
+if OVERLAY:
+    assert patch_files(overlay_patch) == [OVERLAY_MEMBER], overlay_patch
+    assert not src_diff(OVERLAY_MEMBER), 'C:/wk/src already changes ' + OVERLAY_MEMBER
+    overlay_file.parent.mkdir(parents=True, exist_ok=True)
+    source_text = (src / OVERLAY_MEMBER).read_bytes().decode('utf-8')
+    assert '\r\n' not in source_text
+    overlay_file.write_bytes(apply_hunks(overlay_patch, OVERLAY_MEMBER, source_text).encode('utf-8'))
+    overlay_diff = subprocess.run(['git', 'diff', '--no-index', '--', (src / OVERLAY_MEMBER).as_posix(), overlay_file.as_posix()],
+                                  capture_output=True, text=True).stdout
+    assert diff_lines(overlay_diff) == hunk_lines(overlay_patch, OVERLAY_MEMBER), 'overlay differs from the patch'
 
 cache = (build / 'CMakeCache.txt').read_text()
 for flag in ['ENABLE_TOUCH_EVENTS', 'ENABLE_POINTER_LOCK']:
@@ -169,7 +169,7 @@ assert OVERLAY_UNIT not in units, 'the overlay unit is reached by 0051'
 # dependency recorded for its unit.
 stale = {}
 for unit, items in deps.items():
-    if not unit.startswith('Source/WebCore/CMakeFiles/WebCore.dir/') or 'Ranvier' in unit or unit in units or unit == OVERLAY_UNIT:
+    if not unit.startswith('Source/WebCore/CMakeFiles/WebCore.dir/') or 'Ranvier' in unit or unit in units or (OVERLAY and unit == OVERLAY_UNIT):
         continue
     linked = parent_objects.get(unit, (build / unit).as_posix())
     own = mtime(os.path.normcase(os.path.normpath(linked)))
@@ -181,7 +181,7 @@ for unit, items in deps.items():
         stale[unit] = newer
 assert not stale, ('linked objects older than a source', dict(list(stale.items())[:5]))
 if os.environ.get('BATCH6_PLAN_ONLY'):
-    print(json.dumps({'recompile': units, 'reach': reach, 'overlay': OVERLAY_UNIT, 'parentObjects': len(parent_objects)}, indent=1))
+    print(json.dumps({'recompile': units, 'reach': reach, 'overlay': OVERLAY_UNIT if OVERLAY else None, 'parentObjects': len(parent_objects)}, indent=1))
     raise SystemExit(0)
 
 tree = ast.parse((repo / 'scripts/build.py').read_text())
@@ -213,22 +213,24 @@ assert glue_sources[0] == 'host/dom/RanvierDomGlue.cpp' and len(glue_sources) ==
 pointer_glue = {Path(m).name: m.replace(chr(92), '/') for m in re.findall(r'^build (Source\\WebCore\\CMakeFiles\\WebCore\.dir\\C_\\wk\\native-pointer\\host\\\S+?\.cpp\.obj):', '\n'.join(lines), re.M)}
 dom_target = pointer_glue['RanvierDomGlue.cpp.obj']
 command_map = {}
-for command in commands([dom_target, *units, OVERLAY_UNIT]):
+compiled_units = [*units, OVERLAY_UNIT] if OVERLAY else list(units)
+for command in commands([dom_target, *compiled_units]):
     output = re.search(r'/Fo(?:"([^"]+)"|(\S+))', command)
     if 'clang-cl.exe' in command and output:
         command_map[normalize(output.group(1) or output.group(2))] = command
-assert set([dom_target, *units, OVERLAY_UNIT]) <= set(command_map), sorted(set([dom_target, *units, OVERLAY_UNIT]) - set(command_map))
+assert set([dom_target, *compiled_units]) <= set(command_map), sorted(set([dom_target, *compiled_units]) - set(command_map))
 # The overlay unit: a private unified source that includes the overlay EventLoop.cpp in place of the member.
-unified = build / 'WebCore/DerivedSources/unified-sources' / Path(OVERLAY_UNIT).name.removesuffix('.obj')
-unified_lines = unified.read_text().splitlines()
-original = '#include "' + OVERLAY_MEMBER.removeprefix('Source/WebCore/').replace('/', chr(92)) + '"'
-assert unified_lines.count(original) == 1, original
-unified_lines[unified_lines.index(original)] = '#include "' + overlay_file.as_posix() + '"'
-private_unified = out / ('overlay-' + unified.name)
-private_unified.write_text(chr(10).join(unified_lines) + chr(10))
-pattern = ('[/' + chr(92) * 2 + ']').join(re.escape(part) for part in unified.as_posix().split('/'))
-overlay_command, count = re.subn(pattern, lambda _: private_unified.as_posix(), command_map[OVERLAY_UNIT])
-assert count == 1, count
+if OVERLAY:
+    unified = build / 'WebCore/DerivedSources/unified-sources' / Path(OVERLAY_UNIT).name.removesuffix('.obj')
+    unified_lines = unified.read_text().splitlines()
+    original = '#include "' + OVERLAY_MEMBER.removeprefix('Source/WebCore/').replace('/', chr(92)) + '"'
+    assert unified_lines.count(original) == 1, original
+    unified_lines[unified_lines.index(original)] = '#include "' + overlay_file.as_posix() + '"'
+    private_unified = out / ('overlay-' + unified.name)
+    private_unified.write_text(chr(10).join(unified_lines) + chr(10))
+    pattern = ('[/' + chr(92) * 2 + ']').join(re.escape(part) for part in unified.as_posix().split('/'))
+    overlay_command, count = re.subn(pattern, lambda _: private_unified.as_posix(), command_map[OVERLAY_UNIT])
+    assert count == 1, count
 
 # Every glue object of the parent is replaced; the WebCore link takes the parent's other objects.
 replacements = {k: v for k, v in parent_objects.items() if 'Ranvier' not in k}
@@ -239,7 +241,8 @@ for index, source in enumerate(glue_sources):
     jobs.append((index, 'glue/' + Path(source).name + '.obj', glue_command, pointer_glue.get(Path(source).name + '.obj')))
 for index, unit in enumerate(units, start=100):
     jobs.append((index, unit, command_map[unit], unit))
-jobs.append((200, OVERLAY_UNIT, overlay_command, OVERLAY_UNIT))
+if OVERLAY:
+    jobs.append((200, OVERLAY_UNIT, overlay_command, OVERLAY_UNIT))
 
 
 def compile_job(job):
@@ -337,7 +340,7 @@ assert hashes['JavaScriptCore.dll'] == sha(parent5 / 'runtime/JavaScriptCore.dll
 (out / 'source-patches.json').write_text(json.dumps({
     'build': str(build), 'flags': {'ENABLE_TOUCH_EVENTS': 'ON', 'ENABLE_POINTER_LOCK': 'ON'}, 'parent': str(parent5),
     'parentReceipt': parent_receipt, 'patches': patch_receipt, 'recompiledPatches': RECOMPILED_PATCHES,
-    'overlayPatch': {'patch': overlay_patch.name, 'unit': OVERLAY_UNIT, 'note': 'not yet in C:/wk/src; compiled from an overlay copy'},
+    'overlayPatch': {'patch': str(overlay_patch), 'unit': OVERLAY_UNIT, 'note': 'not in C:/wk/src; compiled from an overlay copy'} if OVERLAY else None,
     'recompiledUnits': unit_receipt, 'glueObjects': glue_objects, 'glueAppended': extra_glue,
     'inspectGlue': {'undefinedSymbols': len(undefined), 'inspectorSymbols': inspector_symbols},
     'reusedFromBatch5Candidate1': reused}, indent=2) + '\n', encoding='utf-8')
