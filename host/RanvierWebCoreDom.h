@@ -90,6 +90,7 @@ typedef struct RvURLSearchParams RvURLSearchParams;
 typedef struct RvURLPattern RvURLPattern;
 typedef struct RvHighlight RvHighlight;
 typedef struct RvHighlightRegistry RvHighlightRegistry;
+typedef struct RvFontFace RvFontFace;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -142,11 +143,13 @@ typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
+typedef struct RvDomUnionDOMStringOrArrayBufferOrArrayBufferView RvDomUnionDOMStringOrArrayBufferOrArrayBufferView;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomPairUSVStringAndUnionFileOrUSVString RvDomPairUSVStringAndUnionFileOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionFileOrUSVString RvDomSequencePairUSVStringAndUnionFileOrUSVString;
+typedef struct RvDomSequenceFontFace RvDomSequenceFontFace;
 typedef struct RvDomPairDOMStringAndHighlight RvDomPairDOMStringAndHighlight;
 typedef struct RvDomSequencePairDOMStringAndHighlight RvDomSequencePairDOMStringAndHighlight;
 
@@ -385,6 +388,20 @@ enum {
 enum {
     RV_DOM_ENDING_TYPE_TRANSPARENT = 0, /* "transparent" */
     RV_DOM_ENDING_TYPE_NATIVE = 1, /* "native" */
+};
+
+/* The values of the IDL enumeration FontFaceLoadStatus. */
+enum {
+    RV_DOM_FONT_FACE_LOAD_STATUS_UNLOADED = 0, /* "unloaded" */
+    RV_DOM_FONT_FACE_LOAD_STATUS_LOADING = 1, /* "loading" */
+    RV_DOM_FONT_FACE_LOAD_STATUS_LOADED = 2, /* "loaded" */
+    RV_DOM_FONT_FACE_LOAD_STATUS_ERROR = 3, /* "error" */
+};
+
+/* The values of the IDL enumeration FontFaceSetLoadStatus. */
+enum {
+    RV_DOM_FONT_FACE_SET_LOAD_STATUS_LOADING = 0, /* "loading" */
+    RV_DOM_FONT_FACE_SET_LOAD_STATUS_LOADED = 1, /* "loaded" */
 };
 
 /* The values of the IDL enumeration HighlightType. */
@@ -867,6 +884,19 @@ typedef struct RvDomURLPatternResult {
     const RvDomURLPatternComponentResult* hash; /* URLPatternComponentResult, NULL for absent */
 } RvDomURLPatternResult;
 
+/* The IDL dictionary FontFaceDescriptors. size is sizeof(RvDomFontFaceDescriptors) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomFontFaceDescriptors {
+    uint32_t size;
+    RvDomUtf8StringInput style; /* DOMString, default "normal" */
+    RvDomUtf8StringInput weight; /* DOMString, default "normal" */
+    RvDomUtf8StringInput stretch; /* DOMString, default "normal" */
+    RvDomUtf8StringInput unicode_range; /* DOMString, default "U+0-10FFFF" */
+    RvDomUtf8StringInput feature_settings; /* DOMString, default "normal" */
+    RvDomUtf8StringInput display; /* DOMString, default "auto" */
+    RvDomUtf8StringInput size_adjust; /* DOMString, default "100%" */
+} RvDomFontFaceDescriptors;
+
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDOMCSSCustomPropertyDescriptor {
@@ -961,11 +991,13 @@ typedef struct RvDomUnionUndefinedOrUSVString RvDomUnionUndefinedOrUSVString;
 typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
+typedef struct RvDomUnionDOMStringOrArrayBufferOrArrayBufferView RvDomUnionDOMStringOrArrayBufferOrArrayBufferView;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomPairUSVStringAndUnionFileOrUSVString RvDomPairUSVStringAndUnionFileOrUSVString;
 typedef struct RvDomSequencePairUSVStringAndUnionFileOrUSVString RvDomSequencePairUSVStringAndUnionFileOrUSVString;
+typedef struct RvDomSequenceFontFace RvDomSequenceFontFace;
 typedef struct RvDomPairDOMStringAndHighlight RvDomPairDOMStringAndHighlight;
 typedef struct RvDomSequencePairDOMStringAndHighlight RvDomSequencePairDOMStringAndHighlight;
 
@@ -1525,6 +1557,19 @@ struct RvDomSequenceAbstractRange {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_DOM_STRING_OR_ARRAY_BUFFER_OR_ARRAY_BUFFER_VIEW_STRING = 1,
+    RV_DOM_UNION_DOM_STRING_OR_ARRAY_BUFFER_OR_ARRAY_BUFFER_VIEW_BINARY_DATA = 2,
+};
+struct RvDomUnionDOMStringOrArrayBufferOrArrayBufferView {
+    int32_t present;
+    int32_t tag;
+    RvDomUtf8StringSpan arm0;
+    RvDomByteSpan arm1;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1561,6 +1606,14 @@ struct RvDomSequencePairUSVStringAndUnionFileOrUSVString {
     int32_t present;
     int32_t count;
     RvDomPairUSVStringAndUnionFileOrUSVString* items;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+struct RvDomSequenceFontFace {
+    int32_t present;
+    int32_t count;
+    RvFontFace** items;
 };
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
@@ -1630,11 +1683,13 @@ RV_EXPORT void rv_dom_union_undefined_or_usv_string_release(RvDomUnionUndefinedO
 RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomPairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
+RV_EXPORT void rv_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release(RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairUSVStringAndUnionFileOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value);
+RV_EXPORT void rv_dom_sequence_font_face_release(RvDomSequenceFontFace* value);
 RV_EXPORT void rv_dom_pair_dom_string_and_highlight_release(RvDomPairDOMStringAndHighlight* value);
 RV_EXPORT void rv_dom_sequence_pair_dom_string_and_highlight_release(RvDomSequencePairDOMStringAndHighlight* value);
 /* Releases an owned URLPatternResult result, its strings and nested values, and the struct. */
@@ -1891,6 +1946,10 @@ RV_EXPORT RvHighlight* rv_dom_highlight_retain(RvHighlight*);
 RV_EXPORT void rv_dom_highlight_registry_release(RvHighlightRegistry*);
 /* Adds a reference to a HighlightRegistry and returns it. */
 RV_EXPORT RvHighlightRegistry* rv_dom_highlight_registry_retain(RvHighlightRegistry*);
+/* Releases a handle to a FontFace. */
+RV_EXPORT void rv_dom_font_face_release(RvFontFace*);
+/* Adds a reference to a FontFace and returns it. */
+RV_EXPORT RvFontFace* rv_dom_font_face_retain(RvFontFace*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -2162,6 +2221,8 @@ RV_EXPORT int32_t rv_dom_document_get_style_sheets(RvNode* target, RvStyleSheetL
 RV_EXPORT int32_t rv_dom_document_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result);
 /* Document.adoptedStyleSheets setter: attribute sequence<CSSStyleSheet> adoptedStyleSheets */
 RV_EXPORT int32_t rv_dom_document_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value);
+/* Document.fonts getter: readonly attribute FontFaceSet fonts; *result is a new reference */
+RV_EXPORT int32_t rv_dom_document_get_fonts(RvNode* target, RvEventTarget** result);
 /* Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) ->
  * Element; options defaults to {} in IDL; *result is a new reference */
 RV_EXPORT int32_t rv_dom_document_create_element(RvNode* target, const uint8_t* local_name, int32_t local_name_length, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result);
@@ -8199,6 +8260,84 @@ RV_EXPORT int32_t rv_dom_file_reader_read_as_text(RvEventTarget* target, RvBlob*
 RV_EXPORT int32_t rv_dom_file_reader_read_as_data_url(RvEventTarget* target, RvBlob* blob);
 /* FileReader.abort() -> undefined; RV_ERR_UNSUPPORTED while the setting FileReaderAPIEnabled is off */
 RV_EXPORT int32_t rv_dom_file_reader_abort(RvEventTarget* target);
+/* FontFace */
+
+/* FontFace.constructor: target is the Document of the constructed object; a string part of source is UTF-8, and
+ * invalid UTF-8 returns RV_ERR_NULL_ARGUMENT; descriptors defaults to {} in IDL; descriptors may be NULL for the IDL
+ * default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_font_face_create(RvNode* target, const uint8_t* family, int32_t family_length, const RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* source, const RvDomFontFaceDescriptors* descriptors, RvFontFace** result);
+/* FontFace.family getter: attribute DOMString family */
+RV_EXPORT int32_t rv_dom_font_face_get_family(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.family setter: attribute DOMString family */
+RV_EXPORT int32_t rv_dom_font_face_set_family(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.style getter: attribute DOMString style */
+RV_EXPORT int32_t rv_dom_font_face_get_style(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.style setter: attribute DOMString style */
+RV_EXPORT int32_t rv_dom_font_face_set_style(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.weight getter: attribute DOMString weight */
+RV_EXPORT int32_t rv_dom_font_face_get_weight(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.weight setter: attribute DOMString weight */
+RV_EXPORT int32_t rv_dom_font_face_set_weight(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.width getter: attribute DOMString width */
+RV_EXPORT int32_t rv_dom_font_face_get_width(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.width setter: attribute DOMString width */
+RV_EXPORT int32_t rv_dom_font_face_set_width(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.stretch getter: attribute DOMString stretch */
+RV_EXPORT int32_t rv_dom_font_face_get_stretch(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.stretch setter: attribute DOMString stretch */
+RV_EXPORT int32_t rv_dom_font_face_set_stretch(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.unicodeRange getter: attribute DOMString unicodeRange */
+RV_EXPORT int32_t rv_dom_font_face_get_unicode_range(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.unicodeRange setter: attribute DOMString unicodeRange */
+RV_EXPORT int32_t rv_dom_font_face_set_unicode_range(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.featureSettings getter: attribute DOMString featureSettings */
+RV_EXPORT int32_t rv_dom_font_face_get_feature_settings(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.featureSettings setter: attribute DOMString featureSettings */
+RV_EXPORT int32_t rv_dom_font_face_set_feature_settings(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.display getter: attribute DOMString display */
+RV_EXPORT int32_t rv_dom_font_face_get_display(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.display setter: attribute DOMString display */
+RV_EXPORT int32_t rv_dom_font_face_set_display(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.ascentOverride getter: attribute DOMString ascentOverride; RV_ERR_UNSUPPORTED while the setting
+ * CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_font_face_get_ascent_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.ascentOverride setter: attribute DOMString ascentOverride; RV_ERR_UNSUPPORTED while the setting
+ * CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_font_face_set_ascent_override(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.descentOverride getter: attribute DOMString descentOverride; RV_ERR_UNSUPPORTED while the setting
+ * CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_font_face_get_descent_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.descentOverride setter: attribute DOMString descentOverride; RV_ERR_UNSUPPORTED while the setting
+ * CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_font_face_set_descent_override(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.lineGapOverride getter: attribute DOMString lineGapOverride; RV_ERR_UNSUPPORTED while the setting
+ * CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_font_face_get_line_gap_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.lineGapOverride setter: attribute DOMString lineGapOverride; RV_ERR_UNSUPPORTED while the setting
+ * CSSFontFaceMetricOverrideDescriptorsEnabled is off */
+RV_EXPORT int32_t rv_dom_font_face_set_line_gap_override(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.sizeAdjust getter: attribute DOMString sizeAdjust */
+RV_EXPORT int32_t rv_dom_font_face_get_size_adjust(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length);
+/* FontFace.sizeAdjust setter: attribute DOMString sizeAdjust */
+RV_EXPORT int32_t rv_dom_font_face_set_size_adjust(RvFontFace* target, const uint8_t* value, int32_t value_length);
+/* FontFace.status getter: readonly attribute FontFaceLoadStatus status */
+RV_EXPORT int32_t rv_dom_font_face_get_status(RvFontFace* target, int32_t* result);
+/* FontFaceSet */
+
+/* FontFaceSet.size getter: readonly attribute long size */
+RV_EXPORT int32_t rv_dom_font_face_set_get_size(RvEventTarget* target, int32_t* result);
+/* FontFaceSet.status getter: readonly attribute FontFaceSetLoadStatus status */
+RV_EXPORT int32_t rv_dom_font_face_set_get_status(RvEventTarget* target, int32_t* result);
+/* FontFaceSet.has(FontFace font) -> boolean */
+RV_EXPORT int32_t rv_dom_font_face_set_has(RvEventTarget* target, RvFontFace* font, int32_t* result);
+/* FontFaceSet.add(FontFace font) -> FontFaceSet; *result is a new reference */
+RV_EXPORT int32_t rv_dom_font_face_set_add(RvEventTarget* target, RvFontFace* font, RvEventTarget** result);
+/* FontFaceSet.delete(FontFace font) -> boolean */
+RV_EXPORT int32_t rv_dom_font_face_set_delete(RvEventTarget* target, RvFontFace* font, int32_t* result);
+/* FontFaceSet.clear() -> undefined */
+RV_EXPORT int32_t rv_dom_font_face_set_clear(RvEventTarget* target);
+/* FontFaceSet.check(DOMString font, optional DOMString text = " ") -> boolean; text defaults to " " in IDL */
+RV_EXPORT int32_t rv_dom_font_face_set_check(RvEventTarget* target, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, int32_t* result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */
@@ -8342,6 +8481,11 @@ RV_EXPORT int32_t rv_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* co
 /* URLSearchParams.entries: owned snapshot of the engine key/value iterable; context is an explicit checked Document
  * for the operation; *result owns its contents; release with the matching rv_dom_*_release */
 RV_EXPORT int32_t rv_dom_url_search_params_entries(RvURLSearchParams* target, RvNode* context, RvDomSequencePairUSVStringAndUSVString* result);
+/* FontFaceSet */
+
+/* FontFaceSet.values: owned snapshot of the engine value iterable; *result owns its contents; release with the
+ * matching rv_dom_*_release */
+RV_EXPORT int32_t rv_dom_font_face_set_values(RvEventTarget* target, RvDomSequenceFontFace* result);
 /* Highlight */
 
 /* Highlight.size: setlike<AbstractRange> */

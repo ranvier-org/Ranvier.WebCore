@@ -6,7 +6,9 @@
 #include "CSSFontFace.h"
 #include "CSSFontFaceSet.h"
 #include "CachedImage.h"
+#include "ContextDestructionObserverInlines.h"
 #include "DOMException.h"
+#include "DOMPromiseProxy.h"
 #include "Document.h"
 #include "EventListener.h"
 #include "EventNames.h"
@@ -17,6 +19,7 @@
 #include "FileReaderLoaderClient.h"
 #include "FontFace.h"
 #include "FontFaceSet.h"
+#include "FrameDestructionObserverInlines.h"
 #include "HTMLImageElement.h"
 #include "HTMLElementTypeHelpers.h"
 #include "Image.h"
@@ -317,6 +320,88 @@ private:
 };
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(FontOperation);
+
+// FontFace.load() or FontFace.loaded over a caller's face: settles with the face's loaded promise. A terminal is read
+// on a later run-loop turn, after every client of the face, the face's own promise among them, has seen the change.
+class FontFaceOperation final : public Operation, public CSSFontFaceClient {
+    WTF_MAKE_TZONE_ALLOCATED(FontFaceOperation);
+
+public:
+    static Ref<FontFaceOperation> create(Document& document, FontFace& face, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new FontFaceOperation(document, face, callback, context));
+    }
+
+    void ref() const final { Operation::ref(); }
+    void deref() const final { Operation::deref(); }
+
+    RefPtr<FontFace> face;
+    bool observing { false };
+    bool scheduled { false };
+
+    void detach() final
+    {
+        if (observing && face)
+            face->backing().removeClient(*this);
+        observing = false;
+        face = nullptr;
+        Operation::detach();
+    }
+
+    // SyntaxError (descriptors, source syntax, bytes) is DECODE_FAILED; NetworkError, and any other rejection, LOAD_FAILED.
+    void evaluate()
+    {
+        scheduled = false;
+        if (terminal || !face)
+            return;
+        auto status = face->backing().status();
+        if (status == CSSFontFace::Status::Success) {
+            finish(RV_RESOURCE_SUCCEEDED);
+            return;
+        }
+        if (status != CSSFontFace::Status::Failure)
+            return;
+        auto code = face->loadedPromise().rejectionCode();
+        finish(code == ExceptionCode::SyntaxError ? RV_RESOURCE_DECODE_FAILED : RV_RESOURCE_LOAD_FAILED);
+    }
+
+    void schedule()
+    {
+        if (scheduled)
+            return;
+        scheduled = true;
+        RunLoop::mainSingleton().dispatch([weak = SingleThreadWeakPtr<Operation> { *this }] {
+            if (RefPtr operation = weak.get())
+                static_cast<FontFaceOperation&>(*operation).evaluate();
+        });
+    }
+
+    void fontStateChanged(CSSFontFace&, CSSFontFace::Status, CSSFontFace::Status newState) final
+    {
+        if (!terminal && (newState == CSSFontFace::Status::Success || newState == CSSFontFace::Status::Failure))
+            schedule();
+    }
+
+    void start(bool load)
+    {
+        face->backing().addClient(*this);
+        observing = true;
+        if (load)
+            face->backing().load();
+        auto status = face->backing().status();
+        if (status == CSSFontFace::Status::Success || status == CSSFontFace::Status::Failure)
+            schedule();
+    }
+
+private:
+    FontFaceOperation(Document& document, FontFace& face, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+        , face(&face)
+    {
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(FontFaceOperation);
 
 // Reads a blob, or the blob a blob URL refers to, through the engine's FileReaderLoader, as Blob.text(),
 // arrayBuffer() and bytes() read it. The bytes, the type and the error name stay until release.
@@ -743,6 +828,26 @@ int32_t ranvier_resource_load_font(RvNode* documentHandle, const char* family, c
     *operation = nextOperation++;
     operations().emplace(*operation, value.copyRef());
     value->start(name, std::span<const uint8_t> { bytes, static_cast<size_t>(length) });
+    return RV_OK;
+}
+
+int32_t ranvier_font_face_load(RvNode* documentHandle, RvFontFace* faceHandle, int32_t load, RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || !faceHandle || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    if (!document || !document->window() || !nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    Ref face = *reinterpret_cast<FontFace*>(faceHandle);
+    RefPtr faceDocument = dynamicDowncast<Document>(face->scriptExecutionContext());
+    if (faceDocument != document)
+        return faceDocument && faceDocument->frame() && !faceDocument->activeDOMObjectsAreStopped() ? RV_ERR_WRONG_HOST : RV_ERR_DETACHED;
+    Ref value = FontFaceOperation::create(*document, face, callback, context);
+    *operation = nextOperation++;
+    operations().emplace(*operation, value.copyRef());
+    value->start(load);
     return RV_OK;
 }
 

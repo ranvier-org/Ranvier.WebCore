@@ -321,6 +321,8 @@ and [<AllowNullLiteral>] Document =
 #endif
     abstract member styleSheets: StyleSheetList with get
 
+    /// <summary>Document.fonts.</summary>
+    abstract member fonts: FontFaceSet with get
 
 /// <summary>HTMLDocument in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLDocument =
@@ -5126,6 +5128,53 @@ and [<AllowNullLiteral>] FileReader =
     /// <summary>FileReader.abort.</summary>
     abstract member abort: unit -> unit
 
+/// <summary>FontFace in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FontFace =
+    /// <summary>FontFace.family.</summary>
+    abstract member family: string with get, set
+    /// <summary>FontFace.style.</summary>
+    abstract member style: string with get, set
+    /// <summary>FontFace.weight.</summary>
+    abstract member weight: string with get, set
+    /// <summary>FontFace.width.</summary>
+    abstract member width: string with get, set
+    /// <summary>FontFace.stretch.</summary>
+    abstract member stretch: string with get, set
+    /// <summary>FontFace.unicodeRange.</summary>
+    abstract member unicodeRange: string with get, set
+    /// <summary>FontFace.featureSettings.</summary>
+    abstract member featureSettings: string with get, set
+    /// <summary>FontFace.display.</summary>
+    abstract member display: string with get, set
+    /// <summary>FontFace.ascentOverride.</summary>
+    abstract member ascentOverride: string with get, set
+    /// <summary>FontFace.descentOverride.</summary>
+    abstract member descentOverride: string with get, set
+    /// <summary>FontFace.lineGapOverride.</summary>
+    abstract member lineGapOverride: string with get, set
+    /// <summary>FontFace.sizeAdjust.</summary>
+    abstract member sizeAdjust: string with get, set
+    /// <summary>FontFace.status.</summary>
+    abstract member status: FontFaceLoadStatus with get
+
+/// <summary>FontFaceSet in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FontFaceSet =
+    inherit EventTarget
+    /// <summary>FontFaceSet.has.</summary>
+    abstract member has: font: FontFace -> bool
+    /// <summary>FontFaceSet.size.</summary>
+    abstract member size: int with get
+    /// <summary>FontFaceSet.add.</summary>
+    abstract member add: font: FontFace -> FontFaceSet
+    /// <summary>FontFaceSet.delete.</summary>
+    abstract member delete: font: FontFace -> bool
+    /// <summary>FontFaceSet.clear.</summary>
+    abstract member clear: unit -> unit
+    /// <summary>FontFaceSet.check.</summary>
+    abstract member check: font: string * ?text: string -> bool
+    /// <summary>FontFaceSet.status.</summary>
+    abstract member status: FontFaceSetLoadStatus with get
+
 /// <summary>HTMLUnknownElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLUnknownElement =
     inherit HTMLElement
@@ -5741,6 +5790,18 @@ and NodeFilterResult =
     | Accept = 1
     | Reject = 2
     | Skip = 3
+
+/// <summary>FontFaceLoadStatus in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] FontFaceLoadStatus =
+    | [<CompiledName("unloaded")>] Unloaded
+    | [<CompiledName("loading")>] Loading
+    | [<CompiledName("loaded")>] Loaded
+    | [<CompiledName("error")>] Error
+
+/// <summary>FontFaceSetLoadStatus in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] FontFaceSetLoadStatus =
+    | [<CompiledName("loading")>] Loading
+    | [<CompiledName("loaded")>] Loaded
 
 /// <summary>AriaNotificationPriority in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] AriaNotificationPriority =

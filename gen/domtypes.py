@@ -195,6 +195,9 @@ class ComplexGeneratorMixin:
             if child.kind == 'bytes' and child.label == 'BufferSource':
                 arms.append(len(alternatives) + 1)
                 alternatives += ['Ref<JSC::ArrayBufferView>', 'Ref<JSC::ArrayBuffer>']
+            elif child.kind == 'bytes' and child.label == 'BinaryData':
+                arms.append(len(alternatives))
+                alternatives += ['Ref<JSC::ArrayBuffer>', 'Ref<JSC::ArrayBufferView>']
             else:
                 arms.append(len(alternatives))
                 alternatives.append(self.transport_cpp(child))

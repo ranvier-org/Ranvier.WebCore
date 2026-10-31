@@ -660,6 +660,24 @@ let RV_DOM_ENDING_TYPE_TRANSPARENT = 0
 let RV_DOM_ENDING_TYPE_NATIVE = 1
 
 [<Literal>]
+let RV_DOM_FONT_FACE_LOAD_STATUS_UNLOADED = 0
+
+[<Literal>]
+let RV_DOM_FONT_FACE_LOAD_STATUS_LOADING = 1
+
+[<Literal>]
+let RV_DOM_FONT_FACE_LOAD_STATUS_LOADED = 2
+
+[<Literal>]
+let RV_DOM_FONT_FACE_LOAD_STATUS_ERROR = 3
+
+[<Literal>]
+let RV_DOM_FONT_FACE_SET_LOAD_STATUS_LOADING = 0
+
+[<Literal>]
+let RV_DOM_FONT_FACE_SET_LOAD_STATUS_LOADED = 1
+
+[<Literal>]
 let RV_DOM_HIGHLIGHT_TYPE_HIGHLIGHT = 0
 
 [<Literal>]
@@ -1108,6 +1126,18 @@ type RvDomURLPatternResult =
     val mutable pathname: nativeint
     val mutable search: nativeint
     val mutable hash: nativeint
+
+/// <summary>The IDL dictionary FontFaceDescriptors; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomFontFaceDescriptors =
+    val mutable size: uint32
+    val mutable style: RvDomUtf8StringInput
+    val mutable weight: RvDomUtf8StringInput
+    val mutable stretch: RvDomUtf8StringInput
+    val mutable unicode_range: RvDomUtf8StringInput
+    val mutable feature_settings: RvDomUtf8StringInput
+    val mutable display: RvDomUtf8StringInput
+    val mutable size_adjust: RvDomUtf8StringInput
 
 /// <summary>The IDL dictionary DOMCSSCustomPropertyDescriptor; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1710,6 +1740,20 @@ type RvDomSequenceAbstractRange =
     val mutable count: int
     val mutable items: nativeint
 
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_ARRAY_BUFFER_OR_ARRAY_BUFFER_VIEW_STRING = 1
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_ARRAY_BUFFER_OR_ARRAY_BUFFER_VIEW_BINARY_DATA = 2
+
+/// <summary>ABI transport for DOMStringOrArrayBufferOrArrayBufferView; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionDOMStringOrArrayBufferOrArrayBufferView =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: RvDomUtf8StringSpan
+    val mutable arm1: RvDomByteSpan
+
 /// <summary>ABI transport for CSSStyleValue sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceCSSStyleValue =
@@ -1741,6 +1785,13 @@ type RvDomPairUSVStringAndUnionFileOrUSVString =
 /// <summary>ABI transport for PairUSVStringAndUnionFileOrUSVString sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequencePairUSVStringAndUnionFileOrUSVString =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+/// <summary>ABI transport for FontFace sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceFontFace =
     val mutable present: int
     val mutable count: int
     val mutable items: nativeint
@@ -1916,6 +1967,9 @@ extern void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_re
 extern void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release(RvDomUnionDOMStringOrArrayBufferOrArrayBufferView& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue& value)
 
 [<DllImport(Lib)>]
@@ -1929,6 +1983,9 @@ extern void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPai
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_font_face_release(RvDomSequenceFontFace& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_pair_dom_string_and_highlight_release(RvDomPairDOMStringAndHighlight& value)
@@ -2318,6 +2375,12 @@ extern void rv_dom_highlight_registry_release(nativeint handle)
 extern nativeint rv_dom_highlight_registry_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_font_face_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_font_face_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_rule_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
@@ -2679,6 +2742,9 @@ extern int rv_dom_document_get_adopted_style_sheets(nativeint target, RvDomSeque
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_set_adopted_style_sheets(nativeint target, [<In>] RvDomSequenceCSSStyleSheet[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_get_fonts(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_create_element(nativeint target, byte[] local_name, int local_name_length, [<In>] RvDomUnionDOMStringOrElementCreationOptions[] options, nativeint& result)
@@ -10223,6 +10289,105 @@ extern int rv_dom_file_reader_read_as_data_url(nativeint target, nativeint blob)
 extern int rv_dom_file_reader_abort(nativeint target)
 
 [<DllImport(Lib)>]
+extern int rv_dom_font_face_create(nativeint target, byte[] family, int family_length, [<In>] RvDomUnionDOMStringOrArrayBufferOrArrayBufferView[] source, [<In>] RvDomFontFaceDescriptors[] descriptors, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_family(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_family(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_style(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_style(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_weight(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_weight(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_width(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_stretch(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_stretch(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_unicode_range(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_unicode_range(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_feature_settings(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_feature_settings(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_display(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_display(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_ascent_override(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_ascent_override(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_descent_override(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_descent_override(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_line_gap_override(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_line_gap_override(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_size_adjust(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_size_adjust(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_status(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_get_size(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_get_status(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_has(nativeint target, nativeint font, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_add(nativeint target, nativeint font, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_delete(nativeint target, nativeint font, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_clear(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_check(nativeint target, byte[] font, int font_length, byte[] text, int text_length, int& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_css_supports_2(nativeint target, byte[] property, int property_length, byte[] value, int value_length, int& result)
 
 [<DllImport(Lib)>]
@@ -10350,6 +10515,9 @@ extern int rv_dom_dom_form_data_entries(nativeint target, nativeint context, RvD
 
 [<DllImport(Lib)>]
 extern int rv_dom_url_search_params_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndUSVString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_values(nativeint target, RvDomSequenceFontFace& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_highlight_size(nativeint target, uint32& result)

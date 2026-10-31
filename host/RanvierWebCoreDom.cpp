@@ -128,6 +128,8 @@ void rv_dom_highlight_release(RvHighlight* handle) { ranvier_dom_highlight_relea
 RvHighlight* rv_dom_highlight_retain(RvHighlight* handle) { return ranvier_dom_highlight_retain(handle); }
 void rv_dom_highlight_registry_release(RvHighlightRegistry* handle) { ranvier_dom_highlight_registry_release(handle); }
 RvHighlightRegistry* rv_dom_highlight_registry_retain(RvHighlightRegistry* handle) { return ranvier_dom_highlight_registry_retain(handle); }
+void rv_dom_font_face_release(RvFontFace* handle) { ranvier_dom_font_face_release(handle); }
+RvFontFace* rv_dom_font_face_retain(RvFontFace* handle) { return ranvier_dom_font_face_retain(handle); }
 void rv_dom_union_node_or_dom_string_release(RvDomUnionNodeOrDOMString* value) { ranvier_dom_union_node_or_dom_string_release(value); }
 void rv_dom_sequence_node_or_dom_string_release(RvDomSequenceNodeOrDOMString* value) { ranvier_dom_sequence_node_or_dom_string_release(value); }
 void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet* value) { ranvier_dom_sequence_css_style_sheet_release(value); }
@@ -180,11 +182,13 @@ void rv_dom_union_undefined_or_usv_string_release(RvDomUnionUndefinedOrUSVString
 void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomPairUSVStringAndUnionUndefinedOrUSVString* value) { ranvier_dom_pair_usv_string_and_union_undefined_or_usv_string_release(value); }
 void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value) { ranvier_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(value); }
 void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value) { ranvier_dom_sequence_abstract_range_release(value); }
+void rv_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release(RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* value) { ranvier_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release(value); }
 void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value) { ranvier_dom_sequence_css_style_value_release(value); }
 void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value) { ranvier_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(value); }
 void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value) { ranvier_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(value); }
 void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairUSVStringAndUnionFileOrUSVString* value) { ranvier_dom_pair_usv_string_and_union_file_or_usv_string_release(value); }
 void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value) { ranvier_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(value); }
+void rv_dom_sequence_font_face_release(RvDomSequenceFontFace* value) { ranvier_dom_sequence_font_face_release(value); }
 void rv_dom_pair_dom_string_and_highlight_release(RvDomPairDOMStringAndHighlight* value) { ranvier_dom_pair_dom_string_and_highlight_release(value); }
 void rv_dom_sequence_pair_dom_string_and_highlight_release(RvDomSequencePairDOMStringAndHighlight* value) { ranvier_dom_sequence_pair_dom_string_and_highlight_release(value); }
 void rv_dom_url_pattern_result_release(RvDomURLPatternResult* value) { ranvier_dom_url_pattern_result_release(value); }
@@ -311,6 +315,7 @@ int32_t rv_dom_document_get_active_element(RvNode* target, RvNode** result) { re
 int32_t rv_dom_document_get_style_sheets(RvNode* target, RvStyleSheetList** result) { return ranvier_dom_document_get_style_sheets(target, result); }
 int32_t rv_dom_document_get_adopted_style_sheets(RvNode* target, RvDomSequenceCSSStyleSheet* result) { return ranvier_dom_document_get_adopted_style_sheets(target, result); }
 int32_t rv_dom_document_set_adopted_style_sheets(RvNode* target, const RvDomSequenceCSSStyleSheet* value) { return ranvier_dom_document_set_adopted_style_sheets(target, value); }
+int32_t rv_dom_document_get_fonts(RvNode* target, RvEventTarget** result) { return ranvier_dom_document_get_fonts(target, result); }
 int32_t rv_dom_document_create_element(RvNode* target, const uint8_t* local_name, int32_t local_name_length, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result) { return ranvier_dom_document_create_element(target, local_name, local_name_length, options, result); }
 int32_t rv_dom_document_create_element_ns(RvNode* target, const uint8_t* namespace_uri, int32_t namespace_uri_length, const uint8_t* qualified_name, int32_t qualified_name_length, const RvDomUnionDOMStringOrElementCreationOptions* options, RvNode** result) { return ranvier_dom_document_create_element_ns(target, namespace_uri, namespace_uri_length, qualified_name, qualified_name_length, options, result); }
 int32_t rv_dom_document_get_elements_by_tag_name(RvNode* target, const uint8_t* qualified_name, int32_t qualified_name_length, RvHTMLCollection** result) { return ranvier_dom_document_get_elements_by_tag_name(target, qualified_name, qualified_name_length, result); }
@@ -2825,6 +2830,39 @@ int32_t rv_dom_file_reader_read_as_binary_string(RvEventTarget* target, RvBlob* 
 int32_t rv_dom_file_reader_read_as_text(RvEventTarget* target, RvBlob* blob, const uint8_t* encoding, int32_t encoding_length) { return ranvier_dom_file_reader_read_as_text(target, blob, encoding, encoding_length); }
 int32_t rv_dom_file_reader_read_as_data_url(RvEventTarget* target, RvBlob* blob) { return ranvier_dom_file_reader_read_as_data_url(target, blob); }
 int32_t rv_dom_file_reader_abort(RvEventTarget* target) { return ranvier_dom_file_reader_abort(target); }
+int32_t rv_dom_font_face_create(RvNode* target, const uint8_t* family, int32_t family_length, const RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* source, const RvDomFontFaceDescriptors* descriptors, RvFontFace** result) { return ranvier_dom_font_face_create(target, family, family_length, source, descriptors, result); }
+int32_t rv_dom_font_face_get_family(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_family(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_family(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_family(target, value, value_length); }
+int32_t rv_dom_font_face_get_style(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_style(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_style(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_style(target, value, value_length); }
+int32_t rv_dom_font_face_get_weight(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_weight(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_weight(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_weight(target, value, value_length); }
+int32_t rv_dom_font_face_get_width(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_width(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_width(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_width(target, value, value_length); }
+int32_t rv_dom_font_face_get_stretch(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_stretch(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_stretch(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_stretch(target, value, value_length); }
+int32_t rv_dom_font_face_get_unicode_range(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_unicode_range(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_unicode_range(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_unicode_range(target, value, value_length); }
+int32_t rv_dom_font_face_get_feature_settings(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_feature_settings(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_feature_settings(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_feature_settings(target, value, value_length); }
+int32_t rv_dom_font_face_get_display(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_display(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_display(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_display(target, value, value_length); }
+int32_t rv_dom_font_face_get_ascent_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_ascent_override(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_ascent_override(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_ascent_override(target, value, value_length); }
+int32_t rv_dom_font_face_get_descent_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_descent_override(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_descent_override(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_descent_override(target, value, value_length); }
+int32_t rv_dom_font_face_get_line_gap_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_line_gap_override(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_line_gap_override(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_line_gap_override(target, value, value_length); }
+int32_t rv_dom_font_face_get_size_adjust(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_font_face_get_size_adjust(target, buffer, capacity, length); }
+int32_t rv_dom_font_face_set_size_adjust(RvFontFace* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_font_face_set_size_adjust(target, value, value_length); }
+int32_t rv_dom_font_face_get_status(RvFontFace* target, int32_t* result) { return ranvier_dom_font_face_get_status(target, result); }
+int32_t rv_dom_font_face_set_get_size(RvEventTarget* target, int32_t* result) { return ranvier_dom_font_face_set_get_size(target, result); }
+int32_t rv_dom_font_face_set_get_status(RvEventTarget* target, int32_t* result) { return ranvier_dom_font_face_set_get_status(target, result); }
+int32_t rv_dom_font_face_set_has(RvEventTarget* target, RvFontFace* font, int32_t* result) { return ranvier_dom_font_face_set_has(target, font, result); }
+int32_t rv_dom_font_face_set_add(RvEventTarget* target, RvFontFace* font, RvEventTarget** result) { return ranvier_dom_font_face_set_add(target, font, result); }
+int32_t rv_dom_font_face_set_delete(RvEventTarget* target, RvFontFace* font, int32_t* result) { return ranvier_dom_font_face_set_delete(target, font, result); }
+int32_t rv_dom_font_face_set_clear(RvEventTarget* target) { return ranvier_dom_font_face_set_clear(target); }
+int32_t rv_dom_font_face_set_check(RvEventTarget* target, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, int32_t* result) { return ranvier_dom_font_face_set_check(target, font, font_length, text, text_length, result); }
 int32_t rv_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result) { return ranvier_dom_css_supports_2(target, property, property_length, value, value_length, result); }
 int32_t rv_dom_css_supports_1(RvNode* target, const uint8_t* condition_text, int32_t condition_text_length, int32_t* result) { return ranvier_dom_css_supports_1(target, condition_text, condition_text_length, result); }
 int32_t rv_dom_css_get_highlights(RvNode* target, RvHighlightRegistry** result) { return ranvier_dom_css_get_highlights(target, result); }
@@ -2868,6 +2906,7 @@ int32_t rv_dom_domurl_revoke_object_url(RvNode* target, const uint8_t* url, int3
 int32_t rv_dom_style_property_map_read_only_entries(RvStylePropertyMapReadOnly* target, RvNode* context, RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* result) { return ranvier_dom_style_property_map_read_only_entries(target, context, result); }
 int32_t rv_dom_dom_form_data_entries(RvDOMFormData* target, RvNode* context, RvDomSequencePairUSVStringAndUnionFileOrUSVString* result) { return ranvier_dom_dom_form_data_entries(target, context, result); }
 int32_t rv_dom_url_search_params_entries(RvURLSearchParams* target, RvNode* context, RvDomSequencePairUSVStringAndUSVString* result) { return ranvier_dom_url_search_params_entries(target, context, result); }
+int32_t rv_dom_font_face_set_values(RvEventTarget* target, RvDomSequenceFontFace* result) { return ranvier_dom_font_face_set_values(target, result); }
 int32_t rv_dom_highlight_size(RvHighlight* target, uint32_t* result) { return ranvier_dom_highlight_size(target, result); }
 int32_t rv_dom_highlight_has(RvHighlight* target, RvAbstractRange* value, int32_t* result) { return ranvier_dom_highlight_has(target, value, result); }
 int32_t rv_dom_highlight_values(RvHighlight* target, RvDomSequenceAbstractRange* result) { return ranvier_dom_highlight_values(target, result); }

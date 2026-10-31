@@ -469,6 +469,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/font_readiness.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
 
+      - name: Verify FontFace construction from bytes and URLs and FontFaceSet registration without JavaScript
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/font_construction.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
+
       - name: Verify delayed image decode readiness and drawing
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/image_readiness.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"

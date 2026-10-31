@@ -1905,6 +1905,45 @@ interface Bytes {
         self.assertIn('"JavaScriptCore/ArrayBuffer.h"', glue)
         self.assertNotIn('encodeRvDomUnionBufferSourceOrBytesOrUSVString', glue)
 
+    def test_binary_data_typedef_arm_decodes_to_array_buffer_before_array_buffer_view(self):
+        generator = self.value_object_generator('''
+typedef (ArrayBuffer or ArrayBufferView) BinaryData;
+interface Face {
+    constructor(DOMString family, (DOMString or BinaryData) source);
+    readonly attribute DOMString family;
+};
+''', ['Face'], constructors={'Face': {'receiver': 'Document', 'factory': 'Face::create'}}, byteSpanTypes=['BinaryData'])
+        function = next(item for item in generator.functions if item.name == 'face_create')
+        union = function.arguments[1][1]
+        self.assertEqual(['string', 'bytes'], [child.kind for child in union.subtypes])
+        glue = generator.glue()
+        self.assertIn('Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>>', glue)
+        self.assertIn('WTF::InPlaceIndex<1>, arm1.releaseNonNull()', glue)
+        self.assertIn('JSC::ArrayBuffer::tryCreate(', glue)
+
+    def test_context_settings_object_call_with_and_value_iterable_snapshot_use_the_script_execution_context(self):
+        generator = self.value_object_generator('''
+interface Face {
+    [SetterCallWith=CurrentScriptExecutionContext] attribute DOMString weight;
+};
+interface Faces {
+    iterable<Face>;
+    [CallWith=CurrentScriptExecutionContext] boolean check(DOMString font);
+};
+''', ['Face', 'Faces'], contextSettingsObjects=['Face', 'Faces'], iterableBindings={'Faces': {'feature': 'dom-faces-values'}})
+        names = [item.name for item in generator.functions]
+        self.assertIn('face_set_weight', names)
+        self.assertIn('faces_check', names)
+        snapshot = next(item for item in generator.functions if item.name == 'faces_values')
+        self.assertEqual('iterator_snapshot', snapshot.kind)
+        self.assertEqual('dom-faces-values', snapshot.feature)
+        glue = generator.glue()
+        self.assertIn('RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());', glue)
+        self.assertIn('impl->setWeight(document.get(), a0.string())', glue)
+        self.assertIn('impl->check(document.get(), a0.string())', glue)
+        self.assertIn('entries.append(entry.releaseNonNull())', glue)
+        self.assertIn('impl->createIterator(&document.get())', glue)
+
     def test_byte_span_results_are_unsupported(self):
         generator = self.value_object_generator('''
 interface Bytes { readonly attribute BufferSource data; };

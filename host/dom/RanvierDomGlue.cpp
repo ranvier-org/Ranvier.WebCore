@@ -112,6 +112,8 @@
 #include "FileReader.h"
 #include "FocusEvent.h"
 #include "FocusOptions.h"
+#include "FontFace.h"
+#include "FontFaceSet.h"
 #include "FormDataEvent.h"
 #include "GetComposedRangesOptions.h"
 #include "GetHTMLOptions.h"
@@ -329,6 +331,8 @@
 #include "JSAriaNotifyOptions.h"
 #include "JSDocument.h"
 #include "JSEndingType.h"
+#include "JSFontFace.h"
+#include "JSFontFaceSet.h"
 #include "JSHighlight.h"
 #include "JSScreenOrientation.h"
 #include "JSScrollBehavior.h"
@@ -707,6 +711,8 @@ static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
 static constexpr ASCIILiteral enumerationDocumentReadyState[] = { "loading"_s, "interactive"_s, "complete"_s };
 static constexpr ASCIILiteral enumerationEndingType[] = { "transparent"_s, "native"_s };
+static constexpr ASCIILiteral enumerationFontFaceLoadStatus[] = { "unloaded"_s, "loading"_s, "loaded"_s, "error"_s };
+static constexpr ASCIILiteral enumerationFontFaceSetLoadStatus[] = { "loading"_s, "loaded"_s };
 static constexpr ASCIILiteral enumerationHighlightType[] = { "highlight"_s, "spelling-error"_s, "grammar-error"_s };
 static constexpr ASCIILiteral enumerationOrientationType[] = { "portrait-primary"_s, "portrait-secondary"_s, "landscape-primary"_s, "landscape-secondary"_s };
 static constexpr ASCIILiteral enumerationScrollBehavior[] = { "auto"_s, "instant"_s, "smooth"_s };
@@ -3010,6 +3016,40 @@ template<typename V> int32_t encodeRvDomSequenceAbstractRange(V&& input, RvDomSe
     return RV_OK;
 }
 
+std::optional<Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>>> decodeRvDomUnionDOMStringOrArrayBufferOrArrayBufferView(const RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (source->arm0.length < 0 || (source->arm0.length > 0 && !source->arm0.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm0 = source->arm0.length < 0 ? String() : source->arm0.length ? String::fromUTF8(std::span<const uint8_t> { source->arm0.data, static_cast<size_t>(source->arm0.length) }) : emptyString();
+        if (source->arm0.length >= 0 && arm0.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>> { Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>> { WTF::InPlaceIndex<0>, arm0 } };
+    }
+    case 2: {
+        if (source->arm1.length < 0 || (source->arm1.length > 0 && !source->arm1.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr arm1 = JSC::ArrayBuffer::tryCreate(source->arm1.length ? std::span<const uint8_t> { source->arm1.data, static_cast<size_t>(source->arm1.length) } : std::span<const uint8_t> { });
+        if (!arm1) { status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "Out of memory"_s }); return std::nullopt; }
+        return Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>> { Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>> { WTF::InPlaceIndex<1>, arm1.releaseNonNull() } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionDOMStringOrArrayBufferOrArrayBufferView(RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        std::free(const_cast<uint8_t*>(value->arm0.data));
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
 void clearRvDomSequenceCSSStyleValue(RvDomSequenceCSSStyleValue* value)
 {
     if (!value) return;
@@ -3109,6 +3149,29 @@ template<typename V> int32_t encodeRvDomSequencePairUSVStringAndUnionFileOrUSVSt
     RELEASE_ASSERT(!value.size() || result->items);
     for (int32_t i = 0; i < result->count; ++i) {
         encodeRvDomPairUSVStringAndUnionFileOrUSVString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+void clearRvDomSequenceFontFace(RvDomSequenceFontFace* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<FontFace*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceFontFace(V&& input, RvDomSequenceFontFace* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvFontFace**>(std::calloc(value.size(), sizeof(RvFontFace*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<FontFace>(value[i], &result->items[i]);
     }
     return RV_OK;
 }
@@ -3292,7 +3355,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:FontFace", "dom:FontFaceSet", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:FontFace", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -3339,6 +3402,8 @@ int32_t ranvier_dom_has(const char* feature)
     if (!std::strcmp(feature, "dom-form-data-entries"))
         return 1;
     if (!std::strcmp(feature, "dom-url-search-params-entries"))
+        return 1;
+    if (!std::strcmp(feature, "dom-font-face-set-values"))
         return 1;
     return 0;
 }
@@ -3603,6 +3668,11 @@ void ranvier_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* val
     if (isMainThread()) clearRvDomSequenceAbstractRange(value);
 }
 
+void ranvier_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release(RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* value)
+{
+    if (isMainThread()) clearRvDomUnionDOMStringOrArrayBufferOrArrayBufferView(value);
+}
+
 void ranvier_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value)
 {
     if (isMainThread()) clearRvDomSequenceCSSStyleValue(value);
@@ -3626,6 +3696,11 @@ void ranvier_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairU
 void ranvier_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value)
 {
     if (isMainThread()) clearRvDomSequencePairUSVStringAndUnionFileOrUSVString(value);
+}
+
+void ranvier_dom_sequence_font_face_release(RvDomSequenceFontFace* value)
+{
+    if (isMainThread()) clearRvDomSequenceFontFace(value);
 }
 
 void ranvier_dom_pair_dom_string_and_highlight_release(RvDomPairDOMStringAndHighlight* value)
@@ -4518,6 +4593,20 @@ RvHighlightRegistry* ranvier_dom_highlight_registry_retain(RvHighlightRegistry* 
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<HighlightRegistry*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_font_face_release(RvFontFace* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<FontFace*>(handle)->deref();
+}
+
+RvFontFace* ranvier_dom_font_face_retain(RvFontFace* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<FontFace*>(handle)->ref();
     return handle;
 }
 
@@ -6027,6 +6116,19 @@ int32_t ranvier_dom_document_set_adopted_style_sheets(RvNode* target, const RvDo
     auto a0 = decodeRvDomSequenceCSSStyleSheet(value, status0);
     if (status0 != RV_OK) return status0;
     return invoke([&]() -> decltype(auto) { return impl->setAdoptedStyleSheets(DomSequenceArgument<Ref<CSSStyleSheet>> { std::move(*a0) }); });
+}
+
+// Document.fonts getter: readonly attribute FontFaceSet fonts; *result is a new reference
+int32_t ranvier_dom_document_get_fonts(RvNode* target, RvEventTarget** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fonts(); }, [&](auto&& value) { return storeHandle<EventTarget>(value, result); });
 }
 
 // Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) -> Element; options defaults to {} in IDL; *result is a new reference
@@ -41890,6 +41992,582 @@ int32_t ranvier_dom_file_reader_abort(RvEventTarget* target)
     return invoke([&]() -> decltype(auto) { return impl->abort(); });
 }
 
+// FontFace.constructor: target is the Document of the constructed object; a string part of source is UTF-8, and invalid UTF-8 returns RV_ERR_NULL_ARGUMENT; descriptors defaults to {} in IDL; descriptors may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_font_face_create(RvNode* target, const uint8_t* family, int32_t family_length, const RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* source, const RvDomFontFaceDescriptors* descriptors, RvFontFace** result)
+{
+    if (!target || !(family_length >= 0 && (family_length <= 0 || family)) || !source || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { family, family_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionDOMStringOrArrayBufferOrArrayBufferView(source, status1);
+    if (status1 != RV_OK) return status1;
+    FontFace::Descriptors a2 { };
+    if (descriptors) {
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, style) + sizeof(descriptors->style)) {
+            if (descriptors->style.present != 0 && descriptors->style.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->style.present) {
+                if (descriptors->style.length < 0 || (descriptors->style.length > 0 && !descriptors->style.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.style, descriptors->style.data, descriptors->style.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, weight) + sizeof(descriptors->weight)) {
+            if (descriptors->weight.present != 0 && descriptors->weight.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->weight.present) {
+                if (descriptors->weight.length < 0 || (descriptors->weight.length > 0 && !descriptors->weight.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.weight, descriptors->weight.data, descriptors->weight.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, stretch) + sizeof(descriptors->stretch)) {
+            if (descriptors->stretch.present != 0 && descriptors->stretch.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->stretch.present) {
+                if (descriptors->stretch.length < 0 || (descriptors->stretch.length > 0 && !descriptors->stretch.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.width, descriptors->stretch.data, descriptors->stretch.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, unicode_range) + sizeof(descriptors->unicode_range)) {
+            if (descriptors->unicode_range.present != 0 && descriptors->unicode_range.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->unicode_range.present) {
+                if (descriptors->unicode_range.length < 0 || (descriptors->unicode_range.length > 0 && !descriptors->unicode_range.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.unicodeRange, descriptors->unicode_range.data, descriptors->unicode_range.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, feature_settings) + sizeof(descriptors->feature_settings)) {
+            if (descriptors->feature_settings.present != 0 && descriptors->feature_settings.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->feature_settings.present) {
+                if (descriptors->feature_settings.length < 0 || (descriptors->feature_settings.length > 0 && !descriptors->feature_settings.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.featureSettings, descriptors->feature_settings.data, descriptors->feature_settings.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, display) + sizeof(descriptors->display)) {
+            if (descriptors->display.present != 0 && descriptors->display.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->display.present) {
+                if (descriptors->display.length < 0 || (descriptors->display.length > 0 && !descriptors->display.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.display, descriptors->display.data, descriptors->display.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, size_adjust) + sizeof(descriptors->size_adjust)) {
+            if (descriptors->size_adjust.present != 0 && descriptors->size_adjust.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->size_adjust.present) {
+                if (descriptors->size_adjust.length < 0 || (descriptors->size_adjust.length > 0 && !descriptors->size_adjust.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.sizeAdjust, descriptors->size_adjust.data, descriptors->size_adjust.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return FontFace::create(*impl, a0.atom(), std::move(*a1), std::move(a2)); }, [&](auto&& value) { return storeHandle<FontFace>(value, result); });
+}
+
+// FontFace.family getter: attribute DOMString family
+int32_t ranvier_dom_font_face_get_family(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->family(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.family setter: attribute DOMString family
+int32_t ranvier_dom_font_face_set_family(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setFamily(document.get(), a0.atom()); });
+}
+
+// FontFace.style getter: attribute DOMString style
+int32_t ranvier_dom_font_face_get_style(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->style(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.style setter: attribute DOMString style
+int32_t ranvier_dom_font_face_set_style(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setStyle(document.get(), a0.string()); });
+}
+
+// FontFace.weight getter: attribute DOMString weight
+int32_t ranvier_dom_font_face_get_weight(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->weight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.weight setter: attribute DOMString weight
+int32_t ranvier_dom_font_face_set_weight(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setWeight(document.get(), a0.string()); });
+}
+
+// FontFace.width getter: attribute DOMString width
+int32_t ranvier_dom_font_face_get_width(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.width setter: attribute DOMString width
+int32_t ranvier_dom_font_face_set_width(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setWidth(document.get(), a0.string()); });
+}
+
+// FontFace.stretch getter: attribute DOMString stretch
+int32_t ranvier_dom_font_face_get_stretch(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.stretch setter: attribute DOMString stretch
+int32_t ranvier_dom_font_face_set_stretch(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setWidth(document.get(), a0.string()); });
+}
+
+// FontFace.unicodeRange getter: attribute DOMString unicodeRange
+int32_t ranvier_dom_font_face_get_unicode_range(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->unicodeRange(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.unicodeRange setter: attribute DOMString unicodeRange
+int32_t ranvier_dom_font_face_set_unicode_range(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setUnicodeRange(document.get(), a0.string()); });
+}
+
+// FontFace.featureSettings getter: attribute DOMString featureSettings
+int32_t ranvier_dom_font_face_get_feature_settings(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->featureSettings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.featureSettings setter: attribute DOMString featureSettings
+int32_t ranvier_dom_font_face_set_feature_settings(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setFeatureSettings(document.get(), a0.string()); });
+}
+
+// FontFace.display getter: attribute DOMString display
+int32_t ranvier_dom_font_face_get_display(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->display(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.display setter: attribute DOMString display
+int32_t ranvier_dom_font_face_set_display(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setDisplay(document.get(), a0.string()); });
+}
+
+// FontFace.ascentOverride getter: attribute DOMString ascentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_get_ascent_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->ascentOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.ascentOverride setter: attribute DOMString ascentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_set_ascent_override(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setAscentOverride(document.get(), a0.string()); });
+}
+
+// FontFace.descentOverride getter: attribute DOMString descentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_get_descent_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->descentOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.descentOverride setter: attribute DOMString descentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_set_descent_override(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setDescentOverride(document.get(), a0.string()); });
+}
+
+// FontFace.lineGapOverride getter: attribute DOMString lineGapOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_get_line_gap_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->lineGapOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.lineGapOverride setter: attribute DOMString lineGapOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_set_line_gap_override(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setLineGapOverride(document.get(), a0.string()); });
+}
+
+// FontFace.sizeAdjust getter: attribute DOMString sizeAdjust
+int32_t ranvier_dom_font_face_get_size_adjust(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->sizeAdjust(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.sizeAdjust setter: attribute DOMString sizeAdjust
+int32_t ranvier_dom_font_face_set_size_adjust(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setSizeAdjust(document.get(), a0.string()); });
+}
+
+// FontFace.status getter: readonly attribute FontFaceLoadStatus status
+int32_t ranvier_dom_font_face_get_status(RvFontFace* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->status(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationFontFaceLoadStatus); });
+}
+
+// FontFaceSet.size getter: readonly attribute long size
+int32_t ranvier_dom_font_face_set_get_size(RvEventTarget* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->size(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// FontFaceSet.status getter: readonly attribute FontFaceSetLoadStatus status
+int32_t ranvier_dom_font_face_set_get_status(RvEventTarget* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->status(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationFontFaceSetLoadStatus); });
+}
+
+// FontFaceSet.has(FontFace font) -> boolean
+int32_t ranvier_dom_font_face_set_has(RvEventTarget* target, RvFontFace* font, int32_t* result)
+{
+    if (!target || !font || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<FontFace> a0 = reinterpret_cast<FontFace*>(font);
+    return deliver([&]() -> decltype(auto) { return impl->has(HandleArg<FontFace> { a0.get() }); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// FontFaceSet.add(FontFace font) -> FontFaceSet; *result is a new reference
+int32_t ranvier_dom_font_face_set_add(RvEventTarget* target, RvFontFace* font, RvEventTarget** result)
+{
+    if (!target || !font || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<FontFace> a0 = reinterpret_cast<FontFace*>(font);
+    return deliver([&]() -> decltype(auto) { return impl->add(HandleArg<FontFace> { a0.get() }); }, [&](auto&& value) { return storeHandle<EventTarget>(value, result); });
+}
+
+// FontFaceSet.delete(FontFace font) -> boolean
+int32_t ranvier_dom_font_face_set_delete(RvEventTarget* target, RvFontFace* font, int32_t* result)
+{
+    if (!target || !font || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<FontFace> a0 = reinterpret_cast<FontFace*>(font);
+    return deliver([&]() -> decltype(auto) { return impl->remove(HandleArg<FontFace> { a0.get() }); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// FontFaceSet.clear() -> undefined
+int32_t ranvier_dom_font_face_set_clear(RvEventTarget* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->clear(); });
+}
+
+// FontFaceSet.check(DOMString font, optional DOMString text = " ") -> boolean; text defaults to " " in IDL
+int32_t ranvier_dom_font_face_set_check(RvEventTarget* target, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, int32_t* result)
+{
+    if (!target || !(font_length >= 0 && (font_length <= 0 || font)) || !(text_length >= 0 && (text_length <= 0 || text)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { font, font_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { text, text_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->check(document.get(), a0.string(), a1.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
 // CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths
 int32_t ranvier_dom_css_supports_2(RvNode* target, const uint8_t* property, int32_t property_length, const uint8_t* value, int32_t value_length, int32_t* result)
 {
@@ -42819,6 +43497,23 @@ int32_t ranvier_dom_url_search_params_entries(RvURLSearchParams* target, RvNode*
         return RV_ERR_WRONG_INTERFACE;
     Ref document = contextDocument.releaseNonNull();
     return deliver([&]() -> decltype(auto) { return ([&]() { Vector<KeyValuePair<String, String>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequencePairUSVStringAndUSVString(value, result); });
+}
+
+// FontFaceSet.values: owned snapshot of the engine value iterable; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_font_face_set_values(RvEventTarget* target, RvDomSequenceFontFace* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    return deliver([&]() -> decltype(auto) { return ([&]() { Vector<Ref<FontFace>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(entry.releaseNonNull()); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequenceFontFace(value, result); });
 }
 
 // Highlight.size: setlike<AbstractRange>

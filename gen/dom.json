@@ -248,6 +248,10 @@
     "FileReader": {
       "receiver": "Document",
       "factory": "FileReader::create"
+    },
+    "FontFace": {
+      "receiver": "Document",
+      "factory": "FontFace::create"
     }
   },
   "dictionaryCppTypes": {
@@ -266,7 +270,8 @@
     "HashChangeEventInit": "HashChangeEvent::Init",
     "MediaQueryListEventInit": "MediaQueryListEvent::Init",
     "PopStateEventInit": "PopStateEvent::Init",
-    "CompositionEventInit": "CompositionEvent::Init"
+    "CompositionEventInit": "CompositionEvent::Init",
+    "FontFaceDescriptors": "FontFace::Descriptors"
   },
   "dictionaryObjectMembers": [
     "FormDataEventInit.formData"
@@ -680,7 +685,9 @@
     "VisualViewport",
     "Highlight",
     "HighlightRegistry",
-    "FileReader"
+    "FileReader",
+    "FontFace",
+    "FontFaceSet"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1011,6 +1018,9 @@
     },
     "URLSearchParams": {
       "feature": "dom-url-search-params-entries"
+    },
+    "FontFaceSet": {
+      "feature": "dom-font-face-set-values"
     }
   },
   "windowBindings": {
@@ -1056,7 +1066,8 @@
     }
   },
   "byteSpanTypes": [
-    "BufferSource"
+    "BufferSource",
+    "BinaryData"
   ],
   "typedArrayViewTypes": [
     "ArrayBufferView"
@@ -1101,13 +1112,16 @@
     "VisualViewport": "DOMWindow.visualViewport"
   },
   "contextSettingsObjects": [
-    "FileReader"
+    "FileReader",
+    "FontFace",
+    "FontFaceSet"
   ],
   "eventTargetObjects": {
     "FileReader": {},
     "VisualViewport": {
       "attached": "impl->frame()"
-    }
+    },
+    "FontFaceSet": {}
   },
   "resultDictionaries": [
     "URLPatternResult",
