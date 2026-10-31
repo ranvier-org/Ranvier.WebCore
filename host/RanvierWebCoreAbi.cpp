@@ -5,6 +5,10 @@
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
 #include "RanvierViewportGlue.h"
+#include "RanvierInspectGlue.h"
+#include <atomic>
+#include <string>
+#include <vector>
 #include <JavaScriptCore/DisallowVMEntry.h>
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/Document.h>
@@ -743,6 +747,8 @@ struct RvHost {
     RvDragStartCallback dragStartCallback { nullptr };
     void* dragStartContext { nullptr };
     bool accessibility { false };
+    // rv_host_set_diagnostics: the rv_host_inspect_* calls read the document only while set.
+    bool diagnostics { false };
     RvAxCallback axCallback { nullptr };
     void* axContext { nullptr };
     // Accessibility events posted since the last delivery, and whether a delivery is scheduled.
@@ -1353,6 +1359,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "text-segmentation"))
         return 1;
+    if (!std::strcmp(feature, "diagnostics"))
+        return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
@@ -1444,6 +1452,170 @@ int32_t rv_host_set_screen(RvHost* host, const RvScreenMetrics* metrics)
     host->page->screenPropertiesDidChange();
     host->orientation->setOrientation(static_cast<ScreenOrientationType>(metrics->orientation));
     return RV_OK;
+}
+
+struct RvDiagnosticEntry {
+    double numbers[6] { };
+    std::string strings[3];
+};
+
+struct RvDiagnostic {
+    int32_t kind;
+    std::string text;
+    std::vector<RvDiagnosticEntry> entries;
+};
+
+static std::atomic<int32_t> liveDiagnostics;
+
+static int32_t copyBytes(const std::string& value, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!length)
+        return RV_ERR_NULL_ARGUMENT;
+    *length = static_cast<int32_t>(value.size());
+    if (!buffer || capacity < *length)
+        return RV_ERR_BUFFER_TOO_SMALL;
+    std::memcpy(buffer, value.data(), value.size());
+    return RV_OK;
+}
+
+// RV_OK when the host is live, on its thread and has diagnostics enabled.
+static int32_t diagnosticsAllowed(RvHost* host)
+{
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || !host->diagnostics)
+        return RV_ERR_UNSUPPORTED;
+    return RV_OK;
+}
+
+static RvDiagnostic* newDiagnostic(int32_t kind)
+{
+    auto* diagnostic = new RvDiagnostic { kind, { }, { } };
+    ++liveDiagnostics;
+    return diagnostic;
+}
+
+int32_t rv_host_set_diagnostics(RvHost* host, int32_t enabled)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || (enabled != 0 && enabled != 1))
+        return RV_ERR_UNSUPPORTED;
+    host->diagnostics = enabled;
+    return RV_OK;
+}
+
+int32_t rv_host_inspect_render_tree(RvHost* host, RvNode* target, int32_t flags, RvDiagnostic** diagnostic)
+{
+    if (!host || !diagnostic)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto allowed = diagnosticsAllowed(host))
+        return allowed;
+    constexpr int32_t known = RV_RENDER_TREE_ALL_LAYERS | RV_RENDER_TREE_LAYER_NESTING | RV_RENDER_TREE_OVERFLOW
+        | RV_RENDER_TREE_SVG_GEOMETRY | RV_RENDER_TREE_ID_AND_CLASS | RV_RENDER_TREE_LAYOUT_STATE;
+    constexpr int32_t layers = RV_RENDER_TREE_ALL_LAYERS | RV_RENDER_TREE_LAYER_NESTING;
+    auto* document = reinterpret_cast<RvNode*>(&host->document());
+    bool element = target && target != document;
+    if (flags & ~known || (element && (flags & layers)))
+        return RV_ERR_UNSUPPORTED;
+    std::string text;
+    auto status = ranvier_inspect_render_tree(document, target, flags, [](void* context, const char* bytes, int32_t length) {
+        static_cast<std::string*>(context)->assign(bytes, length);
+    }, &text);
+    if (status)
+        return status;
+    auto* result = newDiagnostic(RV_DIAGNOSTIC_RENDER_TREE);
+    result->text = WTF::move(text);
+    *diagnostic = result;
+    return RV_OK;
+}
+
+int32_t rv_host_inspect_matched_rules(RvHost* host, RvNode* element, RvDiagnostic** diagnostic)
+{
+    if (!host || !element || !diagnostic)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto allowed = diagnosticsAllowed(host))
+        return allowed;
+    std::vector<RvDiagnosticEntry> entries;
+    auto status = ranvier_inspect_matched_rules(reinterpret_cast<RvNode*>(&host->document()), element, [](void* context, const RanvierInspectRule* rule) {
+        RvDiagnosticEntry entry;
+        entry.numbers[RV_RULE_ORIGIN] = rule->origin;
+        entry.numbers[RV_RULE_SPECIFICITY_A] = rule->specificity[0];
+        entry.numbers[RV_RULE_SPECIFICITY_B] = rule->specificity[1];
+        entry.numbers[RV_RULE_SPECIFICITY_C] = rule->specificity[2];
+        entry.numbers[RV_RULE_SELECTOR_COUNT] = rule->selectorCount;
+        entry.numbers[RV_RULE_MATCHED_SELECTOR_COUNT] = rule->matchedSelectorCount;
+        entry.strings[RV_RULE_SELECTOR_TEXT].assign(rule->selectorText ? rule->selectorText : "", rule->selectorTextLength);
+        entry.strings[RV_RULE_MATCHED_SELECTOR].assign(rule->matchedSelector ? rule->matchedSelector : "", rule->matchedSelectorLength);
+        entry.strings[RV_RULE_DECLARATIONS].assign(rule->declarations ? rule->declarations : "", rule->declarationsLength);
+        static_cast<std::vector<RvDiagnosticEntry>*>(context)->push_back(WTF::move(entry));
+    }, &entries);
+    if (status)
+        return status;
+    auto* result = newDiagnostic(RV_DIAGNOSTIC_MATCHED_RULES);
+    result->entries = WTF::move(entries);
+    *diagnostic = result;
+    return RV_OK;
+}
+
+int32_t rv_host_inspect_box_model(RvHost* host, RvNode* element, double* values)
+{
+    if (!host || !element || !values)
+        return RV_ERR_NULL_ARGUMENT;
+    if (auto allowed = diagnosticsAllowed(host))
+        return allowed;
+    return ranvier_inspect_box_model(reinterpret_cast<RvNode*>(&host->document()), element, values);
+}
+
+int32_t rv_diagnostic_kind(RvDiagnostic* diagnostic)
+{
+    return diagnostic ? diagnostic->kind : RV_ERR_NULL_ARGUMENT;
+}
+
+int32_t rv_diagnostic_text(RvDiagnostic* diagnostic, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!diagnostic)
+        return RV_ERR_NULL_ARGUMENT;
+    return copyBytes(diagnostic->text, buffer, capacity, length);
+}
+
+int32_t rv_diagnostic_count(RvDiagnostic* diagnostic)
+{
+    return diagnostic ? static_cast<int32_t>(diagnostic->entries.size()) : RV_ERR_NULL_ARGUMENT;
+}
+
+int32_t rv_diagnostic_entry_string(RvDiagnostic* diagnostic, int32_t index, int32_t field, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!diagnostic || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (index < 0 || static_cast<size_t>(index) >= diagnostic->entries.size() || field < RV_RULE_SELECTOR_TEXT || field > RV_RULE_DECLARATIONS)
+        return RV_ERR_UNSUPPORTED;
+    return copyBytes(diagnostic->entries[index].strings[field], buffer, capacity, length);
+}
+
+int32_t rv_diagnostic_entry_number(RvDiagnostic* diagnostic, int32_t index, int32_t field, double* value)
+{
+    if (!diagnostic || !value)
+        return RV_ERR_NULL_ARGUMENT;
+    if (index < 0 || static_cast<size_t>(index) >= diagnostic->entries.size() || field < RV_RULE_ORIGIN || field > RV_RULE_MATCHED_SELECTOR_COUNT)
+        return RV_ERR_UNSUPPORTED;
+    *value = diagnostic->entries[index].numbers[field];
+    return RV_OK;
+}
+
+void rv_diagnostic_release(RvDiagnostic* diagnostic)
+{
+    if (!diagnostic)
+        return;
+    delete diagnostic;
+    --liveDiagnostics;
+}
+
+int32_t rv_diagnostic_live_count(void)
+{
+    return liveDiagnostics.load();
 }
 
 RvHost* rv_host_create(int32_t width, int32_t height)

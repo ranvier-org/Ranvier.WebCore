@@ -838,6 +838,37 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                 let mutable kind = -1
                 rv_dom_screen_orientation_get_type (held.Value, &kind) |> check "orientation.type after destroy"
                 rv_node_release held.Value
+        | "diagnostics" ->
+            let live = rv_diagnostic_live_count ()
+            rv_host_set_diagnostics (host, 1) |> check "rv_host_set_diagnostics"
+            let tree = [| 0n |]
+            rv_host_inspect_render_tree (host, div, 0, tree) |> check "rv_host_inspect_render_tree"
+            let rules = [| 0n |]
+            rv_host_inspect_matched_rules (host, div, rules) |> check "rv_host_inspect_matched_rules"
+            let length = [| 0 |]
+            rv_diagnostic_text (tree[0], null, 0, length) |> ignore
+            let size = length[0]
+
+            if size <= 0 || rv_diagnostic_count rules[0] < 1 || rv_diagnostic_live_count () <> live + 2 then
+                failwith "diagnostic snapshots before destroy"
+
+            held.Value <- tree[0]
+
+            fun () ->
+                let buffer = Array.zeroCreate<byte> size
+                rv_diagnostic_text (held.Value, buffer, buffer.Length, length) |> check "render tree text after destroy"
+
+                if length[0] <> size || not (Text.Encoding.UTF8.GetString(buffer).StartsWith "RenderBlock {DIV}") then
+                    failwith "render tree snapshot changed after destroy"
+
+                if rv_diagnostic_count rules[0] < 1 || rv_diagnostic_kind rules[0] <> 2 then
+                    failwith "matched-rules snapshot changed after destroy"
+
+                rv_diagnostic_release held.Value
+                rv_diagnostic_release rules[0]
+
+                if rv_diagnostic_live_count () <> live then
+                    failwith "diagnostic snapshots leaked"
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -1104,6 +1135,7 @@ let run (outDir: string) =
                     "blob slice"
                     "caret position"
                     "crypto"
+                    "diagnostics"
                     "screen"
                     "url values"
                     "url pattern result"

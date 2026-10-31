@@ -1,0 +1,392 @@
+{
+  "group": [
+    "H08 #113"
+  ],
+  "status": "green (private Windows x64 slim; not accepted)",
+  "native": "0.1.0-preview.42",
+  "abi": 50,
+  "features": [
+    "diagnostics",
+    "capability facility diagnostics",
+    "capability facility inspector-frontend"
+  ],
+  "members": [
+    "rv_host_set_diagnostics",
+    "rv_host_inspect_render_tree",
+    "rv_host_inspect_matched_rules",
+    "rv_host_inspect_box_model",
+    "rv_diagnostic_kind",
+    "rv_diagnostic_text",
+    "rv_diagnostic_count",
+    "rv_diagnostic_entry_string",
+    "rv_diagnostic_entry_number",
+    "rv_diagnostic_release",
+    "rv_diagnostic_live_count"
+  ],
+  "browserTooling": {
+    "inspector": "stub (USE_INSPECTOR_STUB, patch 0008)",
+    "jscInspector": "stub (USE_JSC_INSPECTOR_STUB, patch 0009)",
+    "remoteInspector": "ENABLE_REMOTE_INSPECTOR=OFF",
+    "webInspectorUI": "not packaged (scripts/build.py)",
+    "inspectorFrontendFacility": "implemented 0, available 0 on every flavor",
+    "glueInspectorSymbols": []
+  },
+  "sourceHeadOfBatch": "ca11a07e6c4dbc5bafde1a3504dcc738f1d21fd8",
+  "batchRunHead": "17639f4",
+  "stackedOn": "G04 15e1bc9 > I08 2a9cf7d > T03 828fb2b > I11 5eee88a (parent ei-candidate-4)",
+  "red": {
+    "file": "red-native38.log",
+    "native38": "the probe fails on its first absent binding, rv_host_set_diagnostics"
+  },
+  "green": {
+    "inspectorDiagnosticsAssertions": 929,
+    "repeats": 30,
+    "repeatsDistinct": [
+      "inspector diagnostics PASS: 929 assertions, 192 box-model oracle checks, 6 snapshots held past destroy, 1 run(s)"
+    ],
+    "probes": 56,
+    "allExitZero": true,
+    "rawAssertions": 76358,
+    "probesRun": [
+      {
+        "name": "css_supports",
+        "exitCode": 0,
+        "assertions": 72
+      },
+      {
+        "name": "computed_style",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "fragment_rectangles",
+        "exitCode": 0,
+        "assertions": 140
+      },
+      {
+        "name": "table_surface",
+        "exitCode": 0,
+        "assertions": 44
+      },
+      {
+        "name": "element_reflection",
+        "exitCode": 0,
+        "assertions": 269
+      },
+      {
+        "name": "area_surface",
+        "exitCode": 0,
+        "assertions": 117
+      },
+      {
+        "name": "cssom_surface",
+        "exitCode": 0,
+        "assertions": 407
+      },
+      {
+        "name": "keyframe_rules",
+        "exitCode": 0,
+        "assertions": 93
+      },
+      {
+        "name": "counter_style_rules",
+        "exitCode": 0,
+        "assertions": 86
+      },
+      {
+        "name": "detached_cssom_context",
+        "exitCode": 0,
+        "assertions": 389
+      },
+      {
+        "name": "svg_mathml_surface",
+        "exitCode": 0,
+        "assertions": 95
+      },
+      {
+        "name": "style_property_maps",
+        "exitCode": 0,
+        "assertions": 189
+      },
+      {
+        "name": "declared_style_maps",
+        "exitCode": 0,
+        "assertions": 2069
+      },
+      {
+        "name": "style_map_entries",
+        "exitCode": 0,
+        "assertions": 144
+      },
+      {
+        "name": "typed_style_values",
+        "exitCode": 0,
+        "assertions": 190
+      },
+      {
+        "name": "custom_properties",
+        "exitCode": 0,
+        "assertions": 231
+      },
+      {
+        "name": "geometry_values",
+        "exitCode": 0,
+        "assertions": 260
+      },
+      {
+        "name": "matrix_values",
+        "exitCode": 0,
+        "assertions": 1091
+      },
+      {
+        "name": "css_transforms",
+        "exitCode": 0,
+        "assertions": 405
+      },
+      {
+        "name": "svg_geometry",
+        "exitCode": 0,
+        "assertions": 639
+      },
+      {
+        "name": "svg_surfaces",
+        "exitCode": 0,
+        "assertions": 1594
+      },
+      {
+        "name": "svg_documents",
+        "exitCode": 0,
+        "assertions": 78
+      },
+      {
+        "name": "svg_view_controls",
+        "exitCode": 0,
+        "assertions": 318
+      },
+      {
+        "name": "svg_animation_variants",
+        "exitCode": 0,
+        "assertions": 70
+      },
+      {
+        "name": "capabilities",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_view_selection",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "svg_paint_servers",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_filters",
+        "exitCode": 0,
+        "assertions": 9086
+      },
+      {
+        "name": "svg_clip_mask_marker",
+        "exitCode": 0,
+        "assertions": 565
+      },
+      {
+        "name": "svg_resources",
+        "exitCode": 0,
+        "assertions": 454
+      },
+      {
+        "name": "mathml_surface",
+        "exitCode": 0,
+        "assertions": 371
+      },
+      {
+        "name": "svg_tests_lists",
+        "exitCode": 0,
+        "assertions": 191
+      },
+      {
+        "name": "image_decode",
+        "exitCode": 0,
+        "assertions": 73
+      },
+      {
+        "name": "font_load",
+        "exitCode": 0,
+        "assertions": 42
+      },
+      {
+        "name": "event_construction",
+        "exitCode": 0,
+        "assertions": 82
+      },
+      {
+        "name": "tree_traversal",
+        "exitCode": 0,
+        "assertions": 22285
+      },
+      {
+        "name": "focus_input",
+        "exitCode": 0,
+        "assertions": 80
+      },
+      {
+        "name": "viewport_events",
+        "exitCode": 0,
+        "assertions": 364
+      },
+      {
+        "name": "form_collections",
+        "exitCode": 0,
+        "assertions": 1168
+      },
+      {
+        "name": "form_navigation",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "viewport_scroll",
+        "exitCode": 0,
+        "assertions": 3232
+      },
+      {
+        "name": "dialog_popover",
+        "exitCode": 0,
+        "assertions": 845
+      },
+      {
+        "name": "binary_values",
+        "exitCode": 0,
+        "assertions": 446
+      },
+      {
+        "name": "caret_hit",
+        "exitCode": 0,
+        "assertions": 18251
+      },
+      {
+        "name": "url_values",
+        "exitCode": 0,
+        "assertions": 3538
+      },
+      {
+        "name": "url_wpt",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "form_submission",
+        "exitCode": 0,
+        "assertions": 418
+      },
+      {
+        "name": "text_segmentation",
+        "exitCode": 0,
+        "assertions": 812
+      },
+      {
+        "name": "crypto_random",
+        "exitCode": 0,
+        "assertions": 275
+      },
+      {
+        "name": "visual_viewport",
+        "exitCode": 0,
+        "assertions": 987
+      },
+      {
+        "name": "screen_metrics",
+        "exitCode": 0,
+        "assertions": 222
+      },
+      {
+        "name": "custom_highlights",
+        "exitCode": 0,
+        "assertions": 378
+      },
+      {
+        "name": "abi_layouts",
+        "exitCode": 0,
+        "assertions": 15
+      },
+      {
+        "name": "event_details",
+        "exitCode": 0,
+        "assertions": 391
+      },
+      {
+        "name": "aria_relations",
+        "exitCode": 0,
+        "assertions": 1210
+      },
+      {
+        "name": "inspector_diagnostics",
+        "exitCode": 0,
+        "assertions": 929
+      },
+      {
+        "name": "frames",
+        "exitCode": 0,
+        "assertions": null
+      },
+      {
+        "name": "teardown",
+        "exitCode": 0,
+        "assertions": null
+      }
+    ],
+    "teardownCases": 96,
+    "diagnosticsTeardownCases": 2,
+    "teardownAllCollected": true
+  },
+  "chromiumOracle": {
+    "browser": "156.0.8078.4",
+    "cases": [
+      "base",
+      "scrolled",
+      "page scale 2"
+    ],
+    "elements": [
+      "target",
+      "flow",
+      "zoomed",
+      "action"
+    ],
+    "repeats": 30,
+    "repeatsDistinct": [
+      "identical 9d186ef3a31ab70a"
+    ],
+    "unsupported": {
+      "matchedRules": "no web API lists the style rules matching an element",
+      "renderTree": "no web API dumps the render tree",
+      "developerToolsFrontend": "a page cannot observe or attach a developer-tools frontend"
+    }
+  },
+  "measured": {
+    "boxModel": "equal to Chromium within 1/64 px for 4 elements x 4 boxes x 3 cases (unscrolled, scrolled 30,45, page scale 2), including CSS zoom 2 and a positioned button; every value is a multiple of 1/64; the border box equals rv_element_rect",
+    "matchedRules": "user-agent div rule first; author rules ordered layer base, layer top, then unlayered :where (0,0,0), .box list (0,1,0), @media .box (0,1,0), #target (1,0,0), :is (1,0,0), div.box#target (1,1,1); the non-matching @media rule is absent; the inline entry is last with no selector",
+    "renderTree": "layer groups nest renderers one level at a time; one box per visible element, none for display:none; the #target line agrees with the box model within the dump's whole-pixel snapping; 7 layers with all-layers",
+    "optIn": "a disabled host returns UNSUPPORTED before reading the node (a text node reads UNSUPPORTED, not NOT_ELEMENT)",
+    "teardown": "snapshots stay readable after disabling and rv_host_destroy; every snapshot is released (live count returns to baseline)"
+  },
+  "files": {
+    "absence_h08.py": "6657299bef07e047d8ffe4b959434ce1cf15dcdd42facfbf40cc2419b2b73728",
+    "allocation-absence.json": "e50cd5b6e92591041db61fe92a967d0c8a49aec68c997c931f48e96b97b9169e",
+    "batch-green.json": "8cf54f67a140d216cc1e5f7c33dafdf82b52a242f93028f6a0f7568cd604f151",
+    "build_native42_candidate.py": "b00b322194185a5ae838cf19f65d24ed33d90cc16d95306fb319ab11ca432996",
+    "inspector-diagnostics-probe.log": "ad46a442d3f8faf5be218014eb02cb5c75c594dcffcec72b7ce91a96e5f95ad3",
+    "inspector-diagnostics-repeat30.txt": "e6ee4305396c27523d3c3062df98657341cdce2392d9fa6f1ffd1fcbe1ed3421",
+    "make_native42_evidence.py": "f857a85d4a6429d2e9bc44575aed1c17d17da14032285123062b11b419cf9fad",
+    "oracle-repeat30.txt": "77cb7d52bf629809af0d3a5cdf0ff4f73e814db850255b633cea585f29fd8b53",
+    "red-native38.log": "35a43d2614af02239ce522e4a40babfee51cad9417526f30982f1412bf5f2c4a",
+    "repeat30.sh": "c49b5d398ba39745701d0e3217bbdeef5379a0dec68e9004727e7351faae354c",
+    "run_native42_full_batch.py": "034df60ffea777305e4160ae3ef6240d699036db8b40a09ff110a58cbf7c1ce5",
+    "runtime-receipt.json": "6c666a36f798fee02a8d5b43ea6ded1205541ed53e3b429b45849a07b44147fb",
+    "source-patches.json": "e447c18c3dd4c12ee2ef454fc1e364f989e43367ed322eb364e853400f14d8ef",
+    "teardown-probes.json": "16a728993cbf5a786b73a405d11ea08db7aae3191704e3be7f009b95fd49d4eb"
+  }
+}
