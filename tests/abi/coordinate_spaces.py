@@ -26,9 +26,10 @@ BORDER, PADDING, CONTENT, MARGIN = range(4)
 ABI = 53
 TOLERANCE = 1 / 64
 CALLBACK = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p)
-QUALIFIED_3D = ('a perspective() function, the perspective property or preserve-3d in the chain: WebKit maps and paints '
-                'it in its software path otherwise than Chromium, and the conversion follows the engine (paint agreement '
-                'asserted below); the distance from the Chromium composition is recorded, not asserted')
+QUALIFIED_3D = ('a perspective() function, the perspective property or preserve-3d in the chain: the slim software path '
+                'paints without 3D compositing, so the property and preserve-3d have no effect and perspective() maps as the '
+                'software paint draws it; the conversion follows that paint and hit testing (both asserted below), and the '
+                'distance from the Chromium composition is recorded, not asserted')
 # Elements whose transforms are singular: their page points exist, and points mapped into them do not.
 SINGULAR = {'z': 'scale(0)', 'y': 'rotateY(90deg)'}
 STATES = [
@@ -353,6 +354,25 @@ def verify(native_directory):
         red = [rgba[(100 * 320 + x) * 4 + 1] < 128 for x in range(50, 70)]
         p.expect(red.index(True) + 50 == math.ceil(left_edge - 0.5), 'paint left edge follows the conversion: ' + str(red))
         report['perspectivePaint'] = {'convertedLeftEdge': left_edge, 'firstRedColumn': red.index(True) + 50, 'chromiumLeftEdge': 54.0}
+
+        def hit_in(host, x, y):
+            node = element_at(host, int(math.floor(x)), int(math.floor(y)))
+            if not node:
+                return None
+            try:
+                return p.attribute(node, 'id') or None
+            finally:
+                release(node)
+
+        # Hit testing agrees: points converted from inside the box hit it, and Chromium's left edge region does not.
+        hits = {}
+        for local in [(3.0, 50.0), (97.0, 50.0), (50.0, 3.0), (50.0, 97.0)]:
+            (x, y), = converted(q, NODE, None, CLIENT, [local], 'perspective child point')
+            hits[str(local)] = hit_in(painter, x, y)
+            p.expect(hits[str(local)] == 'q', 'rv_host_element_at at converted ' + str(local) + ' hits q: ' + str(hits[str(local)]))
+        hits['chromium-only 56,100'] = hit_in(painter, 56, 100)
+        p.expect(hits['chromium-only 56,100'] == 'p', 'Chromium-only edge region hits the perspective parent: ' + str(hits['chromium-only 56,100']))
+        report['perspectivePaint']['hits'] = hits
         release(q)
         # A perspective() function: the painted edges of the trapezoid follow its converted corners.
         p.expect(load_html(painter, b'<!doctype html><style>body{margin:0;background:#fff}#e{position:absolute;left:100px;top:60px;width:80px;'
@@ -372,7 +392,12 @@ def verify(native_directory):
                  'top': (column[0], math.ceil(along(c[0], c[1], 0, 140.5) - 0.5)), 'bottom': (column[-1], math.ceil(along(c[3], c[2], 0, 140.5) - 0.5) - 1)}
         for edge, (painted, predicted) in edges.items():
             p.expect(abs(painted - predicted) <= 1, 'perspective() ' + edge + ' edge: painted ' + str(painted) + ', converted ' + str(predicted))
-        report['perspectiveFunctionPaint'] = {'corners': c, 'edges': edges}
+        hits = {}
+        for local in [(3.0, 30.0), (77.0, 30.0), (40.0, 3.0), (40.0, 57.0)]:
+            (x, y), = converted(e, NODE, None, CLIENT, [local], 'perspective() point')
+            hits[str(local)] = hit_in(painter, x, y)
+            p.expect(hits[str(local)] == 'e', 'rv_host_element_at at converted ' + str(local) + ' hits e: ' + str(hits[str(local)]))
+        report['perspectiveFunctionPaint'] = {'corners': c, 'edges': edges, 'hits': hits}
         release(e)
         host_destroy(painter)
         p.bind('rv_event_target_release', None, [P])(viewport)

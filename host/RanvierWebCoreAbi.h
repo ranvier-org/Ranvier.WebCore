@@ -1643,7 +1643,10 @@ RV_EXPORT int32_t rv_host_inspect_box_model(RvHost*, RvNode* element, double* va
  *   RV_SPACE_DEVICE device pixels of the image rv_host_paint_rgba paints: HOST times the device scale.
  * The app's window position on the screen is the windowing system's: a screen point is a DEVICE point plus the
  * origin the app's windowing system reports for the host's surface. Points are double precision; WebCore maps them
- * in single precision and LayoutUnits of 1/64 CSS pixel. */
+ * in single precision and LayoutUnits of 1/64 CSS pixel. Conversions agree with what the host paints and hit-tests.
+ * The slim software path paints without 3D compositing: the perspective property and transform-style: preserve-3d
+ * have no effect, and a perspective() function maps as the software paint draws it, so points of such chains lie up
+ * to 26.5 CSS pixels from where a 3D-compositing browser such as Chromium places them. */
 enum {
     RV_SPACE_NODE = 0,
     RV_SPACE_PAGE = 1,
