@@ -113,4 +113,8 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', tests / 'svg_animation_variants.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'detached_cssom_context.py', '--native-directory', out])
     run([sys.executable, '-I', tests / 'svg_mathml_surface.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'svg_paint_servers.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'svg_filters.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'svg_clip_mask_marker.py', '--native-directory', out])
+    run([sys.executable, '-I', tests / 'svg_resources.py', '--native-directory', out])
 print('abi tests passed', flush=True)
