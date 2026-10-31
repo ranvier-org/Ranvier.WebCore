@@ -1,5 +1,5 @@
 """Private R12 candidate: a B06 media candidate's WebCore objects (patch 0043's unit included), with this tree's
-RanvierResourceGlue compiled and WebCore relinked, and the four host units recompiled and relinked.
+RanvierResourceGlue compiled and WebCore relinked, and the host units recompiled and relinked.
 usage: build_snapshot_candidate.py <snapshot-candidate-N> --parent DIR --parent-head SHA [--repo DIR]
 The parent's objects and host-glue objects are borrowed read-only, and their inputs must equal --parent-head. Every
 patch of this tree's series past 0034 must be carried by C:/wk/src and covered by the parent's receipt."""
@@ -133,7 +133,7 @@ host_command = next(c for c in commands([host_target]) if 'clang-cl.exe' in c an
 flags = re.findall(r'^((?:USE|ENABLE)_[A-Z0-9_]+):BOOL=(ON|OFF|1|0|TRUE|FALSE)$', cache, re.M)
 flag_arguments = ' '.join('/DRV_CAP_' + name + '=' + ('1' if value in ['ON', '1', 'TRUE'] else '0') for name, value in flags)
 host_objects = []
-for filename in ['RanvierWebCoreAbi.cpp', 'RanvierWebCoreDom.cpp', 'RanvierWebCoreUia.cpp', 'RanvierWebCoreD3D11.cpp']:
+for filename in ['RanvierWebCoreAbi.cpp', 'RanvierWebCoreDom.cpp', 'RanvierWebCoreUia.cpp', 'RanvierWebCoreD3D11.cpp', 'RanvierImageEncoding.cpp']:
     command = re.sub(r'C:[/\\]wk[/\\]src[/\\]Tools[/\\]TestWebKitAPI[/\\]RanvierAbi[/\\]RanvierWebCoreAbi.cpp',
                      (repo / 'host' / filename).as_posix(), host_command)
     host_obj = out / (filename + '.obj')
@@ -155,7 +155,7 @@ assert hashes['JavaScriptCore.dll'].startswith('95149cdc')
 receipt = {'repoHead': subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=repo, capture_output=True, text=True).stdout.strip(),
            'dirty': subprocess.run(['git', 'status', '--porcelain'], cwd=repo, capture_output=True, text=True).stdout.splitlines(),
            'parent': str(parent), 'parentRepoHead': parent_head, 'hostGlueObjects': glue_objects,
-           'recompiled': ['host/' + GLUE + '.cpp', 'host/RanvierWebCoreAbi.cpp', 'host/RanvierWebCoreDom.cpp', 'host/RanvierWebCoreUia.cpp', 'host/RanvierWebCoreD3D11.cpp'],
+           'recompiled': ['host/' + GLUE + '.cpp', 'host/RanvierWebCoreAbi.cpp', 'host/RanvierWebCoreDom.cpp', 'host/RanvierWebCoreUia.cpp', 'host/RanvierWebCoreD3D11.cpp', 'host/RanvierImageEncoding.cpp'],
            'runtimeSha256': hashes}
 (out / 'runtime-sha256.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')
 print('SNAPSHOT CANDIDATE READY: ' + str(runtime), {k: hashes[k][:8] for k in ['WebCore.dll', 'RanvierWebCoreHost.dll', 'JavaScriptCore.dll']}, flush=True)
