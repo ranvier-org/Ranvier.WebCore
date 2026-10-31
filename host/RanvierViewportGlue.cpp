@@ -252,15 +252,15 @@ int32_t ranvier_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace,
         return status;
     LayoutRect rect = sourceBox->borderBoxRect();
     switch (box) {
-    case RV_BOX_BORDER:
+    case RV_QUAD_BORDER_BOX:
         break;
-    case RV_BOX_PADDING:
+    case RV_QUAD_PADDING_BOX:
         rect = { LayoutUnit(sourceBox->borderLeft()), LayoutUnit(sourceBox->borderTop()), rect.width() - sourceBox->borderLeft() - sourceBox->borderRight(), rect.height() - sourceBox->borderTop() - sourceBox->borderBottom() };
         break;
-    case RV_BOX_CONTENT:
+    case RV_QUAD_CONTENT_BOX:
         rect = sourceBox->contentBoxRect();
         break;
-    case RV_BOX_MARGIN:
+    case RV_QUAD_MARGIN_BOX:
         rect = { -sourceBox->marginLeft(), -sourceBox->marginTop(), rect.width() + sourceBox->marginLeft() + sourceBox->marginRight(), rect.height() + sourceBox->marginTop() + sourceBox->marginBottom() };
         break;
     default:

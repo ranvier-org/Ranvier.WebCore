@@ -1648,10 +1648,10 @@ enum {
 };
 /* Boxes of rv_node_box_quad, as CSS box edges. */
 enum {
-    RV_BOX_BORDER = 0,
-    RV_BOX_PADDING = 1,
-    RV_BOX_CONTENT = 2,
-    RV_BOX_MARGIN = 3,
+    RV_QUAD_BORDER_BOX = 0,
+    RV_QUAD_PADDING_BOX = 1,
+    RV_QUAD_CONTENT_BOX = 2,
+    RV_QUAD_MARGIN_BOX = 3,
 };
 enum {
     /* The anchors of a conversion belong to different hosts. */
@@ -1669,7 +1669,7 @@ enum {
  * transforms are singular there, such as scale(0) or rotateY(90deg). */
 RV_EXPORT int32_t rv_node_convert_points(RvNode* from, int32_t fromSpace, RvNode* to, int32_t toSpace, double* xy, int32_t count);
 /* Writes the four corners of a node's box in toSpace anchored at to, as x, y pairs in the order of DOMQuad's p1 to
- * p4: top-left, top-right, bottom-right, bottom-left. box is an RV_BOX_* value; a NULL to is node's document. The
+ * p4: top-left, top-right, bottom-right, bottom-left. box is an RV_QUAD_* value; a NULL to is node's document. The
  * statuses are those of rv_node_convert_points with node as the RV_SPACE_NODE anchor, and RV_ERR_UNSUPPORTED for an
  * unknown box. */
 RV_EXPORT int32_t rv_node_box_quad(RvNode* node, int32_t box, RvNode* to, int32_t toSpace, double* quad);
