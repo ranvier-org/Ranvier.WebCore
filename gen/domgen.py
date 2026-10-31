@@ -1403,7 +1403,7 @@ class Generator(ComplexGeneratorMixin):
                     notes.append(f"{name} may be NULL" + (" (absent)" if optional_no_default else " (null)"))
             elif mapped.kind in ("bool", "number"):
                 ctype = mapped.ctype
-                if (mapped.kind == 'number' and function.interface in self.world.config.get('finiteNumberInputs', [])
+                if (mapped.kind == 'number' and (function.interface in self.world.config.get('finiteNumberInputs', []) or f'{function.interface}.{member.name}' in self.world.config.get('finiteNumberInputs', []))
                         and self.world.resolve(argument.type).name in ('double', 'float')):
                     condition = f'{name} && !std::isfinite(*{name})' if maybe_null else f'!std::isfinite({name})'
                     prepare += [f'if ({condition})',
@@ -1587,6 +1587,13 @@ class Generator(ComplexGeneratorMixin):
         if setting and "Event" in chain and self.world.interfaces[interface].attrs.get("EnabledBySetting") == setting:
             # An event of a gated interface exists only where its setting was on: its constructor checks the
             # setting, and the engine creates one only then. A constructed event has no target before dispatch.
+            setting = None
+        if setting and interface in self.world.config.get("creationGatedInterfaces", {}) and self.world.interfaces[interface].attrs.get("EnabledBySetting") == setting:
+            # An object of the interface comes only from its listed factory, which checks the same setting.
+            factory = self.world.config["creationGatedInterfaces"][interface]
+            owner, name = factory.split(".")
+            if not any(m.name == name and setting in m.attrs.get("EnabledBySetting", "").split("&") for m in self.world.members(owner)):
+                raise SystemExit(f"creationGatedInterfaces: {factory} does not check [EnabledBySetting={setting}]")
             setting = None
         if setting:
             body += self.setting_check(interface, chain, setting)

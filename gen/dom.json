@@ -276,6 +276,9 @@
     "DOMMatrix": "Document",
     "DOMFormData": "Document"
   },
+  "creationGatedInterfaces": {
+    "CaretPosition": "Document.caretPositionFromPoint"
+  },
   "finiteNumberInputs": [
     "CSSUnitValue",
     "SVGSVGElement",
@@ -290,7 +293,8 @@
     "SVGAnimatedNumber",
     "SVGAnimationElement",
     "SVGFEGaussianBlurElement",
-    "SVGFEDropShadowElement"
+    "SVGFEDropShadowElement",
+    "Document.caretPositionFromPoint"
   ],
   "interfaces": [
     "Node",
@@ -427,6 +431,7 @@
     "Range",
     "DOMSelection",
     "DOMRectReadOnly",
+    "CaretPosition",
     "DOMRect",
     "DOMRectList",
     "DOMPointReadOnly",

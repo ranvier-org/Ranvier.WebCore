@@ -818,6 +818,10 @@
       "base": null
     },
     {
+      "name": "CaretPosition",
+      "base": null
+    },
+    {
       "name": "DOMRect",
       "base": "DOMRectReadOnly"
     },
@@ -2585,6 +2589,15 @@
       "mixin": false,
       "contractOnly": false,
       "source": "dom/DOMRectReadOnly.idl"
+    },
+    {
+      "name": "CaretPosition",
+      "idlName": "CaretPosition",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/CaretPosition.idl"
     },
     {
       "name": "DOMRect",
@@ -13281,6 +13294,127 @@
         "enum": null,
         "label": null,
         "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Document",
+      "member": "caretPositionFromPoint",
+      "contractOwner": "Document",
+      "kind": "operation",
+      "function": "rv_dom_document_caret_position_from_point",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "x"
+        },
+        {
+          "ctype": "double",
+          "name": "y"
+        },
+        {
+          "ctype": "const RvDomCaretPositionFromPointOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvCaretPosition**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "x",
+          "idlType": "double",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "y",
+          "idlType": "double",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "CaretPositionFromPointOptions",
+          "idl": {
+            "name": "CaretPositionFromPointOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "CaretPositionFromPointOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "CaretPosition",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "CaretPosition",
+        "root": "CaretPosition",
+        "class": "CaretPosition",
+        "enum": null,
+        "label": null,
+        "nullable": true,
         "atom": false,
         "subtypes": []
       }
@@ -96544,6 +96678,114 @@
       }
     },
     {
+      "interface": "CaretPosition",
+      "member": "offsetNode",
+      "contractOwner": "CaretPosition",
+      "kind": "getter",
+      "function": "rv_dom_caret_position_get_offset_node",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCaretPosition*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Node",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Node",
+        "root": null,
+        "class": "Node",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CaretPosition",
+      "member": "offset",
+      "contractOwner": "CaretPosition",
+      "kind": "getter",
+      "function": "rv_dom_caret_position_get_offset",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCaretPosition*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "CaretPosition",
+      "member": "getClientRect",
+      "contractOwner": "CaretPosition",
+      "kind": "operation",
+      "function": "rv_dom_caret_position_get_client_rect",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCaretPosition*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDOMRectReadOnly**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMRect",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DOMRect",
+        "root": "DOMRectReadOnly",
+        "class": "DOMRect",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMRect",
       "member": "constructor",
       "contractOwner": "DOMRect",
@@ -138206,6 +138448,40 @@
           "nullable": false,
           "atom": false,
           "subtypes": []
+        }
+      }
+    ],
+    "CaretPositionFromPointOptions": [
+      {
+        "name": "shadowRoots",
+        "field": "shadow_roots",
+        "ctype": "const RvDomSequenceShadowRoot*",
+        "required": false,
+        "default": "[]",
+        "mapping": {
+          "kind": "sequence",
+          "ctype": "RvDomSequenceShadowRoot",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "ShadowRoot sequence",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "node",
+              "ctype": null,
+              "interface": "ShadowRoot",
+              "root": null,
+              "class": "ShadowRoot",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            }
+          ]
         }
       }
     ],

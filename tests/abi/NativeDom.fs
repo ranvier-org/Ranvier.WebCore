@@ -685,6 +685,12 @@ type RvDomAriaNotifyOptions =
     val mutable priority: nativeint
     val mutable interrupt: nativeint
 
+/// <summary>The IDL dictionary CaretPositionFromPointOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomCaretPositionFromPointOptions =
+    val mutable size: uint32
+    val mutable shadow_roots: nativeint
+
 /// <summary>The IDL dictionary ShadowRootInit; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomShadowRootInit =
@@ -1575,6 +1581,12 @@ extern void rv_dom_dom_rect_read_only_release(nativeint handle)
 extern nativeint rv_dom_dom_rect_read_only_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_caret_position_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_caret_position_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern void rv_dom_dom_rect_list_release(nativeint handle)
 
 [<DllImport(Lib)>]
@@ -2212,6 +2224,9 @@ extern int rv_dom_document_aria_notify(nativeint target, [<MarshalAs(UnmanagedTy
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_aria_notify_2(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string announcement, [<In>] RvDomAriaNotifyOptions[] options)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_caret_position_from_point(nativeint target, float x, float y, [<In>] RvDomCaretPositionFromPointOptions[] options, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_elements_by_name(nativeint target, [<MarshalAs(UnmanagedType.LPUTF8Str)>] string element_name, nativeint& result)
@@ -6883,6 +6898,15 @@ extern int rv_dom_dom_rect_read_only_get_bottom(nativeint target, float& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_rect_read_only_get_left(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_caret_position_get_offset_node(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_caret_position_get_offset(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_caret_position_get_client_rect(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_rect_create(nativeint target, float x, float y, float width, float height, nativeint& result)

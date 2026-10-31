@@ -1818,6 +1818,40 @@ GatedElement includes GatedMixin;
         extra = glue[glue.index('ranvier_dom_gated_event_get_extra('):]
         self.assertIn('settings.otherEnabled', extra.split('\n}\n')[0])
 
+    def test_creation_gated_interface_members_skip_the_check_their_factory_makes(self):
+        fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
+        fixture.write_text(IDL + '''
+[EnabledBySetting=PickEnabled] interface Pick {
+    readonly attribute unsigned long offset;
+    [EnabledBySetting=OtherEnabled] readonly attribute unsigned long extra;
+};
+partial interface Element {
+    [EnabledBySetting=PickEnabled] Pick? pick(double x, double y);
+    boolean near(double x);
+};
+''')
+        config = dict(self.world.config)
+        config['interfaces'] = list(config['interfaces']) + ['Pick']
+        config['creationGatedInterfaces'] = {'Pick': 'Element.pick'}
+        config['finiteNumberInputs'] = ['Element.pick']
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        generator.run()
+        body = {item.name: chr(10).join(item.body) for item in generator.functions}
+        self.assertNotIn('settings.pickEnabled', body['pick_get_offset'])
+        self.assertNotIn('pick_get_extra', body)
+        self.assertIn('settings.pickEnabled', body['element_pick'])
+        self.assertIn('!std::isfinite(x)', body['element_pick'])
+        self.assertIn('!std::isfinite(y)', body['element_pick'])
+        self.assertNotIn('isfinite', body['element_near'])
+        config['creationGatedInterfaces'] = {'Pick': 'Element.near'}
+        generator = domgen.Generator(domgen.World(self.source, config))
+        generator.lock = {}
+        generator.lock_structs = {}
+        with self.assertRaises(SystemExit):
+            generator.run()
+
     def test_configured_svg_mathml_shared_style_and_focus_members(self):
         fixture = self.source / 'Source/WebCore/dom/Fixture.idl'
         fixture.write_text(IDL + '''
