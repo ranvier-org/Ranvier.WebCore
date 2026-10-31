@@ -248,7 +248,7 @@ def run(native_directory, webkit_source, measure=None):
         extra = [a for a in actual if a not in expected]
         missing = [e for e in expected if e not in actual]
         raise AssertionError('caret differences changed: unqualified ' + json.dumps(extra[:8]) + ' missing ' + json.dumps(missing[:8]))
-    print(f'caret hit testing passed: {checked} oracle checks, {len(differences)} qualified differences, {assertions} assertions', flush=True)
+    print(f'caret hit testing PASS: {checked} oracle checks, {len(differences)} qualified differences, {assertions} assertions', flush=True)
 
 
 if __name__ == '__main__':
