@@ -684,7 +684,9 @@
     "HTMLCanvasElement",
     "CanvasRenderingContext2D",
     "CanvasGradient",
-    "CanvasPattern"
+    "CanvasPattern",
+    "ImageData",
+    "ImageBitmap"
   ],
   "skipDirectories": [
     "Modules/",
@@ -1152,12 +1154,26 @@
       "canvas",
       "fillStyle",
       "fillRect",
-      "clearRect"
+      "clearRect",
+      "createImageData",
+      "getImageData",
+      "putImageData",
+      "drawImage"
     ],
     "CanvasGradient": [],
-    "CanvasPattern": []
+    "CanvasPattern": [],
+    "ImageBitmap": [],
+    "ImageData": [
+      "width",
+      "height",
+      "colorSpace",
+      "pixelFormat"
+    ]
   },
   "unionSetterOverloads": [
     "CanvasRenderingContext2D.fillStyle"
+  ],
+  "unionArgumentConversions": [
+    "CanvasImageSource"
   ]
 }

@@ -1580,6 +1580,14 @@
     {
       "name": "CanvasPattern",
       "base": null
+    },
+    {
+      "name": "ImageData",
+      "base": null
+    },
+    {
+      "name": "ImageBitmap",
+      "base": null
     }
   ],
   "contractInterfaces": [
@@ -4208,6 +4216,24 @@
       "mixin": false,
       "contractOnly": false,
       "source": "html/canvas/CanvasPattern.idl"
+    },
+    {
+      "name": "ImageData",
+      "idlName": "ImageData",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/ImageData.idl"
+    },
+    {
+      "name": "ImageBitmap",
+      "idlName": "ImageBitmap",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "html/ImageBitmap.idl"
     },
     {
       "name": "HTMLUnknownElement",
@@ -147368,6 +147394,1631 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "CanvasRenderingContext2D",
+      "member": "drawImage",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_draw_image_3",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue*",
+          "name": "image"
+        },
+        {
+          "ctype": "double",
+          "name": "dx"
+        },
+        {
+          "ctype": "double",
+          "name": "dy"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "image",
+          "idlType": "CanvasImageSource",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "HTMLImageElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "HTMLCanvasElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "SVGImageElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "ImageBitmap",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSStyleImageValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "HTMLImageElement",
+                "root": null,
+                "class": "HTMLImageElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "HTMLCanvasElement",
+                "root": null,
+                "class": "HTMLCanvasElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "SVGImageElement",
+                "root": null,
+                "class": "SVGImageElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "ImageBitmap",
+                "root": "ImageBitmap",
+                "class": "ImageBitmap",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSStyleImageValue",
+                "root": "CSSStyleValue",
+                "class": "CSSStyleImageValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "dx",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dy",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "drawImage",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_draw_image_5",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue*",
+          "name": "image"
+        },
+        {
+          "ctype": "double",
+          "name": "dx"
+        },
+        {
+          "ctype": "double",
+          "name": "dy"
+        },
+        {
+          "ctype": "double",
+          "name": "dw"
+        },
+        {
+          "ctype": "double",
+          "name": "dh"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "image",
+          "idlType": "CanvasImageSource",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "HTMLImageElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "HTMLCanvasElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "SVGImageElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "ImageBitmap",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSStyleImageValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "HTMLImageElement",
+                "root": null,
+                "class": "HTMLImageElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "HTMLCanvasElement",
+                "root": null,
+                "class": "HTMLCanvasElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "SVGImageElement",
+                "root": null,
+                "class": "SVGImageElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "ImageBitmap",
+                "root": "ImageBitmap",
+                "class": "ImageBitmap",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSStyleImageValue",
+                "root": "CSSStyleValue",
+                "class": "CSSStyleImageValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "dx",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dy",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dw",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dh",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "drawImage",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_draw_image_9",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue*",
+          "name": "image"
+        },
+        {
+          "ctype": "double",
+          "name": "sx"
+        },
+        {
+          "ctype": "double",
+          "name": "sy"
+        },
+        {
+          "ctype": "double",
+          "name": "sw"
+        },
+        {
+          "ctype": "double",
+          "name": "sh"
+        },
+        {
+          "ctype": "double",
+          "name": "dx"
+        },
+        {
+          "ctype": "double",
+          "name": "dy"
+        },
+        {
+          "ctype": "double",
+          "name": "dw"
+        },
+        {
+          "ctype": "double",
+          "name": "dh"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "image",
+          "idlType": "CanvasImageSource",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "HTMLImageElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "HTMLCanvasElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "SVGImageElement",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "ImageBitmap",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSStyleImageValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "HTMLImageElement",
+                "root": null,
+                "class": "HTMLImageElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "HTMLCanvasElement",
+                "root": null,
+                "class": "HTMLCanvasElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "node",
+                "ctype": null,
+                "interface": "SVGImageElement",
+                "root": null,
+                "class": "SVGImageElement",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "ImageBitmap",
+                "root": "ImageBitmap",
+                "class": "ImageBitmap",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSStyleImageValue",
+                "root": "CSSStyleValue",
+                "class": "CSSStyleImageValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "sx",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "sy",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "sw",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "sh",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dx",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dy",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dw",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dh",
+          "idlType": "unrestricted double",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "createImageData",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_create_image_data_3",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "sw"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "sh"
+        },
+        {
+          "ctype": "const RvDomImageDataSettings*",
+          "name": "settings"
+        },
+        {
+          "ctype": "RvImageData**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "sw",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "sh",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "settings",
+          "idlType": "ImageDataSettings",
+          "idl": {
+            "name": "ImageDataSettings",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ImageDataSettings",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ImageData",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "ImageData",
+        "root": "ImageData",
+        "class": "ImageData",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "createImageData",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_create_image_data_1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvImageData*",
+          "name": "imagedata"
+        },
+        {
+          "ctype": "RvImageData**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "imagedata",
+          "idlType": "ImageData",
+          "idl": {
+            "name": "ImageData",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "ImageData",
+            "root": "ImageData",
+            "class": "ImageData",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ImageData",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "ImageData",
+        "root": "ImageData",
+        "class": "ImageData",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "getImageData",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_get_image_data",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "sx"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "sy"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "sw"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "sh"
+        },
+        {
+          "ctype": "const RvDomImageDataSettings*",
+          "name": "settings"
+        },
+        {
+          "ctype": "RvImageData**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "sx",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "sy",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "sw",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "sh",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "settings",
+          "idlType": "ImageDataSettings",
+          "idl": {
+            "name": "ImageDataSettings",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "ImageDataSettings",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "ImageData",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "ImageData",
+        "root": "ImageData",
+        "class": "ImageData",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "putImageData",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_put_image_data_3",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvImageData*",
+          "name": "imagedata"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "dx"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "dy"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "imagedata",
+          "idlType": "ImageData",
+          "idl": {
+            "name": "ImageData",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "ImageData",
+            "root": "ImageData",
+            "class": "ImageData",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dx",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dy",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "CanvasRenderingContext2D",
+      "member": "putImageData",
+      "contractOwner": "CanvasRenderingContext2D",
+      "kind": "operation",
+      "function": "rv_dom_canvas_rendering_context2_d_put_image_data_7",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvCanvasRenderingContext2D*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvImageData*",
+          "name": "imagedata"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "dx"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "dy"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "dirty_x"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "dirty_y"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "dirty_width"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "dirty_height"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "imagedata",
+          "idlType": "ImageData",
+          "idl": {
+            "name": "ImageData",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "ImageData",
+            "root": "ImageData",
+            "class": "ImageData",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dx",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dy",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dirtyX",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dirtyY",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dirtyWidth",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "dirtyHeight",
+          "idlType": "long",
+          "idl": {
+            "name": "long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ImageData",
+      "member": "width",
+      "contractOwner": "ImageData",
+      "kind": "getter",
+      "function": "rv_dom_image_data_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvImageData*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "ImageData",
+      "member": "height",
+      "contractOwner": "ImageData",
+      "kind": "getter",
+      "function": "rv_dom_image_data_get_height",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvImageData*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "DOMCSSNamespace",
       "member": "supports",
       "contractOwner": "CSS",
@@ -151265,6 +152916,22 @@
       {},
       "Modules/highlight/Highlight.idl"
     ],
+    "PredefinedColorSpace": [
+      [
+        "srgb",
+        "srgb-linear"
+      ],
+      {},
+      "html/canvas/PredefinedColorSpace.idl"
+    ],
+    "ImageDataPixelFormat": [
+      [
+        "rgba-unorm8",
+        "rgba-float16"
+      ],
+      {},
+      "html/ImageDataPixelFormat.idl"
+    ],
     "OrientationType": [
       [
         "portrait-primary",
@@ -153586,6 +155253,82 @@
         ]
       },
       "releaseFunction": "rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "HTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLImageElement",
+            "root": null,
+            "class": "HTMLImageElement",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "HTMLCanvasElement",
+            "root": null,
+            "class": "HTMLCanvasElement",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "node",
+            "ctype": null,
+            "interface": "SVGImageElement",
+            "root": null,
+            "class": "SVGImageElement",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "ImageBitmap",
+            "root": "ImageBitmap",
+            "class": "ImageBitmap",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSStyleImageValue",
+            "root": "CSSStyleValue",
+            "class": "CSSStyleImageValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release"
     },
     {
       "mapping": {
@@ -157621,6 +159364,7 @@
         }
       }
     ],
+    "ImageDataSettings": [],
     "DOMCSSCustomPropertyDescriptor": [
       {
         "name": "name",

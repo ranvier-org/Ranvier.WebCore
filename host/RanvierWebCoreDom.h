@@ -93,6 +93,8 @@ typedef struct RvHighlightRegistry RvHighlightRegistry;
 typedef struct RvCanvasRenderingContext2D RvCanvasRenderingContext2D;
 typedef struct RvCanvasGradient RvCanvasGradient;
 typedef struct RvCanvasPattern RvCanvasPattern;
+typedef struct RvImageData RvImageData;
+typedef struct RvImageBitmap RvImageBitmap;
 typedef struct RvDomUnionNodeOrDOMString RvDomUnionNodeOrDOMString;
 typedef struct RvDomSequenceNodeOrDOMString RvDomSequenceNodeOrDOMString;
 typedef struct RvDomSequenceCSSStyleSheet RvDomSequenceCSSStyleSheet;
@@ -146,6 +148,7 @@ typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVString
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
+typedef struct RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -398,12 +401,24 @@ enum {
     RV_DOM_HIGHLIGHT_TYPE_GRAMMAR_ERROR = 2, /* "grammar-error" */
 };
 
+/* The values of the IDL enumeration ImageDataPixelFormat. */
+enum {
+    RV_DOM_IMAGE_DATA_PIXEL_FORMAT_RGBA_UNORM8 = 0, /* "rgba-unorm8" */
+    RV_DOM_IMAGE_DATA_PIXEL_FORMAT_RGBA_FLOAT16 = 1, /* "rgba-float16" */
+};
+
 /* The values of the IDL enumeration OrientationType. */
 enum {
     RV_DOM_ORIENTATION_TYPE_PORTRAIT_PRIMARY = 0, /* "portrait-primary" */
     RV_DOM_ORIENTATION_TYPE_PORTRAIT_SECONDARY = 1, /* "portrait-secondary" */
     RV_DOM_ORIENTATION_TYPE_LANDSCAPE_PRIMARY = 2, /* "landscape-primary" */
     RV_DOM_ORIENTATION_TYPE_LANDSCAPE_SECONDARY = 3, /* "landscape-secondary" */
+};
+
+/* The values of the IDL enumeration PredefinedColorSpace. */
+enum {
+    RV_DOM_PREDEFINED_COLOR_SPACE_SRGB = 0, /* "srgb" */
+    RV_DOM_PREDEFINED_COLOR_SPACE_SRGB_LINEAR = 1, /* "srgb-linear" */
 };
 
 /* The values of the IDL enumeration ScrollBehavior. */
@@ -871,6 +886,12 @@ typedef struct RvDomURLPatternResult {
     const RvDomURLPatternComponentResult* hash; /* URLPatternComponentResult, NULL for absent */
 } RvDomURLPatternResult;
 
+/* The IDL dictionary ImageDataSettings. size is sizeof(RvDomImageDataSettings) as the caller compiles it; a field past
+ * size takes its IDL default, so fields can be added at the end. */
+typedef struct RvDomImageDataSettings {
+    uint32_t size;
+} RvDomImageDataSettings;
+
 /* The IDL dictionary DOMCSSCustomPropertyDescriptor. size is sizeof(RvDomDOMCSSCustomPropertyDescriptor) as the caller compiles it; a field past
  * size takes its IDL default, so fields can be added at the end. */
 typedef struct RvDomDOMCSSCustomPropertyDescriptor {
@@ -966,6 +987,7 @@ typedef struct RvDomPairUSVStringAndUnionUndefinedOrUSVString RvDomPairUSVString
 typedef struct RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString;
 typedef struct RvDomSequenceAbstractRange RvDomSequenceAbstractRange;
 typedef struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern;
+typedef struct RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue;
 typedef struct RvDomSequenceCSSStyleValue RvDomSequenceCSSStyleValue;
 typedef struct RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement;
 typedef struct RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement;
@@ -1545,6 +1567,25 @@ struct RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern {
 
 /* Inputs borrow their pointers. Results own strings and handle references until the matching release.
  * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
+enum {
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_IMAGE_ELEMENT = 1,
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_HTML_CANVAS_ELEMENT = 2,
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_SVG_IMAGE_ELEMENT = 3,
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_IMAGE_BITMAP = 4,
+    RV_DOM_UNION_HTML_IMAGE_ELEMENT_OR_HTML_CANVAS_ELEMENT_OR_SVG_IMAGE_ELEMENT_OR_IMAGE_BITMAP_OR_CSS_STYLE_IMAGE_VALUE_CSS_STYLE_IMAGE_VALUE = 5,
+};
+struct RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue {
+    int32_t present;
+    int32_t tag;
+    RvNode* arm0;
+    RvNode* arm1;
+    RvNode* arm2;
+    RvImageBitmap* arm3;
+    RvCSSStyleValue* arm4;
+};
+
+/* Inputs borrow their pointers. Results own strings and handle references until the matching release.
+ * present is 0 for null and 1 for a value; an empty sequence has count 0 and items NULL. */
 struct RvDomSequenceCSSStyleValue {
     int32_t present;
     int32_t count;
@@ -1651,6 +1692,7 @@ RV_EXPORT void rv_dom_pair_usv_string_and_union_undefined_or_usv_string_release(
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_release(RvDomSequencePairUSVStringAndUnionUndefinedOrUSVString* value);
 RV_EXPORT void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* value);
 RV_EXPORT void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value);
+RV_EXPORT void rv_dom_union_html_image_element_or_html_canvas_element_or_svg_image_element_or_image_bitmap_or_css_style_image_value_release(RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* value);
 RV_EXPORT void rv_dom_sequence_css_style_value_release(RvDomSequenceCSSStyleValue* value);
 RV_EXPORT void rv_dom_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomPairUSVStringAndSequenceCSSStyleValueNullableElement* value);
 RV_EXPORT void rv_dom_sequence_pair_usv_string_and_sequence_css_style_value_nullable_element_release(RvDomSequencePairUSVStringAndSequenceCSSStyleValueNullableElement* value);
@@ -1924,6 +1966,14 @@ RV_EXPORT RvCanvasGradient* rv_dom_canvas_gradient_retain(RvCanvasGradient*);
 RV_EXPORT void rv_dom_canvas_pattern_release(RvCanvasPattern*);
 /* Adds a reference to a CanvasPattern and returns it. */
 RV_EXPORT RvCanvasPattern* rv_dom_canvas_pattern_retain(RvCanvasPattern*);
+/* Releases a handle to a ImageData. */
+RV_EXPORT void rv_dom_image_data_release(RvImageData*);
+/* Adds a reference to a ImageData and returns it. */
+RV_EXPORT RvImageData* rv_dom_image_data_retain(RvImageData*);
+/* Releases a handle to a ImageBitmap. */
+RV_EXPORT void rv_dom_image_bitmap_release(RvImageBitmap*);
+/* Adds a reference to a ImageBitmap and returns it. */
+RV_EXPORT RvImageBitmap* rv_dom_image_bitmap_retain(RvImageBitmap*);
 /* Concrete scoped interface name of a CSSRule handle; borrows target. */
 RV_EXPORT int32_t rv_dom_css_rule_get_interface_name(RvCSSRule* target, char* buffer, int32_t capacity, int32_t* length);
 /* Concrete scoped interface name of a StyleSheet handle; borrows target. */
@@ -8257,6 +8307,35 @@ RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_clear_rect(RvCanvasRenderin
 /* CanvasRenderingContext2D.fillRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted
  * double h) -> undefined */
 RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_fill_rect(RvCanvasRenderingContext2D* target, double x, double y, double w, double h);
+/* CanvasRenderingContext2D.drawImage(CanvasImageSource image, unrestricted double dx, unrestricted double dy) ->
+ * undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_draw_image_3(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy);
+/* CanvasRenderingContext2D.drawImage(CanvasImageSource image, unrestricted double dx, unrestricted double dy,
+ * unrestricted double dw, unrestricted double dh) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_draw_image_5(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double dx, double dy, double dw, double dh);
+/* CanvasRenderingContext2D.drawImage(CanvasImageSource image, unrestricted double sx, unrestricted double sy,
+ * unrestricted double sw, unrestricted double sh, unrestricted double dx, unrestricted double dy, unrestricted double
+ * dw, unrestricted double dh) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_draw_image_9(RvCanvasRenderingContext2D* target, const RvDomUnionHTMLImageElementOrHTMLCanvasElementOrSVGImageElementOrImageBitmapOrCSSStyleImageValue* image, double sx, double sy, double sw, double sh, double dx, double dy, double dw, double dh);
+/* CanvasRenderingContext2D.createImageData(long sw, long sh, optional ImageDataSettings settings = {}) -> ImageData;
+ * settings defaults to {} in IDL; settings may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_create_image_data_3(RvCanvasRenderingContext2D* target, int32_t sw, int32_t sh, const RvDomImageDataSettings* settings, RvImageData** result);
+/* CanvasRenderingContext2D.createImageData(ImageData imagedata) -> ImageData; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_create_image_data_1(RvCanvasRenderingContext2D* target, RvImageData* imagedata, RvImageData** result);
+/* CanvasRenderingContext2D.getImageData(long sx, long sy, long sw, long sh, optional ImageDataSettings settings = {})
+ * -> ImageData; settings defaults to {} in IDL; settings may be NULL for the IDL default; *result is a new reference */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_get_image_data(RvCanvasRenderingContext2D* target, int32_t sx, int32_t sy, int32_t sw, int32_t sh, const RvDomImageDataSettings* settings, RvImageData** result);
+/* CanvasRenderingContext2D.putImageData(ImageData imagedata, long dx, long dy) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_put_image_data_3(RvCanvasRenderingContext2D* target, RvImageData* imagedata, int32_t dx, int32_t dy);
+/* CanvasRenderingContext2D.putImageData(ImageData imagedata, long dx, long dy, long dirtyX, long dirtyY, long
+ * dirtyWidth, long dirtyHeight) -> undefined */
+RV_EXPORT int32_t rv_dom_canvas_rendering_context2_d_put_image_data_7(RvCanvasRenderingContext2D* target, RvImageData* imagedata, int32_t dx, int32_t dy, int32_t dirty_x, int32_t dirty_y, int32_t dirty_width, int32_t dirty_height);
+/* ImageData */
+
+/* ImageData.width getter: readonly attribute unsigned long width */
+RV_EXPORT int32_t rv_dom_image_data_get_width(RvImageData* target, uint32_t* result);
+/* ImageData.height getter: readonly attribute unsigned long height */
+RV_EXPORT int32_t rv_dom_image_data_get_height(RvImageData* target, uint32_t* result);
 /* DOMCSSNamespace */
 
 /* CSS.supports: namespace operation with Document context and explicit UTF-8 byte lengths */

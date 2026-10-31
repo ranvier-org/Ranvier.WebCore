@@ -1,0 +1,33 @@
+{
+ "abi": 55,
+ "exports": {
+  "rv_image_data_create": false,
+  "rv_image_data_layout": false,
+  "rv_image_data_read": false,
+  "rv_image_data_write": false,
+  "rv_dom_image_data_get_width": false,
+  "rv_dom_image_data_get_height": false,
+  "rv_dom_image_data_release": false,
+  "rv_dom_image_data_retain": false,
+  "rv_dom_image_bitmap_release": false,
+  "rv_dom_image_bitmap_retain": false,
+  "rv_dom_canvas_rendering_context2_d_create_image_data_3": false,
+  "rv_dom_canvas_rendering_context2_d_create_image_data_1": false,
+  "rv_dom_canvas_rendering_context2_d_get_image_data": false,
+  "rv_dom_canvas_rendering_context2_d_put_image_data_3": false,
+  "rv_dom_canvas_rendering_context2_d_put_image_data_7": false,
+  "rv_dom_canvas_rendering_context2_d_draw_image_3": false,
+  "rv_dom_canvas_rendering_context2_d_draw_image_5": false,
+  "rv_dom_canvas_rendering_context2_d_draw_image_9": false
+ },
+ "abiHas": {
+  "canvas-context": 1,
+  "canvas-pixels": 0,
+  "dom:ImageData": 0,
+  "dom:ImageBitmap": 0,
+  "dom:CanvasRenderingContext2D": 1
+ },
+ "getContext": 0,
+ "getImageDataReachable": false,
+ "red": true
+}

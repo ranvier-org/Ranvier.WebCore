@@ -6,6 +6,7 @@
 #include "RanvierEventGlue.h"
 #include "RanvierViewportGlue.h"
 #include "RanvierCanvasGlue.h"
+#include "RanvierCanvasPixelsGlue.h"
 #include "RanvierInspectGlue.h"
 #include <atomic>
 #include <string>
@@ -1367,6 +1368,8 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "diagnostics"))
         return 1;
     if (!std::strcmp(feature, "canvas-context"))
+        return 1;
+    if (!std::strcmp(feature, "canvas-pixels"))
         return 1;
     if (!std::strcmp(feature, "cascade-diagnostics"))
         return 1;
@@ -6031,4 +6034,40 @@ int32_t rv_canvas_context_2d_attributes(RvCanvasRenderingContext2D* context, RvC
     if (!onOwningThread())
         return RV_ERR_WRONG_THREAD;
     return ranvier_canvas_context_2d_attributes(context, settings);
+}
+
+int32_t rv_image_data_create(uint32_t width, uint32_t height, const uint8_t* bytes, int64_t length, int32_t colorSpace, int32_t pixelFormat, RvImageData** result)
+{
+    if (!result || (!bytes && length))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_image_data_create(width, height, bytes, length, colorSpace, pixelFormat, result);
+}
+
+int32_t rv_image_data_layout(RvImageData* data, RvImageDataLayout* layout)
+{
+    if (!data || !layout)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_image_data_layout(data, layout);
+}
+
+int32_t rv_image_data_read(RvImageData* data, int64_t offset, uint8_t* buffer, int64_t length)
+{
+    if (!data || (!buffer && length))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_image_data_read(data, offset, buffer, length);
+}
+
+int32_t rv_image_data_write(RvImageData* data, int64_t offset, const uint8_t* bytes, int64_t length)
+{
+    if (!data || (!bytes && length))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_image_data_write(data, offset, bytes, length);
 }

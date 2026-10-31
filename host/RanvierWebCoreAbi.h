@@ -1856,6 +1856,42 @@ RV_EXPORT int32_t rv_canvas_get_context(RvNode* canvas, int32_t type, const RvCa
  * settings unchanged, when settings->size is below sizeof(RvCanvas2DSettings). */
 RV_EXPORT int32_t rv_canvas_context_2d_attributes(RvCanvasRenderingContext2D* context, RvCanvas2DSettings* settings);
 
+/* v55: "canvas-pixels" for rv_abi_has: ImageData construction and pixel bytes without JavaScript. RvImageData is the
+ * generated ImageData handle, released with rv_dom_image_data_release; RanvierWebCoreDom.h holds its generated members
+ * and the generated createImageData, getImageData, putImageData and drawImage of CanvasRenderingContext2D. */
+typedef struct RvImageData RvImageData;
+
+/* The layout of an ImageData's pixels. Rows run top to bottom with no padding, so rowBytes is width * bytesPerPixel.
+ * Each pixel holds R, G, B and A in that order, and the colour channels are not premultiplied by alpha. colorSpace is
+ * an RV_CANVAS_COLOR_SPACE_* value, and pixelFormat an RV_DOM_IMAGE_DATA_PIXEL_FORMAT_* value with 4 bytes per pixel
+ * for rgba-unorm8. byteLength is 0 for detached data. size is sizeof(RvImageDataLayout). */
+typedef struct RvImageDataLayout {
+    int32_t size;
+    uint32_t width;
+    uint32_t height;
+    int32_t colorSpace;
+    int32_t pixelFormat;
+    int32_t bytesPerPixel;
+    int64_t rowBytes;
+    int64_t byteLength;
+} RvImageDataLayout;
+
+/* new ImageData(width, height) when bytes is NULL and length 0, else new ImageData(data, width, height) over a copy of
+ * length bytes in the layout of RvImageDataLayout. *result is a new reference. The DOM exceptions are those of the
+ * constructor: IndexSizeError for a zero dimension or a length that does not match width and height, InvalidStateError
+ * for a length that is not a non-zero multiple of 4, and RangeError for a size the engine cannot allocate. Returns
+ * RV_ERR_UNSUPPORTED for a colour space other than sRGB or a pixel format other than rgba-unorm8. */
+RV_EXPORT int32_t rv_image_data_create(uint32_t width, uint32_t height, const uint8_t* bytes, int64_t length, int32_t colorSpace, int32_t pixelFormat, RvImageData** result);
+/* Writes the layout of data. Returns RV_ERR_UNSUPPORTED, with layout unchanged, when layout->size is below
+ * sizeof(RvImageDataLayout). */
+RV_EXPORT int32_t rv_image_data_layout(RvImageData* data, RvImageDataLayout* layout);
+/* Copies length bytes of the pixels from offset into buffer. A range past the end copies nothing and returns
+ * RV_ERR_DOM_EXCEPTION with a RangeError; detached data returns an InvalidStateError. buffer may be NULL for length 0. */
+RV_EXPORT int32_t rv_image_data_read(RvImageData* data, int64_t offset, uint8_t* buffer, int64_t length);
+/* Copies length bytes into the pixels at offset, as data.set(bytes, offset) does. A range past the end writes nothing
+ * and returns RV_ERR_DOM_EXCEPTION with a RangeError; detached data returns an InvalidStateError. */
+RV_EXPORT int32_t rv_image_data_write(RvImageData* data, int64_t offset, const uint8_t* bytes, int64_t length);
+
 #ifdef __cplusplus
 }
 #endif
