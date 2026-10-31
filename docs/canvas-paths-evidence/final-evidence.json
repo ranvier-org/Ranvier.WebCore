@@ -1,0 +1,39 @@
+{
+ "group": "R02 canvas paths and hit testing (ranvier-org/Ranvier.WebCore#91)",
+ "nativeHead": "8e22b0af7eb6f5ee0d35a4a53749cd20e53f7e86",
+ "runtimeSourceHead": "8e22b0af7eb6f5ee0d35a4a53749cd20e53f7e86",
+ "abi": 55,
+ "runtime": {
+  "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+  "RanvierWebCoreHost.dll": "e7f2ae508644d223ae670cadf18b92233c4842c5f664563316660bb0321bd8f1",
+  "WebCore.dll": "8c65f2fe91a1228e0b7e1a469ea141b5599a4b0bc1bfe4fcb0a977ef1f66bb11"
+ },
+ "canvasPathsAssertions": 325,
+ "repeat30": {
+  "runs": 30,
+  "distinct": [
+   "PASS: canvas_paths 325 assertions"
+  ]
+ },
+ "fullBatchRaw": 91273,
+ "probes": 65,
+ "teardownProbes": 106,
+ "files": {
+  "baseline-r01-results.json": "30dca2dd3509fcf21a6571c60ad06ccf1022d2edc9ad93c3bd706192e0bac2a8",
+  "batch-results.json": "1fce79b4bca189a42c97219325677f5e98e0bf5d3c5a6cb5be8223f35bc66034",
+  "build_paths_candidate.py": "3532cb4063505ad646ebc2500e38f2e6dfe374aed3f7969fea7b2283040027fe",
+  "canvas-paths-repeat30.txt": "cf5d75428d355ad4986599abb7cb93cec07a817ff3bba835f6cd0a319904a528",
+  "canvas-paths-report.json": "82d20cd0f539667a75a9d60dd8dff65d68d852b1abc0bffbcdfc75480c2af0fa",
+  "gen-delta.txt": "3d43369a893bfbf9918d21b930840e48e7f68faacbed5c116cf25c4f4202ceaa",
+  "make_paths_evidence.py": "a14bd00b06284e8809c302cc6571ee403e3ef0b4ca97f5e96c001b7387c04614",
+  "red-chromium.json": "ef80ac6389debc7c7f52b8926cd2d7f8991f0b11a3ea8df2e3bdb994c198ca6e",
+  "red-native.json": "599e3a4c981985db0f29e7b1df35e060501a09a272dcae9855cbd347ea6babbe",
+  "red_chromium.mjs": "9482866c8c489719a2dd739e8e344015aa12bc02f87c5921b31dff48d823461b",
+  "red_native.py": "92e8c5e34907cf7127f445ba843280e4b5397e4e393715286f23c8c2478ee7ea",
+  "repeat30.sh": "33501eac2045ebbe187d895cdd9cd49d5f0a57b4a75ea6b5c4585f77b584ce10",
+  "run_paths_full_batch.py": "620ffc28fc609bdaaa716d90d8417510be3bdcf2456d4c180eb02c0182c7a8ee",
+  "runtime-receipt.json": "9a1d1b975445834636bf6855c08abf0b00e02b358e1f728845eab29310b11895",
+  "source-patches.json": "8067c551064e4709721a5e1136d81601726e72599bf4e79942c3125693a037d6",
+  "teardown-probes.json": "3a2481b4a66ecacfee964dafaeab20b96adb02e55175b912b57ae1639b4ea015"
+ }
+}
