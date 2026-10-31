@@ -84,5 +84,6 @@ try {
 } finally {
   await browser.close();
 }
-writeFileSync(new URL('../fixtures/intersection-observation-oracle.json', import.meta.url), JSON.stringify(result, null, 1) + '\n');
+// ORACLE_OUT writes a repeat run elsewhere, for comparison with the committed oracle.
+writeFileSync(process.env.ORACLE_OUT || new URL('../fixtures/intersection-observation-oracle.json', import.meta.url), JSON.stringify(result, null, 1) + '\n');
 console.log('ORACLE intersection-observation: ' + cases.scenarios.length + ' scenarios + ' + cases.qualifiedScenarios.length + ' qualified, Chromium ' + result.browser);
