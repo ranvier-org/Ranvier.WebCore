@@ -1261,6 +1261,8 @@ static_assert(sizeof(void*) != 8 || (sizeof(RvTextSegments) == 32 && offsetof(Rv
 static_assert(sizeof(void*) != 8 || (sizeof(RvEventInit) == 112 && offsetof(RvEventInit, screenX) == 24 && offsetof(RvEventInit, key) == 64
     && offsetof(RvEventInit, relatedTarget) == 96 && offsetof(RvEventInit, customDetailJson) == 104));
 
+static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
+
 int32_t rv_abi_version(void) { return 45; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.

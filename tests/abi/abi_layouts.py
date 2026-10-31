@@ -20,6 +20,9 @@ LAYOUTS = {
                      ('screenX', D), ('screenY', D), ('clientX', D), ('clientY', D), ('button', I), ('buttons', I), ('key', P),
                      ('code', P), ('location', I), ('repeat', I), ('isComposing', I), ('relatedTarget', P), ('customDetailJson', P)],
                     112, [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56, 60, 64, 72, 80, 84, 88, 96, 104], 'EventInit'),
+    # Views mirrors RvWindowMetrics as WindowMetrics in Ranvier.View.WebCore/Viewport.fs; its fixture checks the mirror.
+    'RvWindowMetrics': ([('size', I), ('innerWidth', I), ('innerHeight', I), ('outerWidth', I), ('outerHeight', I),
+                         ('devicePixelRatio', D)], 32, [0, 4, 8, 12, 16, 24], None),
 }
 
 
@@ -36,10 +39,12 @@ def main():
         struct = type(name, (ctypes.Structure,), {'_fields_': fields})
         assert ctypes.sizeof(struct) == size, name + ' size ' + str(ctypes.sizeof(struct))
         assert [getattr(struct, f).offset for f, _ in fields] == offsets, name + ' offsets'
-        block = re.search(r'type ' + fsharp + r' =\s*\n((?:\s+val mutable .*\n)+)', native)
-        assert block, fsharp + ' in Native.fs'
-        assert len(re.findall(r'val mutable', block.group(1))) == len(fields), fsharp + ' field count'
-        checks += 4
+        checks += 3
+        if fsharp:
+            block = re.search(r'type ' + fsharp + r' =\s*\n((?:\s+val mutable .*\n)+)', native)
+            assert block, fsharp + ' in Native.fs'
+            assert len(re.findall(r'val mutable', block.group(1))) == len(fields), fsharp + ' field count'
+            checks += 1
     print(f'PASS abi_layouts: {checks} assertions', flush=True)
 
 
