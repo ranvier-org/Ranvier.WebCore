@@ -388,7 +388,7 @@ def main():
     report = verify(arguments.native_directory)
     if arguments.report:
         Path(arguments.report).write_text(json.dumps(report, indent=1) + '\n', encoding='utf-8')
-    print('coordinate spaces: %d assertions; max errors %s' % (report['assertions'], {k: round(v, 6) for k, v in report['maxError'].items()}))
+    print('coordinate spaces PASS: %d assertions; max errors %s' % (report['assertions'], {k: round(v, 6) for k, v in report['maxError'].items()}))
     print('COORDINATE_SPACES=PASS')
 
 
