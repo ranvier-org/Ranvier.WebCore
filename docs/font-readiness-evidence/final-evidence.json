@@ -1,0 +1,242 @@
+{
+  "group": [
+    "T01 font loading/readiness (ranvier-org/Ranvier.WebCore#72)",
+    "R09 image readiness and decoding (ranvier-org/Ranvier.WebCore#97)"
+  ],
+  "native": "0.1.0-preview.46",
+  "abi": 54,
+  "abiNote": "placeholder: ABI stays 54; the integration batch assigns the number",
+  "features": [
+    "font-readiness (new)",
+    "image-decode (existing, R09 adds no export)"
+  ],
+  "members": [
+    "rv_fonts_status",
+    "rv_fonts_check",
+    "rv_fonts_load",
+    "rv_fonts_ready",
+    "rv_fonts_watch",
+    "rv_fonts_unwatch",
+    "RV_FONTS_LOADED/LOADING",
+    "RV_FONTS_EVENT_LOADING/LOADINGDONE/LOADINGERROR",
+    "RvFontsEventCallback",
+    "RvFontsWatch"
+  ],
+  "sourcePatch": "none: CSSFontFaceSet FontEventClient and a native window load listener in host/RanvierResourceGlue.cpp",
+  "qualifications": [
+    "The engine dispatches only the loading DOM event on document.fonts; rv_fonts_watch synthesizes loadingdone and loadingerror from FontEventClient, matching the spec and Chromium, while DOM listeners in the slim document see only loading.",
+    "A watch created during a loading period receives LOADING at once; its LOADINGDONE/LOADINGERROR list only faces that finished after it was created.",
+    "rv_fonts_load succeeds with the number of matching faces, not the FontFace objects."
+  ],
+  "sourceHeadOfBatch": "ffb6cd95005ccad5c87d180317ac6af9b6ce30cc",
+  "baseline": {
+    "batch": "C:\\wk\\native-cascade-shadow\\artifacts\\native46-candidate-6-batch",
+    "head": "ed60fd4",
+    "rawAssertions": 90743,
+    "teardownCases": 104
+  },
+  "red": {
+    "native": "red-native.json (red_native.py)",
+    "chromium": "oracle-chromium.json (oracle_chromium.mjs)",
+    "image": "../image-readiness-evidence/red-native.json (red_native.py)",
+    "finding": "ABI54 has no font-readiness feature or FontFaceSet exports: a late @font-face shows only as a width change 57.77 -> 80; rv_image_decode already waits for a held image and the box paints red after it"
+  },
+  "green": {
+    "fontReadinessAssertions": 82,
+    "imageReadinessAssertions": 23,
+    "fontReport": {
+      "fallbackWidth": 57.7734375,
+      "eventsWhileHeld": [
+        [
+          1,
+          0,
+          []
+        ]
+      ],
+      "late": {
+        "load": [
+          [
+            11,
+            0,
+            1,
+            0
+          ]
+        ],
+        "ready": [
+          [
+            10,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "readyWidth": 80.0,
+      "failed": {
+        "broken": [
+          [
+            20,
+            1,
+            0,
+            0
+          ]
+        ],
+        "missing": [
+          [
+            21,
+            1,
+            0,
+            0
+          ]
+        ]
+      },
+      "failedEvents": [
+        [
+          1,
+          0,
+          []
+        ],
+        [
+          1,
+          1,
+          []
+        ],
+        [
+          1,
+          2,
+          [
+            "RvBroken",
+            "RvMissing"
+          ]
+        ]
+      ]
+    },
+    "fontEvents": [
+      [
+        1,
+        0,
+        []
+      ],
+      [
+        1,
+        1,
+        [
+          "RvLate"
+        ]
+      ],
+      [
+        1,
+        0,
+        []
+      ],
+      [
+        1,
+        1,
+        []
+      ],
+      [
+        1,
+        2,
+        [
+          "RvBroken",
+          "RvMissing"
+        ]
+      ],
+      [
+        1,
+        0,
+        []
+      ],
+      [
+        1,
+        1,
+        [
+          "Rv\u00e9\u5b57"
+        ]
+      ],
+      [
+        1,
+        0,
+        []
+      ],
+      [
+        1,
+        1,
+        [
+          "RvHeld"
+        ]
+      ],
+      [
+        2,
+        0,
+        []
+      ]
+    ],
+    "imageReport": {
+      "red": [
+        [
+          1,
+          0,
+          4,
+          4
+        ]
+      ],
+      "failed": [
+        [
+          2,
+          1,
+          0,
+          0
+        ]
+      ],
+      "dropped": [
+        [
+          3,
+          3,
+          0,
+          0
+        ]
+      ]
+    },
+    "repeats": 60,
+    "repeatsDistinct": [
+      "PASS font readiness: 82 assertions",
+      "PASS image readiness: 23 assertions"
+    ],
+    "imageReadinessOnParentAbi54": "../image-readiness-evidence/parent-runtime.json",
+    "probes": 63,
+    "allExitZero": true,
+    "rawAssertions": 90848,
+    "baselineProbesSameCount": true,
+    "changedCounts": [],
+    "newProbes": [
+      "font_readiness",
+      "image_readiness"
+    ],
+    "teardownCases": 104,
+    "teardownAllCollected": true
+  },
+  "files": {
+    "font-readiness-evidence/baseline-comparison.json": "66695d62d9755b1c076c57114125ac748bb185ca94b4c9b7cb9e714976578152",
+    "font-readiness-evidence/batch-green.json": "71b1c6c64dfdf19a1dfcc630f95c845619b37f72eeef824da17f5a6a54ff3dce",
+    "font-readiness-evidence/build-receipt.json": "95429a782faee5ad4ca30bded7a6516d466679c74350c0a012ecdaecae0f02d5",
+    "font-readiness-evidence/build_fonts_candidate.py": "416bda6afc97c1a5009a752e452296bfd8cf6c82ec1e1c0b6ac2f4f6f65cad8f",
+    "font-readiness-evidence/font-readiness-probe.log": "533d42a2a3efcac02a91ce838b370934548496cb4698e8872449f5703127b817",
+    "font-readiness-evidence/font-readiness-report.json": "f1b718b3f076fea210f70f130ac4d3a298640345d78531a50099d7fec2f28c9d",
+    "font-readiness-evidence/image-readiness-probe.log": "2d68e9faada61400b692ba6d82c4547e10a012e95bffaa9e95d0b2787e83cf88",
+    "font-readiness-evidence/make_fonts_evidence.py": "40ede267f42e752f6c72252bc93e4587481494d068444f5f2a2572fafc380a91",
+    "font-readiness-evidence/oracle-chromium.json": "bbe8a778a1f70d20658ff412a84e11b8f72c5a9046657ee8a33537e0adab5bc9",
+    "font-readiness-evidence/oracle_chromium.mjs": "6b96bec85e614c3ad3a1838f25d4a397a1379f7fa8a974b4a8307b0e78a87e1e",
+    "font-readiness-evidence/red-native.json": "7d844b8f3a3b5a4a429eff947a839428ad8dbfcc900f470e7ad605e8f0795586",
+    "font-readiness-evidence/red_native.py": "51419e217711dfb20300e36f0584a5008fc406527ac1824e33e2d0a911027966",
+    "font-readiness-evidence/repeat30-runs.txt": "8d3d7b1f9ae6e22d0f51df2545be54568d5c5fdc9f636ec30fcb742900eea3ec",
+    "font-readiness-evidence/run_fonts_full_batch.py": "7d2d2a5dcf7f433e09414badf4fa92febaf441b6b6ed395ac08ef84876bd7a35",
+    "font-readiness-evidence/runtime-receipt.json": "8fa0652d848b52eb0dfff4c7b22500c3d91b449b3d3bb3fbc2968ed0c39a61b0",
+    "font-readiness-evidence/source-patches.json": "b08c5e50e3b20b4522e08f0242513c27768efa4166c1a9ed8c1a6826b6799a66",
+    "font-readiness-evidence/teardown-probes.json": "5483c939d925c8cc0f30c1cba7ddaad63258da92a314e64be68ea35fcde86432",
+    "image-readiness-evidence/image-readiness-report.json": "705328f7f82528c09d760eb35e147d8dfd35f0fb174de8d86b79310d8f7fcae0",
+    "image-readiness-evidence/parent-runtime.json": "705328f7f82528c09d760eb35e147d8dfd35f0fb174de8d86b79310d8f7fcae0",
+    "image-readiness-evidence/red-native.json": "0890c923831391f2caec8fd3c576f7db8910562e6fd1fcb48f5252b8e675ac77",
+    "image-readiness-evidence/red_native.py": "fb889d895c8dd427bf8a852d8df460df95f9841c827fe454527c3dd424092406"
+  }
+}

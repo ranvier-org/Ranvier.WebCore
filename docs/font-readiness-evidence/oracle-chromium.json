@@ -1,0 +1,136 @@
+{
+ "browser": "156.0.8078.4",
+ "steps": [
+  {
+   "name": "late font requested, response held",
+   "status": "loading",
+   "width": 43.984375,
+   "check": false,
+   "checkUnknown": true,
+   "faces": [
+    "RvLate:loading",
+    "RvBroken:unloaded",
+    "RvMissing:unloaded"
+   ],
+   "log": [
+    [
+     "ready",
+     "loaded"
+    ],
+    [
+     "loading",
+     []
+    ]
+   ]
+  },
+  {
+   "name": "late font served",
+   "status": "loaded",
+   "width": 80,
+   "check": true,
+   "checkUnknown": true,
+   "faces": [
+    "RvLate:loaded",
+    "RvBroken:unloaded",
+    "RvMissing:unloaded"
+   ],
+   "log": [
+    [
+     "ready",
+     "loaded"
+    ],
+    [
+     "loading",
+     []
+    ],
+    [
+     "window load",
+     "loading"
+    ],
+    [
+     "loadingdone",
+     [
+      "RvLate:loaded"
+     ]
+    ],
+    [
+     "ready (taken while loading)",
+     "loaded",
+     80
+    ]
+   ]
+  },
+  {
+   "name": "broken and missing settled",
+   "status": "loaded",
+   "width": 80,
+   "check": true,
+   "checkUnknown": true,
+   "faces": [
+    "RvLate:loaded",
+    "RvBroken:error",
+    "RvMissing:error"
+   ],
+   "log": [
+    [
+     "ready",
+     "loaded"
+    ],
+    [
+     "loading",
+     []
+    ],
+    [
+     "window load",
+     "loading"
+    ],
+    [
+     "loadingdone",
+     [
+      "RvLate:loaded"
+     ]
+    ],
+    [
+     "ready (taken while loading)",
+     "loaded",
+     80
+    ],
+    [
+     "loading",
+     []
+    ],
+    [
+     "loadingdone",
+     []
+    ],
+    [
+     "loadingerror",
+     [
+      "RvBroken:error",
+      "RvMissing:error"
+     ]
+    ]
+   ]
+  }
+ ],
+ "checkSyntax": "SyntaxError",
+ "loadSyntax": "SyntaxError",
+ "loadNoMatch": 0,
+ "lateLoad": [
+  "resolved",
+  [
+   "RvLate"
+  ]
+ ],
+ "brokenLoad": [
+  "rejected",
+  "NetworkError"
+ ],
+ "missingLoad": [
+  "rejected",
+  "NetworkError"
+ ],
+ "loadSucceededAgain": [
+  "loaded"
+ ]
+}

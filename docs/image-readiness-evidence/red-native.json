@@ -1,0 +1,45 @@
+{
+ "runtimeSha256": "30d05791c6c94a62adaa449b8d1f544c5f85f1ffab4b128c01dbc5e1ccf0000c",
+ "abi": 54,
+ "steps": [
+  {
+   "name": "response held",
+   "results": [],
+   "held": 1,
+   "pixel": [
+    0,
+    [
+     255,
+     255,
+     255,
+     255
+    ]
+   ]
+  },
+  {
+   "name": "response served",
+   "results": [
+    [
+     0,
+     4,
+     4
+    ]
+   ],
+   "pixel": [
+    0,
+    [
+     255,
+     0,
+     0,
+     255
+    ]
+   ]
+  }
+ ],
+ "features": {
+  "image-decode": 1,
+  "font-load": 1
+ },
+ "decodeStatus": 0,
+ "note": "ABI54 rv_image_decode already waits for a delayed response and settles once; the painted box is red after SUCCEEDED."
+}

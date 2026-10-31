@@ -1346,6 +1346,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "font-load"))
         return 1;
+    if (!std::strcmp(feature, "font-readiness"))
+        return 1;
     if (!std::strcmp(feature, "event-construction"))
         return 1;
     if (!std::strcmp(feature, "input-state"))
@@ -1823,6 +1825,67 @@ int32_t rv_resource_cancel(uint64_t operation)
 int32_t rv_resource_release(uint64_t operation)
 {
     return ranvier_resource_release(operation);
+}
+
+int32_t rv_fonts_status(RvHost* host, int32_t* status)
+{
+    if (!host || !status)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_status(reinterpret_cast<RvNode*>(&host->document()), status);
+}
+
+int32_t rv_fonts_check(RvHost* host, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, int32_t* loaded)
+{
+    if (!host || !font || font_length < 0 || text_length < 0 || (text_length && !text) || !loaded)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_check(reinterpret_cast<RvNode*>(&host->document()), font, font_length, text, text_length, loaded);
+}
+
+int32_t rv_fonts_load(RvHost* host, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !font || font_length < 0 || text_length < 0 || (text_length && !text) || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_load(reinterpret_cast<RvNode*>(&host->document()), font, font_length, text, text_length, completion, context, operation);
+}
+
+int32_t rv_fonts_ready(RvHost* host, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_ready(reinterpret_cast<RvNode*>(&host->document()), completion, context, operation);
+}
+
+int32_t rv_fonts_watch(RvHost* host, RvFontsEventCallback callback, void* context, RvFontsWatch** watch)
+{
+    if (!host || !callback || !watch)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_fonts_watch(reinterpret_cast<RvNode*>(&host->document()), callback, context, watch);
+}
+
+void rv_fonts_unwatch(RvFontsWatch* watch)
+{
+    if (onOwningThread())
+        ranvier_fonts_unwatch(watch);
 }
 
 int32_t rv_host_scripts_enabled(RvHost* host)
