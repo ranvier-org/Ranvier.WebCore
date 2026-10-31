@@ -1070,6 +1070,38 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
 
             rv_dom_animation_effect_release effect
             fun () -> rv_event_target_release held.Value
+        | "animation promise" ->
+            // Pending ready and finished operations hold the animation; the host's destroy invalidates them, and
+            // neither the operations nor the animation keep the document or the div alive.
+            let mutable duration = RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions()
+            duration.present <- 1
+            duration.tag <- 1
+            duration.arm0 <- 100000.0
+            let mutable keyframes = RvDomSequenceKeyframeNullable()
+            keyframes.present <- 1
+            keyframes.count <- 0
+
+            rv_dom_element_animate (div, [| keyframes |], [| duration |], &held.contents)
+            |> check "Element.animate"
+
+            rv_dom_web_animation_pause held.Value |> check "Animation.pause"
+            let outcomes = Collections.Generic.List<int>()
+            let completion = ResourceCompletion(fun _ outcome _ _ -> outcomes.Add outcome)
+            let pointer = Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate completion
+            let mutable finished = 0UL
+            rv_animation_finished (host, held.Value, pointer, 0n, &finished) |> check "rv_animation_finished"
+            let mutable ready = 0UL
+            rv_animation_ready (host, held.Value, pointer, 0n, &ready) |> check "rv_animation_ready"
+
+            fun () ->
+                // INVALIDATED for both pending promises, delivered by the destroy.
+                if List.ofSeq outcomes <> [ 4; 4 ] then
+                    failwithf "animation promises at destroy: %A" (List.ofSeq outcomes)
+
+                rv_resource_release finished |> check "release finished"
+                rv_resource_release ready |> check "release ready"
+                GC.KeepAlive completion
+                rv_event_target_release held.Value
         | "crypto" ->
             let filled = Array.zeroCreate<byte> 16
 
@@ -1347,6 +1379,7 @@ let run (outDir: string) =
                     "aria relations"
                     "coordinate spaces"
                     "web animation"
+                    "animation promise"
                 ] do
                 for remove in [ false; true ] do
                     releaseAfterDestroy kind remove

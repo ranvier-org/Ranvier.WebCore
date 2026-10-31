@@ -1,0 +1,196 @@
+diff --git a/Source/WebCore/animation/WebAnimation.cpp b/Source/WebCore/animation/WebAnimation.cpp
+index fb39de0..bc27594 100644
+--- a/Source/WebCore/animation/WebAnimation.cpp
++++ b/Source/WebCore/animation/WebAnimation.cpp
+@@ -62,6 +62,7 @@
+ #include "StyleResolver.h"
+ #include "StyledElement.h"
+ #include "ViewTimeline.h"
++#include "WebAnimationPromiseObserver.h"
+ #include "WebAnimationTypes.h"
+ #include "WebAnimationUtilities.h"
+ #include <JavaScriptCore/HeapCellInlines.h>
+@@ -74,6 +75,25 @@ namespace WebCore {
+ 
+ WTF_MAKE_TZONE_ALLOCATED_IMPL(WebAnimation);
+ 
++static WebAnimationPromiseObserver s_promiseObserver;
++
++void setWebAnimationPromiseObserver(WebAnimationPromiseObserver observer)
++{
++    s_promiseObserver = observer;
++}
++
++static void notifyPromiseSettled(WebAnimation& animation, WebAnimationPromiseKind kind, const void* promise, std::optional<ExceptionCode> code)
++{
++    if (s_promiseObserver)
++        s_promiseObserver(animation, kind, promise, code);
++}
++
++static void resolveReadyPromise(WebAnimation& animation, WebAnimation::ReadyPromise& promise)
++{
++    promise.resolve(animation);
++    notifyPromiseSettled(animation, WebAnimationPromiseKind::Ready, &promise, std::nullopt);
++}
++
+ HashSet<CheckedRef<WebAnimation>>& WebAnimation::instances()
+ {
+     static NeverDestroyed<HashSet<CheckedRef<WebAnimation>>> instances;
+@@ -110,7 +130,7 @@ Ref<WebAnimation> WebAnimation::create(Document& document, AnimationEffect* effe
+ void WebAnimation::initialize()
+ {
+     suspendIfNeeded();
+-    m_readyPromise->resolve(*this);
++    resolveReadyPromise(*this, m_readyPromise.get());
+ }
+ 
+ WebAnimation::WebAnimation(Document& document)
+@@ -487,7 +507,7 @@ void WebAnimation::setStartTime(std::optional<WebAnimationTime> newStartTime)
+     if (pending()) {
+         m_timeToRunPendingPauseTask = TimeToRunPendingTask::NotScheduled;
+         m_timeToRunPendingPlayTask = TimeToRunPendingTask::NotScheduled;
+-        m_readyPromise->resolve(*this);
++        resolveReadyPromise(*this, m_readyPromise.get());
+     }
+ 
+     // 11. Run the procedure to update an animation's finished state for animation with the did seek flag set to true, and the synchronously notify flag set to false.
+@@ -613,7 +633,7 @@ ExceptionOr<void> WebAnimation::setCurrentTime(std::optional<WebAnimationTime> s
+         // 4. Cancel the pending pause task.
+         m_timeToRunPendingPauseTask = TimeToRunPendingTask::NotScheduled;
+         // 5. Resolve animation's current ready promise with animation.
+-        m_readyPromise->resolve(*this);
++        resolveReadyPromise(*this, m_readyPromise.get());
+     }
+ 
+     // 3. Run the procedure to update an animation's finished state for animation with the did seek flag set to true, and the synchronously notify flag set to false.
+@@ -866,6 +886,7 @@ void WebAnimation::cancel(Silently silently)
+         // 2. Reject the current finished promise with a DOMException named "AbortError".
+         // 3. Set the [[PromiseIsHandled]] internal slot of the current finished promise to true.
+         if (RefPtr context = scriptExecutionContext(); context && !m_finishedPromise->isFulfilled()) {
++            notifyPromiseSettled(*this, WebAnimationPromiseKind::Finished, &m_finishedPromise.get(), ExceptionCode::AbortError);
+             context->eventLoop().queueMicrotask(context->vm(), [finishedPromise = WTF::move(m_finishedPromise)]() mutable {
+                 finishedPromise->reject(Exception { ExceptionCode::AbortError }, RejectAsHandled::Yes);
+             });
+@@ -987,6 +1008,8 @@ void WebAnimation::resetPendingTasks()
+     // 5. Reject animation's current ready promise with a DOMException named "AbortError".
+     // 6. Set the [[PromiseIsHandled]] internal slot of animation’s current ready promise to true.
+     if (RefPtr context = scriptExecutionContext()) {
++        if (!m_readyPromise->isFulfilled())
++            notifyPromiseSettled(*this, WebAnimationPromiseKind::Ready, &m_readyPromise.get(), ExceptionCode::AbortError);
+         context->eventLoop().queueMicrotask(context->vm(), [readyPromise = WTF::move(m_readyPromise)]() mutable {
+             if (!readyPromise->isFulfilled())
+                 readyPromise->reject(Exception { ExceptionCode::AbortError }, RejectAsHandled::Yes);
+@@ -995,7 +1018,7 @@ void WebAnimation::resetPendingTasks()
+ 
+     // 7. Let animation's current ready promise be the result of creating a new resolved Promise object.
+     m_readyPromise = makeUniqueRef<ReadyPromise>(*this, &WebAnimation::readyPromiseResolve);
+-    m_readyPromise->resolve(*this);
++    resolveReadyPromise(*this, m_readyPromise.get());
+ }
+ 
+ ExceptionOr<void> WebAnimation::finish()
+@@ -1034,13 +1057,13 @@ ExceptionOr<void> WebAnimation::finish()
+         // 2. Cancel the pending pause task.
+         m_timeToRunPendingPauseTask = TimeToRunPendingTask::NotScheduled;
+         // 3. Resolve the current ready promise of animation with animation.
+-        m_readyPromise->resolve(*this);
++        resolveReadyPromise(*this, m_readyPromise.get());
+     }
+ 
+     // 7. If there is a pending play task and start time is resolved, cancel that task and resolve the current ready promise of animation with animation.
+     if (hasPendingPlayTask() && m_startTime) {
+         m_timeToRunPendingPlayTask = TimeToRunPendingTask::NotScheduled;
+-        m_readyPromise->resolve(*this);
++        resolveReadyPromise(*this, m_readyPromise.get());
+     }
+ 
+     // 8. Run the procedure to update an animation's finished state animation with the did seek flag set to true, and the synchronously notify flag set to true.
+@@ -1166,6 +1189,7 @@ void WebAnimation::finishNotificationSteps()
+ 
+     // 2. Resolve animation's current finished promise object with animation.
+     m_finishedPromise->resolve(*this);
++    notifyPromiseSettled(*this, WebAnimationPromiseKind::Finished, &m_finishedPromise.get(), std::nullopt);
+ 
+     // 3. Create an AnimationPlaybackEvent, finishEvent.
+     // 4. Set finishEvent's type attribute to finish.
+@@ -1354,7 +1378,7 @@ void WebAnimation::runPendingPlayTask()
+ 
+     // 4. Resolve animation's current ready promise with animation.
+     if (!m_readyPromise->isFulfilled())
+-        m_readyPromise->resolve(*this);
++        resolveReadyPromise(*this, m_readyPromise.get());
+ 
+     // 5. Run the procedure to update an animation's finished state for animation with the did seek flag set to false, and the synchronously notify flag set to false.
+     timingDidChange(DidSeek::No, SynchronouslyNotify::No, Silently::Yes);
+@@ -1506,7 +1530,7 @@ void WebAnimation::runPendingPauseTask()
+ 
+     // 5. Resolve animation's current ready promise with animation.
+     if (!m_readyPromise->isFulfilled())
+-        m_readyPromise->resolve(*this);
++        resolveReadyPromise(*this, m_readyPromise.get());
+ 
+     // 6. Run the procedure to update an animation's finished state for animation with the did seek flag set to false, and the
+     //    synchronously notify flag set to false.
+diff --git a/Source/WebCore/animation/WebAnimationPromiseObserver.h b/Source/WebCore/animation/WebAnimationPromiseObserver.h
+new file mode 100644
+index 0000000..851fe12
+--- /dev/null
++++ b/Source/WebCore/animation/WebAnimationPromiseObserver.h
+@@ -0,0 +1,45 @@
++/*
++ * Copyright (C) 2026 Ranvier contributors. All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
++ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
++ * THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#pragma once
++
++#include "ExceptionCode.h"
++#include <optional>
++
++namespace WebCore {
++
++class WebAnimation;
++
++enum class WebAnimationPromiseKind : uint8_t { Ready, Finished };
++
++// Called on the main thread each time an animation's ready or finished promise settles: with std::nullopt when it
++// resolves, and with the exception code when the engine rejects it; a rejection is reported when the engine schedules
++// it. promise identifies the settled promise object; it is compared, never dereferenced.
++using WebAnimationPromiseObserver = void (*)(WebAnimation&, WebAnimationPromiseKind, const void* promise, std::optional<ExceptionCode>);
++
++// Installs the process-wide observer, or with nullptr removes it.
++WEBCORE_EXPORT void setWebAnimationPromiseObserver(WebAnimationPromiseObserver);
++
++} // namespace WebCore
+diff --git a/Source/WebCore/Headers.cmake b/Source/WebCore/Headers.cmake
+index d3e12e7..3981569 100644
+--- a/Source/WebCore/Headers.cmake
++++ b/Source/WebCore/Headers.cmake
+@@ -903,6 +903,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
+     animation/ViewTimeline.h
+     animation/ViewTimelineOptions.h
+     animation/WebAnimation.h
++    animation/WebAnimationPromiseObserver.h
+     animation/WebAnimationTime.h
+     animation/WebAnimationTypes.h
+     animation/WebAnimationUtilities.h

@@ -1260,6 +1260,8 @@ enum {
     RV_RESOURCE_DECODE_FAILED = 2,
     RV_RESOURCE_CANCELLED = 3,
     RV_RESOURCE_INVALIDATED = 4,
+    /* The engine rejected the operation with AbortError. */
+    RV_RESOURCE_ABORTED = 5,
 };
 
 /* Receives exactly one terminal outcome per operation on the owning thread. width and height are the image's natural
@@ -1363,6 +1365,17 @@ RV_EXPORT int32_t rv_event_target_equals(RvEventTarget* left, RvEventTarget* rig
  * off the owning thread. It equals (rv_event_target_equals) the handle rv_dom_element_get_animations returns for the
  * same animation; release it with rv_event_target_release. */
 RV_EXPORT RvEventTarget* rv_animation_as_event_target(RvAnimation*);
+/* Animation.ready and Animation.finished without JavaScript ("animation-promises"). animation is a Web Animations
+ * animation handle (rv_dom_element_animate, rv_dom_web_animation_create, rv_animation_as_event_target). Each writes an
+ * operation token that observes the animation's promise current at the call, as the ready or finished attribute
+ * returns it: SUCCEEDED once that promise resolves, also when it is already resolved at the call; ABORTED once the
+ * engine rejects it with AbortError (cancel(), or a reset of the pending tasks). width and height are 0. The
+ * completion is called only from rv_run_loop_cycle, except that rv_resource_cancel and rv_resource_release deliver
+ * CANCELLED before they return. rv_host_destroy and a new document deliver INVALIDATED. A terminal operation holds no
+ * animation. Returns RV_ERR_WRONG_INTERFACE for an event target that is not an animation, and RV_ERR_WRONG_HOST for an
+ * animation of another document than the host's current one. */
+RV_EXPORT int32_t rv_animation_ready(RvHost*, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation);
+RV_EXPORT int32_t rv_animation_finished(RvHost*, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation);
 /* rv_node_add_event_listener for any EventTarget; remove the listener with rv_listener_remove. */
 RV_EXPORT RvListener* rv_event_target_add_listener(RvEventTarget*, const char* type, int32_t flags, RvEventCallback callback, void* context);
 /* rv_node_dispatch for any EventTarget. */

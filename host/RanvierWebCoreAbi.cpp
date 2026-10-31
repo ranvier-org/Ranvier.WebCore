@@ -1343,6 +1343,8 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "font-load"))
         return 1;
+    if (!std::strcmp(feature, "animation-promises"))
+        return 1;
     if (!std::strcmp(feature, "event-construction"))
         return 1;
     if (!std::strcmp(feature, "input-state"))
@@ -1806,6 +1808,27 @@ int32_t rv_font_load(RvHost* host, const char* family, const uint8_t* data, int3
     if (!liveHosts.contains(host))
         return RV_ERR_UNSUPPORTED;
     return ranvier_resource_load_font(reinterpret_cast<RvNode*>(&host->document()), family, data, length, completion, context, operation);
+}
+
+static int32_t animationPromise(RvHost* host, RvEventTarget* animation, int32_t finished, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !animation || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_animation_promise(reinterpret_cast<RvNode*>(&host->document()), animation, finished, completion, context, operation);
+}
+
+int32_t rv_animation_ready(RvHost* host, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return animationPromise(host, animation, 0, completion, context, operation);
+}
+
+int32_t rv_animation_finished(RvHost* host, RvEventTarget* animation, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return animationPromise(host, animation, 1, completion, context, operation);
 }
 
 int32_t rv_resource_cancel(uint64_t operation)

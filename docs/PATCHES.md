@@ -357,6 +357,18 @@ the patch a non-empty `shadowRoots` list returned a text node of the control's u
 `tests/abi/caret_hit.py` replays the Chromium 156 oracle `tests/fixtures/caret-hit-oracle.json` with and without
 `shadowRoots`; its text-control points give `INPUT@1` both ways at device scales 1, 1.5 and 2.
 
+## 0051-web-animation-promise-observer
+
+`WebAnimationPromiseObserver.h` declares `setWebAnimationPromiseObserver`, a process-wide function pointer that
+`WebAnimation.cpp` calls each time a ready or finished promise settles: with no code when it resolves, and with
+`AbortError` when `cancel()` or a reset of the pending tasks schedules its rejection. The engine rejects those promises
+in a microtask, which a host that disallows VM entry never runs, so the observer reports the rejection when it is
+scheduled. The pointer is a file static: no class layout changes, `WebAnimation.h` is untouched, and an unset observer
+leaves the engine's behaviour unchanged. `Headers.cmake` lists the header among the private framework headers.
+
+`tests/abi/animation_lifecycle.py` checks `rv_animation_ready` and `rv_animation_finished` against the Chromium 156
+oracle `tests/fixtures/animation-lifecycle-oracle.json`. Evidence: `docs/animation-lifecycle-evidence/native-evidence.json`.
+
 ## Working on the series
 
 ```

@@ -15,10 +15,13 @@
 //   them. Operations that already reached a terminal outcome keep it and stay registered until released.
 // - A terminal image operation holds no Document, Element or CachedImage. A font operation that succeeded holds its
 //   FontFace in the document's FontFaceSet until release or document invalidation, which remove it.
+// - An animation promise operation is delivered only from a run-loop turn, or by cancel/release; it holds its
+//   animation until its terminal outcome.
 // - A blob read holds its bytes, type and error name from its terminal outcome until release.
 extern "C" {
 WEBCORE_EXPORT int32_t ranvier_resource_decode_image(RvNode* document, RvNode* target, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_resource_load_font(RvNode* document, const char* family, const uint8_t* bytes, int32_t length, RvResourceCompletion, void* context, uint64_t* operation);
+WEBCORE_EXPORT int32_t ranvier_animation_promise(RvNode* document, RvEventTarget* animation, int32_t finished, RvResourceCompletion, void* context, uint64_t* operation);
 WEBCORE_EXPORT int32_t ranvier_resource_cancel(uint64_t operation);
 WEBCORE_EXPORT int32_t ranvier_resource_release(uint64_t operation);
 WEBCORE_EXPORT void ranvier_resource_invalidate_document(RvNode* document);

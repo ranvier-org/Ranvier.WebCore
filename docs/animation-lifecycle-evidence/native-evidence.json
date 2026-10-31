@@ -1,0 +1,73 @@
+{
+  "groups": [
+    "A03 Animation lifecycle/state (#62)",
+    "A10 Typed animation/transition events (#69)"
+  ],
+  "base": {
+    "native": "b95e555 (A01 lane-green)",
+    "parentCandidate": "C:/wk/native-waapi/artifacts/waapi-candidate-3"
+  },
+  "candidate": {
+    "name": "life-candidate-2",
+    "builder": "docs/animation-lifecycle-evidence/build_life_candidate.py",
+    "WebCore.dll": "3a08509df4e3789b3e1599266e34bd4446789af1a1c772b3dcc560e265d83fb1",
+    "RanvierWebCoreHost.dll": "9dcca96cf75583810de2ca846a7236e441a70eda4b673cd0fdb194f937f3e79e",
+    "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+    "recompiled": [
+      "RanvierDomGlue",
+      "RanvierInspectGlue",
+      "RanvierResourceGlue",
+      "UnifiedSource-animation-4 (patch 0051)"
+    ]
+  },
+  "sourcePatch": {
+    "name": "patches/0051-web-animation-promise-observer.patch",
+    "sha256": "e68a584de136c244c7ad23e15c3e7719f94ec63cbf4f76dbef6e466d875ffd13",
+    "appliedBy": "root to C:/wk/src (v2: rejections reported when scheduled)",
+    "layoutChange": false,
+    "units": [
+      "UnifiedSource-animation-4"
+    ]
+  },
+  "abi": {
+    "added": [
+      "rv_animation_ready",
+      "rv_animation_finished",
+      "RV_RESOURCE_ABORTED = 5",
+      "rv_abi_has(\"animation-promises\")"
+    ],
+    "abiVersion": 54,
+    "placeholder": true
+  },
+  "fullBatch": {
+    "raw": 92864,
+    "baselineRaw": 92029,
+    "added": {
+      "animation_lifecycle": 600,
+      "animation_events": 235
+    },
+    "teardownRecords": 108,
+    "teardownAllCollected": true,
+    "everyEarlierCountUnchanged": true,
+    "results": "artifacts/life-candidate-2-batch/results.json"
+  },
+  "repeats": {
+    "animation_lifecycle-repeat30.txt": "91686bc90fc0fdbeb21fc8cf5e27e982d9a29608f167152bf74702ebb969dad3",
+    "animation_events-repeat30.txt": "0d1a741911f5dcc84e3f8e8eaeade9c8c43fbb7fdcd3d1854e74418ac15e7eff",
+    "oracle-repeat30.txt": "bcca99e4f33a47b9e8b9e194d8bcad1534c1474040b8de6d923f7cbf4e78688e"
+  },
+  "oracles": {
+    "browser": "Chromium 156.0.8078.4",
+    "tests/fixtures/animation-lifecycle-oracle.json": "8cdba296670d9b107ee376ec2cf5a79fe16cc545009cd3a37a7f4fa68b0c686e",
+    "tests/fixtures/animation-events-oracle.json": "1f0610161907eaeeee1832973894f250cfd33c635e697f295c50d6e6cf8eb746"
+  },
+  "red": "C:/wk/waapi-life-artifacts/red (chromium.json, native-red-1.json, native-red-events.json, PROPOSAL.md)",
+  "qualifications": [
+    "Under this host WebCore C++ microtasks (EventLoopTaskGroup::queueMicrotask) never run: DisallowVMEntry refuses the drain. The JS-visible AbortError rejection of ready/finished therefore never happens; only the native observer (patch 0051) reports it, when the engine schedules it. The native outcome is the contract. Root follow-up with the VM-entry investigation.",
+    "Completions arrive only from rv_run_loop_cycle (or rv_resource_release/cancel, rv_host_destroy, a new document), while playback and CSS events dispatch inside rv_host_update; probes compare settlement order and event order separately, per animation, plus one cross-animation order (cancel inside a listener).",
+    "WebKit sets the hold time of a pending pause from the ready time, Chromium from the pause() call: currentTime after a pending pause (and the reverse that follows) is compared as presence only.",
+    "A finished animation holds max(previous current time, end): after a late update its currentTime exceeds the end; replace-scenario currentTime is compared as presence only.",
+    "Cancel events (animationcancel, transitioncancel) carry a frame-dependent elapsedTime: presence only. Cross-element event order within one frame differs between engines and is not asserted.",
+    "Hand-written exports rv_event_target_add_listener and rv_host_load_html are still const char* in this tree (#145 Utf8 conversion at integration; strscan lists 2 calls in animation_lifecycle.py)."
+  ]
+}
