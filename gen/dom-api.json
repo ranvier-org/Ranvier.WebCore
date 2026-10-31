@@ -371,6 +371,7 @@
         "InputEvent",
         "KeyboardEvent",
         "MouseEvent",
+        "TouchEvent",
         "AnimationPlaybackEvent",
         "BeforeUnloadEvent",
         "CSSAnimationEvent",
@@ -398,6 +399,7 @@
         "InputEvent",
         "KeyboardEvent",
         "MouseEvent",
+        "TouchEvent",
         "AnimationPlaybackEvent",
         "BeforeUnloadEvent",
         "AnimationEvent",
@@ -1048,6 +1050,18 @@
     {
       "name": "PointerEvent",
       "base": "MouseEvent"
+    },
+    {
+      "name": "Touch",
+      "base": null
+    },
+    {
+      "name": "TouchList",
+      "base": null
+    },
+    {
+      "name": "TouchEvent",
+      "base": "UIEvent"
     },
     {
       "name": "WheelEvent",
@@ -2997,6 +3011,33 @@
       "source": "dom/PointerEvent.idl"
     },
     {
+      "name": "Touch",
+      "idlName": "Touch",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/Touch.idl"
+    },
+    {
+      "name": "TouchList",
+      "idlName": "TouchList",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/TouchList.idl"
+    },
+    {
+      "name": "TouchEvent",
+      "idlName": "TouchEvent",
+      "base": "UIEvent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/TouchEvent.idl"
+    },
+    {
       "name": "WheelEvent",
       "idlName": "WheelEvent",
       "base": "MouseEvent",
@@ -4426,15 +4467,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "html/TimeRanges.idl"
-    },
-    {
-      "name": "TouchEvent",
-      "idlName": "TouchEvent",
-      "base": "UIEvent",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/TouchEvent.idl"
     },
     {
       "name": "ARIAMixin",
@@ -12165,6 +12197,42 @@
     },
     {
       "interface": "Document",
+      "member": "pointerLockElement",
+      "contractOwner": "Document",
+      "kind": "getter",
+      "function": "rv_dom_document_get_pointer_lock_element",
+      "conditional": "ENABLE(POINTER_LOCK)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Element",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Element",
+        "root": null,
+        "class": "Element",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Document",
       "member": "createElement",
       "contractOwner": "Document",
       "kind": "operation",
@@ -14617,6 +14685,85 @@
         "enum": null,
         "label": null,
         "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Document",
+      "member": "createTouchList",
+      "contractOwner": "Document",
+      "kind": "operation",
+      "function": "rv_dom_document_create_touch_list",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceTouch*",
+          "name": "touches"
+        },
+        {
+          "ctype": "RvTouchList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "touches",
+          "idlType": "Touch",
+          "idl": {
+            "name": "Touch",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": true,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceTouch",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Touch sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "Touch",
+                "root": "Touch",
+                "class": "Touch",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "TouchList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TouchList",
+        "root": "TouchList",
+        "class": "TouchList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
         "atom": false,
         "subtypes": []
       },
@@ -113733,6 +113880,648 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "Touch",
+      "member": "clientX",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_client_x",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "clientY",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_client_y",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "screenX",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_screen_x",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "screenY",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_screen_y",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "pageX",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_page_x",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "pageY",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_page_y",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "target",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_target",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "EventTarget",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "EventTarget",
+        "root": null,
+        "class": "EventTarget",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "identifier",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_identifier",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchList",
+      "member": "length",
+      "contractOwner": "TouchList",
+      "kind": "getter",
+      "function": "rv_dom_touch_list_get_length",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouchList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchList",
+      "member": "item",
+      "contractOwner": "TouchList",
+      "kind": "operation",
+      "function": "rv_dom_touch_list_item",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouchList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvTouch**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "Touch",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "Touch",
+        "root": "Touch",
+        "class": "Touch",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "touches",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_touches",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvTouchList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "TouchList",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TouchList",
+        "root": "TouchList",
+        "class": "TouchList",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "targetTouches",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_target_touches",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvTouchList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "TouchList",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TouchList",
+        "root": "TouchList",
+        "class": "TouchList",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "changedTouches",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_changed_touches",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvTouchList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "TouchList",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TouchList",
+        "root": "TouchList",
+        "class": "TouchList",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "ctrlKey",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_ctrl_key",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "shiftKey",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_shift_key",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "altKey",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_alt_key",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "metaKey",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_meta_key",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "WheelEvent",
       "member": "deltaX",
       "contractOwner": "WheelEvent",
@@ -150765,6 +151554,34 @@
         ]
       },
       "releaseFunction": "rv_dom_union_boolean_or_import_node_options_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceTouch",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Touch sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Touch",
+            "root": "Touch",
+            "class": "Touch",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_touch_release"
     },
     {
       "mapping": {

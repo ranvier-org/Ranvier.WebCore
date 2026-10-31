@@ -38,3 +38,7 @@
 0037-frame-loader-client-form-submission-hook.patch
 0038-platform-screen-win-embedder-screen-data.patch
 0039-element-array-attribute-empty-relations.patch
+0044-pointer-event-pen-geometry.patch
+0045-touch-pointer-events-win.patch
+0046-pointer-capture-pen-mouse-path.patch
+0047-navigator-embedder-max-touch-points.patch
