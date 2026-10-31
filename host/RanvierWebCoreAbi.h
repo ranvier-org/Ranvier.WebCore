@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 41.
+ * Ranvier native WebCore C ABI, version 44.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -1379,6 +1379,9 @@ RV_EXPORT int32_t rv_file_list_create(RvBlob* const* files, int32_t count, RvFil
 
 /* "dom-generated" and "dom:<Interface>" for rv_abi_has: the generated functions of RanvierWebCoreDom.h, one per
  * IDL member of the interfaces gen/dom.json lists, from the same library. */
+
+/* v44: "dom-crypto-random" for rv_abi_has: rv_dom_crypto_get_random_values and rv_dom_crypto_random_uuid
+ * (RanvierWebCoreDom.h) call the crypto object of a document's Window. */
 
 #ifdef __cplusplus
 }
