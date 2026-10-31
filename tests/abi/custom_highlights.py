@@ -17,6 +17,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED = 0, -1, -2, -9
@@ -351,7 +352,7 @@ def verify(native_directory, webkit_source, abi, record=None):
             elif name == 'liveRangeShrunk':
                 p.call('rv_dom_range_set_end', [p.pointer, p.pointer, ctypes.c_uint32], state['rr'], f.text, 5)
             elif name == 'textInserted':
-                p.call('rv_dom_character_data_insert_data', [p.pointer, ctypes.c_uint32, ctypes.c_char_p], f.text, 0, b'X ')
+                p.call('rv_dom_character_data_insert_data', [p.pointer, ctypes.c_uint32, Utf8], f.text, 0, b'X ')
             elif name == 'staticAdded':
                 x.add(state['red2'], f.static_range(x, 12, 13))
             elif name == 'rangeRemovedFromHighlight':

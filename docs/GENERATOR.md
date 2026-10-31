@@ -77,9 +77,8 @@ queries borrow a Document and call `DOMCSSNamespace::supports` with its parser s
 namespace and member feature gates all apply. Unselected namespace members stay excluded.
 
 `rv_dom_css_supports_2` tests a property/value pair and `rv_dom_css_supports_1` tests a condition.
-Each string is a `const uint8_t*` plus signed byte length. Empty spans may use NULL; negative lengths,
-NULL with a nonzero length and invalid UTF-8 return `RV_ERR_NULL_ARGUMENT`. Embedded NUL is preserved.
-Existing null-terminated string signatures retain their transport. Failed calls preserve the result.
+Each string is a `const uint8_t*` plus signed byte length, as every generated string input is. Failed calls
+preserve the result.
 
 Run `python -I tests/abi/css_supports.py --native-directory <staged-native-directory>` for real parser,
 complete-input and receiver/thread validation. Every packaged slim CI target runs this probe.
@@ -138,8 +137,8 @@ the member belongs to; the IDL arguments follow in order; the result comes last,
 
 | IDL type | In | Out |
 |---|---|---|
-| `DOMString`, `USVString`, `ByteString` | `const char*`, UTF-8 | `char* buffer, int32_t capacity, int32_t* length`, as `rv_node_get_string`: `*length` -1 for null |
-| a union of strings and Trusted Types, such as `(TrustedHTML or DOMString)` | `const char*`, passed as the union's string | as a string |
+| `DOMString`, `USVString`, `ByteString` | `const uint8_t*` UTF-8 and `int32_t` byte length | `char* buffer, int32_t capacity, int32_t* length`, as `rv_node_get_string`: `*length` -1 for null |
+| a union of strings and Trusted Types, such as `(TrustedHTML or DOMString)` | as a string | as a string |
 | `boolean` | `int32_t` 0 or 1 | `int32_t*` |
 | `byte` ... `unsigned long long` | `int8_t` ... `uint64_t` | the same, by pointer |
 | `float`, `double` (also `unrestricted`) | `float`, `double` | by pointer |
@@ -156,13 +155,19 @@ The object handles are `RvCSSStyleDeclaration`, `RvDOMTokenList`, `RvDOMStringMa
 and `RvValidityState`.
 
 - **Nullable and optional.** A nullable argument, or an optional one without a default, is a pointer, and
-  NULL means null or absent: `const int32_t* force` for `optional boolean force`, `const char*` that may be
-  NULL for `DOMString?`. An optional argument with a default is a plain value; the header comment gives the
-  IDL default. A nullable number or boolean result adds `int32_t* present`, 0 for null.
-- **UTF-8 byte lengths.** A function with `stringInputs` or `interfaceStringInputs` set to `utf8-lengths` takes each
-  string as `const uint8_t*` plus an `int32_t` byte length. An optional string without a default takes length -1
-  for absent, which the member receives as a null `String`. An optional string with a default is passed as a
-  value; the header comment gives the default.
+  NULL means null or absent: `const int32_t* force` for `optional boolean force`. A string takes length -1
+  instead. An optional argument with a default is a plain value; the header comment gives the IDL default. A
+  nullable number or boolean result adds `int32_t* present`, 0 for null.
+- **UTF-8 byte lengths (ABI 51).** Every string input is `const uint8_t*` plus an `int32_t` byte count, so it
+  may hold U+0000. Length -1 is null, or absent for an optional string without a default, which the member
+  receives as a null `String`. These return `RV_ERR_NULL_ARGUMENT`: -1 for a nonnullable string, a length
+  below -1, NULL with a positive length, and invalid UTF-8. NULL with length 0 is the empty string. A string
+  inside a union or sequence is an `RvDomUtf8StringSpan` (`data`, `length`), and a dictionary string field is
+  an `RvDomUtf8StringInput` (`present`, `data`, `length`). The generator rejects a NUL-terminated string
+  input, and the retired keys `stringInputs`, `complexStringSpans`, `interfaceStringInputs` and
+  `dictionaryStringInputs`. `sequenceStringSpans` only names its interfaces' string sequences `Utf8`; those
+  share the layout of the unsuffixed sequences. `browserWellFormedUnions` and `browserWellFormedSetters`
+  select the USVString inputs that the Fable browser provider converts to well-formed strings.
 - **Handles.** Node and event handles are the existing `RvNode` and `RvEvent`: the generated and hand-written
   functions share them, and `rv_node_release` releases both. Each other interface has its own opaque handle,
   named after the root of its inheritance, with `rv_dom_<root>_release` and `rv_dom_<root>_retain`. A
@@ -184,7 +189,7 @@ every default.
 
 - Fields follow the base dictionary's, then the dictionary's own, in IDL order. The committed header fixes the
   order: a regenerated struct keeps the existing fields in place and appends new ones.
-- A field maps as an argument does: `const char*` for a string (NULL for absent), a pointer for a scalar that
+- A field maps as an argument does: `RvDomUtf8StringInput` for a string (`present` 0 for absent), a pointer for a scalar that
   is optional without a default (NULL for absent), a plain value otherwise, `int32_t` for an enumeration and
   `RvNode*` for a node. The header comment of each field gives its IDL default. A `required` field outside
   `size` returns `RV_ERR_NULL_ARGUMENT`.

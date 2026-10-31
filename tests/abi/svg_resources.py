@@ -9,6 +9,7 @@ import zlib
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8, Span, span
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 XHTML = 'http://www.w3.org/1999/xhtml'
@@ -92,13 +93,13 @@ def verify(native_directory):
             return p.text('rv_dom_svg_animated_string_get_base_val', [p.pointer], value)
 
         def set_base(value, text):
-            p.call('rv_dom_svg_animated_string_set_base_val', [p.pointer, ctypes.c_char_p], value, text.encode())
+            p.call('rv_dom_svg_animated_string_set_base_val', [p.pointer, Utf8], value, text.encode())
 
         def string(kind, target, field):
             return p.text('rv_dom_' + kind + '_get_' + field, [p.pointer], target)
 
         def set_string(kind, target, field, value):
-            p.call('rv_dom_' + kind + '_set_' + field, [p.pointer, ctypes.c_char_p], target, None if value is None else value.encode())
+            p.call('rv_dom_' + kind + '_set_' + field, [p.pointer, Utf8], target, None if value is None else value.encode())
 
         state = {}
         # SVGAElement reflection
@@ -109,14 +110,14 @@ def verify(native_directory):
         rel_list = p.object('rv_dom_svga_element_get_rel_list', [p.pointer], [n['link']], 'dom_token_list')
         state['a']['relListLength'] = p.read('dom_token_list', rel_list, 'length', p.unsigned)
         contains = ctypes.c_int32()
-        p.call('rv_dom_dom_token_list_contains', [p.pointer, ctypes.c_char_p, ctypes.POINTER(ctypes.c_int32)], rel_list, b'next', ctypes.byref(contains))
+        p.call('rv_dom_dom_token_list_contains', [p.pointer, Utf8, ctypes.POINTER(ctypes.c_int32)], rel_list, b'next', ctypes.byref(contains))
         state['a']['relListContainsNext'] = bool(contains.value)
         set_base(link_target, '_self')
         set_string('svga_element', n['link'], 'hreflang', 'fr')
         set_string('svga_element', n['link'], 'type', 'image/svg+xml')
         class Strings(ctypes.Structure):
-            _fields_ = [('present', ctypes.c_int32), ('count', ctypes.c_int32), ('items', ctypes.POINTER(ctypes.c_char_p))]
-        tokens = (ctypes.c_char_p * 1)(b'help')
+            _fields_ = [('present', ctypes.c_int32), ('count', ctypes.c_int32), ('items', ctypes.POINTER(Span))]
+        tokens = (Span * 1)(span('help'))
         p.call('rv_dom_dom_token_list_add', [p.pointer, ctypes.POINTER(Strings)], rel_list, ctypes.byref(Strings(1, 1, tokens)))
         state['a'].update(changedTarget=p.attribute(n['link'], 'target'), changedHreflang=p.attribute(n['link'], 'hreflang'),
                           changedType=p.attribute(n['link'], 'type'), changedRel=string('svga_element', n['link'], 'rel'))
@@ -216,7 +217,7 @@ def verify(native_directory):
         p.set_length(use_lengths['x'], 60)
         moved = p.paint()
         state['use']['movedPaint'] = [p.pixel(moved, 55, 10), p.pixel(moved, 75, 10)]
-        p.call('rv_dom_element_set_attribute', [p.pointer, ctypes.c_char_p, ctypes.c_char_p], n['green'], b'fill', b'black')
+        p.call('rv_dom_element_set_attribute', [p.pointer, Utf8, Utf8], n['green'], b'fill', b'black')
         state['use']['targetEditPaint'] = p.pixel(p.paint(), 75, 10)
         set_base(use_href, '#blueTarget')
         state['use']['hrefPaint'] = p.pixel(p.paint(), 75, 10)

@@ -1,0 +1,42 @@
+{
+  "browser": "156.0.8078.4",
+  "headless": "new",
+  "origin": "http://localhost",
+  "values": {
+    "setAttribute value": "a\u0000b",
+    "setAttribute value trailing": "é\u0000",
+    "textContent": "x\u0000y\u0000z",
+    "textContent null": "",
+    "createTextNode": "\u0000lead",
+    "appendData": "a\u0000tail",
+    "id": "i\u0000d",
+    "setAttributeNS null namespace": "n\u0000s",
+    "createComment": "c\u0000omment",
+    "createHTMLDocument absent title": "",
+    "append string": "p\u0000q",
+    "prepend string": "\u0000x",
+    "replaceChildren strings": "r\u0000sz",
+    "classList add": "a\u0000b",
+    "classList remove": "a",
+    "hidden until-found suffix": "",
+    "hidden until-found": "until-found",
+    "ToggleEvent states": [
+      "o\u0000ld",
+      "n\u0000ew"
+    ],
+    "CommandEvent command": "--c\u0000md",
+    "CompositionEvent data": "\u0000",
+    "ErrorEvent message": "m\u0000sg",
+    "Blob type with U+0000": "",
+    "Blob type": "text/plain",
+    "HighlightRegistry name (T03)": [
+      true,
+      false
+    ],
+    "getAttributeNames": [
+      "data-é",
+      "b"
+    ],
+    "hidden getter string": "until-found"
+  }
+}

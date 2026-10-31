@@ -9,7 +9,22 @@ open System.Text.Json
 open RanvierWebCoreAbi.Native
 open RanvierWebCoreAbi.NativeDom
 
+/// The UTF-8 bytes of a generated string input, passed with utf8Length of the same value.
+let private utf8 (value: string) = System.Text.Encoding.UTF8.GetBytes value
+
+let private utf8Length (value: string) = System.Text.Encoding.UTF8.GetByteCount value
+
 let private html = "<!doctype html><html><head></head><body></body></html>"
+
+/// A present dictionary string over pinned UTF-8 bytes, valid until the handle is freed.
+let private stringInput (value: string) =
+    let bytes = utf8 value
+    let pin = Runtime.InteropServices.GCHandle.Alloc(bytes, Runtime.InteropServices.GCHandleType.Pinned)
+    let mutable input = RvDomUtf8StringInput()
+    input.present <- 1
+    input.data <- pin.AddrOfPinnedObject()
+    input.length <- bytes.Length
+    input, pin
 
 let private valueProperty = 6
 
@@ -324,7 +339,7 @@ let private svgPaintHandles (replace: bool) (host: nativeint) (_: nativeint) (_:
         rv_dom_svg_animated_enumeration_get_base_val (units, &unitValue)
         |> check "retained clip units read"
 
-        rv_dom_svg_animated_string_set_base_val (href, "data:,")
+        rv_dom_svg_animated_string_set_base_val (href, utf8 "data:,", utf8Length "data:,")
         |> check "retained image href write"
 
         rv_dom_svg_length_release x1Base
@@ -478,7 +493,7 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                     failwith "scroll listener ran after host destroy"
         | "aria relations" ->
             rv_element_set_attribute (div, "id", "label") |> check "label id"
-            rv_dom_node_set_text_content (div, "Label") |> check "label text"
+            rv_dom_node_set_text_content (div, utf8 "Label", utf8Length "Label") |> check "label text"
             let button = rv_document_create_element (host, "button")
             rv_node_append_child (body, button) |> check "append button"
             held.Value <- button
@@ -602,7 +617,7 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                 if status <> 0 && status <> -9 then
                     failwithf "HTMLDialogElement.open after destroy: %d" status
 
-                let closed = rv_dom_html_dialog_element_close (held.Value, "late")
+                let closed = rv_dom_html_dialog_element_close (held.Value, utf8 "late", utf8Length "late")
 
                 if closed <> 0 && closed <> -9 && closed <> -3 then
                     failwithf "HTMLDialogElement.close after destroy: %d" closed
@@ -811,13 +826,18 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
             rv_node_append_child (div, button) |> check "append button"
             let mutable init = RvDomToggleEventInit()
             init.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomToggleEventInit>())
-            init.old_state <- "closed"
-            init.new_state <- "open"
+            let oldState, oldPin = stringInput "closed"
+            let newState, newPin = stringInput "open"
+            init.old_state <- oldState
+            init.new_state <- newState
             init.source <- button
             let name = Text.Encoding.UTF8.GetBytes "toggle"
 
             rv_dom_toggle_event_create (document, name, name.Length, [| init |], &held.contents)
             |> check "ToggleEvent"
+
+            oldPin.Free()
+            newPin.Free()
 
             rv_node_release button
 
@@ -835,12 +855,15 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
         | "error event" ->
             let mutable init = RvDomErrorEventInit()
             init.size <- uint32 (Runtime.InteropServices.Marshal.SizeOf<RvDomErrorEventInit>())
-            init.message <- "boom"
+            let message, messagePin = stringInput "boom"
+            init.message <- message
             init.lineno <- 3u
             let name = Text.Encoding.UTF8.GetBytes "error"
 
             rv_dom_error_event_create (document, name, name.Length, [| init |], &held.contents)
             |> check "ErrorEvent"
+
+            messagePin.Free()
 
             fun () ->
                 let buffer = Array.zeroCreate<byte> 32
@@ -943,9 +966,85 @@ let private runReleaseAfterDestroy (kind: string) (remove: bool) =
                     failwithf "crypto.randomUUID after destroy: %d" uuid
 
                 rv_node_release held.Value
-        | "caret position" ->
-            rv_dom_node_set_text_content (span, "AAAA") |> check "caret text"
+        | "string results" ->
+            // The container results that carry owned UTF-8 spans, read and released past host destroy.
+            held.Value <- rv_node_retain div
+            rv_element_set_attribute (div, "data-held", "1") |> check "data-held"
+            rv_element_set_attribute (div, "hidden", "until-found") |> check "hidden"
+            let mutable sheet = 0n
+            rv_dom_css_style_sheet_create (document, null, &sheet) |> check "CSSStyleSheet"
+            let css = "@layer first, second; @view-transition { navigation: auto; types: one two; }"
+            rv_dom_css_style_sheet_replace_sync (sheet, utf8 css, utf8Length css) |> check "replaceSync"
+            let mutable rules = 0n
+            rv_dom_css_style_sheet_get_css_rules (sheet, &rules) |> check "cssRules"
+            let mutable layer = 0n
+            let mutable transition = 0n
+            rv_dom_css_rule_list_item (rules, 0u, &layer) |> check "layer statement rule"
+            rv_dom_css_rule_list_item (rules, 1u, &transition) |> check "view transition rule"
+            rv_dom_css_rule_list_release rules
+            rv_dom_style_sheet_release sheet
+            let layer, transition = layer, transition
 
+            let text (span: RvDomUtf8StringSpan) =
+                if span.length <= 0 then
+                    ""
+                else
+                    let bytes = Array.zeroCreate<byte> span.length
+                    Runtime.InteropServices.Marshal.Copy(span.data, bytes, 0, span.length)
+                    Text.Encoding.UTF8.GetString bytes
+
+            let spans (items: nativeint) (count: int) =
+                let size = Runtime.InteropServices.Marshal.SizeOf<RvDomUtf8StringSpan>()
+
+                [ for index in 0 .. count - 1 ->
+                      text (Runtime.InteropServices.Marshal.PtrToStructure<RvDomUtf8StringSpan>(items + nativeint (index * size))) ]
+
+            fun () ->
+                for rule, expected in [ layer, [ "first"; "second" ]; transition, [ "one"; "two" ] ] do
+                    let mutable values = RvDomSequenceUSVString()
+
+                    if rule = layer then
+                        rv_dom_css_layer_statement_rule_get_name_list (rule, &values)
+                        |> check "CSSLayerStatementRule.nameList after destroy"
+                    else
+                        rv_dom_css_view_transition_rule_get_types (rule, &values)
+                        |> check "CSSViewTransitionRule.types after destroy"
+
+                    if spans values.items values.count <> expected then
+                        failwithf "USVString sequence after destroy: %A" (spans values.items values.count)
+
+                    rv_dom_sequence_usv_string_release (&values)
+
+                    if values.present <> 0 || values.count <> 0 || values.items <> 0n then
+                        failwith "USVString sequence release left contents"
+
+                    rv_dom_css_rule_release rule
+
+                let mutable names = RvDomSequenceDOMString()
+                rv_dom_element_get_attribute_names (held.Value, &names) |> check "getAttributeNames after destroy"
+
+                if spans names.items names.count <> [ "data-held"; "hidden" ] then
+                    failwithf "getAttributeNames after destroy: %A" (spans names.items names.count)
+
+                rv_dom_sequence_dom_string_release (&names)
+
+                if names.present <> 0 || names.count <> 0 || names.items <> 0n then
+                    failwith "getAttributeNames release left contents"
+
+                let mutable hidden = RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable()
+                rv_dom_html_element_get_hidden (held.Value, &hidden) |> check "hidden after destroy"
+
+                if hidden.present <> 1 || hidden.tag <> 3 || text hidden.arm2 <> "until-found" then
+                    failwith "hidden after destroy is not the until-found string"
+
+                rv_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release (&hidden)
+
+                if hidden.present <> 0 || hidden.arm2.data <> 0n then
+                    failwith "hidden release left contents"
+
+                rv_node_release held.Value
+        | "caret position" ->
+            rv_dom_node_set_text_content (span, utf8 "AAAA", utf8Length "AAAA") |> check "caret text"
             rv_dom_document_caret_position_from_point (document, 2.0, 2.0, null, &held.contents)
             |> check "caretPositionFromPoint"
 
@@ -1111,6 +1210,7 @@ let run (outDir: string) =
                     "url values"
                     "url pattern result"
                     "visual viewport"
+                    "string results"
                     "aria relations"
                 ] do
                 for remove in [ false; true ] do

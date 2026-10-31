@@ -11,6 +11,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 P, I, U = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint32
 CALLBACK = ctypes.CFUNCTYPE(I, P, P)
@@ -76,9 +79,7 @@ class Native:
         self.assertions = 0
 
     def bind(self, name, result, arguments):
-        function = getattr(self.library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(self.library, name, result, arguments)
 
     def expect(self, condition, label):
         self.assertions += 1
@@ -279,7 +280,7 @@ class Case:
 
         def lookup(collection):
             result = Named()
-            n.ok('rv_dom_html_form_controls_collection_named_item', [P, ctypes.c_char_p, ctypes.POINTER(Named)], collection, name.encode(), ctypes.byref(result))
+            n.ok('rv_dom_html_form_controls_collection_named_item', [P, Utf8, ctypes.POINTER(Named)], collection, name.encode(), ctypes.byref(result))
             try:
                 if not result.present:
                     return None
@@ -321,15 +322,15 @@ class Case:
             n.bind('rv_node_release', None, [P])(appended)
             return None
         if op == 'setAttribute':
-            n.ok('rv_dom_element_set_attribute', [P, ctypes.c_char_p, ctypes.c_char_p], self.node(step['id']), step['name'].encode(), step['value'].encode())
+            n.ok('rv_dom_element_set_attribute', [P, Utf8, Utf8], self.node(step['id']), step['name'].encode(), step['value'].encode())
             return None
         if op == 'removeAttribute':
-            n.ok('rv_dom_element_remove_attribute', [P, ctypes.c_char_p], self.node(step['id']), step['name'].encode())
+            n.ok('rv_dom_element_remove_attribute', [P, Utf8], self.node(step['id']), step['name'].encode())
             return None
         if op == 'create':
-            element = n.handle('rv_dom_document_create_element', [P, ctypes.c_char_p, P], self.document, step['tag'].encode(), None, nullable=False)
-            n.ok('rv_dom_element_set_attribute', [P, ctypes.c_char_p, ctypes.c_char_p], element, b'id', step['id'].encode())
-            n.ok('rv_dom_node_set_text_content', [P, ctypes.c_char_p], element, step['text'].encode())
+            element = n.handle('rv_dom_document_create_element', [P, Utf8, P], self.document, step['tag'].encode(), None, nullable=False)
+            n.ok('rv_dom_element_set_attribute', [P, Utf8, Utf8], element, b'id', step['id'].encode())
+            n.ok('rv_dom_node_set_text_content', [P, Utf8], element, step['text'].encode())
             self.created[step['id']] = element
             return None
         if op == 'optionsList':
@@ -346,7 +347,7 @@ class Case:
             return self.with_options(step['select'], item)
         if op == 'optionsNamed':
             def named(collection):
-                node = n.handle('rv_dom_html_options_collection_named_item', [P, ctypes.c_char_p], collection, step['name'].encode())
+                node = n.handle('rv_dom_html_options_collection_named_item', [P, Utf8], collection, step['name'].encode())
                 label = self.label(node)
                 if node:
                     n.bind('rv_node_release', None, [P])(node)

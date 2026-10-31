@@ -5,6 +5,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -17,9 +20,7 @@ def verify(native_directory):
     implementation = None
 
     def bind(name, result, args):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, args
-        return function
+        return bind_utf8(library, name, result, args)
 
     def expect(condition, label):
         nonlocal assertions
@@ -29,7 +30,7 @@ def verify(native_directory):
 
     query = bind('rv_dom_window_get_computed_style', integer, [pointer, pointer, pointer, integer, ctypes.POINTER(pointer)])
     property_value = bind('rv_dom_css_style_declaration_get_property_value', integer,
-                          [pointer, ctypes.c_char_p, pointer, integer, ctypes.POINTER(integer)])
+                          [pointer, Utf8, pointer, integer, ctypes.POINTER(integer)])
     release_style = bind('rv_dom_css_style_declaration_release', None, [pointer])
     release_node = bind('rv_node_release', None, [pointer])
     host = bind('rv_host_create', pointer, [integer, integer])(320, 240)
@@ -47,7 +48,7 @@ def verify(native_directory):
             #probe::before { content:'before'; width:11px; opacity:.25; }
             #probe::after { content:'after'; width:22px; opacity:.75; }
             </style><div id="probe">probe</div><div id="plain">plain</div>'''
-        expect(bind('rv_dom_element_set_inner_html', integer, [pointer, ctypes.c_char_p])(body, markup) == 0, 'fixture markup')
+        expect(bind('rv_dom_element_set_inner_html', integer, [pointer, Utf8])(body, markup) == 0, 'fixture markup')
         find = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])
         element, plain = find(host, b'probe'), find(host, b'plain')
         nodes.extend([element, plain])
@@ -90,11 +91,11 @@ def verify(native_directory):
         expect(bind('rv_element_set_style', integer, [pointer, ctypes.c_char_p, ctypes.c_char_p, integer])(
             element, b'color', b'rgb(9,8,7)', 0) == 0, 'mutate inline style')
         expect(read(base, 'color') == 'rgb(9, 8, 7)', 'computed declaration is live')
-        expect(bind('rv_dom_css_style_declaration_set_property', integer, [pointer, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p])(
+        expect(bind('rv_dom_css_style_declaration_set_property', integer, [pointer, Utf8, Utf8, Utf8])(
             base, b'opacity', b'1', b'') == -3, 'computed declaration is read-only')
         expect(read(base, 'opacity') == '0.5', 'failed write preserves computed value')
         missing, length = ctypes.create_string_buffer(64), integer(42)
-        expect(bind('rv_dom_element_get_attribute', integer, [pointer, ctypes.c_char_p, pointer, integer, ctypes.POINTER(integer)])(
+        expect(bind('rv_dom_element_get_attribute', integer, [pointer, Utf8, pointer, integer, ctypes.POINTER(integer)])(
             element, b'missing', missing, len(missing), ctypes.byref(length)) == 0 and length.value == -1,
             'nullable DOMString missing attribute preserves null')
 
@@ -103,7 +104,7 @@ def verify(native_directory):
             document, ctypes.byref(owner)) == 0 and bool(owner.value), 'document implementation')
         implementation = owner.value
         detached = pointer()
-        expect(bind('rv_dom_dom_implementation_create_html_document', integer, [pointer, ctypes.c_char_p, ctypes.POINTER(pointer)])(
+        expect(bind('rv_dom_dom_implementation_create_html_document', integer, [pointer, Utf8, ctypes.POINTER(pointer)])(
             implementation, b'detached', ctypes.byref(detached)) == 0 and bool(detached.value), 'windowless document')
         nodes.append(detached.value)
         result = pointer(42)

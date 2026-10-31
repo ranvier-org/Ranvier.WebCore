@@ -13,6 +13,7 @@ import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, BUFFER_TOO_SMALL, UNSUPPORTED, DETACHED, WRONG_INTERFACE = 0, -1, -2, -6, -9, -10, -11
@@ -52,7 +53,7 @@ def verify(native_directory):
         ax_string = p.bind('rv_ax_string', I, [P, I, P, I, ctypes.POINTER(I)])
         node_release = p.bind('rv_node_release', None, [P])
         set_attribute = p.bind('rv_element_set_attribute', I, [P, ctypes.c_char_p, ctypes.c_char_p])
-        remove_attribute = p.bind('rv_dom_element_remove_attribute', I, [P, ctypes.c_char_p])
+        remove_attribute = p.bind('rv_dom_element_remove_attribute', I, [P, Utf8])
         remove = p.bind('rv_dom_element_remove', I, [P])
         by_id = p.bind('rv_document_get_element_by_id', P, [P, ctypes.c_char_p])
         callback = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int32)(lambda *a: None)
@@ -146,7 +147,7 @@ def verify(native_directory):
             reflected['ariaActiveDescendantElement'] = id_of(active.value) if active.value else None
             if active.value:
                 node_release(active)
-            attributes = {a: p.text('rv_dom_element_get_attribute', [P, ctypes.c_char_p], subject, a.encode()) for a in oracle['relations'].values()}
+            attributes = {a: p.text('rv_dom_element_get_attribute', [P, Utf8], subject, a.encode()) for a in oracle['relations'].values()}
             # Repeated reads give the same elements in the same order; each read is a new snapshot buffer.
             p.expect(read_sequence(subject, 'ariaLabelledByElements') == reflected['ariaLabelledByElements'], step['name'] + ' repeated read')
             ax = ax_state(subject)

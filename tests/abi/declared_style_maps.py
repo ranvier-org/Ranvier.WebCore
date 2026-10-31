@@ -5,6 +5,9 @@ import os
 from pathlib import Path
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -27,9 +30,7 @@ def verify(native_directory):
         _fields_ = [('present', integer), ('tag', integer), ('undefined', integer), ('value', pointer)]
 
     def bind(name, result, arguments):
-        method = getattr(library, name)
-        method.restype, method.argtypes = result, arguments
-        return method
+        return bind_utf8(library, name, result, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -53,7 +54,7 @@ def verify(native_directory):
                 css += f'.probe {{width:{width};height:10px;margin:1px 2px;--extent:30px{priority};--tone:red}}'
                 css += '#never-' + str(fixture_number) + ' {color:rgb(1,2,3)}'
                 markup = f'<style id="first">{css}</style><style id="copy">{css}</style><div id="item" class="probe"></div>'
-                self.call('rv_dom_element_set_inner_html', [pointer, string], self.body, markup.encode('utf-8'))
+                self.call('rv_dom_element_set_inner_html', [pointer, Utf8], self.body, markup.encode('utf-8'))
                 self.nodes = {}
                 for name in ['first', 'copy', 'item']:
                     raw = bind('rv_document_get_element_by_id', pointer, [pointer, string])(self.host, name.encode('ascii'))
@@ -157,7 +158,7 @@ def verify(native_directory):
 
         def priority(self, owner, name):
             buffer, length = ctypes.create_string_buffer(128), integer()
-            self.call('rv_dom_css_style_declaration_get_property_priority', [pointer, string, pointer, integer, ctypes.POINTER(integer)],
+            self.call('rv_dom_css_style_declaration_get_property_priority', [pointer, Utf8, pointer, integer, ctypes.POINTER(integer)],
                       owner[4], name.encode('utf-8'), buffer, len(buffer), ctypes.byref(length))
             return buffer.raw[:length.value].decode('utf-8')
 
@@ -243,7 +244,7 @@ def verify(native_directory):
             expect(actual == '44px', f'typed map set replaces important value: expected44px, actual{actual}, priority{priority}')
             expect(fixture.priority(fixture.first, '--extent') == '', 'typed map set removes old important priority')
             expect(fixture.rect()[2:] == (44.0, 10.0), 'priority removal reaches actual var-dependent geometry')
-            fixture.call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string],
+            fixture.call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8],
                          fixture.first[4], b'--extent', b'44px', b'important')
             expect(fixture.priority(fixture.first, '--extent') == 'important', 'same-value declared control restores important priority')
             geometry = fixture.rect()
@@ -260,7 +261,7 @@ def verify(native_directory):
     def inline_priority_case():
         fixture = Fixture(custom=True, important=True)
         try:
-            fixture.call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string],
+            fixture.call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8],
                          fixture.first[4], b'--extent', b'30px', b'')
             expect(fixture.priority(fixture.first, '--extent') == '', 'inline control removes competing stylesheet importance')
             owning_before = fixture.sheet_text(fixture.first)

@@ -6,6 +6,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -25,9 +28,7 @@ def verify(native_directory):
         _fields_ = [('size', unsigned)] + [(field, ctypes.POINTER(double)) for field in ['a', 'b', 'c', 'd', 'e', 'f', 'm11', 'm12', 'm21', 'm22', 'm41', 'm42']]
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     bbox = bind('rv_dom_svg_graphics_element_get_b_box', integer, [pointer, ctypes.POINTER(pointer)])
 
@@ -76,7 +77,7 @@ def verify(native_directory):
 <polygon id="polygon" points="0,0 10,0 10,10"/>
 <polyline id="polyline" points="1,2 3,4"/>
 </svg>'''
-        call('rv_dom_element_set_inner_html', [pointer, ctypes.c_char_p], body, markup)
+        call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
 
         def node(identifier):
             value = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])(host, identifier.encode())
@@ -167,9 +168,9 @@ def verify(native_directory):
         expect(read('svg_length', length_value, 'value') == 96, 'one inch is 96 user units')
         call('rv_dom_svg_length_convert_to_specified_units', [pointer, ctypes.c_uint16], length_value, 6)
         expect(math.isclose(read('svg_length', length_value, 'value_in_specified_units'), 2.54, abs_tol=1e-6), 'inch to centimetres')
-        call('rv_dom_svg_length_set_value_as_string', [pointer, ctypes.c_char_p], length_value, b'12px')
+        call('rv_dom_svg_length_set_value_as_string', [pointer, Utf8], length_value, b'12px')
         expect(text_value('rv_dom_svg_length_get_value_as_string', length_value) == '12px', 'length string roundtrip')
-        exception('rv_dom_svg_length_set_value_as_string', [pointer, ctypes.c_char_p], [length_value, b'invalid'], 'SyntaxError')
+        exception('rv_dom_svg_length_set_value_as_string', [pointer, Utf8], [length_value, b'invalid'], 'SyntaxError')
         exception('rv_dom_svg_length_new_value_specified_units', [pointer, ctypes.c_uint16, single], [length_value, 99, 1], 'NotSupportedError')
         expect(read('svg_length', length_value, 'value') == 12, 'failed length mutations preserve value')
         call('rv_dom_svg_angle_new_value_specified_units', [pointer, ctypes.c_uint16, single], angle_value, 3, math.pi)
@@ -287,16 +288,16 @@ def verify(native_directory):
             buffer, size = ctypes.create_string_buffer(256), integer()
             call('rv_dom_svg_string_list_' + operation, [pointer] + arguments + [pointer, integer, ctypes.POINTER(integer)], languages, *values, buffer, len(buffer), ctypes.byref(size))
             return buffer.value.decode()
-        expect(string_item('initialize', [ctypes.c_char_p], [b'en']) == 'en', 'string list initialize')
-        expect(string_item('append_item', [ctypes.c_char_p], [b'fr']) == 'fr', 'string list append')
-        expect(string_item('insert_item_before', [ctypes.c_char_p, unsigned], [b'de', 1]) == 'de', 'string list insert')
-        expect(string_item('replace_item', [ctypes.c_char_p, unsigned], [b'es', 0]) == 'es', 'string list replace')
+        expect(string_item('initialize', [Utf8], [b'en']) == 'en', 'string list initialize')
+        expect(string_item('append_item', [Utf8], [b'fr']) == 'fr', 'string list append')
+        expect(string_item('insert_item_before', [Utf8, unsigned], [b'de', 1]) == 'de', 'string list insert')
+        expect(string_item('replace_item', [Utf8, unsigned], [b'es', 0]) == 'es', 'string list replace')
         expect(string_item('remove_item', [unsigned], [1]) == 'de', 'string list remove')
         expect(string_item('get_item', [unsigned], [1]) == 'fr', 'string list order')
         call('rv_dom_svg_string_list_clear', [pointer], languages)
         expect(read('svg_string_list', languages, 'length', unsigned) == 0, 'string list clear')
         missing_node = pointer(123)
-        call('rv_dom_svgsvg_element_get_element_by_id', [pointer, ctypes.c_char_p, ctypes.POINTER(pointer)], root, b'never-interned-svg-name-203948', ctypes.byref(missing_node))
+        call('rv_dom_svgsvg_element_get_element_by_id', [pointer, Utf8, ctypes.POINTER(pointer)], root, b'never-interned-svg-name-203948', ctypes.byref(missing_node))
         expect(missing_node.value is None, 'existing-atom lookup missing ID is null')
 
         wrong = single()

@@ -13,6 +13,7 @@ import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -9, -11
@@ -221,7 +222,7 @@ def verify(native_directory):
         implementation = P()
         p.expect(p.bind('rv_dom_document_get_implementation', I, [P, ctypes.POINTER(P)])(document, ctypes.byref(implementation)) == OK, 'implementation')
         detached = P()
-        p.expect(p.bind('rv_dom_dom_implementation_create_html_document', I, [P, ctypes.c_char_p, ctypes.POINTER(P)])(implementation, b'detached', ctypes.byref(detached)) == OK and bool(detached), 'windowless document')
+        p.expect(p.bind('rv_dom_dom_implementation_create_html_document', I, [P, Utf8, ctypes.POINTER(P)])(implementation, b'detached', ctypes.byref(detached)) == OK and bool(detached), 'windowless document')
         p.bind('rv_dom_dom_implementation_release', None, [P])(implementation)
         p.expect(window_get['y'](detached, ctypes.byref(result)) == UNSUPPORTED and window_pair['scroll'](detached, 1, 1) == UNSUPPORTED
                  and window_options['scroll_to'](detached, None) == UNSUPPORTED, 'a windowless document has no Window')

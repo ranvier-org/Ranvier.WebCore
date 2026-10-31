@@ -6,6 +6,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 ORACLE = Path(__file__).resolve().parents[1] / 'fixtures' / 'svg-tests-lists-oracle.json'
 STEPS = ['initial', 'removed', 'empty', 'restored', 'cleared', 'appended', 'removedAgain', 'reinserted']
@@ -21,7 +22,7 @@ def verify(native_directory):
     with SvgProbe(native_directory, 200, 60) as p:
         p.load(oracle['markup'])
         actual, deviations, failures = {}, [], []
-        text = [p.pointer, ctypes.c_char_p]
+        text = [p.pointer, Utf8]
         for field, x, value in [('requiredExtensions', 20, 'urn:x'), ('systemLanguage', 70, 'zz')]:
             element = p.node(field)
             getter = 'rv_dom_svg_graphics_element_get_' + ('required_extensions' if field == 'requiredExtensions' else 'system_language')
@@ -31,13 +32,13 @@ def verify(native_directory):
                 if step == 'removed' or step == 'removedAgain':
                     p.call('rv_dom_element_remove_attribute', text, element, field.encode())
                 if step == 'empty':
-                    p.call('rv_dom_element_set_attribute', text + [ctypes.c_char_p], element, field.encode(), b'')
+                    p.call('rv_dom_element_set_attribute', text + [Utf8], element, field.encode(), b'')
                 if step == 'restored':
-                    p.call('rv_dom_element_set_attribute', text + [ctypes.c_char_p], element, field.encode(), value.encode())
+                    p.call('rv_dom_element_set_attribute', text + [Utf8], element, field.encode(), value.encode())
                 if step == 'cleared':
                     p.call('rv_dom_svg_string_list_clear', [p.pointer], first)
                 if step == 'appended':
-                    p.call('rv_dom_element_set_attribute', text + [ctypes.c_char_p], element, field.encode(), value.encode())
+                    p.call('rv_dom_element_set_attribute', text + [Utf8], element, field.encode(), value.encode())
                     p.expect(p.text('rv_dom_svg_string_list_append_item', text, first, value.encode()) == value, field + ' appendItem result')
                 if step == 'reinserted':
                     parent = p.object('rv_dom_node_get_parent_node', [p.pointer], [element], 'node')

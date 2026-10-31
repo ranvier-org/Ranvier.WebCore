@@ -5,6 +5,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -16,9 +19,7 @@ def verify(native_directory):
     nodes, lists, rectangles, ranges = [], [], [], []
 
     def bind(name, result, arguments):
-        operation = getattr(library, name)
-        operation.restype, operation.argtypes = result, arguments
-        return operation
+        return bind_utf8(library, name, result, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -76,7 +77,7 @@ def verify(native_directory):
             #hidden { display:none; }
             </style><div id="box"><span id="wrapped">alpha beta gamma delta epsilon zeta eta theta</span></div>
             <div id="hidden">hidden</div>'''
-        expect(bind('rv_dom_element_set_inner_html', integer, [pointer, ctypes.c_char_p])(body, markup) == 0, 'insert wrapped text')
+        expect(bind('rv_dom_element_set_inner_html', integer, [pointer, Utf8])(body, markup) == 0, 'insert wrapped text')
         find = bind('rv_document_get_element_by_id', pointer, [pointer, ctypes.c_char_p])
         wrapped, hidden, box = (find(host, name) for name in [b'wrapped', b'hidden', b'box'])
         nodes.extend([wrapped, hidden, box])

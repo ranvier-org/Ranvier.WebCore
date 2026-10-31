@@ -1,10 +1,14 @@
+"""Native44 (#144) full batch: every probe of the #142 baseline batch, which must keep its assertion count, plus blob_urls,
+then the frames and teardown driver runs.
+usage: run_native44_full_batch.py <native44-candidate-N> <abi> <teardown records> <baseline batch dir>"""
 from pathlib import Path
 import hashlib, json, os, re, shutil, subprocess, sys
 CANDIDATE = sys.argv[1]
 ABI = int(sys.argv[2])
 TEARDOWN = int(sys.argv[3])
+BASELINE = Path(sys.argv[4])
 
-repo = Path('C:/wk/native-blob')
+repo = Path(__file__).resolve().parents[2]
 candidate = repo / 'artifacts' / CANDIDATE / 'runtime'
 freeze = repo / 'artifacts' / (CANDIDATE + '-frozen')
 runtime = freeze / 'runtimes/win-x64/native'
@@ -81,17 +85,15 @@ def run(name, command, expected=None, environment=None, executed=None, timeout=3
         assert record.get('assertions') == expected, name + ' expected ' + str(expected) + ' got ' + str(record.get('assertions'))
 
 
-probes = [('css_supports', 72), ('computed_style', 93), ('fragment_rectangles', 140), ('table_surface', 44), ('element_reflection', 269),
-          ('area_surface', 117), ('cssom_surface', 407), ('keyframe_rules', 93), ('counter_style_rules', 86), ('detached_cssom_context', 389),
-          ('svg_mathml_surface', 95), ('style_property_maps', 189), ('declared_style_maps', 2069), ('style_map_entries', 144),
-          ('typed_style_values', 190), ('custom_properties', 231), ('geometry_values', 260), ('matrix_values', 1091), ('css_transforms', 405),
-          ('svg_geometry', 639), ('svg_surfaces', 1594), ('svg_documents', 78), ('svg_view_controls', 318), ('svg_animation_variants', 70),
-          ('capabilities', None), ('svg_view_selection', None),
-          ('svg_paint_servers', None), ('svg_filters', None), ('svg_clip_mask_marker', None), ('svg_resources', 454), ('mathml_surface', 371), ('svg_tests_lists', 191), ('image_decode', 73), ('font_load', 42), ('event_construction', 82), ('tree_traversal', None), ('focus_input', 80), ('viewport_events', 364), ('form_collections', 1168), ('form_navigation', None), ('viewport_scroll', None), ('dialog_popover', None), ('binary_values', None), ('caret_hit', None), ('url_values', None), ('url_wpt', None), ('form_submission', None), ('text_segmentation', None), ('crypto_random', None), ('visual_viewport', None), ('screen_metrics', 222), ('custom_highlights', 378), ('abi_layouts', 15), ('event_details', 391), ('aria_relations', 1210), ('inspector_diagnostics', 929), ('blob_urls', 697)]
+# The baseline batch's probes in its order, each with its exact assertion count; then the probes this group adds.
+baseline = [item for item in json.loads((BASELINE / 'results.json').read_text()) if item['name'] not in ('frames', 'teardown')]
+probes = [(item['name'], item.get('assertions')) for item in baseline] + [('blob_urls', 697)]
 for name, expected in probes:
     arguments = ['C:/Python314/python.exe', '-I', '-X', 'utf8', str(repo / 'tests/abi' / (name + '.py')), '--native-directory', str(runtime)]
     if name == 'abi_layouts':
         arguments = arguments[:5]
+    if name == 'native_types':
+        arguments = arguments[:4] + [str(repo / 'tests/generator/native_types.py'), '--native-dir', str(runtime)]
     if name in ('svg_surfaces', 'font_load', 'caret_hit', 'custom_highlights', 'inspector_diagnostics'):
         arguments += ['--webkit-source', 'C:/wk/src']
     if name == 'dialog_popover':

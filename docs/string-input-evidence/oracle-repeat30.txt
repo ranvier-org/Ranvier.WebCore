@@ -1,0 +1,1 @@
+string_nul_browser.mjs regenerated 30 times on Chromium 156.0.8078.4: values identical to tests/fixtures/string-nul-oracle.json 30/30

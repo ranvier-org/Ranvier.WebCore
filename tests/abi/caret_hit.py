@@ -16,6 +16,7 @@ import threading
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
 from caret_hit_support import CaretPage, FIXTURES, coordinate, same_rect
+from utf8_inputs import Utf8
 
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE = 0, -1, -2, -3, -11
 ABI = 52
@@ -182,7 +183,7 @@ def lifetime(p, fixture, caret, oracle, scale, record):
         p.expect(fixture.is_same(p.object('rv_dom_caret_position_get_offset_node', [p.pointer], [held], 'node'), text), 'offsetNode is the held text node')
         return {'offset': value['offset'], 'connected': bool(connected.value), 'data': data(), 'rect': value['rect']}
     states = {'before': read()}
-    p.call('rv_dom_character_data_set_data', [p.pointer, ctypes.c_char_p], text, b'AA')
+    p.call('rv_dom_character_data_set_data', [p.pointer, Utf8], text, b'AA')
     fixture.settle()
     states['shortened'] = read()
     p.call('rv_dom_element_remove', [p.pointer], p.node('wrap'))
@@ -195,7 +196,7 @@ def lifetime(p, fixture, caret, oracle, scale, record):
             record.append({'scale': scale, 'scroll': 'held', 'point': name, 'member': 'getClientRect', 'native': native['rect'], 'chromium': chromium['rect']})
     # A document without a render tree yields no position, as Chromium's createHTMLDocument document does.
     implementation = p.object('rv_dom_document_get_implementation', [p.pointer], [fixture.document], 'dom_implementation')
-    detached = p.object('rv_dom_dom_implementation_create_html_document', [p.pointer, ctypes.c_char_p], [implementation, b''], 'node')
+    detached = p.object('rv_dom_dom_implementation_create_html_document', [p.pointer, Utf8], [implementation, b''], 'node')
     inert = p.pointer()
     p.expect(caret.position(detached, 5, 10, None, ctypes.byref(inert)) == OK and not inert.value and expected['detachedDocument'] is None, 'document without a render tree')
     caret.release(None)

@@ -5,6 +5,9 @@ from pathlib import Path
 import sys
 import threading
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory):
     directory = Path(native_directory).resolve()
@@ -16,9 +19,7 @@ def verify(native_directory):
     assertions = 0
 
     def bind(name, returns, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = returns, arguments
-        return function
+        return bind_utf8(library, name, returns, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -51,7 +52,7 @@ def verify(native_directory):
         css = b'@keyframes c11-raw { from {width:20px} 25% {width:60px} to {width:100px} }'
         markup = b'<style id="first">' + css + b'</style><style id="copy">' + css + b'</style>'
         markup += b'<style>#probe {width:12px;animation:c11-raw 100s linear -25s 1 normal both paused}</style><div id="probe"></div>'
-        call('rv_dom_element_set_inner_html', [pointer, string], body, markup)
+        call('rv_dom_element_set_inner_html', [pointer, Utf8], body, markup)
         find = bind('rv_document_get_element_by_id', pointer, [pointer, string])
         first, copy, probe = [find(host, name) for name in [b'first', b'copy', b'probe']]
         for node in [first, copy, probe]:
@@ -65,8 +66,8 @@ def verify(native_directory):
 
         sheet, frames = keyframes(first)
         _, copied_frames = keyframes(copy)
-        middle = handle('rv_dom_css_keyframes_rule_find_rule', [pointer, string], [frames, b'25%'], 'rv_dom_css_rule_release')
-        copied_middle = handle('rv_dom_css_keyframes_rule_find_rule', [pointer, string], [copied_frames, b'25%'], 'rv_dom_css_rule_release')
+        middle = handle('rv_dom_css_keyframes_rule_find_rule', [pointer, Utf8], [frames, b'25%'], 'rv_dom_css_rule_release')
+        copied_middle = handle('rv_dom_css_keyframes_rule_find_rule', [pointer, Utf8], [copied_frames, b'25%'], 'rv_dom_css_rule_release')
         declaration = handle('rv_dom_css_keyframe_rule_get_style', [pointer], [middle], 'rv_dom_css_style_declaration_release')
         copied_text = text('rv_dom_css_rule_get_css_text', copied_middle)
         call('rv_node_remove_child', [pointer, pointer], body, copy)
@@ -79,30 +80,30 @@ def verify(native_directory):
             return buffer.raw[:length.value].decode('utf-8')
 
         expect(width() == '60px', 'paused 25% starts at the middle keyframe')
-        call('rv_dom_css_keyframe_rule_set_key_text', [pointer, string], middle, b'50%')
+        call('rv_dom_css_keyframe_rule_set_key_text', [pointer, Utf8], middle, b'50%')
         expect(text('rv_dom_css_keyframe_rule_get_key_text', middle) == '50%', 'offset metadata changed')
         actual = width()
         expect(actual == '40px', 'offset edit must invalidate paused animation: expected 40px, got ' + actual)
         expect(text('rv_dom_css_keyframe_rule_get_key_text', copied_middle) == '25%', 'other stylesheet retains original offset')
-        call('rv_dom_css_keyframe_rule_set_key_text', [pointer, string], middle, b'invalid')
+        call('rv_dom_css_keyframe_rule_set_key_text', [pointer, Utf8], middle, b'invalid')
         expect(text('rv_dom_css_keyframe_rule_get_key_text', middle) == '50%', 'invalid offset is a no-op in pinned WebCore')
         expect(width() == '40px', 'invalid offset preserves animation output')
-        call('rv_dom_css_style_declaration_set_property', [pointer, string, string, string], declaration, b'width', b'140px', b'')
+        call('rv_dom_css_style_declaration_set_property', [pointer, Utf8, Utf8, Utf8], declaration, b'width', b'140px', b'')
         expect(width() == '80px', 'declaration edit changes paused animation')
         expect(text('rv_dom_css_rule_get_css_text', copied_middle) == copied_text, 'other stylesheet retains original declarations')
-        call('rv_dom_css_keyframes_rule_append_rule', [pointer, string], frames, b'50% {width:180px}')
+        call('rv_dom_css_keyframes_rule_append_rule', [pointer, Utf8], frames, b'50% {width:180px}')
         expect(width() == '100px', 'duplicate last offset changes paused animation')
-        call('rv_dom_css_keyframes_rule_delete_rule', [pointer, string], frames, b'50%')
+        call('rv_dom_css_keyframes_rule_delete_rule', [pointer, Utf8], frames, b'50%')
         expect(width() == '80px', 'delete duplicate restores earlier offset')
-        call('rv_dom_css_keyframes_rule_delete_rule', [pointer, string], frames, b'50%')
+        call('rv_dom_css_keyframes_rule_delete_rule', [pointer, Utf8], frames, b'50%')
         expect(width() == '40px', 'delete final middle offset changes interpolation')
         parent = pointer(42)
         call('rv_dom_css_rule_get_parent_rule', [pointer, ctypes.POINTER(pointer)], middle, ctypes.byref(parent))
         expect(not parent.value, 'deleted keyframe has no parent')
-        call('rv_dom_css_keyframe_rule_set_key_text', [pointer, string], middle, b'75%')
+        call('rv_dom_css_keyframe_rule_set_key_text', [pointer, Utf8], middle, b'75%')
         expect(text('rv_dom_css_keyframe_rule_get_key_text', middle) == '75%', 'detached keyframe offset stays editable')
         expect(width() == '40px', 'detached keyframe edit preserves active animation')
-        setter = bind('rv_dom_css_keyframe_rule_set_key_text', integer, [pointer, string])
+        setter = bind('rv_dom_css_keyframe_rule_set_key_text', integer, [pointer, Utf8])
         expect(setter(None, b'25%') == -1, 'null target rejected')
         expect(setter(middle, None) == -1, 'null key text rejected')
         expect(setter(frames, b'25%') == -11, 'wrong interface rejected')
@@ -112,7 +113,7 @@ def verify(native_directory):
         worker.join()
         expect(statuses == [-2], 'wrong thread rejected')
         expect(text('rv_dom_css_keyframe_rule_get_key_text', middle) == '75%', 'failed calls preserve detached offset')
-        call('rv_dom_css_keyframes_rule_set_name', [pointer, string], frames, b'c11-renamed')
+        call('rv_dom_css_keyframes_rule_set_name', [pointer, Utf8], frames, b'c11-renamed')
         expect(width() == '12px', 'renaming keyframes invalidates the old animation name')
         call('rv_element_set_style', [pointer, string, string, integer], probe, b'animation-name', b'c11-renamed', 0)
         expect(width() == '40px', 'new animation name resolves the renamed keyframes')

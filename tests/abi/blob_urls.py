@@ -81,8 +81,9 @@ class Host:
         return self.binary.blob(parts, type=spec['type'] if spec['type'] else None)
 
     def node(self, identifier):
+        text, length = utf8(identifier)
         result = P()
-        self.n.ok('rv_dom_document_get_element_by_id', [P, ctypes.c_char_p, ctypes.POINTER(P)], self.document, identifier.encode('utf-8'), ctypes.byref(result))
+        self.n.ok('rv_dom_document_get_element_by_id', [P, P, I, ctypes.POINTER(P)], self.document, text, length, ctypes.byref(result))
         return result.value
 
     def object_url(self, blob):
@@ -179,7 +180,8 @@ def url_read_result(host, url):
 def image(host, url):
     n = host.n
     element = host.node('i')
-    n.ok('rv_dom_html_image_element_set_src', [P, ctypes.c_char_p], element, url.encode('utf-8'))
+    source, source_length = utf8(url)
+    n.ok('rv_dom_html_image_element_set_src', [P, P, I], element, source, source_length)
     operation = Operation(n)
     n.ok('rv_image_decode', [P, P, COMPLETION, P, ctypes.POINTER(ctypes.c_uint64)], host.host, element, operation.callback, None, ctypes.byref(operation.token))
     outcome = operation.finish('image ' + url)

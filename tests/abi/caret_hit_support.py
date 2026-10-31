@@ -6,6 +6,10 @@ import hashlib
 import math
 from pathlib import Path
 import time
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8
 
 AHEM_SHA256 = '63d2abd0041c3e3b4b52ad8d382353b53c51c6785e76ce56ed9dacad2d2e31c4'
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
@@ -46,7 +50,7 @@ class CaretPage:
         for host, mode, markup in [('host', 2, b'<span id="s">SSSS</span>'), ('closed', 1, b'<span id="t">TTTT</span>')]:
             init = ShadowRootInit(size=ctypes.sizeof(ShadowRootInit), mode=mode)
             root = p.object('rv_dom_element_attach_shadow', [P, ctypes.POINTER(ShadowRootInit)], [p.node(host), ctypes.byref(init)], 'node')
-            p.call('rv_dom_shadow_root_set_inner_html', [P, ctypes.c_char_p], root, markup)
+            p.call('rv_dom_shadow_root_set_inner_html', [P, Utf8], root, markup)
             self.roots['open' if mode == 2 else 'closed'] = root
         deadline = time.monotonic() + 10
         while self.width('inline') != 160:

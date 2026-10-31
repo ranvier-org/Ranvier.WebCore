@@ -10,6 +10,9 @@ import sys
 import threading
 import time
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from utf8_inputs import Utf8, bind as bind_utf8
+
 
 def verify(native_directory, webkit_source, evidence_json=None):
     directory = Path(native_directory).resolve()
@@ -24,9 +27,7 @@ def verify(native_directory, webkit_source, evidence_json=None):
         _fields_ = [('size', unsigned), ('x', double), ('y', double), ('z', double), ('w', double)]
 
     def bind(name, result, arguments):
-        function = getattr(library, name)
-        function.restype, function.argtypes = result, arguments
-        return function
+        return bind_utf8(library, name, result, arguments)
 
     def expect(condition, label):
         nonlocal assertions
@@ -200,7 +201,7 @@ def verify(native_directory, webkit_source, evidence_json=None):
             target_base = handle('rv_dom_svg_animated_length_get_base_val', [pointer], [target_length], 'svg_length')
             target_adjust = handle('rv_dom_svg_text_content_element_get_length_adjust', [pointer], [target], 'svg_animated_enumeration')
             for rotation in rotations:
-                call('rv_dom_element_set_attribute', [pointer, ctypes.c_char_p, ctypes.c_char_p], target, b'rotate', rotation.encode())
+                call('rv_dom_element_set_attribute', [pointer, Utf8, Utf8], target, b'rotate', rotation.encode())
                 for adjust in [1, 2]:
                     call('rv_dom_svg_animated_enumeration_set_base_val', [pointer, ctypes.c_uint16], target_adjust, adjust)
                     call('rv_dom_svg_length_set_value', [pointer, single], target_base, 90)
@@ -245,7 +246,7 @@ def verify(native_directory, webkit_source, evidence_json=None):
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text(json.dumps(adjustment_rows, indent=2)+'\n')
         adjusted = number('rv_dom_svg_text_content_element_get_computed_text_length', [pointer], [plain])
-        print('TEXT_LENGTH_ADJUSTMENT', {'computed': adjusted, 'bbox': bounds(plain), 'end': point(handle('rv_dom_svg_text_content_element_get_end_position_of_char', [pointer, unsigned], [plain, 2], 'svg_point')), 'authored': text('rv_dom_element_get_attribute', [pointer, ctypes.c_char_p], plain, b'textLength'), 'lengthAdjust': read('svg_animated_enumeration', length_adjust, 'base_val', ctypes.c_uint16)}, flush=True)
+        print('TEXT_LENGTH_ADJUSTMENT', {'computed': adjusted, 'bbox': bounds(plain), 'end': point(handle('rv_dom_svg_text_content_element_get_end_position_of_char', [pointer, unsigned], [plain, 2], 'svg_point')), 'authored': text('rv_dom_element_get_attribute', [pointer, Utf8], plain, b'textLength'), 'lengthAdjust': read('svg_animated_enumeration', length_adjust, 'base_val', ctypes.c_uint16)}, flush=True)
         close([adjusted], [90], 'textLength/lengthAdjust change actual glyph metrics')
         offset, offset_base = length_property('text_path', path_text, 'start_offset')
         call('rv_dom_svg_length_set_value', [pointer, single], offset_base, 30)
@@ -272,7 +273,7 @@ def verify(native_directory, webkit_source, evidence_json=None):
                 exception('rv_dom_svg_length_set_value', [pointer, single], [readonly, value + 1], 'NoModificationAllowedError')
                 call('rv_dom_svg_length_set_value', [pointer, single], base, value)
                 expect(read('svg_length', base, 'value') == value and read('svg_length', readonly, 'value') == value, kind + '.' + field + ' base/animated mutation')
-                expect(text('rv_dom_element_get_attribute', [pointer, ctypes.c_char_p], target, field.encode()) is not None, kind + '.' + field + ' reflected attribute')
+                expect(text('rv_dom_element_get_attribute', [pointer, Utf8], target, field.encode()) is not None, kind + '.' + field + ' reflected attribute')
             close(bounds(target), expected, kind + ' edited bounds')
         for kind, identifier, index, field, value, expected in [('polygon', 'polygon', 0, 'x', 170, (170, 10, 30, 20)), ('polyline', 'polyline', 2, 'y', 40, (220, 10, 20, 30))]:
             target = node(identifier)
@@ -281,14 +282,14 @@ def verify(native_directory, webkit_source, evidence_json=None):
             call('rv_dom_svg_point_set_' + field, [pointer, single], item, value)
             close(bounds(target), expected, kind + ' point mutation updates bounds')
         path = node('shapePath')
-        expect(text('rv_dom_element_get_attribute', [pointer, ctypes.c_char_p], path, b'd') == 'M10 200H110', 'path facade reads authored data')
-        call('rv_dom_element_set_attribute', [pointer, ctypes.c_char_p, ctypes.c_char_p], path, b'd', b'M10 200H110V240H10Z')
+        expect(text('rv_dom_element_get_attribute', [pointer, Utf8], path, b'd') == 'M10 200H110', 'path facade reads authored data')
+        call('rv_dom_element_set_attribute', [pointer, Utf8, Utf8], path, b'd', b'M10 200H110V240H10Z')
         close(bounds(path), (10, 200, 100, 40), 'authored path-data edit updates engine bounds')
         expect(number('rv_dom_svg_geometry_element_get_total_length', [pointer], [path]) == 280, 'authored path-data edit updates engine length')
-        call('rv_dom_element_set_attribute', [pointer, ctypes.c_char_p, ctypes.c_char_p], path, b'd', b'')
-        expect(text('rv_dom_element_get_attribute', [pointer, ctypes.c_char_p], path, b'd') == '', 'empty path data stays present')
-        call('rv_dom_element_remove_attribute', [pointer, ctypes.c_char_p], path, b'd')
-        expect(text('rv_dom_element_get_attribute', [pointer, ctypes.c_char_p], path, b'd') is None, 'removed path data stays absent')
+        call('rv_dom_element_set_attribute', [pointer, Utf8, Utf8], path, b'd', b'')
+        expect(text('rv_dom_element_get_attribute', [pointer, Utf8], path, b'd') == '', 'empty path data stays present')
+        call('rv_dom_element_remove_attribute', [pointer, Utf8], path, b'd')
+        expect(text('rv_dom_element_get_attribute', [pointer, Utf8], path, b'd') is None, 'removed path data stays absent')
         expect(number('rv_dom_svg_geometry_element_get_total_length', [pointer], [path]) == 0, 'removed authored path has zero length')
 
         convolve = node('convolve')
@@ -296,7 +297,7 @@ def verify(native_directory, webkit_source, evidence_json=None):
         expect(read('svg_animated_boolean', boolean, 'base_val', integer) == 0, 'real Boolean initial state')
         call('rv_dom_svg_animated_boolean_set_base_val', [pointer, integer], boolean, 1)
         expect(read('svg_animated_boolean', boolean, 'base_val', integer) == 1 and read('svg_animated_boolean', boolean, 'anim_val', integer) == 1, 'real Boolean base/animated mutation')
-        expect(text('rv_dom_element_get_attribute', [pointer, ctypes.c_char_p], convolve, b'preserveAlpha') == 'true', 'real Boolean reflects actual preserveAlpha attribute')
+        expect(text('rv_dom_element_get_attribute', [pointer, Utf8], convolve, b'preserveAlpha') == 'true', 'real Boolean reflects actual preserveAlpha attribute')
         order = handle('rv_dom_svgfe_convolve_matrix_element_get_order_x', [pointer], [convolve], 'svg_animated_integer')
         expect(read('svg_animated_integer', order, 'base_val', integer) == 3, 'real integer wrapper initial order')
         call('rv_dom_svg_animated_integer_set_base_val', [pointer, integer], order, 4)

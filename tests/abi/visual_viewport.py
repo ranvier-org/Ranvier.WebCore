@@ -14,6 +14,7 @@ import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from svg_paint_probe import SvgProbe
+from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, UNSUPPORTED, DETACHED, WRONG_INTERFACE = 0, -1, -2, -9, -10, -11
@@ -253,7 +254,7 @@ def verify(native_directory):
         implementation = P()
         p.expect(p.bind('rv_dom_document_get_implementation', I, [P, ctypes.POINTER(P)])(document, ctypes.byref(implementation)) == OK, 'implementation')
         windowless = P()
-        p.expect(p.bind('rv_dom_dom_implementation_create_html_document', I, [P, ctypes.c_char_p, ctypes.POINTER(P)])(implementation, b'windowless', ctypes.byref(windowless)) == OK, 'windowless document')
+        p.expect(p.bind('rv_dom_dom_implementation_create_html_document', I, [P, Utf8, ctypes.POINTER(P)])(implementation, b'windowless', ctypes.byref(windowless)) == OK, 'windowless document')
         p.bind('rv_dom_dom_implementation_release', None, [P])(implementation)
         p.expect(get_viewport(windowless, ctypes.byref(P())) == UNSUPPORTED, 'a windowless document has no visualViewport')
         node_release(windowless)
