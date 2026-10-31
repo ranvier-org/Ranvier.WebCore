@@ -953,5 +953,8 @@
     "URLPatternResult",
     "URLPatternComponentResult",
     "URLPatternInit"
+  ],
+  "sequenceStringSpans": [
+    "URLSearchParams"
   ]
 }

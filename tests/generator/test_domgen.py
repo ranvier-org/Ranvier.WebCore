@@ -1715,6 +1715,28 @@ interface Matcher { boolean test(optional (USVString or PartInit) input = {}, op
         self.assertNotIn('abstract member test: ?baseURL: string -> bool', contract)
         self.assertIn('this.__ranvier_test (?input = None, ?baseURL = None)', contract)
 
+    def test_sequence_string_spans_keep_byte_lengths_under_a_distinct_name(self):
+        idl = '''
+interface Params {
+    constructor(optional (sequence<sequence<USVString>> or USVString) init = "");
+    sequence<USVString> getAll(USVString name);
+};
+interface Other { sequence<USVString> names(); };
+'''
+        generator = self.value_object_generator(idl, ['Params', 'Other'], sequenceStringSpans=['Params'],
+            constructors={'Params': {'receiver': 'Document', 'factory': 'Params::create', 'passReceiver': False,
+                                     'stringInputs': 'utf8-lengths'}})
+        get_all = next(item for item in generator.functions if item.name == 'params_get_all')
+        names = next(item for item in generator.functions if item.name == 'other_names')
+        self.assertEqual('RvDomSequenceUSVStringUtf8', get_all.returns.ctype)
+        self.assertTrue(get_all.returns.subtypes[0].string_spans)
+        self.assertEqual('RvDomSequenceUSVString', names.returns.ctype)
+        self.assertFalse(names.returns.subtypes[0].string_spans)
+        create = next(item for item in generator.functions if item.name == 'params_create')
+        self.assertEqual('RvDomSequenceSequenceOfUSVStringUtf8', create.arguments[0][1].subtypes[0].ctype)
+        header = generator.header()
+        self.assertIn('RvDomUtf8StringSpan* items;', header.split('struct RvDomSequenceUSVStringUtf8 {')[1].split('};')[0])
+
     def test_unconfigured_dictionary_results_stay_left_out(self):
         generator = self.value_object_generator(self.dictionary_result_idl(), ['Matcher'])
         excluded = dict(generator.excluded)
@@ -2145,6 +2167,14 @@ SVGStyleElement includes LinkStyle;
                 case = lines[index + 1].strip()
                 self.assertFalse(case.startswith('|') and '=' in case, line)
         self.assertIn('and NodeFilterResult =', lines)
+
+    def test_fable_reads_wide_integers_as_bigint_and_passes_them_as_numbers(self):
+        # Fable represents int64 and uint64 as BigInt; a browser reads and takes them as numbers.
+        source = (ROOT / 'gen' / 'Ranvier.Dom.fs').read_text(encoding='utf-8').replace('\r\n', '\n')
+        for member in ['size: uint64 with get', 'lastModified: int64 with get']:
+            name = member.split(':')[0]
+            self.assertIn(f'#if FABLE_COMPILER\n    [<Fable.Core.Emit("BigInt($0.{name})")>]\n#endif\n    abstract member {member}', source)
+        self.assertIn('o.slice(a0===void 0?void 0:Number(a0),a1===void 0?void 0:Number(a1),a2))($0,$1,$2,$3)', source)
 
     def test_fable_adapters_are_not_shadowed_by_inherited_intrinsic_members(self):
         # F# prefers an intrinsic member to an extension, so a Fable adapter extension on an interface is unreachable
