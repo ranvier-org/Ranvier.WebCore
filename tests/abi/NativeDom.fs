@@ -2426,6 +2426,24 @@ extern void rv_dom_highlight_registry_release(nativeint handle)
 extern nativeint rv_dom_highlight_registry_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_data_transfer_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_data_transfer_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_data_transfer_item_list_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_data_transfer_item_list_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_data_transfer_item_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_data_transfer_item_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern void rv_dom_canvas_rendering_context2_d_release(nativeint handle)
 
 [<DllImport(Lib)>]
@@ -8360,6 +8378,9 @@ extern int rv_dom_input_event_get_data(nativeint target, byte[] buffer, int capa
 extern int rv_dom_input_event_get_is_composing(nativeint target, int& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_input_event_get_data_transfer(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_input_event_get_target_ranges(nativeint target, RvDomSequenceStaticRange& result)
 
 [<DllImport(Lib)>]
@@ -10374,6 +10395,75 @@ extern int rv_dom_file_reader_read_as_data_url(nativeint target, nativeint blob)
 
 [<DllImport(Lib)>]
 extern int rv_dom_file_reader_abort(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_create(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_drop_effect(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_set_drop_effect(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_effect_allowed(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_set_effect_allowed(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_items(nativeint target, nativeint context, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_types(nativeint target, nativeint context, RvDomSequenceDOMString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_files(nativeint target, nativeint context, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_set_drag_image(nativeint target, nativeint image, int x, int y)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_get_data(nativeint target, nativeint context, byte[] format, int format_length, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_set_data(nativeint target, nativeint context, byte[] format, int format_length, byte[] data, int data_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_clear_data(nativeint target, byte[] format, int format_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_get_length(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_item(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_add_2(nativeint target, nativeint context, byte[] data, int data_length, byte[] ``type``, int type_length, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_add_1(nativeint target, nativeint file, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_remove(nativeint target, uint32 index)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_list_clear(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_get_kind(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_get_type(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_data_transfer_item_get_as_file(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_clipboard_event_get_clipboard_data(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_drag_event_get_data_transfer(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_html_canvas_element_get_width(nativeint target, uint32& result)

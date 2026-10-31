@@ -68,6 +68,7 @@
 #include "CaretPositionFromPointOptions.h"
 #include "CharacterData.h"
 #include "CheckVisibilityOptions.h"
+#include "ClipboardEvent.h"
 #include "CommandEvent.h"
 #include "Comment.h"
 #include "CompositionEvent.h"
@@ -97,11 +98,15 @@
 #include "DOMStringMap.h"
 #include "DOMTokenList.h"
 #include "DOMURL.h"
+#include "DataTransfer.h"
+#include "DataTransferItem.h"
+#include "DataTransferItemList.h"
 #include "Document.h"
 #include "DocumentFragment.h"
 #include "DocumentOrShadowRootFullscreen.h"
 #include "DocumentSVG.h"
 #include "DocumentSettingsValues.h"
+#include "DragEvent.h"
 #include "Element.h"
 #include "ElementCreationOptions.h"
 #include "ElementInlines.h"
@@ -3380,7 +3385,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:DataTransfer", "dom:DataTransferItemList", "dom:DataTransferItem", "dom:ClipboardEvent", "dom:DragEvent", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:DataTransfer", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -4613,6 +4618,48 @@ RvHighlightRegistry* ranvier_dom_highlight_registry_retain(RvHighlightRegistry* 
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<HighlightRegistry*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_data_transfer_release(RvDataTransfer* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<DataTransfer*>(handle)->deref();
+}
+
+RvDataTransfer* ranvier_dom_data_transfer_retain(RvDataTransfer* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<DataTransfer*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_data_transfer_item_list_release(RvDataTransferItemList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<DataTransferItemList*>(handle)->deref();
+}
+
+RvDataTransferItemList* ranvier_dom_data_transfer_item_list_retain(RvDataTransferItemList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<DataTransferItemList*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_data_transfer_item_release(RvDataTransferItem* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<DataTransferItem*>(handle)->deref();
+}
+
+RvDataTransferItem* ranvier_dom_data_transfer_item_retain(RvDataTransferItem* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<DataTransferItem*>(handle)->ref();
     return handle;
 }
 
@@ -33237,6 +33284,19 @@ int32_t ranvier_dom_input_event_get_is_composing(RvEvent* target, int32_t* resul
     return deliver([&]() -> decltype(auto) { return impl->isInputMethodComposing(); }, [&](auto&& value) { return store<int32_t>(value, result); });
 }
 
+// InputEvent.dataTransfer getter: readonly attribute DataTransfer? dataTransfer; *result is a new reference, or NULL
+int32_t ranvier_dom_input_event_get_data_transfer(RvEvent* target, RvDataTransfer** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<InputEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dataTransfer(); }, [&](auto&& value) { return storeHandle<DataTransfer>(value, result); });
+}
+
 // InputEvent.getTargetRanges() -> sequence<StaticRange>; *result owns its contents; release with the matching rv_dom_*_release
 int32_t ranvier_dom_input_event_get_target_ranges(RvEvent* target, RvDomSequenceStaticRange* result)
 {
@@ -42362,6 +42422,317 @@ int32_t ranvier_dom_file_reader_abort(RvEventTarget* target)
     return invoke([&]() -> decltype(auto) { return impl->abort(); });
 }
 
+// DataTransfer.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_data_transfer_create(RvNode* target, RvDataTransfer** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return DataTransfer::create(); }, [&](auto&& value) { return storeHandle<DataTransfer>(value, result); });
+}
+
+// DataTransfer.dropEffect getter: attribute DOMString dropEffect
+int32_t ranvier_dom_data_transfer_get_drop_effect(RvDataTransfer* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->dropEffect(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DataTransfer.dropEffect setter: attribute DOMString dropEffect
+int32_t ranvier_dom_data_transfer_set_drop_effect(RvDataTransfer* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setDropEffect(a0.string()); });
+}
+
+// DataTransfer.effectAllowed getter: attribute DOMString effectAllowed
+int32_t ranvier_dom_data_transfer_get_effect_allowed(RvDataTransfer* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->effectAllowed(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DataTransfer.effectAllowed setter: attribute DOMString effectAllowed
+int32_t ranvier_dom_data_transfer_set_effect_allowed(RvDataTransfer* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setEffectAllowed(a0.string()); });
+}
+
+// DataTransfer.items getter: readonly attribute DataTransferItemList items; context is an explicit checked Document for the operation; *result is a new reference; RV_ERR_UNSUPPORTED while the setting DataTransferItemsEnabled is off
+int32_t ranvier_dom_data_transfer_get_items(RvDataTransfer* target, RvNode* context, RvDataTransferItemList** result)
+{
+    if (!target || !context || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!settingsDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.dataTransferItemsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    return deliver([&]() -> decltype(auto) { return impl->items(document.get()); }, [&](auto&& value) { return storeHandle<DataTransferItemList>(value, result); });
+}
+
+// DataTransfer.types getter: readonly attribute FrozenArray<DOMString> types; context is an explicit checked Document for the operation; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_data_transfer_get_types(RvDataTransfer* target, RvNode* context, RvDomSequenceDOMString* result)
+{
+    if (!target || !context || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    return deliver([&]() -> decltype(auto) { return impl->types(document.get()); }, [&](auto&& value) { return encodeRvDomSequenceDOMString(value, result); });
+}
+
+// DataTransfer.files getter: readonly attribute FileList files; context is an explicit checked Document for the operation; *result is a new reference
+int32_t ranvier_dom_data_transfer_get_files(RvDataTransfer* target, RvNode* context, RvFileList** result)
+{
+    if (!target || !context || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    return deliver([&]() -> decltype(auto) { return impl->files(document.get()); }, [&](auto&& value) { return storeHandle<FileList>(value, result); });
+}
+
+// DataTransfer.setDragImage(Element image, long x, long y) -> undefined
+int32_t ranvier_dom_data_transfer_set_drag_image(RvDataTransfer* target, RvNode* image, int32_t x, int32_t y)
+{
+    if (!target || !image)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    RefPtr<Element> a0 = image ? dynamicDowncast<Element>(*nodeOf(image)) : nullptr;
+    if (image && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setDragImage(HandleArg<Element> { a0.get() }, x, y); });
+}
+
+// DataTransfer.getData(DOMString format) -> DOMString; context is an explicit checked Document for the operation
+int32_t ranvier_dom_data_transfer_get_data(RvDataTransfer* target, RvNode* context, const uint8_t* format, int32_t format_length, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !context || !(format_length >= 0 && (format_length <= 0 || format)) || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { format, format_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->getData(document.get(), a0.string()); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DataTransfer.setData(DOMString format, DOMString data) -> undefined; context is an explicit checked Document for the operation
+int32_t ranvier_dom_data_transfer_set_data(RvDataTransfer* target, RvNode* context, const uint8_t* format, int32_t format_length, const uint8_t* data, int32_t data_length)
+{
+    if (!target || !context || !(format_length >= 0 && (format_length <= 0 || format)) || !(data_length >= 0 && (data_length <= 0 || data)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { format, format_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { data, data_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setData(document.get(), a0.string(), a1.string()); });
+}
+
+// DataTransfer.clearData(optional DOMString format) -> undefined; format_length -1 means absent
+int32_t ranvier_dom_data_transfer_clear_data(RvDataTransfer* target, const uint8_t* format, int32_t format_length)
+{
+    if (!target || !(format_length >= -1 && (format_length <= 0 || format)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransfer> impl = reinterpret_cast<DataTransfer*>(target);
+    StringArg a0 { format, format_length };
+    if (format_length >= 0 && a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->clearData(a0); });
+}
+
+// DataTransferItemList.length getter: readonly attribute long length
+int32_t ranvier_dom_data_transfer_item_list_get_length(RvDataTransferItemList* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransferItemList> impl = reinterpret_cast<DataTransferItemList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// DataTransferItemList.item(unsigned long index) -> DataTransferItem?; *result is a new reference, or NULL
+int32_t ranvier_dom_data_transfer_item_list_item(RvDataTransferItemList* target, uint32_t index, RvDataTransferItem** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransferItemList> impl = reinterpret_cast<DataTransferItemList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<DataTransferItem>(value, result); });
+}
+
+// DataTransferItemList.add(DOMString data, DOMString type) -> DataTransferItem?; context is an explicit checked Document for the operation; *result is a new reference, or NULL
+int32_t ranvier_dom_data_transfer_item_list_add_2(RvDataTransferItemList* target, RvNode* context, const uint8_t* data, int32_t data_length, const uint8_t* type, int32_t type_length, RvDataTransferItem** result)
+{
+    if (!target || !context || !(data_length >= 0 && (data_length <= 0 || data)) || !(type_length >= 0 && (type_length <= 0 || type)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransferItemList> impl = reinterpret_cast<DataTransferItemList*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { data, data_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { type, type_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->add(document.get(), a0.string(), a1.string()); }, [&](auto&& value) { return storeHandle<DataTransferItem>(value, result); });
+}
+
+// DataTransferItemList.add(File file) -> DataTransferItem?; *result is a new reference, or NULL
+int32_t ranvier_dom_data_transfer_item_list_add_1(RvDataTransferItemList* target, RvBlob* file, RvDataTransferItem** result)
+{
+    if (!target || !file || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransferItemList> impl = reinterpret_cast<DataTransferItemList*>(target);
+    RefPtr<File> a0 = file ? dynamicDowncast<File>(*reinterpret_cast<Blob*>(file)) : nullptr;
+    if (file && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->add(HandleArg<File> { a0.get() }); }, [&](auto&& value) { return storeHandle<DataTransferItem>(value, result); });
+}
+
+// DataTransferItemList.remove(unsigned long index) -> undefined
+int32_t ranvier_dom_data_transfer_item_list_remove(RvDataTransferItemList* target, uint32_t index)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransferItemList> impl = reinterpret_cast<DataTransferItemList*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->remove(index); });
+}
+
+// DataTransferItemList.clear() -> undefined
+int32_t ranvier_dom_data_transfer_item_list_clear(RvDataTransferItemList* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransferItemList> impl = reinterpret_cast<DataTransferItemList*>(target);
+    return invoke([&]() -> decltype(auto) { return impl->clear(); });
+}
+
+// DataTransferItem.kind getter: readonly attribute DOMString kind
+int32_t ranvier_dom_data_transfer_item_get_kind(RvDataTransferItem* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransferItem> impl = reinterpret_cast<DataTransferItem*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->kind(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DataTransferItem.type getter: readonly attribute DOMString type
+int32_t ranvier_dom_data_transfer_item_get_type(RvDataTransferItem* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransferItem> impl = reinterpret_cast<DataTransferItem*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->type(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// DataTransferItem.getAsFile() -> File?; *result is a new reference, or NULL
+int32_t ranvier_dom_data_transfer_item_get_as_file(RvDataTransferItem* target, RvBlob** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<DataTransferItem> impl = reinterpret_cast<DataTransferItem*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->getAsFile(); }, [&](auto&& value) { return storeHandle<Blob>(value, result); });
+}
+
+// ClipboardEvent.clipboardData getter: readonly attribute DataTransfer? clipboardData; *result is a new reference, or NULL
+int32_t ranvier_dom_clipboard_event_get_clipboard_data(RvEvent* target, RvDataTransfer** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = ([&]() -> ClipboardEvent* { auto& event = *eventOf(target); return event.interfaceType() == EventInterfaceType::ClipboardEvent ? static_cast<ClipboardEvent*>(&event) : nullptr; }());
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->clipboardData(); }, [&](auto&& value) { return storeHandle<DataTransfer>(value, result); });
+}
+
+// DragEvent.dataTransfer getter: readonly attribute DataTransfer? dataTransfer; *result is a new reference, or NULL
+int32_t ranvier_dom_drag_event_get_data_transfer(RvEvent* target, RvDataTransfer** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<DragEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->dataTransfer(); }, [&](auto&& value) { return storeHandle<DataTransfer>(value, result); });
+}
+
 // HTMLCanvasElement.width getter: attribute unsigned long width
 int32_t ranvier_dom_html_canvas_element_get_width(RvNode* target, uint32_t* result)
 {
@@ -43827,6 +44198,8 @@ int32_t ranvier_dom_event_get_interface_name(RvEvent* target, char* buffer, int3
     if (!isMainThread())
         return RV_ERR_WRONG_THREAD;
     auto* impl = reinterpret_cast<Event*>(target);
+    if (dynamicDowncast<DragEvent>(*impl))
+        return copyString("DragEvent"_s, buffer, capacity, length);
     if (dynamicDowncast<PointerEvent>(*impl))
         return copyString("PointerEvent"_s, buffer, capacity, length);
     if (dynamicDowncast<WheelEvent>(*impl))
@@ -43849,6 +44222,8 @@ int32_t ranvier_dom_event_get_interface_name(RvEvent* target, char* buffer, int3
         return copyString("AnimationEvent"_s, buffer, capacity, length);
     if (dynamicDowncast<CSSTransitionEvent>(*impl))
         return copyString("TransitionEvent"_s, buffer, capacity, length);
+    if (([&]() -> ClipboardEvent* { auto& event = *impl; return event.interfaceType() == EventInterfaceType::ClipboardEvent ? static_cast<ClipboardEvent*>(&event) : nullptr; }()))
+        return copyString("ClipboardEvent"_s, buffer, capacity, length);
     if (dynamicDowncast<CommandEvent>(*impl))
         return copyString("CommandEvent"_s, buffer, capacity, length);
     if (([&]() -> ContentVisibilityAutoStateChangeEvent* { auto& event = *impl; return event.interfaceType() == EventInterfaceType::ContentVisibilityAutoStateChangeEvent ? static_cast<ContentVisibilityAutoStateChangeEvent*>(&event) : nullptr; }()))

@@ -1313,11 +1313,16 @@ class Generator(ComplexGeneratorMixin):
             return "impl->getNameAttribute()"
         return f"impl->attributeWithoutSynchronization({attribute})"
 
-    def setting_check(self, interface, chain, setting):
+    def setting_check(self, interface, chain, setting, context=False):
         """The glue that returns RV_ERR_UNSUPPORTED while a setting of [EnabledBySetting] is off, as WebKit's
-        bindings hide the member then: A&B needs both, A|B either."""
+        bindings hide the member then: A&B needs both, A|B either. context is whether the member takes the
+        checked Document of objectContexts, whose settings then apply."""
         lines = []
-        if "Node" in chain:
+        if context:
+            lines = ["RefPtr settingsDocument = dynamicDowncast<Document>(*nodeOf(context));", "if (!settingsDocument)",
+                     "    return RV_ERR_WRONG_INTERFACE;"]
+            document = "(*settingsDocument)"
+        elif "Node" in chain:
             document = "impl->document()"
         elif "Event" in chain:
             # An event reaches the settings through its target's document; one without a node target has none.
@@ -1991,7 +1996,7 @@ class Generator(ComplexGeneratorMixin):
                 raise SystemExit(f"creationGatedInterfaces: {factory} does not check [EnabledBySetting={setting}]")
             setting = None
         if setting:
-            body += self.setting_check(interface, chain, setting)
+            body += self.setting_check(interface, chain, setting, bool(call_with and "Node" not in chain and context_receiver))
             notes.append(f"RV_ERR_UNSUPPORTED while the setting {setting} is off")
         if call_with:
             if "Node" not in chain:

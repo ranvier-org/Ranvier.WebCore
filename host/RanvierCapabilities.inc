@@ -18,7 +18,8 @@ static constexpr const char* capabilityFacilityNames[] = {
     "shared-worker", "websocket", "webtransport", "file-system", "push", "inspector", "remote-inspector",
     "jsc-inspector", "jit", "dfg-jit", "ftl-jit", "webassembly", "webassembly-bbq-jit", "webassembly-omg-jit",
     "accessibility", "accessibility-uia", "accessibility-events", "clipboard", "clipboard-read-callback",
-    "clipboard-write-callback", "drop", "drag-out", "popups", "tooltip", "input", "ime", "frame", "scroll",
+    "clipboard-write-callback", "clipboard-file-write-callback", "clipboard-files", "drop", "drag-out", "data-transfer-files",
+    "range-replacement", "popups", "tooltip", "input", "ime", "frame", "scroll",
     "speech-synthesis", "gamepad", "spellcheck", "pdfjs", "wk-web-extensions", "notifications", "diagnostics",
     "inspector-frontend", "cascade-diagnostics", "media-preferences", "media-color-scheme", "media-reduced-motion",
     "media-contrast", "media-pointer", "media-hover", "media-text-scale", "media-forced-colors", "media-contrast-less",
@@ -231,6 +232,9 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     if (!std::strcmp(name, "resource-callback")) { result.facts[1] = 1; result.boolean(!!host.resourceHandler); }
     else if (!std::strcmp(name, "clipboard-read-callback")) { result.facts[1] = 1; result.boolean(!!host.clipboardRead); }
     else if (!std::strcmp(name, "clipboard-write-callback")) { result.facts[1] = 1; result.boolean(!!host.clipboardWrite); }
+    else if (!std::strcmp(name, "clipboard-file-write-callback")) { result.facts[1] = 1; result.boolean(!!host.clipboardWriteFile); }
+    else if (!std::strcmp(name, "clipboard-files") || !std::strcmp(name, "data-transfer-files") || !std::strcmp(name, "range-replacement"))
+        result.facts[1] = rv_abi_has(name);
     else if (!std::strcmp(name, "popups")) { result.facts[1] = 1; result.boolean(!!host.popupCallback); }
     else if (!std::strcmp(name, "drag-out")) { result.facts[1] = 1; result.boolean(!!host.dragStartCallback); }
     else if (!std::strcmp(name, "frame")) { result.facts[1] = 1; result.boolean(!!host.frameCallback); }

@@ -17,7 +17,8 @@
     "browserWellFormedUnions and browserWellFormedSetters list the unions and interfaces whose USVString inputs the",
     "Fable browser provider converts to well-formed strings. Every generated string input is UTF-8 with an explicit byte",
     "length; sequenceStringSpans only names the string sequences of its interfaces Utf8.",
-    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear."
+    "elementArrayReflections lists [Reflect] FrozenArray<Element>? attributes bound to the engine's element array reflection: the getter returns a snapshot sequence, or none for null; the setter takes a sequence, or none to clear.",
+    "browserIndexedGetters lists named IDL getters that browsers expose only as an indexed property; the Fable binding reads $0[index], null when absent."
   ],
   "attributeBridges": {
     "Document.adoptedStyleSheets": {
@@ -288,6 +289,11 @@
       "receiver": "Document",
       "factory": "PointerEvent::create",
       "passReceiver": false
+    },
+    "DataTransfer": {
+      "receiver": "Document",
+      "factory": "DataTransfer::create",
+      "passReceiver": false
     }
   },
   "dictionaryCppTypes": {
@@ -424,7 +430,10 @@
     "StylePropertyMap": "Document",
     "DOMMatrix": "Document",
     "DOMFormData": "Document",
-    "URLSearchParams": "Document"
+    "URLSearchParams": "Document",
+    "DataTransfer": "Document",
+    "DataTransferItemList": "Document",
+    "DataTransferItem": "Document"
   },
   "finiteNumberInputs": [
     "CSSUnitValue",
@@ -725,6 +734,11 @@
     "Highlight",
     "HighlightRegistry",
     "FileReader",
+    "DataTransfer",
+    "DataTransferItemList",
+    "DataTransferItem",
+    "ClipboardEvent",
+    "DragEvent",
     "HTMLCanvasElement",
     "CanvasRenderingContext2D",
     "CanvasGradient",
@@ -764,8 +778,6 @@
       "CSSStyleSheet",
       "CSSStyleProperties",
       "CustomElementRegistry",
-      "ClipboardEvent",
-      "DragEvent",
       "ErrorEvent",
       "FormDataEvent",
       "GamepadEvent",
@@ -863,7 +875,8 @@
     "HashChangeEvent",
     "MediaQueryListEvent",
     "PopStateEvent",
-    "CustomEvent"
+    "CustomEvent",
+    "ClipboardEvent"
   ],
   "castVia": {
     "SVGAnimationElement": "SVGElement",
@@ -959,7 +972,9 @@
     "AnimationEventInit.animation",
     "CSSTransitionEvent.animation",
     "TransitionEventInit.animation",
-    "UIEventInit.view"
+    "UIEventInit.view",
+    "DataTransferItem.getAsString",
+    "DataTransferItem.webkitGetAsEntry"
   ],
   "namespaceBindings": {
     "DOMCSSNamespace": {
@@ -1157,7 +1172,9 @@
   },
   "creationGatedInterfaces": {
     "CaretPosition": "Document.caretPositionFromPoint",
-    "VisualViewport": "DOMWindow.visualViewport"
+    "VisualViewport": "DOMWindow.visualViewport",
+    "DataTransferItemList": "DataTransfer.items",
+    "DataTransferItem": "DataTransferItemList.item"
   },
   "contextSettingsObjects": [
     "FileReader"
@@ -1227,5 +1244,8 @@
   ],
   "idlDefaultDictionaries": [
     "PointerEventInit"
+  ],
+  "browserIndexedGetters": [
+    "DataTransferItemList.item"
   ]
 }

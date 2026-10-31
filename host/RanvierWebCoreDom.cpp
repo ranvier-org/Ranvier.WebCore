@@ -128,6 +128,12 @@ void rv_dom_highlight_release(RvHighlight* handle) { ranvier_dom_highlight_relea
 RvHighlight* rv_dom_highlight_retain(RvHighlight* handle) { return ranvier_dom_highlight_retain(handle); }
 void rv_dom_highlight_registry_release(RvHighlightRegistry* handle) { ranvier_dom_highlight_registry_release(handle); }
 RvHighlightRegistry* rv_dom_highlight_registry_retain(RvHighlightRegistry* handle) { return ranvier_dom_highlight_registry_retain(handle); }
+void rv_dom_data_transfer_release(RvDataTransfer* handle) { ranvier_dom_data_transfer_release(handle); }
+RvDataTransfer* rv_dom_data_transfer_retain(RvDataTransfer* handle) { return ranvier_dom_data_transfer_retain(handle); }
+void rv_dom_data_transfer_item_list_release(RvDataTransferItemList* handle) { ranvier_dom_data_transfer_item_list_release(handle); }
+RvDataTransferItemList* rv_dom_data_transfer_item_list_retain(RvDataTransferItemList* handle) { return ranvier_dom_data_transfer_item_list_retain(handle); }
+void rv_dom_data_transfer_item_release(RvDataTransferItem* handle) { ranvier_dom_data_transfer_item_release(handle); }
+RvDataTransferItem* rv_dom_data_transfer_item_retain(RvDataTransferItem* handle) { return ranvier_dom_data_transfer_item_retain(handle); }
 void rv_dom_canvas_rendering_context2_d_release(RvCanvasRenderingContext2D* handle) { ranvier_dom_canvas_rendering_context2_d_release(handle); }
 RvCanvasRenderingContext2D* rv_dom_canvas_rendering_context2_d_retain(RvCanvasRenderingContext2D* handle) { return ranvier_dom_canvas_rendering_context2_d_retain(handle); }
 void rv_dom_canvas_gradient_release(RvCanvasGradient* handle) { ranvier_dom_canvas_gradient_release(handle); }
@@ -2169,6 +2175,7 @@ int32_t rv_dom_input_event_create(RvNode* target, const uint8_t* type, int32_t t
 int32_t rv_dom_input_event_get_input_type(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_input_event_get_input_type(target, buffer, capacity, length); }
 int32_t rv_dom_input_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_input_event_get_data(target, buffer, capacity, length); }
 int32_t rv_dom_input_event_get_is_composing(RvEvent* target, int32_t* result) { return ranvier_dom_input_event_get_is_composing(target, result); }
+int32_t rv_dom_input_event_get_data_transfer(RvEvent* target, RvDataTransfer** result) { return ranvier_dom_input_event_get_data_transfer(target, result); }
 int32_t rv_dom_input_event_get_target_ranges(RvEvent* target, RvDomSequenceStaticRange* result) { return ranvier_dom_input_event_get_target_ranges(target, result); }
 int32_t rv_dom_composition_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomCompositionEventInit* event_init_dict, RvEvent** result) { return ranvier_dom_composition_event_create(target, type, type_length, event_init_dict, result); }
 int32_t rv_dom_composition_event_get_data(RvEvent* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_composition_event_get_data(target, buffer, capacity, length); }
@@ -2841,6 +2848,29 @@ int32_t rv_dom_file_reader_read_as_binary_string(RvEventTarget* target, RvBlob* 
 int32_t rv_dom_file_reader_read_as_text(RvEventTarget* target, RvBlob* blob, const uint8_t* encoding, int32_t encoding_length) { return ranvier_dom_file_reader_read_as_text(target, blob, encoding, encoding_length); }
 int32_t rv_dom_file_reader_read_as_data_url(RvEventTarget* target, RvBlob* blob) { return ranvier_dom_file_reader_read_as_data_url(target, blob); }
 int32_t rv_dom_file_reader_abort(RvEventTarget* target) { return ranvier_dom_file_reader_abort(target); }
+int32_t rv_dom_data_transfer_create(RvNode* target, RvDataTransfer** result) { return ranvier_dom_data_transfer_create(target, result); }
+int32_t rv_dom_data_transfer_get_drop_effect(RvDataTransfer* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_data_transfer_get_drop_effect(target, buffer, capacity, length); }
+int32_t rv_dom_data_transfer_set_drop_effect(RvDataTransfer* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_data_transfer_set_drop_effect(target, value, value_length); }
+int32_t rv_dom_data_transfer_get_effect_allowed(RvDataTransfer* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_data_transfer_get_effect_allowed(target, buffer, capacity, length); }
+int32_t rv_dom_data_transfer_set_effect_allowed(RvDataTransfer* target, const uint8_t* value, int32_t value_length) { return ranvier_dom_data_transfer_set_effect_allowed(target, value, value_length); }
+int32_t rv_dom_data_transfer_get_items(RvDataTransfer* target, RvNode* context, RvDataTransferItemList** result) { return ranvier_dom_data_transfer_get_items(target, context, result); }
+int32_t rv_dom_data_transfer_get_types(RvDataTransfer* target, RvNode* context, RvDomSequenceDOMString* result) { return ranvier_dom_data_transfer_get_types(target, context, result); }
+int32_t rv_dom_data_transfer_get_files(RvDataTransfer* target, RvNode* context, RvFileList** result) { return ranvier_dom_data_transfer_get_files(target, context, result); }
+int32_t rv_dom_data_transfer_set_drag_image(RvDataTransfer* target, RvNode* image, int32_t x, int32_t y) { return ranvier_dom_data_transfer_set_drag_image(target, image, x, y); }
+int32_t rv_dom_data_transfer_get_data(RvDataTransfer* target, RvNode* context, const uint8_t* format, int32_t format_length, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_data_transfer_get_data(target, context, format, format_length, buffer, capacity, length); }
+int32_t rv_dom_data_transfer_set_data(RvDataTransfer* target, RvNode* context, const uint8_t* format, int32_t format_length, const uint8_t* data, int32_t data_length) { return ranvier_dom_data_transfer_set_data(target, context, format, format_length, data, data_length); }
+int32_t rv_dom_data_transfer_clear_data(RvDataTransfer* target, const uint8_t* format, int32_t format_length) { return ranvier_dom_data_transfer_clear_data(target, format, format_length); }
+int32_t rv_dom_data_transfer_item_list_get_length(RvDataTransferItemList* target, int32_t* result) { return ranvier_dom_data_transfer_item_list_get_length(target, result); }
+int32_t rv_dom_data_transfer_item_list_item(RvDataTransferItemList* target, uint32_t index, RvDataTransferItem** result) { return ranvier_dom_data_transfer_item_list_item(target, index, result); }
+int32_t rv_dom_data_transfer_item_list_add_2(RvDataTransferItemList* target, RvNode* context, const uint8_t* data, int32_t data_length, const uint8_t* type, int32_t type_length, RvDataTransferItem** result) { return ranvier_dom_data_transfer_item_list_add_2(target, context, data, data_length, type, type_length, result); }
+int32_t rv_dom_data_transfer_item_list_add_1(RvDataTransferItemList* target, RvBlob* file, RvDataTransferItem** result) { return ranvier_dom_data_transfer_item_list_add_1(target, file, result); }
+int32_t rv_dom_data_transfer_item_list_remove(RvDataTransferItemList* target, uint32_t index) { return ranvier_dom_data_transfer_item_list_remove(target, index); }
+int32_t rv_dom_data_transfer_item_list_clear(RvDataTransferItemList* target) { return ranvier_dom_data_transfer_item_list_clear(target); }
+int32_t rv_dom_data_transfer_item_get_kind(RvDataTransferItem* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_data_transfer_item_get_kind(target, buffer, capacity, length); }
+int32_t rv_dom_data_transfer_item_get_type(RvDataTransferItem* target, char* buffer, int32_t capacity, int32_t* length) { return ranvier_dom_data_transfer_item_get_type(target, buffer, capacity, length); }
+int32_t rv_dom_data_transfer_item_get_as_file(RvDataTransferItem* target, RvBlob** result) { return ranvier_dom_data_transfer_item_get_as_file(target, result); }
+int32_t rv_dom_clipboard_event_get_clipboard_data(RvEvent* target, RvDataTransfer** result) { return ranvier_dom_clipboard_event_get_clipboard_data(target, result); }
+int32_t rv_dom_drag_event_get_data_transfer(RvEvent* target, RvDataTransfer** result) { return ranvier_dom_drag_event_get_data_transfer(target, result); }
 int32_t rv_dom_html_canvas_element_get_width(RvNode* target, uint32_t* result) { return ranvier_dom_html_canvas_element_get_width(target, result); }
 int32_t rv_dom_html_canvas_element_set_width(RvNode* target, uint32_t value) { return ranvier_dom_html_canvas_element_set_width(target, value); }
 int32_t rv_dom_html_canvas_element_get_height(RvNode* target, uint32_t* result) { return ranvier_dom_html_canvas_element_get_height(target, result); }

@@ -157,4 +157,5 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
     run([sys.executable, '-I', '-X', 'utf8', tests / 'media_queries.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'canvas_context.py', '--native-directory', out])
     run([sys.executable, '-I', '-X', 'utf8', tests / 'value_factories.py', '--native-directory', out])
+    run([sys.executable, '-I', '-X', 'utf8', tests / 'data_transfer.py', '--native-directory', out])
 print('abi tests passed', flush=True)

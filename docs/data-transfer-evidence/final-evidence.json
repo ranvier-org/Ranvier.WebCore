@@ -1,0 +1,33 @@
+{
+  "groups": [
+    "I07 drag/drop object model (#104)",
+    "T09 clipboard formats and file payloads (#77)",
+    "T04 rich beforeinput/input payloads (#75)"
+  ],
+  "native": "private dnd candidate on #145 Native47/ABI55 + batch-1 d1ff8ace (root assigns NativeNN/ABI at integration)",
+  "abi": 55,
+  "sourcePatch": "0041-data-transfer-in-memory-file-access.patch (unit UnifiedSource-dom-6 recompiled)",
+  "batch": {
+    "probes": 63,
+    "rawAssertions": 91903,
+    "teardownCases": 107,
+    "dataTransfer": 851
+  },
+  "repeat30": {
+    "runs": 30,
+    "identicalResults": true
+  },
+  "qualified": 38,
+  "chromium": "156.0.8078.4",
+  "files": {
+    "baseline-comparison.json": "c2ddab2e2b072f23a4d3f6dc40280b2e9e6dd75191218506beb2a7eb8cc6b828",
+    "batch-green.json": "ce4e8ee4040496a63d1aabcbcfb18feac4295abfa82a7d9ae3f251acad85ce8f",
+    "data-transfer-probe.log": "100ad1fb580a30d151667c337234a90fc7a648a28a7c1a8bb1e283be5259979e",
+    "data-transfer-repeat30.txt": "9262bb4264720fd7746c45e17f682b52b91d8ea52284dd0f8425d5a8cdf61a34",
+    "data-transfer-report.json": "6ce20cd8be6714963c40d7e78114b2e44b68ac7b1af097e53bb8aa97a1d42568",
+    "red-native46.json": "0d52286d6d9c1bfc45088313314b7bad2f5cb4aa93d9c1cb93427303167a13e4",
+    "runtime-receipt.json": "58844d4c79285a11700c7ca3c85193d66033cd9ec86b4619c908fbcbe8aa46cd",
+    "source-patches.json": "c01b9f80db9407c9a427ce3ff6dc0847b1efc19677a62e78f759f7ea5a7fe62b",
+    "teardown-probes.json": "fff8f2efc36cdd7eeb1a03308a6868935163f01e2bc93f6cae31e98a5a38ab20"
+  }
+}

@@ -600,6 +600,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/host_string_nul.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify the DataTransfer object model, drag and clipboard payloads and range replacement against the Chromium oracle
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/data_transfer.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify the native inspector diagnostics against the Chromium box-model oracle
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/inspector_diagnostics.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"

@@ -3346,6 +3346,8 @@ and [<AllowNullLiteral>] InputEvent =
     abstract member data: string with get
     /// <summary>InputEvent.isComposing.</summary>
     abstract member isComposing: bool with get
+    /// <summary>InputEvent.dataTransfer.</summary>
+    abstract member dataTransfer: DataTransfer with get
     /// <summary>InputEvent.getTargetRanges.</summary>
     abstract member getTargetRanges: unit -> (StaticRange) array
 
@@ -5126,6 +5128,68 @@ and [<AllowNullLiteral>] FileReader =
     /// <summary>FileReader.abort.</summary>
     abstract member abort: unit -> unit
 
+/// <summary>DataTransfer in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DataTransfer =
+    /// <summary>DataTransfer.dropEffect.</summary>
+    abstract member dropEffect: string with get, set
+    /// <summary>DataTransfer.effectAllowed.</summary>
+    abstract member effectAllowed: string with get, set
+    /// <summary>DataTransfer.items.</summary>
+    abstract member items: DataTransferItemList with get
+    /// <summary>DataTransfer.setDragImage.</summary>
+    abstract member setDragImage: image: Element * x: int * y: int -> unit
+    /// <summary>DataTransfer.types.</summary>
+    abstract member types: (string) array with get
+    /// <summary>DataTransfer.getData.</summary>
+    abstract member getData: format: string -> string
+    /// <summary>DataTransfer.setData.</summary>
+    abstract member setData: format: string * data: string -> unit
+    /// <summary>DataTransfer.clearData.</summary>
+    abstract member clearData: ?format: string -> unit
+    /// <summary>DataTransfer.files.</summary>
+    abstract member files: FileList with get
+
+/// <summary>DataTransferItemList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DataTransferItemList =
+    /// <summary>DataTransferItemList.length.</summary>
+    abstract member length: int with get
+
+    /// <summary>DataTransferItemList.item.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("($0[$1] ?? null)")>]
+#endif
+    abstract member item: index: uint32 -> DataTransferItem
+
+    /// <summary>DataTransferItemList.add.</summary>
+    abstract member add: data: string * ``type``: string -> DataTransferItem
+    /// <summary>DataTransferItemList.add.</summary>
+    abstract member add: file: File -> DataTransferItem
+    /// <summary>DataTransferItemList.remove.</summary>
+    abstract member remove: index: uint32 -> unit
+    /// <summary>DataTransferItemList.clear.</summary>
+    abstract member clear: unit -> unit
+
+/// <summary>DataTransferItem in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DataTransferItem =
+    /// <summary>DataTransferItem.kind.</summary>
+    abstract member kind: string with get
+    /// <summary>DataTransferItem.type.</summary>
+    abstract member ``type``: string with get
+    /// <summary>DataTransferItem.getAsFile.</summary>
+    abstract member getAsFile: unit -> File
+
+/// <summary>ClipboardEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] ClipboardEvent =
+    inherit Event
+    /// <summary>ClipboardEvent.clipboardData.</summary>
+    abstract member clipboardData: DataTransfer with get
+
+/// <summary>DragEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DragEvent =
+    inherit MouseEvent
+    /// <summary>DragEvent.dataTransfer.</summary>
+    abstract member dataTransfer: DataTransfer with get
+
 /// <summary>HTMLCanvasElement in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLCanvasElement =
     inherit HTMLElement
@@ -5210,14 +5274,6 @@ and [<AllowNullLiteral>] HTMLVideoElement =
 
 /// <summary>CustomElementRegistry in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] CustomElementRegistry = interface end
-
-/// <summary>ClipboardEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] ClipboardEvent =
-    inherit Event
-
-/// <summary>DragEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] DragEvent =
-    inherit MouseEvent
 
 /// <summary>GamepadEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] GamepadEvent =
