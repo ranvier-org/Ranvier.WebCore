@@ -15,7 +15,7 @@ FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 P, I, U = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint32
 CALLBACK = ctypes.CFUNCTYPE(I, P, P)
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE = 0, -1, -2, -3, -11
-ABI = 41
+ABI = 43
 FILE_ARM, STRING_ARM = 1, 2
 
 

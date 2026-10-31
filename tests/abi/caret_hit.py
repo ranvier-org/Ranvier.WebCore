@@ -18,7 +18,7 @@ from svg_paint_probe import SvgProbe
 from caret_hit_support import CaretPage, FIXTURES, coordinate, same_rect
 
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, WRONG_INTERFACE = 0, -1, -2, -3, -11
-ABI = 41
+ABI = 43
 # FreeType scales each 20px Ahem advance in 16.16 fixed point on Linux; four glyphs may lose 4/65536 px.
 RECT_TOLERANCE = 0.01
 

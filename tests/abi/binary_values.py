@@ -17,7 +17,7 @@ from form_collections import Native, Case, EntryValue, EntryValues, Entries, P, 
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, BUFFER_TOO_SMALL, UNSUPPORTED, WRONG_INTERFACE = 0, -1, -2, -6, -9, -11
-ABI = 41
+ABI = 43
 BYTES_ARM, BLOB_ARM, STRING_ARM = 1, 2, 3
 FILE_ARM = 1
 TRANSPARENT, NATIVE = 0, 1

@@ -1,5 +1,5 @@
 /*
- * Ranvier native WebCore C ABI, version 41.
+ * Ranvier native WebCore C ABI, version 43.
  *
  * The boundary consists of C scalars, UTF-8 strings, opaque handles and a caller-owned RGBA8 buffer,
  * and is identical on every WebCore port that compiles RanvierWebCoreAbi.cpp.
@@ -1400,7 +1400,8 @@ typedef struct RvTextSegments {
 /* Segments length UTF-16 code units of text at granularity for locale, a BCP 47 language tag; NULL or "" is the
  * root locale. text may be NULL for length 0, which gives zero segments. A locale that is not a well-formed tag
  * returns RV_ERR_DOM_EXCEPTION with a RangeError. Runs on the owning thread after the first rv_host_create, and
- * keeps working after every host is destroyed. */
+ * keeps working after every host is destroyed. Windows packages segment with their own ICU 77; Linux and macOS
+ * packages use the system ICU, so results follow its version (rv_text_segmentation_version). */
 RV_EXPORT int32_t rv_text_segment(int32_t granularity, const char* locale, const uint16_t* text, int32_t length, RvTextSegments* result);
 /* Frees the buffers of segments and zeroes it; on any thread. */
 RV_EXPORT void rv_text_segments_release(RvTextSegments* segments);
