@@ -51,7 +51,7 @@ def verify(native_directory):
     host = bind('rv_host_create', pointer, [integer, integer])(320, 240)
     expect(bool(host), 'host creation')
     try:
-        expect(bind('rv_abi_version', unsigned, [])() == 56, 'Native48 ABI56 registration transport')
+        expect(bind('rv_abi_version', unsigned, [])() == 57, 'Native49 ABI57 registration transport')
         expect(bind('rv_abi_has', integer, [string])(b'dom-css-register-property') == 1, 'registration capability')
         body = bind('rv_document_body', pointer, [pointer])(host)
         retained.append(('rv_node_release', body))

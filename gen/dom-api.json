@@ -372,6 +372,7 @@
         "InputEvent",
         "KeyboardEvent",
         "MouseEvent",
+        "TouchEvent",
         "AnimationPlaybackEvent",
         "BeforeUnloadEvent",
         "CSSAnimationEvent",
@@ -401,6 +402,7 @@
         "InputEvent",
         "KeyboardEvent",
         "MouseEvent",
+        "TouchEvent",
         "AnimationPlaybackEvent",
         "BeforeUnloadEvent",
         "AnimationEvent",
@@ -427,6 +429,70 @@
       "parameters": [
         {
           "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    },
+    {
+      "root": "AnimationEffect",
+      "function": "rv_dom_animation_effect_get_interface_name",
+      "feature": "dom-type-query:AnimationEffect",
+      "interfaces": [
+        "KeyframeEffect",
+        "AnimationEffect"
+      ],
+      "names": [
+        "KeyframeEffect",
+        "AnimationEffect"
+      ],
+      "extras": [],
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ]
+    },
+    {
+      "root": "AnimationTimeline",
+      "function": "rv_dom_animation_timeline_get_interface_name",
+      "feature": "dom-type-query:AnimationTimeline",
+      "interfaces": [
+        "DocumentTimeline",
+        "AnimationTimeline"
+      ],
+      "names": [
+        "DocumentTimeline",
+        "AnimationTimeline"
+      ],
+      "extras": [],
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
           "name": "target"
         },
         {
@@ -1054,6 +1120,18 @@
       "base": "MouseEvent"
     },
     {
+      "name": "Touch",
+      "base": null
+    },
+    {
+      "name": "TouchList",
+      "base": null
+    },
+    {
+      "name": "TouchEvent",
+      "base": "UIEvent"
+    },
+    {
       "name": "WheelEvent",
       "base": "MouseEvent"
     },
@@ -1568,6 +1646,34 @@
     {
       "name": "FileReader",
       "base": "EventTarget"
+    },
+    {
+      "name": "FontFace",
+      "base": null
+    },
+    {
+      "name": "FontFaceSet",
+      "base": "EventTarget"
+    },
+    {
+      "name": "WebAnimation",
+      "base": "EventTarget"
+    },
+    {
+      "name": "AnimationEffect",
+      "base": null
+    },
+    {
+      "name": "KeyframeEffect",
+      "base": "AnimationEffect"
+    },
+    {
+      "name": "AnimationTimeline",
+      "base": null
+    },
+    {
+      "name": "DocumentTimeline",
+      "base": "AnimationTimeline"
     },
     {
       "name": "DataTransfer",
@@ -3037,6 +3143,33 @@
       "source": "dom/PointerEvent.idl"
     },
     {
+      "name": "Touch",
+      "idlName": "Touch",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/Touch.idl"
+    },
+    {
+      "name": "TouchList",
+      "idlName": "TouchList",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/TouchList.idl"
+    },
+    {
+      "name": "TouchEvent",
+      "idlName": "TouchEvent",
+      "base": "UIEvent",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "dom/TouchEvent.idl"
+    },
+    {
       "name": "WheelEvent",
       "idlName": "WheelEvent",
       "base": "MouseEvent",
@@ -4198,6 +4331,69 @@
       "source": "fileapi/FileReader.idl"
     },
     {
+      "name": "FontFace",
+      "idlName": "FontFace",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/FontFace.idl"
+    },
+    {
+      "name": "FontFaceSet",
+      "idlName": "FontFaceSet",
+      "base": "EventTarget",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "css/FontFaceSet.idl"
+    },
+    {
+      "name": "WebAnimation",
+      "idlName": "WebAnimation",
+      "base": "EventTarget",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/WebAnimation.idl"
+    },
+    {
+      "name": "AnimationEffect",
+      "idlName": "AnimationEffect",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/AnimationEffect.idl"
+    },
+    {
+      "name": "KeyframeEffect",
+      "idlName": "KeyframeEffect",
+      "base": "AnimationEffect",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/KeyframeEffect.idl"
+    },
+    {
+      "name": "AnimationTimeline",
+      "idlName": "AnimationTimeline",
+      "base": null,
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/AnimationTimeline.idl"
+    },
+    {
+      "name": "DocumentTimeline",
+      "idlName": "DocumentTimeline",
+      "base": "AnimationTimeline",
+      "mixins": [],
+      "mixin": false,
+      "contractOnly": false,
+      "source": "animation/DocumentTimeline.idl"
+    },
+    {
       "name": "DataTransfer",
       "idlName": "DataTransfer",
       "base": null,
@@ -4520,15 +4716,6 @@
       "mixin": false,
       "contractOnly": true,
       "source": "html/TimeRanges.idl"
-    },
-    {
-      "name": "TouchEvent",
-      "idlName": "TouchEvent",
-      "base": "UIEvent",
-      "mixins": [],
-      "mixin": false,
-      "contractOnly": true,
-      "source": "dom/TouchEvent.idl"
     },
     {
       "name": "ARIAMixin",
@@ -6091,6 +6278,338 @@
           "mapping": {
             "kind": "bool",
             "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ]
+    },
+    "KeyframeEffectOptions": {
+      "base": "EffectTiming",
+      "contractOnly": false,
+      "omittedFields": [],
+      "fields": [
+        {
+          "name": "delay",
+          "required": false,
+          "default": "0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "endDelay",
+          "required": false,
+          "default": "0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "fill",
+          "required": false,
+          "default": "\"auto\"",
+          "idl": {
+            "name": "FillMode",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "FillMode",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "iterationStart",
+          "required": false,
+          "default": "0.0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "iterations",
+          "required": false,
+          "default": "1.0",
+          "idl": {
+            "name": "unrestricted double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "duration",
+          "required": false,
+          "default": "\"auto\"",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "unrestricted double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "UnrestrictedDoubleOrCSSNumericValueOrDOMString",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              }
+            ]
+          }
+        },
+        {
+          "name": "direction",
+          "required": false,
+          "default": "\"normal\"",
+          "idl": {
+            "name": "PlaybackDirection",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "PlaybackDirection",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "easing",
+          "required": false,
+          "default": "\"linear\"",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "iterationComposite",
+          "required": false,
+          "default": "\"replace\"",
+          "idl": {
+            "name": "IterationCompositeOperation",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "IterationCompositeOperation",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "composite",
+          "required": false,
+          "default": "\"replace\"",
+          "idl": {
+            "name": "CompositeOperation",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "CompositeOperation",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "pseudoElement",
+          "required": false,
+          "default": "null",
+          "idl": {
+            "name": "USVString",
+            "nullable": true,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ]
+    },
+    "DocumentTimelineOptions": {
+      "base": null,
+      "contractOnly": false,
+      "omittedFields": [],
+      "fields": [
+        {
+          "name": "originTime",
+          "required": false,
+          "default": "0",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
             "interface": null,
             "root": null,
             "class": null,
@@ -10907,6 +11426,62 @@
     },
     {
       "interface": "ShadowRoot",
+      "member": "getAnimations",
+      "contractOwner": "ShadowRoot",
+      "kind": "operation",
+      "function": "rv_dom_shadow_root_get_animations",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceWebAnimation*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "WebAnimation",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceWebAnimation",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "WebAnimation sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "WebAnimation",
+            "root": "EventTarget",
+            "class": "WebAnimation",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "ShadowRoot",
       "member": "setHTMLUnsafe",
       "contractOwner": "ShadowRoot",
       "kind": "operation",
@@ -11295,6 +11870,42 @@
         "enum": null,
         "label": null,
         "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Document",
+      "member": "timeline",
+      "contractOwner": "Document",
+      "kind": "getter",
+      "function": "rv_dom_document_get_timeline",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAnimationTimeline**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DocumentTimeline",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DocumentTimeline",
+        "root": "AnimationTimeline",
+        "class": "DocumentTimeline",
+        "enum": null,
+        "label": null,
+        "nullable": false,
         "atom": false,
         "subtypes": []
       }
@@ -12478,6 +13089,78 @@
       "stringInputs": "utf8-lengths",
       "binding": "facade",
       "feature": "dom-adopted-style-sheets"
+    },
+    {
+      "interface": "Document",
+      "member": "pointerLockElement",
+      "contractOwner": "Document",
+      "kind": "getter",
+      "function": "rv_dom_document_get_pointer_lock_element",
+      "conditional": "ENABLE(POINTER_LOCK)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Element",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Element",
+        "root": null,
+        "class": "Element",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Document",
+      "member": "fonts",
+      "contractOwner": "Document",
+      "kind": "getter",
+      "function": "rv_dom_document_get_fonts",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvEventTarget**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FontFaceSet",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "FontFaceSet",
+        "root": "EventTarget",
+        "class": "FontFaceSet",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
     },
     {
       "interface": "Document",
@@ -14940,6 +15623,85 @@
     },
     {
       "interface": "Document",
+      "member": "createTouchList",
+      "contractOwner": "Document",
+      "kind": "operation",
+      "function": "rv_dom_document_create_touch_list",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceTouch*",
+          "name": "touches"
+        },
+        {
+          "ctype": "RvTouchList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "touches",
+          "idlType": "Touch",
+          "idl": {
+            "name": "Touch",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": true,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceTouch",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Touch sequence",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "Touch",
+                "root": "Touch",
+                "class": "Touch",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "TouchList",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TouchList",
+        "root": "TouchList",
+        "class": "TouchList",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Document",
       "member": "prepend",
       "contractOwner": "ParentNode",
       "kind": "operation",
@@ -15771,6 +16533,62 @@
             "interface": "Element",
             "root": null,
             "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Document",
+      "member": "getAnimations",
+      "contractOwner": "Document",
+      "kind": "operation",
+      "function": "rv_dom_document_get_animations",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceWebAnimation*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "WebAnimation",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceWebAnimation",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "WebAnimation sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "WebAnimation",
+            "root": "EventTarget",
+            "class": "WebAnimation",
             "enum": null,
             "label": null,
             "nullable": false,
@@ -26617,6 +27435,240 @@
         "nullable": false,
         "atom": false,
         "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Element",
+      "member": "animate",
+      "contractOwner": "Element",
+      "kind": "operation",
+      "function": "rv_dom_element_animate",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomSequenceKeyframeNullable*",
+          "name": "keyframes"
+        },
+        {
+          "ctype": "const RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvEventTarget**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "keyframes",
+          "idlType": "sequence<Keyframe>?",
+          "idl": {
+            "name": "sequence",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Keyframe",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceKeyframeNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Keyframe sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "Keyframe",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "(unrestricted double or KeyframeAnimationOptions)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "unrestricted double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "KeyframeAnimationOptions",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "UnrestrictedDoubleOrKeyframeAnimationOptions",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "KeyframeAnimationOptions",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "WebAnimation",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "WebAnimation",
+        "root": "EventTarget",
+        "class": "WebAnimation",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "Element",
+      "member": "getAnimations",
+      "contractOwner": "Element",
+      "kind": "operation",
+      "function": "rv_dom_element_get_animations",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomGetAnimationsOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvDomSequenceWebAnimation*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "options",
+          "idlType": "GetAnimationsOptions",
+          "idl": {
+            "name": "GetAnimationsOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "GetAnimationsOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "WebAnimation",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceWebAnimation",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "WebAnimation sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "WebAnimation",
+            "root": "EventTarget",
+            "class": "WebAnimation",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
       },
       "stringInputs": "utf8-lengths"
     },
@@ -114256,6 +115308,648 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "Touch",
+      "member": "clientX",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_client_x",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "clientY",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_client_y",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "screenX",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_screen_x",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "screenY",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_screen_y",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "pageX",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_page_x",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "pageY",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_page_y",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "target",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_target",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "EventTarget",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "EventTarget",
+        "root": null,
+        "class": "EventTarget",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "Touch",
+      "member": "identifier",
+      "contractOwner": "Touch",
+      "kind": "getter",
+      "function": "rv_dom_touch_get_identifier",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouch*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchList",
+      "member": "length",
+      "contractOwner": "TouchList",
+      "kind": "getter",
+      "function": "rv_dom_touch_list_get_length",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouchList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "unsigned long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "uint32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchList",
+      "member": "item",
+      "contractOwner": "TouchList",
+      "kind": "operation",
+      "function": "rv_dom_touch_list_item",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvTouchList*",
+          "name": "target"
+        },
+        {
+          "ctype": "uint32_t",
+          "name": "index"
+        },
+        {
+          "ctype": "RvTouch**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "index",
+          "idlType": "unsigned long",
+          "idl": {
+            "name": "unsigned long",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "Touch",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "Touch",
+        "root": "Touch",
+        "class": "Touch",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "touches",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_touches",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvTouchList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "TouchList",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TouchList",
+        "root": "TouchList",
+        "class": "TouchList",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "targetTouches",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_target_touches",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvTouchList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "TouchList",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TouchList",
+        "root": "TouchList",
+        "class": "TouchList",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "changedTouches",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_changed_touches",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvTouchList**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "TouchList",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "TouchList",
+        "root": "TouchList",
+        "class": "TouchList",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "ctrlKey",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_ctrl_key",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "shiftKey",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_shift_key",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "altKey",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_alt_key",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "TouchEvent",
+      "member": "metaKey",
+      "contractOwner": "TouchEvent",
+      "kind": "getter",
+      "function": "rv_dom_touch_event_get_meta_key",
+      "conditional": "ENABLE(TOUCH_EVENTS)",
+      "parameters": [
+        {
+          "ctype": "RvEvent*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
       "interface": "WheelEvent",
       "member": "constructor",
       "contractOwner": "WheelEvent",
@@ -147354,6 +149048,4184 @@
       "stringInputs": "utf8-lengths"
     },
     {
+      "interface": "FontFace",
+      "member": "constructor",
+      "contractOwner": "FontFace",
+      "kind": "constructor",
+      "function": "rv_dom_font_face_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "family"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "family_length"
+        },
+        {
+          "ctype": "const RvDomUnionDOMStringOrArrayBufferOrArrayBufferView*",
+          "name": "source"
+        },
+        {
+          "ctype": "const RvDomFontFaceDescriptors*",
+          "name": "descriptors"
+        },
+        {
+          "ctype": "RvFontFace**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "family",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "source",
+          "idlType": "(DOMString or BinaryData)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "DOMString",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "union",
+                "nullable": false,
+                "subtypes": [
+                  {
+                    "name": "ArrayBuffer",
+                    "nullable": false,
+                    "subtypes": []
+                  },
+                  {
+                    "name": "ArrayBufferView",
+                    "nullable": false,
+                    "subtypes": []
+                  }
+                ]
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDOMStringOrArrayBufferOrArrayBufferView",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DOMStringOrArrayBufferOrArrayBufferView",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "string",
+                "ctype": null,
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "stringTransport": "utf8-lengths"
+              },
+              {
+                "kind": "bytes",
+                "ctype": "RvDomByteSpan",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": "BinaryData",
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "descriptors",
+          "idlType": "FontFaceDescriptors",
+          "idl": {
+            "name": "FontFaceDescriptors",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "FontFaceDescriptors",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "FontFace",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "FontFace",
+        "root": "FontFace",
+        "class": "FontFace",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:FontFace",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "family",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_family",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "family",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_family",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "style",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_style",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "style",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_style",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "weight",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_weight",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "weight",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_weight",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "width",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "width",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_width",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "stretch",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_stretch",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "stretch",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_stretch",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "unicodeRange",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_unicode_range",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "unicodeRange",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_unicode_range",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "featureSettings",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_feature_settings",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "featureSettings",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_feature_settings",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "display",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_display",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "display",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_display",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "ascentOverride",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_ascent_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "ascentOverride",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_ascent_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "descentOverride",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_descent_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "descentOverride",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_descent_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "lineGapOverride",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_line_gap_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "lineGapOverride",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_line_gap_override",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "sizeAdjust",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_size_adjust",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFace",
+      "member": "sizeAdjust",
+      "contractOwner": "FontFace",
+      "kind": "setter",
+      "function": "rv_dom_font_face_set_size_adjust",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFace",
+      "member": "status",
+      "contractOwner": "FontFace",
+      "kind": "getter",
+      "function": "rv_dom_font_face_get_status",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvFontFace*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FontFaceLoadStatus",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "FontFaceLoadStatus",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "size",
+      "contractOwner": "FontFaceSet",
+      "kind": "getter",
+      "function": "rv_dom_font_face_set_get_size",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "long",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "status",
+      "contractOwner": "FontFaceSet",
+      "kind": "getter",
+      "function": "rv_dom_font_face_set_get_status",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "FontFaceSetLoadStatus",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "FontFaceSetLoadStatus",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "has",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_has",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvFontFace*",
+          "name": "font"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "font",
+          "idlType": "FontFace",
+          "idl": {
+            "name": "FontFace",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "add",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_add",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvFontFace*",
+          "name": "font"
+        },
+        {
+          "ctype": "RvEventTarget**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "font",
+          "idlType": "FontFace",
+          "idl": {
+            "name": "FontFace",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "FontFaceSet",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "FontFaceSet",
+        "root": "EventTarget",
+        "class": "FontFaceSet",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "delete",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_delete",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvFontFace*",
+          "name": "font"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "font",
+          "idlType": "FontFace",
+          "idl": {
+            "name": "FontFace",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "clear",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_clear",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "FontFaceSet",
+      "member": "check",
+      "contractOwner": "FontFaceSet",
+      "kind": "operation",
+      "function": "rv_dom_font_face_set_check",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "font"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "font_length"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "text"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "text_length"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "font",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "text",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "\" \"",
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "constructor",
+      "contractOwner": "WebAnimation",
+      "kind": "constructor",
+      "function": "rv_dom_web_animation_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "effect"
+        },
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "timeline"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "timeline_present"
+        },
+        {
+          "ctype": "RvEventTarget**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "effect",
+          "idlType": "AnimationEffect?",
+          "idl": {
+            "name": "AnimationEffect",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "null",
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "AnimationEffect",
+            "root": "AnimationEffect",
+            "class": "AnimationEffect",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "timeline",
+          "idlType": "AnimationTimeline?",
+          "idl": {
+            "name": "AnimationTimeline",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "AnimationTimeline",
+            "root": "AnimationTimeline",
+            "class": "AnimationTimeline",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "WebAnimation",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "WebAnimation",
+        "root": "EventTarget",
+        "class": "WebAnimation",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:WebAnimation",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "id",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_id",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "DOMString",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "id",
+      "contractOwner": "WebAnimation",
+      "kind": "setter",
+      "function": "rv_dom_web_animation_set_id",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "DOMString",
+          "idl": {
+            "name": "DOMString",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "effect",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_effect",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAnimationEffect**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "AnimationEffect",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "AnimationEffect",
+        "root": "AnimationEffect",
+        "class": "AnimationEffect",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "effect",
+      "contractOwner": "WebAnimation",
+      "kind": "setter",
+      "function": "rv_dom_web_animation_set_effect",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "AnimationEffect?",
+          "idl": {
+            "name": "AnimationEffect",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "AnimationEffect",
+            "root": "AnimationEffect",
+            "class": "AnimationEffect",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "timeline",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_timeline",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAnimationTimeline**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "AnimationTimeline",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "AnimationTimeline",
+        "root": "AnimationTimeline",
+        "class": "AnimationTimeline",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "timeline",
+      "contractOwner": "WebAnimation",
+      "kind": "setter",
+      "function": "rv_dom_web_animation_set_timeline",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "AnimationTimeline?",
+          "idl": {
+            "name": "AnimationTimeline",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "AnimationTimeline",
+            "root": "AnimationTimeline",
+            "class": "AnimationTimeline",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "startTime",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_start_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "startTime",
+      "contractOwner": "WebAnimation",
+      "kind": "setter",
+      "function": "rv_dom_web_animation_set_start_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValueNullable*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumberish?",
+          "idl": {
+            "name": "union",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "currentTime",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_current_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "currentTime",
+      "contractOwner": "WebAnimation",
+      "kind": "setter",
+      "function": "rv_dom_web_animation_set_current_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomUnionDoubleOrCSSNumericValueNullable*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSNumberish?",
+          "idl": {
+            "name": "union",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "CSSNumericValue",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "DoubleOrCSSNumericValue",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": [],
+                "finiteInput": true
+              },
+              {
+                "kind": "object",
+                "ctype": null,
+                "interface": "CSSNumericValue",
+                "root": "CSSStyleValue",
+                "class": "CSSNumericValue",
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "playbackRate",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_playback_rate",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "playbackRate",
+      "contractOwner": "WebAnimation",
+      "kind": "setter",
+      "function": "rv_dom_web_animation_set_playback_rate",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "double",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "overallProgress",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_overall_progress",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double*",
+          "name": "result"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "present"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "double",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "number",
+        "ctype": "double",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "playState",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_play_state",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "AnimationPlayState",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "AnimationPlayState",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "replaceState",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_replace_state",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "AnimationReplaceState",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "AnimationReplaceState",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "pending",
+      "contractOwner": "WebAnimation",
+      "kind": "getter",
+      "function": "rv_dom_web_animation_get_pending",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "boolean",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "bool",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "cancel",
+      "contractOwner": "WebAnimation",
+      "kind": "operation",
+      "function": "rv_dom_web_animation_cancel",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "finish",
+      "contractOwner": "WebAnimation",
+      "kind": "operation",
+      "function": "rv_dom_web_animation_finish",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "play",
+      "contractOwner": "WebAnimation",
+      "kind": "operation",
+      "function": "rv_dom_web_animation_play",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "pause",
+      "contractOwner": "WebAnimation",
+      "kind": "operation",
+      "function": "rv_dom_web_animation_pause",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "updatePlaybackRate",
+      "contractOwner": "WebAnimation",
+      "kind": "operation",
+      "function": "rv_dom_web_animation_update_playback_rate",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "double",
+          "name": "playback_rate"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "playbackRate",
+          "idlType": "double",
+          "idl": {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "reverse",
+      "contractOwner": "WebAnimation",
+      "kind": "operation",
+      "function": "rv_dom_web_animation_reverse",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "persist",
+      "contractOwner": "WebAnimation",
+      "kind": "operation",
+      "function": "rv_dom_web_animation_persist",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "WebAnimation",
+      "member": "commitStyles",
+      "contractOwner": "WebAnimation",
+      "kind": "operation",
+      "function": "rv_dom_web_animation_commit_styles",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "constructor",
+      "contractOwner": "KeyframeEffect",
+      "kind": "constructor",
+      "function": "rv_dom_keyframe_effect_create_3",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "target_"
+        },
+        {
+          "ctype": "const RvDomSequenceKeyframeNullable*",
+          "name": "keyframes"
+        },
+        {
+          "ctype": "const RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvAnimationEffect**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "target",
+          "idlType": "Element?",
+          "idl": {
+            "name": "Element",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        },
+        {
+          "name": "keyframes",
+          "idlType": "sequence<Keyframe>?",
+          "idl": {
+            "name": "sequence",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Keyframe",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceKeyframeNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Keyframe sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "Keyframe",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        },
+        {
+          "name": "options",
+          "idlType": "(unrestricted double or KeyframeEffectOptions)",
+          "idl": {
+            "name": "union",
+            "nullable": false,
+            "subtypes": [
+              {
+                "name": "unrestricted double",
+                "nullable": false,
+                "subtypes": []
+              },
+              {
+                "name": "KeyframeEffectOptions",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "union",
+            "ctype": "RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "UnrestrictedDoubleOrKeyframeEffectOptions",
+            "nullable": false,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "number",
+                "ctype": "double",
+                "interface": null,
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              },
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "KeyframeEffectOptions",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "KeyframeEffect",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "KeyframeEffect",
+        "root": "AnimationEffect",
+        "class": "KeyframeEffect",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:KeyframeEffect",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "constructor",
+      "contractOwner": "KeyframeEffect",
+      "kind": "constructor",
+      "function": "rv_dom_keyframe_effect_create_1",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "source"
+        },
+        {
+          "ctype": "RvAnimationEffect**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "source",
+          "idlType": "KeyframeEffect",
+          "idl": {
+            "name": "KeyframeEffect",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "object",
+            "ctype": null,
+            "interface": "KeyframeEffect",
+            "root": "AnimationEffect",
+            "class": "KeyframeEffect",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "KeyframeEffect",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "KeyframeEffect",
+        "root": "AnimationEffect",
+        "class": "KeyframeEffect",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:KeyframeEffect",
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "target",
+      "contractOwner": "KeyframeEffect",
+      "kind": "getter",
+      "function": "rv_dom_keyframe_effect_get_target",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode**",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "Element",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "node",
+        "ctype": null,
+        "interface": "Element",
+        "root": null,
+        "class": "Element",
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "target",
+      "contractOwner": "KeyframeEffect",
+      "kind": "setter",
+      "function": "rv_dom_keyframe_effect_set_target",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "Element?",
+          "idl": {
+            "name": "Element",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "node",
+            "ctype": null,
+            "interface": "Element",
+            "root": null,
+            "class": "Element",
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "pseudoElement",
+      "contractOwner": "KeyframeEffect",
+      "kind": "getter",
+      "function": "rv_dom_keyframe_effect_get_pseudo_element",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "char*",
+          "name": "buffer"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "capacity"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "length"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "USVString",
+        "nullable": true,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "string",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": true,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "pseudoElement",
+      "contractOwner": "KeyframeEffect",
+      "kind": "setter",
+      "function": "rv_dom_keyframe_effect_set_pseudo_element",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "const uint8_t*",
+          "name": "value"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value_length"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CSSOMString?",
+          "idl": {
+            "name": "USVString",
+            "nullable": true,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": true,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "iterationComposite",
+      "contractOwner": "KeyframeEffect",
+      "kind": "getter",
+      "function": "rv_dom_keyframe_effect_get_iteration_composite",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "IterationCompositeOperation",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "IterationCompositeOperation",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "iterationComposite",
+      "contractOwner": "KeyframeEffect",
+      "kind": "setter",
+      "function": "rv_dom_keyframe_effect_set_iteration_composite",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "IterationCompositeOperation",
+          "idl": {
+            "name": "IterationCompositeOperation",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "IterationCompositeOperation",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "composite",
+      "contractOwner": "KeyframeEffect",
+      "kind": "getter",
+      "function": "rv_dom_keyframe_effect_get_composite",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "CompositeOperation",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "enum",
+        "ctype": "int32_t",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": "CompositeOperation",
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      }
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "composite",
+      "contractOwner": "KeyframeEffect",
+      "kind": "setter",
+      "function": "rv_dom_keyframe_effect_set_composite",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "int32_t",
+          "name": "value"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "value",
+          "idlType": "CompositeOperation",
+          "idl": {
+            "name": "CompositeOperation",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "CompositeOperation",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths"
+    },
+    {
+      "interface": "KeyframeEffect",
+      "member": "setKeyframes",
+      "contractOwner": "KeyframeEffect",
+      "kind": "operation",
+      "function": "rv_dom_keyframe_effect_set_keyframes",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationEffect*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvNode*",
+          "name": "context"
+        },
+        {
+          "ctype": "const RvDomSequenceKeyframeNullable*",
+          "name": "keyframes"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "keyframes",
+          "idlType": "sequence<Keyframe>?",
+          "idl": {
+            "name": "sequence",
+            "nullable": true,
+            "subtypes": [
+              {
+                "name": "Keyframe",
+                "nullable": false,
+                "subtypes": []
+              }
+            ]
+          },
+          "optional": false,
+          "default": null,
+          "variadic": false,
+          "mapping": {
+            "kind": "sequence",
+            "ctype": "RvDomSequenceKeyframeNullable",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "Keyframe sequence",
+            "nullable": true,
+            "atom": false,
+            "subtypes": [
+              {
+                "kind": "dict",
+                "ctype": null,
+                "interface": "Keyframe",
+                "root": null,
+                "class": null,
+                "enum": null,
+                "label": null,
+                "nullable": false,
+                "atom": false,
+                "subtypes": []
+              }
+            ]
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "undefined",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "void",
+        "ctype": null,
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "stringInputs": "utf8-lengths",
+      "contextReceiver": "Document",
+      "contextParameter": "context"
+    },
+    {
+      "interface": "AnimationTimeline",
+      "member": "currentTime",
+      "contractOwner": "AnimationTimeline",
+      "kind": "getter",
+      "function": "rv_dom_animation_timeline_get_current_time",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "AnimationTimeline",
+      "member": "duration",
+      "contractOwner": "AnimationTimeline",
+      "kind": "getter",
+      "function": "rv_dom_animation_timeline_get_duration",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvAnimationTimeline*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "union",
+        "nullable": true,
+        "subtypes": [
+          {
+            "name": "double",
+            "nullable": false,
+            "subtypes": []
+          },
+          {
+            "name": "CSSNumericValue",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "union",
+        "ctype": "RvDomUnionDoubleOrCSSNumericValueNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DoubleOrCSSNumericValue",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "finiteInput": true
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      }
+    },
+    {
+      "interface": "DocumentTimeline",
+      "member": "constructor",
+      "contractOwner": "DocumentTimeline",
+      "kind": "constructor",
+      "function": "rv_dom_document_timeline_create",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvNode*",
+          "name": "target"
+        },
+        {
+          "ctype": "const RvDomDocumentTimelineOptions*",
+          "name": "options"
+        },
+        {
+          "ctype": "RvAnimationTimeline**",
+          "name": "result"
+        }
+      ],
+      "arguments": [
+        {
+          "name": "options",
+          "idlType": "DocumentTimelineOptions",
+          "idl": {
+            "name": "DocumentTimelineOptions",
+            "nullable": false,
+            "subtypes": []
+          },
+          "optional": true,
+          "default": "{}",
+          "variadic": false,
+          "mapping": {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "DocumentTimelineOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        }
+      ],
+      "returnIdl": {
+        "name": "DocumentTimeline",
+        "nullable": false,
+        "subtypes": []
+      },
+      "returns": {
+        "kind": "object",
+        "ctype": null,
+        "interface": "DocumentTimeline",
+        "root": "AnimationTimeline",
+        "class": "DocumentTimeline",
+        "enum": null,
+        "label": null,
+        "nullable": false,
+        "atom": false,
+        "subtypes": []
+      },
+      "receiver": "Document",
+      "feature": "dom-constructor:DocumentTimeline",
+      "stringInputs": "utf8-lengths"
+    },
+    {
       "interface": "DataTransfer",
       "member": "constructor",
       "contractOwner": "DataTransfer",
@@ -152827,6 +158699,64 @@
       "contextParameter": "context"
     },
     {
+      "interface": "FontFaceSet",
+      "member": "entries",
+      "contractOwner": "FontFaceSet",
+      "kind": "iterator_snapshot",
+      "function": "rv_dom_font_face_set_values",
+      "conditional": null,
+      "parameters": [
+        {
+          "ctype": "RvEventTarget*",
+          "name": "target"
+        },
+        {
+          "ctype": "RvDomSequenceFontFace*",
+          "name": "result"
+        }
+      ],
+      "arguments": [],
+      "returnIdl": {
+        "name": "sequence",
+        "nullable": false,
+        "subtypes": [
+          {
+            "name": "FontFace",
+            "nullable": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "returns": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceFontFace",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "FontFace sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "binding": "facade",
+      "feature": "dom-font-face-set-values",
+      "sourceKind": "iterable"
+    },
+    {
       "interface": "Highlight",
       "member": "size",
       "contractOwner": "Highlight",
@@ -153685,6 +159615,44 @@
       {},
       "page/ScrollLogicalPosition.idl"
     ],
+    "FillMode": [
+      [
+        "none",
+        "forwards",
+        "backwards",
+        "both",
+        "auto"
+      ],
+      {},
+      "animation/FillMode.idl"
+    ],
+    "PlaybackDirection": [
+      [
+        "normal",
+        "reverse",
+        "alternate",
+        "alternate-reverse"
+      ],
+      {},
+      "animation/PlaybackDirection.idl"
+    ],
+    "IterationCompositeOperation": [
+      [
+        "replace",
+        "accumulate"
+      ],
+      {},
+      "animation/IterationCompositeOperation.idl"
+    ],
+    "CompositeOperation": [
+      [
+        "replace",
+        "add",
+        "accumulate"
+      ],
+      {},
+      "animation/CompositeOperation.idl"
+    ],
     "EndingType": [
       [
         "transparent",
@@ -153701,6 +159669,53 @@
       ],
       {},
       "Modules/highlight/Highlight.idl"
+    ],
+    "FontFaceLoadStatus": [
+      [
+        "unloaded",
+        "loading",
+        "loaded",
+        "error"
+      ],
+      {},
+      "css/FontFace.idl"
+    ],
+    "FontFaceSetLoadStatus": [
+      [
+        "loading",
+        "loaded"
+      ],
+      {},
+      "css/FontFaceSet.idl"
+    ],
+    "AnimationFrameRatePreset": [
+      [
+        "auto",
+        "low",
+        "high",
+        "highest"
+      ],
+      {},
+      "animation/AnimationFrameRatePreset.idl"
+    ],
+    "AnimationPlayState": [
+      [
+        "idle",
+        "running",
+        "paused",
+        "finished"
+      ],
+      {},
+      "animation/WebAnimation.idl"
+    ],
+    "AnimationReplaceState": [
+      [
+        "active",
+        "removed",
+        "persisted"
+      ],
+      {},
+      "animation/WebAnimation.idl"
     ],
     "OrientationType": [
       [
@@ -153870,6 +159885,34 @@
     {
       "mapping": {
         "kind": "sequence",
+        "ctype": "RvDomSequenceWebAnimation",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "WebAnimation sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "WebAnimation",
+            "root": "EventTarget",
+            "class": "WebAnimation",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_web_animation_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
         "ctype": "RvDomSequenceShadowRoot",
         "interface": null,
         "root": null,
@@ -153979,6 +160022,34 @@
     {
       "mapping": {
         "kind": "sequence",
+        "ctype": "RvDomSequenceTouch",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Touch sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "Touch",
+            "root": "Touch",
+            "class": "Touch",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_touch_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
         "ctype": "RvDomSequenceElementNullable",
         "interface": null,
         "root": null,
@@ -154072,6 +160143,155 @@
         ]
       },
       "releaseFunction": "rv_dom_union_boolean_or_scroll_into_view_options_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceKeyframeProperty",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "KeyframeProperty sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "KeyframeProperty",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_keyframe_property_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceKeyframeNullable",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "Keyframe sequence",
+        "nullable": true,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "Keyframe",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_keyframe_nullable_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UnrestrictedDoubleOrCSSNumericValueOrDOMString",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "CSSNumericValue",
+            "root": "CSSStyleValue",
+            "class": "CSSNumericValue",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_unrestricted_double_or_css_numeric_value_or_dom_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UnrestrictedDoubleOrKeyframeAnimationOptions",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "KeyframeAnimationOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_unrestricted_double_or_keyframe_animation_options_release"
     },
     {
       "mapping": {
@@ -155974,6 +162194,127 @@
     {
       "mapping": {
         "kind": "union",
+        "ctype": "RvDomUnionDOMStringOrArrayBufferOrArrayBufferView",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "DOMStringOrArrayBufferOrArrayBufferView",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "string",
+            "ctype": null,
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": [],
+            "stringTransport": "utf8-lengths"
+          },
+          {
+            "kind": "bytes",
+            "ctype": "RvDomByteSpan",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": "BinaryData",
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUnsignedLongOrAnimationFrameRatePreset",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UnsignedLongOrAnimationFrameRatePreset",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "uint32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "enum",
+            "ctype": "int32_t",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": "AnimationFrameRatePreset",
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_unsigned_long_or_animation_frame_rate_preset_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
+        "ctype": "RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "UnrestrictedDoubleOrKeyframeEffectOptions",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "number",
+            "ctype": "double",
+            "interface": null,
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          },
+          {
+            "kind": "dict",
+            "ctype": null,
+            "interface": "KeyframeEffectOptions",
+            "root": null,
+            "class": null,
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_union_unrestricted_double_or_keyframe_effect_options_release"
+    },
+    {
+      "mapping": {
+        "kind": "union",
         "ctype": "RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern",
         "interface": null,
         "root": null,
@@ -156319,6 +162660,34 @@
         ]
       },
       "releaseFunction": "rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release"
+    },
+    {
+      "mapping": {
+        "kind": "sequence",
+        "ctype": "RvDomSequenceFontFace",
+        "interface": null,
+        "root": null,
+        "class": null,
+        "enum": null,
+        "label": "FontFace sequence",
+        "nullable": false,
+        "atom": false,
+        "subtypes": [
+          {
+            "kind": "object",
+            "ctype": null,
+            "interface": "FontFace",
+            "root": "FontFace",
+            "class": "FontFace",
+            "enum": null,
+            "label": null,
+            "nullable": false,
+            "atom": false,
+            "subtypes": []
+          }
+        ]
+      },
+      "releaseFunction": "rv_dom_sequence_font_face_release"
     },
     {
       "mapping": {
@@ -156902,6 +163271,445 @@
         "mapping": {
           "kind": "number",
           "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "KeyframeProperty": [
+      {
+        "name": "name",
+        "field": "name",
+        "ctype": "RvDomUtf8StringInput",
+        "required": true,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "value",
+        "field": "value",
+        "ctype": "RvDomUtf8StringInput",
+        "required": true,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "Keyframe": [
+      {
+        "name": "offset",
+        "field": "offset",
+        "ctype": "const double*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "easing",
+        "field": "easing",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composite",
+        "field": "composite",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "properties",
+        "field": "properties",
+        "ctype": "const RvDomSequenceKeyframeProperty*",
+        "required": false,
+        "default": "[]",
+        "mapping": {
+          "kind": "sequence",
+          "ctype": "RvDomSequenceKeyframeProperty",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "KeyframeProperty sequence",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "dict",
+              "ctype": null,
+              "interface": "KeyframeProperty",
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            }
+          ]
+        }
+      }
+    ],
+    "KeyframeAnimationOptions": [
+      {
+        "name": "delay",
+        "field": "delay",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "endDelay",
+        "field": "end_delay",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "fill",
+        "field": "fill",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"auto\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "FillMode",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "iterationStart",
+        "field": "iteration_start",
+        "ctype": "double",
+        "required": false,
+        "default": "0.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "iterations",
+        "field": "iterations",
+        "ctype": "double",
+        "required": false,
+        "default": "1.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "duration",
+        "field": "duration",
+        "ctype": "const RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*",
+        "required": false,
+        "default": "\"auto\"",
+        "mapping": {
+          "kind": "union",
+          "ctype": "RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "UnrestrictedDoubleOrCSSNumericValueOrDOMString",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "number",
+              "ctype": "double",
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "CSSNumericValue",
+              "root": "CSSStyleValue",
+              "class": "CSSNumericValue",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "string",
+              "ctype": null,
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": [],
+              "stringTransport": "utf8-lengths"
+            }
+          ]
+        }
+      },
+      {
+        "name": "direction",
+        "field": "direction",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "PlaybackDirection",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "easing",
+        "field": "easing",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"linear\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "iterationComposite",
+        "field": "iteration_composite",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"replace\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "IterationCompositeOperation",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composite",
+        "field": "composite",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"replace\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "CompositeOperation",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "pseudoElement",
+        "field": "pseudo_element",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "id",
+        "field": "id",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "timeline",
+        "field": "timeline",
+        "ctype": "RvAnimationTimeline* const*",
+        "required": false,
+        "default": null,
+        "mapping": {
+          "kind": "object",
+          "ctype": null,
+          "interface": "AnimationTimeline",
+          "root": "AnimationTimeline",
+          "class": "AnimationTimeline",
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "GetAnimationsOptions": [
+      {
+        "name": "subtree",
+        "field": "subtree",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "false",
+        "mapping": {
+          "kind": "bool",
+          "ctype": "int32_t",
           "interface": null,
           "root": null,
           "class": null,
@@ -161355,6 +168163,411 @@
           "kind": "dict",
           "ctype": null,
           "interface": "URLPatternComponentResult",
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "FontFaceDescriptors": [
+      {
+        "name": "style",
+        "field": "style",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "weight",
+        "field": "weight",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "stretch",
+        "field": "stretch",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "unicodeRange",
+        "field": "unicode_range",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"U+0-10FFFF\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "featureSettings",
+        "field": "feature_settings",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "display",
+        "field": "display",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"auto\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "sizeAdjust",
+        "field": "size_adjust",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"100%\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "KeyframeEffectOptions": [
+      {
+        "name": "delay",
+        "field": "delay",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "endDelay",
+        "field": "end_delay",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "fill",
+        "field": "fill",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"auto\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "FillMode",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "iterationStart",
+        "field": "iteration_start",
+        "ctype": "double",
+        "required": false,
+        "default": "0.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "iterations",
+        "field": "iterations",
+        "ctype": "double",
+        "required": false,
+        "default": "1.0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "duration",
+        "field": "duration",
+        "ctype": "const RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString*",
+        "required": false,
+        "default": "\"auto\"",
+        "mapping": {
+          "kind": "union",
+          "ctype": "RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": "UnrestrictedDoubleOrCSSNumericValueOrDOMString",
+          "nullable": false,
+          "atom": false,
+          "subtypes": [
+            {
+              "kind": "number",
+              "ctype": "double",
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "object",
+              "ctype": null,
+              "interface": "CSSNumericValue",
+              "root": "CSSStyleValue",
+              "class": "CSSNumericValue",
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": []
+            },
+            {
+              "kind": "string",
+              "ctype": null,
+              "interface": null,
+              "root": null,
+              "class": null,
+              "enum": null,
+              "label": null,
+              "nullable": false,
+              "atom": false,
+              "subtypes": [],
+              "stringTransport": "utf8-lengths"
+            }
+          ]
+        }
+      },
+      {
+        "name": "direction",
+        "field": "direction",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"normal\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "PlaybackDirection",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "easing",
+        "field": "easing",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "\"linear\"",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "iterationComposite",
+        "field": "iteration_composite",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"replace\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "IterationCompositeOperation",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "composite",
+        "field": "composite",
+        "ctype": "int32_t",
+        "required": false,
+        "default": "\"replace\"",
+        "mapping": {
+          "kind": "enum",
+          "ctype": "int32_t",
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": "CompositeOperation",
+          "label": null,
+          "nullable": false,
+          "atom": false,
+          "subtypes": []
+        }
+      },
+      {
+        "name": "pseudoElement",
+        "field": "pseudo_element",
+        "ctype": "RvDomUtf8StringInput",
+        "required": false,
+        "default": "null",
+        "mapping": {
+          "kind": "string",
+          "ctype": null,
+          "interface": null,
+          "root": null,
+          "class": null,
+          "enum": null,
+          "label": null,
+          "nullable": true,
+          "atom": false,
+          "subtypes": []
+        }
+      }
+    ],
+    "DocumentTimelineOptions": [
+      {
+        "name": "originTime",
+        "field": "origin_time",
+        "ctype": "double",
+        "required": false,
+        "default": "0",
+        "mapping": {
+          "kind": "number",
+          "ctype": "double",
+          "interface": null,
           "root": null,
           "class": null,
           "enum": null,

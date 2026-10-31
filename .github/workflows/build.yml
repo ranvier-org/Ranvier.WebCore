@@ -481,6 +481,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/font_readiness.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
 
+      - name: Verify FontFace construction from bytes and URLs and FontFaceSet registration without JavaScript
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/font_construction.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native" --webkit-source "${{ env.RANVIER_WORK }}/src"
+
       - name: Verify delayed image decode readiness and drawing
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/image_readiness.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
@@ -500,6 +504,18 @@ jobs:
       - name: Verify the window event target, activation, touch capacity and pointer capture
         if: env.FLAVOR == 'slim'
         run: python -I tests/abi/focus_input.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify touch frames, touch lists and touch pointer events
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/touch_input.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify pen and mouse pointer fidelity and pen capture
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/pen_input.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify pointer lock requests, relative movement and loss
+        if: env.FLAVOR == 'slim'
+        run: python -I tests/abi/pointer_lock.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
       - name: Verify window metrics, visibility, media queries and viewport event order
         if: env.FLAVOR == 'slim'
@@ -552,6 +568,10 @@ jobs:
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/coordinate_spaces.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
+      - name: Verify Web Animations creation against the Chromium oracle
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/web_animations.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
       - name: Verify ARIA element reflection and accessibility relations against the Chromium oracle
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/aria_relations.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
@@ -575,6 +595,14 @@ jobs:
       - name: Verify intersection observation roots, margins, entries and takeRecords against the Chromium oracle
         if: env.FLAVOR == 'slim'
         run: python -I -X utf8 tests/abi/intersection_observation.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify media capability queries, their delivery and teardown against the Chromium oracle
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/media_capabilities.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
+
+      - name: Verify snapshot scale, crop, color space, encodings and delivery
+        if: env.FLAVOR == 'slim'
+        run: python -I -X utf8 tests/abi/snapshot_options.py --native-directory "${{ env.RANVIER_WORK }}/out/${{ env.FLAVOR }}/runtimes/${{ matrix.rid }}/native"
 
       - name: Verify form submission keeps the host document
         if: env.FLAVOR == 'slim'

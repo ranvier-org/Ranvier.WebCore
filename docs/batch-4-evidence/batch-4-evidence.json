@@ -1,0 +1,141 @@
+{
+  "batch": "batch 4: I03+I04+I06 pointer input, A01 Web Animations, T02 font construction, B06 media capabilities + R12 snapshot options",
+  "numbers": {
+    "abi": 57,
+    "native": "0.1.0-preview.49",
+    "dom": "0.1.0-alpha.52",
+    "views": "0.1.42",
+    "backend": "0.1.0-alpha.42",
+    "absence": "docs\\batch-4-evidence\\allocation-absence.json",
+    "absenceSha256": "6c1bb3fabd291c57ceaf6539e62557a438a7d1b9b682f34c4544767f9f4f766e"
+  },
+  "nativeHeadBuilt": "21670e9 (binary inputs); probes from f6cb1bf",
+  "laneHeads": {
+    "pointer": "a4ef57c",
+    "webAnimations": "b95e555",
+    "fontConstruction": "d5c8375",
+    "snapshotOptions": "adf21c9 (carries B06 d37791e and image encoding 22bc8ea)",
+    "b06Evidence": "ae432ba"
+  },
+  "candidate": {
+    "dir": "artifacts\\batch4-candidate-1",
+    "builder": "docs/batch-4-evidence/build_batch4_candidate.py",
+    "parentBuild": "C:/wk/pointer-build (ENABLE_TOUCH_EVENTS, ENABLE_POINTER_LOCK on; read-only)",
+    "runtime": {
+      "WebCore.dll": "c5c101b4bef87a42b34bc98dfccf1bc56a4492b7ec93b54b0d3f6039a5b54773",
+      "RanvierWebCoreHost.dll": "f979f02323a74cce2958d2e54d7d688a9d0745cebb4de217b9c75a61d63a34b2",
+      "JavaScriptCore.dll": "1af0ee5fc6c4a907812cd16a92d72961786c3a631ffb81b14479f0123c9264dc"
+    },
+    "recompiledUnits": 33,
+    "disassemblyEqualToBuild": 33,
+    "recompiledUnitsReachingLaterPatches": [
+      "JSDOMWindow.cpp.obj",
+      "UnifiedSource-JSBindings-10.cpp.obj",
+      "UnifiedSource-JSBindings-11.cpp.obj",
+      "UnifiedSource-JSBindings-12.cpp.obj",
+      "UnifiedSource-JSBindings-14.cpp.obj",
+      "UnifiedSource-JSBindings-15.cpp.obj",
+      "UnifiedSource-JSBindings-16.cpp.obj",
+      "UnifiedSource-JSBindings-17.cpp.obj",
+      "UnifiedSource-JSBindings-18.cpp.obj",
+      "UnifiedSource-JSBindings-2.cpp.obj",
+      "UnifiedSource-JSBindings-20.cpp.obj",
+      "UnifiedSource-JSBindings-21.cpp.obj",
+      "UnifiedSource-JSBindings-3.cpp.obj",
+      "UnifiedSource-JSBindings-4.cpp.obj",
+      "UnifiedSource-JSBindings-5.cpp.obj",
+      "UnifiedSource-JSBindings-6.cpp.obj",
+      "UnifiedSource-JSBindings-7.cpp.obj",
+      "UnifiedSource-JSBindings-9.cpp.obj",
+      "UnifiedSource-css-17.cpp.obj",
+      "UnifiedSource-html-6.cpp.obj",
+      "UnifiedSource-loader-3.cpp.obj",
+      "UnifiedSource-page-24.cpp.obj",
+      "UnifiedSource-page-9.cpp.obj",
+      "UnifiedSource-root-1.cpp.obj",
+      "UnifiedSource-svg-17.cpp.obj",
+      "WebAPIStub.cpp.obj"
+    ],
+    "borrowedBecauseTheyCompileALaterPatchCpp": [
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-animation-4.cpp.obj"
+    ],
+    "borrowedObjectsOlderOnlyThanLaterPatchFiles": 138,
+    "laterPatches": "0049, 0050, 0051 applied in C:/wk/src, outside batch 4; every recompiled unit reaching 0049 ImageBitmap.h disassembles identically to its pre-0049 build object, so no later-patch code entered the candidate. 0050 (ImageBitmap.cpp) and 0051 (WebAnimation.cpp) units were borrowed from the build.",
+    "hostCapabilityFlags": "RV_CAP_* from the build CMakeCache (pointer-candidate-4 compiled its host from a flags-off template)",
+    "sourcePatchesSha256": "de95fb9d98ad31c38d750223fb0bd8aa56e38c68d992d99d34aa7c6823735b21"
+  },
+  "nativeBatch": {
+    "runner": "docs/batch-4-evidence/run_batch4_full_batch.py",
+    "results": "artifacts\\batch4-candidate-1-batch\\results.json",
+    "resultsSha256": "f904191ea591414406c1bcfaa8e36db8c3c2695e8a03300cb633420d34a1568d",
+    "raw": 97854,
+    "teardownRecords": 117,
+    "teardownAllCollected": true,
+    "expectedRaw": "batch 3 94704 (viewport_scroll 2156) + abi_layouts 9 + touch 429 + pen 80 + lock 153 + web_animations 1286 + font_construction 249 + media_capabilities 365 + snapshot_options 579 = 97854",
+    "changedFromBatch3": {
+      "viewport_scroll": [
+        3232,
+        2156
+      ],
+      "abi_layouts": [
+        27,
+        36
+      ],
+      "touch_input": [
+        null,
+        429
+      ],
+      "pen_input": [
+        null,
+        80
+      ],
+      "pointer_lock": [
+        null,
+        153
+      ],
+      "web_animations": [
+        null,
+        1286
+      ],
+      "font_construction": [
+        null,
+        249
+      ],
+      "media_capabilities": [
+        null,
+        365
+      ],
+      "snapshot_options": [
+        null,
+        579
+      ]
+    },
+    "allExit0": true,
+    "snapshotFacilities": {
+      "snapshot-options": 1,
+      "snapshot-display-p3": 0,
+      "image-encoding-png": 1,
+      "image-encoding-jpeg": 1,
+      "image-encoding-webp": 1
+    },
+    "attempt1": "stopped at media_capabilities (IndentationError from the merge-time #145 conversion, fixed in f6cb1bf); the rerun retained the earlier exit-0 records"
+  },
+  "managed": {
+    "runs": "C:\\wk\\int4-tools\\runs\\run1",
+    "feed": "C:/wk/int4-feed (Core 7b8459ce packed alpha.52, native 21670e9 packed preview.49)",
+    "stage": "batch4-candidate-1",
+    "jitPassLines": 150,
+    "aotPassLines": 150,
+    "chromiumPassLines": 102,
+    "logsSha256": {
+      "jit": "756a18c90d63e70d24f2d3656fd04b3454748b86a50db88afa1b8034b3b71a3f",
+      "aot": "578340e6cb49d21ab7840d7ee686f36ed12ab61d09f8a8a646fb93fbaab9b77a",
+      "chromium": "60d8f4e17e51b3b1065b6c3ab7c57f8ef0383458e440276dd720867c2d5f92be"
+    },
+    "superset": "every PASS line of batch 3 run1 and of each lane final run is present; the only count changes are C07 79, H13 190, T06 220 against lanes that predate batch 2 (opt2)"
+  },
+  "generatorChecks": {
+    "windows": "docs/batch-4-evidence/gen-check-windows.txt",
+    "wslUbuntu": "docs/batch-4-evidence/gen-check-wsl-ubuntu.txt"
+  }
+}

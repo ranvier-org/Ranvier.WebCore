@@ -5,8 +5,10 @@
 #include "RanvierDomGlue.h"
 
 #include "AbstractRange.h"
+#include "AnimationEffect.h"
 #include "AnimationPlaybackEvent.h"
 #include "AnimationPlaybackEventInit.h"
+#include "AnimationTimeline.h"
 #include "AriaNotifyOptions.h"
 #include "Attr.h"
 #include "BeforeUnloadEvent.h"
@@ -106,6 +108,9 @@
 #include "DocumentOrShadowRootFullscreen.h"
 #include "DocumentSVG.h"
 #include "DocumentSettingsValues.h"
+#include "DocumentTimeline.h"
+#include "DocumentTimelineOptions.h"
+#include "DocumentTouch.h"
 #include "DragEvent.h"
 #include "Element.h"
 #include "ElementCreationOptions.h"
@@ -120,7 +125,10 @@
 #include "FileReader.h"
 #include "FocusEvent.h"
 #include "FocusOptions.h"
+#include "FontFace.h"
+#include "FontFaceSet.h"
 #include "FormDataEvent.h"
+#include "GetAnimationsOptions.h"
 #include "GetComposedRangesOptions.h"
 #include "GetHTMLOptions.h"
 #include "HTMLAnchorElement.h"
@@ -199,6 +207,9 @@
 #include "JavaScriptCore/DataView.h"
 #include "JavaScriptCore/TypedArrays.h"
 #include "KeyboardEvent.h"
+#include "KeyframeAnimationOptions.h"
+#include "KeyframeEffect.h"
+#include "KeyframeEffectOptions.h"
 #include "LiveNodeList.h"
 #include "LocalDOMWindow.h"
 #include "MathMLElement.h"
@@ -219,6 +230,7 @@
 #include "RadioNodeList.h"
 #include "Range.h"
 #include "RanvierCollectionLike.h"
+#include "RanvierKeyframes.h"
 #include "SVGAElement.h"
 #include "SVGAngle.h"
 #include "SVGAnimateElement.h"
@@ -321,6 +333,9 @@
 #include "SubmitEvent.h"
 #include "Text.h"
 #include "ToggleEvent.h"
+#include "Touch.h"
+#include "TouchEvent.h"
+#include "TouchList.h"
 #include "TreeWalker.h"
 #include "TrustedScriptURL.h"
 #include "UIEvent.h"
@@ -331,15 +346,25 @@
 #include "URLSearchParams.h"
 #include "ValidityState.h"
 #include "VisualViewport.h"
+#include "WebAnimation.h"
 #include "WheelEvent.h"
 #include "svg/properties/SVGAnimatedPropertyImpl.h"
 #include "wtf/KeyValuePair.h"
+#include "JSAnimationFrameRatePreset.h"
+#include "JSWebAnimation.h"
+#include "JSWebAnimation.h"
 #include "JSAriaNotifyOptions.h"
 #include "JSAriaNotifyOptions.h"
+#include "JSCompositeOperation.h"
 #include "JSDocument.h"
 #include "JSEndingType.h"
+#include "JSFillMode.h"
+#include "JSFontFace.h"
+#include "JSFontFaceSet.h"
 #include "JSHighlight.h"
+#include "JSIterationCompositeOperation.h"
 #include "JSScreenOrientation.h"
+#include "JSPlaybackDirection.h"
 #include "JSScrollBehavior.h"
 #include "JSScrollLogicalPosition.h"
 #include "JSShadowRootMode.h"
@@ -712,12 +737,21 @@ void copyTypedArrayView(JSC::ArrayBufferView& view, uint8_t* bytes)
 }
 }
 
+static constexpr ASCIILiteral enumerationAnimationFrameRatePreset[] = { "auto"_s, "low"_s, "high"_s, "highest"_s };
+static constexpr ASCIILiteral enumerationAnimationPlayState[] = { "idle"_s, "running"_s, "paused"_s, "finished"_s };
+static constexpr ASCIILiteral enumerationAnimationReplaceState[] = { "active"_s, "removed"_s, "persisted"_s };
 static constexpr ASCIILiteral enumerationAriaNotificationInterrupt[] = { "none"_s, "all"_s, "pending"_s };
 static constexpr ASCIILiteral enumerationAriaNotificationPriority[] = { "normal"_s, "high"_s };
+static constexpr ASCIILiteral enumerationCompositeOperation[] = { "replace"_s, "add"_s, "accumulate"_s };
 static constexpr ASCIILiteral enumerationDocumentReadyState[] = { "loading"_s, "interactive"_s, "complete"_s };
 static constexpr ASCIILiteral enumerationEndingType[] = { "transparent"_s, "native"_s };
+static constexpr ASCIILiteral enumerationFillMode[] = { "none"_s, "forwards"_s, "backwards"_s, "both"_s, "auto"_s };
+static constexpr ASCIILiteral enumerationFontFaceLoadStatus[] = { "unloaded"_s, "loading"_s, "loaded"_s, "error"_s };
+static constexpr ASCIILiteral enumerationFontFaceSetLoadStatus[] = { "loading"_s, "loaded"_s };
 static constexpr ASCIILiteral enumerationHighlightType[] = { "highlight"_s, "spelling-error"_s, "grammar-error"_s };
+static constexpr ASCIILiteral enumerationIterationCompositeOperation[] = { "replace"_s, "accumulate"_s };
 static constexpr ASCIILiteral enumerationOrientationType[] = { "portrait-primary"_s, "portrait-secondary"_s, "landscape-primary"_s, "landscape-secondary"_s };
+static constexpr ASCIILiteral enumerationPlaybackDirection[] = { "normal"_s, "reverse"_s, "alternate"_s, "alternate-reverse"_s };
 static constexpr ASCIILiteral enumerationScrollBehavior[] = { "auto"_s, "instant"_s, "smooth"_s };
 static constexpr ASCIILiteral enumerationScrollLogicalPosition[] = { "start"_s, "center"_s, "end"_s, "nearest"_s };
 static constexpr ASCIILiteral enumerationShadowRootMode[] = { "user-agent"_s, "closed"_s, "open"_s };
@@ -928,6 +962,29 @@ template<typename V> int32_t encodeRvDomSequenceElement(V&& input, RvDomSequence
     return RV_OK;
 }
 
+void clearRvDomSequenceWebAnimation(RvDomSequenceWebAnimation* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<EventTarget*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceWebAnimation(V&& input, RvDomSequenceWebAnimation* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvEventTarget**>(std::calloc(value.size(), sizeof(RvEventTarget*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<EventTarget>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
 std::optional<Vector<Ref<ShadowRoot>>> decodeRvDomSequenceShadowRoot(const RvDomSequenceShadowRoot* source, int32_t& status)
 {
     if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -1041,6 +1098,44 @@ void clearRvDomUnionBooleanOrImportNodeOptions(RvDomUnionBooleanOrImportNodeOpti
     *value = { };
 }
 
+std::optional<Vector<Ref<Touch>>> decodeRvDomSequenceTouch(const RvDomSequenceTouch* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Ref<Touch>> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        if (!source->items[i]) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<Touch> item = reinterpret_cast<Touch*>(source->items[i]);
+        if (source->items[i] && !item) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        result.append(Ref { *item });
+    }
+    return Vector<Ref<Touch>> { std::move(result) };
+}
+
+void clearRvDomSequenceTouch(RvDomSequenceTouch* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<Touch*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceTouch(V&& input, RvDomSequenceTouch* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvTouch**>(std::calloc(value.size(), sizeof(RvTouch*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<Touch>(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
 std::optional<std::optional<Vector<Ref<Element>>>> decodeRvDomSequenceElementNullable(const RvDomSequenceElementNullable* source, int32_t& status)
 {
     if (!source || !source->present) return std::optional<std::optional<Vector<Ref<Element>>>> { std::in_place, std::nullopt };
@@ -1148,6 +1243,277 @@ std::optional<Variant<bool, ScrollIntoViewOptions>> decodeRvDomUnionBooleanOrScr
 }
 
 void clearRvDomUnionBooleanOrScrollIntoViewOptions(RvDomUnionBooleanOrScrollIntoViewOptions* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+std::optional<Vector<Ranvier::KeyframeProperty>> decodeRvDomSequenceKeyframeProperty(const RvDomSequenceKeyframeProperty* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Ranvier::KeyframeProperty> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        Ranvier::KeyframeProperty item { };
+        if (source->items[i]) {
+            auto decodeFields = [&]() -> int32_t {
+                if (!(source->items[i]->size >= offsetof(RvDomKeyframeProperty, name) + sizeof(source->items[i]->name)))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (source->items[i]->name.present != 1)
+                    return RV_ERR_NULL_ARGUMENT;
+                if (true) {
+                    if (source->items[i]->name.present != 0 && source->items[i]->name.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->items[i]->name.present) {
+                        if (source->items[i]->name.length < 0 || (source->items[i]->name.length > 0 && !source->items[i]->name.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(item.name, source->items[i]->name.data, source->items[i]->name.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (!(source->items[i]->size >= offsetof(RvDomKeyframeProperty, value) + sizeof(source->items[i]->value)))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (source->items[i]->value.present != 1)
+                    return RV_ERR_NULL_ARGUMENT;
+                if (true) {
+                    if (source->items[i]->value.present != 0 && source->items[i]->value.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->items[i]->value.present) {
+                        if (source->items[i]->value.length < 0 || (source->items[i]->value.length > 0 && !source->items[i]->value.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(item.value, source->items[i]->value.data, source->items[i]->value.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        result.append(std::move(item));
+    }
+    return Vector<Ranvier::KeyframeProperty> { std::move(result) };
+}
+
+void clearRvDomSequenceKeyframeProperty(RvDomSequenceKeyframeProperty* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+    }
+    std::free(value->items);
+    *value = { };
+}
+
+std::optional<std::optional<Vector<Ranvier::Keyframe>>> decodeRvDomSequenceKeyframeNullable(const RvDomSequenceKeyframeNullable* source, int32_t& status)
+{
+    if (!source || !source->present) return std::optional<std::optional<Vector<Ranvier::Keyframe>>> { std::in_place, std::nullopt };
+    if (source->count < 0 || (source->count && !source->items)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    Vector<Ranvier::Keyframe> result;
+    result.reserveInitialCapacity(source->count);
+    for (int32_t i = 0; i < source->count; ++i) {
+        Ranvier::Keyframe item { };
+        if (source->items[i]) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->items[i]->size >= offsetof(RvDomKeyframe, offset) + sizeof(source->items[i]->offset) && source->items[i]->offset)
+                    assignValue(item.offset, *source->items[i]->offset);
+                if (source->items[i]->size >= offsetof(RvDomKeyframe, easing) + sizeof(source->items[i]->easing)) {
+                    if (source->items[i]->easing.present != 0 && source->items[i]->easing.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->items[i]->easing.present) {
+                        if (source->items[i]->easing.length < 0 || (source->items[i]->easing.length > 0 && !source->items[i]->easing.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(item.easing, source->items[i]->easing.data, source->items[i]->easing.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->items[i]->size >= offsetof(RvDomKeyframe, composite) + sizeof(source->items[i]->composite)) {
+                    if (source->items[i]->composite.present != 0 && source->items[i]->composite.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->items[i]->composite.present) {
+                        if (source->items[i]->composite.length < 0 || (source->items[i]->composite.length > 0 && !source->items[i]->composite.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(item.composite, source->items[i]->composite.data, source->items[i]->composite.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->items[i]->size >= offsetof(RvDomKeyframe, properties) + sizeof(source->items[i]->properties) && source->items[i]->properties) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomSequenceKeyframeProperty(source->items[i]->properties, status);
+                    if (status != RV_OK) return status;
+                    item.properties = std::move(*value);
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        result.append(std::move(item));
+    }
+    return std::optional<Vector<Ranvier::Keyframe>> { std::move(result) };
+}
+
+void clearRvDomSequenceKeyframeNullable(RvDomSequenceKeyframeNullable* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+    }
+    std::free(value->items);
+    *value = { };
+}
+
+std::optional<Variant<double, Ref<CSSNumericValue>, String>> decodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(const RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, Ref<CSSNumericValue>, String> { Variant<double, Ref<CSSNumericValue>, String> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        if (!source->arm1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr<CSSNumericValue> arm1 = source->arm1 ? dynamicDowncast<CSSNumericValue>(*reinterpret_cast<CSSStyleValue*>(source->arm1)) : nullptr;
+        if (source->arm1 && !arm1) { status = RV_ERR_WRONG_INTERFACE; return std::nullopt; }
+        return Variant<double, Ref<CSSNumericValue>, String> { Variant<double, Ref<CSSNumericValue>, String> { WTF::InPlaceIndex<1>, Ref { *arm1 } } };
+    }
+    case 3: {
+        if (source->arm2.length < 0 || (source->arm2.length > 0 && !source->arm2.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm2 = source->arm2.length < 0 ? String() : source->arm2.length ? String::fromUTF8(std::span<const uint8_t> { source->arm2.data, static_cast<size_t>(source->arm2.length) }) : emptyString();
+        if (source->arm2.length >= 0 && arm2.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<double, Ref<CSSNumericValue>, String> { Variant<double, Ref<CSSNumericValue>, String> { WTF::InPlaceIndex<2>, arm2 } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        if (value->arm1) reinterpret_cast<CSSStyleValue*>(value->arm1)->deref();
+        break;
+    case 3:
+        std::free(const_cast<uint8_t*>(value->arm2.data));
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(V&& value, RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* result)
+{
+    if constexpr (I < 3) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = static_cast<double>(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                storeHandle<CSSStyleValue>(std::get<I>(value), &result->arm1);
+            }
+            else if constexpr (I == 2) {
+                result->arm2 = copyOwnedDomStringSpan(asString(std::get<I>(value)));
+            }
+        } else encodeArmsRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(V&& input, RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(value, result);
+    return RV_OK;
+}
+
+std::optional<Variant<double, KeyframeAnimationOptions>> decodeRvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions(const RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, KeyframeAnimationOptions> { Variant<double, KeyframeAnimationOptions> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        KeyframeAnimationOptions arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, delay) + sizeof(source->arm1->delay))
+                    assignValue(arm1.delay, source->arm1->delay);
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, end_delay) + sizeof(source->arm1->end_delay))
+                    assignValue(arm1.endDelay, source->arm1->end_delay);
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, fill) + sizeof(source->arm1->fill) && !assignEnumeration(arm1.fill, source->arm1->fill, enumerationFillMode))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, iteration_start) + sizeof(source->arm1->iteration_start))
+                    assignValue(arm1.iterationStart, source->arm1->iteration_start);
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, iterations) + sizeof(source->arm1->iterations))
+                    assignValue(arm1.iterations, source->arm1->iterations);
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, duration) + sizeof(source->arm1->duration) && source->arm1->duration) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(source->arm1->duration, status);
+                    if (status != RV_OK) return status;
+                    arm1.duration = std::move(*value);
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, direction) + sizeof(source->arm1->direction) && !assignEnumeration(arm1.direction, source->arm1->direction, enumerationPlaybackDirection))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, easing) + sizeof(source->arm1->easing)) {
+                    if (source->arm1->easing.present != 0 && source->arm1->easing.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->easing.present) {
+                        if (source->arm1->easing.length < 0 || (source->arm1->easing.length > 0 && !source->arm1->easing.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.easing, source->arm1->easing.data, source->arm1->easing.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, iteration_composite) + sizeof(source->arm1->iteration_composite) && !assignEnumeration(arm1.iterationComposite, source->arm1->iteration_composite, enumerationIterationCompositeOperation))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, composite) + sizeof(source->arm1->composite) && !assignEnumeration(arm1.composite, source->arm1->composite, enumerationCompositeOperation))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, pseudo_element) + sizeof(source->arm1->pseudo_element)) {
+                    if (source->arm1->pseudo_element.present != 0 && source->arm1->pseudo_element.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->pseudo_element.present) {
+                        if (source->arm1->pseudo_element.length < 0 || (source->arm1->pseudo_element.length > 0 && !source->arm1->pseudo_element.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.pseudoElement, source->arm1->pseudo_element.data, source->arm1->pseudo_element.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, id) + sizeof(source->arm1->id)) {
+                    if (source->arm1->id.present != 0 && source->arm1->id.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->id.present) {
+                        if (source->arm1->id.length < 0 || (source->arm1->id.length > 0 && !source->arm1->id.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.id, source->arm1->id.data, source->arm1->id.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeAnimationOptions, timeline) + sizeof(source->arm1->timeline) && source->arm1->timeline) {
+                    RefPtr<AnimationTimeline> value = *source->arm1->timeline ? reinterpret_cast<AnimationTimeline*>(*source->arm1->timeline) : nullptr;
+                    if (*source->arm1->timeline && !value)
+                        return RV_ERR_WRONG_INTERFACE;
+                    arm1.timeline = std::move(value);
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<double, KeyframeAnimationOptions> { Variant<double, KeyframeAnimationOptions> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions(RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions* value)
 {
     if (!value) return;
     switch (value->tag) {
@@ -3034,6 +3400,164 @@ template<typename V> int32_t encodeRvDomSequenceAbstractRange(V&& input, RvDomSe
     return RV_OK;
 }
 
+std::optional<Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>>> decodeRvDomUnionDOMStringOrArrayBufferOrArrayBufferView(const RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* source, int32_t& status)
+{
+    if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        if (source->arm0.length < 0 || (source->arm0.length > 0 && !source->arm0.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        String arm0 = source->arm0.length < 0 ? String() : source->arm0.length ? String::fromUTF8(std::span<const uint8_t> { source->arm0.data, static_cast<size_t>(source->arm0.length) }) : emptyString();
+        if (source->arm0.length >= 0 && arm0.isNull()) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        return Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>> { Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>> { WTF::InPlaceIndex<0>, arm0 } };
+    }
+    case 2: {
+        if (source->arm1.length < 0 || (source->arm1.length > 0 && !source->arm1.data)) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+        RefPtr arm1 = JSC::ArrayBuffer::tryCreate(source->arm1.length ? std::span<const uint8_t> { source->arm1.data, static_cast<size_t>(source->arm1.length) } : std::span<const uint8_t> { });
+        if (!arm1) { status = Ranvier::recordException(Exception { ExceptionCode::RangeError, "Out of memory"_s }); return std::nullopt; }
+        return Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>> { Variant<String, Ref<JSC::ArrayBuffer>, Ref<JSC::ArrayBufferView>> { WTF::InPlaceIndex<1>, arm1.releaseNonNull() } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionDOMStringOrArrayBufferOrArrayBufferView(RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        std::free(const_cast<uint8_t*>(value->arm0.data));
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
+std::optional<Variant<uint32_t, AnimationFrameRatePreset>> decodeRvDomUnionUnsignedLongOrAnimationFrameRatePreset(const RvDomUnionUnsignedLongOrAnimationFrameRatePreset* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<uint32_t, AnimationFrameRatePreset> { Variant<uint32_t, AnimationFrameRatePreset> { WTF::InPlaceIndex<0>, static_cast<uint32_t>(source->arm0) } };
+    }
+    case 2: {
+        return Variant<uint32_t, AnimationFrameRatePreset> { Variant<uint32_t, AnimationFrameRatePreset> { WTF::InPlaceIndex<1>, static_cast<AnimationFrameRatePreset>(source->arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnsignedLongOrAnimationFrameRatePreset(RvDomUnionUnsignedLongOrAnimationFrameRatePreset* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+template<size_t I = 0, typename V> void encodeArmsRvDomUnionUnsignedLongOrAnimationFrameRatePreset(V&& value, RvDomUnionUnsignedLongOrAnimationFrameRatePreset* result)
+{
+    if constexpr (I < 2) {
+        if (value.index() == I) {
+            if constexpr (I == 0) {
+                result->arm0 = static_cast<uint32_t>(std::get<I>(value));
+            }
+            else if constexpr (I == 1) {
+                result->arm1 = static_cast<int32_t>(std::get<I>(value));
+            }
+        } else encodeArmsRvDomUnionUnsignedLongOrAnimationFrameRatePreset<I + 1>(std::forward<V>(value), result);
+    }
+}
+template<typename V> int32_t encodeRvDomUnionUnsignedLongOrAnimationFrameRatePreset(V&& input, RvDomUnionUnsignedLongOrAnimationFrameRatePreset* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->tag = static_cast<int32_t>(value.index()) + 1;
+    encodeArmsRvDomUnionUnsignedLongOrAnimationFrameRatePreset(value, result);
+    return RV_OK;
+}
+
+std::optional<Variant<double, KeyframeEffectOptions>> decodeRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(const RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* source, int32_t& status)
+{
+    if (!source || !source->present) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
+    switch (source->tag) {
+    case 1: {
+        return Variant<double, KeyframeEffectOptions> { Variant<double, KeyframeEffectOptions> { WTF::InPlaceIndex<0>, static_cast<double>(source->arm0) } };
+    }
+    case 2: {
+        KeyframeEffectOptions arm1 { };
+        if (source->arm1) {
+            auto decodeFields = [&]() -> int32_t {
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, delay) + sizeof(source->arm1->delay))
+                    assignValue(arm1.delay, source->arm1->delay);
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, end_delay) + sizeof(source->arm1->end_delay))
+                    assignValue(arm1.endDelay, source->arm1->end_delay);
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, fill) + sizeof(source->arm1->fill) && !assignEnumeration(arm1.fill, source->arm1->fill, enumerationFillMode))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, iteration_start) + sizeof(source->arm1->iteration_start))
+                    assignValue(arm1.iterationStart, source->arm1->iteration_start);
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, iterations) + sizeof(source->arm1->iterations))
+                    assignValue(arm1.iterations, source->arm1->iterations);
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, duration) + sizeof(source->arm1->duration) && source->arm1->duration) {
+                    int32_t status = RV_OK;
+                    auto value = decodeRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(source->arm1->duration, status);
+                    if (status != RV_OK) return status;
+                    arm1.duration = std::move(*value);
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, direction) + sizeof(source->arm1->direction) && !assignEnumeration(arm1.direction, source->arm1->direction, enumerationPlaybackDirection))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, easing) + sizeof(source->arm1->easing)) {
+                    if (source->arm1->easing.present != 0 && source->arm1->easing.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->easing.present) {
+                        if (source->arm1->easing.length < 0 || (source->arm1->easing.length > 0 && !source->arm1->easing.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.easing, source->arm1->easing.data, source->arm1->easing.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, iteration_composite) + sizeof(source->arm1->iteration_composite) && !assignEnumeration(arm1.iterationComposite, source->arm1->iteration_composite, enumerationIterationCompositeOperation))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, composite) + sizeof(source->arm1->composite) && !assignEnumeration(arm1.composite, source->arm1->composite, enumerationCompositeOperation))
+                    return RV_ERR_UNSUPPORTED;
+                if (source->arm1->size >= offsetof(RvDomKeyframeEffectOptions, pseudo_element) + sizeof(source->arm1->pseudo_element)) {
+                    if (source->arm1->pseudo_element.present != 0 && source->arm1->pseudo_element.present != 1)
+                        return RV_ERR_NULL_ARGUMENT;
+                    if (source->arm1->pseudo_element.present) {
+                        if (source->arm1->pseudo_element.length < 0 || (source->arm1->pseudo_element.length > 0 && !source->arm1->pseudo_element.data))
+                            return RV_ERR_NULL_ARGUMENT;
+                        if (!assignString(arm1.pseudoElement, source->arm1->pseudo_element.data, source->arm1->pseudo_element.length))
+                            return RV_ERR_NULL_ARGUMENT;
+                    }
+                }
+                return RV_OK;
+            };
+            status = decodeFields();
+            if (status != RV_OK) return std::nullopt;
+        }
+        return Variant<double, KeyframeEffectOptions> { Variant<double, KeyframeEffectOptions> { WTF::InPlaceIndex<1>, std::move(arm1) } };
+    }
+    default: status = RV_ERR_UNSUPPORTED; return std::nullopt;
+    }
+}
+
+void clearRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* value)
+{
+    if (!value) return;
+    switch (value->tag) {
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    *value = { };
+}
+
 std::optional<Variant<String, Ref<CanvasGradient>, Ref<CanvasPattern>>> decodeRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(const RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* source, int32_t& status)
 {
     if (source && source->present != 0 && source->present != 1) { status = RV_ERR_NULL_ARGUMENT; return std::nullopt; }
@@ -3202,6 +3726,29 @@ template<typename V> int32_t encodeRvDomSequencePairUSVStringAndUnionFileOrUSVSt
     RELEASE_ASSERT(!value.size() || result->items);
     for (int32_t i = 0; i < result->count; ++i) {
         encodeRvDomPairUSVStringAndUnionFileOrUSVString(value[i], &result->items[i]);
+    }
+    return RV_OK;
+}
+
+void clearRvDomSequenceFontFace(RvDomSequenceFontFace* value)
+{
+    if (!value) return;
+    for (int32_t i = 0; i < value->count; ++i) {
+        if (value->items[i]) reinterpret_cast<FontFace*>(value->items[i])->deref();
+    }
+    std::free(value->items);
+    *value = { };
+}
+template<typename V> int32_t encodeRvDomSequenceFontFace(V&& input, RvDomSequenceFontFace* result)
+{
+    *result = { };
+    auto&& value = input;
+    result->present = 1;
+    result->count = static_cast<int32_t>(value.size());
+    result->items = value.size() ? static_cast<RvFontFace**>(std::calloc(value.size(), sizeof(RvFontFace*))) : nullptr;
+    RELEASE_ASSERT(!value.size() || result->items);
+    for (int32_t i = 0; i < result->count; ++i) {
+        storeHandle<FontFace>(value[i], &result->items[i]);
     }
     return RV_OK;
 }
@@ -3385,7 +3932,7 @@ int32_t ranvier_dom_has(const char* feature)
 {
     if (!feature)
         return 0;
-    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:DataTransfer", "dom:DataTransferItemList", "dom:DataTransferItem", "dom:ClipboardEvent", "dom:DragEvent", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:DataTransfer", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
+    for (auto* name : { "dom-generated", "dom:Node", "dom:CharacterData", "dom:Text", "dom:Comment", "dom:DocumentFragment", "dom:ShadowRoot", "dom:Document", "dom:HTMLDocument", "dom:DOMImplementation", "dom:Element", "dom:Attr", "dom:NamedNodeMap", "dom:HTMLElement", "dom:HTMLAnchorElement", "dom:HTMLAreaElement", "dom:HTMLBodyElement", "dom:HTMLButtonElement", "dom:HTMLDetailsElement", "dom:HTMLDialogElement", "dom:HTMLDivElement", "dom:HTMLFieldSetElement", "dom:HTMLFormElement", "dom:HTMLHeadElement", "dom:HTMLImageElement", "dom:HTMLInputElement", "dom:HTMLLabelElement", "dom:HTMLLegendElement", "dom:HTMLLIElement", "dom:HTMLMeterElement", "dom:HTMLOListElement", "dom:HTMLOptGroupElement", "dom:HTMLOptionElement", "dom:HTMLOutputElement", "dom:HTMLParagraphElement", "dom:HTMLProgressElement", "dom:HTMLSelectElement", "dom:HTMLSlotElement", "dom:HTMLSpanElement", "dom:HTMLTableElement", "dom:HTMLTableCaptionElement", "dom:HTMLTableColElement", "dom:HTMLTableSectionElement", "dom:HTMLTableRowElement", "dom:HTMLTableCellElement", "dom:HTMLTextAreaElement", "dom:HTMLTemplateElement", "dom:HTMLUListElement", "dom:HTMLBaseElement", "dom:HTMLBRElement", "dom:HTMLDataElement", "dom:HTMLDataListElement", "dom:HTMLDirectoryElement", "dom:HTMLDListElement", "dom:HTMLFontElement", "dom:HTMLHeadingElement", "dom:HTMLHRElement", "dom:HTMLHtmlElement", "dom:HTMLMapElement", "dom:HTMLMarqueeElement", "dom:HTMLMenuElement", "dom:HTMLMetaElement", "dom:HTMLModElement", "dom:HTMLParamElement", "dom:HTMLPictureElement", "dom:HTMLPreElement", "dom:HTMLQuoteElement", "dom:HTMLSelectedContentElement", "dom:HTMLSourceElement", "dom:HTMLTimeElement", "dom:HTMLTitleElement", "dom:SVGElement", "dom:MathMLElement", "dom:MathMLMathElement", "dom:HTMLStyleElement", "dom:SVGStyleElement", "dom:HTMLLinkElement", "dom:StyleSheet", "dom:StyleSheetList", "dom:CSSStyleSheet", "dom:MediaList", "dom:CSSRule", "dom:CSSRuleList", "dom:CSSStyleRule", "dom:CSSStyleProperties", "dom:CSSGroupingRule", "dom:CSSConditionRule", "dom:CSSMediaRule", "dom:CSSSupportsRule", "dom:CSSContainerRule", "dom:CSSLayerBlockRule", "dom:CSSLayerStatementRule", "dom:CSSScopeRule", "dom:CSSNestedDeclarations", "dom:CSSImportRule", "dom:CSSNamespaceRule", "dom:CSSKeyframesRule", "dom:CSSKeyframeRule", "dom:CSSFontFaceRule", "dom:CSSFontFaceDescriptors", "dom:CSSFontFeatureValuesRule", "dom:CSSFontPaletteValuesRule", "dom:CSSCounterStyleRule", "dom:CSSPropertyRule", "dom:CSSStyleValue", "dom:CSSNumericValue", "dom:CSSTransformValue", "dom:CSSTransformComponent", "dom:CSSTranslate", "dom:CSSRotate", "dom:CSSScale", "dom:CSSSkew", "dom:CSSSkewX", "dom:CSSSkewY", "dom:CSSPerspective", "dom:CSSMatrixComponent", "dom:CSSUnitValue", "dom:CSSOMKeywordValue", "dom:CSSStyleImageValue", "dom:CSSUnparsedValue", "dom:CSSOMVariableReferenceValue", "dom:StylePropertyMapReadOnly", "dom:StylePropertyMap", "dom:CSSPositionTryRule", "dom:CSSPositionTryDescriptors", "dom:CSSStartingStyleRule", "dom:CSSViewTransitionRule", "dom:CSSStyleDeclaration", "dom:DOMTokenList", "dom:DOMStringMap", "dom:AbstractRange", "dom:StaticRange", "dom:Range", "dom:DOMSelection", "dom:DOMRectReadOnly", "dom:DOMRect", "dom:DOMRectList", "dom:DOMPointReadOnly", "dom:DOMPoint", "dom:DOMQuad", "dom:DOMMatrixReadOnly", "dom:DOMMatrix", "dom:NodeList", "dom:RadioNodeList", "dom:HTMLCollection", "dom:HTMLFormControlsCollection", "dom:HTMLOptionsCollection", "dom:DOMFormData", "dom:ValidityState", "dom:Event", "dom:UIEvent", "dom:MouseEvent", "dom:PointerEvent", "dom:Touch", "dom:TouchList", "dom:TouchEvent", "dom:WheelEvent", "dom:KeyboardEvent", "dom:FocusEvent", "dom:InputEvent", "dom:CompositionEvent", "dom:SubmitEvent", "dom:FormDataEvent", "dom:ToggleEvent", "dom:CommandEvent", "dom:ErrorEvent", "dom:ProgressEvent", "dom:CSSAnimationEvent", "dom:CSSTransitionEvent", "dom:ContentVisibilityAutoStateChangeEvent", "dom:AnimationPlaybackEvent", "dom:PageTransitionEvent", "dom:HashChangeEvent", "dom:MediaQueryListEvent", "dom:PopStateEvent", "dom:BeforeUnloadEvent", "dom:SVGGraphicsElement", "dom:SVGGeometryElement", "dom:SVGPolygonElement", "dom:SVGPolylineElement", "dom:SVGSVGElement", "dom:SVGRect", "dom:SVGMatrix", "dom:SVGPoint", "dom:SVGAnimatedRect", "dom:SVGPreserveAspectRatio", "dom:SVGAnimatedPreserveAspectRatio", "dom:SVGTransform", "dom:SVGTransformList", "dom:SVGAnimatedTransformList", "dom:SVGNumber", "dom:SVGLength", "dom:SVGAngle", "dom:SVGNumberList", "dom:SVGLengthList", "dom:SVGPointList", "dom:SVGAnimatedNumber", "dom:SVGAnimatedLength", "dom:SVGAnimatedLengthList", "dom:SVGAnimatedNumberList", "dom:SVGAnimatedEnumeration", "dom:SVGAnimatedString", "dom:SVGAnimatedBoolean", "dom:SVGStringList", "dom:SVGViewSpec", "dom:SVGAnimatedAngle", "dom:SVGSymbolElement", "dom:SVGViewElement", "dom:SVGMarkerElement", "dom:SVGPatternElement", "dom:SVGTextContentElement", "dom:SVGTextPositioningElement", "dom:SVGCircleElement", "dom:SVGEllipseElement", "dom:SVGLineElement", "dom:SVGRectElement", "dom:SVGPathElement", "dom:SVGTextElement", "dom:SVGTSpanElement", "dom:SVGTextPathElement", "dom:SVGAnimationElement", "dom:SVGAnimateElement", "dom:SVGAnimateMotionElement", "dom:SVGAnimateTransformElement", "dom:SVGSetElement", "dom:SVGMPathElement", "dom:SVGFEConvolveMatrixElement", "dom:SVGAnimatedInteger", "dom:SVGGradientElement", "dom:SVGLinearGradientElement", "dom:SVGRadialGradientElement", "dom:SVGStopElement", "dom:SVGFEBlendElement", "dom:SVGFEColorMatrixElement", "dom:SVGFEComponentTransferElement", "dom:SVGFECompositeElement", "dom:SVGFEDiffuseLightingElement", "dom:SVGFEDisplacementMapElement", "dom:SVGFEDistantLightElement", "dom:SVGFEDropShadowElement", "dom:SVGFEFloodElement", "dom:SVGFEFuncAElement", "dom:SVGFEFuncBElement", "dom:SVGFEFuncGElement", "dom:SVGFEFuncRElement", "dom:SVGFEGaussianBlurElement", "dom:SVGFEImageElement", "dom:SVGFEMergeElement", "dom:SVGFEMergeNodeElement", "dom:SVGFEMorphologyElement", "dom:SVGFEOffsetElement", "dom:SVGFEPointLightElement", "dom:SVGFESpecularLightingElement", "dom:SVGFESpotLightElement", "dom:SVGFETileElement", "dom:SVGFETurbulenceElement", "dom:SVGFilterElement", "dom:SVGComponentTransferFunctionElement", "dom:SVGClipPathElement", "dom:SVGMaskElement", "dom:SVGAElement", "dom:SVGDefsElement", "dom:SVGDescElement", "dom:SVGForeignObjectElement", "dom:SVGGElement", "dom:SVGImageElement", "dom:SVGMetadataElement", "dom:SVGScriptElement", "dom:SVGSwitchElement", "dom:SVGTitleElement", "dom:SVGUseElement", "dom:NodeFilter", "dom:NodeIterator", "dom:TreeWalker", "dom:Blob", "dom:File", "dom:FileList", "dom:CaretPosition", "dom:DOMURL", "dom:URLSearchParams", "dom:URLPattern", "dom:VisualViewport", "dom:Highlight", "dom:HighlightRegistry", "dom:FileReader", "dom:FontFace", "dom:FontFaceSet", "dom:WebAnimation", "dom:AnimationEffect", "dom:KeyframeEffect", "dom:AnimationTimeline", "dom:DocumentTimeline", "dom:DataTransfer", "dom:DataTransferItemList", "dom:DataTransferItem", "dom:ClipboardEvent", "dom:DragEvent", "dom:HTMLCanvasElement", "dom:CanvasRenderingContext2D", "dom:CanvasGradient", "dom:CanvasPattern", "dom-type-query:CSSRule", "dom-type-query:StyleSheet", "dom-type-query:CSSStyleDeclaration", "dom-type-query:CSSStyleValue", "dom-type-query:StylePropertyMapReadOnly", "dom-type-query:DOMRectReadOnly", "dom-type-query:DOMPointReadOnly", "dom-type-query:DOMMatrixReadOnly", "dom-type-query:CSSTransformComponent", "dom-type-query:Event", "dom-type-query:AnimationEffect", "dom-type-query:AnimationTimeline", "dom-constructor:Text", "dom-constructor:Comment", "dom-constructor:DocumentFragment", "dom-constructor:Document", "dom-constructor:CSSStyleSheet", "dom-constructor:CSSTransformValue", "dom-constructor:CSSTranslate", "dom-constructor:CSSRotate", "dom-constructor:CSSRotate", "dom-constructor:CSSScale", "dom-constructor:CSSSkew", "dom-constructor:CSSSkewX", "dom-constructor:CSSSkewY", "dom-constructor:CSSPerspective", "dom-constructor:CSSMatrixComponent", "dom-constructor:CSSUnitValue", "dom-constructor:CSSOMKeywordValue", "dom-constructor:CSSUnparsedValue", "dom-constructor:CSSOMVariableReferenceValue", "dom-constructor:StaticRange", "dom-constructor:Range", "dom-constructor:DOMRectReadOnly", "dom-constructor:DOMRect", "dom-constructor:DOMPointReadOnly", "dom-constructor:DOMPoint", "dom-constructor:DOMQuad", "dom-constructor:DOMMatrixReadOnly", "dom-constructor:DOMMatrix", "dom-constructor:DOMFormData", "dom-constructor:PointerEvent", "dom-constructor:WheelEvent", "dom-constructor:InputEvent", "dom-constructor:CompositionEvent", "dom-constructor:SubmitEvent", "dom-constructor:FormDataEvent", "dom-constructor:ToggleEvent", "dom-constructor:CommandEvent", "dom-constructor:ErrorEvent", "dom-constructor:ProgressEvent", "dom-constructor:CSSAnimationEvent", "dom-constructor:CSSTransitionEvent", "dom-constructor:ContentVisibilityAutoStateChangeEvent", "dom-constructor:AnimationPlaybackEvent", "dom-constructor:PageTransitionEvent", "dom-constructor:HashChangeEvent", "dom-constructor:MediaQueryListEvent", "dom-constructor:PopStateEvent", "dom-constructor:Blob", "dom-constructor:File", "dom-constructor:DOMURL", "dom-constructor:URLSearchParams", "dom-constructor:URLPattern", "dom-constructor:URLPattern", "dom-constructor:Highlight", "dom-constructor:FileReader", "dom-constructor:FontFace", "dom-constructor:WebAnimation", "dom-constructor:KeyframeEffect", "dom-constructor:KeyframeEffect", "dom-constructor:DocumentTimeline", "dom-constructor:DataTransfer", "dom-adopted-style-sheets", "dom-adopted-style-sheets" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -3435,6 +3982,8 @@ int32_t ranvier_dom_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "dom-url-search-params-entries"))
         return 1;
+    if (!std::strcmp(feature, "dom-font-face-set-values"))
+        return 1;
     return 0;
 }
 
@@ -3458,6 +4007,11 @@ void ranvier_dom_sequence_element_release(RvDomSequenceElement* value)
     if (isMainThread()) clearRvDomSequenceElement(value);
 }
 
+void ranvier_dom_sequence_web_animation_release(RvDomSequenceWebAnimation* value)
+{
+    if (isMainThread()) clearRvDomSequenceWebAnimation(value);
+}
+
 void ranvier_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot* value)
 {
     if (isMainThread()) clearRvDomSequenceShadowRoot(value);
@@ -3473,6 +4027,11 @@ void ranvier_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanO
     if (isMainThread()) clearRvDomUnionBooleanOrImportNodeOptions(value);
 }
 
+void ranvier_dom_sequence_touch_release(RvDomSequenceTouch* value)
+{
+    if (isMainThread()) clearRvDomSequenceTouch(value);
+}
+
 void ranvier_dom_sequence_element_nullable_release(RvDomSequenceElementNullable* value)
 {
     if (isMainThread()) clearRvDomSequenceElementNullable(value);
@@ -3486,6 +4045,26 @@ void ranvier_dom_sequence_dom_string_release(RvDomSequenceDOMString* value)
 void ranvier_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions* value)
 {
     if (isMainThread()) clearRvDomUnionBooleanOrScrollIntoViewOptions(value);
+}
+
+void ranvier_dom_sequence_keyframe_property_release(RvDomSequenceKeyframeProperty* value)
+{
+    if (isMainThread()) clearRvDomSequenceKeyframeProperty(value);
+}
+
+void ranvier_dom_sequence_keyframe_nullable_release(RvDomSequenceKeyframeNullable* value)
+{
+    if (isMainThread()) clearRvDomSequenceKeyframeNullable(value);
+}
+
+void ranvier_dom_union_unrestricted_double_or_css_numeric_value_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString(value);
+}
+
+void ranvier_dom_union_unrestricted_double_or_keyframe_animation_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions(value);
 }
 
 void ranvier_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable* value)
@@ -3698,6 +4277,21 @@ void ranvier_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange* val
     if (isMainThread()) clearRvDomSequenceAbstractRange(value);
 }
 
+void ranvier_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release(RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* value)
+{
+    if (isMainThread()) clearRvDomUnionDOMStringOrArrayBufferOrArrayBufferView(value);
+}
+
+void ranvier_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDomUnionUnsignedLongOrAnimationFrameRatePreset* value)
+{
+    if (isMainThread()) clearRvDomUnionUnsignedLongOrAnimationFrameRatePreset(value);
+}
+
+void ranvier_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* value)
+{
+    if (isMainThread()) clearRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(value);
+}
+
 void ranvier_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern* value)
 {
     if (isMainThread()) clearRvDomUnionDOMStringOrCanvasGradientOrCanvasPattern(value);
@@ -3726,6 +4320,11 @@ void ranvier_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPairU
 void ranvier_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString* value)
 {
     if (isMainThread()) clearRvDomSequencePairUSVStringAndUnionFileOrUSVString(value);
+}
+
+void ranvier_dom_sequence_font_face_release(RvDomSequenceFontFace* value)
+{
+    if (isMainThread()) clearRvDomSequenceFontFace(value);
 }
 
 void ranvier_dom_pair_dom_string_and_highlight_release(RvDomPairDOMStringAndHighlight* value)
@@ -4100,6 +4699,34 @@ RvValidityState* ranvier_dom_validity_state_retain(RvValidityState* handle)
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<ValidityState*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_touch_release(RvTouch* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<Touch*>(handle)->deref();
+}
+
+RvTouch* ranvier_dom_touch_retain(RvTouch* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<Touch*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_touch_list_release(RvTouchList* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<TouchList*>(handle)->deref();
+}
+
+RvTouchList* ranvier_dom_touch_list_retain(RvTouchList* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<TouchList*>(handle)->ref();
     return handle;
 }
 
@@ -4618,6 +5245,48 @@ RvHighlightRegistry* ranvier_dom_highlight_registry_retain(RvHighlightRegistry* 
     if (!handle || !isMainThread())
         return nullptr;
     reinterpret_cast<HighlightRegistry*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_font_face_release(RvFontFace* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<FontFace*>(handle)->deref();
+}
+
+RvFontFace* ranvier_dom_font_face_retain(RvFontFace* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<FontFace*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_animation_effect_release(RvAnimationEffect* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<AnimationEffect*>(handle)->deref();
+}
+
+RvAnimationEffect* ranvier_dom_animation_effect_retain(RvAnimationEffect* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<AnimationEffect*>(handle)->ref();
+    return handle;
+}
+
+void ranvier_dom_animation_timeline_release(RvAnimationTimeline* handle)
+{
+    if (handle && isMainThread())
+        reinterpret_cast<AnimationTimeline*>(handle)->deref();
+}
+
+RvAnimationTimeline* ranvier_dom_animation_timeline_retain(RvAnimationTimeline* handle)
+{
+    if (!handle || !isMainThread())
+        return nullptr;
+    reinterpret_cast<AnimationTimeline*>(handle)->ref();
     return handle;
 }
 
@@ -5789,6 +6458,19 @@ int32_t ranvier_dom_shadow_root_elements_from_point(RvNode* target, double x, do
     return deliver([&]() -> decltype(auto) { return impl->elementsFromPoint(x, y); }, [&](auto&& value) { return encodeRvDomSequenceElement(value, result); });
 }
 
+// ShadowRoot.getAnimations() -> sequence<WebAnimation>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_shadow_root_get_animations(RvNode* target, RvDomSequenceWebAnimation* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<ShadowRoot>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getAnimations(); }, [&](auto&& value) { return encodeRvDomSequenceWebAnimation(value, result); });
+}
+
 // ShadowRoot.setHTMLUnsafe((TrustedHTML or DOMString) html) -> undefined
 int32_t ranvier_dom_shadow_root_set_html_unsafe(RvNode* target, const uint8_t* html, int32_t html_length)
 {
@@ -5904,6 +6586,19 @@ int32_t ranvier_dom_document_get_document_element(RvNode* target, RvNode** resul
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->documentElement(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// Document.timeline getter: readonly attribute DocumentTimeline timeline; *result is a new reference
+int32_t ranvier_dom_document_get_timeline(RvNode* target, RvAnimationTimeline** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->timeline(); }, [&](auto&& value) { return storeHandle<AnimationTimeline>(value, result); });
 }
 
 // Document.scrollingElement getter: readonly attribute Element? scrollingElement; *result is a new reference, or NULL
@@ -6267,6 +6962,41 @@ int32_t ranvier_dom_document_set_adopted_style_sheets(RvNode* target, const RvDo
     auto a0 = decodeRvDomSequenceCSSStyleSheet(value, status0);
     if (status0 != RV_OK) return status0;
     return invoke([&]() -> decltype(auto) { return impl->setAdoptedStyleSheets(DomSequenceArgument<Ref<CSSStyleSheet>> { std::move(*a0) }); });
+}
+
+// Document.pointerLockElement getter: readonly attribute Element? pointerLockElement; *result is a new reference, or NULL; RV_ERR_UNSUPPORTED while the setting PointerLockEnabled is off; RV_ERR_UNSUPPORTED where WebKit builds without POINTER_LOCK
+int32_t ranvier_dom_document_get_pointer_lock_element(RvNode* target, RvNode** result)
+{
+#if ENABLE(POINTER_LOCK)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto& settings = impl->document().settingsValues();
+    if (!(settings.pointerLockEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->pointerLockElement(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// Document.fonts getter: readonly attribute FontFaceSet fonts; *result is a new reference
+int32_t ranvier_dom_document_get_fonts(RvNode* target, RvEventTarget** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->fonts(); }, [&](auto&& value) { return storeHandle<EventTarget>(value, result); });
 }
 
 // Document.createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options = {}) -> Element; options defaults to {} in IDL; *result is a new reference
@@ -6739,6 +7469,29 @@ int32_t ranvier_dom_document_get_selection(RvNode* target, RvDOMSelection** resu
     return deliver([&]() -> decltype(auto) { return impl->getSelection(); }, [&](auto&& value) { return storeHandle<DOMSelection>(value, result); });
 }
 
+// Document.createTouchList(Touch touches) -> TouchList; *result is a new reference; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_document_create_touch_list(RvNode* target, const RvDomSequenceTouch* touches, RvTouchList** result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !touches || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceTouch(touches, status0);
+    if (status0 != RV_OK) return status0;
+    return deliver([&]() -> decltype(auto) { return WebCore::DocumentTouch::createTouchList(*impl, DomSequenceArgument<Ref<Touch>> { std::move(*a0) }); }, [&](auto&& value) { return storeHandle<TouchList>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(touches);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
 // Document.prepend((Node or DOMString) nodes) -> undefined
 int32_t ranvier_dom_document_prepend(RvNode* target, const RvDomSequenceNodeOrDOMString* nodes)
 {
@@ -6874,6 +7627,19 @@ int32_t ranvier_dom_document_elements_from_point(RvNode* target, double x, doubl
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->elementsFromPoint(x, y); }, [&](auto&& value) { return encodeRvDomSequenceElement(value, result); });
+}
+
+// Document.getAnimations() -> sequence<WebAnimation>; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_document_get_animations(RvNode* target, RvDomSequenceWebAnimation* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->getAnimations(); }, [&](auto&& value) { return encodeRvDomSequenceWebAnimation(value, result); });
 }
 
 // DOMImplementation.createHTMLDocument(optional DOMString title) -> HTMLDocument; title_length -1 means absent; *result is a new reference
@@ -9528,6 +10294,48 @@ int32_t ranvier_dom_element_computed_style_map(RvNode* target, RvStylePropertyMa
     if (!impl)
         return RV_ERR_WRONG_INTERFACE;
     return deliver([&]() -> decltype(auto) { return impl->computedStyleMap(); }, [&](auto&& value) { return storeHandle<StylePropertyMapReadOnly>(value, result); });
+}
+
+// Element.animate(sequence<Keyframe>? keyframes, optional (unrestricted double or KeyframeAnimationOptions) options = {}) -> WebAnimation; options defaults to {} in IDL; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; *result is a new reference; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object
+int32_t ranvier_dom_element_animate(RvNode* target, const RvDomSequenceKeyframeNullable* keyframes, const RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions* options, RvEventTarget** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    auto* global = document->globalObject();
+    if (!global)
+        return Ranvier::recordException(Exception { ExceptionCode::InvalidStateError, "The document has no global object."_s });
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceKeyframeNullable(keyframes, status0);
+    if (status0 != RV_OK) return status0;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions(options, status1);
+    if (!options) { a1 = Variant<double, KeyframeAnimationOptions> { WTF::InPlaceIndex<1>, KeyframeAnimationOptions { } }; status1 = RV_OK; }
+    if (status1 != RV_OK) return status1;
+    return deliver([&]() -> decltype(auto) { return Ranvier::keyframesCall(*global, std::move(*a0), [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return impl->animate(*global, std::move(keyframesObject), std::move(*a1)); }); }, [&](auto&& value) { return storeHandle<EventTarget>(value, result); });
+}
+
+// Element.getAnimations(optional GetAnimationsOptions options = {}) -> sequence<WebAnimation>; options defaults to {} in IDL; options may be NULL for the IDL default; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_element_get_animations(RvNode* target, const RvDomGetAnimationsOptions* options, RvDomSequenceWebAnimation* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Element>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    GetAnimationsOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomGetAnimationsOptions, subtree) + sizeof(options->subtree))
+            assignValue(a0.subtree, !!options->subtree);
+    }
+    return deliver([&]() -> decltype(auto) { return impl->getAnimations(std::move(a0)); }, [&](auto&& value) { return encodeRvDomSequenceWebAnimation(value, result); });
 }
 
 // Element.before((Node or DOMString) nodes) -> undefined
@@ -32853,6 +33661,310 @@ int32_t ranvier_dom_pointer_event_get_predicted_events(RvEvent* target, RvDomSeq
     return deliver([&]() -> decltype(auto) { return impl->getPredictedEvents(); }, [&](auto&& value) { return encodeRvDomSequencePointerEvent(value, result); });
 }
 
+// Touch.clientX getter: readonly attribute double clientX; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_get_client_x(RvTouch* target, double* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Touch> impl = reinterpret_cast<Touch*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->clientX(); }, [&](auto&& value) { return store<double>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// Touch.clientY getter: readonly attribute double clientY; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_get_client_y(RvTouch* target, double* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Touch> impl = reinterpret_cast<Touch*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->clientY(); }, [&](auto&& value) { return store<double>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// Touch.screenX getter: readonly attribute double screenX; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_get_screen_x(RvTouch* target, double* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Touch> impl = reinterpret_cast<Touch*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->screenX(); }, [&](auto&& value) { return store<double>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// Touch.screenY getter: readonly attribute double screenY; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_get_screen_y(RvTouch* target, double* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Touch> impl = reinterpret_cast<Touch*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->screenY(); }, [&](auto&& value) { return store<double>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// Touch.pageX getter: readonly attribute double pageX; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_get_page_x(RvTouch* target, double* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Touch> impl = reinterpret_cast<Touch*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->pageX(); }, [&](auto&& value) { return store<double>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// Touch.pageY getter: readonly attribute double pageY; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_get_page_y(RvTouch* target, double* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Touch> impl = reinterpret_cast<Touch*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->pageY(); }, [&](auto&& value) { return store<double>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// Touch.target getter: readonly attribute EventTarget? target; *result is a new reference, or NULL; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_get_target(RvTouch* target, RvNode** result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Touch> impl = reinterpret_cast<Touch*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->target(); }, [&](auto&& value) { return storeNode(dynamicDowncast<Node>(rawPointer<EventTarget>(value)), result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// Touch.identifier getter: readonly attribute long identifier; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_get_identifier(RvTouch* target, int32_t* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<Touch> impl = reinterpret_cast<Touch*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->identifier(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// TouchList.length getter: readonly attribute unsigned long length; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_list_get_length(RvTouchList* target, uint32_t* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TouchList> impl = reinterpret_cast<TouchList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->length(); }, [&](auto&& value) { return store<uint32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// TouchList.item(unsigned long index) -> Touch?; *result is a new reference, or NULL; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_list_item(RvTouchList* target, uint32_t index, RvTouch** result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<TouchList> impl = reinterpret_cast<TouchList*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->item(index); }, [&](auto&& value) { return storeHandle<Touch>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(index);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// TouchEvent.touches getter: readonly attribute TouchList? touches; *result is a new reference, or NULL; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_event_get_touches(RvEvent* target, RvTouchList** result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<TouchEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->touches(); }, [&](auto&& value) { return storeHandle<TouchList>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// TouchEvent.targetTouches getter: readonly attribute TouchList? targetTouches; *result is a new reference, or NULL; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_event_get_target_touches(RvEvent* target, RvTouchList** result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<TouchEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->targetTouches(); }, [&](auto&& value) { return storeHandle<TouchList>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// TouchEvent.changedTouches getter: readonly attribute TouchList? changedTouches; *result is a new reference, or NULL; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_event_get_changed_touches(RvEvent* target, RvTouchList** result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<TouchEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->changedTouches(); }, [&](auto&& value) { return storeHandle<TouchList>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// TouchEvent.ctrlKey getter: readonly attribute boolean ctrlKey; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_event_get_ctrl_key(RvEvent* target, int32_t* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<TouchEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->ctrlKey(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// TouchEvent.shiftKey getter: readonly attribute boolean shiftKey; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_event_get_shift_key(RvEvent* target, int32_t* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<TouchEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->shiftKey(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// TouchEvent.altKey getter: readonly attribute boolean altKey; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_event_get_alt_key(RvEvent* target, int32_t* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<TouchEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->altKey(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+// TouchEvent.metaKey getter: readonly attribute boolean metaKey; RV_ERR_UNSUPPORTED where WebKit builds without TOUCH_EVENTS
+int32_t ranvier_dom_touch_event_get_meta_key(RvEvent* target, int32_t* result)
+{
+#if ENABLE(TOUCH_EVENTS)
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<TouchEvent>(*eventOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->metaKey(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+#else
+    UNUSED_PARAM(target);
+    UNUSED_PARAM(result);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
 // WheelEvent.constructor: target is the Document of the constructed object; event_init_dict defaults to {} in IDL; event_init_dict may be NULL for the IDL default; *result is a new reference
 int32_t ranvier_dom_wheel_event_create(RvNode* target, const uint8_t* type, int32_t type_length, const RvDomWheelEventInit* event_init_dict, RvEvent** result)
 {
@@ -42422,6 +43534,1140 @@ int32_t ranvier_dom_file_reader_abort(RvEventTarget* target)
     return invoke([&]() -> decltype(auto) { return impl->abort(); });
 }
 
+// FontFace.constructor: target is the Document of the constructed object; a string part of source is UTF-8, and invalid UTF-8 returns RV_ERR_NULL_ARGUMENT; descriptors defaults to {} in IDL; descriptors may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_font_face_create(RvNode* target, const uint8_t* family, int32_t family_length, const RvDomUnionDOMStringOrArrayBufferOrArrayBufferView* source, const RvDomFontFaceDescriptors* descriptors, RvFontFace** result)
+{
+    if (!target || !(family_length >= 0 && (family_length <= 0 || family)) || !source || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { family, family_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomUnionDOMStringOrArrayBufferOrArrayBufferView(source, status1);
+    if (status1 != RV_OK) return status1;
+    FontFace::Descriptors a2 { };
+    if (descriptors) {
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, style) + sizeof(descriptors->style)) {
+            if (descriptors->style.present != 0 && descriptors->style.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->style.present) {
+                if (descriptors->style.length < 0 || (descriptors->style.length > 0 && !descriptors->style.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.style, descriptors->style.data, descriptors->style.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, weight) + sizeof(descriptors->weight)) {
+            if (descriptors->weight.present != 0 && descriptors->weight.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->weight.present) {
+                if (descriptors->weight.length < 0 || (descriptors->weight.length > 0 && !descriptors->weight.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.weight, descriptors->weight.data, descriptors->weight.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, stretch) + sizeof(descriptors->stretch)) {
+            if (descriptors->stretch.present != 0 && descriptors->stretch.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->stretch.present) {
+                if (descriptors->stretch.length < 0 || (descriptors->stretch.length > 0 && !descriptors->stretch.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.width, descriptors->stretch.data, descriptors->stretch.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, unicode_range) + sizeof(descriptors->unicode_range)) {
+            if (descriptors->unicode_range.present != 0 && descriptors->unicode_range.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->unicode_range.present) {
+                if (descriptors->unicode_range.length < 0 || (descriptors->unicode_range.length > 0 && !descriptors->unicode_range.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.unicodeRange, descriptors->unicode_range.data, descriptors->unicode_range.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, feature_settings) + sizeof(descriptors->feature_settings)) {
+            if (descriptors->feature_settings.present != 0 && descriptors->feature_settings.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->feature_settings.present) {
+                if (descriptors->feature_settings.length < 0 || (descriptors->feature_settings.length > 0 && !descriptors->feature_settings.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.featureSettings, descriptors->feature_settings.data, descriptors->feature_settings.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, display) + sizeof(descriptors->display)) {
+            if (descriptors->display.present != 0 && descriptors->display.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->display.present) {
+                if (descriptors->display.length < 0 || (descriptors->display.length > 0 && !descriptors->display.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.display, descriptors->display.data, descriptors->display.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+        if (descriptors->size >= offsetof(RvDomFontFaceDescriptors, size_adjust) + sizeof(descriptors->size_adjust)) {
+            if (descriptors->size_adjust.present != 0 && descriptors->size_adjust.present != 1)
+                return RV_ERR_NULL_ARGUMENT;
+            if (descriptors->size_adjust.present) {
+                if (descriptors->size_adjust.length < 0 || (descriptors->size_adjust.length > 0 && !descriptors->size_adjust.data))
+                    return RV_ERR_NULL_ARGUMENT;
+                if (!assignString(a2.sizeAdjust, descriptors->size_adjust.data, descriptors->size_adjust.length))
+                    return RV_ERR_NULL_ARGUMENT;
+            }
+        }
+    }
+    return deliver([&]() -> decltype(auto) { return FontFace::create(*impl, a0.atom(), std::move(*a1), std::move(a2)); }, [&](auto&& value) { return storeHandle<FontFace>(value, result); });
+}
+
+// FontFace.family getter: attribute DOMString family
+int32_t ranvier_dom_font_face_get_family(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->family(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.family setter: attribute DOMString family
+int32_t ranvier_dom_font_face_set_family(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setFamily(document.get(), a0.atom()); });
+}
+
+// FontFace.style getter: attribute DOMString style
+int32_t ranvier_dom_font_face_get_style(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->style(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.style setter: attribute DOMString style
+int32_t ranvier_dom_font_face_set_style(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setStyle(document.get(), a0.string()); });
+}
+
+// FontFace.weight getter: attribute DOMString weight
+int32_t ranvier_dom_font_face_get_weight(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->weight(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.weight setter: attribute DOMString weight
+int32_t ranvier_dom_font_face_set_weight(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setWeight(document.get(), a0.string()); });
+}
+
+// FontFace.width getter: attribute DOMString width
+int32_t ranvier_dom_font_face_get_width(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.width setter: attribute DOMString width
+int32_t ranvier_dom_font_face_set_width(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setWidth(document.get(), a0.string()); });
+}
+
+// FontFace.stretch getter: attribute DOMString stretch
+int32_t ranvier_dom_font_face_get_stretch(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->width(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.stretch setter: attribute DOMString stretch
+int32_t ranvier_dom_font_face_set_stretch(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setWidth(document.get(), a0.string()); });
+}
+
+// FontFace.unicodeRange getter: attribute DOMString unicodeRange
+int32_t ranvier_dom_font_face_get_unicode_range(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->unicodeRange(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.unicodeRange setter: attribute DOMString unicodeRange
+int32_t ranvier_dom_font_face_set_unicode_range(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setUnicodeRange(document.get(), a0.string()); });
+}
+
+// FontFace.featureSettings getter: attribute DOMString featureSettings
+int32_t ranvier_dom_font_face_get_feature_settings(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->featureSettings(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.featureSettings setter: attribute DOMString featureSettings
+int32_t ranvier_dom_font_face_set_feature_settings(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setFeatureSettings(document.get(), a0.string()); });
+}
+
+// FontFace.display getter: attribute DOMString display
+int32_t ranvier_dom_font_face_get_display(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->display(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.display setter: attribute DOMString display
+int32_t ranvier_dom_font_face_set_display(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setDisplay(document.get(), a0.string()); });
+}
+
+// FontFace.ascentOverride getter: attribute DOMString ascentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_get_ascent_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->ascentOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.ascentOverride setter: attribute DOMString ascentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_set_ascent_override(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setAscentOverride(document.get(), a0.string()); });
+}
+
+// FontFace.descentOverride getter: attribute DOMString descentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_get_descent_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->descentOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.descentOverride setter: attribute DOMString descentOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_set_descent_override(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setDescentOverride(document.get(), a0.string()); });
+}
+
+// FontFace.lineGapOverride getter: attribute DOMString lineGapOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_get_line_gap_override(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    return deliver([&]() -> decltype(auto) { return impl->lineGapOverride(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.lineGapOverride setter: attribute DOMString lineGapOverride; RV_ERR_UNSUPPORTED while the setting CSSFontFaceMetricOverrideDescriptorsEnabled is off
+int32_t ranvier_dom_font_face_set_line_gap_override(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr settingsDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!settingsDocument)
+        return RV_ERR_DETACHED;
+    auto& settings = (*settingsDocument).settingsValues();
+    if (!(settings.cssFontFaceMetricOverrideDescriptorsEnabled))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setLineGapOverride(document.get(), a0.string()); });
+}
+
+// FontFace.sizeAdjust getter: attribute DOMString sizeAdjust
+int32_t ranvier_dom_font_face_get_size_adjust(RvFontFace* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->sizeAdjust(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// FontFace.sizeAdjust setter: attribute DOMString sizeAdjust
+int32_t ranvier_dom_font_face_set_size_adjust(RvFontFace* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setSizeAdjust(document.get(), a0.string()); });
+}
+
+// FontFace.status getter: readonly attribute FontFaceLoadStatus status
+int32_t ranvier_dom_font_face_get_status(RvFontFace* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<FontFace> impl = reinterpret_cast<FontFace*>(target);
+    return deliver([&]() -> decltype(auto) { return impl->status(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationFontFaceLoadStatus); });
+}
+
+// FontFaceSet.size getter: readonly attribute long size
+int32_t ranvier_dom_font_face_set_get_size(RvEventTarget* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->size(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// FontFaceSet.status getter: readonly attribute FontFaceSetLoadStatus status
+int32_t ranvier_dom_font_face_set_get_status(RvEventTarget* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->status(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationFontFaceSetLoadStatus); });
+}
+
+// FontFaceSet.has(FontFace font) -> boolean
+int32_t ranvier_dom_font_face_set_has(RvEventTarget* target, RvFontFace* font, int32_t* result)
+{
+    if (!target || !font || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<FontFace> a0 = reinterpret_cast<FontFace*>(font);
+    return deliver([&]() -> decltype(auto) { return impl->has(HandleArg<FontFace> { a0.get() }); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// FontFaceSet.add(FontFace font) -> FontFaceSet; *result is a new reference
+int32_t ranvier_dom_font_face_set_add(RvEventTarget* target, RvFontFace* font, RvEventTarget** result)
+{
+    if (!target || !font || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<FontFace> a0 = reinterpret_cast<FontFace*>(font);
+    return deliver([&]() -> decltype(auto) { return impl->add(HandleArg<FontFace> { a0.get() }); }, [&](auto&& value) { return storeHandle<EventTarget>(value, result); });
+}
+
+// FontFaceSet.delete(FontFace font) -> boolean
+int32_t ranvier_dom_font_face_set_delete(RvEventTarget* target, RvFontFace* font, int32_t* result)
+{
+    if (!target || !font || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<FontFace> a0 = reinterpret_cast<FontFace*>(font);
+    return deliver([&]() -> decltype(auto) { return impl->remove(HandleArg<FontFace> { a0.get() }); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// FontFaceSet.clear() -> undefined
+int32_t ranvier_dom_font_face_set_clear(RvEventTarget* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->clear(); });
+}
+
+// FontFaceSet.check(DOMString font, optional DOMString text = " ") -> boolean; text defaults to " " in IDL
+int32_t ranvier_dom_font_face_set_check(RvEventTarget* target, const uint8_t* font, int32_t font_length, const uint8_t* text, int32_t text_length, int32_t* result)
+{
+    if (!target || !(font_length >= 0 && (font_length <= 0 || font)) || !(text_length >= 0 && (text_length <= 0 || text)) || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    StringArg a0 { font, font_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    StringArg a1 { text, text_length };
+    if (a1.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return deliver([&]() -> decltype(auto) { return impl->check(document.get(), a0.string(), a1.string()); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// WebAnimation.constructor: target is the Document of the constructed object; effect defaults to null in IDL; effect may be NULL; timeline_present 0 means absent; with timeline_present 1, a NULL timeline means null; *result is a new reference
+int32_t ranvier_dom_web_animation_create(RvNode* target, RvAnimationEffect* effect, RvAnimationTimeline* timeline, int32_t timeline_present, RvEventTarget** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<AnimationEffect> a0 = reinterpret_cast<AnimationEffect*>(effect);
+    RefPtr<AnimationTimeline> a1 = reinterpret_cast<AnimationTimeline*>(timeline);
+    return deliver([&]() -> decltype(auto) { return [](Document& document, AnimationEffect* effect, std::optional<RefPtr<AnimationTimeline>>&& timeline) -> Ref<WebAnimation> { return timeline ? WebAnimation::create(document, effect, timeline->get()) : WebAnimation::create(document, effect); }(*impl, a0.get(), timeline_present ? std::optional<RefPtr<AnimationTimeline>> { a1 } : std::nullopt); }, [&](auto&& value) { return storeHandle<EventTarget>(value, result); });
+}
+
+// WebAnimation.id getter: attribute DOMString id
+int32_t ranvier_dom_web_animation_get_id(RvEventTarget* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->id(); }, [&](auto&& value) { return copyRequiredString(asString(value), buffer, capacity, length); });
+}
+
+// WebAnimation.id setter: attribute DOMString id
+int32_t ranvier_dom_web_animation_set_id(RvEventTarget* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= 0 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value, value_length };
+    if (a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setId(a0.string()); });
+}
+
+// WebAnimation.effect getter: attribute AnimationEffect? effect; *result is a new reference, or NULL
+int32_t ranvier_dom_web_animation_get_effect(RvEventTarget* target, RvAnimationEffect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsEffect(); }, [&](auto&& value) { return storeHandle<AnimationEffect>(value, result); });
+}
+
+// WebAnimation.effect setter: attribute AnimationEffect? effect; value may be NULL
+int32_t ranvier_dom_web_animation_set_effect(RvEventTarget* target, RvAnimationEffect* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<AnimationEffect> a0 = reinterpret_cast<AnimationEffect*>(value);
+    return invoke([&]() -> decltype(auto) { return impl->setBindingsEffect(a0.get()); });
+}
+
+// WebAnimation.timeline getter: attribute AnimationTimeline? timeline; *result is a new reference, or NULL
+int32_t ranvier_dom_web_animation_get_timeline(RvEventTarget* target, RvAnimationTimeline** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsTimeline(); }, [&](auto&& value) { return storeHandle<AnimationTimeline>(value, result); });
+}
+
+// WebAnimation.timeline setter: attribute AnimationTimeline? timeline; value may be NULL
+int32_t ranvier_dom_web_animation_set_timeline(RvEventTarget* target, RvAnimationTimeline* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<AnimationTimeline> a0 = reinterpret_cast<AnimationTimeline*>(value);
+    return invoke([&]() -> decltype(auto) { return impl->setBindingsTimeline(a0.get()); });
+}
+
+// WebAnimation.startTime getter: attribute CSSNumberish? startTime; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_web_animation_get_start_time(RvEventTarget* target, RvDomUnionDoubleOrCSSNumericValueNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return [&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsStartTime()) return CSSNumberish { *time }; return std::nullopt; }(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValueNullable(value, result); });
+}
+
+// WebAnimation.startTime setter: attribute CSSNumberish? startTime
+int32_t ranvier_dom_web_animation_set_start_time(RvEventTarget* target, const RvDomUnionDoubleOrCSSNumericValueNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValueNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return [&](auto&& time) { return impl->setBindingsStartTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }(std::move(*a0)); });
+}
+
+// WebAnimation.currentTime getter: attribute CSSNumberish? currentTime; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_web_animation_get_current_time(RvEventTarget* target, RvDomUnionDoubleOrCSSNumericValueNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return [&]() -> std::optional<CSSNumberish> { if (auto time = impl->bindingsCurrentTime()) return CSSNumberish { *time }; return std::nullopt; }(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValueNullable(value, result); });
+}
+
+// WebAnimation.currentTime setter: attribute CSSNumberish? currentTime
+int32_t ranvier_dom_web_animation_set_current_time(RvEventTarget* target, const RvDomUnionDoubleOrCSSNumericValueNullable* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomUnionDoubleOrCSSNumericValueNullable(value, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return [&](auto&& time) { return impl->setBindingsCurrentTime(time ? std::optional<WebAnimationTime> { WebAnimationTime { *time } } : std::nullopt); }(std::move(*a0)); });
+}
+
+// WebAnimation.playbackRate getter: attribute double playbackRate
+int32_t ranvier_dom_web_animation_get_playback_rate(RvEventTarget* target, double* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->playbackRate(); }, [&](auto&& value) { return store<double>(value, result); });
+}
+
+// WebAnimation.playbackRate setter: attribute double playbackRate
+int32_t ranvier_dom_web_animation_set_playback_rate(RvEventTarget* target, double value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setPlaybackRate(value); });
+}
+
+// WebAnimation.overallProgress getter: readonly attribute double? overallProgress; *present is 0 for null, and *result is then unchanged
+int32_t ranvier_dom_web_animation_get_overall_progress(RvEventTarget* target, double* result, int32_t* present)
+{
+    if (!target || !result || !present)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->overallProgress(); }, [&](auto&& value) { return storeOptional<double>(value, result, present); });
+}
+
+// WebAnimation.playState getter: readonly attribute AnimationPlayState playState
+int32_t ranvier_dom_web_animation_get_play_state(RvEventTarget* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsPlayState(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationAnimationPlayState); });
+}
+
+// WebAnimation.replaceState getter: readonly attribute AnimationReplaceState replaceState
+int32_t ranvier_dom_web_animation_get_replace_state(RvEventTarget* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsReplaceState(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationAnimationReplaceState); });
+}
+
+// WebAnimation.pending getter: readonly attribute boolean pending
+int32_t ranvier_dom_web_animation_get_pending(RvEventTarget* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsPending(); }, [&](auto&& value) { return store<int32_t>(value, result); });
+}
+
+// WebAnimation.cancel() -> undefined
+int32_t ranvier_dom_web_animation_cancel(RvEventTarget* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->cancel(); });
+}
+
+// WebAnimation.finish() -> undefined
+int32_t ranvier_dom_web_animation_finish(RvEventTarget* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->finish(); });
+}
+
+// WebAnimation.play() -> undefined
+int32_t ranvier_dom_web_animation_play(RvEventTarget* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->bindingsPlay(); });
+}
+
+// WebAnimation.pause() -> undefined
+int32_t ranvier_dom_web_animation_pause(RvEventTarget* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->bindingsPause(); });
+}
+
+// WebAnimation.updatePlaybackRate(double playbackRate) -> undefined
+int32_t ranvier_dom_web_animation_update_playback_rate(RvEventTarget* target, double playback_rate)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->updatePlaybackRate(playback_rate); });
+}
+
+// WebAnimation.reverse() -> undefined
+int32_t ranvier_dom_web_animation_reverse(RvEventTarget* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->bindingsReverse(); });
+}
+
+// WebAnimation.persist() -> undefined
+int32_t ranvier_dom_web_animation_persist(RvEventTarget* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->persist(); });
+}
+
+// WebAnimation.commitStyles() -> undefined
+int32_t ranvier_dom_web_animation_commit_styles(RvEventTarget* target)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<WebAnimation>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->commitStyles(); });
+}
+
+// KeyframeEffect.constructor: target is the Document of the constructed object; target_ may be NULL; options defaults to {} in IDL; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; *result is a new reference; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object
+int32_t ranvier_dom_keyframe_effect_create_3(RvNode* target, RvNode* target_, const RvDomSequenceKeyframeNullable* keyframes, const RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions* options, RvAnimationEffect** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = impl->document();
+    auto* global = document->globalObject();
+    if (!global)
+        return Ranvier::recordException(Exception { ExceptionCode::InvalidStateError, "The document has no global object."_s });
+    RefPtr<Element> a0 = target_ ? dynamicDowncast<Element>(*nodeOf(target_)) : nullptr;
+    if (target_ && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    int32_t status1 = RV_OK;
+    auto a1 = decodeRvDomSequenceKeyframeNullable(keyframes, status1);
+    if (status1 != RV_OK) return status1;
+    int32_t status2 = RV_OK;
+    auto a2 = decodeRvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions(options, status2);
+    if (!options) { a2 = Variant<double, KeyframeEffectOptions> { WTF::InPlaceIndex<1>, KeyframeEffectOptions { } }; status2 = RV_OK; }
+    if (status2 != RV_OK) return status2;
+    return deliver([&]() -> decltype(auto) { return Ranvier::keyframesCall(*global, std::move(*a1), [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return KeyframeEffect::create(*global, *impl, a0.get(), std::move(keyframesObject), std::move(*a2)); }); }, [&](auto&& value) { return storeHandle<AnimationEffect>(value, result); });
+}
+
+// KeyframeEffect.constructor: target is the Document of the constructed object; *result is a new reference
+int32_t ranvier_dom_keyframe_effect_create_1(RvNode* target, RvAnimationEffect* source, RvAnimationEffect** result)
+{
+    if (!target || !source || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<KeyframeEffect> a0 = source ? dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(source)) : nullptr;
+    if (source && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return KeyframeEffect::create(HandleArg<KeyframeEffect> { a0.get() }); }, [&](auto&& value) { return storeHandle<AnimationEffect>(value, result); });
+}
+
+// KeyframeEffect.target getter: attribute Element? target; *result is a new reference, or NULL
+int32_t ranvier_dom_keyframe_effect_get_target(RvAnimationEffect* target, RvNode** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->target(); }, [&](auto&& value) { return storeHandle<Node>(value, result); });
+}
+
+// KeyframeEffect.target setter: attribute Element? target; value may be NULL
+int32_t ranvier_dom_keyframe_effect_set_target(RvAnimationEffect* target, RvNode* value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr<Element> a0 = value ? dynamicDowncast<Element>(*nodeOf(value)) : nullptr;
+    if (value && !a0)
+        return RV_ERR_WRONG_INTERFACE;
+    return invoke([&]() -> decltype(auto) { return impl->setTarget(a0.get()); });
+}
+
+// KeyframeEffect.pseudoElement getter: attribute CSSOMString? pseudoElement
+int32_t ranvier_dom_keyframe_effect_get_pseudo_element(RvAnimationEffect* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->pseudoElement(); }, [&](auto&& value) { return copyString(asString(value), buffer, capacity, length); });
+}
+
+// KeyframeEffect.pseudoElement setter: attribute CSSOMString? pseudoElement; value_length -1 means null
+int32_t ranvier_dom_keyframe_effect_set_pseudo_element(RvAnimationEffect* target, const uint8_t* value, int32_t value_length)
+{
+    if (!target || !(value_length >= -1 && (value_length <= 0 || value)))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    StringArg a0 { value, value_length };
+    if (value_length >= 0 && a0.string().isNull()) return RV_ERR_NULL_ARGUMENT;
+    return invoke([&]() -> decltype(auto) { return impl->setPseudoElement(a0.string()); });
+}
+
+// KeyframeEffect.iterationComposite getter: attribute IterationCompositeOperation iterationComposite
+int32_t ranvier_dom_keyframe_effect_get_iteration_composite(RvAnimationEffect* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->iterationComposite(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationIterationCompositeOperation); });
+}
+
+// KeyframeEffect.iterationComposite setter: attribute IterationCompositeOperation iterationComposite
+int32_t ranvier_dom_keyframe_effect_set_iteration_composite(RvAnimationEffect* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->iterationComposite())>>(value, enumerationIterationCompositeOperation);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setIterationComposite(*a0); });
+}
+
+// KeyframeEffect.composite getter: attribute CompositeOperation composite
+int32_t ranvier_dom_keyframe_effect_get_composite(RvAnimationEffect* target, int32_t* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    return deliver([&]() -> decltype(auto) { return impl->bindingsComposite(); }, [&](auto&& value) { return storeEnumeration(value, result, enumerationCompositeOperation); });
+}
+
+// KeyframeEffect.composite setter: attribute CompositeOperation composite
+int32_t ranvier_dom_keyframe_effect_set_composite(RvAnimationEffect* target, int32_t value)
+{
+    if (!target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    auto a0 = enumerationFromIndex<std::remove_cvref_t<decltype(impl->bindingsComposite())>>(value, enumerationCompositeOperation);
+    if (!a0)
+        return RV_ERR_UNSUPPORTED;
+    return invoke([&]() -> decltype(auto) { return impl->setBindingsComposite(*a0); });
+}
+
+// KeyframeEffect.setKeyframes(sequence<Keyframe>? keyframes) -> undefined; context is an explicit checked Document for the operation; keyframes NULL or present 0 is null; WebKit processes the keyframes as a script-built array of objects, and an error it leaves on the VM returns RV_ERR_DOM_EXCEPTION with its WebIDL name; RV_ERR_DOM_EXCEPTION (InvalidStateError) for a document without a global object
+int32_t ranvier_dom_keyframe_effect_set_keyframes(RvAnimationEffect* target, RvNode* context, const RvDomSequenceKeyframeNullable* keyframes)
+{
+    if (!target || !context)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<KeyframeEffect>(*reinterpret_cast<AnimationEffect*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr contextDocument = dynamicDowncast<Document>(*nodeOf(context));
+    if (!contextDocument)
+        return RV_ERR_WRONG_INTERFACE;
+    Ref document = contextDocument.releaseNonNull();
+    auto* global = document->globalObject();
+    if (!global)
+        return Ranvier::recordException(Exception { ExceptionCode::InvalidStateError, "The document has no global object."_s });
+    int32_t status0 = RV_OK;
+    auto a0 = decodeRvDomSequenceKeyframeNullable(keyframes, status0);
+    if (status0 != RV_OK) return status0;
+    return invoke([&]() -> decltype(auto) { return Ranvier::keyframesCall(*global, std::move(*a0), [&](JSC::Strong<JSC::JSObject>&& keyframesObject) { return impl->setBindingsKeyframes(*global, document.get(), std::move(keyframesObject)); }); });
+}
+
+// AnimationTimeline.currentTime getter: readonly attribute CSSNumberish? currentTime; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_animation_timeline_get_current_time(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<AnimationTimeline> impl = reinterpret_cast<AnimationTimeline*>(target);
+    return deliver([&]() -> decltype(auto) { return [&]() -> std::optional<CSSNumberish> { if (auto time = impl->currentTime()) return CSSNumberish { *time }; return std::nullopt; }(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValueNullable(value, result); });
+}
+
+// AnimationTimeline.duration getter: readonly attribute CSSNumberish? duration; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_animation_timeline_get_duration(RvAnimationTimeline* target, RvDomUnionDoubleOrCSSNumericValueNullable* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr<AnimationTimeline> impl = reinterpret_cast<AnimationTimeline*>(target);
+    return deliver([&]() -> decltype(auto) { return [&]() -> std::optional<CSSNumberish> { if (auto time = impl->duration()) return CSSNumberish { *time }; return std::nullopt; }(); }, [&](auto&& value) { return encodeRvDomUnionDoubleOrCSSNumericValueNullable(value, result); });
+}
+
+// DocumentTimeline.constructor: target is the Document of the constructed object; options defaults to {} in IDL; options may be NULL for the IDL default; *result is a new reference
+int32_t ranvier_dom_document_timeline_create(RvNode* target, const RvDomDocumentTimelineOptions* options, RvAnimationTimeline** result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<Document>(*nodeOf(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    DocumentTimelineOptions a0 { };
+    if (options) {
+        if (options->size >= offsetof(RvDomDocumentTimelineOptions, origin_time) + sizeof(options->origin_time))
+            assignValue(a0.originTime, options->origin_time);
+    }
+    return deliver([&]() -> decltype(auto) { return DocumentTimeline::create(*impl, std::move(a0)); }, [&](auto&& value) { return storeHandle<AnimationTimeline>(value, result); });
+}
+
 // DataTransfer.constructor: target is the Document of the constructed object; *result is a new reference
 int32_t ranvier_dom_data_transfer_create(RvNode* target, RvDataTransfer** result)
 {
@@ -43858,6 +46104,23 @@ int32_t ranvier_dom_url_search_params_entries(RvURLSearchParams* target, RvNode*
     return deliver([&]() -> decltype(auto) { return ([&]() { Vector<KeyValuePair<String, String>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(WTF::move(*entry)); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequencePairUSVStringAndUSVString(value, result); });
 }
 
+// FontFaceSet.values: owned snapshot of the engine value iterable; *result owns its contents; release with the matching rv_dom_*_release
+int32_t ranvier_dom_font_face_set_values(RvEventTarget* target, RvDomSequenceFontFace* result)
+{
+    if (!target || !result)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    RefPtr impl = dynamicDowncast<FontFaceSet>(*reinterpret_cast<EventTarget*>(target));
+    if (!impl)
+        return RV_ERR_WRONG_INTERFACE;
+    RefPtr contextDocument = dynamicDowncast<Document>(static_cast<ActiveDOMObject&>(*impl).scriptExecutionContext());
+    if (!contextDocument)
+        return RV_ERR_DETACHED;
+    Ref document = contextDocument.releaseNonNull();
+    return deliver([&]() -> decltype(auto) { return ([&]() { Vector<Ref<FontFace>> entries; auto iterator = impl->createIterator(&document.get()); while (auto entry = iterator.next()) entries.append(entry.releaseNonNull()); return entries; })(); }, [&](auto&& value) { return encodeRvDomSequenceFontFace(value, result); });
+}
+
 // Highlight.size: setlike<AbstractRange>
 int32_t ranvier_dom_highlight_size(RvHighlight* target, uint32_t* result)
 {
@@ -44214,6 +46477,10 @@ int32_t ranvier_dom_event_get_interface_name(RvEvent* target, char* buffer, int3
         return copyString("KeyboardEvent"_s, buffer, capacity, length);
     if (dynamicDowncast<MouseEvent>(*impl))
         return copyString("MouseEvent"_s, buffer, capacity, length);
+#if ENABLE(TOUCH_EVENTS)
+    if (dynamicDowncast<TouchEvent>(*impl))
+        return copyString("TouchEvent"_s, buffer, capacity, length);
+#endif
     if (dynamicDowncast<AnimationPlaybackEvent>(*impl))
         return copyString("AnimationPlaybackEvent"_s, buffer, capacity, length);
     if (dynamicDowncast<BeforeUnloadEvent>(*impl))
@@ -44251,6 +46518,30 @@ int32_t ranvier_dom_event_get_interface_name(RvEvent* target, char* buffer, int3
     if (dynamicDowncast<UIEvent>(*impl))
         return copyString("UIEvent"_s, buffer, capacity, length);
     return copyString("Event"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_animation_effect_get_interface_name(RvAnimationEffect* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<AnimationEffect*>(target);
+    if (dynamicDowncast<KeyframeEffect>(*impl))
+        return copyString("KeyframeEffect"_s, buffer, capacity, length);
+    return copyString("AnimationEffect"_s, buffer, capacity, length);
+}
+
+int32_t ranvier_dom_animation_timeline_get_interface_name(RvAnimationTimeline* target, char* buffer, int32_t capacity, int32_t* length)
+{
+    if (!target || !length)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* impl = reinterpret_cast<AnimationTimeline*>(target);
+    if (dynamicDowncast<DocumentTimeline>(*impl))
+        return copyString("DocumentTimeline"_s, buffer, capacity, length);
+    return copyString("AnimationTimeline"_s, buffer, capacity, length);
 }
 
 } // extern "C"

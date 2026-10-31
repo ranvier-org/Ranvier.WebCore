@@ -1,0 +1,68 @@
+{
+ "browser": "156.0.8078.4",
+ "result": {
+  "members": {
+   "drawElementImage": false,
+   "drawElement": false,
+   "layoutsubtree": false,
+   "getDisplayMedia": "undefined",
+   "elementCapture": "function",
+   "cropTarget": "function",
+   "html2canvasLike": "undefined"
+  },
+  "encodings": {
+   "image/png": {
+    "type": "image/png",
+    "size": 112
+   },
+   "image/jpeg": {
+    "type": "image/jpeg",
+    "size": 764
+   },
+   "image/webp": {
+    "type": "image/webp",
+    "size": 560
+   },
+   "image/avif": {
+    "type": "image/png",
+    "size": 112
+   },
+   "image/bmp": {
+    "type": "image/png",
+    "size": 112
+   },
+   "image/gif": {
+    "type": "image/png",
+    "size": 112
+   },
+   "image/x-unknown": {
+    "type": "image/png",
+    "size": 112
+   }
+  },
+  "quality": {
+   "0": 763,
+   "1": 767,
+   "0.5": 764
+  },
+  "colorSpaces": {
+   "srgb": "srgb",
+   "display-p3": "display-p3",
+   "rec2100-pq": "error TypeError"
+  },
+  "readback": {
+   "srgb": [
+    255,
+    0,
+    0,
+    255
+   ],
+   "p3": [
+    255,
+    0,
+    0,
+    255
+   ]
+  }
+ }
+}

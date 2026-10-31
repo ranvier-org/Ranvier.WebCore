@@ -22,7 +22,7 @@ from utf8_inputs import Utf8
 
 FIXTURES = Path(__file__).resolve().parents[1] / 'fixtures'
 OK, NULL_ARGUMENT, WRONG_THREAD, DOM_EXCEPTION, BUFFER_TOO_SMALL, UNSUPPORTED, DETACHED, WRONG_INTERFACE = 0, -1, -2, -3, -6, -9, -10, -11
-ABI = 56
+ABI = 57
 SUCCEEDED, LOAD_FAILED, DECODE_FAILED, CANCELLED, INVALIDATED = 0, 1, 2, 3, 4
 OUTCOMES = {0: 'succeeded', 1: 'loadFailed', 2: 'decodeFailed', 3: 'cancelled', 4: 'invalidated'}
 READ_TEXT, READ_BYTES = 0, 1

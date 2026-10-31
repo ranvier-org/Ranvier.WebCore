@@ -1,0 +1,40 @@
+diff --git a/Source/WebCore/page/PointerCaptureController.cpp b/Source/WebCore/page/PointerCaptureController.cpp
+index 0b324ca..dda111b 100644
+--- a/Source/WebCore/page/PointerCaptureController.cpp
++++ b/Source/WebCore/page/PointerCaptureController.cpp
+@@ -605,6 +605,17 @@ void PointerCaptureController::cancelPointer(PointerID pointerId, const IntPoint
+     processPendingPointerCapture(pointerId);
+ }
+ 
++// Off iOS a pen's pointer events come from platform mouse events, so its capture retargets the mouse event path, as
++// a mouse's does.
++static bool pointerTypeUsesMouseEventPath(const String& pointerType)
++{
++#if PLATFORM(IOS_FAMILY)
++    return pointerType == mousePointerEventType();
++#else
++    return pointerType == mousePointerEventType() || pointerType == penPointerEventType();
++#endif
++}
++
+ void PointerCaptureController::processPendingPointerCapture(PointerID pointerId)
+ {
+     RefPtr capturingData = m_activePointerIdsToCapturingData.get(pointerId);
+@@ -625,7 +636,7 @@ void PointerCaptureController::processPendingPointerCapture(PointerID pointerId)
+     if (auto targetOverride = capturingData->targetOverride; targetOverride && targetOverride != pendingTargetOverride) {
+         if (capturingData->targetOverride->isConnected())
+             protect(capturingData->targetOverride)->dispatchEvent(PointerEvent::createForPointerCapture(eventNames().lostpointercaptureEvent, pointerId, capturingData->isPrimary, capturingData->pointerType));
+-        if (capturingData->pointerType == mousePointerEventType()) {
++        if (pointerTypeUsesMouseEventPath(capturingData->pointerType)) {
+             if (RefPtr frame = capturingData->targetOverride->document().frame())
+                 frame->eventHandler().pointerCaptureElementDidChange(nullptr);
+         }
+@@ -634,7 +645,7 @@ void PointerCaptureController::processPendingPointerCapture(PointerID pointerId)
+     // 2. If the pending pointer capture target override for this pointer is set and is not equal to the pointer capture target override,
+     // then fire a pointer event named gotpointercapture at the pending pointer capture target override.
+     if (capturingData->pendingTargetOverride && capturingData->targetOverride != pendingTargetOverride) {
+-        if (capturingData->pointerType == mousePointerEventType()) {
++        if (pointerTypeUsesMouseEventPath(capturingData->pointerType)) {
+             if (RefPtr frame = pendingTargetOverride->document().frame())
+                 frame->eventHandler().pointerCaptureElementDidChange(pendingTargetOverride.get());
+         }

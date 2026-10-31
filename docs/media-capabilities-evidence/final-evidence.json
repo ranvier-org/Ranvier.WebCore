@@ -1,0 +1,64 @@
+{
+ "group": "B06",
+ "issue": "ranvier-org/Ranvier.WebCore#116",
+ "abi": 54,
+ "abiNote": "placeholder: native batch-1 ABI54; root assigns NativeNN/ABI at batch integration",
+ "sourcePatch": {
+  "name": "0043-media-capabilities-native-query.patch",
+  "sha256": "54dd186cd264336c891ada2c5a06a5d30b15a8cd0cadab5e5b3ba6b656ee4967",
+  "units": [
+   "UnifiedSource-Modules-6"
+  ]
+ },
+ "candidate": "artifacts/media-candidate-2",
+ "candidateBuildHead": "df4767fdcf4985676eddf93a179f7eaa799eda04",
+ "runtime": {
+  "JavaScriptCore.dll": "95149cdcba0751d0960786872635a7f3ec17771fd5281a6f06bac75d9ec84d42",
+  "RanvierWebCoreHost.dll": "44c3be70c0105a085388173032c2b4107d388f90b1cccea4d9e844bf29db5ba7",
+  "WebCore.dll": "349fb2e2b176676fe876d6c29e3dfaa766fe74ee968386354c722d655418107d"
+ },
+ "batch": {
+  "probes": 62,
+  "rawAssertions": 91114,
+  "teardownRecords": 104,
+  "baseline": "C:/wk/native-cascade-shadow/docs/cascade-evidence/batch-green.json (63 entries, 90743 raw)",
+  "added": {
+   "media_capabilities": 365,
+   "abi_layouts": "15 -> 21"
+  },
+  "allExit0": true
+ },
+ "repeat30": {
+  "runs": 30,
+  "distinctLines": 1,
+  "line": "PASS media_capabilities: 365 assertions; providers {\"media-decoding-provider\": 0, \"media-encoding-provider\": 0}; qualified differences 5"
+ },
+ "red": {
+  "native": "red-native.json",
+  "chromium": "red-chromium.json",
+  "probe": "red-probe.log"
+ },
+ "qualifications": [
+  "No flavor has a media engine configuration provider (Cocoa/GStreamer only): every valid configuration answers unsupported/not smooth/not power efficient; media-decoding-provider and media-encoding-provider report 0.",
+  "Answers the providers give inside the starting call are delivered on a later rv_run_loop_cycle; cancel/release/new document/host destroy keep a reached answer (rv_resource_* contract); INVALIDATED applies only to a provider that has not answered.",
+  "Five TypeError differences from Chromium 156 are qualified, not asserted equal: WebKit rejects bucket containers without exactly one codec (2 cases), accepts an extra MIME parameter (FIXME in MediaCapabilities.cpp), and Chromium rejects record encoding (2 cases).",
+  "The native route does not read MediaCapabilitiesEnabled (off in the host); no setting, codec or playback subsystem is enabled."
+ ],
+ "files": {
+  "batch-green.json": "0cbdc0b2859422f983305ab58a2e8016b578730138ac09f707438f348aa322b1",
+  "build_media_candidate.py": "0b37d752e407168cc071f448e11abb5ac730748ba28747394c56d2081133ed34",
+  "media-capabilities-probe.log": "2c052c7a0d467dcb0321834116ce67258e8219604171f07449e319120209d8e2",
+  "media-capabilities-repeat30.txt": "e94fc03cc0c7294c7e8d547ea44cf8edef2fafeedccf3bb2f4115625132475b4",
+  "media-capabilities-report.json": "e2617976c8bfc880e3ba67b44d8d5a3b318750db6f6588b514f9a91dd80b4758",
+  "red-chromium.json": "abe86c995e28a3e4e2591f35964fdbbdbb416917b01bbf479d9ad8467d506ddc",
+  "red-native.json": "d9be0a6a8e7b361dbcc759f14016379dfa224ff2b802a06761e7be5f106d87b5",
+  "red-probe.log": "880d83c0a2bbe23f576fbe03b6b436d2af5ad07ca949c0bf56945180ebbe8310",
+  "red_chromium.mjs": "b24930c00b0b04a0b45079638d8205fd878c94ec387486469ec67b88fa742844",
+  "red_native.py": "dd85d63eb88ba265d13ed5ddc3bfec3cb7c11eb9d6878e37d1254645665981f6",
+  "repeat30.sh": "143cf5e2199b6e7b3295629778e6eb772e686b9561d7e28e2f973648d8c844f9",
+  "run_media_full_batch.py": "b0c3d9062ef881546b9480a29b08c19a935c63b7e4eec7edd734a7ec3d5e652d",
+  "runtime-receipt.json": "b9cb1171ed7747c20dda03f4b83d894581072b2783f099b3613f2e702254c5f0",
+  "source-patches.json": "25a81ad4155dda6fff5dd629e63a8601c1b7534a349e981f6a11be19ffcd5fdb",
+  "teardown-probes.json": "263c729dc539fcce1f0738a1299bf5852c5eb4a6838f9caf7abb99ef436dd33c"
+ }
+}

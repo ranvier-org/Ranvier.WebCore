@@ -6,7 +6,9 @@
 #include "CSSFontFace.h"
 #include "CSSFontFaceSet.h"
 #include "CachedImage.h"
+#include "ContextDestructionObserverInlines.h"
 #include "DOMException.h"
+#include "DOMPromiseProxy.h"
 #include "Document.h"
 #include "EventListener.h"
 #include "EventNames.h"
@@ -17,17 +19,23 @@
 #include "FileReaderLoaderClient.h"
 #include "FontFace.h"
 #include "FontFaceSet.h"
+#include "FrameDestructionObserverInlines.h"
 #include "HTMLImageElement.h"
 #include "HTMLElementTypeHelpers.h"
 #include "Image.h"
 #include "ImageLoader.h"
 #include "LocalDOMWindow.h"
+#include "MediaCapabilitiesNativeQuery.h"
+#include "MediaDecodingConfiguration.h"
+#include "MediaEncodingConfiguration.h"
 #include "Node.h"
 #include "OriginAccessPatterns.h"
+#include "PlatformMediaEngineConfigurationFactory.h"
 #include "SVGImageElement.h"
 #include "SecurityOrigin.h"
 #include "ThreadableBlobRegistry.h"
 #include "SVGElementTypeHelpers.h"
+#include "dom/RanvierDomGlue.h"
 #include <JavaScriptCore/ArrayBuffer.h>
 #include <unordered_map>
 #include <wtf/Deque.h>
@@ -68,6 +76,8 @@ int32_t outcomeFor(ImageDecodeResult result)
 }
 
 class BlobReadOperation;
+class MediaQueryOperation;
+class BytesOperation;
 
 // One terminal outcome per operation, delivered on the owning thread; see RanvierResourceGlue.h.
 class Operation : public RefCounted<Operation>, public CanMakeSingleThreadWeakPtr<Operation> {
@@ -132,6 +142,8 @@ public:
 
     virtual bool belongsTo(const Document& candidate) const { return document == &candidate; }
     virtual BlobReadOperation* asBlobRead() { return nullptr; }
+    virtual MediaQueryOperation* asMediaQuery() { return nullptr; }
+    virtual BytesOperation* asBytes() { return nullptr; }
 
 protected:
     Operation(Document& document, RvResourceCompletion callback, void* context)
@@ -318,6 +330,88 @@ private:
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(FontOperation);
 
+// FontFace.load() or FontFace.loaded over a caller's face: settles with the face's loaded promise. A terminal is read
+// on a later run-loop turn, after every client of the face, the face's own promise among them, has seen the change.
+class FontFaceOperation final : public Operation, public CSSFontFaceClient {
+    WTF_MAKE_TZONE_ALLOCATED(FontFaceOperation);
+
+public:
+    static Ref<FontFaceOperation> create(Document& document, FontFace& face, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new FontFaceOperation(document, face, callback, context));
+    }
+
+    void ref() const final { Operation::ref(); }
+    void deref() const final { Operation::deref(); }
+
+    RefPtr<FontFace> face;
+    bool observing { false };
+    bool scheduled { false };
+
+    void detach() final
+    {
+        if (observing && face)
+            face->backing().removeClient(*this);
+        observing = false;
+        face = nullptr;
+        Operation::detach();
+    }
+
+    // SyntaxError (descriptors, source syntax, bytes) is DECODE_FAILED; NetworkError, and any other rejection, LOAD_FAILED.
+    void evaluate()
+    {
+        scheduled = false;
+        if (terminal || !face)
+            return;
+        auto status = face->backing().status();
+        if (status == CSSFontFace::Status::Success) {
+            finish(RV_RESOURCE_SUCCEEDED);
+            return;
+        }
+        if (status != CSSFontFace::Status::Failure)
+            return;
+        auto code = face->loadedPromise().rejectionCode();
+        finish(code == ExceptionCode::SyntaxError ? RV_RESOURCE_DECODE_FAILED : RV_RESOURCE_LOAD_FAILED);
+    }
+
+    void schedule()
+    {
+        if (scheduled)
+            return;
+        scheduled = true;
+        RunLoop::mainSingleton().dispatch([weak = SingleThreadWeakPtr<Operation> { *this }] {
+            if (RefPtr operation = weak.get())
+                static_cast<FontFaceOperation&>(*operation).evaluate();
+        });
+    }
+
+    void fontStateChanged(CSSFontFace&, CSSFontFace::Status, CSSFontFace::Status newState) final
+    {
+        if (!terminal && (newState == CSSFontFace::Status::Success || newState == CSSFontFace::Status::Failure))
+            schedule();
+    }
+
+    void start(bool load)
+    {
+        face->backing().addClient(*this);
+        observing = true;
+        if (load)
+            face->backing().load();
+        auto status = face->backing().status();
+        if (status == CSSFontFace::Status::Success || status == CSSFontFace::Status::Failure)
+            schedule();
+    }
+
+private:
+    FontFaceOperation(Document& document, FontFace& face, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+        , face(&face)
+    {
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(FontFaceOperation);
+
 // Reads a blob, or the blob a blob URL refers to, through the engine's FileReaderLoader, as Blob.text(),
 // arrayBuffer() and bytes() read it. The bytes, the type and the error name stay until release.
 class BlobReadOperation final : public Operation, public FileReaderLoaderClient {
@@ -407,6 +501,85 @@ private:
 };
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(BlobReadOperation);
+
+// MediaCapabilities.decodingInfo() or encodingInfo() through patch 0043. The providers can answer inside the starting
+// call, where finish() defers delivery to a later run-loop turn.
+class MediaQueryOperation final : public Operation {
+    WTF_MAKE_TZONE_ALLOCATED(MediaQueryOperation);
+
+public:
+    static Ref<MediaQueryOperation> create(Document& document, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new MediaQueryOperation(document, callback, context));
+    }
+
+    bool succeeded { false };
+    bool rejected { false };
+    PlatformMediaCapabilitiesInfo info;
+
+    MediaQueryOperation* asMediaQuery() final { return this; }
+
+    template<typename Result> Function<void(ExceptionOr<Result>&&)> completion()
+    {
+        return [weak = SingleThreadWeakPtr<Operation> { *this }](ExceptionOr<Result>&& result) {
+            RefPtr operation = weak.get();
+            if (!operation || operation->terminal)
+                return;
+            auto& query = *operation->asMediaQuery();
+            if (result.hasException()) {
+                // A rejected configuration is never registered and never delivered.
+                query.rejected = true;
+                query.terminal = true;
+                query.callback = nullptr;
+                return;
+            }
+            auto value = result.releaseReturnValue();
+            query.info = { value.supported, value.smooth, value.powerEfficient };
+            query.succeeded = true;
+            query.finish(RV_RESOURCE_SUCCEEDED);
+        };
+    }
+
+private:
+    MediaQueryOperation(Document& document, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+    {
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(MediaQueryOperation);
+
+// Bytes the host produced during the starting call, such as an encoded snapshot. The operation is SUCCEEDED as it
+// starts, so finish() delivers it on a later run-loop turn.
+class BytesOperation final : public Operation {
+    WTF_MAKE_TZONE_ALLOCATED(BytesOperation);
+
+public:
+    static Ref<BytesOperation> create(Document& document, RvResourceCompletion callback, void* context)
+    {
+        return adoptRef(*new BytesOperation(document, callback, context));
+    }
+
+    Vector<uint8_t> bytes;
+    int32_t width { 0 };
+    int32_t height { 0 };
+
+    BytesOperation* asBytes() final { return this; }
+
+    void measure(int32_t& outWidth, int32_t& outHeight) final
+    {
+        outWidth = width;
+        outHeight = height;
+    }
+
+private:
+    BytesOperation(Document& document, RvResourceCompletion callback, void* context)
+        : Operation(document, callback, context)
+    {
+    }
+};
+
+WTF_MAKE_TZONE_ALLOCATED_IMPL(BytesOperation);
 
 std::optional<String> textFromBytes(const uint8_t* bytes, int32_t length)
 {
@@ -746,6 +919,26 @@ int32_t ranvier_resource_load_font(RvNode* documentHandle, const char* family, c
     return RV_OK;
 }
 
+int32_t ranvier_font_face_load(RvNode* documentHandle, RvFontFace* faceHandle, int32_t load, RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || !faceHandle || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    if (!document || !document->window() || !nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    Ref face = *reinterpret_cast<FontFace*>(faceHandle);
+    RefPtr faceDocument = dynamicDowncast<Document>(face->scriptExecutionContext());
+    if (faceDocument != document)
+        return faceDocument && faceDocument->frame() && !faceDocument->activeDOMObjectsAreStopped() ? RV_ERR_WRONG_HOST : RV_ERR_DETACHED;
+    Ref value = FontFaceOperation::create(*document, face, callback, context);
+    *operation = nextOperation++;
+    operations().emplace(*operation, value.copyRef());
+    value->start(load);
+    return RV_OK;
+}
+
 int32_t ranvier_resource_cancel(uint64_t operation)
 {
     if (!WTF::isMainThread())
@@ -1067,4 +1260,182 @@ int32_t ranvier_file_reader_error(RvEventTarget* target, char* buffer, int32_t c
         return RV_OK;
     }
     return copyText(error->name().utf8().span(), buffer, capacity, length);
+}
+
+namespace {
+
+std::optional<String> mediaText(const uint8_t* bytes, int32_t length)
+{
+    if (length < 0 || (length && !bytes))
+        return std::nullopt;
+    if (!length)
+        return emptyString();
+    auto text = String::fromUTF8(std::span<const char8_t> { reinterpret_cast<const char8_t*>(bytes), static_cast<size_t>(length) });
+    if (text.isNull())
+        return std::nullopt;
+    return text;
+}
+
+template<typename Enum> bool mediaEnum(int32_t value, int32_t count, std::optional<Enum>& result)
+{
+    if (value == -1)
+        return true;
+    if (value < 0 || value >= count)
+        return false;
+    result = static_cast<Enum>(value);
+    return true;
+}
+
+bool mediaFlag(int32_t value, std::optional<bool>& result)
+{
+    if (value == -1)
+        return true;
+    if (value != 0 && value != 1)
+        return false;
+    result = value == 1;
+    return true;
+}
+
+bool mediaConfiguration(const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio, MediaConfiguration& result)
+{
+    if (video) {
+        if (video->size != static_cast<int32_t>(sizeof(RvMediaVideoConfiguration)))
+            return false;
+        auto contentType = mediaText(video->content_type, video->content_type_length);
+        if (!contentType)
+            return false;
+        VideoConfiguration value;
+        value.contentType = *contentType;
+        value.width = video->width;
+        value.height = video->height;
+        value.bitrate = video->bitrate;
+        value.framerate = video->framerate;
+        if (!mediaFlag(video->alpha_channel, value.alphaChannel)
+            || !mediaEnum(video->hdr_metadata_type, 3, value.hdrMetadataType)
+            || !mediaEnum(video->color_gamut, 3, value.colorGamut)
+            || !mediaEnum(video->transfer_function, 3, value.transferFunction))
+            return false;
+        result.video = WTF::move(value);
+    }
+    if (audio) {
+        if (audio->size != static_cast<int32_t>(sizeof(RvMediaAudioConfiguration)))
+            return false;
+        auto contentType = mediaText(audio->content_type, audio->content_type_length);
+        if (!contentType)
+            return false;
+        AudioConfiguration value;
+        value.contentType = *contentType;
+        if (audio->channels) {
+            auto channels = mediaText(audio->channels, audio->channels_length);
+            if (!channels)
+                return false;
+            value.channels = *channels;
+        } else if (audio->channels_length)
+            return false;
+        if (audio->bitrate >= 0)
+            value.bitrate = static_cast<uint64_t>(audio->bitrate);
+        if (audio->samplerate > static_cast<int64_t>(std::numeric_limits<uint32_t>::max()))
+            return false;
+        if (audio->samplerate >= 0)
+            value.samplerate = static_cast<uint32_t>(audio->samplerate);
+        if (!mediaFlag(audio->spatial_rendering, value.spatialRendering))
+            return false;
+        result.audio = WTF::move(value);
+    }
+    return true;
+}
+
+}
+
+int32_t ranvier_media_capabilities_query(RvNode* documentHandle, int32_t encoding, int32_t type, const RvMediaVideoConfiguration* video,
+    const RvMediaAudioConfiguration* audio, RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    if (!document || !document->window() || !nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    if (type < 0 || type >= (encoding ? 2 : 3))
+        return RV_ERR_UNSUPPORTED;
+    MediaConfiguration configuration;
+    if (!mediaConfiguration(video, audio, configuration))
+        return RV_ERR_UNSUPPORTED;
+    Ref value = MediaQueryOperation::create(*document, callback, context);
+    value->starting = true;
+    if (encoding) {
+        MediaEncodingConfiguration query { WTF::move(configuration), static_cast<MediaEncodingType>(type) };
+        queryMediaEncodingInfo(*document, WTF::move(query), value->completion<PlatformMediaCapabilitiesEncodingInfo>());
+    } else {
+        MediaDecodingConfiguration query { WTF::move(configuration), static_cast<MediaDecodingType>(type) };
+        queryMediaDecodingInfo(*document, WTF::move(query), value->completion<PlatformMediaCapabilitiesDecodingInfo>());
+    }
+    value->starting = false;
+    if (value->rejected) {
+        value->detach();
+        return Ranvier::recordException(Exception { ExceptionCode::TypeError });
+    }
+    *operation = nextOperation++;
+    operations().emplace(*operation, WTF::move(value));
+    return RV_OK;
+}
+
+int32_t ranvier_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient)
+{
+    if (!supported || !smooth || !power_efficient)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto found = operations().find(operation);
+    auto* query = found == operations().end() ? nullptr : found->second->asMediaQuery();
+    if (!query || !query->succeeded)
+        return RV_ERR_UNSUPPORTED;
+    *supported = query->info.supported;
+    *smooth = query->info.smooth;
+    *power_efficient = query->info.powerEfficient;
+    return RV_OK;
+}
+
+int32_t ranvier_media_capabilities_provider(int32_t encoding)
+{
+    if (encoding)
+        return PlatformMediaEngineConfigurationFactory::hasEncodingConfigurationFactory() ? 1 : 0;
+    return PlatformMediaEngineConfigurationFactory::hasDecodingConfigurationFactory() ? 1 : 0;
+}
+
+int32_t ranvier_resource_settled_bytes(RvNode* documentHandle, const uint8_t* bytes, int64_t length, int32_t width, int32_t height,
+    RvResourceCompletion callback, void* context, uint64_t* operation)
+{
+    if (!documentHandle || (!bytes && length) || length < 0 || !callback || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto* document = documentFromHandle(documentHandle);
+    if (!document || !document->window() || !nextOperation)
+        return RV_ERR_UNSUPPORTED;
+    Ref value = BytesOperation::create(*document, callback, context);
+    value->bytes.append(std::span<const uint8_t> { bytes, static_cast<size_t>(length) });
+    value->width = width;
+    value->height = height;
+    value->starting = true;
+    value->finish(RV_RESOURCE_SUCCEEDED);
+    value->starting = false;
+    *operation = nextOperation++;
+    operations().emplace(*operation, WTF::move(value));
+    return RV_OK;
+}
+
+int32_t ranvier_resource_bytes(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    if (!length || capacity < 0 || (capacity && !buffer))
+        return RV_ERR_NULL_ARGUMENT;
+    if (!WTF::isMainThread())
+        return RV_ERR_WRONG_THREAD;
+    auto found = operations().find(operation);
+    auto* value = found == operations().end() ? nullptr : found->second->asBytes();
+    // The bytes are readable once SUCCEEDED is delivered.
+    if (!value || value->pending)
+        return RV_ERR_UNSUPPORTED;
+    return copyBytes(value->bytes.span(), buffer, capacity, length);
 }

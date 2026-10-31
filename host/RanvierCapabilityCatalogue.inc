@@ -153,6 +153,9 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom:UIEvent",
     "dom:MouseEvent",
     "dom:PointerEvent",
+    "dom:Touch",
+    "dom:TouchList",
+    "dom:TouchEvent",
     "dom:WheelEvent",
     "dom:KeyboardEvent",
     "dom:FocusEvent",
@@ -282,6 +285,13 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom:Highlight",
     "dom:HighlightRegistry",
     "dom:FileReader",
+    "dom:FontFace",
+    "dom:FontFaceSet",
+    "dom:WebAnimation",
+    "dom:AnimationEffect",
+    "dom:KeyframeEffect",
+    "dom:AnimationTimeline",
+    "dom:DocumentTimeline",
     "dom:DataTransfer",
     "dom:DataTransferItemList",
     "dom:DataTransferItem",
@@ -345,6 +355,10 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom-constructor:URLPattern",
     "dom-constructor:Highlight",
     "dom-constructor:FileReader",
+    "dom-constructor:FontFace",
+    "dom-constructor:WebAnimation",
+    "dom-constructor:KeyframeEffect",
+    "dom-constructor:DocumentTimeline",
     "dom-constructor:DataTransfer",
     "dom-css-supports",
     "dom-custom-highlights",
@@ -369,6 +383,7 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom-css-style-map-entries",
     "dom-form-data-entries",
     "dom-url-search-params-entries",
+    "dom-font-face-set-values",
     "dom-type-query:CSSRule",
     "dom-type-query:StyleSheet",
     "dom-type-query:CSSStyleDeclaration",
@@ -379,14 +394,20 @@ static constexpr const char* capabilityAbiNames[] = {
     "dom-type-query:DOMMatrixReadOnly",
     "dom-type-query:CSSTransformComponent",
     "dom-type-query:Event",
+    "dom-type-query:AnimationEffect",
+    "dom-type-query:AnimationTimeline",
     "screen",
     "capabilities",
     "svg-view-selection",
     "image-decode",
     "font-load",
     "font-readiness",
+    "font-face-load",
     "event-construction",
     "input-state",
+    "pointer-input",
+    "touch-input",
+    "pointer-lock",
     "viewport",
     "dom-binary-values",
     "accessibility-relations",
@@ -401,6 +422,8 @@ static constexpr const char* capabilityAbiNames[] = {
     "media-preferences",
     "wake-locks",
     "notifications",
+    "media-capabilities",
+    "snapshot-options",
     "accessibility-uia",
     "resize",
     "input",
@@ -568,6 +591,13 @@ static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
 #else
     {"build:ENABLE_PDFJS", -1},
 #endif
+#if defined(RV_CAP_ENABLE_POINTER_LOCK)
+    {"build:ENABLE_POINTER_LOCK", RV_CAP_ENABLE_POINTER_LOCK},
+#elif defined(ENABLE_POINTER_LOCK)
+    {"build:ENABLE_POINTER_LOCK", ENABLE_POINTER_LOCK},
+#else
+    {"build:ENABLE_POINTER_LOCK", -1},
+#endif
 #if defined(RV_CAP_ENABLE_REMOTE_INSPECTOR)
     {"build:ENABLE_REMOTE_INSPECTOR", RV_CAP_ENABLE_REMOTE_INSPECTOR},
 #elif defined(ENABLE_REMOTE_INSPECTOR)
@@ -588,6 +618,13 @@ static constexpr CapabilityBuildFlag capabilityBuildFlags[] = {
     {"build:ENABLE_SPELLCHECK", ENABLE_SPELLCHECK},
 #else
     {"build:ENABLE_SPELLCHECK", -1},
+#endif
+#if defined(RV_CAP_ENABLE_TOUCH_EVENTS)
+    {"build:ENABLE_TOUCH_EVENTS", RV_CAP_ENABLE_TOUCH_EVENTS},
+#elif defined(ENABLE_TOUCH_EVENTS)
+    {"build:ENABLE_TOUCH_EVENTS", ENABLE_TOUCH_EVENTS},
+#else
+    {"build:ENABLE_TOUCH_EVENTS", -1},
 #endif
 #if defined(RV_CAP_ENABLE_VIDEO)
     {"build:ENABLE_VIDEO", RV_CAP_ENABLE_VIDEO},

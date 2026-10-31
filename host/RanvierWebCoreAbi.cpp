@@ -2,9 +2,11 @@
 #include "RanvierWebCoreAbi.h"
 #include "dom/RanvierDomGlue.h"
 #include "RanvierSvgViewGlue.h"
+#include "RanvierImageEncoding.h"
 #include "RanvierResourceGlue.h"
 #include "RanvierEventGlue.h"
 #include "RanvierTransferGlue.h"
+#include "RanvierPointerGlue.h"
 #include "RanvierViewportGlue.h"
 #include "RanvierCanvasGlue.h"
 #include "RanvierInspectGlue.h"
@@ -169,6 +171,18 @@
 #include <WebCore/MouseEventTypes.h>
 #include <WebCore/PlatformKeyboardEvent.h>
 #include <WebCore/PlatformMouseEvent.h>
+#include <WebCore/Navigator.h>
+#include <WebCore/PointerCaptureController.h>
+#include <WebCore/PointerEvent.h>
+#include <WebCore/PointerEventTypeNames.h>
+#if ENABLE(POINTER_LOCK)
+#include <WebCore/PointerLockController.h>
+#endif
+#if ENABLE(TOUCH_EVENTS)
+#include <WebCore/PlatformTouchEvent.h>
+#include <WebCore/PlatformTouchPoint.h>
+#include <WebCore/RemoteFrameGeometryTransformer.h>
+#endif
 #include <WebCore/PlatformWheelEvent.h>
 #include <WebCore/ScrollingCoordinatorTypes.h>
 #include <WebCore/WheelEvent.h>
@@ -246,6 +260,11 @@ private:
 #endif
     void invalidate(const IntRect&);
     void wantUpdate();
+#if ENABLE(POINTER_LOCK)
+    void requestPointerLock(CompletionHandler<void(PointerLockRequestResult)>&&) final;
+    // The host ends a lock at once: the platform cursor has no state to restore.
+    void requestPointerUnlock(CompletionHandler<void(bool)>&& completion) final { completion(true); }
+#endif
 };
 
 // The RV_CURSOR_* value of a WebCore cursor.
@@ -599,10 +618,11 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
     }();
     UNUSED_VARIABLE(prewarmed);
     auto configuration = pageConfigurationWithEmptyClients(std::nullopt, PAL::SessionID::defaultSessionID());
-    // The empty clients' sandbox, except that forms may submit: a submission reaches RvFrameLoaderClient.
+    // The empty clients' sandbox, except that forms may submit, a submission reaching RvFrameLoaderClient, and an element
+    // may request pointer lock, which the app grants or denies (rv_host_pointer_lock_resolve).
     configuration.mainFrameCreationParameters = PageConfiguration::LocalMainFrameCreationParameters { CompletionHandler<UniqueRef<LocalFrameLoaderClient>(LocalFrame&, FrameLoader&)> { [](auto&, auto& loader) -> UniqueRef<LocalFrameLoaderClient> {
         return makeUniqueRefWithoutRefCountedCheck<RvFrameLoaderClient>(loader);
-    } }, SandboxFlags::all() - SandboxFlag::Forms, ReferrerPolicy::EmptyString };
+    } }, SandboxFlags::all() - SandboxFlags { SandboxFlag::Forms, SandboxFlag::PointerLock }, ReferrerPolicy::EmptyString };
     configuration.chromeClient = makeUniqueRef<RvChromeClient>();
     configuration.editorClient = makeUniqueRef<RvEditorClient>();
     configuration.dragClient = makeUnique<RvDragClient>();
@@ -621,6 +641,11 @@ static Ref<Page> createPage(IntSize viewportSize, RvScreenOrientationManager& or
     page->settings().setVisualViewportAPIEnabled(true);
     page->settings().setInteractiveFormValidationEnabled(true);
     page->settings().setDataTransferItemsEnabled(true);
+#if ENABLE(POINTER_LOCK)
+    page->settings().setPointerLockEnabled(true);
+#endif
+    page->settings().setAltitudeAngleEnabled(true);
+    page->settings().setAzimuthAngleEnabled(true);
     // Markup arrives decoded, so the document's encoding, which form submission and URL query encoding use, is UTF-8.
     page->settings().setDefaultTextEncodingName("UTF-8"_s);
 #if ENABLE(VIDEO)
@@ -812,6 +837,14 @@ struct RvHost {
     PlatformDisplayID displayID { 0 };
     // The app's screen, from rv_host_set_screen; until then the screen follows the host size.
     std::optional<ScreenData> screen;
+    // The mouse buttons rv_host_mouse holds down, as MouseEvent.buttons, and the last mouse or pen position outside
+    // pointer lock: the position the page sees while the pointer is locked, and the origin of rv_host_mouse's movement.
+    int32_t mouseButtons { 0 };
+    std::optional<DoublePoint> pointerPosition;
+#if ENABLE(POINTER_LOCK)
+    // The page's pending pointer-lock request, answered by rv_host_pointer_lock_resolve.
+    CompletionHandler<void(PointerLockRequestResult)> pointerLockRequest;
+#endif
 
     void requestFrame()
     {
@@ -829,6 +862,19 @@ void RvChromeClient::invalidate(const IntRect& rect)
     host->dirty.unite(intersection(rect, IntRect { { }, host->size }));
     host->requestFrame();
 }
+
+#if ENABLE(POINTER_LOCK)
+void RvChromeClient::requestPointerLock(CompletionHandler<void(PointerLockRequestResult)>&& completion)
+{
+    // An unfocused window cannot take the pointer, and a request waits for the app's answer.
+    if (!host || !host->page->focusController().isFocused() || host->pointerLockRequest) {
+        completion(PointerLockRequestResult::Failure);
+        return;
+    }
+    host->pointerLockRequest = WTF::move(completion);
+    host->requestFrame();
+}
+#endif
 
 void RvChromeClient::setCursor(const Cursor& cursor)
 {
@@ -1400,8 +1446,11 @@ static_assert(sizeof(RvResizeEntry) == 96 && offsetof(RvResizeEntry, target) == 
 static_assert(sizeof(void*) != 8 || (sizeof(RvNotificationOptions) == 64 && offsetof(RvNotificationOptions, reserved) == 28
     && offsetof(RvNotificationOptions, body) == 32 && offsetof(RvNotificationOptions, icon) == 56));
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
+static_assert(sizeof(RvMediaVideoConfiguration) == 64 && offsetof(RvMediaVideoConfiguration, bitrate) == 32 && offsetof(RvMediaVideoConfiguration, transfer_function) == 60);
+static_assert(sizeof(RvSnapshotOptions) == 64 && offsetof(RvSnapshotOptions, scale) == 8 && offsetof(RvSnapshotOptions, x) == 24 && offsetof(RvSnapshotOptions, quality) == 64 - 8);
+static_assert(sizeof(RvMediaAudioConfiguration) == 64 && offsetof(RvMediaAudioConfiguration, bitrate) == 40 && offsetof(RvMediaAudioConfiguration, spatial_rendering) == 56);
 
-int32_t rv_abi_version(void) { return 56; }
+int32_t rv_abi_version(void) { return 57; }
 
 // The device pixels of a paint: the viewport scaled and truncated, as ImageBuffer::getPixelBuffer scales it.
 static IntSize paintSize(const RvHost& host)
@@ -1427,10 +1476,22 @@ int32_t rv_abi_has(const char* feature)
         return 1;
     if (!std::strcmp(feature, "font-readiness"))
         return 1;
+    if (!std::strcmp(feature, "font-face-load"))
+        return 1;
     if (!std::strcmp(feature, "event-construction"))
         return 1;
     if (!std::strcmp(feature, "input-state"))
         return 1;
+    if (!std::strcmp(feature, "pointer-input"))
+        return 1;
+#if ENABLE(TOUCH_EVENTS)
+    if (!std::strcmp(feature, "touch-input"))
+        return 1;
+#endif
+#if ENABLE(POINTER_LOCK)
+    if (!std::strcmp(feature, "pointer-lock"))
+        return 1;
+#endif
     if (!std::strcmp(feature, "viewport"))
         return 1;
     if (!std::strcmp(feature, "dom-binary-values"))
@@ -1458,6 +1519,10 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "wake-locks"))
         return 1;
     if (!std::strcmp(feature, "notifications"))
+        return 1;
+    if (!std::strcmp(feature, "media-capabilities"))
+        return 1;
+    if (!std::strcmp(feature, "snapshot-options"))
         return 1;
 #if defined(_WIN32)
     if (!std::strcmp(feature, "accessibility-uia"))
@@ -1489,6 +1554,16 @@ int32_t rv_abi_has(const char* feature)
         return 1;
 #endif
     return 0;
+}
+
+// Whether rv_host_snapshot accepts RV_SNAPSHOT_DISPLAY_P3.
+static constexpr bool snapshotDisplayP3()
+{
+#if ENABLE(DESTINATION_COLOR_SPACE_DISPLAY_P3)
+    return true;
+#else
+    return false;
+#endif
 }
 
 #include "RanvierCapabilities.inc"
@@ -1911,6 +1986,20 @@ int32_t rv_host_set_accelerated_compositing(RvHost* host, int32_t mode)
 #endif
 }
 
+// Denies a pending pointer-lock request and ends a held lock, as a platform window losing focus does.
+static void releasePointerLock(RvHost& host)
+{
+#if ENABLE(POINTER_LOCK)
+    if (auto completion = std::exchange(host.pointerLockRequest, { }))
+        completion(PointerLockRequestResult::Failure);
+    auto& controller = host.page->pointerLockController();
+    if (controller.element() && !controller.lockPending())
+        controller.didLosePointerLock();
+#else
+    UNUSED_PARAM(host);
+#endif
+}
+
 void rv_host_destroy(RvHost* host)
 {
     if (!host || !onOwningThread())
@@ -1922,6 +2011,7 @@ void rv_host_destroy(RvHost* host)
     rv_host_set_accelerated_compositing(host, RV_COMPOSITING_OFF);
     host->noScript.reset();
     rv_host_set_accessibility(host, 0, nullptr, nullptr);
+    releasePointerLock(*host);
     static_cast<RvChromeClient&>(host->page->chrome().client()).host = nullptr;
     liveHosts.removeFirst(host);
     delete host;
@@ -1990,6 +2080,27 @@ int32_t rv_font_load(RvHost* host, const char* family, const uint8_t* data, int3
     if (!liveHosts.contains(host))
         return RV_ERR_UNSUPPORTED;
     return ranvier_resource_load_font(reinterpret_cast<RvNode*>(&host->document()), family, data, length, completion, context, operation);
+}
+
+static int32_t fontFaceOperation(RvHost* host, RvFontFace* face, int32_t load, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !face || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_font_face_load(reinterpret_cast<RvNode*>(&host->document()), face, load, completion, context, operation);
+}
+
+int32_t rv_font_face_load(RvHost* host, RvFontFace* face, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return fontFaceOperation(host, face, 1, completion, context, operation);
+}
+
+int32_t rv_font_face_loaded(RvHost* host, RvFontFace* face, RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    return fontFaceOperation(host, face, 0, completion, context, operation);
 }
 
 int32_t rv_resource_cancel(uint64_t operation)
@@ -3671,6 +3782,89 @@ template<typename Handle> static int32_t handleInput(RvHost& host, Handle&& hand
     return status == RV_OK ? (handled ? 1 : 0) : status;
 }
 
+// A mouse or pen sample as WebCore's platform event, with the fields its constructor leaves at their defaults.
+class RvPlatformPointerEvent final : public PlatformMouseEvent {
+public:
+    RvPlatformPointerEvent(const RvPointerSample& sample, const DoublePoint& position, PlatformEvent::Type type, PointerID pointerId, double force)
+        : PlatformMouseEvent(position, position, sample.button == RV_BUTTON_NONE ? MouseButton::None : static_cast<MouseButton>(sample.button),
+            type, sample.clickCount, platformModifiers(sample.modifiers), MonotonicTime::now(), force, SyntheticClickType::NoTap,
+            MouseEventInputSource::UserDriven, pointerId)
+    {
+        m_pointerType = sample.pointerType == RV_POINTER_TYPE_PEN ? penPointerEventType() : mousePointerEventType();
+        m_buttons = static_cast<unsigned short>(sample.buttons);
+        m_movementDelta = { sample.movementX, sample.movementY };
+        m_unadjustedMovementDelta = m_movementDelta;
+    }
+};
+
+static constexpr PointerID penPointerBase = 1u << 30;
+
+static bool pointerLocked(RvHost& host)
+{
+#if ENABLE(POINTER_LOCK)
+    auto& controller = host.page->pointerLockController();
+    return controller.element() && !controller.lockPending();
+#else
+    UNUSED_PARAM(host);
+    return false;
+#endif
+}
+
+// Sends one mouse or pen sample down WebCore's mouse path, which dispatches its pointer events and the compatibility
+// mouse events. Under pointer lock the page sees the position from before the lock.
+static int32_t dispatchMouseSample(RvHost& host, const RvPointerSample& sample)
+{
+    static constexpr PlatformEvent::Type types[] = { PlatformEvent::Type::MouseMoved, PlatformEvent::Type::MousePressed, PlatformEvent::Type::MouseReleased };
+    DoublePoint position { sample.x, sample.y };
+    if (pointerLocked(host) && host.pointerPosition)
+        position = *host.pointerPosition;
+    else
+        host.pointerPosition = position;
+    bool pen = sample.pointerType == RV_POINTER_TYPE_PEN;
+    double force = std::isnan(sample.pressure) ? (sample.buttons ? 0.5 : 0) : std::clamp<double>(sample.pressure, 0, 1);
+    PointerID pointerId = pen ? penPointerBase + static_cast<PointerID>(sample.id) : mousePointerID;
+    // A pen contact the platform withdrew ends as a release.
+    int32_t action = sample.action == RV_POINTER_CANCEL ? RV_POINTER_UP : sample.action;
+    RvPlatformPointerEvent event(sample, position, types[action], pointerId, force);
+    PointerEvent::PenGeometry geometry { sample.tiltX, sample.tiltY, sample.twist, std::clamp(sample.tangentialPressure, -1.f, 1.f), sample.width, sample.height };
+    Ref frame = host.frame();
+    if (action == RV_POINTER_DOWN) {
+        host.pressPoint = flooredIntPoint(position);
+        if (host.dragStyle == RV_DRAG_APP && host.dragStartCallback && host.dragStartDocument.get() != &host.document()) {
+            AddEventListenerOptions capture;
+            capture.capture = true;
+            host.document().addEventListener(eventNames().dragstartEvent, RvDragStartCapture::create(), capture);
+            host.dragStartDocument = host.document();
+        }
+    }
+    // The drag client finds the host of a drag that starts during this call here.
+    SetForScope dragHost { inputHost, &host };
+    return handleInput(host, [&] {
+        std::optional<PointerEvent::PendingPenGeometryScope> penScope;
+        if (pen)
+            penScope.emplace(geometry);
+        auto& handler = frame->eventHandler();
+        switch (action) {
+        case RV_POINTER_MOVE:
+            return handler.mouseMoved(event).wasHandled();
+        case RV_POINTER_DOWN:
+            return handler.handleMousePressEvent(event).wasHandled();
+        default:
+            return handler.handleMouseReleaseEvent(event).wasHandled();
+        }
+    });
+}
+
+static int32_t mouseButtonBit(int32_t button)
+{
+    switch (button) {
+    case RV_BUTTON_LEFT: return 1;
+    case RV_BUTTON_RIGHT: return 2;
+    case RV_BUTTON_MIDDLE: return 4;
+    default: return 0;
+    }
+}
+
 int32_t rv_host_mouse(RvHost* host, int32_t action, int32_t x, int32_t y, int32_t button, int32_t clickCount, int32_t modifiers)
 {
     if (!host)
@@ -3679,33 +3873,200 @@ int32_t rv_host_mouse(RvHost* host, int32_t action, int32_t x, int32_t y, int32_
         return RV_ERR_WRONG_THREAD;
     if (action < RV_MOUSE_MOVE || action > RV_MOUSE_UP || button < RV_BUTTON_NONE || button > RV_BUTTON_RIGHT || clickCount < 0)
         return RV_ERR_UNSUPPORTED;
-    static constexpr PlatformEvent::Type types[] = { PlatformEvent::Type::MouseMoved, PlatformEvent::Type::MousePressed, PlatformEvent::Type::MouseReleased };
-    DoublePoint position { static_cast<double>(x), static_cast<double>(y) };
-    PlatformMouseEvent mouse(position, position, button == RV_BUTTON_NONE ? MouseButton::None : static_cast<MouseButton>(button),
-        types[action], clickCount, platformModifiers(modifiers), MonotonicTime::now(), 0, SyntheticClickType::NoTap, MouseEventInputSource::UserDriven);
-    Ref frame = host->frame();
-    if (action == RV_MOUSE_DOWN) {
-        host->pressPoint = { x, y };
-        if (host->dragStyle == RV_DRAG_APP && host->dragStartCallback && host->dragStartDocument.get() != &host->document()) {
-            AddEventListenerOptions capture;
-            capture.capture = true;
-            host->document().addEventListener(eventNames().dragstartEvent, RvDragStartCapture::create(), capture);
-            host->dragStartDocument = host->document();
+    if (action == RV_MOUSE_DOWN)
+        host->mouseButtons |= mouseButtonBit(button);
+    else if (action == RV_MOUSE_UP)
+        host->mouseButtons &= ~mouseButtonBit(button);
+    RvPointerSample sample { };
+    sample.size = sizeof sample;
+    sample.pointerType = RV_POINTER_TYPE_MOUSE;
+    sample.action = action;
+    sample.x = x;
+    sample.y = y;
+    sample.button = button;
+    sample.buttons = host->mouseButtons;
+    sample.modifiers = modifiers;
+    sample.clickCount = clickCount;
+    sample.pressure = std::numeric_limits<float>::quiet_NaN();
+    sample.width = 1;
+    sample.height = 1;
+    // The movement since the previous sample. Under pointer lock an app sends relative movement through rv_host_pointer.
+    if (host->pointerPosition && !pointerLocked(*host)) {
+        sample.movementX = x - host->pointerPosition->x();
+        sample.movementY = y - host->pointerPosition->y();
+    }
+    return dispatchMouseSample(*host, sample);
+}
+
+#if ENABLE(TOUCH_EVENTS)
+class RvPlatformTouchPoint final : public PlatformTouchPoint {
+public:
+    explicit RvPlatformTouchPoint(const RvPointerSample& sample)
+    {
+        static constexpr State states[] = { TouchMoved, TouchPressed, TouchReleased, TouchCancelled, TouchStationary };
+        m_id = static_cast<unsigned>(sample.id);
+        m_state = states[sample.action];
+        m_pos = { sample.x, sample.y };
+        m_screenPos = m_pos;
+        m_radius = { sample.width / 2, sample.height / 2 };
+        m_rotationAngle = static_cast<float>(sample.twist);
+        m_twist = static_cast<float>(sample.twist);
+        m_force = std::isnan(sample.pressure) ? 0 : std::clamp(sample.pressure, 0.f, 1.f);
+    }
+};
+
+class RvPlatformTouchEvent final : public PlatformTouchEvent {
+public:
+    RvPlatformTouchEvent(const RvPointerSample* samples, int32_t count, int32_t modifiers)
+    {
+        bool pressed = false;
+        bool released = false;
+        bool cancelled = false;
+        for (int32_t index = 0; index < count; ++index) {
+            m_touchPoints.append(RvPlatformTouchPoint(samples[index]));
+            pressed |= samples[index].action == RV_POINTER_DOWN;
+            released |= samples[index].action == RV_POINTER_UP;
+            cancelled |= samples[index].action == RV_POINTER_CANCEL;
+        }
+        m_type = cancelled ? Type::TouchCancel : pressed ? Type::TouchStart : released ? Type::TouchEnd : Type::TouchMove;
+        m_modifiers = platformModifiers(modifiers);
+        m_timestamp = MonotonicTime::now();
+    }
+};
+#endif
+
+static bool validSample(const RvPointerSample& sample)
+{
+    return sample.size == static_cast<int32_t>(sizeof(RvPointerSample)) && sample.pointerType >= RV_POINTER_TYPE_MOUSE
+        && sample.pointerType <= RV_POINTER_TYPE_TOUCH && sample.id >= 0 && sample.action >= RV_POINTER_MOVE
+        && sample.action <= RV_POINTER_STATIONARY && sample.button >= RV_BUTTON_NONE && sample.button <= RV_BUTTON_RIGHT
+        && sample.clickCount >= 0 && sample.buttons >= 0 && sample.buttons <= 0xffff && std::isfinite(sample.x) && std::isfinite(sample.y)
+        && sample.width >= 0 && sample.height >= 0;
+}
+
+int32_t rv_host_pointer(RvHost* host, const RvPointerSample* samples, int32_t count)
+{
+    if (!host || !samples)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (count < 1)
+        return RV_ERR_UNSUPPORTED;
+    for (int32_t index = 0; index < count; ++index) {
+        if (!validSample(samples[index]))
+            return RV_ERR_UNSUPPORTED;
+    }
+    if (samples[0].pointerType != RV_POINTER_TYPE_TOUCH) {
+        // One mouse or pen sample per call; stationary belongs to touch frames, and only a pen contact is cancelled.
+        if (count != 1 || samples[0].action == RV_POINTER_STATIONARY || (samples[0].pointerType == RV_POINTER_TYPE_MOUSE && samples[0].action == RV_POINTER_CANCEL))
+            return RV_ERR_UNSUPPORTED;
+        return dispatchMouseSample(*host, samples[0]);
+    }
+#if ENABLE(TOUCH_EVENTS)
+    bool changed = false;
+    for (int32_t index = 0; index < count; ++index) {
+        if (samples[index].pointerType != RV_POINTER_TYPE_TOUCH)
+            return RV_ERR_UNSUPPORTED;
+        changed |= samples[index].action != RV_POINTER_STATIONARY;
+        for (int32_t other = 0; other < index; ++other) {
+            if (samples[other].id == samples[index].id)
+                return RV_ERR_UNSUPPORTED;
         }
     }
-    // The drag client finds the host of a drag that starts during this call here.
-    SetForScope dragHost { inputHost, host };
+    if (!changed)
+        return RV_ERR_UNSUPPORTED;
+    RvPlatformTouchEvent event(samples, count, samples[0].modifiers);
+    Ref frame = host->frame();
+    Ref page = host->page;
     return handleInput(*host, [&] {
-        auto& handler = frame->eventHandler();
-        switch (action) {
-        case RV_MOUSE_MOVE:
-            return handler.mouseMoved(mouse).wasHandled();
-        case RV_MOUSE_DOWN:
-            return handler.handleMousePressEvent(mouse).wasHandled();
-        default:
-            return handler.handleMouseReleaseEvent(mouse).wasHandled();
+        auto result = frame->eventHandler().handleTouchEvent(event);
+        // An ended contact leaves the pointer state, as a platform view reports after the touch: until then WebCore
+        // dispatches no pointer events for mouse or pen input.
+        for (int32_t index = 0; index < count; ++index) {
+            if (samples[index].action == RV_POINTER_UP || samples[index].action == RV_POINTER_CANCEL)
+                page->pointerCaptureController().touchWithIdentifierWasRemoved(mousePointerID + 1 + static_cast<PointerID>(samples[index].id));
         }
+        return result && *result;
     });
+#else
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_host_set_max_touch_points(RvHost* host, int32_t value)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (value < 0)
+        return RV_ERR_UNSUPPORTED;
+    Navigator::setEmbedderMaxTouchPoints(host->page.get(), value);
+    return RV_OK;
+}
+
+int32_t rv_host_pointer_lock_state(RvHost* host, int32_t* state, RvNode** element)
+{
+    if (!host || !state)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_pointer_lock_state(reinterpret_cast<RvNode*>(&host->document()), state, element);
+}
+
+int32_t rv_host_pointer_lock_resolve(RvHost* host, int32_t granted)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+#if ENABLE(POINTER_LOCK)
+    if (!host->pointerLockRequest)
+        return RV_ERR_UNSUPPORTED;
+    auto completion = std::exchange(host->pointerLockRequest, { });
+    return dispatchCountingFailures([&] {
+        completion(granted ? PointerLockRequestResult::Success : PointerLockRequestResult::Failure);
+    });
+#else
+    UNUSED_PARAM(granted);
+    return RV_ERR_UNSUPPORTED;
+#endif
+}
+
+int32_t rv_host_pointer_lock_lose(RvHost* host)
+{
+    if (!host)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_pointer_lock_lose(reinterpret_cast<RvNode*>(&host->document()));
+}
+
+int32_t rv_element_request_pointer_lock(RvNode* element, int32_t unadjustedMovement)
+{
+    if (!element)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_element_request_pointer_lock(element, unadjustedMovement);
+}
+
+int32_t rv_touch_geometry(RvTouch* touch, RvTouchGeometry* geometry)
+{
+    if (!touch || !geometry)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_touch_geometry(touch, geometry);
+}
+
+int32_t rv_document_exit_pointer_lock(RvNode* document)
+{
+    if (!document)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    return ranvier_document_exit_pointer_lock(document);
 }
 
 int32_t rv_host_wheel(RvHost* host, int32_t x, int32_t y, float deltaX, float deltaY, int32_t modifiers)
@@ -3784,6 +4145,8 @@ int32_t rv_host_set_focused(RvHost* host, int32_t focused)
             focus.setFocusedFrame(&host->frame());
         focus.setActive(!!focused);
         focus.setFocused(!!focused);
+        if (!focused)
+            releasePointerLock(*host);
     });
 }
 
@@ -4045,6 +4408,35 @@ int32_t rv_blob_url_read(RvHost* host, const uint8_t* url, int32_t url_length, R
     if (!liveHosts.contains(host))
         return RV_ERR_UNSUPPORTED;
     return ranvier_blob_url_read(reinterpret_cast<RvNode*>(&host->document()), url, url_length, completion, context, operation);
+}
+
+int32_t rv_media_decoding_info(RvHost* host, int32_t type, const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_media_capabilities_query(reinterpret_cast<RvNode*>(&host->document()), 0, type, video, audio, completion, context, operation);
+}
+
+int32_t rv_media_encoding_info(RvHost* host, int32_t type, const RvMediaVideoConfiguration* video, const RvMediaAudioConfiguration* audio,
+    RvResourceCompletion completion, void* context, uint64_t* operation)
+{
+    if (!host || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host))
+        return RV_ERR_UNSUPPORTED;
+    return ranvier_media_capabilities_query(reinterpret_cast<RvNode*>(&host->document()), 1, type, video, audio, completion, context, operation);
+}
+
+int32_t rv_media_capabilities_info(uint64_t operation, int32_t* supported, int32_t* smooth, int32_t* power_efficient)
+{
+    return ranvier_media_capabilities_info(operation, supported, smooth, power_efficient);
 }
 
 int32_t rv_blob_read_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
@@ -4589,6 +4981,13 @@ RvNode* rv_animation_target(RvAnimation* handle)
     return handleOrNull(effect ? effect->target() : nullptr);
 }
 
+RvEventTarget* rv_animation_as_event_target(RvAnimation* handle)
+{
+    if (!handle || !onOwningThread())
+        return nullptr;
+    return targetHandleOrNull(static_cast<EventTarget*>(animation(handle)));
+}
+
 RvNode* rv_node_retain(RvNode* target)
 {
     if (!target || !onOwningThread())
@@ -4987,6 +5386,122 @@ int32_t rv_element_snapshot(RvNode* target, uint8_t* rgba, int32_t length, int32
         return RV_ERR_BUFFER_TOO_SMALL;
     std::memcpy(rgba, pixels->bytes().data(), required);
     return RV_OK;
+}
+
+// Paints the subject's area, or the viewport's for a null subject, at scale into a new buffer in colorSpace.
+// rect is the painted area in CSS pixels: the element's paint bounds or the viewport, intersected with the crop.
+static RefPtr<ImageBuffer> captureSnapshot(RvHost& host, Node* subject, const RvSnapshotOptions& options, float scale,
+    const DestinationColorSpace& colorSpace, int32_t& status)
+{
+    status = RV_ERR_PAINT_FAILED;
+    host.document().updateLayoutIgnorePendingStylesheets();
+    RefPtr view = host.frame().view();
+    if (!view)
+        return nullptr;
+    view->updateLayoutAndStyleIfNeededRecursive();
+    IntRect rect { { }, host.size };
+    if (subject) {
+        CheckedPtr renderer = subject->renderer();
+        if (!renderer)
+            return nullptr;
+        LayoutRect elementRect;
+        rect = snappedIntRect(renderer->subtreePaintRootRect(elementRect, RenderObject::RespectTransforms::Yes));
+    }
+    if (options.crop) {
+        auto area = enclosingIntRect(FloatRect { static_cast<float>(options.x), static_cast<float>(options.y),
+            static_cast<float>(options.width), static_cast<float>(options.height) });
+        area.moveBy(rect.location());
+        rect.intersect(area);
+    }
+    if (rect.isEmpty()) {
+        status = RV_ERR_UNSUPPORTED;
+        return nullptr;
+    }
+    auto buffer = ImageBuffer::create(FloatSize { rect.size() }, RenderingMode::Unaccelerated, RenderingPurpose::Snapshot, scale,
+        colorSpace, PixelFormat::BGRA8);
+    if (!buffer)
+        return nullptr;
+    buffer->context().translate(-rect.x(), -rect.y());
+    host.inFrame = true;
+    auto behavior = view->paintBehavior();
+    if (subject) {
+        // As rv_element_snapshot paints it: the subtree alone, over a transparent base background.
+        auto background = view->baseBackgroundColor();
+        view->setBaseBackgroundColor(Color::transparentBlack);
+        view->paintContentsForSnapshot(buffer->context(), rect, subject, LocalFrameView::IncludeSelection, LocalFrameView::DocumentCoordinates);
+        view->setBaseBackgroundColor(background);
+    } else {
+        // As rv_host_paint_rgba's CPU path paints the viewport.
+        view->setPaintBehavior(behavior | PaintBehavior::FlattenCompositingLayers);
+        view->paint(buffer->context(), rect);
+    }
+    view->setPaintBehavior(behavior);
+    host.inFrame = false;
+    if (host.updateWanted)
+        host.requestFrame();
+    buffer->flushDrawingContext();
+    status = RV_OK;
+    return buffer;
+}
+
+int32_t rv_host_snapshot(RvHost* host, RvNode* element, const RvSnapshotOptions* options, RvResourceCompletion completion,
+    void* context, uint64_t* operation)
+{
+    if (!host || !options || !completion || !operation)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!liveHosts.contains(host) || options->size != static_cast<int32_t>(sizeof(RvSnapshotOptions)))
+        return RV_ERR_UNSUPPORTED;
+    float scale = options->scale == 0 ? host->deviceScale : static_cast<float>(options->scale);
+    if (!(scale >= 0.25f && scale <= 8))
+        return RV_ERR_UNSUPPORTED;
+    if (options->crop != 0 && options->crop != 1)
+        return RV_ERR_UNSUPPORTED;
+    if (options->crop && !(std::isfinite(options->x) && std::isfinite(options->y) && options->width > 0 && options->height > 0
+        && std::isfinite(options->width) && std::isfinite(options->height)))
+        return RV_ERR_UNSUPPORTED;
+    const DestinationColorSpace* colorSpace = nullptr;
+    if (options->color_space == RV_SNAPSHOT_SRGB)
+        colorSpace = &DestinationColorSpace::SRGB();
+#if ENABLE(DESTINATION_COLOR_SPACE_DISPLAY_P3)
+    else if (options->color_space == RV_SNAPSHOT_DISPLAY_P3)
+        colorSpace = &DestinationColorSpace::DisplayP3();
+#endif
+    if (!colorSpace || !Ranvier::Internal::imageEncodingSupported(options->encoding))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr<Node> subject;
+    if (element) {
+        subject = node(element);
+        if (&subject->document() != &host->document())
+            return RV_ERR_WRONG_HOST;
+    }
+    int32_t status = RV_OK;
+    auto buffer = captureSnapshot(*host, subject.get(), *options, scale, *colorSpace, status);
+    if (!buffer)
+        return status;
+    Vector<uint8_t> bytes;
+    IntSize pixelSize;
+    if (options->encoding == RV_IMAGE_ENCODING_RGBA8) {
+        PixelBufferFormat format { AlphaPremultiplication::Unpremultiplied, PixelFormat::RGBA8, *colorSpace };
+        auto pixels = buffer->getPixelBuffer(format, IntRect { { }, buffer->truncatedLogicalSize() });
+        if (!pixels)
+            return RV_ERR_PAINT_FAILED;
+        pixelSize = pixels->size();
+        bytes.append(pixels->bytes());
+    } else {
+        pixelSize = buffer->backendSize();
+        bytes = Ranvier::Internal::encodeImage(WTF::move(buffer), options->encoding, options->quality);
+        if (bytes.isEmpty())
+            return RV_ERR_PAINT_FAILED;
+    }
+    return ranvier_resource_settled_bytes(reinterpret_cast<RvNode*>(&host->document()), bytes.span().data(),
+        static_cast<int64_t>(bytes.size()), pixelSize.width(), pixelSize.height(), completion, context, operation);
+}
+
+int32_t rv_snapshot_result(uint64_t operation, uint8_t* buffer, int64_t capacity, int64_t* length)
+{
+    return ranvier_resource_bytes(operation, buffer, capacity, length);
 }
 
 int32_t rv_host_set_popup_handler(RvHost* host, RvPopupCallback callback, void* context)

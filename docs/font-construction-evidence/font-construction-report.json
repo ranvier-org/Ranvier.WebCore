@@ -1,0 +1,213 @@
+{
+  "assertions": 249,
+  "cases": {
+    "fallbackWidth": 57.7734375,
+    "bytes": {
+      "ahemTtf": {
+        "initial": 2,
+        "outcome": 0,
+        "status": 2
+      },
+      "ahemCff": {
+        "initial": 2,
+        "outcome": 0,
+        "status": 2
+      },
+      "robotoOtf": {
+        "initial": 2,
+        "outcome": 0,
+        "status": 2
+      },
+      "robotoWoff": {
+        "initial": 2,
+        "outcome": 0,
+        "status": 2
+      },
+      "robotoWoff2": {
+        "initial": 2,
+        "outcome": 0,
+        "status": 2
+      },
+      "invalid": {
+        "initial": 3,
+        "outcome": 2,
+        "status": 3
+      },
+      "empty": {
+        "initial": 3,
+        "outcome": 2,
+        "status": 3
+      },
+      "nul": {
+        "initial": 3,
+        "outcome": 2,
+        "status": 3
+      }
+    },
+    "defaults": {
+      "family": "Rv\u00e9\u5b57",
+      "style": "normal",
+      "weight": "normal",
+      "stretch": "normal",
+      "unicode_range": "U+0-10ffff",
+      "feature_settings": "normal",
+      "display": "auto",
+      "size_adjust": "100%",
+      "width": "normal"
+    },
+    "descriptors": {
+      "family": "RvDesc",
+      "style": "italic",
+      "weight": "bold",
+      "stretch": "condensed",
+      "unicode_range": "U+0-7f",
+      "feature_settings": "\"liga\" 0",
+      "display": "swap",
+      "size_adjust": "90%",
+      "width": "condensed"
+    },
+    "descriptorErrors": {
+      "weight": [
+        3,
+        2
+      ],
+      "style": [
+        3,
+        2
+      ],
+      "stretch": [
+        3,
+        2
+      ],
+      "unicode_range": [
+        3,
+        2
+      ],
+      "display": [
+        3,
+        2
+      ],
+      "feature_settings": [
+        3,
+        2
+      ],
+      "size_adjust": [
+        3,
+        2
+      ]
+    },
+    "setters": {
+      "weight=300": [
+        0,
+        "",
+        "300"
+      ],
+      "weight=heavy": [
+        -3,
+        "SyntaxError",
+        "300"
+      ],
+      "style=oblique 10deg": [
+        0,
+        "",
+        "oblique 10deg"
+      ],
+      "family=Renamed": [
+        0,
+        "",
+        "Renamed"
+      ],
+      "unicode_range=U+20-7E": [
+        0,
+        "",
+        "U+20-7e"
+      ],
+      "display=later": [
+        -3,
+        "SyntaxError",
+        "swap"
+      ]
+    },
+    "nulFamily": "\"Rv\\0 Nul\"",
+    "badSource": [
+      3,
+      [
+        2
+      ]
+    ],
+    "urlBadDescriptor": [
+      3,
+      [
+        2
+      ]
+    ],
+    "url": {
+      "200": [
+        0
+      ],
+      "201": [
+        0
+      ],
+      "202": [
+        1
+      ],
+      "203": [
+        1
+      ],
+      "204": [
+        0
+      ]
+    },
+    "registration": {
+      "widthBefore": 57.7734375,
+      "checkBefore": [
+        0,
+        1
+      ],
+      "afterAdd": [
+        "RvCss",
+        "RvAdded",
+        "RvSecond"
+      ],
+      "widthAfterAdd": 80.0,
+      "checkAfterAdd": [
+        0,
+        1
+      ],
+      "checkLazy": [
+        0,
+        1
+      ],
+      "addCss": [
+        0,
+        ""
+      ],
+      "afterDelete": [
+        "RvCss",
+        "RvSecond",
+        "RvLazy"
+      ],
+      "widthAfterDelete": 57.7734375,
+      "afterClear": [
+        "RvCss"
+      ],
+      "widthAfterClear": 57.7734375
+    },
+    "reload": [
+      "RvCss"
+    ],
+    "addOldCssFace": [
+      -3,
+      "InvalidModificationError"
+    ],
+    "addForeignFace": 0
+  },
+  "requested": [
+    "ahem.ttf",
+    "missing.ttf",
+    "broken.ttf",
+    "ahem2.ttf",
+    "held.ttf",
+    "linger.ttf"
+  ]
+}

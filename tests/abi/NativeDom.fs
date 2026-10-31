@@ -630,6 +630,39 @@ let RV_DOM_ARRAY_BUFFER_VIEW_BIG_UINT64 = 11
 let RV_DOM_ARRAY_BUFFER_VIEW_DATA_VIEW = 12
 
 [<Literal>]
+let RV_DOM_ANIMATION_FRAME_RATE_PRESET_AUTO = 0
+
+[<Literal>]
+let RV_DOM_ANIMATION_FRAME_RATE_PRESET_LOW = 1
+
+[<Literal>]
+let RV_DOM_ANIMATION_FRAME_RATE_PRESET_HIGH = 2
+
+[<Literal>]
+let RV_DOM_ANIMATION_FRAME_RATE_PRESET_HIGHEST = 3
+
+[<Literal>]
+let RV_DOM_ANIMATION_PLAY_STATE_IDLE = 0
+
+[<Literal>]
+let RV_DOM_ANIMATION_PLAY_STATE_RUNNING = 1
+
+[<Literal>]
+let RV_DOM_ANIMATION_PLAY_STATE_PAUSED = 2
+
+[<Literal>]
+let RV_DOM_ANIMATION_PLAY_STATE_FINISHED = 3
+
+[<Literal>]
+let RV_DOM_ANIMATION_REPLACE_STATE_ACTIVE = 0
+
+[<Literal>]
+let RV_DOM_ANIMATION_REPLACE_STATE_REMOVED = 1
+
+[<Literal>]
+let RV_DOM_ANIMATION_REPLACE_STATE_PERSISTED = 2
+
+[<Literal>]
 let RV_DOM_ARIA_NOTIFICATION_INTERRUPT_NONE = 0
 
 [<Literal>]
@@ -643,6 +676,15 @@ let RV_DOM_ARIA_NOTIFICATION_PRIORITY_NORMAL = 0
 
 [<Literal>]
 let RV_DOM_ARIA_NOTIFICATION_PRIORITY_HIGH = 1
+
+[<Literal>]
+let RV_DOM_COMPOSITE_OPERATION_REPLACE = 0
+
+[<Literal>]
+let RV_DOM_COMPOSITE_OPERATION_ADD = 1
+
+[<Literal>]
+let RV_DOM_COMPOSITE_OPERATION_ACCUMULATE = 2
 
 [<Literal>]
 let RV_DOM_DOCUMENT_READY_STATE_LOADING = 0
@@ -660,6 +702,39 @@ let RV_DOM_ENDING_TYPE_TRANSPARENT = 0
 let RV_DOM_ENDING_TYPE_NATIVE = 1
 
 [<Literal>]
+let RV_DOM_FILL_MODE_NONE = 0
+
+[<Literal>]
+let RV_DOM_FILL_MODE_FORWARDS = 1
+
+[<Literal>]
+let RV_DOM_FILL_MODE_BACKWARDS = 2
+
+[<Literal>]
+let RV_DOM_FILL_MODE_BOTH = 3
+
+[<Literal>]
+let RV_DOM_FILL_MODE_AUTO = 4
+
+[<Literal>]
+let RV_DOM_FONT_FACE_LOAD_STATUS_UNLOADED = 0
+
+[<Literal>]
+let RV_DOM_FONT_FACE_LOAD_STATUS_LOADING = 1
+
+[<Literal>]
+let RV_DOM_FONT_FACE_LOAD_STATUS_LOADED = 2
+
+[<Literal>]
+let RV_DOM_FONT_FACE_LOAD_STATUS_ERROR = 3
+
+[<Literal>]
+let RV_DOM_FONT_FACE_SET_LOAD_STATUS_LOADING = 0
+
+[<Literal>]
+let RV_DOM_FONT_FACE_SET_LOAD_STATUS_LOADED = 1
+
+[<Literal>]
 let RV_DOM_HIGHLIGHT_TYPE_HIGHLIGHT = 0
 
 [<Literal>]
@@ -667,6 +742,12 @@ let RV_DOM_HIGHLIGHT_TYPE_SPELLING_ERROR = 1
 
 [<Literal>]
 let RV_DOM_HIGHLIGHT_TYPE_GRAMMAR_ERROR = 2
+
+[<Literal>]
+let RV_DOM_ITERATION_COMPOSITE_OPERATION_REPLACE = 0
+
+[<Literal>]
+let RV_DOM_ITERATION_COMPOSITE_OPERATION_ACCUMULATE = 1
 
 [<Literal>]
 let RV_DOM_ORIENTATION_TYPE_PORTRAIT_PRIMARY = 0
@@ -679,6 +760,18 @@ let RV_DOM_ORIENTATION_TYPE_LANDSCAPE_PRIMARY = 2
 
 [<Literal>]
 let RV_DOM_ORIENTATION_TYPE_LANDSCAPE_SECONDARY = 3
+
+[<Literal>]
+let RV_DOM_PLAYBACK_DIRECTION_NORMAL = 0
+
+[<Literal>]
+let RV_DOM_PLAYBACK_DIRECTION_REVERSE = 1
+
+[<Literal>]
+let RV_DOM_PLAYBACK_DIRECTION_ALTERNATE = 2
+
+[<Literal>]
+let RV_DOM_PLAYBACK_DIRECTION_ALTERNATE_REVERSE = 3
 
 [<Literal>]
 let RV_DOM_SCROLL_BEHAVIOR_AUTO = 0
@@ -801,6 +894,46 @@ type RvDomScrollToOptions =
     val mutable behavior: int
     val mutable left: nativeint
     val mutable top: nativeint
+
+/// <summary>The IDL dictionary KeyframeProperty; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomKeyframeProperty =
+    val mutable size: uint32
+    val mutable name: RvDomUtf8StringInput
+    val mutable value: RvDomUtf8StringInput
+
+/// <summary>The IDL dictionary Keyframe; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomKeyframe =
+    val mutable size: uint32
+    val mutable offset: nativeint
+    val mutable easing: RvDomUtf8StringInput
+    val mutable composite: RvDomUtf8StringInput
+    val mutable properties: nativeint
+
+/// <summary>The IDL dictionary KeyframeAnimationOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomKeyframeAnimationOptions =
+    val mutable size: uint32
+    val mutable delay: float
+    val mutable end_delay: float
+    val mutable fill: int
+    val mutable iteration_start: float
+    val mutable iterations: float
+    val mutable duration: nativeint
+    val mutable direction: int
+    val mutable easing: RvDomUtf8StringInput
+    val mutable iteration_composite: int
+    val mutable composite: int
+    val mutable pseudo_element: RvDomUtf8StringInput
+    val mutable id: RvDomUtf8StringInput
+    val mutable timeline: nativeint
+
+/// <summary>The IDL dictionary GetAnimationsOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomGetAnimationsOptions =
+    val mutable size: uint32
+    val mutable subtree: int
 
 /// <summary>The IDL dictionary ShowPopoverOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
@@ -1196,6 +1329,40 @@ type RvDomURLPatternResult =
     val mutable search: nativeint
     val mutable hash: nativeint
 
+/// <summary>The IDL dictionary FontFaceDescriptors; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomFontFaceDescriptors =
+    val mutable size: uint32
+    val mutable style: RvDomUtf8StringInput
+    val mutable weight: RvDomUtf8StringInput
+    val mutable stretch: RvDomUtf8StringInput
+    val mutable unicode_range: RvDomUtf8StringInput
+    val mutable feature_settings: RvDomUtf8StringInput
+    val mutable display: RvDomUtf8StringInput
+    val mutable size_adjust: RvDomUtf8StringInput
+
+/// <summary>The IDL dictionary KeyframeEffectOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomKeyframeEffectOptions =
+    val mutable size: uint32
+    val mutable delay: float
+    val mutable end_delay: float
+    val mutable fill: int
+    val mutable iteration_start: float
+    val mutable iterations: float
+    val mutable duration: nativeint
+    val mutable direction: int
+    val mutable easing: RvDomUtf8StringInput
+    val mutable iteration_composite: int
+    val mutable composite: int
+    val mutable pseudo_element: RvDomUtf8StringInput
+
+/// <summary>The IDL dictionary DocumentTimelineOptions; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomDocumentTimelineOptions =
+    val mutable size: uint32
+    val mutable origin_time: float
+
 /// <summary>The IDL dictionary DOMCSSCustomPropertyDescriptor; set <c>size</c> to <c>Marshal.SizeOf</c> of the struct.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomDOMCSSCustomPropertyDescriptor =
@@ -1270,6 +1437,13 @@ type RvDomSequenceElement =
     val mutable count: int
     val mutable items: nativeint
 
+/// <summary>ABI transport for WebAnimation sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceWebAnimation =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for ShadowRoot sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceShadowRoot =
@@ -1305,6 +1479,13 @@ type RvDomUnionBooleanOrImportNodeOptions =
     val mutable arm0: int
     val mutable arm1: nativeint
 
+/// <summary>ABI transport for Touch sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceTouch =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for Element sequence; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomSequenceElementNullable =
@@ -1331,6 +1512,52 @@ type RvDomUnionBooleanOrScrollIntoViewOptions =
     val mutable present: int
     val mutable tag: int
     val mutable arm0: int
+    val mutable arm1: nativeint
+
+/// <summary>ABI transport for KeyframeProperty sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceKeyframeProperty =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+/// <summary>ABI transport for Keyframe sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceKeyframeNullable =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_CSS_NUMERIC_VALUE_OR_DOM_STRING_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_CSS_NUMERIC_VALUE_OR_DOM_STRING_CSS_NUMERIC_VALUE = 2
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_CSS_NUMERIC_VALUE_OR_DOM_STRING_STRING = 3
+
+/// <summary>ABI transport for UnrestrictedDoubleOrCSSNumericValueOrDOMString; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
+    val mutable arm1: nativeint
+    val mutable arm2: RvDomUtf8StringSpan
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_KEYFRAME_ANIMATION_OPTIONS_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_KEYFRAME_ANIMATION_OPTIONS_KEYFRAME_ANIMATION_OPTIONS = 2
+
+/// <summary>ABI transport for UnrestrictedDoubleOrKeyframeAnimationOptions; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
     val mutable arm1: nativeint
 
 [<Literal>]
@@ -1798,6 +2025,48 @@ type RvDomSequenceAbstractRange =
     val mutable items: nativeint
 
 [<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_ARRAY_BUFFER_OR_ARRAY_BUFFER_VIEW_STRING = 1
+
+[<Literal>]
+let RV_DOM_UNION_DOM_STRING_OR_ARRAY_BUFFER_OR_ARRAY_BUFFER_VIEW_BINARY_DATA = 2
+
+/// <summary>ABI transport for DOMStringOrArrayBufferOrArrayBufferView; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionDOMStringOrArrayBufferOrArrayBufferView =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: RvDomUtf8StringSpan
+    val mutable arm1: RvDomByteSpan
+
+[<Literal>]
+let RV_DOM_UNION_UNSIGNED_LONG_OR_ANIMATION_FRAME_RATE_PRESET_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNSIGNED_LONG_OR_ANIMATION_FRAME_RATE_PRESET_ANIMATION_FRAME_RATE_PRESET = 2
+
+/// <summary>ABI transport for UnsignedLongOrAnimationFrameRatePreset; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUnsignedLongOrAnimationFrameRatePreset =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: uint32
+    val mutable arm1: int
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_KEYFRAME_EFFECT_OPTIONS_NUMBER = 1
+
+[<Literal>]
+let RV_DOM_UNION_UNRESTRICTED_DOUBLE_OR_KEYFRAME_EFFECT_OPTIONS_KEYFRAME_EFFECT_OPTIONS = 2
+
+/// <summary>ABI transport for UnrestrictedDoubleOrKeyframeEffectOptions; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions =
+    val mutable present: int
+    val mutable tag: int
+    val mutable arm0: float
+    val mutable arm1: nativeint
+
+[<Literal>]
 let RV_DOM_UNION_DOM_STRING_OR_CANVAS_GRADIENT_OR_CANVAS_PATTERN_STRING = 1
 
 [<Literal>]
@@ -1850,6 +2119,13 @@ type RvDomSequencePairUSVStringAndUnionFileOrUSVString =
     val mutable count: int
     val mutable items: nativeint
 
+/// <summary>ABI transport for FontFace sequence; result contents are owned until the matching release call.</summary>
+[<Struct; StructLayout(LayoutKind.Sequential)>]
+type RvDomSequenceFontFace =
+    val mutable present: int
+    val mutable count: int
+    val mutable items: nativeint
+
 /// <summary>ABI transport for DOMStringAndHighlight entry; result contents are owned until the matching release call.</summary>
 [<Struct; StructLayout(LayoutKind.Sequential)>]
 type RvDomPairDOMStringAndHighlight =
@@ -1877,6 +2153,9 @@ extern void rv_dom_sequence_css_style_sheet_release(RvDomSequenceCSSStyleSheet& 
 extern void rv_dom_sequence_element_release(RvDomSequenceElement& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_sequence_web_animation_release(RvDomSequenceWebAnimation& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_shadow_root_release(RvDomSequenceShadowRoot& value)
 
 [<DllImport(Lib)>]
@@ -1886,6 +2165,9 @@ extern void rv_dom_union_dom_string_or_element_creation_options_release(RvDomUni
 extern void rv_dom_union_boolean_or_import_node_options_release(RvDomUnionBooleanOrImportNodeOptions& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_sequence_touch_release(RvDomSequenceTouch& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_sequence_element_nullable_release(RvDomSequenceElementNullable& value)
 
 [<DllImport(Lib)>]
@@ -1893,6 +2175,18 @@ extern void rv_dom_sequence_dom_string_release(RvDomSequenceDOMString& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_boolean_or_scroll_into_view_options_release(RvDomUnionBooleanOrScrollIntoViewOptions& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_keyframe_property_release(RvDomSequenceKeyframeProperty& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_keyframe_nullable_release(RvDomSequenceKeyframeNullable& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_unrestricted_double_or_css_numeric_value_or_dom_string_release(RvDomUnionUnrestrictedDoubleOrCSSNumericValueOrDOMString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_unrestricted_double_or_keyframe_animation_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_union_boolean_or_unrestricted_double_or_dom_string_nullable_release(RvDomUnionBooleanOrUnrestrictedDoubleOrDOMStringNullable& value)
@@ -2021,6 +2315,15 @@ extern void rv_dom_sequence_pair_usv_string_and_union_undefined_or_usv_string_re
 extern void rv_dom_sequence_abstract_range_release(RvDomSequenceAbstractRange& value)
 
 [<DllImport(Lib)>]
+extern void rv_dom_union_dom_string_or_array_buffer_or_array_buffer_view_release(RvDomUnionDOMStringOrArrayBufferOrArrayBufferView& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_unsigned_long_or_animation_frame_rate_preset_release(RvDomUnionUnsignedLongOrAnimationFrameRatePreset& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_union_unrestricted_double_or_keyframe_effect_options_release(RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions& value)
+
+[<DllImport(Lib)>]
 extern void rv_dom_union_dom_string_or_canvas_gradient_or_canvas_pattern_release(RvDomUnionDOMStringOrCanvasGradientOrCanvasPattern& value)
 
 [<DllImport(Lib)>]
@@ -2037,6 +2340,9 @@ extern void rv_dom_pair_usv_string_and_union_file_or_usv_string_release(RvDomPai
 
 [<DllImport(Lib)>]
 extern void rv_dom_sequence_pair_usv_string_and_union_file_or_usv_string_release(RvDomSequencePairUSVStringAndUnionFileOrUSVString& value)
+
+[<DllImport(Lib)>]
+extern void rv_dom_sequence_font_face_release(RvDomSequenceFontFace& value)
 
 [<DllImport(Lib)>]
 extern void rv_dom_pair_dom_string_and_highlight_release(RvDomPairDOMStringAndHighlight& value)
@@ -2202,6 +2508,18 @@ extern void rv_dom_validity_state_release(nativeint handle)
 
 [<DllImport(Lib)>]
 extern nativeint rv_dom_validity_state_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_touch_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_touch_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_touch_list_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_touch_list_retain(nativeint handle)
 
 [<DllImport(Lib)>]
 extern void rv_dom_svg_rect_release(nativeint handle)
@@ -2426,6 +2744,24 @@ extern void rv_dom_highlight_registry_release(nativeint handle)
 extern nativeint rv_dom_highlight_registry_retain(nativeint handle)
 
 [<DllImport(Lib)>]
+extern void rv_dom_font_face_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_font_face_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_animation_effect_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_animation_effect_retain(nativeint handle)
+
+[<DllImport(Lib)>]
+extern void rv_dom_animation_timeline_release(nativeint handle)
+
+[<DllImport(Lib)>]
+extern nativeint rv_dom_animation_timeline_retain(nativeint handle)
+
+[<DllImport(Lib)>]
 extern void rv_dom_data_transfer_release(nativeint handle)
 
 [<DllImport(Lib)>]
@@ -2490,6 +2826,12 @@ extern int rv_dom_css_transform_component_get_interface_name(nativeint target, b
 
 [<DllImport(Lib)>]
 extern int rv_dom_event_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_effect_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_timeline_get_interface_name(nativeint target, byte[] buffer, int capacity, int[] length)
 
 [<DllImport(Lib)>]
 extern int rv_dom_node_get_node_type(nativeint target, uint16& result)
@@ -2732,6 +3074,9 @@ extern int rv_dom_shadow_root_element_from_point(nativeint target, float x, floa
 extern int rv_dom_shadow_root_elements_from_point(nativeint target, float x, float y, RvDomSequenceElement& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_shadow_root_get_animations(nativeint target, RvDomSequenceWebAnimation& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_shadow_root_set_html_unsafe(nativeint target, byte[] html, int html_length)
 
 [<DllImport(Lib)>]
@@ -2754,6 +3099,9 @@ extern int rv_dom_document_get_content_type(nativeint target, byte[] buffer, int
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_document_element(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_get_timeline(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_get_scrolling_element(nativeint target, nativeint& result)
@@ -2835,6 +3183,12 @@ extern int rv_dom_document_get_adopted_style_sheets(nativeint target, RvDomSeque
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_set_adopted_style_sheets(nativeint target, [<In>] RvDomSequenceCSSStyleSheet[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_get_pointer_lock_element(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_get_fonts(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_create_element(nativeint target, byte[] local_name, int local_name_length, [<In>] RvDomUnionDOMStringOrElementCreationOptions[] options, nativeint& result)
@@ -2924,6 +3278,9 @@ extern int rv_dom_document_query_command_value(nativeint target, byte[] command_
 extern int rv_dom_document_get_selection(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_document_create_touch_list(nativeint target, [<In>] RvDomSequenceTouch[] touches, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_document_prepend(nativeint target, [<In>] RvDomSequenceNodeOrDOMString[] nodes)
 
 [<DllImport(Lib)>]
@@ -2949,6 +3306,9 @@ extern int rv_dom_document_element_from_point(nativeint target, float x, float y
 
 [<DllImport(Lib)>]
 extern int rv_dom_document_elements_from_point(nativeint target, float x, float y, RvDomSequenceElement& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_get_animations(nativeint target, RvDomSequenceWebAnimation& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_dom_implementation_create_html_document(nativeint target, byte[] title, int title_length, nativeint& result)
@@ -3498,6 +3858,12 @@ extern int rv_dom_element_has_pointer_capture(nativeint target, int pointer_id, 
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_computed_style_map(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_animate(nativeint target, [<In>] RvDomSequenceKeyframeNullable[] keyframes, [<In>] RvDomUnionUnrestrictedDoubleOrKeyframeAnimationOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_element_get_animations(nativeint target, [<In>] RvDomGetAnimationsOptions[] options, RvDomSequenceWebAnimation& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_element_before(nativeint target, [<In>] RvDomSequenceNodeOrDOMString[] nodes)
@@ -8300,6 +8666,57 @@ extern int rv_dom_pointer_event_get_coalesced_events(nativeint target, RvDomSequ
 extern int rv_dom_pointer_event_get_predicted_events(nativeint target, RvDomSequencePointerEvent& result)
 
 [<DllImport(Lib)>]
+extern int rv_dom_touch_get_client_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_client_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_screen_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_screen_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_page_x(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_page_y(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_target(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_get_identifier(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_list_get_length(nativeint target, uint32& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_list_item(nativeint target, uint32 index, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_touches(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_target_touches(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_changed_touches(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_ctrl_key(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_shift_key(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_alt_key(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_touch_event_get_meta_key(nativeint target, int& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_wheel_event_create(nativeint target, byte[] ``type``, int type_length, [<In>] RvDomWheelEventInit[] event_init_dict, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -10397,6 +10814,222 @@ extern int rv_dom_file_reader_read_as_data_url(nativeint target, nativeint blob)
 extern int rv_dom_file_reader_abort(nativeint target)
 
 [<DllImport(Lib)>]
+extern int rv_dom_font_face_create(nativeint target, byte[] family, int family_length, [<In>] RvDomUnionDOMStringOrArrayBufferOrArrayBufferView[] source, [<In>] RvDomFontFaceDescriptors[] descriptors, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_family(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_family(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_style(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_style(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_weight(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_weight(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_width(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_width(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_stretch(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_stretch(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_unicode_range(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_unicode_range(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_feature_settings(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_feature_settings(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_display(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_display(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_ascent_override(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_ascent_override(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_descent_override(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_descent_override(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_line_gap_override(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_line_gap_override(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_size_adjust(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_size_adjust(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_get_status(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_get_size(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_get_status(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_has(nativeint target, nativeint font, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_add(nativeint target, nativeint font, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_delete(nativeint target, nativeint font, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_clear(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_check(nativeint target, byte[] font, int font_length, byte[] text, int text_length, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_create(nativeint target, nativeint effect, nativeint timeline, int timeline_present, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_id(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_set_id(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_effect(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_set_effect(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_timeline(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_set_timeline(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_start_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_set_start_time(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValueNullable[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_current_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_set_current_time(nativeint target, [<In>] RvDomUnionDoubleOrCSSNumericValueNullable[] value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_playback_rate(nativeint target, float& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_set_playback_rate(nativeint target, float value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_overall_progress(nativeint target, float& result, int& present)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_play_state(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_replace_state(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_get_pending(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_cancel(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_finish(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_play(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_pause(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_update_playback_rate(nativeint target, float playback_rate)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_reverse(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_persist(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_web_animation_commit_styles(nativeint target)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_create_3(nativeint target, nativeint target_, [<In>] RvDomSequenceKeyframeNullable[] keyframes, [<In>] RvDomUnionUnrestrictedDoubleOrKeyframeEffectOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_create_1(nativeint target, nativeint source, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_get_target(nativeint target, nativeint& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_set_target(nativeint target, nativeint value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_get_pseudo_element(nativeint target, byte[] buffer, int capacity, int[] length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_set_pseudo_element(nativeint target, byte[] value, int value_length)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_get_iteration_composite(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_set_iteration_composite(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_get_composite(nativeint target, int& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_set_composite(nativeint target, int value)
+
+[<DllImport(Lib)>]
+extern int rv_dom_keyframe_effect_set_keyframes(nativeint target, nativeint context, [<In>] RvDomSequenceKeyframeNullable[] keyframes)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_timeline_get_current_time(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_animation_timeline_get_duration(nativeint target, RvDomUnionDoubleOrCSSNumericValueNullable& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_document_timeline_create(nativeint target, [<In>] RvDomDocumentTimelineOptions[] options, nativeint& result)
+
+[<DllImport(Lib)>]
 extern int rv_dom_data_transfer_create(nativeint target, nativeint& result)
 
 [<DllImport(Lib)>]
@@ -10635,6 +11268,9 @@ extern int rv_dom_dom_form_data_entries(nativeint target, nativeint context, RvD
 
 [<DllImport(Lib)>]
 extern int rv_dom_url_search_params_entries(nativeint target, nativeint context, RvDomSequencePairUSVStringAndUSVString& result)
+
+[<DllImport(Lib)>]
+extern int rv_dom_font_face_set_values(nativeint target, RvDomSequenceFontFace& result)
 
 [<DllImport(Lib)>]
 extern int rv_dom_highlight_size(nativeint target, uint32& result)

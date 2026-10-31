@@ -357,6 +357,18 @@ the patch a non-empty `shadowRoots` list returned a text node of the control's u
 `tests/abi/caret_hit.py` replays the Chromium 156 oracle `tests/fixtures/caret-hit-oracle.json` with and without
 `shadowRoots`; its text-control points give `INPUT@1` both ways at device scales 1, 1.5 and 2.
 
+## 0043-media-capabilities-native-query
+
+`MediaCapabilitiesNativeQuery.h` declares `queryMediaDecodingInfo` and `queryMediaEncodingInfo`, defined at the end
+of `MediaCapabilities.cpp`: `decodingInfo()` and `encodingInfo()` for an embedder, without JavaScript or a promise.
+They run the file's own configuration validation, completing with TypeError for an invalid configuration, and its
+gather path: settings, allowed container and codec types, the VP9 gate, the WebRTC route and the media engine
+configuration factories. The promise path, `MediaCapabilities.h`, the navigator and every setting are unchanged.
+The new header is included only by `MediaCapabilities.cpp` and the host, so the patch recompiles one unified source.
+
+`tests/abi/media_capabilities.py` checks each case of `tests/fixtures/media-capabilities-cases.json` through
+`rv_media_decoding_info` and `rv_media_encoding_info`.
+
 ## Working on the series
 
 ```

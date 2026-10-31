@@ -1,0 +1,300 @@
+{
+  "group": [
+    "T02 font construction/registration (ranvier-org/Ranvier.WebCore#73)"
+  ],
+  "native": "0.1.0-preview.46",
+  "abi": 54,
+  "abiNote": "placeholder: ABI stays 54; the integration batch assigns the number",
+  "features": [
+    "font-face-load (new)",
+    "dom:FontFace",
+    "dom:FontFaceSet",
+    "dom-constructor:FontFace",
+    "dom-font-face-set-values"
+  ],
+  "members": [
+    "rv_font_face_load",
+    "rv_font_face_loaded",
+    "rv_dom_font_face_create",
+    "rv_dom_font_face_get_*/set_* (family, style, weight, width, stretch, unicodeRange, featureSettings, display, ascent/descent/lineGapOverride, sizeAdjust)",
+    "rv_dom_font_face_get_status",
+    "rv_dom_document_get_fonts",
+    "rv_dom_font_face_set_get_size/get_status/has/add/delete/clear/check/values",
+    "RV_DOM_FONT_FACE_LOAD_STATUS_*",
+    "RV_DOM_FONT_FACE_SET_LOAD_STATUS_*",
+    "RvDomFontFaceDescriptors",
+    "RvDomUnionDOMStringOrArrayBufferOrArrayBufferView",
+    "RvDomSequenceFontFace"
+  ],
+  "sourcePatch": "0048-fontface-loaded-rejection.patch (root-applied): DOMPromiseProxyWithResolveCallback::rejectionCode and FontFace::loadedPromise, inline, no layout change; its 25 reached units are recompiled",
+  "generator": {
+    "delta": "gen-delta.txt",
+    "checks": "gen-check.txt (Windows and WSL Ubuntu)",
+    "teachings": [
+      "byte-span typedef BinaryData: ArrayBuffer then ArrayBufferView arms",
+      "[CallWith]/[SetterCallWith] on contextSettingsObjects through the script execution context",
+      "value-iterable snapshots (FontFaceSet.values)"
+    ]
+  },
+  "qualifications": [
+    "WebKit serializes unicode-range in lowercase hexadecimal (U+0-10ffff); Chromium in uppercase.",
+    "WebKit FontFaceSet.check is true for an unloaded URL face it does not load; Chromium is false. Neither starts the load.",
+    "A family holding U+0000 reads back as the escaped CSS string \"Rv\\0 Nul\" in WebKit; Chromium keeps the raw NUL. The family reaches the engine whole, so the transport is length-delimited.",
+    "The engine accepts a face built in another document or host into a document's set (FontFaceSet.add); rv_font_face_load on such a face from the wrong host is RV_ERR_WRONG_HOST, and on a replaced document RV_ERR_DETACHED.",
+    "FontFaceSet construction, its load and ready promises and on* handlers stay out of the generated surface; T01 rv_fonts_* cover load, ready and events for document.fonts.",
+    "The metric-override descriptors (ascentOverride, descentOverride, lineGapOverride) are attributes only; FontFaceDescriptors leaves its setting-gated fields out.",
+    "TTF, CFF OTF, WOFF and WOFF2 load from bytes on win-x64 as in Chromium; other ports report through the CI probe."
+  ],
+  "sourceHeadOfBatch": "aabf041a96af170c5697c36e3d0ff7802f0e4b67",
+  "baseline": {
+    "batch": "C:\\wk\\native-fonts\\artifacts\\fonts-candidate-3-batch",
+    "head": "86f179b",
+    "rawAssertions": 90848,
+    "teardownCases": 104
+  },
+  "red": {
+    "native": "red-native.json (red_native.py)",
+    "chromium": "oracle-chromium.json (oracle_chromium.mjs, 156.0.8078.4)",
+    "finding": "ABI54 builds a font only from bytes through rv_font_load: no descriptors, URL source, FontFace handle or status, and no FontFaceSet registration; width 57.77 -> 80 -> 57.77 only on release"
+  },
+  "green": {
+    "fontConstructionAssertions": 249,
+    "report": {
+      "fallbackWidth": 57.7734375,
+      "bytes": {
+        "ahemTtf": {
+          "initial": 2,
+          "outcome": 0,
+          "status": 2
+        },
+        "ahemCff": {
+          "initial": 2,
+          "outcome": 0,
+          "status": 2
+        },
+        "robotoOtf": {
+          "initial": 2,
+          "outcome": 0,
+          "status": 2
+        },
+        "robotoWoff": {
+          "initial": 2,
+          "outcome": 0,
+          "status": 2
+        },
+        "robotoWoff2": {
+          "initial": 2,
+          "outcome": 0,
+          "status": 2
+        },
+        "invalid": {
+          "initial": 3,
+          "outcome": 2,
+          "status": 3
+        },
+        "empty": {
+          "initial": 3,
+          "outcome": 2,
+          "status": 3
+        },
+        "nul": {
+          "initial": 3,
+          "outcome": 2,
+          "status": 3
+        }
+      },
+      "defaults": {
+        "family": "Rv\u00e9\u5b57",
+        "style": "normal",
+        "weight": "normal",
+        "stretch": "normal",
+        "unicode_range": "U+0-10ffff",
+        "feature_settings": "normal",
+        "display": "auto",
+        "size_adjust": "100%",
+        "width": "normal"
+      },
+      "descriptors": {
+        "family": "RvDesc",
+        "style": "italic",
+        "weight": "bold",
+        "stretch": "condensed",
+        "unicode_range": "U+0-7f",
+        "feature_settings": "\"liga\" 0",
+        "display": "swap",
+        "size_adjust": "90%",
+        "width": "condensed"
+      },
+      "descriptorErrors": {
+        "weight": [
+          3,
+          2
+        ],
+        "style": [
+          3,
+          2
+        ],
+        "stretch": [
+          3,
+          2
+        ],
+        "unicode_range": [
+          3,
+          2
+        ],
+        "display": [
+          3,
+          2
+        ],
+        "feature_settings": [
+          3,
+          2
+        ],
+        "size_adjust": [
+          3,
+          2
+        ]
+      },
+      "setters": {
+        "weight=300": [
+          0,
+          "",
+          "300"
+        ],
+        "weight=heavy": [
+          -3,
+          "SyntaxError",
+          "300"
+        ],
+        "style=oblique 10deg": [
+          0,
+          "",
+          "oblique 10deg"
+        ],
+        "family=Renamed": [
+          0,
+          "",
+          "Renamed"
+        ],
+        "unicode_range=U+20-7E": [
+          0,
+          "",
+          "U+20-7e"
+        ],
+        "display=later": [
+          -3,
+          "SyntaxError",
+          "swap"
+        ]
+      },
+      "nulFamily": "\"Rv\\0 Nul\"",
+      "badSource": [
+        3,
+        [
+          2
+        ]
+      ],
+      "urlBadDescriptor": [
+        3,
+        [
+          2
+        ]
+      ],
+      "url": {
+        "200": [
+          0
+        ],
+        "201": [
+          0
+        ],
+        "202": [
+          1
+        ],
+        "203": [
+          1
+        ],
+        "204": [
+          0
+        ]
+      },
+      "registration": {
+        "widthBefore": 57.7734375,
+        "checkBefore": [
+          0,
+          1
+        ],
+        "afterAdd": [
+          "RvCss",
+          "RvAdded",
+          "RvSecond"
+        ],
+        "widthAfterAdd": 80.0,
+        "checkAfterAdd": [
+          0,
+          1
+        ],
+        "checkLazy": [
+          0,
+          1
+        ],
+        "addCss": [
+          0,
+          ""
+        ],
+        "afterDelete": [
+          "RvCss",
+          "RvSecond",
+          "RvLazy"
+        ],
+        "widthAfterDelete": 57.7734375,
+        "afterClear": [
+          "RvCss"
+        ],
+        "widthAfterClear": 57.7734375
+      },
+      "reload": [
+        "RvCss"
+      ],
+      "addOldCssFace": [
+        -3,
+        "InvalidModificationError"
+      ],
+      "addForeignFace": 0
+    },
+    "repeats": 30,
+    "repeatsDistinct": [
+      "PASS font construction: 249 assertions"
+    ],
+    "probes": 64,
+    "allExitZero": true,
+    "rawAssertions": 91097,
+    "baselineProbesSameCount": true,
+    "changedCounts": [],
+    "newProbes": [
+      "font_construction"
+    ],
+    "teardownCases": 104,
+    "teardownAllCollected": true
+  },
+  "files": {
+    "font-construction-evidence/baseline-comparison.json": "0827b34e6e1dcefaf7ba9df72e1adf44fb9e1637fbbdfbdafbdc27709545dbf6",
+    "font-construction-evidence/batch-green.json": "3408203696d9b1848a9c8ad53a675383a944ef53d90f2286c6be38d5d39db0ef",
+    "font-construction-evidence/build-receipt.json": "fba855c44ffeeb1a3bf1d643f6506c69173a926155198e2e18ea246a4ff8c391",
+    "font-construction-evidence/build_fontface_candidate.py": "e7c1cb537f96bd5c08aa1c0e3db3f9ddec843afacd0a227626320729323b6bca",
+    "font-construction-evidence/font-construction-probe.log": "44fb01b7db761da0983a676130cd26aec660eb3696218710bf19316b9f5304ab",
+    "font-construction-evidence/font-construction-report.json": "fb648509310e2d3d4e57743543fa0f6768a81dd922d030c95de1ad4e6cd19389",
+    "font-construction-evidence/gen-check.txt": "6e90601a98c21181f0a898198aa85b78f570b8f73e81fd6a3e73d2ace1e43865",
+    "font-construction-evidence/gen-delta.txt": "c16ddb31df0fc8819f56c6e219a2910ac9d18acc5458942cbf1f30e0c1d0b462",
+    "font-construction-evidence/gen_delta.py": "b5a5398769b0e6b45f763fbb51b190005f43ffc9568e42083040fafdcd308ed2",
+    "font-construction-evidence/make_fontface_evidence.py": "31a0f74e8ef3578dc8ceabd9b6642b91d7a542043ab0a4cf6e3a66da7c11eec6",
+    "font-construction-evidence/oracle-chromium.json": "3f4513b7f9e6955c6cc2034130ec83d95133f4c3f4a78980104ff7fa767b7322",
+    "font-construction-evidence/oracle_chromium.mjs": "34b8a8442ed089bf214cbdff1c66ef60d14d03cbd180306c33a6d9cb32318945",
+    "font-construction-evidence/red-native.json": "f1e0790141de1e7baab8e12e81f2818aba7163463f9d587e21ddb600d8b27dc8",
+    "font-construction-evidence/red_native.py": "641ab3486a63cebe836da12e515a2642be446d3d7efa926e8c313127a44f50a1",
+    "font-construction-evidence/repeat30-runs.txt": "cc96a3f59857cf1df7a6b15b638de749d697c78aede968097ce00d2a8a5744f0",
+    "font-construction-evidence/run_fontface_full_batch.py": "c21e1c46381d37917633c7572c6c39b09197189078ea10ddd366d3eb33a5f201",
+    "font-construction-evidence/runtime-receipt.json": "db00130bc038105878560ea0b807b407b7c382d1e3981dda82e5410303ec67fd",
+    "font-construction-evidence/source-patches.json": "cfed2025360109542808662f500468c04141e931fa42fdc829361bfbf8bd74be",
+    "font-construction-evidence/teardown-probes.json": "5483c939d925c8cc0f30c1cba7ddaad63258da92a314e64be68ea35fcde86432"
+  }
+}

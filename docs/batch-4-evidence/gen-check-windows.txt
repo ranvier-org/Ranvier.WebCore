@@ -1,0 +1,5 @@
+[0] tests/test_package_contract.py ::  OK 
+[0] tests/generator/test_domgen.py ::  OK 
+[0] scripts/capability_catalogue.py --check :: CAPABILITY_CATALOGUE_CHECK=PASS 
+[0] tests/abi/generate_native.py check :: header functions 300, Native.fs externs 300, differences 0 
+[0] gen/domgen.py check --source C:/wk/src :: interfaces 300, functions 2826 (getters 1497, setters 673, operations 546, constructors 61, namespace operations 4, static operations 19, iterator snapshots 4, context operations 22), handle types 73, constants 206, enumerations 20, dictionaries 55, stubs 0, left out 864 

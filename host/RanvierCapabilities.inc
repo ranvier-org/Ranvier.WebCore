@@ -25,7 +25,8 @@ static constexpr const char* capabilityFacilityNames[] = {
     "media-contrast", "media-pointer", "media-hover", "media-text-scale", "media-forced-colors", "media-contrast-less",
     "media-reduced-transparency", "media-reduced-data",
     "screen-wake-lock", "sleep-disabler-callback",
-    "notification-presenter"
+    "notification-presenter", "media-capabilities", "media-decoding-provider", "media-encoding-provider",
+    "snapshot-options", "snapshot-display-p3", "image-encoding-png", "image-encoding-jpeg", "image-encoding-webp"
 };
 
 static constexpr const char* capabilityHostFacilityNames[] = { "clipboard", "drop", "tooltip", "input", "ime", "scroll" };
@@ -264,6 +265,22 @@ static CapabilityResult capabilityQuery(RvHost& host, int category, const char* 
     else if (!std::strcmp(name, "notification-presenter")) { result.facts[1] = 1; result.boolean(!!host.notificationPresenter); }
     // No flavor ships a developer-tools frontend (WebInspectorUI) or connects one to the page's inspector controller.
     else if (!std::strcmp(name, "inspector-frontend")) { result.facts[1] = 0; result.facts[4] = 0; }
+    else if (!std::strcmp(name, "media-capabilities")) result.facts[1] = rv_abi_has(name);
+    else if (!std::strcmp(name, "snapshot-options")) result.facts[1] = rv_abi_has(name);
+    // A display-p3 snapshot needs the engine's DisplayP3 destination color space, compiled out on some flavors.
+    else if (!std::strcmp(name, "snapshot-display-p3")) {
+        result.facts[1] = snapshotDisplayP3() ? 1 : 0;
+        result.facts[4] = result.facts[1];
+    } else if (!std::strncmp(name, "image-encoding-", 15)) {
+        result.facts[1] = MIMETypeRegistry::isSupportedImageMIMETypeForEncoding(makeString("image/"_s, String::fromUTF8(name + 15))) ? 1 : 0;
+        result.facts[4] = result.facts[1];
+    }
+    // A media engine configuration provider answers MediaCapabilities queries; without one every valid query is unsupported.
+    else if (!std::strcmp(name, "media-decoding-provider") || !std::strcmp(name, "media-encoding-provider")) {
+        auto provider = ranvier_media_capabilities_provider(!std::strcmp(name, "media-encoding-provider"));
+        result.facts[1] = provider;
+        result.facts[4] = provider;
+    }
     else if (capabilityContains(capabilityHostFacilityNames, name)) result.facts[1] = 1;
     if (result.kind == 1) result.facts[2] = result.number ? 1 : 0;
     return result;

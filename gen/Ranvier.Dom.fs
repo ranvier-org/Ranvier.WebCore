@@ -161,6 +161,8 @@ and [<AllowNullLiteral>] ShadowRoot =
     abstract member elementFromPoint: x: float * y: float -> Element
     /// <summary>ShadowRoot.elementsFromPoint.</summary>
     abstract member elementsFromPoint: x: float * y: float -> (Element) array
+    /// <summary>ShadowRoot.getAnimations.</summary>
+    abstract member getAnimations: unit -> (WebAnimation) array
 
     /// <summary>ShadowRoot.styleSheets.</summary>
 #if FABLE_COMPILER
@@ -256,6 +258,8 @@ and [<AllowNullLiteral>] Document =
     abstract member ariaNotify: announcement: string -> unit
     /// <summary>Document.ariaNotify.</summary>
     abstract member ariaNotify: announcement: string * options: AriaNotifyOptions -> unit
+    /// <summary>Document.timeline.</summary>
+    abstract member timeline: DocumentTimeline with get
     /// <summary>Document.caretPositionFromPoint.</summary>
     abstract member caretPositionFromPoint: x: float * y: float * ?options: CaretPositionFromPointOptions -> CaretPosition
     /// <summary>Document.scrollingElement.</summary>
@@ -304,6 +308,8 @@ and [<AllowNullLiteral>] Document =
     abstract member visibilityState: VisibilityState with get
     /// <summary>Document.getSelection.</summary>
     abstract member getSelection: unit -> DOMSelection
+    /// <summary>Document.createTouchList.</summary>
+    abstract member createTouchList: [<System.ParamArray>] touches: Touch array -> TouchList
     /// <summary>Document.rootElement.</summary>
     abstract member rootElement: SVGSVGElement with get
     /// <summary>Document.getElementById.</summary>
@@ -314,6 +320,8 @@ and [<AllowNullLiteral>] Document =
     abstract member elementFromPoint: x: float * y: float -> Element
     /// <summary>Document.elementsFromPoint.</summary>
     abstract member elementsFromPoint: x: float * y: float -> (Element) array
+    /// <summary>Document.getAnimations.</summary>
+    abstract member getAnimations: unit -> (WebAnimation) array
 
     /// <summary>Document.styleSheets.</summary>
 #if FABLE_COMPILER
@@ -321,6 +329,10 @@ and [<AllowNullLiteral>] Document =
 #endif
     abstract member styleSheets: StyleSheetList with get
 
+    /// <summary>Document.pointerLockElement.</summary>
+    abstract member pointerLockElement: Element with get
+    /// <summary>Document.fonts.</summary>
+    abstract member fonts: FontFaceSet with get
 
 /// <summary>HTMLDocument in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] HTMLDocument =
@@ -475,6 +487,18 @@ and [<AllowNullLiteral>] Element =
     abstract member computedStyleMap: unit -> StylePropertyMapReadOnly
     /// <summary>Element.role.</summary>
     abstract member role: string with get, set
+
+    /// <summary>Element.animate.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.animate(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))($1), ((o)=>{if(o==null||typeof o!=='object')return o;const r={};for(const k of ['delay', 'endDelay', 'fill', 'iterationStart', 'iterations', 'direction', 'easing', 'iterationComposite', 'composite', 'pseudoElement', 'id', 'timeline'])if(o[k]!==undefined)r[k]=o[k];const d=o.duration;r.duration=d!=null&&typeof d==='object'&&Array.isArray(d.fields)?d.fields[0]:d;return r;})($2))")>]
+    abstract member __ranvier_animate: keyframes: (Keyframe) array * ?options: obj -> WebAnimation
+#else
+    abstract member animate: keyframes: (Keyframe) array -> WebAnimation
+    abstract member animate: keyframes: (Keyframe) array * options: float -> WebAnimation
+    abstract member animate: keyframes: (Keyframe) array * options: KeyframeAnimationOptions -> WebAnimation
+#endif
+    /// <summary>Element.getAnimations.</summary>
+    abstract member getAnimations: ?options: GetAnimationsOptions -> (WebAnimation) array
     /// <summary>Element.setHTMLUnsafe.</summary>
     abstract member setHTMLUnsafe: html: string -> unit
     /// <summary>Element.getHTML.</summary>
@@ -3283,6 +3307,50 @@ and [<AllowNullLiteral>] PointerEvent =
     /// <summary>PointerEvent.getPredictedEvents.</summary>
     abstract member getPredictedEvents: unit -> (PointerEvent) array
 
+/// <summary>Touch in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] Touch =
+    /// <summary>Touch.clientX.</summary>
+    abstract member clientX: float with get
+    /// <summary>Touch.clientY.</summary>
+    abstract member clientY: float with get
+    /// <summary>Touch.screenX.</summary>
+    abstract member screenX: float with get
+    /// <summary>Touch.screenY.</summary>
+    abstract member screenY: float with get
+    /// <summary>Touch.pageX.</summary>
+    abstract member pageX: float with get
+    /// <summary>Touch.pageY.</summary>
+    abstract member pageY: float with get
+    /// <summary>Touch.target.</summary>
+    abstract member target: EventTarget with get
+    /// <summary>Touch.identifier.</summary>
+    abstract member identifier: int with get
+
+/// <summary>TouchList in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TouchList =
+    /// <summary>TouchList.length.</summary>
+    abstract member length: uint32 with get
+    /// <summary>TouchList.item.</summary>
+    abstract member item: index: uint32 -> Touch
+
+/// <summary>TouchEvent in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] TouchEvent =
+    inherit UIEvent
+    /// <summary>TouchEvent.touches.</summary>
+    abstract member touches: TouchList with get
+    /// <summary>TouchEvent.targetTouches.</summary>
+    abstract member targetTouches: TouchList with get
+    /// <summary>TouchEvent.changedTouches.</summary>
+    abstract member changedTouches: TouchList with get
+    /// <summary>TouchEvent.ctrlKey.</summary>
+    abstract member ctrlKey: bool with get
+    /// <summary>TouchEvent.shiftKey.</summary>
+    abstract member shiftKey: bool with get
+    /// <summary>TouchEvent.altKey.</summary>
+    abstract member altKey: bool with get
+    /// <summary>TouchEvent.metaKey.</summary>
+    abstract member metaKey: bool with get
+
 /// <summary>WheelEvent in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] WheelEvent =
     inherit MouseEvent
@@ -5128,6 +5196,155 @@ and [<AllowNullLiteral>] FileReader =
     /// <summary>FileReader.abort.</summary>
     abstract member abort: unit -> unit
 
+/// <summary>FontFace in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FontFace =
+    /// <summary>FontFace.family.</summary>
+    abstract member family: string with get, set
+    /// <summary>FontFace.style.</summary>
+    abstract member style: string with get, set
+    /// <summary>FontFace.weight.</summary>
+    abstract member weight: string with get, set
+    /// <summary>FontFace.width.</summary>
+    abstract member width: string with get, set
+    /// <summary>FontFace.stretch.</summary>
+    abstract member stretch: string with get, set
+    /// <summary>FontFace.unicodeRange.</summary>
+    abstract member unicodeRange: string with get, set
+    /// <summary>FontFace.featureSettings.</summary>
+    abstract member featureSettings: string with get, set
+    /// <summary>FontFace.display.</summary>
+    abstract member display: string with get, set
+    /// <summary>FontFace.ascentOverride.</summary>
+    abstract member ascentOverride: string with get, set
+    /// <summary>FontFace.descentOverride.</summary>
+    abstract member descentOverride: string with get, set
+    /// <summary>FontFace.lineGapOverride.</summary>
+    abstract member lineGapOverride: string with get, set
+    /// <summary>FontFace.sizeAdjust.</summary>
+    abstract member sizeAdjust: string with get, set
+    /// <summary>FontFace.status.</summary>
+    abstract member status: FontFaceLoadStatus with get
+
+/// <summary>FontFaceSet in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] FontFaceSet =
+    inherit EventTarget
+    /// <summary>FontFaceSet.has.</summary>
+    abstract member has: font: FontFace -> bool
+    /// <summary>FontFaceSet.size.</summary>
+    abstract member size: int with get
+    /// <summary>FontFaceSet.add.</summary>
+    abstract member add: font: FontFace -> FontFaceSet
+    /// <summary>FontFaceSet.delete.</summary>
+    abstract member delete: font: FontFace -> bool
+    /// <summary>FontFaceSet.clear.</summary>
+    abstract member clear: unit -> unit
+    /// <summary>FontFaceSet.check.</summary>
+    abstract member check: font: string * ?text: string -> bool
+    /// <summary>FontFaceSet.status.</summary>
+    abstract member status: FontFaceSetLoadStatus with get
+
+/// <summary>WebAnimation in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] WebAnimation =
+    inherit EventTarget
+    /// <summary>WebAnimation.id.</summary>
+    abstract member id: string with get, set
+    /// <summary>WebAnimation.effect.</summary>
+    abstract member effect: AnimationEffect with get, set
+    /// <summary>WebAnimation.timeline.</summary>
+    abstract member timeline: AnimationTimeline with get, set
+
+    /// <summary>WebAnimation.startTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.startTime")>]
+    abstract member __ranvier_get_startTime: unit -> obj
+
+    [<Fable.Core.Emit("$0.startTime = $1")>]
+    abstract member __ranvier_set_startTime: value: obj -> unit
+#else
+    abstract member startTime: (DoubleOrCSSNumericValue) option with get, set
+#endif
+
+    /// <summary>WebAnimation.currentTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.currentTime")>]
+    abstract member __ranvier_get_currentTime: unit -> obj
+
+    [<Fable.Core.Emit("$0.currentTime = $1")>]
+    abstract member __ranvier_set_currentTime: value: obj -> unit
+#else
+    abstract member currentTime: (DoubleOrCSSNumericValue) option with get, set
+#endif
+    /// <summary>WebAnimation.playbackRate.</summary>
+    abstract member playbackRate: float with get, set
+    /// <summary>WebAnimation.overallProgress.</summary>
+    abstract member overallProgress: (float) option with get
+    /// <summary>WebAnimation.playState.</summary>
+    abstract member playState: AnimationPlayState with get
+    /// <summary>WebAnimation.replaceState.</summary>
+    abstract member replaceState: AnimationReplaceState with get
+    /// <summary>WebAnimation.pending.</summary>
+    abstract member pending: bool with get
+    /// <summary>WebAnimation.cancel.</summary>
+    abstract member cancel: unit -> unit
+    /// <summary>WebAnimation.finish.</summary>
+    abstract member finish: unit -> unit
+    /// <summary>WebAnimation.play.</summary>
+    abstract member play: unit -> unit
+    /// <summary>WebAnimation.pause.</summary>
+    abstract member pause: unit -> unit
+    /// <summary>WebAnimation.updatePlaybackRate.</summary>
+    abstract member updatePlaybackRate: playbackRate: float -> unit
+    /// <summary>WebAnimation.reverse.</summary>
+    abstract member reverse: unit -> unit
+    /// <summary>WebAnimation.persist.</summary>
+    abstract member persist: unit -> unit
+    /// <summary>WebAnimation.commitStyles.</summary>
+    abstract member commitStyles: unit -> unit
+
+/// <summary>AnimationEffect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] AnimationEffect = interface end
+
+/// <summary>KeyframeEffect in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] KeyframeEffect =
+    inherit AnimationEffect
+    /// <summary>KeyframeEffect.target.</summary>
+    abstract member target: Element with get, set
+    /// <summary>KeyframeEffect.pseudoElement.</summary>
+    abstract member pseudoElement: string with get, set
+    /// <summary>KeyframeEffect.iterationComposite.</summary>
+    abstract member iterationComposite: IterationCompositeOperation with get, set
+    /// <summary>KeyframeEffect.composite.</summary>
+    abstract member composite: CompositeOperation with get, set
+
+    /// <summary>KeyframeEffect.setKeyframes.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("((o,a0)=>o.setKeyframes(((k)=>k==null?null:k.map((f)=>{const r={};for(const p of f.properties??[])r[p.name]=p.value;if(f.offset!=null)r.offset=f.offset;if(f.easing!=null)r.easing=f.easing;if(f.composite!=null)r.composite=f.composite;return r;}))(a0)))($0,$1)")>]
+#endif
+    abstract member setKeyframes: keyframes: (Keyframe) array -> unit
+
+/// <summary>AnimationTimeline in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] AnimationTimeline =
+
+    /// <summary>AnimationTimeline.currentTime.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.currentTime")>]
+    abstract member __ranvier_get_currentTime: unit -> obj
+#else
+    abstract member currentTime: (DoubleOrCSSNumericValue) option with get
+#endif
+
+    /// <summary>AnimationTimeline.duration.</summary>
+#if FABLE_COMPILER
+    [<Fable.Core.Emit("$0.duration")>]
+    abstract member __ranvier_get_duration: unit -> obj
+#else
+    abstract member duration: (DoubleOrCSSNumericValue) option with get
+#endif
+
+/// <summary>DocumentTimeline in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral>] DocumentTimeline =
+    inherit AnimationTimeline
+
 /// <summary>DataTransfer in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] DataTransfer =
     /// <summary>DataTransfer.dropEffect.</summary>
@@ -5327,10 +5544,6 @@ and [<AllowNullLiteral>] TextTrackList =
 
 /// <summary>TimeRanges in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] TimeRanges = interface end
-
-/// <summary>TouchEvent in the scoped DOM interface model.</summary>
-and [<AllowNullLiteral>] TouchEvent =
-    inherit UIEvent
 
 /// <summary>ARIAMixin in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral>] ARIAMixin =
@@ -5574,6 +5787,12 @@ and [<AllowNullLiteral>] Slottable =
     /// <summary>Slottable.assignedSlot.</summary>
     abstract member assignedSlot: HTMLSlotElement with get
 
+/// <summary>UnrestrictedDoubleOrCSSNumericValueOrDOMString in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+    | UnrestrictedDouble of float
+    | CSSNumericValue of CSSNumericValue
+    | DOMString of string
+
 /// <summary>DOMStringOrElementCreationOptions in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] DOMStringOrElementCreationOptions =
     | DOMString of string
@@ -5588,6 +5807,11 @@ and [<RequireQualifiedAccess>] BooleanOrImportNodeOptions =
 and [<RequireQualifiedAccess>] BooleanOrScrollIntoViewOptions =
     | Boolean of bool
     | ScrollIntoViewOptions of ScrollIntoViewOptions
+
+/// <summary>UnrestrictedDoubleOrKeyframeAnimationOptions in the scoped DOM interface model.</summary>
+and [<RequireQualifiedAccess>] UnrestrictedDoubleOrKeyframeAnimationOptions =
+    | UnrestrictedDouble of float
+    | KeyframeAnimationOptions of KeyframeAnimationOptions
 
 /// <summary>BooleanOrUnrestrictedDoubleOrDOMString in the scoped DOM interface model.</summary>
 and [<RequireQualifiedAccess>] BooleanOrUnrestrictedDoubleOrDOMString =
@@ -5683,6 +5907,27 @@ and [<AllowNullLiteral; DomDictionary>] AddEventListenerOptions() =
     member val passive: (bool) option = None with get, set
     member val once: bool = false with get, set
 
+/// <summary>KeyframeEffectOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] KeyframeEffectOptions() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
+    member val composite: CompositeOperation = CompositeOperation.Replace with get, set
+    member val pseudoElement: string = null with get, set
+
+/// <summary>DocumentTimelineOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] DocumentTimelineOptions() =
+    member val originTime: float = 0 with get, set
+
 /// <summary>GetRootNodeOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] GetRootNodeOptions() =
     member val composed: bool = false with get, set
@@ -5735,6 +5980,41 @@ and [<AllowNullLiteral; DomDictionary>] ScrollToOptions() =
     member val behavior: ScrollBehavior = ScrollBehavior.Auto with get, set
     member val left: (float) option = None with get, set
     member val top: (float) option = None with get, set
+
+/// <summary>Keyframe in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] Keyframe() =
+    member val offset: (float) option = None with get, set
+    member val easing: (string) option = None with get, set
+    member val composite: (string) option = None with get, set
+    member val properties: (KeyframeProperty) array = [||] with get, set
+
+/// <summary>KeyframeProperty in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] KeyframeProperty() =
+    member val name: string = Unchecked.defaultof<_> with get, set
+    member val value: string = Unchecked.defaultof<_> with get, set
+
+/// <summary>KeyframeAnimationOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] KeyframeAnimationOptions() =
+    member val delay: float = 0 with get, set
+    member val endDelay: float = 0 with get, set
+    member val fill: FillMode = FillMode.Auto with get, set
+    member val iterationStart: float = 0.0 with get, set
+    member val iterations: float = 1.0 with get, set
+
+    member val duration: UnrestrictedDoubleOrCSSNumericValueOrDOMString =
+        UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString "auto" with get, set
+
+    member val direction: PlaybackDirection = PlaybackDirection.Normal with get, set
+    member val easing: string = "linear" with get, set
+    member val iterationComposite: IterationCompositeOperation = IterationCompositeOperation.Replace with get, set
+    member val composite: CompositeOperation = CompositeOperation.Replace with get, set
+    member val pseudoElement: string = null with get, set
+    member val id: string = "" with get, set
+    member val timeline: (AnimationTimeline) option = None with get, set
+
+/// <summary>GetAnimationsOptions in the scoped DOM interface model.</summary>
+and [<AllowNullLiteral; DomDictionary>] GetAnimationsOptions() =
+    member val subtree: bool = false with get, set
 
 /// <summary>ShowPopoverOptions in the scoped DOM interface model.</summary>
 and [<AllowNullLiteral; DomDictionary>] ShowPopoverOptions() =
@@ -5833,6 +6113,57 @@ and NodeFilterResult =
     | Accept = 1
     | Reject = 2
     | Skip = 3
+
+/// <summary>CompositeOperation in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] CompositeOperation =
+    | [<CompiledName("replace")>] Replace
+    | [<CompiledName("add")>] Add
+    | [<CompiledName("accumulate")>] Accumulate
+
+/// <summary>FillMode in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] FillMode =
+    | [<CompiledName("none")>] None
+    | [<CompiledName("forwards")>] Forwards
+    | [<CompiledName("backwards")>] Backwards
+    | [<CompiledName("both")>] Both
+    | [<CompiledName("auto")>] Auto
+
+/// <summary>IterationCompositeOperation in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] IterationCompositeOperation =
+    | [<CompiledName("replace")>] Replace
+    | [<CompiledName("accumulate")>] Accumulate
+
+/// <summary>PlaybackDirection in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] PlaybackDirection =
+    | [<CompiledName("normal")>] Normal
+    | [<CompiledName("reverse")>] Reverse
+    | [<CompiledName("alternate")>] Alternate
+    | [<CompiledName("alternate-reverse")>] AlternateReverse
+
+/// <summary>AnimationPlayState in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] AnimationPlayState =
+    | [<CompiledName("idle")>] Idle
+    | [<CompiledName("running")>] Running
+    | [<CompiledName("paused")>] Paused
+    | [<CompiledName("finished")>] Finished
+
+/// <summary>AnimationReplaceState in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] AnimationReplaceState =
+    | [<CompiledName("active")>] Active
+    | [<CompiledName("removed")>] Removed
+    | [<CompiledName("persisted")>] Persisted
+
+/// <summary>FontFaceLoadStatus in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] FontFaceLoadStatus =
+    | [<CompiledName("unloaded")>] Unloaded
+    | [<CompiledName("loading")>] Loading
+    | [<CompiledName("loaded")>] Loaded
+    | [<CompiledName("error")>] Error
+
+/// <summary>FontFaceSetLoadStatus in the scoped DOM interface model.</summary>
+and [<DomStringEnum; RequireQualifiedAccess>] FontFaceSetLoadStatus =
+    | [<CompiledName("loading")>] Loading
+    | [<CompiledName("loaded")>] Loaded
 
 /// <summary>AriaNotificationPriority in the scoped DOM interface model.</summary>
 and [<DomStringEnum; RequireQualifiedAccess>] AriaNotificationPriority =
@@ -5935,6 +6266,12 @@ module BrowserUnionAdapters =
         Fable.Core.Util.jsNative
 
 
+    let private boxUnrestrictedDoubleOrCSSNumericValueOrDOMString (value: UnrestrictedDoubleOrCSSNumericValueOrDOMString) : obj =
+        match value with
+        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.CSSNumericValue value -> box value
+        | UnrestrictedDoubleOrCSSNumericValueOrDOMString.DOMString value -> box value
+
     let private boxDOMStringOrElementCreationOptions (value: DOMStringOrElementCreationOptions) : obj =
         match value with
         | DOMStringOrElementCreationOptions.DOMString value -> box value
@@ -5949,6 +6286,11 @@ module BrowserUnionAdapters =
         match value with
         | BooleanOrScrollIntoViewOptions.Boolean value -> box value
         | BooleanOrScrollIntoViewOptions.ScrollIntoViewOptions value -> box value
+
+    let private boxUnrestrictedDoubleOrKeyframeAnimationOptions (value: UnrestrictedDoubleOrKeyframeAnimationOptions) : obj =
+        match value with
+        | UnrestrictedDoubleOrKeyframeAnimationOptions.UnrestrictedDouble value -> box value
+        | UnrestrictedDoubleOrKeyframeAnimationOptions.KeyframeAnimationOptions value -> box value
 
     let private boxBooleanOrUnrestrictedDoubleOrDOMString (value: BooleanOrUnrestrictedDoubleOrDOMString) : obj =
         match value with
@@ -6184,6 +6526,15 @@ module BrowserUnionAdapters =
         member this.scrollIntoView(arg: ScrollIntoViewOptions) : unit =
             this.__ranvier_scrollIntoView (?arg = Some (box arg))
 
+        member this.animate(keyframes: (Keyframe) array) : WebAnimation =
+            this.__ranvier_animate (keyframes, ?options = None)
+
+        member this.animate(keyframes: (Keyframe) array, options: float) : WebAnimation =
+            this.__ranvier_animate (keyframes, ?options = Some (box options))
+
+        member this.animate(keyframes: (Keyframe) array, options: KeyframeAnimationOptions) : WebAnimation =
+            this.__ranvier_animate (keyframes, ?options = Some (box options))
+
 
     type HTMLElement with
         member this.hidden
@@ -6415,6 +6766,56 @@ module BrowserUnionAdapters =
 
         member this.test(input: URLPatternInit, ?baseURL: string) : bool =
             this.__ranvier_test (?input = Some (box input), ?baseURL = baseURL)
+
+
+    type WebAnimation with
+        member this.startTime
+            with get (): (DoubleOrCSSNumericValue) option =
+                let value = this.__ranvier_get_startTime ()
+
+                if isNull value then
+                    None
+                else
+                    Some (unboxDoubleOrCSSNumericValue value)
+            and set (value: (DoubleOrCSSNumericValue) option) =
+                this.__ranvier_set_startTime (
+                    value
+                    |> Option.map boxDoubleOrCSSNumericValue
+                    |> Option.defaultValue null
+                )
+
+        member this.currentTime
+            with get (): (DoubleOrCSSNumericValue) option =
+                let value = this.__ranvier_get_currentTime ()
+
+                if isNull value then
+                    None
+                else
+                    Some (unboxDoubleOrCSSNumericValue value)
+            and set (value: (DoubleOrCSSNumericValue) option) =
+                this.__ranvier_set_currentTime (
+                    value
+                    |> Option.map boxDoubleOrCSSNumericValue
+                    |> Option.defaultValue null
+                )
+
+
+    type AnimationTimeline with
+        member this.currentTime: (DoubleOrCSSNumericValue) option =
+            let value = this.__ranvier_get_currentTime ()
+
+            if isNull value then
+                None
+            else
+                Some (unboxDoubleOrCSSNumericValue value)
+
+        member this.duration: (DoubleOrCSSNumericValue) option =
+            let value = this.__ranvier_get_duration ()
+
+            if isNull value then
+                None
+            else
+                Some (unboxDoubleOrCSSNumericValue value)
 
 
     type CanvasRenderingContext2D with
