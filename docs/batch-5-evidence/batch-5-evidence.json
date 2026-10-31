@@ -1,0 +1,101 @@
+{
+  "batch": "batch 5: canvas R02 paths, R03 state/transforms/compositing, R04 paints, R05 text, R06 pixels, R07 export/bitmaps, plus gen1 per-file typedefs and single-arm unions",
+  "numbers": {
+    "abi": 58,
+    "native": "0.1.0-preview.50",
+    "dom": "0.1.0-alpha.53",
+    "views": "0.1.43",
+    "backend": "0.1.0-alpha.43",
+    "absence": "docs/batch-5-evidence/allocation-absence.json",
+    "absenceSha256": "35fc863a6724bc9794c9615af5bad93d28c2b1ad0d87ca3dbb3faadefe5df7e7",
+    "viewsKinds": {
+      "Path2D": 112,
+      "ImageBitmap": 113,
+      "ImageData": 114,
+      "ImageBitmapRenderingContext": 115,
+      "TextMetrics": 116
+    }
+  },
+  "laneHeads": {
+    "canvasText": "ea98df1 (carries R04 65fe9d9, R03 b5c722f, R02 d2d209b, T01 86f179b)",
+    "canvasPixels": "56b4044 (R06 + R07, patches 0049 and 0050, encoder 22bc8ea)",
+    "gen1": "c0111a1"
+  },
+  "nativeHeadBuilt": "7cbabeb (glue compiled 2026-10-31T18:38Z from the 77b3844 tree; batch sourceHead 7cbabeb)",
+  "candidate": {
+    "dir": "artifacts/batch5-candidate-1",
+    "builder": "docs/batch-5-evidence/build_batch5_candidate.py",
+    "parent": "batch4-candidate-1 objects on C:/wk/pointer-build (read-only)",
+    "runtime": {
+      "WebCore.dll": "7c9db48c581f792ecb80ff80a272d8439c28ce8c9f988800b6aa9dab11a32cc5",
+      "RanvierWebCoreHost.dll": "02960194c81583d0ccfab0f47d37127a52eb4a7181f3105408d2f7110f3c2661",
+      "JavaScriptCore.dll": "1af0ee5fc6c4a907812cd16a92d72961786c3a631ffb81b14479f0123c9264dc"
+    },
+    "units": 141,
+    "reusedFromBatch4Candidate1": 33,
+    "recompiledUnits": 108,
+    "disassemblyEqualToBuild": 107,
+    "disassemblyDiffers": [
+      "UnifiedSource-html-16.cpp.obj"
+    ],
+    "disassemblyNote": "UnifiedSource-html-16 compiles ImageBitmap.cpp, which patches 0049 and 0050 change.",
+    "glueUnits": [
+      "RanvierCanvasExportGlue.cpp.obj",
+      "RanvierCanvasGlue.cpp.obj",
+      "RanvierCanvasPixelsGlue.cpp.obj",
+      "RanvierDomGlue.cpp.obj",
+      "RanvierEventGlue.cpp.obj",
+      "RanvierInspectGlue.cpp.obj",
+      "RanvierNotificationGlue.cpp.obj",
+      "RanvierPointerGlue.cpp.obj",
+      "RanvierResourceGlue.cpp.obj",
+      "RanvierSvgViewGlue.cpp.obj",
+      "RanvierTransferGlue.cpp.obj",
+      "RanvierViewportGlue.cpp.obj",
+      "RanvierWakeLockGlue.cpp.obj"
+    ],
+    "hostUnits": 5,
+    "borrowedBecauseTheyCompileALaterPatchCpp": [
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-animation-4.cpp.obj"
+    ],
+    "borrowedUnitsOlderThanImageBitmapHeader": {
+      "Source/WebCore/CMakeFiles/WebCore.dir/__/__/WebCore/DerivedSources/unified-sources/UnifiedSource-animation-4.cpp.obj": [
+        "c:/wk/src/source/webcore/html/imagebitmap.h"
+      ]
+    },
+    "laterPatches": "0051 (WebAnimation.cpp, WebAnimationPromiseObserver.h) is applied in C:/wk/src and stays out of batch 5; UnifiedSource-animation-4 is borrowed from the build, as in batch 4.",
+    "sourcePatchesSha256": "9e517d9edd1e559bd8ca8ded105823727a42841795266dfc702c3d6f99f5a33c",
+    "buildLog": "lost: two copies of the build chain ran (a stopped chain survived TaskStop); the second found the finished candidate and overwrote build-c1.log. The receipt files above and the per-unit logs in the candidate directory remain."
+  },
+  "nativeBatch": {
+    "runner": "docs/batch-5-evidence/run_batch5_full_batch.py",
+    "results": "artifacts/batch5-candidate-1-batch/results.json",
+    "resultsSha256": "04a15ff656f079039a01fdfd0b37b007d8391de41a6a62e7bdec88ddb1a7c8f6",
+    "raw": 99920,
+    "expectedRaw": "97854 (batch 4) + canvas_paths 325 + canvas_state 475 + canvas_paints 210 + canvas_text 473 + canvas_pixels 297 + canvas_export 286 = 99920",
+    "teardownRecords": 123,
+    "teardownAllCollected": true,
+    "countsChangedFromBatch4": {},
+    "canvasCounts": {
+      "canvas_context": 205,
+      "canvas_paths": 325,
+      "canvas_state": 475,
+      "canvas_paints": 210,
+      "canvas_text": 473,
+      "canvas_pixels": 297,
+      "canvas_export": 286
+    }
+  },
+  "generatorChecks": {
+    "windows": "docs/batch-5-evidence/gen-check-windows.txt",
+    "wslUbuntu": "docs/batch-5-evidence/gen-check-wsl-ubuntu.txt",
+    "generatorTests": 124
+  },
+  "managed": {
+    "run": "C:/wk/int5-tools/runs/run1",
+    "jitPassLines": 158,
+    "aotPassLines": 158,
+    "chromiumPassLines": 108,
+    "superset": "batch-4 run1 lines all present; new: R02 43, R03 26, R04 35, R05 80 (+teardown), R06 36 (+lifetime 3), R07 40 on JIT and AOT; R02-R07 on Chromium"
+  }
+}
