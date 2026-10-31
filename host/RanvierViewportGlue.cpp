@@ -9,6 +9,8 @@
 #include "Node.h"
 #include "DocumentPage.h"
 #include "Page.h"
+#include "ResizeObserver.h"
+#include "ResizeObserverOptions.h"
 #include <cstring>
 
 using namespace WebCore;
@@ -92,4 +94,9 @@ int32_t ranvier_media_query_media(RvEventTarget* handle, char* buffer, int32_t c
         return RV_ERR_BUFFER_TOO_SMALL;
     std::memcpy(buffer, bytes.data(), bytes.length());
     return RV_OK;
+}
+
+void ranvier_resize_observe_box(ResizeObserver& observer, Element& element, bool border)
+{
+    observer.observe(element, ResizeObserverOptions { border ? ResizeObserverBoxOptions::BorderBox : ResizeObserverBoxOptions::ContentBox });
 }

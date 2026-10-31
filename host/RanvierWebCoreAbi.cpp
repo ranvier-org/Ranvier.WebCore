@@ -125,6 +125,7 @@
 #include <WebCore/ResizeObserver.h>
 #include <WebCore/ResizeObserverCallback.h>
 #include <WebCore/ResizeObserverEntry.h>
+#include <WebCore/ResizeObserverSize.h>
 #include <WebCore/CSSAnimation.h>
 #include <WebCore/CSSComputedStyleDeclaration.h>
 #include <WebCore/CSSStyleDeclaration.h>
@@ -1317,6 +1318,7 @@ static_assert(sizeof(void*) != 8 || (sizeof(RvEventInit) == 112 && offsetof(RvEv
 static_assert(sizeof(RvScreenMetrics) == 36 && offsetof(RvScreenMetrics, avail_left) == 12 && offsetof(RvScreenMetrics, orientation) == 32);
 
 
+static_assert(sizeof(RvResizeEntry) == 96 && offsetof(RvResizeEntry, target) == 8 && offsetof(RvResizeEntry, contentX) == 16 && offsetof(RvResizeEntry, devicePixelBlockSize) == 88);
 static_assert(sizeof(RvWindowMetrics) == 32 && offsetof(RvWindowMetrics, outerHeight) == 16 && offsetof(RvWindowMetrics, devicePixelRatio) == 24);
 
 int32_t rv_abi_version(void) { return 52; }
@@ -1367,7 +1369,7 @@ int32_t rv_abi_has(const char* feature)
     if (!std::strcmp(feature, "accessibility-uia"))
         return 1;
 #endif
-    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text", "svg-document" }) {
+    for (auto* name : { "resize", "input", "frame", "event-details", "cursor", "scroll", "ime", "style", "geometry", "animation", "shadow", "text-selection", "observers", "snapshot", "partial-paint", "popups", "tooltip", "clipboard", "drop", "drag-out", "accessibility", "accessibility-text", "svg-document", "resize-entries" }) {
         if (!std::strcmp(feature, name))
             return 1;
     }
@@ -4087,6 +4089,7 @@ struct RvObserver {
     RefPtr<IntersectionObserverCallback> delivery;
     RefPtr<ResizeObserverCallback> resizeDelivery;
     RvResizeCallback resizeCallback { nullptr };
+    RvResizeEntriesCallback entriesCallback { nullptr };
     RvIntersectionCallback intersectionCallback { nullptr };
     void* context { nullptr };
 };
@@ -4110,6 +4113,32 @@ private:
 
     CallbackResult<void> invoke(ResizeObserver&, const Vector<Ref<ResizeObserverEntry>>& entries, ResizeObserver&) final
     {
+        if (owner && owner->entriesCallback) {
+            Vector<RvResizeEntry> copies;
+            copies.reserveInitialCapacity(entries.size());
+            for (auto& entry : entries) {
+                RvResizeEntry copy { };
+                copy.size = sizeof(RvResizeEntry);
+                copy.target = reinterpret_cast<RvNode*>(&entry->target());
+                auto& rect = entry->contentRect();
+                copy.contentX = rect.x();
+                copy.contentY = rect.y();
+                copy.contentWidth = rect.width();
+                copy.contentHeight = rect.height();
+                if (!entry->contentBoxSize().isEmpty()) {
+                    copy.contentInlineSize = entry->contentBoxSize()[0]->inlineSize();
+                    copy.contentBlockSize = entry->contentBoxSize()[0]->blockSize();
+                }
+                if (!entry->borderBoxSize().isEmpty()) {
+                    copy.borderInlineSize = entry->borderBoxSize()[0]->inlineSize();
+                    copy.borderBlockSize = entry->borderBoxSize()[0]->blockSize();
+                }
+                copies.append(copy);
+            }
+            // The entries keep their targets alive for the call; the callback may release the observer.
+            owner->entriesCallback(owner->context, owner, copies.span().data(), static_cast<int32_t>(copies.size()));
+            return { };
+        }
         for (auto& entry : entries) {
             if (!owner)
                 break;
@@ -4172,6 +4201,21 @@ RvObserver* rv_host_observe_resize(RvHost* host, RvResizeCallback callback, void
     return observer;
 }
 
+RvObserver* rv_host_observe_resize_entries(RvHost* host, RvResizeEntriesCallback callback, void* context)
+{
+    if (!host || !callback || !onOwningThread())
+        return nullptr;
+    Ref document = host->document();
+    Ref delivery = RvResizeDelivery::create(document.get());
+    auto* observer = new RvObserver;
+    observer->entriesCallback = callback;
+    observer->context = context;
+    observer->resize = ResizeObserver::create(document.get(), delivery.copyRef());
+    delivery->owner = observer;
+    observer->resizeDelivery = WTF::move(delivery);
+    return observer;
+}
+
 RvObserver* rv_host_observe_intersection(RvHost* host, RvIntersectionCallback callback, void* context, const char* rootMargin,
     const double* thresholds, int32_t thresholdCount)
 {
@@ -4216,6 +4260,21 @@ int32_t rv_observer_observe(RvObserver* observer, RvNode* target)
     return RV_OK;
 }
 
+int32_t rv_observer_observe_box(RvObserver* observer, RvNode* target, int32_t box)
+{
+    if (!observer || !target)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (!observer->resize || (box != RV_RESIZE_BOX_CONTENT && box != RV_RESIZE_BOX_BORDER))
+        return RV_ERR_UNSUPPORTED;
+    RefPtr element = elementOf(target);
+    if (!element)
+        return RV_ERR_NOT_ELEMENT;
+    ranvier_resize_observe_box(*observer->resize, *element, box == RV_RESIZE_BOX_BORDER);
+    return RV_OK;
+}
+
 int32_t rv_observer_unobserve(RvObserver* observer, RvNode* target)
 {
     if (!observer || !target)
@@ -4229,6 +4288,19 @@ int32_t rv_observer_unobserve(RvObserver* observer, RvNode* target)
         observer->resize->unobserve(*element);
     else
         observer->intersection->unobserve(*element);
+    return RV_OK;
+}
+
+int32_t rv_observer_disconnect(RvObserver* observer)
+{
+    if (!observer)
+        return RV_ERR_NULL_ARGUMENT;
+    if (!onOwningThread())
+        return RV_ERR_WRONG_THREAD;
+    if (observer->resize)
+        observer->resize->disconnect();
+    else
+        observer->intersection->disconnect();
     return RV_OK;
 }
 

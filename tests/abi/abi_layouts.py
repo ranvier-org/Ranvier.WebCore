@@ -20,6 +20,10 @@ LAYOUTS = {
                      ('screenX', D), ('screenY', D), ('clientX', D), ('clientY', D), ('button', I), ('buttons', I), ('key', P),
                      ('code', P), ('location', I), ('repeat', I), ('isComposing', I), ('relatedTarget', P), ('customDetailJson', P)],
                     112, [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56, 60, 64, 72, 80, 84, 88, 96, 104], 'EventInit'),
+    'RvResizeEntry': ([('size', I), ('hasDevicePixel', I), ('target', P), ('contentX', D), ('contentY', D), ('contentWidth', D),
+                       ('contentHeight', D), ('contentInlineSize', D), ('contentBlockSize', D), ('borderInlineSize', D),
+                       ('borderBlockSize', D), ('devicePixelInlineSize', D), ('devicePixelBlockSize', D)], 96,
+                      [0, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88], 'ResizeEntry'),
     # Views mirrors RvWindowMetrics as WindowMetrics in Ranvier.View.WebCore/Viewport.fs; its fixture checks the mirror.
     'RvWindowMetrics': ([('size', I), ('innerWidth', I), ('innerHeight', I), ('outerWidth', I), ('outerHeight', I),
                          ('devicePixelRatio', D)], 32, [0, 4, 8, 12, 16, 24], None),
